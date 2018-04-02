@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Guesser;
 
-use Symfony\Component\Form\Guess\TypeGuess;
-
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 {

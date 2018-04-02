@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\LocaleBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class LocalizationController extends Controller
 {
@@ -103,7 +102,7 @@ class LocalizationController extends Controller
      */
     protected function update(Localization $localization)
     {
-        $form = $this->createForm('oro_localization', $localization);
+        $form = $this->createForm(LocalizationType::class, $localization);
 
         /** @var $handler UpdateHandler */
         $handler = $this->get('oro_form.model.update_handler');

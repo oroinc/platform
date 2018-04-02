@@ -3,12 +3,11 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
-
-use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class EntityPaginationStorageTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication;
 
+use JDare\ClankBundle\Server\App\Handler\TopicHandler;
+use Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler;
 use Psr\Log\LoggerInterface;
-
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\Wamp\WampConnection;
 use Ratchet\WebSocket\Version\RFC6455\Connection;
-
-use JDare\ClankBundle\Server\App\Handler\TopicHandler;
-
-use Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler;
 
 class AuthenticationTopicHandlerTest extends \PHPUnit_Framework_TestCase
 {

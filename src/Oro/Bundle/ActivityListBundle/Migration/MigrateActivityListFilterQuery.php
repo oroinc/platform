@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ActivityListBundle\Migration;
 
 use Doctrine\DBAL\Types\Type;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class MigrateActivityListFilterQuery extends ParametrizedSqlMigrationQuery
 {

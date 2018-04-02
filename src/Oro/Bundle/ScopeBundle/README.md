@@ -1,7 +1,8 @@
-Scopes
-------
+# Scopes
 
-Scope in Oro applications arms you with additional abstraction layer and helps you get the missing information about the execution context in a standard and controllable way. With a scope approach your bundle can launch an alternative behavior and modify displayed data based on the information from the scope that indirectly matches current execution context.
+OroScopeBundle introduces the Scope entity into the Oro applications. A scope is a set of application parameters that have different values in different requests.
+
+OroScopeBundle enables developers to establish a relation between scopes and other application data, then calculate current scopes at runtime at any point of the application flow and obtain authorized data for the scope.
 
 For working example of using scopes in Oro application, please check out the *VisibilityBundle* and *AccountBundle* code.
 
@@ -16,31 +17,31 @@ For working example of using scopes in Oro application, please check out the *Vi
 * [Example: Using Related Scopes](#example-using-related-scopes)
 * [Example: Using Scope Criteria](#example-using-scope-criteria)
 
-How Scopes work
----------------
+## How Scopes work
+
 Sometimes in a bundle activities, you need to alter behavior or data based on the set of criteria that the bundle is not able to evaluate. Scope Manager gets you the missing details by polling dedicated Scope Criteria Providers. In the scope-consuming bundle, you can request information using one of the [Scope Operations](#scope-operations). As a first parameter, you usually pass the scope type (e.g. web_content in the following examples). Scope type helps Scope Manager find the scope-provider bundles who can deliver the information your bundle is missing. As the second parameter, you usually pass the context - information available to your bundle that is used as a scope filtering criteria. **Note:** Scope Manager evaluates the priority of the Scope Criteria Providers who are registered to deliver information for the requested scope type and scope criterion, and sorts the results based on the criterion priority. 
 
-Scope Manager
--------------
+## Scope Manager
+
 Scope Manager is a service that provides an interface for collecting the scope items in Oro application. It is in charge of the following functions:
 * Expose scope-related operations (find, findOrCreate, findDefaultScope, findRelatedScopes) to the scope-aware bundles and deliver requested scope(s) as a result. See [Scope Operations](#scope-operations) for more information.
 * Create a collected scope in response to the findOrCreate operation (if the scope is not found).
 * Call Scope Criteria Provider's getCriteriaForCurrentScope() method to get a portion of the scope information.
 
-Scope Criteria Providers
-------------------------
+## Scope Criteria Providers
+
 Scope Criteria Provider is a service that calculates the value for the scope criterion based on the provided context. Scope criteria help model a relationship between the scope and the scope-consuming context. In any bundle, you can create a [Scope Criteria Provider](#configuring-scope-criteria-providers) service and register it as scope provider for the specific scope type. This service shall deliver the scope criterion value to the Scope Manager, who, in turn, use the scope criteria to filter the scope instances or find the one matching to the provided context.
 
-Scope Type
-----------
+## Scope Type
+
 Scope Type is a tag that groups scope providers that are used by particular scope consumers. One scope provider may be reused in several scope types. It may happen, that a particular scope criteria provider, like the one for Account Group, is not involved in the scope construction because it serves the scope-consumers with the different scope type (e.g. web_content). In this case, Scope Manager looks for the scope(s) that do(es) not prompt to evaluate this criterion. 
 
-Scope Model
------------
+## Scope Model
+
 Scope model is a data structure for storing scope items. Every scope item has fields for every scope criterion registered by the scope criteria provider services. When the scope criterion is not involved in the scope (based on the scope type), the value of the field is NULL.
 
-Add Scope Criterion
--------------------
+## Add Scope Criterion
+
 To add criterion to the scope, extend Scope entity using migration, as shown int the following example:
 ```
 class OroAccountBundleScopeRelations implements Migration, ScopeExtensionAwareInterface
@@ -63,8 +64,8 @@ class OroAccountBundleScopeRelations implements Migration, ScopeExtensionAwareIn
 
 ```
 
-Configuring Scope Criteria Providers
-------------------------------------
+## Configuring Scope Criteria Providers
+
 To extend a scope with a criterion that may be provided by your bundle:
 
 1. Create a **Scope<your criterion name>CriteriaProvider** class and implement getCriteriaForCurrentScope() and getCriteriaField() methods, as shown in the following examples. 
@@ -109,12 +110,12 @@ oro_customer.account_scope_criteria_provider:
 ```
 **Note:** One CriteriaScopeProvider can be used in many scope types.
 
-Using Context
--------------
+## Using Context
+
 When you need to find a scope based on the information that differs from the current context, you can pass the custom context (array or object) as a second parameter of *find* and *findOrCreate* method.
 
-Scope Operations
-----------------
+## Scope Operations
+
 Scope Manager exposes the following operations for the scope-consuming bundles:
 
 Find scope by context (when the context is provided), or
@@ -138,8 +139,8 @@ Get all scopes that match given context. When some scope criteria are not provid
 $scopeManager->findRelatedScopes($scopeType, $context = null);
 ```
 
-Example: Using related scopes
------------------------------
+## Example: Using related scopes
+
 For example, let's create the following scope criteria providers and register them for the *web_content* scope type. 
 
 * ScopeAccountCriteriaProvider (priority:300)
@@ -190,8 +191,7 @@ The resulting scopes delivered to the scope consumer by Scope Manager are:
 |1|1||1|
 |3|1||2|
 
-Example: Using Scope Criteria
------------------------------
+## Example: Using Scope Criteria
 
 When the slug URLs are linked to the scopes, in a many-to-many way, and we need to find a slug URL related to the scope with the highest priority, fitting best for the current context, this is what happens:
 

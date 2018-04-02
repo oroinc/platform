@@ -3,12 +3,11 @@
 namespace Oro\Bundle\UserBundle\Command;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
 
 class UpdateUserCommand extends CreateUserCommand
 {

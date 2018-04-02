@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\DataTransformer;
 
-use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class ScopeTransformerTest extends \PHPUnit_Framework_TestCase

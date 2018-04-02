@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class ConfigProviderBagTest extends \PHPUnit_Framework_TestCase
 {

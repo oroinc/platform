@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\FieldAcl;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Extension\FieldAcl\FieldAclExtension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
 {

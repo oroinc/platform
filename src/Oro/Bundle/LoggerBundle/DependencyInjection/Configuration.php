@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LoggerBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class Configuration implements ConfigurationInterface
 {

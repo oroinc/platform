@@ -181,7 +181,7 @@ define(function(require) {
                     setTimeout(function() {
                         instance.trigger('sync', instance, {foo: 'bar'});
                         done();
-                    });
+                    }, 1);
                 });
 
                 it('time mark of data  is updated in cache', function() {

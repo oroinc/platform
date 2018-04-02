@@ -9,7 +9,6 @@ define(function(require) {
     var Modal = require('oroui/js/modal');
 
     AttributeGroupComponent = BaseComponent.extend({
-
         /**
          * @property {Object}
          */
@@ -26,6 +25,13 @@ define(function(require) {
          * @property {String}
          */
         removeBtn: '.removeRow.btn-link',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function AttributeGroupComponent() {
+            AttributeGroupComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

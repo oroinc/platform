@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Validator\Constraints;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 class DefaultLocalizationValidator extends ConstraintValidator
 {

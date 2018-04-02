@@ -3,9 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -13,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class EmailActivityManager
 {

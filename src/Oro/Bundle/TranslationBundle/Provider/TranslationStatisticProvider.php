@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-
 use Psr\Log\LoggerInterface;
 
 class TranslationStatisticProvider

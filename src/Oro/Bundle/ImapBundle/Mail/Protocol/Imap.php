@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
-use Zend\Mail\Storage\Exception as BaseException;
-
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
+use Zend\Mail\Storage\Exception as BaseException;
 
 /**
  * Class Imap

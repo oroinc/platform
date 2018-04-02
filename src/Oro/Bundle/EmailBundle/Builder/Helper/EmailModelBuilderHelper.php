@@ -4,10 +4,6 @@ namespace Oro\Bundle\EmailBundle\Builder\Helper;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Templating\EngineInterface;
-
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
@@ -22,6 +18,8 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

@@ -6,12 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
@@ -19,6 +13,11 @@ use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
@@ -32,8 +31,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);
 
@@ -47,6 +44,22 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
         $this->type = new WorkflowVariablesType($this->variableGuesser, $managerRegistry);
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type
+                ],
+                []
+            ),
+        ];
     }
 
     public function testBuildForm()
@@ -104,7 +117,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->variableGuesser->expects($this->at($number))->method('guessVariableForm')->willReturn($typeGuess);
         }
 
-        $form = $this->factory->create($this->type, null, $formOptions);
+        $form = $this->factory->create(WorkflowVariablesType::class, null, $formOptions);
 
         $this->assertSameSize($childrenOptions, $form->all());
 

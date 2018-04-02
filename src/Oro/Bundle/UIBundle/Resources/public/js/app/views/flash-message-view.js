@@ -23,6 +23,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function FlashMessageView() {
+            FlashMessageView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             if (this.initializeMessenger) {
                 this._initializeMessenger();

@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormConfigInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Test\FormInterface;
-
-use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\EventListener\ConfigTypeSubscriber;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 
 class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 {

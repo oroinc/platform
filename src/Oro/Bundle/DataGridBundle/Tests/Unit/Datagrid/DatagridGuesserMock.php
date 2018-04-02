@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Special DatagridGuesser mock used for testing purposes.

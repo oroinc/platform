@@ -3,14 +3,12 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRole;
+use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
+use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
 {

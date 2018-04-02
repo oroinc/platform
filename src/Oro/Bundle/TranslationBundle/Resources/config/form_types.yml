@@ -4,23 +4,20 @@ parameters:
 
 services:
     oro_translation.form.type.translatable_entity:
-        class: %oro_translation.form.type.translatable_entity.class%
+        class: '%oro_translation.form.type.translatable_entity.class%'
         arguments: ["@doctrine"]
         tags:
             - { name: form.type, alias: translatable_entity }
 
-    oro_translation.form.type.jqueryselect2_translatable_entity:
-        parent: oro_form.type.select2
-        arguments:
-            - 'Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType'
-            - 'oro_select2_translatable_entity'
+    oro_translation.form.type.select2_translatable_entity:
+        class: Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType
         tags:
             - { name: form.type, alias: oro_select2_translatable_entity }
 
     oro_translation.form.extension.translatable_choice:
-        class: %oro_translation.form.extension.translatable_choice.class%
+        class: '%oro_translation.form.extension.translatable_choice.class%'
         tags:
-            - { name: form.type_extension, alias: choice }
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType, alias: choice }
 
     oro_translation.form.type.add_language:
         class: 'Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType'

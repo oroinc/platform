@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Symfony\Component\EventDispatcher\Event;
 
 class EmailBodyAdded extends Event
 {

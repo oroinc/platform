@@ -4,11 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -16,13 +11,16 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
+ * Provides totals aggregation, which will be shown in grid's footer.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrmTotalsExtension extends AbstractExtension
@@ -302,9 +300,11 @@ class OrmTotalsExtension extends AbstractExtension
         $queryBuilder = clone $this->masterQB;
         $queryBuilder
             ->select($totalQueries)
-            ->resetDQLPart('groupBy');
+            ->resetDQLParts(['groupBy', 'having']);
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
+
+        QueryBuilderUtil::removeUnusedParameters($queryBuilder);
 
         $query = $queryBuilder->getQuery();
 

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
 
 /**
  * This compiler pass hides detailed logs handler's nested handler for all channels

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class MailboxGridType extends AbstractType
 {
@@ -29,6 +30,6 @@ class MailboxGridType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 }

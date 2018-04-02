@@ -1,14 +1,13 @@
-OroLoggerBundle
-===============
+# OroLoggerBundle
 
-This bundle extends functionality of [MonologBundle](https://github.com/symfony/monolog-bundle) to provide:
-* [Error logs email notifications](#error-logs-email-notifications)
-* [Ability to temporarily decrease log level](#temporarily-decrease-log-level)
-* [Logging Console Commands](#logging-console-commands)
+OroLoggerBundle extends the [MonologBundle](https://github.com/symfony/monolog-bundle) functionality and provides:
+* [error logs email notifications](#error-logs-email-notifications)
+* [ability to temporarily decrease log level](#temporarily-decrease-log-level)
+* [console commands logging](#logging-console-commands)
 
-Please see Symfony [documentation](http://symfony.com/doc/current/logging.html) for more details how to use [MonologBundle](https://github.com/symfony/monolog-bundle).
+For more details on how to use [MonologBundle](https://github.com/symfony/monolog-bundle), refer to the Symfony [documentation](http://symfony.com/doc/current/logging.html).
 
-### Error Logs Email Notifications
+## Error Logs Email Notifications
 To enable error logs email notification run console command `oro:logger:email-notification` with semicolons separated 
 recipients, for example:  
 
@@ -21,7 +20,7 @@ notifications` section.
 
 To change log level for email notifications update `monolog.handlers.swift.level` parameter at `config_prod.yml`. 
 
-### Temporarily Decrease Log Level
+## Temporarily Decrease Log Level
 Default log level at production environment is specified by `oro_logger.detailed_logs_default_level` container parameter 
 and equals to `error`, you can update it at application configuration.
 
@@ -35,7 +34,7 @@ Where `debug` is log level and `1 hour` is time interval when the level will be 
 
 Also you can decrease log level system wide by skipping `--user` option.
 
-### Logging Console Commands
+## Logging Console Commands
 
 All console commands logged automatically on **ConsoleEvents::COMMAND** and **ConsoleEvents::EXCEPTION**, see [ConsoleCommandSubscriber](./EventSubscriber/ConsoleCommandSubscriber.php).
 

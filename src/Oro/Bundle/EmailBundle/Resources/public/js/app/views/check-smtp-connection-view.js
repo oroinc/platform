@@ -12,13 +12,29 @@ define(function(require) {
 
     CheckConnectionView = BaseView.extend({
         route: 'oro_email_check_smtp_connection',
+
         entity: 'user',
+
         entityId: 0,
+
         organization: '',
+
         requestPrefix: 'oro_email_configuration',
+
         events: {
             'click [data-role=check-smtp-connection]': 'checkSmtpConnection'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function CheckConnectionView() {
+            CheckConnectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['entity', 'entityId', 'organization']));
         },

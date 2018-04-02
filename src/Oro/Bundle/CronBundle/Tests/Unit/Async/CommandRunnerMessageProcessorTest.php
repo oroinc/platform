@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\MessageQueue\Job\Job;
+use Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor;
+use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-
-use Oro\Bundle\CronBundle\Async\CommandRunnerMessageProcessor;
-use Oro\Bundle\CronBundle\Async\Topics;
+use Psr\Log\LoggerInterface;
 
 class CommandRunnerMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

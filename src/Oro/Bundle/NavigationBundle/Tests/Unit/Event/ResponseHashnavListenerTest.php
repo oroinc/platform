@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\Cron;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
@@ -11,9 +9,10 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapServices;
 use Oro\Bundle\ImapBundle\Connector\ImapServicesFactory;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
+use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @dbIsolationPerTest

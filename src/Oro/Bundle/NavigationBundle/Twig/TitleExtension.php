@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TitleExtension extends \Twig_Extension
 {

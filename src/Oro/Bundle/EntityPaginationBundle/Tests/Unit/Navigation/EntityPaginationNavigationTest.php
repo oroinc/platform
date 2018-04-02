@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Navigation;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Filter;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;

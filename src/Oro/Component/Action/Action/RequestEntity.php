@@ -4,13 +4,11 @@ namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class RequestEntity extends AbstractAction
 {

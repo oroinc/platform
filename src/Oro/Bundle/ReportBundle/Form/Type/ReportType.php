@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
+use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
-use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 
 class ReportType extends AbstractQueryDesignerType
 {
@@ -18,7 +17,7 @@ class ReportType extends AbstractQueryDesignerType
     {
         $builder
             ->add('name', 'text', array('required' => true))
-            ->add('entity', 'oro_report_entity_choice', array('required' => true))
+            ->add('entity', ReportEntityChoiceType::class, array('required' => true))
             ->add(
                 'type',
                 EntityType::class,
@@ -26,7 +25,7 @@ class ReportType extends AbstractQueryDesignerType
                     'class'       => 'OroReportBundle:ReportType',
                     'choice_label'    => 'label',
                     'required'    => true,
-                    'empty_value' => 'oro.report.form.choose_report_type'
+                    'placeholder' => 'oro.report.form.choose_report_type'
                 )
             )
             ->add(
@@ -39,7 +38,7 @@ class ReportType extends AbstractQueryDesignerType
             )
             ->add(
                 'chartOptions',
-                'oro_report_chart',
+                ReportChartType::class,
                 array('required' => true)
             )
             ->add('description', 'textarea', array('required' => false));
@@ -59,7 +58,7 @@ class ReportType extends AbstractQueryDesignerType
             $this->getDefaultOptions(),
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
-                'intention'          => 'report',
+                'csrf_token_id'      => 'report',
                 'query_type'         => 'report',
             )
         );

@@ -6,12 +6,13 @@ define([
 ], function(Backbone, routing, RegionModel, _) {
     'use strict';
 
+    var AddressRegionCollection;
     /**
      * @export  oroaddress/js/region/collection
      * @class   oroaddress.region.Collection
      * @extends Backbone.Collection
      */
-    return Backbone.Collection.extend({
+    AddressRegionCollection = Backbone.Collection.extend({
         defaultOptions: {
             route: 'oro_api_country_get_regions'
         },
@@ -19,7 +20,14 @@ define([
         model: RegionModel,
 
         /**
-         * Constructor
+         * @inheritDoc
+         */
+        constructor: function AddressRegionCollection() {
+            AddressRegionCollection.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
          */
         initialize: function(models, options) {
             this.options = _.extend({}, this.defaultOptions, options);
@@ -35,4 +43,6 @@ define([
             this.url = routing.generate(this.options.route, {country: id});
         }
     });
+
+    return AddressRegionCollection;
 });

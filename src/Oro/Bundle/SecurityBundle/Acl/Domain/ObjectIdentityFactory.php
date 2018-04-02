@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclException;
-use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * A factory class to create ACL ObjectIdentity objects

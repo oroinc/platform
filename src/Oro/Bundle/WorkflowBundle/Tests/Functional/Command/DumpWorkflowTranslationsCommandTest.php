@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
+use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends WebTestCase
 {

@@ -5,19 +5,13 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Extension;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
@@ -25,9 +19,13 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -235,7 +233,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->fieldName,
             'oro_type_business_unit_select_autocomplete',
             array(
-                'empty_value' => 'oro.business_unit.form.choose_business_user',
+                'placeholder' => 'oro.business_unit.form.choose_business_user',
                 'label' => 'oro.user.owner.label',
                 'configs' => [
                     'multiple' => false,

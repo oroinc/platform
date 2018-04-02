@@ -27,7 +27,7 @@ parameters:
     oro_user.change_password.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
     oro_user.handler.delete.class:                Oro\Bundle\UserBundle\Handler\UserDeleteHandler
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
-    oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
+    oro_user.activity_widget_provider.class:      '%oro_activity.widget_provider.activities.menu.class%'
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
@@ -53,25 +53,25 @@ parameters:
 
 services:
     oro_user.manager:
-        class: %oro_user.manager.class%
+        class: '%oro_user.manager.class%'
         arguments:
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
 
     oro_user.manager.api:
-        class: %oro_user.manager.api.class%
+        class: '%oro_user.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_user.permission_manager.api:
-        class: %oro_user.permission.manager.api.class%
+        class: '%oro_user.permission.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@security.token_storage'
@@ -85,12 +85,12 @@ services:
             - { name: doctrine.event_subscriber }
 
     oro_user.security.provider:
-        class:                        %oro_user.security.provider.class%
+        class:                        '%oro_user.security.provider.class%'
         public:                       false
         arguments:                    ["@oro_user.manager"]
 
     oro_user.security.login:
-        class:                        %oro_user.security.login.class%
+        class:                        '%oro_user.security.login.class%'
         arguments:                    ["@oro_user.manager"]
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
@@ -101,12 +101,12 @@ services:
             - [ setNamespace, [ 'oro_user' ] ]
 
     oro_user.user_menu:
-        class:                        %oro_user.user_menu.builder.class%
+        class:                        '%oro_user.user_menu.builder.class%'
         tags:
             - { name: oro_menu.builder, alias: usermenu }
 
     oro_user.role.listener:
-        class:                        %oro_user.role.listener.class%
+        class:                        '%oro_user.role.listener.class%'
         arguments:                    ["@oro_security.link.sid_manager"]
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
@@ -121,29 +121,29 @@ services:
             - { name: twig.extension }
 
     oro_user.status_manager:
-        class:                        %oro_user.status.manager.class%
+        class:                        '%oro_user.status.manager.class%'
         arguments:                    ["@doctrine.orm.entity_manager", "@oro_user.manager"]
 
     oro_user.role_manager:
-        class:                        %oro_user.role.manager.class%
+        class:                        '%oro_user.role.manager.class%'
         arguments:                    ["@doctrine.orm.entity_manager"]
 
     oro_user.role_manager.api:
-        class: %oro_user.role.manager.api.class%
+        class: '%oro_user.role.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_user.role.entity.class%
+            - '%oro_user.role.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_user.group_manager:
-        class:                        %oro_user.group.manager.class%
+        class:                        '%oro_user.group.manager.class%'
         arguments:                    ["@doctrine.orm.entity_manager"]
 
     oro_user.group_manager.api:
-        class: %oro_user.group.manager.api.class%
+        class: '%oro_user.group.manager.api.class%'
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_user.group.entity.class%
+            - '%oro_user.group.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_user.impersonation_authenticator:
@@ -166,11 +166,11 @@ services:
     # Autocomplete acl user search handler
     oro_user.autocomplete.user.search_acl_handler.abstract:
         abstract: true
-        class: %oro_user.autocomplete.user.search_acl_handler.class%
+        class: '%oro_user.autocomplete.user.search_acl_handler.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.manager'
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
@@ -188,11 +188,11 @@ services:
 
     # Autocomplete search handler
     oro_user.autocomplete.user.search_handler:
-        class: %oro_user.autocomplete.user.search_handler%
+        class: '%oro_user.autocomplete.user.search_handler%'
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_attachment.manager'
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
@@ -202,7 +202,7 @@ services:
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_attachment.manager'
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
@@ -216,7 +216,7 @@ services:
         arguments:
             - '@translator'
             - '@oro_attachment.manager'
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
@@ -226,7 +226,7 @@ services:
 
     # Autocomplite search user handler limit by current organization
     oro_user.autocomplete.user.organization_search_handler:
-        class: %oro_user.autocomplete.user.organization_search_handler.class%
+        class: '%oro_user.autocomplete.user.organization_search_handler.class%'
         parent: oro_user.autocomplete.user.search_handler
         calls:
            - [setTokenAccessor,  ['@oro_security.token_accessor']]
@@ -238,22 +238,22 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchUserCriteria
 
     oro_user.autocomplete.user.search_without_current_handler:
-        class: %oro_user.autocomplete.user.search_without_current_handler.class%
+        class: '%oro_user.autocomplete.user.search_without_current_handler.class%'
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_attachment.manager'
-            - %oro_user.entity.class%
+            - '%oro_user.entity.class%'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
     # Autocomplete role search handler
     oro_user.autocomplete.role.search_handler:
-        class: %oro_user.autocomplete.role.search_handler.class%
+        class: '%oro_user.autocomplete.role.search_handler.class%'
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - %oro_user.role.entity.class%
+            - '%oro_user.role.entity.class%'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
@@ -262,28 +262,28 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\WidgetRoleSearchHandler
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - %oro_user.role.entity.class%
+            - '%oro_user.role.entity.class%'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
 
     # Autocomplete role search handler for authenticated roles
     oro_user.autocomplete.role.authenticated_search_handler:
-        class: %oro_user.autocomplete.role.authenticated_search_handler.class%
+        class: '%oro_user.autocomplete.role.authenticated_search_handler.class%'
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - %oro_user.role.entity.class%
+            - '%oro_user.role.entity.class%'
             - ["label"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
 
     oro_user.gender_provider:
-        class: %oro_user.gender_provider.class%
+        class: '%oro_user.gender_provider.class%'
         arguments:
             - '@translator'
 
     oro_user.email_recipients_provider:
-        class: %oro_user.email_recipients_provider.class%
+        class: '%oro_user.email_recipients_provider.class%'
         arguments:
             - '@doctrine'
             - '@oro_email.provider.email_recipients.helper'
@@ -291,24 +291,24 @@ services:
             - { name: oro_email.recipients_provider, priority: 30 }
 
     oro_user.email.owner.provider:
-        class: %oro_user.email.owner.provider.class%
+        class: '%oro_user.email.owner.provider.class%'
         tags:
             - { name: oro_email.owner.provider, order: 1 }
 
     oro_user.change_password.subscriber:
-        class: %oro_user.change_password.subscriber.class%
+        class: '%oro_user.change_password.subscriber.class%'
         arguments:
             - '@form.factory'
             - '@oro_security.token_accessor'
 
     oro_user.handler.delete:
-        class: %oro_user.handler.delete.class%
+        class: '%oro_user.handler.delete.class%'
         parent: oro_soap.handler.delete.abstract
         calls:
             - [ setTokenAccessor,  ['@oro_security.token_accessor'] ]
 
     oro_user.role.handler.delete:
-        class: %oro_user.role.handler.delete.class%
+        class: '%oro_user.role.handler.delete.class%'
         parent: oro_soap.handler.delete.abstract
         arguments:
             - '@oro_security.acl.sid_manager'
@@ -323,17 +323,17 @@ services:
             - '@logger'
 
     oro_user.activity_widget_provider:
-        class: %oro_user.activity_widget_provider.class%
+        class: '%oro_user.activity_widget_provider.class%'
         arguments:
            - '@oro_entity.entity_identifier_accessor'
            - '@oro_ui.twig.tab_extension'
            - 'user_activity_tab_panel'
-           - %oro_user.entity.class%
+           - '%oro_user.entity.class%'
         tags:
            - { name: oro_activity.activity_widget_provider, priority: -10 }
 
     oro_user.event_listener.owner_user_grid_listener:
-        class: %oro_user.event_listener.owner_user_grid_listener.class%
+        class: '%oro_user.event_listener.owner_user_grid_listener.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
@@ -344,7 +344,7 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }
 
     oro_user.mailer.processor:
-        class: %oro_user.mailer.processor.class%
+        class: '%oro_user.mailer.processor.class%'
         arguments:
             - '@doctrine'
             - '@oro_config.global'
@@ -353,7 +353,7 @@ services:
             - '@oro_email.direct_mailer'
 
     oro_user.placeholder.filter:
-        class: %oro_user.placeholder.filter.class%
+        class: '%oro_user.placeholder.filter.class%'
         arguments:
             - '@oro_security.token_accessor'
 
@@ -367,17 +367,17 @@ services:
             - { name: oro_ui.update_action_provider, group: activity, priority: 100 }
 
     security.user_checker:
-        class: %oro_user.security.user_checker.class%
+        class: '%oro_user.security.user_checker.class%'
         arguments:
             - '@security.token_storage'
             - '@session.flash_bag'
             - '@translator'
 
     oro_user.token.factory.wsse:
-        class: %oro_user.token.factory.wsse.class%
+        class: '%oro_user.token.factory.wsse.class%'
 
     oro_user.role.datagrid_helper:
-        class: %oro_user.role.datagrid_helper.class%
+        class: '%oro_user.role.datagrid_helper.class%'
         arguments:
             - '@security.authorization_checker'
 
@@ -388,31 +388,31 @@ services:
             - { name: oro_entity.name_provider, priority: 100 }
 
     oro_user.provider.filter.user_choice_tree:
-        class: %oro_user.provider.filter.user_choice_tree.class%
+        class: '%oro_user.provider.filter.user_choice_tree.class%'
         arguments:
             - '@doctrine'
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
 
     oro_user.provider.role_privilege_category_provider:
-        class: %oro_user.provider.role_privilege_category_provider.class%
+        class: '%oro_user.provider.role_privilege_category_provider.class%'
         arguments:
             - '@translator'
 
     oro_user.provider.privilege_category_provider:
-        class: %oro_user.provider.privilege_category_provider.class%
+        class: '%oro_user.provider.privilege_category_provider.class%'
         tags:
             - { name: oro_user.privilege_category}
 
     oro_user.provider.role_privilege_capability_provider:
-        class: %oro_user.provider.role_privilege_capability_provider.class%
+        class: '%oro_user.provider.role_privilege_capability_provider.class%'
         arguments:
             - '@translator'
             - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_user.form.handler.abstract.acl_role='
 
     oro_user.datagrid.datasource.role_permission_datasource:
-        class: %oro_user.datagrid.datasource.role_permission_datasource.class%
+        class: '%oro_user.datagrid.datasource.role_permission_datasource.class%'
         arguments:
             - '@translator'
             - '@oro_security.acl.permission_manager'
@@ -424,7 +424,7 @@ services:
 
     # Validator
     oro_user.validator.user_custom_grid_field_validator:
-        class: %oro_user.validator.user_custom_grid_field_validator.class%
+        class: '%oro_user.validator.user_custom_grid_field_validator.class%'
         arguments:
             - '@oro_security.token_accessor'
         tags:
@@ -470,12 +470,12 @@ services:
             - { name: kernel.event_listener, event: oro_filter.choice_tree_filter_load_data, method: fillData }
 
     oro_user.provider.user_config_form_provider:
-        class: %oro_user.provider.user_configuration.form_provider.class%
+        class: '%oro_user.provider.user_configuration.form_provider.class%'
         parent: 'oro_config.provider.abstract_provider'
         lazy: true
 
     oro_user.imap_configuration.subscriber:
-        class: %oro_user.imap_configuration.subscriber.class%
+        class: '%oro_user.imap_configuration.subscriber.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
@@ -535,6 +535,7 @@ services:
         abstract: true
         arguments:
             - '@oro_user.provider.default_user'
+            - '@oro_entity.doctrine_helper'
 
     oro_user.event_listener.turn_off_caching:
         class: 'Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener'

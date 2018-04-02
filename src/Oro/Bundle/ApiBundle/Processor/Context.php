@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ParameterBag;
-use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
@@ -24,8 +22,12 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
+ * The base execution context for Data API processors.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
@@ -107,6 +109,16 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasIdentifierFields()
+    {
+        $metadata = $this->getMetadata();
+
+        return null !== $metadata && $metadata->hasIdentifierFields();
     }
 
     /**

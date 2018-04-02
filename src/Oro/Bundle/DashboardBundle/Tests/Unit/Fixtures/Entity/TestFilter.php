@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
+use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 class TestFilter implements WidgetProviderFilterInterface
 {

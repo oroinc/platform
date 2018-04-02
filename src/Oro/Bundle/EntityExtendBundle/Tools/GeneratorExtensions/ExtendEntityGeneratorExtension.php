@@ -5,12 +5,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpParameter;
 use CG\Generator\PhpProperty;
-
-use Symfony\Component\PropertyAccess\StringUtil;
-
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Symfony\Component\PropertyAccess\StringUtil;
 
 /**
  * The main extension of the entity generator. This extension is responsible for generate extend entity skeleton

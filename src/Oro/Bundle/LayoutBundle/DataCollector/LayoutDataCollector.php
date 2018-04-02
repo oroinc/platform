@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\LayoutBundle\DataCollector;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
-
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 class LayoutDataCollector extends DataCollector
 {

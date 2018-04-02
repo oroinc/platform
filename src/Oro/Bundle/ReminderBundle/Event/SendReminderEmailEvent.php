@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Symfony\Component\EventDispatcher\Event;
 
 class SendReminderEmailEvent extends Event
 {

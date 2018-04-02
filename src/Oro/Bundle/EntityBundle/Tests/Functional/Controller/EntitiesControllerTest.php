@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller;
 
 use Extend\Entity\TestEntity1;
-
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture\LoadExtendedRelationsData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 

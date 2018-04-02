@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
+use Psr\Log\LoggerInterface;
 
 class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 {

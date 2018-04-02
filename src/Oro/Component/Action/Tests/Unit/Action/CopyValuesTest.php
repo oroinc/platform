@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Action\CopyValues;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CopyValuesTest extends \PHPUnit_Framework_TestCase
 {

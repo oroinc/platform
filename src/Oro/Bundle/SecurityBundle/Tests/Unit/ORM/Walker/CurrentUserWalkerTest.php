@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_5;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateDateActivityListQuery extends ParametrizedMigrationQuery
 {

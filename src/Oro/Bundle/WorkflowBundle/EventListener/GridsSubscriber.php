@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class GridsSubscriber implements EventSubscriberInterface
 {

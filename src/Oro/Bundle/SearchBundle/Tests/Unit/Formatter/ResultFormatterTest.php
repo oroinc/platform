@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Formatter;
 
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
-use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
+use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
 
 class ResultFormatterTest extends \PHPUnit_Framework_TestCase
 {

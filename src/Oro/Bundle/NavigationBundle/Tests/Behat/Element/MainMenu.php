@@ -3,13 +3,15 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
+/**
+ * The element represents the main menu.
+ */
 class MainMenu extends Element
 {
     /** @var Element */
-    protected $dropDown = null;
+    protected $dropDown;
 
     /**
      * @inheritdoc
@@ -21,7 +23,6 @@ class MainMenu extends Element
 
     /**
      * @param string $path
-     * @throws ElementNotFoundException
      * @return NodeElement
      */
     public function openAndClick($path)
@@ -30,7 +31,11 @@ class MainMenu extends Element
         $items = explode('/', $path);
         $linkLocator = trim(array_pop($items));
 
-        $this->moveByMenuTree($path);
+        if ($this->hasClass('scroller') && !$this->getParent()->hasClass('minimized')) {
+            $this->clickByMenuTree($path);
+        } else {
+            $this->moveByMenuTree($path);
+        }
 
         $link = $this->findVisibleLink($linkLocator);
         $link->click();
@@ -48,23 +53,40 @@ class MainMenu extends Element
             $linkLocator = trim(array_pop($items));
 
             $this->moveByMenuTree($path);
-
-            return null !== $this->findVisibleLink($linkLocator);
+            $this->findVisibleLink($linkLocator);
         } catch (\Exception $e) {
             return false;
         }
+
+        return true;
     }
 
+    /**
+     * @param string $path
+     */
     private function moveByMenuTree($path)
     {
         $items = explode('/', $path);
         array_pop($items);
-
         while ($item = array_shift($items)) {
-            /** @var NodeElement $link */
             $link = $this->findVisibleLink($item);
             $link->mouseOver();
             $this->getDropDown($link);
+        }
+    }
+
+    /**
+     * @param string $path
+     */
+    private function clickByMenuTree($path)
+    {
+        $items = explode('/', $path);
+        array_pop($items);
+        while ($item = array_shift($items)) {
+            $link = $this->findVisibleLink($item);
+            if ($link->find('xpath', './span')->hasClass('collapsed')) {
+                $link->click();
+            }
         }
     }
 

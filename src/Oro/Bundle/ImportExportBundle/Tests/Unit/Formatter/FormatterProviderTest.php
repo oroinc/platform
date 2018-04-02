@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FormatterProviderTest extends \PHPUnit_Framework_TestCase
 {

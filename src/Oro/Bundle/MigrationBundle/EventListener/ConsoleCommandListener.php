@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\MigrationBundle\EventListener;
 
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class ConsoleCommandListener
 {

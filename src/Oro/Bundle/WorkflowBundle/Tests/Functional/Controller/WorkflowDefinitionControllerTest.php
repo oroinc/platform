@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
@@ -32,7 +31,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_workflow_definition_index'),
+            $this->getUrl('oro_workflow_definition_index', ['workflow-definitions-grid[_pager][_per_page]' => 30]),
             [],
             [],
             $this->generateBasicAuthHeader()

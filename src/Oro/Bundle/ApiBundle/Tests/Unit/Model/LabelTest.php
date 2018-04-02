@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ApiBundle\Model\Label;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LabelTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,9 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
-
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

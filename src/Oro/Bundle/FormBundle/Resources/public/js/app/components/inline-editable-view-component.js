@@ -106,6 +106,13 @@ define(function(require) {
         ESCAPE_KEY_CODE: 27,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function InlineEditableViewComponent() {
+            InlineEditableViewComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */
@@ -201,9 +208,9 @@ define(function(require) {
         },
 
         getEditorOptions: function() {
-            var viewConfiguration = this.inlineEditingOptions.editor ?
-                this.inlineEditingOptions.editor.view_options :
-                {};
+            var viewConfiguration = this.inlineEditingOptions.editor
+                ? this.inlineEditingOptions.editor.view_options
+                : {};
 
             if (!this.isInsertEditorModeOverlay()) {
                 viewConfiguration.container = this.view.$el;

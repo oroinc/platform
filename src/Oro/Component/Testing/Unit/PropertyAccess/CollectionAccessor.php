@@ -4,10 +4,9 @@ namespace Oro\Component\Testing\Unit\PropertyAccess;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\Inflector;
-
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 class CollectionAccessor
 {

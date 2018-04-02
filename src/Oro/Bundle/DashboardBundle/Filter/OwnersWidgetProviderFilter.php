@@ -3,10 +3,9 @@
 namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
 {

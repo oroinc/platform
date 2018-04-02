@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 
 class ChartSettingsType extends ConfigProviderAwareType
 {
@@ -31,14 +30,10 @@ class ChartSettingsType extends ConfigProviderAwareType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['chart_name']);
-        $resolver->setOptional(['chart_config']);
+        $resolver->setDefined(['chart_config']);
 
-        $resolver->setAllowedTypes(
-            [
-                'chart_name'   => 'string',
-                'chart_config' => 'array'
-            ]
-        );
+        $resolver->setAllowedTypes('chart_name', 'string');
+        $resolver->setAllowedTypes('chart_config', 'array');
     }
 
     /**

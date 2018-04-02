@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;

@@ -14,11 +14,9 @@ use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
+use Psr\Log\LoggerInterface;
 
 class MigrationExecutor
 {

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldImportStrategy extends AbstractImportStrategy
 {

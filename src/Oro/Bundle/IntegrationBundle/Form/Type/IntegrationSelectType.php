@@ -3,21 +3,20 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSelectType extends AbstractType
 {
@@ -68,7 +67,7 @@ class IntegrationSelectType extends AbstractType
             return array_merge($defaultConfigs, $configs);
         };
         $choiceLoader = function (Options $options) use ($em) {
-            $types = $options->has('allowed_types') ? $options->get('allowed_types') : null;
+            $types = $options['allowed_types'] ?? null;
 
             return new DoctrineChoiceLoader(
                 $this->choiceListFactory,
@@ -81,15 +80,15 @@ class IntegrationSelectType extends AbstractType
 
         $resolver->setDefaults(
             [
-                'empty_value' => '',
+                'placeholder' => '',
                 'configs'     => $defaultConfigs,
                 'choice_loader' => $choiceLoader,
                 'choice_label' => 'name',
                 'choice_value' => 'id'
             ]
         );
-        $resolver->setOptional(['allowed_types']);
-        $resolver->setNormalizers(['configs' => $configsNormalizer]);
+        $resolver->setDefined(['allowed_types']);
+        $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
     /**
@@ -117,7 +116,7 @@ class IntegrationSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

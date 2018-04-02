@@ -45,6 +45,16 @@ define(function(require) {
             'toView collection': 'onViewActivity'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityListComponent() {
+            ActivityListComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options || {};
             this.processOptions();
@@ -116,7 +126,7 @@ define(function(require) {
             }
 
             // bind template for item view
-            activityOptions.itemView = activityOptions.itemView.extend({
+            activityOptions.itemView = activityOptions.itemView.extend({// eslint-disable-line oro/named-constructor
                 template: _.template($(activityOptions.itemTemplate).html())
             });
 

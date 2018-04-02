@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
  * Provides the configuration for an entity that can be uses as a part of other Data API resources.

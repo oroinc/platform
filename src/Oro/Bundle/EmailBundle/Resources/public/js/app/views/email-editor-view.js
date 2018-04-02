@@ -21,6 +21,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function EmailEditorView() {
+            EmailEditorView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */
@@ -62,9 +69,9 @@ define(function(require) {
                     'oro_user_profile_configuration',
                     {activeGroup: 'platform', activeSubGroup: 'email_configuration'}
                 );
-                message = this.model.get('isSignatureEditable') ?
-                    __('oro.email.thread.no_signature', {url: url}) :
-                    __('oro.email.thread.no_signature_no_permission');
+                message = this.model.get('isSignatureEditable')
+                    ? __('oro.email.thread.no_signature', {url: url})
+                    : __('oro.email.thread.no_signature_no_permission');
                 mediator.execute('showFlashMessage', 'info', message);
             }
         },

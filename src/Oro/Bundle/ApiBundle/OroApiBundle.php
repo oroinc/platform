@@ -3,14 +3,12 @@
 namespace Oro\Bundle\ApiBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * The ApiBundle bundle class.
@@ -34,9 +32,12 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\ExceptionTextExtractorCompilerPass());
         $container->addCompilerPass(new Compiler\ConstraintTextExtractorCompilerPass());
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
+        $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());
+        $container->addCompilerPass(new Compiler\RestDocUrlGeneratorCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentBuilderCompilerPass());
         $container->addCompilerPass(new Compiler\ErrorCompleterCompilerPass());
+        $container->addCompilerPass(new Compiler\ResourceDocParserCompilerPass());
         $container->addCompilerPass(new Compiler\ResourcesCacheWarmerCompilerPass());
         $container->addCompilerPass(
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\AddressBundle\Form\EventListener\ItemIdentifierCollectionTypeSubscriber;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\AddressBundle\Form\EventListener\ItemIdentifierCollectionTypeSubscriber;
 
 class EmailCollectionType extends AbstractType
 {
@@ -22,7 +22,7 @@ class EmailCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_collection';
+        return CollectionType::class;
     }
 
     /**

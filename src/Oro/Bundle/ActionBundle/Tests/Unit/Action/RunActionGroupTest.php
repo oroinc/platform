@@ -3,15 +3,12 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Bundle\ActionBundle\Action\RunActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 {

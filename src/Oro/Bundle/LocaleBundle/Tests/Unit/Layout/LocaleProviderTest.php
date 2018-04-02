@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Layout;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Layout\LocaleProvider;

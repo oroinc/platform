@@ -10,13 +10,14 @@
 
 <div class="widget-content import-widget-content">
     <div class="form-container" {{ UI.renderPageComponentAttributes(exportConfigurableWidgetViewOptions) }}>
-        <form method="post"
-              data-nohash="true"
-              id="{{ form.vars.id }}"
-              name="{{ form.vars.name }}"
-              action="{{ path('oro_importexport_export_config', {entity: entityName, options: options, exportJob: exportJob}) }}"
-              class="form-horizontal"
-                {{ form_enctype(form) }}>
+        {{ form_start(form, {
+            'action': path('oro_importexport_export_config', {entity: entityName, options: options, exportJob: exportJob}),
+            'attr': {
+                'id': form.vars.id,
+                'data-nohash': 'true',
+                'class': 'form-horizontal'
+            }
+        }) }}
 
             <fieldset class="form">
                 <div>
@@ -31,7 +32,7 @@
                     {{ 'Export'|trans }}
                 </button>
             </div>
-        </form>
+        {{ form_end(form) }}
         {{ oro_form_js_validation(form) }}
     </div>
 </div>

@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
-use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
-use Symfony\Component\Security\Acl\Model\AclInterface;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
-use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
-use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
-use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
-
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+use Symfony\Component\Security\Acl\Model\AclInterface;
+use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.

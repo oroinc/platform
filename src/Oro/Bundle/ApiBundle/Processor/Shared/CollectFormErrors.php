@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
-use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.

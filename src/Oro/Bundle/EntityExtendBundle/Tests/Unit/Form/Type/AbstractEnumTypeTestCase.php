@@ -3,17 +3,15 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractEnumType;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractEnumType;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {

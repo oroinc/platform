@@ -7,6 +7,7 @@ define(function(require) {
 
     var Select2EmailRecipientsView = BaseView.extend({
         $contextEl: null,
+
         clearSearch: null,
 
         events: {
@@ -15,6 +16,16 @@ define(function(require) {
             'select2-blur': '_onSelect2Blur'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function Select2EmailRecipientsView() {
+            Select2EmailRecipientsView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
             this.$el.on('input-widget:init', _.bind(this._onSelect2Init, this));

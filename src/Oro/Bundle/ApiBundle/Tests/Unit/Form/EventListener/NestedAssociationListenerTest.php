@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures\ObjectWithNestedAssociation;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
-use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
-use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures\ObjectWithNestedAssociation;
 
 class NestedAssociationListenerTest extends \PHPUnit_Framework_TestCase
 {

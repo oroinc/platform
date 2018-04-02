@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;

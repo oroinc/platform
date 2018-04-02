@@ -1,13 +1,13 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 
 class BusinessUnitTreeType extends AbstractType
 {
@@ -36,7 +36,7 @@ class BusinessUnitTreeType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

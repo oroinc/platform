@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Formatter;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class ResultFormatter

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class EmailLinkToScopeType extends AbstractType
 {
@@ -12,7 +13,7 @@ class EmailLinkToScopeType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

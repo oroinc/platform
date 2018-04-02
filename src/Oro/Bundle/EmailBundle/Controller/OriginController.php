@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/emailorigin")

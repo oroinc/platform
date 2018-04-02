@@ -3,16 +3,14 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AdditionalEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Routing;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
-
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Symfony\Component\Routing\Route;
 
 class DictionaryEntityApiDocHandler implements HandlerInterface
 {

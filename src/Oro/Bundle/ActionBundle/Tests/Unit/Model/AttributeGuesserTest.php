@@ -3,15 +3,13 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\Guess\TypeGuess;
-
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 {

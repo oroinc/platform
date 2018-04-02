@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-
 use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\Request;
 

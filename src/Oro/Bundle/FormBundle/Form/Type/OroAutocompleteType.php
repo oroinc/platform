@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 
 class OroAutocompleteType extends AbstractType
 {
@@ -48,7 +48,7 @@ class OroAutocompleteType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 
     /**

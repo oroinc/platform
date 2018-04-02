@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
+use Symfony\Component\HttpFoundation\Response;
 
 class AccessGrantedTest extends \PHPUnit_Framework_TestCase
 {

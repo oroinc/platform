@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\AbstractType;
-
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GenderType extends AbstractType
 {
@@ -45,7 +45,7 @@ class GenderType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -58,7 +58,7 @@ class GenderType extends AbstractType
                 'choices'     => $this->genderProvider->getChoices(),
                 'multiple'    => false,
                 'expanded'    => false,
-                'empty_value' => 'oro.user.form.choose_gender',
+                'placeholder' => 'oro.user.form.choose_gender',
                 'translatable_options' => false
             )
         );

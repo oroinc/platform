@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
  * Warms up Data API resourses and sub-resources caches.

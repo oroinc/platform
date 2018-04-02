@@ -4,8 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
 
 class DateTimePicker extends Element
 {
@@ -21,7 +19,9 @@ class DateTimePicker extends Element
         $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getCalendarDate($dateTime->format('j'))->click();
 
-        $this->getTimePicker()->setValue($dateTime);
+        if ($this->getElements('TimePicker')) {
+            $this->getTimePicker()->setValue($dateTime);
+        }
     }
 
     /**

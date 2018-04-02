@@ -1,0 +1,14 @@
+oro_behat_extension:
+  suites:
+    OroEntityBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - OroFormBundle::FormContext
+        - OroSecurityBundle::ACLContext
+      paths:
+        - '@OroEntityBundle/Tests/Behat/Features'
+
+  optional_listeners:
+    required_for_fixtures:
+      - 'oro_entity.event_listener.entity_modify_created_updated_properties_listener'

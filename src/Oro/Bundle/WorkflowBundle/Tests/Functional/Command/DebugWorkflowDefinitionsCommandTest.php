@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {

@@ -14,6 +14,13 @@ define(function(require) {
      */
     LineChartComponent = BaseChartComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function LineChartComponent() {
+            LineChartComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Sorts chart data
          */
         sortData: function() {

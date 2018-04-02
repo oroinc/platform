@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create\JsonApi;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether entity identifier exists in the request data,
@@ -34,7 +34,7 @@ class ExtractEntityId implements ProcessorInterface
 
         $requestData = $context->getRequestData();
         if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // unexpected request data or they are already normalized
+            // unsupported request data or the data are already normalized
             return;
         }
 

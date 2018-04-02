@@ -11,7 +11,7 @@ parameters:
 
 services:
     oro_importexport.writer.csv:
-        class: %oro_importexport.writer.csv.class%
+        class: '%oro_importexport.writer.csv.class%'
         arguments:
             - '@oro_importexport.context_registry'
         calls:
@@ -20,7 +20,7 @@ services:
             - { name: oro_importexport.writer, alias: csv }
 
     oro_importexport.writer.xlsx:
-        class: %oro_importexport.writer.xlsx.class%
+        class: '%oro_importexport.writer.xlsx.class%'
         arguments:
             - '@oro_importexport.context_registry'
             - '@phpexcel'
@@ -30,49 +30,50 @@ services:
             - { name: oro_importexport.writer, alias: xlsx }
 
     oro_importexport.writer.entity:
-        class: %oro_importexport.writer.entity.class%
+        class: '%oro_importexport.writer.entity.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_importexport.writer.entity_detach_fixer'
             - '@oro_importexport.context_registry'
+            - '@oro_entity.database_exception_helper'
         tags:
             - { name: oro_importexport.writer, alias: entity }
 
     oro_importexport.writer.entity_detach_fixer:
-        class: %oro_importexport.writer.entity_detach_fixer.class%
+        class: '%oro_importexport.writer.entity_detach_fixer.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.helper.field_helper'
             - '@property_accessor'
 
     oro_importexport.writer.dummy:
-        class: %oro_importexport.writer.dummy.class%
+        class: '%oro_importexport.writer.dummy.class%'
         arguments:
             - '@doctrine'
         tags:
             - { name: oro_importexport.writer, alias: dummy }
 
     oro_importexport.writer.doctrine_clear:
-        class: %oro_importexport.writer.doctrine_clear.class%
+        class: '%oro_importexport.writer.doctrine_clear.class%'
         arguments:
             - '@doctrine'
         tags:
             - { name: oro_importexport.writer, alias: doctrine_clear }
 
     oro_importexport.writer.echo.csv:
-        class: %oro_importexport.writer.echo.csv.class%
+        class: '%oro_importexport.writer.echo.csv.class%'
         tags:
             - { name: oro_importexport.writer, alias: echo_csv }
 
     oro_importexport.writer.echo.xlsx:
-        class: %oro_importexport.writer.echo.xlsx.class%
+        class: '%oro_importexport.writer.echo.xlsx.class%'
         arguments:
             - '@phpexcel'
         tags:
             - { name: oro_importexport.writer, alias: echo_xlsx }
 
     oro_importexport.writer.insert_from_select_writer:
-        class: %oro_importexport.writer.insert_from_select_writer.class%
+        class: '%oro_importexport.writer.insert_from_select_writer.class%'
         arguments:
             - '@oro_entity.orm.insert_from_select_query_executor'
         abstract: true

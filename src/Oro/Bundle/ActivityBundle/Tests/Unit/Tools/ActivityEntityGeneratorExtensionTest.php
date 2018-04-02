@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Tools;
 
 use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Tools\ActivityEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Config;

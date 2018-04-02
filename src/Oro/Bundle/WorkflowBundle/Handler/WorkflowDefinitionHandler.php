@@ -4,15 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMInvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowDefinitionHandler
 {

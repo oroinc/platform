@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Request\Rest;
 
+use FOS\RestBundle\View\View;
+use FOS\RestBundle\View\ViewHandlerInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\RequestActionHandler as BaseRequestActionHandler;
+use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
+use Oro\Component\ChainProcessor\AbstractParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\JsonEncode;
 
-use FOS\RestBundle\View\View;
-use FOS\RestBundle\View\ViewHandlerInterface;
-
-use Oro\Component\ChainProcessor\AbstractParameterBag;
-use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
-use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
-use Oro\Bundle\ApiBundle\Request\RequestActionHandler as BaseRequestActionHandler;
-
+/**
+ * Handles API actions for REST API.
+ */
 class RequestActionHandler extends BaseRequestActionHandler
 {
     /** @var ViewHandlerInterface */

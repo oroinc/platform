@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
-use Symfony\Component\Finder\Finder;
-
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeResourceLoader;
+use Symfony\Component\Finder\Finder;
 
 class AclAnnotationCumulativeResourceLoader implements CumulativeResourceLoader
 {

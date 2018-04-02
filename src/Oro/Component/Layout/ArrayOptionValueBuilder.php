@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout;
 
-use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
 class ArrayOptionValueBuilder implements OptionValueBuilderInterface
 {

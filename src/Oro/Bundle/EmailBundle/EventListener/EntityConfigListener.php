@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
 class EntityConfigListener

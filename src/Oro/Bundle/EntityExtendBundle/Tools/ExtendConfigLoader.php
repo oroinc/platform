@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 

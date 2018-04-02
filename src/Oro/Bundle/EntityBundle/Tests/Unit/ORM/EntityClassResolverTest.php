@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\ORM\ORMException;
-
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class EntityClassResolverTest extends \PHPUnit_Framework_TestCase

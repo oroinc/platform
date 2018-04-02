@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;

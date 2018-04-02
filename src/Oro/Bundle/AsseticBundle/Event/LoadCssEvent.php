@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\AsseticBundle\AssetsConfiguration;
+use Symfony\Component\EventDispatcher\Event;
 
 class LoadCssEvent extends Event
 {

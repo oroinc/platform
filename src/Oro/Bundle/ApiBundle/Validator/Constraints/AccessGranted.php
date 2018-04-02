@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * This constraint can be used to check if an access to read an associated entity is granted.
+ * The VIEW permission is used to check.
+ *
  * @Annotation
  */
 class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterface

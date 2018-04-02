@@ -2,22 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\DefaultTranslator;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Validator;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\ConstraintValidatorFactory;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
+use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
-class AbstractConfigTypeTestCase extends TypeTestCase
+abstract class AbstractConfigTypeTestCase extends TypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -36,19 +37,26 @@ class AbstractConfigTypeTestCase extends TypeTestCase
         parent::setUp();
     }
 
+    /**
+     * @return AbstractType
+     */
+    abstract protected function getFormType();
+
     protected function getExtensions()
     {
-        $validator = new Validator(
-            new ClassMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new DefaultTranslator()
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
+            new LazyLoadingMetadataFactory(new LoaderChain([])),
+            new ConstraintValidatorFactory()
         );
 
         return [
             new PreloadedExtension(
-                [],
                 [
-                    'form' => [
+                    $this->getFormType()
+                ],
+                [
+                    FormType::class => [
                         new FormTypeValidatorExtension($validator),
                         new ConfigExtension()
                     ]
@@ -59,7 +67,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
 
     /**
      * @param string                                     $formName
-     * @param AbstractType                               $formType
+     * @param string                                     $formTypeClass
      * @param array                                      $options
      * @param \PHPUnit_Framework_MockObject_MockObject[] $configProviders
      * @param mixed                                      $newVal
@@ -71,7 +79,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
      */
     protected function doTestSubmit(
         $formName,
-        AbstractType $formType,
+        $formTypeClass,
         array $options,
         array $configProviders,
         $newVal,
@@ -117,7 +125,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             ->method('getProvider')
             ->will($this->returnValueMap($configProvidersMap));
 
-        $form = $this->factory->createNamed($formName, $formType, $oldVal, $options);
+        $form = $this->factory->createNamed($formName, $formTypeClass, $oldVal, $options);
 
         $expectedExtendConfig = new Config($extendConfigId);
         $schemaUpdateRequired = call_user_func(

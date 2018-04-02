@@ -3,13 +3,11 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
-
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\RuntimeException;
-
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
 class DbalMessageQueueIsolator extends AbstractMessageQueueIsolator
 {

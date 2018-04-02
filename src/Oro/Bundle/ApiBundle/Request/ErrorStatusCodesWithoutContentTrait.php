@@ -18,7 +18,7 @@ trait ErrorStatusCodesWithoutContentTrait
      *
      * @return bool
      */
-    protected function isResponseWithoutContent(int $statusCode): bool
+    private function isErrorResponseWithoutContent(int $statusCode): bool
     {
         return Response::HTTP_METHOD_NOT_ALLOWED === $statusCode;
     }

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityExtendBundle\Model\EnumValue as EnumValueEntity;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue as EnumValueEntity;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumValueValidator extends ConstraintValidator
 {
@@ -34,8 +33,10 @@ class EnumValueValidator extends ConstraintValidator
         $valueId = ExtendHelper::buildEnumValueId($entity['label'], false);
 
         if (empty($valueId)) {
-            $this->context
-                ->addViolationAt('[label]', $constraint->message, ['{{ value }}' => $entity['label']]);
+            $this->context->buildViolation($constraint->message)
+                ->atPath('[label]')
+                ->setParameters(['{{ value }}' => $entity['label']])
+                ->addViolation();
         }
     }
 }

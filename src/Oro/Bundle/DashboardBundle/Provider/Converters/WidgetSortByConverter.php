@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WidgetSortByConverter extends ConfigValueConverterAbstract
 {

@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
-
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
-
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,10 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Migrations\Data\Orm;
+namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 class UpdateAttachmentsWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface

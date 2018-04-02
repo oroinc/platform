@@ -4,9 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithIcon;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithoutIcon;
-use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistryTest extends \PHPUnit_Framework_TestCase
 {

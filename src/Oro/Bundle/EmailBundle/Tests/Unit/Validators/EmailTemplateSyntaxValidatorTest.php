@@ -4,10 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
-use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
+use Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,8 +46,7 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = $this
-            ->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

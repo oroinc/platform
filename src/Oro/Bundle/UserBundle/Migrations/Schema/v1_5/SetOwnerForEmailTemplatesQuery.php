@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_5;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\UserBundle\Entity\User;
+use Psr\Log\LoggerInterface;
 
 class SetOwnerForEmailTemplatesQuery extends ParametrizedSqlMigrationQuery
 {

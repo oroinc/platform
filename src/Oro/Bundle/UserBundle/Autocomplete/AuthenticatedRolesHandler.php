@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 

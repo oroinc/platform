@@ -11,6 +11,13 @@ define(function(require) {
             rows: []
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SelectStateModel() {
+            SelectStateModel.__super__.constructor.apply(this, arguments);
+        },
+
         addRow: function(model) {
             var id = model.get('id');
             this.set('rows', _.uniq(this.attributes.rows.concat(id)));

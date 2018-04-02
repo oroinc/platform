@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class BusinessUnitApiType extends BusinessUnitType
 {
@@ -28,7 +27,7 @@ class BusinessUnitApiType extends BusinessUnitType
         $resolver->setDefaults(
             array(
                 'data_class'      => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
-                'intention'       => 'business_unit',
+                'csrf_token_id'   => 'business_unit',
                 'csrf_protection' => false
             )
         );

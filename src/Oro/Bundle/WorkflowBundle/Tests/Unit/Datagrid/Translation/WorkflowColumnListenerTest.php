@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Translation;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-
 use Oro\Bundle\WorkflowBundle\Datagrid\Translation\WorkflowColumnListener;
 
 class WorkflowColumnListenerTest extends \PHPUnit_Framework_TestCase

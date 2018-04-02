@@ -12,6 +12,13 @@ define(function(require) {
             refresh: 'onRefresh'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function RecentEmailsContentView() {
+            RecentEmailsContentView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             if (this.model.notificationComponentInstance) {
                 this.model.notificationComponentInstance.dispose();

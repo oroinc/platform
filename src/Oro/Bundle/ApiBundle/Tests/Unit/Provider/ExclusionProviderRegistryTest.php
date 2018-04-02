@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ExclusionProviderRegistryTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class OrganizationExtension extends \Twig_Extension
 {

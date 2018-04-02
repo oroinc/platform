@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 
 class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -110,8 +109,6 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('auto_initialize' => true)));
 
         $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType->expects($this->once())->method('getName')
-            ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')
             ->will($this->returnValue($formType));
 
@@ -169,8 +166,6 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('auto_initialize' => true)));
 
         $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $formType->expects($this->once())->method('getName')
-            ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')
             ->will($this->returnValue($formType));
 

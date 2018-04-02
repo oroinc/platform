@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {

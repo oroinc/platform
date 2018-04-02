@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
+use Symfony\Component\DependencyInjection\Reference;
 
 class OrganizationRememberMeFactory extends RememberMeFactory
 {

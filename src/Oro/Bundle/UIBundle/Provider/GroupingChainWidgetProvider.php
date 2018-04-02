@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 use Oro\Bundle\UIBundle\Event\Events;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This provider calls all registered leaf providers in a chain, merges and does grouping of widgets returned

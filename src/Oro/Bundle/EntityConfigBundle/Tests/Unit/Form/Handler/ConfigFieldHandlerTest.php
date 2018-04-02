@@ -6,7 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Component\Testing\Unit\EntityTrait;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -96,6 +95,11 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('showSuccessMessageAndRedirect')
             ->with($this->fieldConfigModel, $successMessage)
             ->willReturn($response);
+
+        $this->configHelperHandler
+            ->expects($this->once())
+            ->method('showClearCacheMessage')
+            ->willReturn($this->configHelperHandler);
 
         $formAction = 'formAction';
         $this->assertEquals(

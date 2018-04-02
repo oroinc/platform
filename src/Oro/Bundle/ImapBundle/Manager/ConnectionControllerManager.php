@@ -4,20 +4,19 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
-use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
-use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class ConnectionManager
@@ -100,9 +99,9 @@ class ConnectionControllerManager
             $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
-        $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form = $this->formFactory->create(ConfigurationGmailType::class, null, ['csrf_protection' => false]);
         $form->setData($data);
-        $form->submit($request);
+        $form->handleRequest($request);
 
         if (!$form->isValid()) {
             throw new Exception("Incorrect setting for IMAP authentication");

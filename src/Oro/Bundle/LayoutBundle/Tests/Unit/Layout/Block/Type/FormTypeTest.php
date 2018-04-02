@@ -5,11 +5,9 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
-
 use Symfony\Component\Form\FormView;
 
 class FormTypeTest extends BlockTypeTestCase

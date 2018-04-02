@@ -3,9 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Reader;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
 

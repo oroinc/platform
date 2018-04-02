@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -94,7 +92,7 @@ class AttributeFamilyController extends Controller
     protected function update(AttributeFamily $attributeFamily, $message)
     {
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
-        $form = $this->createForm(AttributeFamilyType::NAME, $attributeFamily, $options);
+        $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
         $handler = $this->get('oro_form.model.update_handler');
 

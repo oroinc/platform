@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\MappingException;
-
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;

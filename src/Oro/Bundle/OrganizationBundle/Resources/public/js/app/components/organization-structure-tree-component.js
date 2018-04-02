@@ -5,7 +5,9 @@ define([
 ], function(_, BaseComponent, OrganizationStructureTreeView) {
     'use strict';
 
-    return BaseComponent.extend({
+    var OrganizationStructureTreeComponent;
+
+    OrganizationStructureTreeComponent = BaseComponent.extend({
         organizationStructureTreeView: null,
 
         requiredOptions: [
@@ -16,6 +18,16 @@ define([
             'accordionEnabled'
         ],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function OrganizationStructureTreeComponent() {
+            OrganizationStructureTreeComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {
                 if (!_.has(options, optionName)) {
@@ -33,4 +45,6 @@ define([
             });
         }
     });
+
+    return OrganizationStructureTreeComponent;
 });

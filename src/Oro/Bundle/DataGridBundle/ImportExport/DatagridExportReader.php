@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 
 class DatagridExportReader extends AbstractReader
 {

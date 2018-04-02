@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\OroFormBundle;
-
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroFormBundleTest extends \PHPUnit_Framework_TestCase
 {

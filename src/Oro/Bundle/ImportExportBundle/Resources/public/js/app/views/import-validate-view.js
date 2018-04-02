@@ -17,6 +17,16 @@ define(function(require) {
             'importProcessorAliasesToConfirmMessages', 'wid'
         ]),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ImportValidateView() {
+            ImportValidateView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             ImportValidateView.__super__.initialize.apply(this, arguments);
 
@@ -78,9 +88,9 @@ define(function(require) {
             widget._onContentLoad = function(content) {
                 if (_.has(content, 'success')) {
                     if (content.success) {
-                        var message = _.has(content, 'message') ?
-                            content.message :
-                            __('oro.importexport.import.success.message');
+                        var message = _.has(content, 'message')
+                            ? content.message
+                            : __('oro.importexport.import.success.message');
                         Messenger.notificationFlashMessage('success', message);
                     } else {
                         Messenger.notificationFlashMessage('error', __('oro.importexport.import.form_fail.message'));

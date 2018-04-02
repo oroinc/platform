@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\EntityMergeBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Constraints\File as FileConstraint;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Component\Validator\Constraints\File as FileConstraint;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigFileValidator
 {

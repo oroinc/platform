@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var errorHandler = require('oroui/js/error');
 
     EmailBodyView = BaseView.extend({
         autoRender: true,
@@ -25,6 +26,13 @@ define(function(require) {
 
         listen: {
             'layout:reposition mediator': '_updateHeight'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailBodyView() {
+            EmailBodyView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -60,8 +68,30 @@ define(function(require) {
             var $content;
             var content = this.bodyContent;
             try {
-                $content = $(content);
+                /**
+                 * Valid email could not contain a root node after HTML tags strip,
+                 * but it is still valid HTML fragment and it should be displayed like an HTML
+                 *
+                 * Example:
+                 * Original email:
+                 * <html>
+                 *     <head>
+                 *         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                 *     </head>
+                 *     <body>
+                 *         Some Text <b>Some other text</b>
+                 *     </body>
+                 * </html>
+                 *
+                 * Content after strip:
+                 * Some Text <b>Some other text</b>
+                 *
+                 * This content will not be correctly parsed by JQuery, but should be displayed as an HTML
+                 */
+                var contentWithRootNode = '<div>' + content + '</div>';
+                $content = $(contentWithRootNode);
             } catch (e) {
+                errorHandler.showErrorInConsole(e);
                 // if content can not be processed as HTML, output it as plain text
                 content = content.replace(/[&<>]/g, function(c) {
                     return '&#' + c.charCodeAt(0) + ';';

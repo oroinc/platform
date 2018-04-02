@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Extension;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormInterface;
-
-use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\ContextInterface;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * Transforms form related context variables to the appropriate objects.
@@ -36,7 +34,7 @@ class FormContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setDefined(['form'])
-            ->setAllowedTypes(['form' => ['null', 'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface']]);
+            ->setAllowedTypes('form', ['null', 'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface']);
 
         $form = $context->getOr('form');
         if (null === $form || $form instanceof FormAccessorInterface) {

@@ -14,6 +14,13 @@ define(function(require) {
      */
     ViewComponent = BaseComponent.extend({
         /**
+         * @inheritDoc
+         */
+        constructor: function ViewComponent() {
+            ViewComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */

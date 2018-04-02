@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\AsseticBundle\DependencyInjection;
 
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-
+/**
+ * OroAsseticBundle dependency injection Extension
+ * - Load assets configuration from assets.yml files
+ * - Provides functionality to exclude bundles from assetic
+ */
 class OroAsseticExtension extends Extension
 {
     /**
@@ -27,6 +31,11 @@ class OroAsseticExtension extends Extension
             'oro_assetic.raw_configuration',
             $this->getBundlesAssetsConfiguration($container, $config)
         );
+
+        if ($container->hasParameter('assetic.bundles')) {
+            $asseticBundles = $container->getParameter('assetic.bundles');
+            $container->setParameter('assetic.bundles', array_diff($asseticBundles, $config['excluded_bundles']));
+        }
     }
 
     /**

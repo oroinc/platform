@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 
 class PersistConfigEventTest extends \PHPUnit_Framework_TestCase

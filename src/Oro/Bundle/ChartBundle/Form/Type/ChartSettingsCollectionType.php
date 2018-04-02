@@ -16,7 +16,7 @@ class ChartSettingsCollectionType extends AbstractType
         foreach ($options['chart_configs'] as $chartName => $chartConfig) {
             $builder->add(
                 $chartName,
-                'oro_chart_setting',
+                ChartSettingsType::class,
                 [
                     'chart_name'   => $chartName,
                     'chart_config' => $chartConfig
@@ -32,11 +32,7 @@ class ChartSettingsCollectionType extends AbstractType
     {
         $resolver->setRequired(['chart_configs']);
 
-        $resolver->setAllowedTypes(
-            [
-                'chart_configs' => 'array'
-            ]
-        );
+        $resolver->setAllowedTypes('chart_configs', 'array');
     }
 
     /**

@@ -3,17 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Validator;
 
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
-
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailTemplateSyntaxValidator extends ConstraintValidator
 {

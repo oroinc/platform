@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Appearance;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class AppearanceExtensionTest extends \PHPUnit_Framework_TestCase
 {

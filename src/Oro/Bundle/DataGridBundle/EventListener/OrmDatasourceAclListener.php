@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class OrmDatasourceAclListener

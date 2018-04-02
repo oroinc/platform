@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Entity;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class PriceTest extends \PHPUnit_Framework_TestCase
 {

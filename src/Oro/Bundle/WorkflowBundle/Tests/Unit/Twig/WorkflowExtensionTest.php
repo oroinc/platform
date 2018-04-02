@@ -8,7 +8,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension;
-
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase

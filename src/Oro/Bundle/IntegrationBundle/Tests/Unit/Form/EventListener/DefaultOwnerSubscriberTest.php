@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,12 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Formatter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowVariableFormatterTest extends \PHPUnit_Framework_TestCase
 {

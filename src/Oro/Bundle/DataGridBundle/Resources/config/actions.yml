@@ -19,31 +19,31 @@ services:
             - '@translator'
 
     oro_datagrid.extension.action.type.navigate:
-        class: %oro_datagrid.extension.action.type.navigate.class%
+        class: '%oro_datagrid.extension.action.type.navigate.class%'
         shared: false
         tags:
             - { name:  oro_datagrid.extension.action.type, type: navigate }
 
     oro_datagrid.extension.action.type.ajax:
-        class: %oro_datagrid.extension.action.type.ajax.class%
+        class: '%oro_datagrid.extension.action.type.ajax.class%'
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajax }
 
     oro_datagrid.extension.action.type.delete:
-        class: %oro_datagrid.extension.action.type.delete.class%
+        class: '%oro_datagrid.extension.action.type.delete.class%'
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: delete }
 
     oro_datagrid.extension.action.type.ajaxdelete:
-        class: %oro_datagrid.extension.action.type.ajaxdelete.class%
+        class: '%oro_datagrid.extension.action.type.ajaxdelete.class%'
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdelete }
 
     oro_datagrid.extension.action.type.frontend:
-        class: %oro_datagrid.extension.action.type.frontend.class%
+        class: '%oro_datagrid.extension.action.type.frontend.class%'
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: frontend }

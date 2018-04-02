@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\ChoiceList;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\DBAL\Connection;
-
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 {

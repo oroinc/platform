@@ -1,13 +1,15 @@
-define([
-    'jquery',
-    'backbone',
-    'routing',
-    'oroui/js/mediator',
-    'orotranslation/js/translator',
-    'oroui/js/delete-confirmation'
-], function($, Backbone, routing, mediator, __, DeleteConfirmation) {
+define(function(require) {
     'use strict';
 
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Backbone = require('backbone');
+    var routing = require('routing');
+    var mediator = require('oroui/js/mediator');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+
+    var EmbeddedFormWatcher;
     var $formTypeField;
     var $cssField;
     var $successMessageField;
@@ -70,24 +72,43 @@ define([
             });
     }
 
-    return Backbone.View.extend({
+    EmbeddedFormWatcher = Backbone.View.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmbeddedFormWatcher() {
+            EmbeddedFormWatcher.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
-            $formTypeField = $('#' + options.formTypeFieldId);
-            $cssField = $('#' + options.cssFieldId);
-            $successMessageField = $('#' + options.successMessageFieldId);
+            if (!_.isObject(options)) {
+                return;
+            }
+
+            $formTypeField = $(options.formTypeFieldId);
+            $cssField = $(options.cssFieldId);
+            $successMessageField = $(options.successMessageFieldId);
 
             rememberedFormType = $formTypeField.val();
             rememberedCss = options.defaultCss;
             rememberedSuccessMessage = options.defaultSuccessMessage;
 
             blockNextRequest = false;
+
+            this.startWatching(options.forceDataLoading);
         },
+
         startWatching: function(forceDataLoading) {
             $formTypeField.change(processFormTypeChange);
 
-            if (true === forceDataLoading) {
+            if (forceDataLoading) {
                 $formTypeField.trigger('change');
             }
         }
     });
+
+    return EmbeddedFormWatcher;
 });

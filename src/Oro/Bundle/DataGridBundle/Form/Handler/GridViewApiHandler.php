@@ -3,13 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Form\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
-use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 class GridViewApiHandler
 {

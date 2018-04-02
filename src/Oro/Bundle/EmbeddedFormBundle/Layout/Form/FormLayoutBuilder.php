@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Form;
 
+use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
 use Oro\Component\Layout\Block\Type\Options;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
-
-use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
+use Symfony\Component\Form\FormInterface;
 
 class FormLayoutBuilder implements FormLayoutBuilderInterface
 {
@@ -219,7 +217,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
         }
         $resolvedFormType = $formConfig->getType();
         while ($resolvedFormType) {
-            if (isset($this->simpleFormTypes[$resolvedFormType->getInnerType()->getName()])) {
+            if (isset($this->simpleFormTypes[$resolvedFormType->getName()])) {
                 return false;
             }
             $resolvedFormType = $resolvedFormType->getParent();

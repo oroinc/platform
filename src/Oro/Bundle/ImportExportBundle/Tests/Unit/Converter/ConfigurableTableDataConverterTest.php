@@ -2,221 +2,248 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 
 class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var array
      */
-    protected $fields = array(
-        'ScalarEntity' => array(
-            array(
+    protected $fields = [
+        'ScalarEntity' => [
+            [
                 'name' => 'created',
                 'label' => 'Created',
-            ),
-            array(
+            ],
+            [
                 'name' => 'name',
                 'label' => 'Name',
-            ),
-            array(
+            ],
+            [
                 'name' => 'id',
                 'label' => 'ID',
-            ),
-            array(
+            ],
+            [
                 'name' => 'description',
                 'label' => 'Description',
-            ),
-        ),
-        'SingleRelationEntity' => array(
-            array(
+            ],
+        ],
+        'SingleRelationEntity' => [
+            [
                 'name' => 'id',
                 'label' => 'ID',
-            ),
-            array(
+            ],
+            [
                 'name' => 'name',
                 'label' => 'Name',
-            ),
-            array(
+            ],
+            [
                 'name' => 'fullScalar',
                 'label' => 'Full Scalar',
                 'relation_type' => 'ref-one',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-            array(
+            ],
+            [
                 'name' => 'shortScalar',
                 'label' => 'Short Scalar',
                 'relation_type' => 'manyToOne',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-            array(
+            ],
+            [
                 'name' => 'innerRelation',
                 'label' => 'Inner Relation',
                 'relation_type' => 'ref-one',
                 'related_entity_name' => 'IdentitySingleRelationEntity',
-            ),
-        ),
-        'IdentitySingleRelationEntity' => array(
-            array(
+            ],
+        ],
+        'IdentitySingleRelationEntity' => [
+            [
                 'name' => 'id',
                 'label' => 'ID',
-            ),
-            array(
+            ],
+            [
                 'name' => 'name',
                 'label' => 'Name',
-            ),
-            array(
+            ],
+            [
                 'name' => 'identityRelation',
                 'label' => 'Identity Relation',
                 'relation_type' => 'ref-one',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-        ),
-        'DictionaryEntity' => array(
-            array(
+            ],
+        ],
+        'DictionaryEntity' => [
+            [
                 'name' => 'id',
                 'label' => 'ID',
-            ),
-            array(
+            ],
+            [
                 'name' => 'scalarEntity',
                 'label' => 'Scalar Entity',
                 'relation_type' => 'ref-one',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-            array(
+            ],
+            [
                 'name' => 'dictionaryScalarEntities',
                 'label' => 'Dictionary Scalar Entities',
                 'relation_type' => 'ref-many',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-        ),
-        'MultipleRelationEntity' => array(
-            array(
+            ],
+        ],
+        'MultipleRelationEntity' => [
+            [
                 'name' => 'id',
                 'label' => 'ID',
-            ),
-            array(
+            ],
+            [
                 'name' => 'scalarEntities',
                 'label' => 'Scalar Entities',
                 'relation_type' => 'ref-many',
                 'related_entity_name' => 'ScalarEntity',
-            ),
-            array(
+            ],
+            [
                 'name' => 'singleRelationEntities',
                 'label' => 'Single Relation Entities',
                 'relation_type' => 'oneToMany',
                 'related_entity_name' => 'SingleRelationEntity',
-            ),
-            array(
+            ],
+            [
                 'name' => 'dictionaryEntities',
                 'label' => 'Dictionary Entities',
                 'relation_type' => 'manyToMany',
                 'related_entity_name' => 'DictionaryEntity',
-            )
-        ),
-    );
+            ]
+        ],
+    ];
 
     /**
      * @var array
      */
-    protected $config = array(
-        'ScalarEntity' => array(
-            'id' => array(
+    protected $config = [
+        'ScalarEntity' => [
+            'id' => [
                 'order' => 10
-            ),
-            'name' => array(
+            ],
+            'created' => [
+                'header' => '',
+            ],
+            'name' => [
                 'header' => 'Entity Name',
                 'identity' => true,
                 'order' => 20,
-            ),
-            'description' => array(
+            ],
+            'description' => [
                 'excluded' => true,
-            ),
-        ),
-        'SingleRelationEntity' => array(
-            'id' => array(
+            ],
+        ],
+        'SingleRelationEntity' => [
+            'id' => [
                 'order' => 10
-            ),
-            'name' => array(
+            ],
+            'name' => [
                 'order' => 20,
-            ),
-            'fullScalar' => array(
+            ],
+            'fullScalar' => [
                 'order' => 30,
                 'full' => true,
-            ),
-            'shortScalar' => array(
+            ],
+            'shortScalar' => [
                 'order' => 40,
-            ),
-            'innerRelation' => array(
+            ],
+            'innerRelation' => [
                 'order' => 50,
-            ),
-        ),
-        'IdentitySingleRelationEntity' => array(
-            'id' => array(
+            ],
+        ],
+        'IdentitySingleRelationEntity' => [
+            'id' => [
                 'order' => 10
-            ),
-            'name' => array(
+            ],
+            'name' => [
                 'order' => 20,
-            ),
-            'identityRelation' => array(
+            ],
+            'identityRelation' => [
                 'order' => 30,
                 'identity' => true,
-            ),
-        ),
-        'DictionaryEntity' => array(
-            'id' => array(
+            ],
+        ],
+        'DictionaryEntity' => [
+            'id' => [
                 'order' => 10
-            ),
-            'scalarEntity' => array(
+            ],
+            'scalarEntity' => [
                 'order' => 20,
-            ),
-            'dictionaryScalarEntities' => array(
+            ],
+            'dictionaryScalarEntities' => [
                 'order' => 30,
-            ),
-        ),
-        'MultipleRelationEntity' => array(
-            'id' => array(
+            ],
+        ],
+        'MultipleRelationEntity' => [
+            'id' => [
                 'order' => 10
-            ),
-            'scalarEntities' => array(
+            ],
+            'scalarEntities' => [
                 'order' => 20
-            ),
-            'singleRelationEntities' => array(
+            ],
+            'singleRelationEntities' => [
                 'order' => 30,
                 'full' => true,
-            ),
-            'dictionaryEntities' => array(
+            ],
+            'dictionaryEntities' => [
                 'order' => 40,
                 'full' => true,
-            ),
-        ),
-    );
+            ],
+        ],
+    ];
 
     /**
      * @var array
      */
-    protected $relations = array(
-        'DictionaryEntity' => array(
+    protected $relations = [
+        'DictionaryEntity' => [
             'dictionaryScalarEntities' => 2,
-        ),
-        'MultipleRelationEntity' => array(
+        ],
+        'MultipleRelationEntity' => [
             'scalarEntities' => 3,
             'singleRelationEntities' => 1,
             'dictionaryEntities' => 2,
-        )
-    );
+        ]
+    ];
 
     /**
      * @var ConfigurableTableDataConverter
      */
     protected $converter;
 
+    /**
+     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldHelper;
+
+    /**
+     * @var RelationCalculator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $relationCalculator;
+
     protected function setUp()
     {
-        $fieldHelper = $this->prepareFieldHelper();
-        $relationCalculator = $this->prepareRelationCalculator();
-        $this->converter = new ConfigurableTableDataConverter($fieldHelper, $relationCalculator);
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $fieldProvider = $this->createMock(EntityFieldProvider::class);
+        $fieldTypeHelper = new FieldTypeHelper([]);
+
+        $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
+            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
+            ->setMethods(['getConfigValue', 'getFields', 'processRelationAsScalar', 'setLocale'])
+            ->getMock();
+
+        $this->relationCalculator = $this->createMock(RelationCalculator::class);
+
+        $this->converter = new ConfigurableTableDataConverter($this->fieldHelper, $this->relationCalculator);
     }
 
     /**
@@ -225,7 +252,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssertEntityName()
     {
-        $this->converter->convertToExportFormat(array());
+        $this->converter->convertToExportFormat([]);
     }
 
     /**
@@ -234,33 +261,33 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function exportDataProvider()
     {
-        return array(
-            'empty scalar' => array(
+        return [
+            'empty scalar' => [
                 'entityName' => 'ScalarEntity',
-                'input' => array(),
-                'expected' => array(
+                'input' => [],
+                'expected' => [
                     'ID' => '',
                     'Entity Name' => '',
                     'Created' => '',
-                ),
-            ),
-            'full scalar' => array(
+                ],
+            ],
+            'full scalar' => [
                 'entityName' => 'ScalarEntity',
-                'input' => array(
+                'input' => [
                     'id' => 42,
                     'name' => 'qwerty',
                     'created' => '2012-12-12 12:12:12'
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'ID' => '42',
                     'Entity Name' => 'qwerty',
                     'Created' => '2012-12-12 12:12:12',
-                ),
-            ),
-            'empty single relation' => array(
+                ],
+            ],
+            'empty single relation' => [
                 'entityName' => 'SingleRelationEntity',
-                'input' => array(),
-                'expected' => array(
+                'input' => [],
+                'expected' => [
                     'ID' => '',
                     'Name' => '',
                     'Full Scalar ID' => '',
@@ -268,22 +295,22 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Full Scalar Created' => '',
                     'Short Scalar Entity Name' => '',
                     'Inner Relation Identity Relation Entity Name' => '',
-                ),
-            ),
-            'full single relation' => array(
+                ],
+            ],
+            'full single relation' => [
                 'entityName' => 'SingleRelationEntity',
-                'input' => array(
+                'input' => [
                     'id' => 1,
                     'name' => 'Relation Name',
-                    'fullScalar' => array(
+                    'fullScalar' => [
                         'id' => 42,
                         'name' => 'qwerty',
                         'created' => '2012-12-12 12:12:12',
-                    ),
-                    'shortScalar' => array('name' => 'asdfgh'),
-                    'innerRelation' => array('identityRelation' => array('name' => 'test123')),
-                ),
-                'expected' => array(
+                    ],
+                    'shortScalar' => ['name' => 'asdfgh'],
+                    'innerRelation' => ['identityRelation' => ['name' => 'test123']],
+                ],
+                'expected' => [
                     'ID' => '1',
                     'Name' => 'Relation Name',
                     'Full Scalar ID' => '42',
@@ -291,12 +318,12 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Full Scalar Created' => '2012-12-12 12:12:12',
                     'Short Scalar Entity Name' => 'asdfgh',
                     'Inner Relation Identity Relation Entity Name' => 'test123'
-                ),
-            ),
-            'empty multiple relation' => array(
+                ],
+            ],
+            'empty multiple relation' => [
                 'entityName' => 'MultipleRelationEntity',
-                'input' => array(),
-                'expected' => array(
+                'input' => [],
+                'expected' => [
                     'ID' => '',
                     'Scalar Entities 1 Entity Name' => '',
                     'Scalar Entities 2 Entity Name' => '',
@@ -316,54 +343,54 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Dictionary Entities 2 Scalar Entity Entity Name' => '',
                     'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => '',
                     'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => '',
-                ),
-            ),
-            'full multiple relation' => array(
+                ],
+            ],
+            'full multiple relation' => [
                 'entityName' => 'MultipleRelationEntity',
-                'input' => array(
+                'input' => [
                     'id' => 12,
-                    'scalarEntities' => array(
-                        array('name' => 'first'),
-                        array('name' => 'second'),
-                        array('name' => 'third')
-                    ),
-                    'singleRelationEntities' => array(
-                        array(
+                    'scalarEntities' => [
+                        ['name' => 'first'],
+                        ['name' => 'second'],
+                        ['name' => 'third']
+                    ],
+                    'singleRelationEntities' => [
+                        [
                             'id' => 23,
                             'name' => 'relation',
-                            'fullScalar' => array(
+                            'fullScalar' => [
                                 'id' => 43,
                                 'name' => 'qwerty',
                                 'created' => '2012-12-12 12:12:12',
-                            ),
-                            'shortScalar' => array('name' => 'asdfgh'),
-                            'innerRelation' => array('identityRelation' => array('name' => 'test123')),
-                        )
-                    ),
-                    'dictionaryEntities' => array(
-                        array(
+                            ],
+                            'shortScalar' => ['name' => 'asdfgh'],
+                            'innerRelation' => ['identityRelation' => ['name' => 'test123']],
+                        ]
+                    ],
+                    'dictionaryEntities' => [
+                        [
                             'id' => 55,
-                            'scalarEntity' => array(
+                            'scalarEntity' => [
                                 'name' => 'dictionary_scalar_1',
-                            ),
-                            'dictionaryScalarEntities' => array(
-                                array('name' => 'dict_1'),
-                                array('name' => 'dict_2'),
-                            ),
-                        ),
-                        array(
+                            ],
+                            'dictionaryScalarEntities' => [
+                                ['name' => 'dict_1'],
+                                ['name' => 'dict_2'],
+                            ],
+                        ],
+                        [
                             'id' => 56,
-                            'scalarEntity' => array(
+                            'scalarEntity' => [
                                 'name' => 'dictionary_scalar_2',
-                            ),
-                            'dictionaryScalarEntities' => array(
-                                array('name' => 'dict_3'),
-                                array('name' => 'dict_4'),
-                            ),
-                        ),
-                    )
-                ),
-                'expected' => array(
+                            ],
+                            'dictionaryScalarEntities' => [
+                                ['name' => 'dict_3'],
+                                ['name' => 'dict_4'],
+                            ],
+                        ],
+                    ]
+                ],
+                'expected' => [
                     'ID' => '12',
                     'Scalar Entities 1 Entity Name' => 'first',
                     'Scalar Entities 2 Entity Name' => 'second',
@@ -383,9 +410,9 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Dictionary Entities 2 Scalar Entity Entity Name' => 'dictionary_scalar_2',
                     'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => 'dict_3',
                     'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => 'dict_4',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -396,6 +423,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testExport($entityName, array $input, array $expected)
     {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
         $this->assertSame($expected, $this->converter->convertToExportFormat($input));
     }
@@ -406,33 +435,33 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function importDataProvider()
     {
-        return array(
-            'empty scalar' => array(
+        return [
+            'empty scalar' => [
                 'entityName' => 'ScalarEntity',
-                'input' => array(),
-                'expected' => array(),
-            ),
-            'full scalar' => array(
+                'input' => [],
+                'expected' => [],
+            ],
+            'full scalar' => [
                 'entityName' => 'ScalarEntity',
-                'input' => array(
+                'input' => [
                     'ID' => '42',
                     'Entity Name' => 'qwerty',
                     'Created' => '2012-12-12 12:12:12',
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'id' => '42',
                     'name' => 'qwerty',
                     'created' => '2012-12-12 12:12:12'
-                ),
-            ),
-            'empty single relation' => array(
+                ],
+            ],
+            'empty single relation' => [
                 'entityName' => 'SingleRelationEntity',
-                'input' => array(),
-                'expected' => array(),
-            ),
-            'full single relation' => array(
+                'input' => [],
+                'expected' => [],
+            ],
+            'full single relation' => [
                 'entityName' => 'SingleRelationEntity',
-                'input' => array(
+                'input' => [
                     'ID' => '1',
                     'Name' => 'Relation Name',
                     'Full Scalar ID' => '42',
@@ -440,33 +469,33 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Full Scalar Created' => '2012-12-12 12:12:12',
                     'Short Scalar Entity Name' => 'asdfgh',
                     'Inner Relation Identity Relation Entity Name' => 'test123',
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'id' => '1',
                     'name' => 'Relation Name',
-                    'fullScalar' => array(
+                    'fullScalar' => [
                         'id' => '42',
                         'name' => 'qwerty',
                         'created' => '2012-12-12 12:12:12',
-                    ),
-                    'shortScalar' => array(
+                    ],
+                    'shortScalar' => [
                         'name' => 'asdfgh',
-                    ),
-                    'innerRelation' => array(
-                        'identityRelation' => array(
+                    ],
+                    'innerRelation' => [
+                        'identityRelation' => [
                             'name' => 'test123'
-                        )
-                    ),
-                ),
-            ),
-            'empty multiple relation' => array(
+                        ]
+                    ],
+                ],
+            ],
+            'empty multiple relation' => [
                 'entityName' => 'MultipleRelationEntity',
-                'input' => array(),
-                'expected' => array(),
-            ),
-            'full multiple relation' => array(
+                'input' => [],
+                'expected' => [],
+            ],
+            'full multiple relation' => [
                 'entityName' => 'MultipleRelationEntity',
-                'input' => array(
+                'input' => [
                     'ID' => '12',
                     'Scalar Entities 1 Entity Name' => 'first',
                     'Scalar Entities 2 Entity Name' => 'second',
@@ -485,51 +514,51 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Dictionary Entities 2 Scalar Entity Entity Name' => 'dictionary_scalar_2',
                     'Dictionary Entities 2 Dictionary Scalar Entities 1 Entity Name' => 'dict_3',
                     'Dictionary Entities 2 Dictionary Scalar Entities 2 Entity Name' => 'dict_4',
-                ),
-                'expected' => array(
+                ],
+                'expected' => [
                     'id' => '12',
-                    'scalarEntities' => array(
-                        array('name' => 'first'),
-                        array('name' => 'second'),
-                        array('name' => 'third')
-                    ),
-                    'singleRelationEntities' => array(
-                        array(
+                    'scalarEntities' => [
+                        ['name' => 'first'],
+                        ['name' => 'second'],
+                        ['name' => 'third']
+                    ],
+                    'singleRelationEntities' => [
+                        [
                             'id' => '23',
                             'name' => 'relation',
-                            'fullScalar' => array(
+                            'fullScalar' => [
                                 'id' => '43',
                                 'name' => 'qwerty',
                                 'created' => '2012-12-12 12:12:12',
-                            ),
-                            'shortScalar' => array('name' => 'asdfgh'),
-                        )
-                    ),
-                    'dictionaryEntities' => array(
-                        array(
+                            ],
+                            'shortScalar' => ['name' => 'asdfgh'],
+                        ]
+                    ],
+                    'dictionaryEntities' => [
+                        [
                             'id' => '55',
-                            'scalarEntity' => array(
+                            'scalarEntity' => [
                                 'name' => 'dictionary_scalar_1',
-                            ),
-                            'dictionaryScalarEntities' => array(
-                                array('name' => 'dict_1'),
-                                array('name' => 'dict_2'),
-                            ),
-                        ),
-                        array(
+                            ],
+                            'dictionaryScalarEntities' => [
+                                ['name' => 'dict_1'],
+                                ['name' => 'dict_2'],
+                            ],
+                        ],
+                        [
                             'id' => '56',
-                            'scalarEntity' => array(
+                            'scalarEntity' => [
                                 'name' => 'dictionary_scalar_2',
-                            ),
-                            'dictionaryScalarEntities' => array(
-                                array('name' => 'dict_3'),
-                                array('name' => 'dict_4'),
-                            ),
-                        ),
-                    )
-                ),
-            ),
-        );
+                            ],
+                            'dictionaryScalarEntities' => [
+                                ['name' => 'dict_3'],
+                                ['name' => 'dict_4'],
+                            ],
+                        ],
+                    ]
+                ],
+            ],
+        ];
     }
 
     /**
@@ -540,6 +569,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testImport($entityName, array $input, array $expected)
     {
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $this->converter->setEntityName($entityName);
         $this->assertSame($expected, $this->converter->convertToImportFormat($input));
     }
@@ -547,6 +578,8 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldHeaderWithRelation()
     {
         $fieldName = 'name';
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
         $simpleFieldValue = $this->converter->getFieldHeaderWithRelation('SingleRelationEntity', $fieldName);
         $this->assertEquals($simpleFieldValue, ucfirst($fieldName));
 
@@ -555,62 +588,90 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param bool $translateUsingLocale
+     * @param string $locale
+     * @param int $expectedCallsToGetLocale
+     * @param int $translateUsingLocaleCalls
+     *
+     * @dataProvider getImportWithTranslatedFieldsDataProvider
      */
-    protected function prepareFieldHelper()
-    {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldTypeHelper = new FieldTypeHelper([]);
+    public function testImportWithTranslatedFields(
+        $translateUsingLocale,
+        $locale,
+        $expectedCallsToGetLocale,
+        $translateUsingLocaleCalls
+    ) {
+        $this->converter->setTranslateUsingLocale($translateUsingLocale);
 
-        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->setConstructorArgs([$fieldProvider, $configProvider, $fieldTypeHelper])
-            ->setMethods(array('getConfigValue', 'getFields', 'processRelationAsScalar'))
-            ->getMock();
-        $fieldHelper->expects($this->any())->method('getConfigValue')
-            ->will(
-                $this->returnCallback(
-                    function ($entityName, $fieldName, $parameter, $default = null) {
-                        return isset($this->config[$entityName][$fieldName][$parameter])
-                            ? $this->config[$entityName][$fieldName][$parameter]
-                            : $default;
-                    }
-                )
-            );
-        $fieldHelper->expects($this->any())->method('getFields')->with($this->isType('string'), true)
-            ->will(
-                $this->returnCallback(
-                    function ($entityName) {
-                        return isset($this->fields[$entityName]) ? $this->fields[$entityName] : array();
-                    }
-                )
-            );
-        return $fieldHelper;
+        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->exactly($expectedCallsToGetLocale))
+            ->method('get')
+            ->with('oro_locale.language', false, false, null)
+            ->willReturn($locale);
+        $this->converter->setConfigManager($configManager);
+
+        $this->fieldHelper->expects($this->exactly($translateUsingLocaleCalls))
+            ->method('setLocale')
+            ->with($locale);
+
+        $this->prepareFieldHelper();
+        $this->prepareRelationCalculator();
+
+        $this->converter->setEntityName('EntityName');
+        $this->converter->convertToImportFormat(['field1' => 'Field1 name']);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return array
      */
-    protected function prepareRelationCalculator()
+    public function getImportWithTranslatedFieldsDataProvider()
     {
-        $relationCalculator = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\RelationCalculator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $relationCalculator->expects($this->any())->method('getMaxRelatedEntities')
+        return [
+            'fields should use locale' => [
+                'translateUsingLocale' => true,
+                'locale' => 'it_IT',
+                'expectedCallsToGetLocale' => 1,
+                'translateUsingLocaleCalls' => 1
+            ],
+            'fields should use default locale' => [
+                'translateUsingLocale' => false,
+                'locale' => null,
+                'expectedCallsToGetLocale' => 0,
+                'translateUsingLocaleCalls' => 0
+            ]
+        ];
+    }
+
+    protected function prepareFieldHelper()
+    {
+        $this->fieldHelper->expects($this->any())->method('getConfigValue')
             ->will(
                 $this->returnCallback(
-                    function ($entityName, $fieldName) {
-                        return isset($this->relations[$entityName][$fieldName])
-                            ? $this->relations[$entityName][$fieldName]
-                            : 0;
+                    function ($entityName, $fieldName, $parameter, $default = null) {
+                        return $this->config[$entityName][$fieldName][$parameter] ?? $default;
                     }
                 )
             );
+        $this->fieldHelper->expects($this->any())->method('getFields')->with($this->isType('string'), true)
+            ->will(
+                $this->returnCallback(
+                    function ($entityName) {
+                        return $this->fields[$entityName] ?? [];
+                    }
+                )
+            );
+    }
 
-        return $relationCalculator;
+    protected function prepareRelationCalculator()
+    {
+        $this->relationCalculator->expects($this->any())->method('getMaxRelatedEntities')
+            ->will(
+                $this->returnCallback(
+                    function ($entityName, $fieldName) {
+                        return $this->relations[$entityName][$fieldName] ?? 0;
+                    }
+                )
+            );
     }
 }

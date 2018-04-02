@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
@@ -17,6 +16,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Process async import message
+ */
 class ImportMessageProcessor implements MessageProcessorInterface
 {
     /**
@@ -149,6 +151,9 @@ class ImportMessageProcessor implements MessageProcessorInterface
             $body['options']
         );
 
+        if (!empty($result['deadlockDetected'])) {
+            throw new JobRedeliveryException();
+        }
         if (!empty($result['postponedRows'])) {
             $fileName = $this
                 ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $body['fileName']);

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients;
 use Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->constraint = new EmailRecipients();
-        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
     }
 
     public function testValidateNoErrors()

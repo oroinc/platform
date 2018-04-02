@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
-use Oro\Bundle\FormBundle\Form\Type\OroIconType;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
 
 class WorkflowDefinitionType extends AbstractType
 {
@@ -44,7 +43,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'related_entity',
-                ApplicableEntitiesType::NAME,
+                ApplicableEntitiesType::class,
                 [
                     'label' => 'oro.workflow.workflowdefinition.related_entity.label',
                     'required' => true,
@@ -63,7 +62,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'transition_prototype_icon',
-                OroIconType::NAME,
+                OroIconType::class,
                 [
                     'label' => 'oro.workflow.form.button_icon.label',
                     'mapped' => false,
@@ -73,7 +72,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'exclusive_active_groups',
-                OroChoiceType::NAME,
+                OroChoiceType::class,
                 [
                     'choices' => $this->provider->getActiveGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_active_groups.label',
@@ -84,7 +83,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'exclusive_record_groups',
-                OroChoiceType::NAME,
+                OroChoiceType::class,
                 [
                     'choices' => $this->provider->getRecordGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_record_groups.label',

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
 
 class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 {
@@ -150,7 +150,7 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->formType->getParent());
+        $this->assertEquals(HiddenType::class, $this->formType->getParent());
     }
 
     public function testGetName()

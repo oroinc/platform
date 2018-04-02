@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Bundle\SoapBundle\Event\FindAfter;
-use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ApiEventListener
 {

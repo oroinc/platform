@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Layout\Extension\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\Layout\Exception;
-use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Extension\ExtensionInterface;
+use Oro\Component\Layout\LayoutItemInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements ExtensionInterface
 {

@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type\Configuration;
 
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
-use Oro\Bundle\InstallerBundle\Validator\Constraints\ExtensionLoaded;
 
 class DatabaseType extends AbstractType
 {
@@ -26,7 +30,7 @@ class DatabaseType extends AbstractType
         $builder
             ->add(
                 'oro_installer_database_driver',
-                'choice',
+                ChoiceType::class,
                 array(
                     'label'       => 'form.configuration.database.driver',
                     'choices'       => array(
@@ -46,7 +50,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_host',
-                'text',
+                TextType::class,
                 array(
                     'label'       => 'form.configuration.database.host',
                     'constraints' => array(
@@ -56,7 +60,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_port',
-                'integer',
+                IntegerType::class,
                 array(
                     'label'       => 'form.configuration.database.port',
                     'required'    => false,
@@ -67,7 +71,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_name',
-                'text',
+                TextType::class,
                 array(
                     'label'       => 'form.configuration.database.name',
                     'constraints' => array(
@@ -77,7 +81,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_user',
-                'text',
+                TextType::class,
                 array(
                     'label'       => 'form.configuration.database.user',
                     'constraints' => array(
@@ -87,7 +91,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_password',
-                'password',
+                PasswordType::class,
                 array(
                     'label'    => 'form.configuration.database.password',
                     'required' => false,
@@ -95,7 +99,7 @@ class DatabaseType extends AbstractType
             )
             ->add(
                 'oro_installer_database_drop',
-                'choice',
+                ChoiceType::class,
                 array(
                     'label'         => 'form.configuration.database.drop',
                     'data'          => 'none',
@@ -135,7 +139,7 @@ class DatabaseType extends AbstractType
         $builder
             ->add(
                 'oro_installer_database_driver_options',
-                'oro_collection',
+                CollectionType::class,
                 [
                     'show_form_when_empty' => false,
                     'handle_primary' => false,

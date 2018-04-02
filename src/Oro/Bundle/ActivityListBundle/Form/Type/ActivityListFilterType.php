@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Form\Type;
 
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType as BaseFilterType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType as BaseFilterType;
 
 class ActivityListFilterType extends AbstractType
 {
@@ -32,7 +32,7 @@ class ActivityListFilterType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('filterType', 'choice', [
+            ->add('filterType', ChoiceType::class, [
                 'choices' => [
                     ActivityListFilter::TYPE_HAS_ACTIVITY     => ActivityListFilter::TYPE_HAS_ACTIVITY,
                     ActivityListFilter::TYPE_HAS_NOT_ACTIVITY => ActivityListFilter::TYPE_HAS_NOT_ACTIVITY,
@@ -59,7 +59,7 @@ class ActivityListFilterType extends AbstractType
      */
     public function getParent()
     {
-        return BaseFilterType::NAME;
+        return BaseFilterType::class;
     }
 
     /**

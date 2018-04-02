@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler\Stub;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class TestWarmer1 implements ConfigCacheWarmerInterface
 {

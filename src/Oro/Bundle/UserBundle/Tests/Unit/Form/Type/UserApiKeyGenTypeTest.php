@@ -2,40 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 {
-    /** @var UserApiKeyGenType */
-    protected $type;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        $this->type = new UserApiKeyGenType();
-        parent::setUp();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->type);
-        parent::tearDown();
-    }
-
     public function testSubmit()
     {
         $userApi = new UserApi();
-        $form = $this->factory->create($this->type, $userApi);
+        $form = $this->factory->create(UserApiKeyGenType::class, $userApi);
         $form->submit([]);
         $this->assertTrue($form->isValid());
 
@@ -47,7 +25,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
      */
     public function testApiKeyElementIdIsRequiredOption()
     {
-        $this->factory->create($this->type, null, ['apiKeyElementId' => null]);
+        $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => null]);
     }
 
     /**
@@ -55,7 +33,7 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
      */
     public function testApiKeyElementIdIsStringOption()
     {
-        $this->factory->create($this->type, null, ['apiKeyElementId' => new \stdClass]);
+        $this->factory->create(UserApiKeyGenType::class, null, ['apiKeyElementId' => new \stdClass]);
     }
 
     public function testDefaultOptions()
@@ -63,10 +41,10 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         $expected   = [
             'data_class' => UserApi::class,
             'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
-            'intention'   => UserApiKeyGenType::NAME,
+            'csrf_token_id' => UserApiKeyGenType::NAME,
             'apiKeyElementId' => 'user-apikey-gen-elem'
         ];
-        $form       = $this->factory->create($this->type, null, []);
+        $form       = $this->factory->create(UserApiKeyGenType::class, null, []);
         $defaults   = array_intersect_key($expected, $form->getConfig()->getOptions());
 
         $this->assertEquals($expected, $defaults);
@@ -74,12 +52,14 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $this->assertEquals(UserApiKeyGenType::NAME, $this->type->getName());
+        $type = new UserApiKeyGenType();
+        $this->assertEquals(UserApiKeyGenType::NAME, $type->getName());
     }
 
     public function testGetBlockPrefix()
     {
-        $this->assertEquals(UserApiKeyGenType::NAME, $this->type->getBlockPrefix());
+        $type = new UserApiKeyGenType();
+        $this->assertEquals(UserApiKeyGenType::NAME, $type->getBlockPrefix());
     }
 
     /**
@@ -90,8 +70,8 @@ class UserApiKeyGenTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    UserApiKeyGenType::NAME => new UserApiKeyGenType(),
-                    UserApiKeyGenKeyType::NAME => new UserApiKeyGenKeyType()
+                    UserApiKeyGenType::class => new UserApiKeyGenType(),
+                    UserApiKeyGenKeyType::class => new UserApiKeyGenKeyType()
                 ],
                 []
             )

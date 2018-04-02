@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Twig;
 
+use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 
 class FormExtension extends \Twig_Extension
 {

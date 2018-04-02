@@ -4,19 +4,19 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailOriginFromType extends AbstractType
 {
@@ -86,8 +86,14 @@ class EmailOriginFromType extends AbstractType
         $choices = $this->createChoices();
         $resolver->setDefaults([
             'choices'   => $choices,
-            'read_only' => count($choices) === 1,
+            'attr' => [],
         ]);
+
+        $resolver->setNormalizer('attr', function (Options $options, $value) {
+            $value['readonly'] = (count($options['choices']) === 1);
+
+            return $value;
+        });
     }
 
     /**
@@ -114,7 +120,7 @@ class EmailOriginFromType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

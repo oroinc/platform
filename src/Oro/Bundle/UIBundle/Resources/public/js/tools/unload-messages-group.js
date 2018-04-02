@@ -4,7 +4,9 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var MultiUseResourceManager = require('./multi-use-resource-manager');
-    var UnloadMessagesGroup = MultiUseResourceManager.extend({
+    var UnloadMessagesGroup;
+
+    UnloadMessagesGroup = MultiUseResourceManager.extend({
         listen: {
             constructResource: function() {
                 $(window).on('beforeunload', this.onBeforeUnload);
@@ -20,7 +22,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function(options) {
+        constructor: function UnloadMessagesGroup(options) {
             if (options.single) {
                 this.single = options.single;
             }

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Routing\Loader;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CumulativeRoutingFileLoader extends AbstractLoader
 {

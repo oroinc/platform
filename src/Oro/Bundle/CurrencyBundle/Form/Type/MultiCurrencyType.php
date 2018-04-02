@@ -2,17 +2,22 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
+use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
+use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
-
+/**
+ * Builds multi currency select with value and currency inputs, handles constraints assigning depending on default value
+ */
 class MultiCurrencyType extends PriceType
 {
     const NAME = 'oro_multicurrency';
@@ -44,25 +49,23 @@ class MultiCurrencyType extends PriceType
         $builder
             ->add(
                 'value',
-                'number',
+                NumberType::class,
                 [
                     'required' => $isRequired,
-                    'scale' => $this->roundingService->getPrecision(),
-                    'rounding_mode' => $this->roundingService->getRoundType(),
-                    'attr' => ['data-scale' => $this->roundingService->getPrecision()],
+                    'scale' => Price::MAX_VALUE_SCALE,
                     'constraints' => $options['value_constraints']
                 ]
             )
             ->add(
                 'currency',
-                CurrencySelectionType::NAME,
+                CurrencySelectionType::class,
                 [
                     'additional_currencies' => $options['additional_currencies'],
                     'currencies_list' => $options['currencies_list'],
                     'full_currency_list' => $options['full_currency_list'],
                     'compact' => false,
                     'required' => $isRequired,
-                    'empty_value' => false
+                    'placeholder' => false
                 ]
             );
 
@@ -81,7 +84,7 @@ class MultiCurrencyType extends PriceType
                     ];
                 }
 
-                $event->getForm()->add('baseCurrencyValue', 'oro_money', $options);
+                $event->getForm()->add('baseCurrencyValue', OroMoneyType::class, $options);
             }
         );
     }

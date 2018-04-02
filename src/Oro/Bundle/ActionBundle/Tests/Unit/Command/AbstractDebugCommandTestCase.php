@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
-use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
-
-use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Increase or decrease the integer value by some value

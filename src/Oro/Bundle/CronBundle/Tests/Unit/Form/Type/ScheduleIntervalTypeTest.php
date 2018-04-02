@@ -2,31 +2,15 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\PreloadedExtension;
-
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
 use Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalType;
 use Oro\Bundle\CronBundle\Tests\Unit\Stub\ScheduleIntervalStub;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var FormInterface
-     */
-    protected $formType;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->formType = new ScheduleIntervalType();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -35,7 +19,7 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    OroDateTimeType::NAME => new OroDateTimeType()
+                    OroDateTimeType::class => new OroDateTimeType()
                 ],
                 []
             )
@@ -57,7 +41,7 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
         if (!$data) {
             $data = new ScheduleIntervalStub();
         }
-        $form = $this->factory->create($this->formType, $data);
+        $form = $this->factory->create(ScheduleIntervalType::class, $data);
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
@@ -91,11 +75,11 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
             ScheduleIntervalInterface::class
         ));
 
-        $this->factory->create($this->formType, null, ['data_class' => \stdClass::class]);
+        $this->factory->create(ScheduleIntervalType::class, null, ['data_class' => \stdClass::class]);
     }
 
     public function testDataClassImplementsInterface()
     {
-        $this->factory->create($this->formType, null, ['data_class' => ScheduleIntervalStub::class]);
+        $this->factory->create(ScheduleIntervalType::class, null, ['data_class' => ScheduleIntervalStub::class]);
     }
 }

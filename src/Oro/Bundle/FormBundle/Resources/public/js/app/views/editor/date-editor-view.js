@@ -99,6 +99,13 @@ define(function(require) {
 
         format: datetimeFormatter.getBackendDateFormat(),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function DateEditorView() {
+            DateEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             DateEditorView.__super__.render.call(this);
             var $input;

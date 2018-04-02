@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\Common\Annotations\AnnotationReader;
-
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 
 class IntegrationSelectTypeTest extends OrmTestCase
 {
@@ -63,7 +62,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
     public function testParent()
     {
-        $this->assertSame('oro_select2_choice', $this->type->getParent());
+        $this->assertSame(Select2ChoiceType::class, $this->type->getParent());
     }
 
     public function testFinishView()

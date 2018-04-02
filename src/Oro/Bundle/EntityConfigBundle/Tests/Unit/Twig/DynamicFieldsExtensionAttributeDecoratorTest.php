@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
-use Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator;
 use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\Unit\EntityTrait;

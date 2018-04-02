@@ -19,7 +19,7 @@ entity_config:
                         type:               oro_entity_config_choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.entity.items.auditable
 
@@ -46,7 +46,7 @@ entity_config:
                         type:               oro_entity_config_choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable
 

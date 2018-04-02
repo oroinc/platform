@@ -21,6 +21,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function ChangeEditableCellListener() {
+            ChangeEditableCellListener.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!_.has(options, 'selector')) {
                 throw new Error('Parameter selector is not specified');

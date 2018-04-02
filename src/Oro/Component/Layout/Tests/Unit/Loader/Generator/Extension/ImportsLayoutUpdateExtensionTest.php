@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 
-use Oro\Component\Layout\Loader\Generator\GeneratorData;
-use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
-use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportLayoutUpdateVisitor;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
+use Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension;
+use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ImportsLayoutUpdateExtensionTest extends \PHPUnit_Framework_TestCase
 {

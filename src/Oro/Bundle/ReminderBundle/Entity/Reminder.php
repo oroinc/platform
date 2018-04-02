@@ -3,13 +3,12 @@
 namespace Oro\Bundle\ReminderBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ExtendReminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
+use Oro\Bundle\ReminderBundle\Model\SenderAwareReminderDataInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**

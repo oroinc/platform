@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
-use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
-use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
+use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class OwnerTreeProviderTest extends OrmTestCase
 {

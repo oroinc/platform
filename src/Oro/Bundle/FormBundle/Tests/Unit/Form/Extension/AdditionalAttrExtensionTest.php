@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
+use Symfony\Component\Form\FormView;
 
 class AdditionalAttrExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Routing\Tests\Unit\Resolver;
 
-use Symfony\Component\Routing\Route;
-
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
+use Symfony\Component\Routing\Route;
 
 class SortableRouteCollectionTest extends \PHPUnit_Framework_TestCase
 {

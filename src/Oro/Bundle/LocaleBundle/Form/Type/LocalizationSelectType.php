@@ -17,7 +17,7 @@ class LocalizationSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'autocomplete_alias' => 'oro_localization',
+                'autocomplete_alias' => LocalizationType::class,
                 'create_form_route' => 'oro_locale_localization_create',
                 'configs' => [
                     'placeholder' => 'oro.locale.localization.form.placeholder.choose',
@@ -47,6 +47,6 @@ class LocalizationSelectType extends AbstractType
      */
     public function getParent()
     {
-        return OroEntitySelectOrCreateInlineType::NAME;
+        return OroEntitySelectOrCreateInlineType::class;
     }
 }

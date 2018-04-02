@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors as BaseCollectFormErrors;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.

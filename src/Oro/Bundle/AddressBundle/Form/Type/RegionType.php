@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RegionType extends AbstractType
 {
@@ -51,7 +52,7 @@ class RegionType extends AbstractType
                         'placeholder' => 'oro.address.form.choose_region',
                         'allowClear' => true
                     ),
-                    'empty_value' => '',
+                    'placeholder' => '',
                     'empty_data'  => null
                 )
             );
@@ -70,7 +71,7 @@ class RegionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

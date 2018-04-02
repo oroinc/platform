@@ -2,26 +2,16 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroColorTableType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\FormBundle\Form\Type\OroColorTableType;
-
 class OroColorTableTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroColorTableType */
-    protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->formType = new OroColorTableType();
-    }
-
     public function testBuildForm()
     {
-        $form = $this->factory->create($this->formType, [], []);
+        $form = $this->factory->create(OroColorTableType::class, [], []);
         $testData = [
             '#FFFFFF',
             '#000000',
@@ -36,7 +26,7 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
             'picker_control' => null,
         ];
 
-        $form = $this->factory->create($this->formType, [], []);
+        $form = $this->factory->create(OroColorTableType::class, [], []);
         $form->submit('');
         $options = $form->getConfig()->getOptions();
 
@@ -53,25 +43,28 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
      */
     public function testBuildView(array $options, array $expectedVars)
     {
-        $form = $this->factory->create($this->formType, [], []);
+        $form = $this->factory->create(OroColorTableType::class, [], []);
         $form->submit(json_encode(['#FFFFFF', '#000000']));
         $view = new FormView();
         $view->vars['value'] = [
             '#FFFFFF',
             '#000000',
         ];
-        $this->formType->buildView($view, $form, $options);
+        $formType = new OroColorTableType();
+        $formType->buildView($view, $form, $options);
         $this->assertEquals($expectedVars, $view->vars);
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->formType->getParent());
+        $formType = new OroColorTableType();
+        $this->assertEquals(HiddenType::class, $formType->getParent());
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_color_table', $this->formType->getName());
+        $formType = new OroColorTableType();
+        $this->assertEquals('oro_color_table', $formType->getName());
     }
 
     public function buildViewDataProvider()

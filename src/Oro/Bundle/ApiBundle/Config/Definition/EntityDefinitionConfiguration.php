@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {

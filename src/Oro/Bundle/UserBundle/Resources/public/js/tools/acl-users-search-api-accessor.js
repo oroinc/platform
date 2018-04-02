@@ -18,6 +18,13 @@ define(function(require) {
 
     AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @lends AclUsersSearchApiAccessor.prototype */{
         /**
+         * @inheritDoc
+         */
+        constructor: function AclUsersSearchApiAccessor() {
+            AclUsersSearchApiAccessor.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          */
         initialize: function(options) {

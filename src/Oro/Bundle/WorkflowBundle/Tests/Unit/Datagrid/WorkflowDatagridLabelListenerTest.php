@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\WorkflowBundle\Datagrid\WorkflowDatagridLabelListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WorkflowDatagridLabelListenerTest extends \PHPUnit_Framework_TestCase
 {

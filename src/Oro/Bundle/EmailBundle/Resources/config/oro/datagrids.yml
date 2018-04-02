@@ -182,7 +182,7 @@ datagrids:
                 subject: { data_name: subject }
                 receivedAt: { data_name: receivedAt }
                 mailbox: { data_name: originId }
-            default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
+            default: { receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC' }
         options:
             entityHint: emails
 
@@ -294,13 +294,13 @@ datagrids:
         mass_actions:
             emailmarkread:
                 type: emailmarkread
-                entity_name: %oro_email.email_user.entity.class%
+                entity_name: '%oro_email.email_user.entity.class%'
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_read
                 icon: check-square-o
             emailmarkunread:
                 type: emailmarkunread
-                entity_name: %oro_email.email_user.entity.class%
+                entity_name: '%oro_email.email_user.entity.class%'
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
@@ -418,7 +418,7 @@ datagrids:
                 fromEmailAddress: { data_name: fromEmailAddress }
                 receivedAt:  { data_name: receivedAt }
             default:
-                receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
 
     dashboard-recent-emails-sent-grid:
         extends: dashboard-recent-emails-grid
@@ -452,7 +452,7 @@ datagrids:
             columns:
                 sentAt:  { data_name: e.sentAt }
             default:
-                sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                sentAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
 
     dashboard-recent-emails-new-grid:
         extends: dashboard-recent-emails-grid
@@ -486,7 +486,7 @@ datagrids:
                 fromEmailAddress: { data_name: fromEmailAddress }
                 receivedAt:  { data_name: receivedAt }
             default:
-                receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                receivedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         options:
             requireJSModules:
                 - oroemail/js/datagrid/listen-to-read-email-extension
@@ -503,7 +503,7 @@ datagrids:
                     - t.type
                     - t.isSystem
                 from:
-                    - { table: %oro_email.emailtemplate.entity.class%, alias: t }
+                    - { table: '%oro_email.emailtemplate.entity.class%', alias: t }
                 where:
                     and:
                         - t.visible = true
@@ -593,9 +593,9 @@ datagrids:
                 link:         delete_link
         options:
             entity_pagination: true
+            entityHint: email template
         action_configuration: "@oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure"
         views_list : "@oro_email.emailtemplate.datagrid_view_list"
-        options: { entityHint: email template }
 
     base-mailboxes-grid:
         source:

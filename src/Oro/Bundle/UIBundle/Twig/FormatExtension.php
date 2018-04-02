@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 
 class FormatExtension extends \Twig_Extension
 {

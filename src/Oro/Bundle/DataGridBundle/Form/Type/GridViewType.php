@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
+use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\DataGridBundle\Entity\GridView;
 
 class GridViewType extends AbstractType
 {
@@ -22,17 +25,17 @@ class GridViewType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('label', 'text', [
+            ->add('label', TextType::class, [
                 'property_path' => 'name',
             ])
-            ->add('is_default', 'checkbox', [
+            ->add('is_default', CheckboxType::class, [
                 'required' => false,
                 'mapped'   => false,
             ])
-            ->add('type', 'choice', [
+            ->add('type', ChoiceType::class, [
                 'choices' => GridView::getTypes(),
             ])
-            ->add('grid_name', 'text', [
+            ->add('grid_name', TextType::class, [
                 'property_path' => 'gridName',
             ])
             ->add(
@@ -44,7 +47,7 @@ class GridViewType extends AbstractType
                     'required' => false,
                 ]
             )
-            ->add('appearanceData', 'text', [
+            ->add('appearanceData', TextType::class, [
                 'property_path' => 'appearanceData',
                 'empty_data'    => [],
                 'required' => false,
@@ -53,13 +56,13 @@ class GridViewType extends AbstractType
                 'property_path' => 'filtersData',
                 'empty_data'    => [],
             ])
-            ->add('sorters', 'collection', [
+            ->add('sorters', CollectionType::class, [
                 'property_path'  => 'sorters_data',
                 'error_bubbling' => false,
                 'allow_add'      => true,
                 'allow_delete'   => true,
-                'type'           => 'choice',
-                'options'        => [
+                'entry_type'           => 'choice',
+                'entry_options'        => [
                     'choices' => [
                         1  => 1,
                         -1 => -1

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration\Sorter;
 
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Exception\CircularReferenceException;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
 /**
  * Basically code of this class comes from origin \Doctrine\Common\DataFixtures\Loader.

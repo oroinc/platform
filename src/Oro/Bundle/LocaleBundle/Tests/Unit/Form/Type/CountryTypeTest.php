@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType as BaseCountryType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\LocaleBundle\Form\Type\CountryType;
 
 class CountryTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class CountryTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('country', $this->formType->getParent());
+        $this->assertEquals(BaseCountryType::class, $this->formType->getParent());
     }
 
     public function testGetName()

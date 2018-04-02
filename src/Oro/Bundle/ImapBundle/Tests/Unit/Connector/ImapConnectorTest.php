@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector;
 
-use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapServices;
 
 class ImapConnectorTest extends \PHPUnit_Framework_TestCase

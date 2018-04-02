@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;

@@ -4,12 +4,10 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\Expr;
-
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 {

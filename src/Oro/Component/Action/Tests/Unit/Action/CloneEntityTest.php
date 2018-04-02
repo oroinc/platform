@@ -4,17 +4,14 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Action\CloneEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CloneEntityTest extends \PHPUnit_Framework_TestCase
 {

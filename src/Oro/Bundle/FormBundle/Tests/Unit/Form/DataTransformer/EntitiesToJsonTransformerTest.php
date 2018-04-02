@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 
 class EntitiesToJsonTransformerTest extends \PHPUnit_Framework_TestCase

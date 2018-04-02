@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor;
 
-use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\Testing\Unit\TestContainerBuilder;
-
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverterInterface;
 use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Bundle\MessageQueueBundle\Log\Processor\AddConsumerStateProcessor;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor\Stub\ExtensionProxy;
+use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddConsumerStateProcessorTest extends \PHPUnit_Framework_TestCase
 {

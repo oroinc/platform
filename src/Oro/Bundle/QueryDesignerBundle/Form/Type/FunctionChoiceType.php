@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 
 class FunctionChoiceType extends AbstractType
 {
@@ -54,7 +55,7 @@ class FunctionChoiceType extends AbstractType
 
         $resolver->setDefaults([
             'choices'                => [],
-            'empty_value'            => 'oro.query_designer.form.choose_function',
+            'placeholder'            => 'oro.query_designer.form.choose_function',
             'empty_data'             => '',
             'page_component'         => 'oroui/js/app/components/view-component',
             'page_component_options' => [
@@ -81,7 +82,7 @@ class FunctionChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

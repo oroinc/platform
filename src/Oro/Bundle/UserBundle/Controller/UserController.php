@@ -2,26 +2,28 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * This controller covers basic CRUD functionality for User entity.
+ * Also includes user profile management functionality.
+ */
 class UserController extends Controller
 {
     /**
@@ -33,6 +35,9 @@ class UserController extends Controller
      *      class="OroUserBundle:User",
      *      permission="VIEW"
      * )
+     *
+     * @param User $user
+     * @return array
      */
     public function viewAction(User $user)
     {
@@ -45,6 +50,7 @@ class UserController extends Controller
     /**
      * @Route("/profile/view", name="oro_user_profile_view")
      * @Template("OroUserBundle:User:view.html.twig")
+     * @AclAncestor("oro_user_user_view")
      */
     public function viewProfileAction()
     {
@@ -64,6 +70,9 @@ class UserController extends Controller
     /**
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
      * @Method({"GET","POST"})
+     *
+     * @param User $user
+     * @return JsonResponse|Response
      */
     public function apigenAction(User $user)
     {
@@ -71,13 +80,13 @@ class UserController extends Controller
             throw $this->createAccessDeniedException();
         }
         $userApi = $this->getUserApi($user);
-        $form = $this->createForm('oro_user_apikey_gen', $userApi);
+        $form = $this->createForm(UserApiKeyGenType::class, $userApi);
 
         $request = $this->container->get('request_stack')->getCurrentRequest();
         if ($request->getMethod() === 'POST') {
             $userApi->setApiKey($userApi->generateKey());
             $form->setData($userApi);
-            $form->submit($request);
+            $form->handleRequest($request);
 
             $responseData = ['data' => [], 'status' => 'success'];
             $status = Response::HTTP_OK;
@@ -92,6 +101,7 @@ class UserController extends Controller
 
             return new JsonResponse($responseData, $status);
         }
+        $view = $form->createView();
 
         return $this->render(
             'OroUserBundle:User/widget:apiKeyGen.html.twig',
@@ -129,6 +139,9 @@ class UserController extends Controller
      *      class="OroUserBundle:User",
      *      permission="EDIT"
      * )
+     *
+     * @param User $entity
+     * @return array|RedirectResponse
      */
     public function updateAction(User $entity)
     {
@@ -147,9 +160,9 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        return array(
+        return [
             'entity_class' => $this->container->getParameter('oro_user.entity.class')
-        );
+        ];
     }
 
     /**
@@ -186,7 +199,7 @@ class UserController extends Controller
     {
         // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
         // completely delete an owner and related entities or reassign related entities to another owner before
-        
+
         return [
             'entity' => $entity,
             'allow_delete' => $this->isUserDeleteAllowed($entity),
@@ -219,11 +232,11 @@ class UserController extends Controller
             throw new AccessDeniedException();
         }
 
-        return array(
+        return [
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
             'viewProfile' => $isViewProfile
-        );
+        ];
     }
 
     /**

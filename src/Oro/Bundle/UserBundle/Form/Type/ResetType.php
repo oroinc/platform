@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 
 class ResetType extends AbstractType
 {
@@ -31,7 +31,7 @@ class ResetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('plainPassword', 'repeated', [
+        $builder->add('plainPassword', RepeatedType::class, [
             'type'            => 'password',
             'required'        => true,
             'invalid_message' => 'oro.user.message.password_mismatch',
@@ -55,7 +55,7 @@ class ResetType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => $this->class,
-            'intention'  => 'reset',
+            'csrf_token_id' => 'reset',
             'dynamic_fields_disabled' => true
         ]);
     }

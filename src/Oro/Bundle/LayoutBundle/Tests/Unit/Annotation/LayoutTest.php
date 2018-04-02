@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Annotation;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\LayoutBundle\Annotation\Layout;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class LayoutTest extends \PHPUnit_Framework_TestCase
 {

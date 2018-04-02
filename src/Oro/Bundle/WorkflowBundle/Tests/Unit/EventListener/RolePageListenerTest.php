@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\WorkflowBundle\EventListener\RolePageListener;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RolePageListenerTest extends \PHPUnit_Framework_TestCase

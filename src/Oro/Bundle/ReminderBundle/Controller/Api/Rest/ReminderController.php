@@ -6,7 +6,6 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
-
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\HttpFoundation\Request;
 

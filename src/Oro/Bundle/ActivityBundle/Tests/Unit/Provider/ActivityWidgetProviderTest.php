@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Provider\ActivityWidgetProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
 {

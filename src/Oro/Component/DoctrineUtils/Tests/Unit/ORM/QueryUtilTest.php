@@ -6,7 +6,6 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
-
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 

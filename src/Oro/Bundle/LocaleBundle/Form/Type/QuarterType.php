@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class QuarterType extends AbstractType
 {
@@ -46,7 +46,7 @@ class QuarterType extends AbstractType
             ]
         );
 
-        $resolver->setAllowedValues(['input' => ['array']]);
+        $resolver->setAllowedValues('input', ['array']);
     }
 
     /**
@@ -70,6 +70,6 @@ class QuarterType extends AbstractType
      */
     public function getParent()
     {
-        return 'date';
+        return DateType::class;
     }
 }

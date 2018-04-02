@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\NotificationBundle\Form\Type;
 
+use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,7 +20,7 @@ class RecipientListType extends AbstractType
     {
         $builder->add(
             'users',
-            'oro_user_organization_acl_multiselect',
+            OrganizationUserAclMultiSelectType::class,
             [
                 'required' => false,
                 'label'    => 'oro.user.entity_plural_label'
@@ -35,7 +37,7 @@ class RecipientListType extends AbstractType
                 'choice_label'      => 'name',
                 'multiple'      => true,
                 'expanded'      => true,
-                'empty_value'   => '',
+                'placeholder'   => '',
                 'empty_data'    => null,
                 'required'      => false,
             ]
@@ -44,7 +46,7 @@ class RecipientListType extends AbstractType
         // custom email
         $builder->add(
             'email',
-            'email',
+            EmailType::class,
             ['label' => 'oro.notification.emailnotification.email.label', 'required' => false]
         );
     }
@@ -57,7 +59,7 @@ class RecipientListType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
-                'intention' => 'recipientlist',
+                'csrf_token_id' => 'recipientlist',
             ]
         );
     }

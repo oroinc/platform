@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
+use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
+use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,11 +17,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
-use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
-use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
-use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
 
 class EntityFieldFallbackValueType extends AbstractType
 {

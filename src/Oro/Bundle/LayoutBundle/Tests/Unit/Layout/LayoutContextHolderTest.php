@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Oro\Component\Layout\ContextInterface;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Component\Layout\ContextInterface;
 
 class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
 {

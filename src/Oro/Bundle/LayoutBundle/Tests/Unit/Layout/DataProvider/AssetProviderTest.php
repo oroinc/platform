@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 
-use Symfony\Component\Asset\Packages;
-
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\AssetProvider;
+use Symfony\Component\Asset\Packages;
 
 class AssetProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
@@ -22,6 +18,8 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

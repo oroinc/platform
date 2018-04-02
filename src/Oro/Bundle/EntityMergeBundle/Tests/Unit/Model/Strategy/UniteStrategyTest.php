@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;

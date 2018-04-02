@@ -23,7 +23,7 @@ Form components are form types, data transformers and event listeners.
 
 ### Event Subscribers
 
-* **Form / EventListener / FixArrayToStringListener** - converts array to string on form PRE_BIND event.
+* **Form / EventListener / FixArrayToStringListener** - converts array to string on form PRE_SUBMIT event.
 
 
 ### Configuration

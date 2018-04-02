@@ -3,13 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Model\Condition;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * Check For Active integration of given type

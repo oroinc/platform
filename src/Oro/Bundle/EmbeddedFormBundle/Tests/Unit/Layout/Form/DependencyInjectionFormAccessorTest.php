@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormView;
 
 class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 {

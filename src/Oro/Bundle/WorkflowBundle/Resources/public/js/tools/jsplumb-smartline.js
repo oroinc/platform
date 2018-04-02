@@ -93,10 +93,10 @@ define(function(require) {
                     });
                 } else {
                     // dx + dy are used to adjust for line width.
-                    var dx = (current[2] === current[0]) ? 0 :
-                        (current[2] > current[0]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
-                    var dy = (current[3] === current[1]) ? 0 :
-                        (current[3] > current[1]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
+                    var dx = (current[2] === current[0]) ? 0
+                        : (current[2] > current[0]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
+                    var dy = (current[3] === current[1]) ? 0
+                        : (current[3] > current[1]) ? (paintInfo.lw / 2) : -(paintInfo.lw / 2);
                     _super.addSegment(conn, 'Straight', {
                         x1: current[0] - dx, y1: current[1] - dy, x2: current[2] + dx, y2: current[3] + dy
                     });

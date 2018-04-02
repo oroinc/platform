@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-
 use Oro\Bundle\UserBundle\Validator\UserAuthenticationFieldsValidator;
+use Symfony\Component\Validator\Constraint;
 
 class UserAuthenticationFieldsConstraint extends Constraint
 {

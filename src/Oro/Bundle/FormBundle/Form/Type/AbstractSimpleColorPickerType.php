@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 abstract class AbstractSimpleColorPickerType extends AbstractType
 {
@@ -88,21 +87,23 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
                     'picker_delay'      => 0
                 ]
             )
-            ->setNormalizers(
-                [
-                    'color_schema' => function (Options $options, $colorSchema) {
-                        return $colorSchema ?: 'custom';
-                    },
-                    'translatable' => function (Options $options, $translatable) {
-                        if (isset(static::$colorSchema[$options['color_schema']])
-                            && static::$colorSchema[$options['color_schema']]['translatable']
-                        ) {
-                            $translatable = true;
-                        }
-
-                        return $translatable;
+            ->setNormalizer(
+                'color_schema',
+                function (Options $options, $colorSchema) {
+                    return $colorSchema ?: 'custom';
+                }
+            )
+            ->setNormalizer(
+                'translatable',
+                function (Options $options, $translatable) {
+                    if (isset(static::$colorSchema[$options['color_schema']])
+                        && static::$colorSchema[$options['color_schema']]['translatable']
+                    ) {
+                        $translatable = true;
                     }
-                ]
+
+                    return $translatable;
+                }
             );
     }
 

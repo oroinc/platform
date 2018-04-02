@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\TransformationFailedException;
-
-use Oro\Bundle\FormBundle\Form\Exception\FormException;
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\MappingException;
 
 /**
  * Transforms between entity and id

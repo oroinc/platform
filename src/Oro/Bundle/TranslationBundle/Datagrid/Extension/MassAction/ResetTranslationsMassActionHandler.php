@@ -4,12 +4,12 @@ namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ResetTranslationsMassActionHandler implements MassActionHandlerInterface

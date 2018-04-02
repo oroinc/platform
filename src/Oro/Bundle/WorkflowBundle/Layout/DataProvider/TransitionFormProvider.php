@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Layout\DataProvider;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Oro\Component\Action\Action\ActionInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class TransitionFormProvider extends AbstractFormProvider
 {

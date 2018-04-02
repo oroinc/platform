@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Symfony\Component\Form\FormInterface;
-
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
-
-use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Symfony\Component\Form\FormInterface;
 
 class EmbedFormLayoutManager
 {

@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
-
 use Oro\Component\Config\CumulativeResourceManager;
 
 class EntityExtendPassTest extends \PHPUnit_Framework_TestCase

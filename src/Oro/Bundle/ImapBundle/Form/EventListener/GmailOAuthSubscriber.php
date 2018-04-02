@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class GmailOAuthSubscriber implements EventSubscriberInterface
 {
@@ -79,11 +80,11 @@ class GmailOAuthSubscriber implements EventSubscriberInterface
         //for empty() function must be only variable for compatibility with PHP 5.4
         $token = $emailOrigin->getAccessToken();
         if (!empty($token)) {
-            $form->add('checkFolder', 'button', [
+            $form->add('checkFolder', ButtonType::class, [
                 'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                 'attr' => ['class' => 'btn btn-primary']
             ])
-                ->add('folders', 'oro_email_email_folder_tree', [
+                ->add('folders', EmailFolderTreeType::class, [
                     'label' => $this->translator->trans('oro.email.folders.label'),
                     'attr' => ['class' => 'folder-tree'],
                     'tooltip' => $this->translator->trans('oro.email.folders.tooltip'),

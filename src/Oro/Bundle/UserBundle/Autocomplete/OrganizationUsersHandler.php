@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\QueryCriteria\SearchCriteria;
 

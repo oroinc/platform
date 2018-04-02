@@ -2,14 +2,14 @@ system_configuration:
     fields:
         some_field:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             options: []
             acl_resource: 'ALLOWED'
             priority: 20
 
         some_another_field:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             acl_resource: 'DENIED'
             priority: 10
 

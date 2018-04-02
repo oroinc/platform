@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroDateTimeType extends OroDateType
 {
@@ -24,7 +24,7 @@ class OroDateTimeType extends OroDateType
      */
     public function getParent()
     {
-        return 'datetime';
+        return DateTimeType::class;
     }
 
     /**

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
 {

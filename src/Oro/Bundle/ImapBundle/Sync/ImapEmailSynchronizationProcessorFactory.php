@@ -4,12 +4,10 @@ namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Psr\Log\LoggerAwareTrait;
-
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Psr\Log\LoggerAwareTrait;
 
 class ImapEmailSynchronizationProcessorFactory
 {

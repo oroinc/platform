@@ -51,6 +51,16 @@ define(function(require) {
             cancelAndEditPrevRowAction: 'editPrevRowCell'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function CellPopupEditorComponent() {
+            CellPopupEditorComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options || {};
             if (!this.options.plugin) {
@@ -504,9 +514,9 @@ define(function(require) {
         },
 
         onSaveError: function(jqXHR) {
-            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON ?
-                jqXHR.responseJSON.code :
-                jqXHR.status;
+            var errorCode = 'responseJSON' in jqXHR && 'code' in jqXHR.responseJSON
+                ? jqXHR.responseJSON.code
+                : jqXHR.status;
 
             var errors = [];
             var fieldLabel;
@@ -600,9 +610,9 @@ define(function(require) {
             var fieldName = metadata.name;
             if (_.has(metadata, 'divisor')) {
                 if (!isNaN(fields[fieldName])) {
-                    fields[fieldName] = toResponse ?
-                        fields[fieldName] / metadata.divisor :
-                        fields[fieldName] * metadata.divisor;
+                    fields[fieldName] = toResponse
+                        ? fields[fieldName] / metadata.divisor
+                        : fields[fieldName] * metadata.divisor;
                 }
             }
         }

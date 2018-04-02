@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OperationExtension extends \Twig_Extension
 {

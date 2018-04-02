@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -19,7 +18,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerif
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase

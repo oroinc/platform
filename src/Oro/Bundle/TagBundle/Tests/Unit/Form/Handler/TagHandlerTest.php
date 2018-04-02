@@ -3,16 +3,16 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class TagHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|FormInterface
      */
@@ -76,11 +76,12 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($this->entity);
 
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod($method);
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->assertFalse($this->handler->process($this->entity));
     }
@@ -99,11 +100,12 @@ class TagHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($this->entity);
 
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
         $this->form->expects($this->once())
             ->method('isValid')

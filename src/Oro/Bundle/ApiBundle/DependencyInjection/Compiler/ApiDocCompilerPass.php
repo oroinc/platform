@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 /**
  * Configures ApiDoc related services.
@@ -32,6 +31,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
     private const DEFAULT_API_DOC_HTML_FORMATTER_CLASS      = 'Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter';
+    private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
 
     /**
@@ -157,6 +157,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $isPublicService = $defaultHtmlFormatterDef->isPublic();
         $defaultHtmlFormatterDef->setPublic(false);
         $defaultHtmlFormatterDef->setClass(self::DEFAULT_API_DOC_HTML_FORMATTER_CLASS);
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setSecurityContext',
+            [new Reference(self::API_DOC_SECURITY_CONTEXT_SERVICE)]
+        );
         $defaultHtmlFormatterDef->addMethodCall(
             'setFileLocator',
             [new Reference(self::FILE_LOCATOR_SERVICE)]

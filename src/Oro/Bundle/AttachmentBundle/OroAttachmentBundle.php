@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle;
 
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-
-use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
+use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroAttachmentBundle extends Bundle
 {

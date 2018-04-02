@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class AclPrivilegeFilterPassTest extends \PHPUnit_Framework_TestCase
 {

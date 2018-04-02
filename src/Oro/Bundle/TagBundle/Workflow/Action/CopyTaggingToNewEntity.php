@@ -3,18 +3,15 @@
 namespace Oro\Bundle\TagBundle\Workflow\Action;
 
 use LogicException;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\TagBundle\Entity\Tagging;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * This class was provided for backwards compatibility.

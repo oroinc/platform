@@ -4,9 +4,8 @@ namespace Oro\Bundle\SoapBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
-
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 /**

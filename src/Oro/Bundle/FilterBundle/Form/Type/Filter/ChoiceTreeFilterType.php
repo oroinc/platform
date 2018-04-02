@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChoiceTreeFilterType extends AbstractType
 {
@@ -32,7 +32,7 @@ class ChoiceTreeFilterType extends AbstractType
      */
     public function getParent()
     {
-        return TextFilterType::NAME;
+        return TextFilterType::class;
     }
 
     /**

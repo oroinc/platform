@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
+use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
-use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
@@ -24,8 +25,6 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         /** @var TranslatorInterface $translator */
         $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
@@ -34,11 +33,27 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
             ->willReturn('Parent Localization');
 
         $this->formType = new FallbackPropertyType($this->translator);
+        parent::setUp();
     }
 
     protected function tearDown()
     {
         unset($this->translator, $this->formType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    FallbackPropertyType::class => $this->formType
+                ],
+                []
+            ),
+        ];
     }
 
     /**
@@ -49,7 +64,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(array $inputOptions, array $expectedOptions, $submittedData)
     {
-        $form = $this->factory->create($this->formType, null, $inputOptions);
+        $form = $this->factory->create(FallbackPropertyType::class, null, $inputOptions);
 
         $formConfig = $form->getConfig();
         foreach ($expectedOptions as $key => $value) {
@@ -73,7 +88,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 'inputOptions' => [],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
                     ],
@@ -86,7 +101,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::PARENT_LOCALIZATION => 'oro.locale.fallback.type.parent_localization',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
@@ -102,7 +117,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'required' => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'choices' => [
                         FallbackType::PARENT_LOCALIZATION => 'en [Parent Localization]',
                         FallbackType::SYSTEM => 'oro.locale.fallback.type.default',
@@ -150,6 +165,6 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->formType->getParent());
+        $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 }

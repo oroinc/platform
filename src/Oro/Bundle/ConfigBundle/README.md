@@ -1,12 +1,8 @@
-OroConfigBundle
-===============
+# OroConfigBundle
 
-This bundle allows to introduce and maintain configuration settings definition with possibility to define values
-in different scopes (bundle, application and user level by default) and organize and visualize multiple
-configuration trees.
+OroConfigBundle enables developers to define the application configuration settings in the YAML configuration files in any bundle. It also enables the application users to set values for the application-wide or user-specific settings in the System Configuration UI.
 
-Usage
------
+## Usage
 
 - [Configuration Reference](./Resources/doc/system_configuration.md)
 - [Config management](./Resources/doc/config_management.md)

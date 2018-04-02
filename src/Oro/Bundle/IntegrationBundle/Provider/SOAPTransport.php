@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use FOS\RestBundle\Util\Codes;
 use Guzzle\Http\Url;
 use Guzzle\Parser\ParserRegistry;
-
-use FOS\RestBundle\Util\Codes;
-
-use Symfony\Component\HttpFoundation\ParameterBag;
-
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerAwareInterface;
-
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
-use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * @package Oro\Bundle\IntegrationBundle

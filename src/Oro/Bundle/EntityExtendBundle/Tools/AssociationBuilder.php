@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
-use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;

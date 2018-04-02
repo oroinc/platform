@@ -7,13 +7,11 @@ use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
-
 use Psr\Log\LoggerInterface;
 
 class SegmentManager

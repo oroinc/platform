@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    var SideBarView;
+
     require('jquery-ui');
     var _ = require('underscore');
     var Backbone = require('backbone');
@@ -30,7 +32,7 @@ define(function(require) {
      * @class   orosidebar.View
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    SideBarView = Backbone.View.extend({
         template: _.template(sidebarTemplate),
 
         events: {
@@ -44,6 +46,16 @@ define(function(require) {
             widgets: null
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function SideBarView() {
+            SideBarView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
@@ -413,4 +425,6 @@ define(function(require) {
             });
         }
     });
+
+    return SideBarView;
 });

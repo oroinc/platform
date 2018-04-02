@@ -3,17 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
-use Oro\Bundle\WorkflowBundle\Model\Variable;
-use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class WorkflowVariablesType extends AbstractType
 {

@@ -36,6 +36,13 @@ define([
         transTemplate: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function VisibleItemsCounter() {
+            VisibleItemsCounter.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializer.
          *
          * @param {Object} options

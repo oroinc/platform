@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Checker;
 
-use Oro\Component\PhpUtils\ArrayUtil;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class FeatureChecker
 {

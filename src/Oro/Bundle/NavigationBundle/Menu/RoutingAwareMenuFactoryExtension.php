@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\Factory\ExtensionInterface;
 use Knp\Menu\ItemInterface;
-
 use Symfony\Component\Routing\RouterInterface;
 
 class RoutingAwareMenuFactoryExtension implements ExtensionInterface

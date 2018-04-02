@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**

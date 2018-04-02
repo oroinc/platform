@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Restriction;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Routing\Route;
 
 class ChainBreadcrumbManager implements BreadcrumbManagerInterface

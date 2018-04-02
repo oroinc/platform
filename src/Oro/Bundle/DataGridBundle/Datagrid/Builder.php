@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Builder
 {

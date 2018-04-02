@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -160,6 +159,23 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($config->hasDocumentationResources());
         $this->assertSame([], $config->getDocumentationResources());
         $this->assertEquals([], $config->toArray());
+    }
+
+    public function testAclResource()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasAclResource());
+        $this->assertNull($config->getAclResource());
+
+        $config->setAclResource('test_acl_resource');
+        $this->assertTrue($config->hasAclResource());
+        $this->assertEquals('test_acl_resource', $config->getAclResource());
+        $this->assertEquals(['acl_resource' => 'test_acl_resource'], $config->toArray());
+
+        $config->setAclResource(null);
+        $this->assertTrue($config->hasAclResource());
+        $this->assertNull($config->getAclResource());
+        $this->assertEquals(['acl_resource' => null], $config->toArray());
     }
 
     public function testFields()
@@ -510,15 +526,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddFormConstraint()
+    public function testFormConstraints()
     {
         $config = new EntityDefinitionConfig();
 
+        $this->assertNull($config->getFormOptions());
+        $this->assertNull($config->getFormConstraints());
+
         $config->addFormConstraint(new NotNull());
         $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull()], $config->getFormConstraints());
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
     public function testFormEventSubscribers()

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\ReminderBundle\DependencyInjection\OroReminderExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroReminderExtensionTest extends \PHPUnit_Framework_TestCase
 {

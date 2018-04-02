@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**

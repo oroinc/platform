@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Provides the request type for the current ApiDoc view.
+ * Provides the request type for the current API view.
  */
 class RestRequestTypeProvider implements RequestTypeProviderInterface, RestDocViewDetectorAwareInterface
 {
@@ -16,7 +16,7 @@ class RestRequestTypeProvider implements RequestTypeProviderInterface, RestDocVi
     private $docViewDetector;
 
     /**
-     * Adds a mapping between ApiDoc view and related to it request type.
+     * Adds a mapping between API view and related to it request type.
      *
      * @param string   $view
      * @param string[] $requestTypes

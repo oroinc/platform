@@ -7,14 +7,12 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Symfony\Component\Yaml\Yaml;
 
 class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 {

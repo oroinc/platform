@@ -3,7 +3,6 @@
 namespace Oro\Bundle\RequireJSBundle\Tests\Unit\Config;
 
 use Oro\Bundle\RequireJSBundle\Config\Config;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase

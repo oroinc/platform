@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBundle2;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\TestBundleIncorrect;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class ConfigurablePermissionLoadCommandTest extends WebTestCase
 {

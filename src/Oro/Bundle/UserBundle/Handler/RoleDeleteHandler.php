@@ -3,9 +3,9 @@
 namespace Oro\Bundle\UserBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 
 class RoleDeleteHandler extends DeleteHandler

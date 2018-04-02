@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;

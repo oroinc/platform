@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator\Extension;
 
+use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
-use CG\Core\DefaultGeneratorStrategy;
-
-use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Generator\Extension\ImportsAwareLayoutUpdateVisitor;
+use Oro\Component\Layout\Loader\Generator\VisitContext;
 
 class ImportsAwareLayoutUpdateVisitorTest extends \PHPUnit_Framework_TestCase
 {
@@ -68,7 +67,8 @@ class LayoutUpdateWithImport implements \Oro\Component\Layout\ImportsAwareLayout
 }
 CLASS
         ,
-        $strategy->generate($visitContext->getClass()));
+        $strategy->generate($visitContext->getClass())
+        );
     }
     //codingStandardsIgnoreEnd
 }

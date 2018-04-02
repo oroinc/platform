@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ActivityBundle\Routing;
 
-use Symfony\Component\Routing\Route;
-
-use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
-use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
 
 class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {

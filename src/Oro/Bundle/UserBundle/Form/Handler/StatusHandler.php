@@ -3,14 +3,17 @@
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class StatusHandler
 {
+    use RequestHandlerTrait;
+
     /**
      * @var \Symfony\Component\Form\FormInterface
      */
@@ -60,7 +63,7 @@ class StatusHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($user, $status, $updateCurrentStatus);

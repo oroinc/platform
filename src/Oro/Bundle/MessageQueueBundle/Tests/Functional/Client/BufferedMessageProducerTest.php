@@ -3,12 +3,11 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Client;
 
 use Doctrine\DBAL\Connection;
-
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 
 class BufferedMessageProducerTest extends WebTestCase
 {

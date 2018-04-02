@@ -5,7 +5,6 @@ namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 

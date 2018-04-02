@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
-
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 

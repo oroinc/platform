@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Routing\Route;
 
 /**
  * Adds an additional view to ApiDoc annotation if the accotation contains specific view.

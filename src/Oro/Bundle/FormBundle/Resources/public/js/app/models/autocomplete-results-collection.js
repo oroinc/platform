@@ -15,6 +15,13 @@ define(function(require) {
             per_page: 10
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function AutocompleteResultsCollection() {
+            AutocompleteResultsCollection.__super__.constructor.apply(this, arguments);
+        },
+
         parse: function(response) {
             return response.results;
         },

@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Doctrine\ORM\Query;
-
 use Gedmo\Translatable\TranslatableListener;
-
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;

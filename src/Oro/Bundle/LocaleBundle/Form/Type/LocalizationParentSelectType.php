@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationParentSelectType extends AbstractType
 {
@@ -49,7 +48,7 @@ class LocalizationParentSelectType extends AbstractType
      */
     public function getParent()
     {
-        return OroEntitySelectOrCreateInlineType::NAME;
+        return OroEntitySelectOrCreateInlineType::class;
     }
 
     /**

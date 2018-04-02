@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DateTimeExtension extends \Twig_Extension
 {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormBuilderInterface;
-
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleApiType extends AclRoleType
 {
@@ -29,7 +29,7 @@ class RoleApiType extends AclRoleType
 
         $builder->add(
             'appendUsers',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             array(
                 'class'    => 'OroUserBundle:User',
                 'required' => false,
@@ -40,7 +40,7 @@ class RoleApiType extends AclRoleType
 
         $builder->add(
             'removeUsers',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             array(
                 'class'    => 'OroUserBundle:User',
                 'required' => false,

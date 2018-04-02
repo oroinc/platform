@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CalendarExtension extends \Twig_Extension
 {

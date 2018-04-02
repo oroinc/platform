@@ -4,11 +4,14 @@ namespace Oro\Bundle\AttachmentBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class AttachmentHandler
 {
+    use RequestHandlerTrait;
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -35,7 +38,7 @@ class AttachmentHandler
     {
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
-            $form->submit($request);
+            $this->submitPostPutRequest($form, $request);
             if ($form->isValid()) {
                 $this->onSuccess($form->getData());
                 return true;

@@ -424,6 +424,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -434,6 +435,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
@@ -449,6 +451,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
         tags:
@@ -464,6 +467,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
@@ -474,6 +478,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - EDIT
         tags:
             - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 10 }
@@ -486,6 +491,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_security.acl.group_provider.chain'
             - VIEW
             - true
         tags:
@@ -613,15 +619,19 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -50 }
 
+    #
+    # data_security_check
+    #
+
     oro_api.subresource.parent_entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
         arguments:
             - '@security.authorization_checker'
             - EDIT
         tags:
-            - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -70 }
-            - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -70 }
-            - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -70 }
+            - { name: oro.api.processor, action: add_relationship, group: data_security_check, priority: 10 }
+            - { name: oro.api.processor, action: update_relationship, group: data_security_check, priority: 10 }
+            - { name: oro.api.processor, action: delete_relationship, group: data_security_check, priority: 10 }
 
     #
     # normalize_data
@@ -876,14 +886,14 @@ services:
     oro_api.rest.set_http_response_status_code.created:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 201
+            - 201
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.no_content:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 204
+            - 204
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -30 }
@@ -894,7 +904,7 @@ services:
     oro_api.rest.set_http_response_status_code.not_allowed:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 405
+            - 405
         tags:
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, priority: -30 }
 

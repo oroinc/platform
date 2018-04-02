@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Oro\Bundle\UserBundle\Entity\UserApi;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\UserBundle\Entity\UserApi;
 
 class UserApiKeyGenType extends AbstractType
 {
@@ -19,7 +18,7 @@ class UserApiKeyGenType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('apiKey', 'oro_user_apikey_gen_key');
+        $builder->add('apiKey', UserApiKeyGenKeyType::class);
     }
 
     /**
@@ -33,7 +32,7 @@ class UserApiKeyGenType extends AbstractType
             [
                 'data_class' => UserApi::class,
                 'csrf_protection' => ['enabled' => true, 'fieild_name' => 'apikey_token'],
-                'intention'   => self::NAME,
+                'csrf_token_id' => self::NAME,
                 'apiKeyElementId' => 'user-apikey-gen-elem'
             ]
         );

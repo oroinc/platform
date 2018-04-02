@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Model;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 abstract class AbstractSegmentProxy extends AbstractQueryDesigner
 {

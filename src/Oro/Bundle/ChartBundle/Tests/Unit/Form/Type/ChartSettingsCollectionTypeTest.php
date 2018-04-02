@@ -2,31 +2,14 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsCollectionType;
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ChartSettingsCollectionType
-     */
-    protected $type;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $configProvider;
-
-    protected function setUp()
-    {
-        $this->type = new ChartSettingsCollectionType();
-
-        parent::setUp();
-    }
-
     /**
      * @param array $chartConfigs
      *
@@ -34,7 +17,7 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm($chartConfigs)
     {
-        $form = $this->factory->create($this->type, null, ['chart_configs' => $chartConfigs]);
+        $form = $this->factory->create(ChartSettingsCollectionType::class, null, ['chart_configs' => $chartConfigs]);
 
         foreach (array_keys($chartConfigs) as $chartName) {
             $this->assertTrue($form->has($chartName));
@@ -56,7 +39,7 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
                             'field' => [
                                 'name'  => 'name',
                                 'label' => 'Name',
-                                'type'  => 'text'
+                                'type'  => TextType::class
                             ]
                         ]
                     ],
@@ -67,7 +50,7 @@ class ChartSettingsCollectionTypeTest extends FormIntegrationTestCase
                             'field' => [
                                 'name'  => 'name2',
                                 'label' => 'Name2',
-                                'type'  => 'text'
+                                'type'  => TextType::class
                             ]
                         ]
                     ]

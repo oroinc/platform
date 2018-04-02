@@ -2,11 +2,10 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
-
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ResultTest extends \PHPUnit_Framework_TestCase
 {

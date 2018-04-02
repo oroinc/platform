@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,11 +42,11 @@ class AttributeGroupType extends AbstractType
     {
         $builder->add(
             'labels',
-            LocalizedFallbackValueCollectionType::NAME,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.labels.label',
                 'required' => true,
-                'options' => [
+                'entry_options' => [
                     'constraints' => [
                         new NotBlank(['message' => 'oro.entity_config.validator.attribute_family.labels.blank'])
                     ],
@@ -69,7 +68,7 @@ class AttributeGroupType extends AbstractType
 
         $builder->add(//This needed for new forms which will be dynamically added
             'attributeRelations',
-            AttributeMultiSelectType::NAME,
+            AttributeMultiSelectType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [
@@ -97,7 +96,7 @@ class AttributeGroupType extends AbstractType
         $form = $event->getForm();
         $form->add(
             'attributeRelations',
-            AttributeMultiSelectType::NAME,
+            AttributeMultiSelectType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [

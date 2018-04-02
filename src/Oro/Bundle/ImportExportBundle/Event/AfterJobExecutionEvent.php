@@ -3,10 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Symfony\Component\EventDispatcher\Event;
 
 class AfterJobExecutionEvent extends Event
 {

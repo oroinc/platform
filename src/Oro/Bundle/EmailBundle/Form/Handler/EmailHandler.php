@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailHandler
 {
+    use RequestHandlerTrait;
+
     /**
      * @var FormInterface
      */
@@ -61,7 +64,7 @@ class EmailHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 try {

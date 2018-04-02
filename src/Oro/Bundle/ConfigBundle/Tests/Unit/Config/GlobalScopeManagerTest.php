@@ -4,10 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
 {

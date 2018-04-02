@@ -64,6 +64,13 @@ define(function(require) {
         $messengerContainer: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function DialogWidget() {
+            DialogWidget.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize dialog
          */
         initialize: function(options) {

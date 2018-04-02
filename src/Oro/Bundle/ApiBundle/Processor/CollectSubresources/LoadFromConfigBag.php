@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
-use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -15,6 +14,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
  * Loads sub-resources configured in "Resources/config/oro/api.yml".

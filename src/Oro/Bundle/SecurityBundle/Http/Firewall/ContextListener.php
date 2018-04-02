@@ -3,16 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
 use Doctrine\ORM\NoResultException;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Security\Core\Security;
-
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Security;
 
 class ContextListener
 {

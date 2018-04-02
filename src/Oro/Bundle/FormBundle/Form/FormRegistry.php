@@ -12,11 +12,10 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Not that this is a slightly modified version to support of defining stub in form type tests.
  * The central registry of the Form component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -86,26 +85,36 @@ class FormRegistry implements FormRegistryInterface
             if (!$type) {
                 // Support fully-qualified class names
                 if (!class_exists($name)) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $name));
+                    throw new InvalidArgumentException(
+                        sprintf('Could not load type "%s": class does not exist.', $name)
+                    );
                 }
                 if (!is_subclass_of($name, 'Symfony\Component\Form\FormTypeInterface')) {
-                    throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $name));
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Could not load type "%s": class does not implement "%s".',
+                            $name,
+                            FormTypeInterface::class
+                        )
+                    );
                 }
 
                 $type = new $name();
             }
 
-            // Add support for defining form type stubs in tests
-            $formTypeClass = null;
-            if (is_subclass_of($name, 'Symfony\Component\Form\FormTypeInterface')) {
-                $formTypeClass = $name;
-            }
-
-            $this->resolveAndAddType($type, $formTypeClass);
+            $this->resolveAndAddType($type, $name);
         }
 
         if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
+            @trigger_error(
+                sprintf(
+                    'Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0.'
+                    . 'Use the fully-qualified type class name "%s" instead.',
+                    $name,
+                    get_class($this->types[$name]->getInnerType())
+                ),
+                E_USER_DEPRECATED
+            );
         }
 
         return $this->types[$name];
@@ -116,11 +125,10 @@ class FormRegistry implements FormRegistryInterface
      * it with its parent type.
      *
      * @param FormTypeInterface $type The type to resolve
-     * @param string|null $formTypeClass
      *
      * @return ResolvedFormTypeInterface The resolved type
      */
-    private function resolveAndAddType(FormTypeInterface $type, $formTypeClass)
+    private function resolveAndAddType(FormTypeInterface $type, string $originalName)
     {
         $typeExtensions = array();
         $parentType = $type->getParent();
@@ -129,7 +137,14 @@ class FormRegistry implements FormRegistryInterface
         $hasCustomName = $name !== $fqcn;
 
         if ($parentType instanceof FormTypeInterface) {
-            @trigger_error(sprintf('Returning a FormTypeInterface from %s::getParent() is deprecated since Symfony 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', $fqcn), E_USER_DEPRECATED);
+            @trigger_error(
+                sprintf(
+                    'Returning a FormTypeInterface from %s::getParent() is deprecated since Symfony 2.8 and will be'
+                    . 'removed in 3.0. Return the fully-qualified type class name instead.',
+                    $fqcn
+                ),
+                E_USER_DEPRECATED
+            );
 
             $this->resolveAndAddType($parentType);
             $parentType = $parentType->getName();
@@ -138,7 +153,14 @@ class FormRegistry implements FormRegistryInterface
         if ($hasCustomName) {
             foreach ($this->extensions as $extension) {
                 if ($x = $extension->getTypeExtensions($name)) {
-                    @trigger_error(sprintf('Returning a type name from %s::getExtendedType() is deprecated since Symfony 2.8 and will be removed in 3.0. Return the fully-qualified type class name instead.', get_class($x[0])), E_USER_DEPRECATED);
+                    @trigger_error(
+                        sprintf(
+                            'Returning a type name from %s::getExtendedType() is deprecated since Symfony 2.8'
+                            . 'and will be removed in 3.0. Return the fully-qualified type class name instead.',
+                            get_class($x[0])
+                        ),
+                        E_USER_DEPRECATED
+                    );
 
                     $typeExtensions = array_merge($typeExtensions, $x);
                 }
@@ -159,11 +181,7 @@ class FormRegistry implements FormRegistryInterface
         );
 
         $this->types[$fqcn] = $resolvedType;
-
-        // Add support for defining form type stubs in tests
-        if ($formTypeClass) {
-            $this->types[$formTypeClass] = $resolvedType;
-        }
+        $this->types[$originalName] = $resolvedType;
 
         if ($hasCustomName) {
             // Enable access by the explicit type name until Symfony 3.0
@@ -178,7 +196,15 @@ class FormRegistry implements FormRegistryInterface
     public function hasType($name)
     {
         if (isset($this->legacyNames[$name])) {
-            @trigger_error(sprintf('Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0. Use the fully-qualified type class name "%s" instead.', $name, get_class($this->types[$name]->getInnerType())), E_USER_DEPRECATED);
+            @trigger_error(
+                sprintf(
+                    'Accessing type "%s" by its string name is deprecated since Symfony 2.8 and will be removed in 3.0.'
+                    . ' Use the fully-qualified type class name "%s" instead.',
+                    $name,
+                    get_class($this->types[$name]->getInnerType())
+                ),
+                E_USER_DEPRECATED
+            );
         }
 
         if (isset($this->types[$name])) {

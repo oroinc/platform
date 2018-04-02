@@ -1,18 +1,18 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Handler;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\UserBundle\Entity\User;
-
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /**
      * @var Request
      */
@@ -70,8 +70,9 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
 
+        $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
@@ -84,7 +85,7 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
         $appendForm->expects($this->once())
             ->method('getData')
             ->will($this->returnValue(array($appendedUser)));
-        $this->form->expects($this->at(3))
+        $this->form->expects($this->at(5))
             ->method('get')
             ->with('appendUsers')
             ->will($this->returnValue($appendForm));
@@ -95,7 +96,7 @@ class BusinessUnitHandlerTest extends \PHPUnit_Framework_TestCase
         $removeForm->expects($this->once())
             ->method('getData')
             ->will($this->returnValue(array($removedUser)));
-        $this->form->expects($this->at(4))
+        $this->form->expects($this->at(6))
             ->method('get')
             ->with('removeUsers')
             ->will($this->returnValue($removeForm));

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Component\Layout\LayoutContext;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\ActionContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
 
 class ActionContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

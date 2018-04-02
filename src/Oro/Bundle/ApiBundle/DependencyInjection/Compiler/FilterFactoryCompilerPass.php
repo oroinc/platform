@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 /**
  * Configures factories responsible to create instances of filters that can be used in Data API.

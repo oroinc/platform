@@ -3,13 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Twig;
 
 use Doctrine\Common\Collections\Collection;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LocalizationExtension extends \Twig_Extension
 {

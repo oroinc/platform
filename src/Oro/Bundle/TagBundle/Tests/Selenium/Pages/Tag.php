@@ -18,11 +18,11 @@ class Tag extends AbstractPageEntity
     /** @var  string */
     protected $owner = "//div[starts-with(@id,'s2id_oro_tag_tag_form_owner')]/a";
 
-   /**
-     * @param $accountName
-     *
-     * @return $this
-     */
+    /**
+      * @param $accountName
+      *
+      * @return $this
+      */
     public function setTagName($accountName)
     {
         $element = $this->test->byXPath("//*[@data-ftid='oro_tag_tag_form_name']");

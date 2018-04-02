@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * A base implementation of the execution context of processors.
+ */
 class Context extends ParameterBag implements ContextInterface
 {
     /** action name */
@@ -88,7 +91,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function skipGroup($group)
     {
-        if (!in_array($group, $this->skippedGroups, true)) {
+        if (!\in_array($group, $this->skippedGroups, true)) {
             $this->skippedGroups[] = $group;
         }
     }
@@ -98,7 +101,7 @@ class Context extends ParameterBag implements ContextInterface
      */
     public function undoGroupSkipping($group)
     {
-        if (in_array($group, $this->skippedGroups, true)) {
+        if (\in_array($group, $this->skippedGroups, true)) {
             $this->skippedGroups = array_values(array_diff($this->skippedGroups, [$group]));
         }
     }

@@ -3,22 +3,10 @@
 namespace Oro\Bundle\DashboardBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
-use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
@@ -28,6 +16,15 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/dashboard")
@@ -182,14 +179,14 @@ class DashboardController extends Controller
     protected function update(Request $request, DashboardModel $dashboardModel)
     {
         $form = $this->createForm(
-            $this->container->get('oro_dashboard.form.type.edit'),
+            DashboardType::class,
             $dashboardModel->getEntity(),
             [
                 'create_new' => !$dashboardModel->getId()
             ]
         );
 
-        if ($request->isMethod('POST') && $form->submit($request)->isValid()) {
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
             $this->getDashboardManager()->save($dashboardModel, true);
             $this->get('session')->getFlashBag()->add(
                 'success',

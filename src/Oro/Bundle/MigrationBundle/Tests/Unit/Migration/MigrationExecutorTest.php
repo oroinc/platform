@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpQueue;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Wire\AMQPTable;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
-
-use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpQueue;
 
 class AmqpMessageQueueIsolator extends AbstractMessageQueueIsolator
 {

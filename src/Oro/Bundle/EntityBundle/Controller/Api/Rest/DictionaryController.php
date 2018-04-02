@@ -2,17 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
  * @RouteResource("dictionary_value")

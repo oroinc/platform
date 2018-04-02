@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 
 use Carbon\Carbon;
-
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DateFormatExtension extends \Twig_Extension
 {

@@ -11,6 +11,13 @@ define(function(require) {
     var SegmentChoiceView = require('orosegment/js/app/views/segment-choice-view');
 
     SegmentConditionView = AbstractConditionView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function SegmentConditionView() {
+            SegmentConditionView.__super__.constructor.apply(this, arguments);
+        },
+
         getDefaultOptions: function() {
             var defaultOptions = SegmentConditionView.__super__.getDefaultOptions.call(this);
             return _.extend({}, defaultOptions, {

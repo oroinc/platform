@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EnumFilterTypeTest extends TypeTestCase
 {
@@ -297,7 +296,7 @@ class EnumFilterTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            ChoiceFilterType::NAME,
+            ChoiceFilterType::class,
             $this->type->getParent()
         );
     }
