@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -86,7 +87,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         // existing entity field
         $builder->add(
             'existing_entity',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             array(
                 'required' => $options['required'],
                 'class' => $options['class'],
@@ -95,7 +96,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
 
         // rendering mode
-        $builder->add('mode', 'hidden');
+        $builder->add('mode', HiddenType::class);
     }
 
     /**

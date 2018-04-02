@@ -5,7 +5,10 @@ namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -40,7 +43,7 @@ class MergeFieldType extends AbstractType
 
         $builder->add(
             'sourceEntity',
-            'entity',
+            EntityType::class,
             array(
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],
@@ -58,7 +61,7 @@ class MergeFieldType extends AbstractType
         if (count($mergeModes) > 1) {
             $builder->add(
                 'mode',
-                'choice',
+                ChoiceType::class,
                 array(
                     'choices'  => $this->getMergeValues($mergeModes),
                     'multiple' => false,
@@ -70,7 +73,7 @@ class MergeFieldType extends AbstractType
         } else {
             $builder->add(
                 'mode',
-                'hidden',
+                HiddenType::class,
                 array('data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes))
             );
         }

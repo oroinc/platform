@@ -53,7 +53,6 @@ services:
         class:                                                  '%oro_entity_extend.type.relation.class%'
         arguments:
             - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.type.target_field_type'
         tags:
             - { name: form.type, alias: oro_entity_relation_type }
 
@@ -63,6 +62,13 @@ services:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_entity_target_field_type}
+
+    oro_entity_extend.type.target_type:
+        class: Oro\Bundle\EntityExtendBundle\Form\Type\TargetType
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: form.type }
 
     oro_entity_extend.type.integer:
         class: '%oro_entity_extend.type.integer.class%'
@@ -206,7 +212,7 @@ services:
         arguments:
             - '@oro_entity_extend.entity_config_type.enum.subscriber'
         tags:
-            - { name: form.type_extension, alias: oro_entity_config_type }
+            - { name: form.type_extension, extended_type: Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType, alias: oro_entity_config_type }
 
     oro_entity_extend.type.enum_choice:
         class: '%oro_entity_extend.type.enum_choice.class%'

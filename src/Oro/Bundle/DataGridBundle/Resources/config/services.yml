@@ -201,7 +201,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - ~
-            - oro_datagrid_grid_view
+            - Oro\Bundle\DataGridBundle\Form\Type\GridViewType
 
     oro_datagrid.grid_view.form.handler.api:
         class: '%oro_datagrid.grid_view.form.handler.api.class%'

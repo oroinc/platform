@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class WidgetItemsChoiceType extends AbstractType
 {
@@ -29,6 +30,6 @@ class WidgetItemsChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

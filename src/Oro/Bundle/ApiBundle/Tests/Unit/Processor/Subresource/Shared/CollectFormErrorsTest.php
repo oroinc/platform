@@ -7,6 +7,8 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipTestCase;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipTestCase
@@ -29,7 +31,7 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $associationName = 'testAssociation';
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add($associationName, 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add($associationName, TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit([$associationName => null]);
 
@@ -52,9 +54,9 @@ class CollectFormErrorsTest extends ChangeRelationshipTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 $associationName,
-                'collection',
+                CollectionType::class,
                 [
-                    'entry_type'      => 'text',
+                    'entry_type'      => TextType::class,
                     'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]

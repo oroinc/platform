@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroDateType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -37,7 +39,7 @@ class WidgetDateType extends AbstractType
     {
         $builder->add(
             'useDate',
-            'checkbox',
+            CheckboxType::class,
             [
                 'label'      => false,
                 'required'   => false
@@ -47,7 +49,7 @@ class WidgetDateType extends AbstractType
         if ($options['enable_date']) {
             $builder->add(
                 'date',
-                'oro_date',
+                OroDateType::class,
                 [
                     'required' => false,
                     'label' => false

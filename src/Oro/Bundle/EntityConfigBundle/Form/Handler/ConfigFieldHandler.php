@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handle form configuration for config field
+ */
 class ConfigFieldHandler
 {
     /** @var ConfigHelperHandler */
@@ -41,7 +44,9 @@ class ConfigFieldHandler
         $request = $this->requestStack->getCurrentRequest();
 
         if ($this->configHelperHandler->isFormValidAfterSubmit($request, $form)) {
-            return $this->configHelperHandler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
+            return $this
+                ->configHelperHandler->showClearCacheMessage()
+                ->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
         }
 
         return $this->configHelperHandler->constructConfigResponse($fieldConfigModel, $form, $formAction);

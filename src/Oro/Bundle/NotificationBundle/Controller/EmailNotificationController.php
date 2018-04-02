@@ -85,10 +85,10 @@ class EmailNotificationController extends Controller
      */
     protected function update(EmailNotification $entity, Request $request)
     {
-        $form = $this->createForm(EmailNotificationType::NAME, $entity);
+        $form = $this->createForm(EmailNotificationType::class, $entity);
         if ($request->get(EmailNotificationType::NAME)) {
             $form->handleRequest($request);
-            $form = $this->createForm(EmailNotificationType::NAME, $form->getData());
+            $form = $this->createForm(EmailNotificationType::class, $form->getData());
         }
 
         return $this->get('oro_form.update_handler')

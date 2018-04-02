@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ChartBundle\Form\Type;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -38,7 +39,7 @@ class ChartType extends ConfigProviderAwareType
         $builder
             ->add(
                 'name',
-                'choice',
+                ChoiceType::class,
                 [
                     'label' => 'oro.chart.form.name.label',
                     'choices' => array_map(
@@ -52,7 +53,7 @@ class ChartType extends ConfigProviderAwareType
             )
             ->add(
                 'settings',
-                'oro_chart_settings_collection',
+                ChartSettingsCollectionType::class,
                 [
                     'chart_configs' => $chartConfigs
                 ]

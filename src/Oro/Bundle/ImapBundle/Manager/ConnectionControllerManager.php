@@ -9,6 +9,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -98,7 +99,7 @@ class ConnectionControllerManager
             $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
-        $form = $this->formFactory->create('oro_imap_configuration_gmail', null, ['csrf_protection' => false]);
+        $form = $this->formFactory->create(ConfigurationGmailType::class, null, ['csrf_protection' => false]);
         $form->setData($data);
         $form->handleRequest($request);
 

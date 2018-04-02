@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -61,8 +61,8 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         $types = [
-            'oro_multiple_entity'   => new MultipleEntityType($this->doctrineHelper, $this->authorizationChecker),
-            'oro_entity_identifier' => new EntityIdentifierType($this->registry)
+            MultipleEntityType::class   => new MultipleEntityType($this->doctrineHelper, $this->authorizationChecker),
+            EntityIdentifierType::class => new EntityIdentifierType($this->registry)
         ];
 
         return [
@@ -72,7 +72,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $form = $this->factory->create('oro_multiple_entity', null, ['class' => '\stdClass']);
+        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => '\stdClass']);
 
         $this->assertTrue($form->has('added'));
         $this->assertTrue($form->has('removed'));
@@ -80,7 +80,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     public function testHasKnownOptions()
     {
-        $form = $this->factory->create('oro_multiple_entity', null, ['class' => '\stdClass']);
+        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => '\stdClass']);
 
         $knownOptions = [
             'add_acl_resource',
@@ -109,7 +109,11 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
      */
     public function testViewHasVars($options, $expectedKey, $expectedValue)
     {
-        $form = $this->factory->create('oro_multiple_entity', null, array_merge($options, ['class' => '\stdClass']));
+        $form = $this->factory->create(
+            MultipleEntityType::class,
+            null,
+            array_merge($options, ['class' => '\stdClass'])
+        );
 
         if (isset($options['add_acl_resource'])) {
             $this->authorizationChecker->expects($this->once())

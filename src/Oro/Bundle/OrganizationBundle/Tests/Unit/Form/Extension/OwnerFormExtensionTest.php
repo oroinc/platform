@@ -19,6 +19,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -330,7 +331,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'entity',
+            EntityType::class,
             array(
                 'class' => 'OroOrganizationBundle:BusinessUnit',
                 'property' => 'name',

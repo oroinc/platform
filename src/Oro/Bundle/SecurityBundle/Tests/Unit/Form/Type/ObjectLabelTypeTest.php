@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,6 @@ class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('hidden', $this->formType->getParent());
+        $this->assertEquals(HiddenType::class, $this->formType->getParent());
     }
 }

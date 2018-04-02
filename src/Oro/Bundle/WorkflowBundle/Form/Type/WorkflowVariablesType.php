@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -84,7 +85,7 @@ class WorkflowVariablesType extends AbstractType
 
             if ($variable->getType() === 'entity') {
                 if (!$guessedType) {
-                    $guessedType = 'entity';
+                    $guessedType = EntityType::class;
                 }
 
                 $transformer = new WorkflowVariableDataTransformer($this->managerRegistry, $variable);

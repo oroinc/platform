@@ -44,7 +44,7 @@ class ApplicableEntitiesType extends AbstractType
      */
     public function getParent()
     {
-        return EntityChoiceType::NAME;
+        return EntityChoiceType::class;
     }
 
     /**

@@ -8,6 +8,8 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
+use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
@@ -222,7 +224,7 @@ class ImportExportController extends Controller
      */
     protected function getImportForm($entityName)
     {
-        return $this->createForm(ImportType::NAME, null, ['entityName' => $entityName]);
+        return $this->createForm(ImportType::class, null, ['entityName' => $entityName]);
     }
 
     /**
@@ -335,7 +337,7 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export', null, [
+        $exportForm = $this->createForm(ExportType::class, null, [
             'entityName' => $entityName,
             'processorAlias' => $request->get('processorAlias') ?? null
         ]);
@@ -377,7 +379,7 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export_template', null, ['entityName' => $entityName]);
+        $exportForm = $this->createForm(ExportTemplateType::class, null, ['entityName' => $entityName]);
 
         if ($request->isMethod('POST')) {
             $exportForm->handleRequest($request);

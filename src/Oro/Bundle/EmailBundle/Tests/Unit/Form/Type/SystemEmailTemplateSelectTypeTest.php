@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,14 +52,6 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new SystemEmailTemplateSelectType($this->em);
     }
 
-    protected function tearDown()
-    {
-        unset($this->type);
-        unset($this->em);
-        unset($this->queryBuilder);
-        unset($this->entityRepository);
-    }
-
     public function testConfigureOptions()
     {
         $this->entityRepository->expects($this->any())
@@ -97,7 +90,7 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_select2_translatable_entity', $this->type->getParent());
+        $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
     public function testGetName()

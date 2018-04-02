@@ -10,6 +10,8 @@ use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
+use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -424,7 +426,7 @@ abstract class AbstractProvider implements ProviderInterface
             $bc[$block->getName()]['subblocks'] = $sbc;
         }
 
-        $fb = $this->factory->createNamedBuilder($group, 'oro_config_form_type', null, ['block_config' => $bc]);
+        $fb = $this->factory->createNamedBuilder($group, FormType::class, null, ['block_config' => $bc]);
         foreach ($toAdd as $field) {
             $this->addFieldToForm($fb, $field);
         }
@@ -504,7 +506,7 @@ abstract class AbstractProvider implements ProviderInterface
             $configFieldOptions['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
         }
         $configFieldOptions['parent_checkbox_label'] = $this->getParentCheckboxLabel();
-        $form->add($name, 'oro_config_form_field_type', $configFieldOptions);
+        $form->add($name, FormFieldType::class, $configFieldOptions);
     }
 
     /**

@@ -5,7 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Controller;
 use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -53,7 +55,7 @@ class ConfigEntityGridController extends Controller
         $entityConfig   = $entityProvider->getConfig($className);
 
         $form = $this->createForm(
-            'oro_entity_extend_unique_key_collection_type',
+            UniqueKeyCollectionType::class,
             $entityConfig->get('unique_key', false, []),
             [
                 'className' => $className
@@ -123,7 +125,7 @@ class ConfigEntityGridController extends Controller
         }
 
         $form = $this->createForm(
-            'oro_entity_config_type',
+            ConfigType::class,
             null,
             array(
                 'config_model' => $entityModel,

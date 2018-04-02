@@ -7,9 +7,6 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -91,7 +88,7 @@ class SearchEntityFilterType extends AbstractType
      */
     public function getParent()
     {
-        return EntityFilterType::NAME;
+        return EntityFilterType::class;
     }
 
     /**

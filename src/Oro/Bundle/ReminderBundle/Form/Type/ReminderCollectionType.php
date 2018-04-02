@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,7 +15,7 @@ class ReminderCollectionType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'type'                 => 'oro_reminder',
+                'type'                 => ReminderType::class,
                 'required'             => false,
                 'show_form_when_empty' => false,
                 'error_bubbling'       => false,
@@ -30,7 +31,7 @@ class ReminderCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_collection';
+        return CollectionType::class;
     }
 
     /**

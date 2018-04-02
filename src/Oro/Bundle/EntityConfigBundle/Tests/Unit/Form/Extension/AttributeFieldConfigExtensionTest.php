@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFieldConfigExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -46,7 +47,7 @@ class AttributeFieldConfigExtensionTest extends TypeTestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals('oro_entity_extend_field_type', $this->extension->getExtendedType());
+        $this->assertEquals(FieldType::class, $this->extension->getExtendedType());
     }
 
     public function testOnPostSetData()

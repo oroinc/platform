@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -43,7 +45,7 @@ class BusinessUnitType extends AbstractType
         $builder
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'oro.organization.businessunit.name.label',
                     'required' => true,
@@ -68,7 +70,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'phone',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'oro.organization.businessunit.phone.label',
                     'required' => false,
@@ -76,7 +78,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'website',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'oro.organization.businessunit.website.label',
                     'required' => false,
@@ -84,7 +86,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'email',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'oro.organization.businessunit.email.label',
                     'required' => false,
@@ -92,7 +94,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'fax',
-                'text',
+                TextType::class,
                 [
                     'label'    => 'oro.organization.businessunit.fax.label',
                     'required' => false,
@@ -100,7 +102,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'appendUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 [
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
@@ -110,7 +112,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'removeUsers',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 [
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
@@ -175,15 +177,5 @@ class BusinessUnitType extends AbstractType
     public function getName()
     {
         return self::FORM_NAME;
-    }
-
-    /**
-     * Return current organization id
-     *
-     * @return int|null
-     */
-    protected function getOrganizationId()
-    {
-        return $this->tokenAccessor->getOrganizationId();
     }
 }

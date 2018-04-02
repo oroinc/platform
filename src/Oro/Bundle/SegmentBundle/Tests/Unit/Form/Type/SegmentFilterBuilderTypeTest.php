@@ -13,9 +13,9 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -45,12 +45,11 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        parent::setUp();
-
         $this->formType = new SegmentFilterBuilderType(
             $this->doctrineHelper,
             $this->tokenStorage
         );
+        parent::setUp();
     }
 
     /**
@@ -60,7 +59,9 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     {
         return [
             new PreloadedExtension(
-                [],
+                [
+                    $this->formType
+                ],
                 []
             ),
             $this->getValidatorExtension(false),
@@ -82,7 +83,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'segment_entity' => $entityClass
         ];
 
-        $this->factory->create($this->formType, null, $options);
+        $this->factory->create(SegmentFilterBuilderType::class, null, $options);
     }
 
     /**
@@ -100,7 +101,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ->willReturn($em);
         $this->expectException(InvalidOptionsException::class);
 
-        $this->factory->create($this->formType, null, $options);
+        $this->factory->create(SegmentFilterBuilderType::class, null, $options);
     }
 
     /**
@@ -144,7 +145,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     {
         $this->assertNormalizersCalls('\stdClass');
 
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(SegmentFilterBuilderType::class, null, $options);
 
         $actualOptions = $form->getConfig()->getOptions();
 
@@ -245,7 +246,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ->method('getToken')
             ->willReturn($token);
 
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(SegmentFilterBuilderType::class, null, $options);
 
         $form->submit($data);
         /** @var Segment $submittedData */
@@ -286,7 +287,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             ->method('getToken');
         $existingEntity = $this->getEntity(Segment::class, ['id' => 2]);
 
-        $form = $this->factory->create($this->formType, $existingEntity, $options);
+        $form = $this->factory->create(SegmentFilterBuilderType::class, $existingEntity, $options);
 
         $form->submit($data);
         /** @var Segment $submittedData */
@@ -442,7 +443,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         /** @var Segment $existingEntity */
         $existingEntity = $this->getEntity(Segment::class, ['id' => 2, 'name' => $existingName]);
 
-        $form = $this->factory->create($this->formType, $existingEntity, $options);
+        $form = $this->factory->create(SegmentFilterBuilderType::class, $existingEntity, $options);
 
         $form->submit([]);
         $this->assertEquals($existingName, $existingEntity->getName());
@@ -478,7 +479,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
         $existingEntity = $this->getEntity(Segment::class, ['id' => 2]);
 
-        $this->factory->create($this->formType, $existingEntity, $options);
+        $this->factory->create(SegmentFilterBuilderType::class, $existingEntity, $options);
 
         $this->assertTrue($isCalled);
     }
