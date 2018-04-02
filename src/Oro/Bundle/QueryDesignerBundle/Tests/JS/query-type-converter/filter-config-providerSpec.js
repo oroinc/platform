@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var data = JSON.parse(require('text!./Fixture/config-filters-provider/filter-config-data.json'));
+    var data = JSON.parse(require('text!../Fixture/query-type-converter/filter-config-data.json'));
     var FilterConfigProvider = require('oroquerydesigner/js/query-type-converter/filter-config-provider');
     var exposure = require('requirejs-exposure')
         .disclose('oroquerydesigner/js/query-type-converter/filter-config-provider');

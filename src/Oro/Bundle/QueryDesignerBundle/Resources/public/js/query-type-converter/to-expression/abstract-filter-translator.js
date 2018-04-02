@@ -103,12 +103,23 @@ define(function(require) {
             var filterConfigs = this.filterConfigProvider.getFilterConfigsByType(this.filterType);
             var schema = this.getConditionSchema(filterConfigs);
 
-            if (jsonSchemaValidator.validate(schema, condition)) {
+            if (filterConfigs && jsonSchemaValidator.validate(schema, condition)) {
                 var config = _.findWhere(filterConfigs, {name: condition.criterion.filter});
-                result = _.pluck(config.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
+                result = config && this.testToConfig(condition, config);
             }
 
             return result;
+        },
+
+        /**
+         * Check if the condition complies to the filter config
+         *
+         * @param {Object} condition
+         * @param {Object} config
+         * @return {boolean}
+         */
+        testToConfig: function(condition, config) {
+            return _.pluck(config.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
         },
 
         /**
