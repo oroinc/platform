@@ -289,6 +289,9 @@ config:
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
 
+        'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery
@@ -302,6 +305,7 @@ config:
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
         - oroui/js/app/modules/resizable-area-module
+        - oroui/js/app/modules/swipe-actions-module
 
 build:
     paths:
