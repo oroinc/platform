@@ -6,25 +6,15 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator');
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
     var Node = ExpressionLanguageLibrary.Node;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator', function() {
         var translator;
         var filterConfigProviderMock;
-        var createGetFieldAST = function() {
-            return new GetAttrNode(
-                new NameNode('foo'),
-                new ConstantNode('bar'),
-                new ArgumentsNode(),
-                GetAttrNode.PROPERTY_CALL
-            );
-        };
+        var createGetFieldAST = ExpressionLanguageLibrary.tools.createGetAttrNode.bind(null, 'foo.bar'.split('.'));
         var createFuncCallAST = function(funcName) {
             return new FunctionNode(funcName, new Node(_.rest(arguments)));
         };
