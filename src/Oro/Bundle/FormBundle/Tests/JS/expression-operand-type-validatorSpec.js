@@ -13,7 +13,7 @@ define(function(require) {
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
+    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
 
     // pre-calculated object to using in `createValidatorOptions` function only
     var _operationsValidatorOption = _.object(_.map(
@@ -59,14 +59,6 @@ define(function(require) {
             });
 
             describe('check correct expression', function() {
-                function createArrayNode(values) {
-                    var node = new ArrayNode();
-                    _.each(values, function(value) {
-                        node.addElement(new ConstantNode(value));
-                    });
-                    return node;
-                }
-
                 var correctCases = {
                     '1': new ConstantNode(1),
                     '1 == 1': new BinaryNode('==', new ConstantNode(1), new ConstantNode(1)),

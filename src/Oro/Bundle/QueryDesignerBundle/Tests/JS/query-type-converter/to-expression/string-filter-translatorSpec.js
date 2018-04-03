@@ -8,12 +8,12 @@ define(function(require) {
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var Node = ExpressionLanguageLibrary.Node;
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
+    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator', function() {
         var translator;
@@ -68,15 +68,6 @@ define(function(require) {
         });
 
         describe('translates valid condition', function() {
-            function createArrayNode() {
-                var arrayNode = new ArrayNode();
-
-                arrayNode.addElement(new ConstantNode('baz'));
-                arrayNode.addElement(new ConstantNode('qux'));
-
-                return arrayNode;
-            }
-
             var cases = [
                 [
                     // filter type
@@ -109,7 +100,7 @@ define(function(require) {
                         type: '3',
                         value: 'baz'
                     },
-                    '==',
+                    '=',
                     new ConstantNode('baz')
                 ],
                 [
@@ -137,7 +128,7 @@ define(function(require) {
                         value: 'baz, qux'
                     },
                     'in',
-                    createArrayNode()
+                    createArrayNode(['baz', 'qux'])
                 ],
                 [
                     'is not any of',
@@ -146,22 +137,22 @@ define(function(require) {
                         value: 'baz, qux'
                     },
                     'not in',
-                    createArrayNode()
+                    createArrayNode(['baz', 'qux'])
                 ],
                 [
                     'is empty',
                     {
                         type: 'filter_empty_option',
-                        value: ''
+                        value: 'qux'
                     },
-                    '==',
+                    '=',
                     new ConstantNode('')
                 ],
                 [
                     'is not empty',
                     {
                         type: 'filter_not_empty_option',
-                        value: ''
+                        value: 'qux'
                     },
                     '!=',
                     new ConstantNode('')

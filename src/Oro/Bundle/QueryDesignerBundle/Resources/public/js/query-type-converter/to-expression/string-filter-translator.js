@@ -41,7 +41,7 @@ define(function(require) {
                 valueModifier: 'containsRegExp'
             },
             3: { // is equal to
-                operator: '=='
+                operator: '='
             },
             4: { // starts with
                 operator: 'matches',
@@ -60,7 +60,7 @@ define(function(require) {
                 hasArrayValue: true
             },
             filter_empty_option: { // is empty
-                operator: '==',
+                operator: '=',
                 value: ''
             },
             filter_not_empty_option: { // is not empty
@@ -102,8 +102,8 @@ define(function(require) {
                     params.valueModifier,
                     new Node([new ConstantNode(value)])
                 );
-            } else if (params.value) {
-                rightOperand = new ConstantNode(operator.value);
+            } else if ('value' in params) {
+                rightOperand = new ConstantNode(params.value);
             } else {
                 rightOperand = new ConstantNode(value);
             }

@@ -96,14 +96,15 @@ define(function(require) {
          * @protected
          */
         test: function(condition) {
-            if (!(condition.criterion.data.type in this.operatorMap)) {
-                return false;
-            }
             var result = false;
             var filterConfigs = this.filterConfigProvider.getFilterConfigsByType(this.filterType);
             var schema = this.getConditionSchema(filterConfigs);
 
-            if (filterConfigs && jsonSchemaValidator.validate(schema, condition)) {
+            if (
+                filterConfigs &&
+                jsonSchemaValidator.validate(schema, condition) &&
+                condition.criterion.data.type in this.operatorMap
+            ) {
                 var config = _.findWhere(filterConfigs, {name: condition.criterion.filter});
                 result = config && this.testToConfig(condition, config);
             }

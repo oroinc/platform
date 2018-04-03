@@ -29,6 +29,7 @@ define(function(require) {
         ParsedExpression: require('oroexpressionlanguage/js/library/parsed-expression'),
         Parser: require('oroexpressionlanguage/js/extend/parser'),
         Token: require('oroexpressionlanguage/js/extend/token'),
-        TokenStream: require('oroexpressionlanguage/js/library/token-stream')
+        TokenStream: require('oroexpressionlanguage/js/library/token-stream'),
+        tools: require('oroexpressionlanguage/js/expression-language-tools')
     };
 });

@@ -7,11 +7,11 @@ define(function(require) {
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
+    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
 
     describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', function() {
         var translator;
@@ -41,9 +41,6 @@ define(function(require) {
                     return new ConstantNode('test');
                 },
                 'improper operation': function() {
-                    var arrayNode = new ArrayNode();
-                    arrayNode.addElement(new ConstantNode(1));
-                    arrayNode.addElement(new ConstantNode(2));
                     return new BinaryNode(
                         '>=',
                         new GetAttrNode(
@@ -52,17 +49,14 @@ define(function(require) {
                             new ArgumentsNode(),
                             GetAttrNode.PROPERTY_CALL
                         ),
-                        arrayNode
+                        createArrayNode([1, 2])
                     );
                 },
                 'improper left operand AST': function() {
-                    var arrayNode = new ArrayNode();
-                    arrayNode.addElement(new ConstantNode(1));
-                    arrayNode.addElement(new ConstantNode(2));
                     return new BinaryNode(
                         'in',
                         new ConstantNode('test'),
-                        arrayNode
+                        createArrayNode([1, 2])
                     );
                 },
                 'improper right operand AST': function() {
@@ -78,9 +72,6 @@ define(function(require) {
                     );
                 },
                 'improper AST values in right operand': function() {
-                    var arrayNode = new ArrayNode();
-                    arrayNode.addElement(new NameNode('foo'));
-                    arrayNode.addElement(new ConstantNode(2));
                     return new BinaryNode(
                         'in',
                         new GetAttrNode(
@@ -89,7 +80,7 @@ define(function(require) {
                             new ArgumentsNode(),
                             GetAttrNode.PROPERTY_CALL
                         ),
-                        arrayNode
+                        createArrayNode([new NameNode('foo'), 2])
                     );
                 }
             };
@@ -107,9 +98,6 @@ define(function(require) {
             var node;
 
             beforeEach(function() {
-                var arrayNode = new ArrayNode();
-                arrayNode.addElement(new ConstantNode(1));
-                arrayNode.addElement(new ConstantNode(2));
                 node = new BinaryNode(
                     'in',
                     new GetAttrNode(
@@ -118,7 +106,7 @@ define(function(require) {
                         new ArgumentsNode(),
                         GetAttrNode.PROPERTY_CALL
                     ),
-                    arrayNode
+                    createArrayNode(['1', '2'])
                 );
             });
 

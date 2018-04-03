@@ -10,15 +10,15 @@ define(function(require) {
 
     /**
      * @typedef {Object} EntityInfo
-     * @poperty {boolean} isCollection - says if entity has to be used like collection
-     * @poperty {string} name - alias or className of entity
-     * @poperty {EntityTreeNode} fields - node of entityTree that contains its fields
+     * @property {boolean} isCollection - says if entity has to be used like collection
+     * @property {string} name - alias or className of entity
+     * @property {EntityTreeNode} fields - node of entityTree that contains its fields
      */
 
     /**
      * @typedef {Object} OperationInfo
-     * @poperty {string} item - an operator (e.g. '+', '*')
-     * @poperty {string} type - type of operator (e.g. 'math', 'equal')
+     * @property {string} item - an operator (e.g. '+', '*')
+     * @property {string} type - type of operator (e.g. 'math', 'equal')
      */
 
     /**

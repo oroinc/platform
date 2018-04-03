@@ -8,34 +8,14 @@ define(function(require) {
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
     var UnaryNode = ExpressionLanguageLibrary.UnaryNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
+    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
 
     function createGetAttrNode(node, item, type) {
         return new GetAttrNode(node, new ConstantNode(item), new ArgumentsNode(), type);
-    }
-
-    /**
-     * Constructs ArrayNode with received items
-     *
-     * @param {...*} - items, if item is an array first item of it is key and second is value for node element
-     * @returns {ArgumentsNode}
-     */
-    function createArrayNode() {
-        var node = new ArrayNode();
-
-        for (var i = 0; i < arguments.length; i++) {
-            if (Object.prototype.toString.call(arguments[i]) === '[object Array]' && arguments[i].length > 1) {
-                node.addElement(new ConstantNode(arguments[i][1]), new ConstantNode(arguments[i][0]));
-            } else {
-                node.addElement(new ConstantNode(arguments[i]));
-            }
-        }
-
-        return node;
     }
 
     /**
@@ -54,7 +34,7 @@ define(function(require) {
         return node;
     }
 
-    describe('oroexpressionlanguage/js/ToExpressionCompiler', function() {
+    describe('oroexpressionlanguage/js/to-expression-compiler', function() {
         describe('parse AST', function() {
             var cases = [
                 [
@@ -232,27 +212,27 @@ define(function(require) {
                     ['foo']
                 ],
                 [
-                    createArrayNode(3, 'foo'),
+                    createArrayNode([3, 'foo']),
                     '[3, "foo"]'
                 ],
                 [
-                    createArrayNode([0, 'foo'], [1, 'bar']),
+                    createArrayNode(['foo', 'bar']),
                     '["foo", "bar"]'
                 ],
                 [
-                    createArrayNode(['foo', 3]),
+                    createArrayNode({foo: 3}),
                     '{foo: 3}'
                 ],
                 [
-                    createArrayNode([4, 3]),
+                    createArrayNode([[4, 3]]),
                     '{4: 3}'
                 ],
                 [
-                    createArrayNode(['b', 'a'], 'b'),
+                    createArrayNode([['b', 'a'], 'b']),
                     '{b: "a", 0: "b"}'
                 ],
                 [
-                    createArrayNode(['foo bar', 1]),
+                    createArrayNode({'foo bar': 1}),
                     '{"foo bar": 1}'
                 ],
                 [

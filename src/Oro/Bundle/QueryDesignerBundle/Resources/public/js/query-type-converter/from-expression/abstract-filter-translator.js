@@ -1,5 +1,18 @@
-define(function() {
+define(function(require) {
     'use strict';
+
+    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
+    var tools = ExpressionLanguageLibrary.tools;
+
+    /**
+     * @typedef {Object} OperatorParams
+     * @property {string} type - used for determine filter type
+     * @property {string} operator
+     * @property {string} [valueModifier] - contains function name in case operator expects it as right operand
+     * @property {boolean} [hasArrayValue] - determine if operator expects array as right operand
+     * @property {*} [value] - presents if operation expects specific value in right operand (like `empty` operation)
+     */
 
     /**
      * Defines interface and implements base functionality of FilterTranslatorFromExpression
@@ -49,11 +62,13 @@ define(function() {
          * @return {Object|null} condition
          */
         tryToTranslate: function(node) {
-            if (this.checkAST(node)) {
+            var operatorParams = this.resolveOperatorParams(node);
+
+            if (operatorParams) {
                 var filterConfig = this.getFilterConfig(node);
 
-                if (this.checkFilterType(filterConfig) && this.checkOperation(node, filterConfig)) {
-                    return this.translate(node, filterConfig);
+                if (this.checkFilterType(filterConfig) && this.checkOperation(node, filterConfig, operatorParams)) {
+                    return this.translate(node, filterConfig, operatorParams);
                 }
             }
 
@@ -61,15 +76,18 @@ define(function() {
         },
 
         /**
-         * Check if structure of the node corresponds to expected node for translation
+         * Checks if a node can be used as right operand of `in` operation
          *
-         * @param {Node} node ExpressionLanguage AST node
+         * @param {Node} node
+         * @param {function(Node)} [callback] - will be implemented to each array item and has to return boolean
          * @return {boolean}
-         * @protected
-         * @abstract
          */
-        checkAST: function(node) {
-            throw new Error('Method `checkAST` has to defined in descendant FilterTranslatorFromExpression');
+        checkListOperandAST: function(node, callback) {
+            return node instanceof ArrayNode &&
+                tools.isIndexedArrayNode(node) &&
+                (!callback || _.every(node.getKeyValuePairs(), function(pair) {
+                    return callback(pair.value);
+                }));
         },
 
         /**
@@ -78,10 +96,22 @@ define(function() {
          * @param {Node} node ExpressionLanguage AST node
          * @return {Node} node
          * @protected
-         * @abstract
          */
         resolveFieldAST: function(node) {
-            throw new Error('Method `resolveFieldAST` has to defined in descendant FilterTranslatorFromExpression');
+            return node.nodes[0];
+        },
+
+        /**
+         * Finds correspond filter type using operator map
+         *
+         * @param {Node} node - processed Node
+         * @return {OperatorParams|null}
+         * @protected
+         * @abstract
+         */
+        resolveOperatorParams: function(node) {
+            throw new Error(
+                'Method `resolveOperatorParams` has to defined in descendant FilterTranslatorFromExpression');
         },
 
         /**
@@ -89,11 +119,12 @@ define(function() {
          *
          * @param {Node} node ExpressionLanguage AST node
          * @param {Object} filterConfig
+         * @param {OperatorParams} operatorParams
          * @return {Object}
          * @protected
          * @abstract
          */
-        translate: function(node, filterConfig) {
+        translate: function(node, filterConfig, operatorParams) {
             throw new Error('Method `translate` has to defined in descendant FilterTranslatorFromExpression');
         },
 
@@ -113,11 +144,12 @@ define(function() {
          *
          * @param {Node} node ExpressionLanguage AST node
          * @param {Object} filterConfig
+         * @param {OperatorParams} operatorParams
          * @returns {boolean}
          * @protected
          */
-        checkOperation: function(node, filterConfig) {
-            return _.pluck(filterConfig.choices, 'value').indexOf(this.operatorMap[node.attrs.operator]) !== -1;
+        checkOperation: function(node, filterConfig, operatorParams) {
+            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.type) !== -1;
         },
 
         /**

@@ -7,7 +7,6 @@ define(function(require) {
     var DictionaryFilterTranslatorToExpression =
         require('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
@@ -28,7 +27,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        operatorMap: _.invert(DictionaryFilterTranslatorToExpression.prototype.operatorMap),
+        operatorMap: DictionaryFilterTranslatorToExpression.prototype.operatorMap,
 
         /**
          * @inheritDoc
@@ -36,29 +35,40 @@ define(function(require) {
         filterType: 'dictionary',
 
         /**
+         * Checks if node has correct type and value
+         *
+         * @param {Node} node
+         * @return {boolean}
+         */
+        checkValueNode: function(node) {
+            return node instanceof ConstantNode &&_.isString(node.attrs.value);
+        },
+
+        /**
          * @inheritDoc
          */
-        checkAST: function(node) {
-            return node instanceof BinaryNode &&
-                node.attrs.operator in this.operatorMap &&
-                node.nodes[0] instanceof GetAttrNode &&
-                node.nodes[1] instanceof ArrayNode &&
-                _.every(node.nodes[1].nodes, function(node) {
-                    return node instanceof ConstantNode;
+        resolveOperatorParams: function(node) {
+            if (
+                node instanceof BinaryNode &&
+                this.resolveFieldAST(node) instanceof GetAttrNode &&
+                this.checkListOperandAST(node.nodes[1], this.checkValueNode)
+            ) {
+                var type = _.findKey(this.operatorMap, function(operator) {
+                    return operator === node.attrs.operator;
                 });
+
+                if (type) {
+                    return {type: type, operator: node.attrs.operator};
+                }
+            }
+
+            return null;
         },
 
         /**
          * @inheritDoc
          */
-        resolveFieldAST: function(node) {
-            return node.nodes[0];
-        },
-
-        /**
-         * @inheritDoc
-         */
-        translate: function(node, filterConfig) {
+        translate: function(node, filterConfig, operatorParams) {
             var fieldId = this.fieldIdTranslator.translate(this.resolveFieldAST(node));
 
             var condition = {
@@ -66,7 +76,7 @@ define(function(require) {
                 criterion: {
                     filter: filterConfig.name,
                     data: {
-                        type: this.operatorMap[node.attrs.operator],
+                        type: operatorParams.type,
                         value: _.map(node.nodes[1].getKeyValuePairs(), function(pair) {
                             return String(pair.value.attrs.value);
                         })

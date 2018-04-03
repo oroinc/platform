@@ -7,11 +7,11 @@ define(function(require) {
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
+    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator', function() {
         var translator;
@@ -67,16 +67,6 @@ define(function(require) {
         });
 
         describe('translates valid condition', function() {
-            function createArrayNode(array) {
-                var arrayNode = new ArrayNode();
-
-                _.each(array, function(item) {
-                    arrayNode.addElement(new ConstantNode(item));
-                });
-
-                return arrayNode;
-            }
-
             var cases = [
                 [
                     'equals or greater than',
