@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -20,24 +21,12 @@ class TargetType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var FieldConfigId */
-    protected $configId;
-
-    /** @var string|null */
-    protected $targetEntityClass;
-
     /**
      * @param ConfigManager $configManager
-     * @param FieldConfigId $configId
      */
-    public function __construct(ConfigManager $configManager, FieldConfigId $configId)
+    public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-        $this->configId = $configId;
-        $this->targetEntityClass = $this->configManager
-            ->getProvider('extend')
-            ->getConfigById($this->configId)
-            ->get('target_entity');
     }
 
     /**
@@ -45,7 +34,9 @@ class TargetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
+            $this->preSetData($event, $options['field_config_id']);
+        });
     }
 
     /**
@@ -53,9 +44,9 @@ class TargetType extends AbstractType
      *
      * @param FormEvent $event
      */
-    public function preSetData(FormEvent $event)
+    public function preSetData(FormEvent $event, FieldConfigId $fieldConfigId)
     {
-        $event->setData($this->targetEntityClass);
+        $event->setData($this->getTargetEntityClass($fieldConfigId));
     }
 
     /**
@@ -63,17 +54,14 @@ class TargetType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired('field_config_id');
+        $resolver->setAllowedTypes('field_config_id', FieldConfigId::class);
         $resolver->setDefaults(
             array(
                 'attr'        => array(
                     'class' => 'extend-rel-target-name',
                 ),
                 'label'       => 'oro.entity_extend.form.target_entity',
-                'placeholder' => $this->targetEntityClass ? null : '',
-                'choices'     => $this->getEntityChoiceList(
-                    $this->configId->getClassName(),
-                    $this->configId->getFieldType()
-                ),
                 'choice_attr' => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
@@ -87,23 +75,32 @@ class TargetType extends AbstractType
         );
 
         $resolver->setNormalizer('attr', function (Options $options, $value) {
-            $value['readonly'] = (bool) $this->targetEntityClass;
+            $value['readonly'] = (bool) $this->getTargetEntityClass($options['field_config_id']);
 
             return $value;
+        });
+
+        $resolver->setNormalizer('placeholder', function (Options $options) {
+            return $this->getTargetEntityClass($options['field_config_id']) ? null : '';
+        });
+
+        $resolver->setNormalizer('choices', function (Options $options) {
+            return $this->getEntityChoiceList($options['field_config_id']);
         });
     }
 
     /**
-     * @param string $entityClassName
-     * @param string $relationType
-     *
+     * @param FieldConfigId $fieldConfigId
      * @return array
      */
-    protected function getEntityChoiceList($entityClassName, $relationType)
+    protected function getEntityChoiceList(FieldConfigId $fieldConfigId)
     {
+        $relationType = $fieldConfigId->getFieldType();
+        $targetEntityClass = $this->getTargetEntityClass($fieldConfigId);
+
         /** @var EntityConfigId[] $entityIds */
-        $entityIds = $this->targetEntityClass
-            ? [$this->configManager->getId('extend', $this->targetEntityClass)]
+        $entityIds = $targetEntityClass
+            ? [$this->configManager->getId('extend', $targetEntityClass)]
             : $this->configManager->getIds('extend');
 
         if ($relationType === RelationTypeBase::ONE_TO_MANY) {
@@ -119,10 +116,10 @@ class TargetType extends AbstractType
 
         $entityIds = array_filter(
             $entityIds,
-            function (EntityConfigId $configId) {
+            function (EntityConfigId $configId) use ($targetEntityClass) {
                 $config = $this->configManager->getConfig($configId);
 
-                return $this->isSuitableAsTarget($config, $this->targetEntityClass);
+                return $this->isSuitableAsTarget($config, $targetEntityClass);
             }
         );
 
@@ -134,6 +131,18 @@ class TargetType extends AbstractType
         }
 
         return $choices;
+    }
+
+    /**
+     * @param FieldConfigId $fieldConfigId
+     * @return string
+     */
+    private function getTargetEntityClass(FieldConfigId $fieldConfigId)
+    {
+        return $this->configManager
+            ->getProvider('extend')
+            ->getConfigById($fieldConfigId)
+            ->get('target_entity');
     }
 
     /**
@@ -175,7 +184,7 @@ class TargetType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

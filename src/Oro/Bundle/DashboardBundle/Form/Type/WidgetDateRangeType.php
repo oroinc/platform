@@ -50,7 +50,7 @@ class WidgetDateRangeType extends AbstractType
      */
     public function getParent()
     {
-        return DateRangeFilterType::NAME;
+        return DateRangeFilterType::class;
     }
 
     /**
@@ -94,7 +94,7 @@ class WidgetDateRangeType extends AbstractType
                 'tooltip'          => 'oro.filter.date.info',
                 'required'         => false,
                 'compile_date'     => false,
-                'field_type'       => WidgetDateRangeValueType::NAME,
+                'field_type'       => WidgetDateRangeValueType::class,
                 'operator_choices' => [],
                 'value_types'      => false,
                 'all_time_value'   => true,

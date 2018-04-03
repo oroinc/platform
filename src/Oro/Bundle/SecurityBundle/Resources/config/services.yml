@@ -637,7 +637,7 @@ services:
         arguments:
             - '@oro_security.acl_helper'
         tags:
-            - { name: form.type_extension, alias: entity }
+            - { name: form.type_extension, alias: entity, extended_type: Symfony\Bridge\Doctrine\Form\Type\EntityType }
 
     oro_security.listener.search_listener:
           class: '%oro_security.listener.search_listener.class%'

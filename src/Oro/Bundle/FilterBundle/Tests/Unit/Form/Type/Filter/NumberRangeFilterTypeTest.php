@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
@@ -23,14 +24,14 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $this->type = new NumberRangeFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
             new NumberFilterType($translator),
         ]);
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-
-        $this->type = new NumberRangeFilterType($translator);
     }
 
     /**

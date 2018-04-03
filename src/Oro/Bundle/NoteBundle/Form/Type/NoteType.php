@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\NoteBundle\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Valid;
 
 class NoteType extends AbstractType
 {
@@ -19,7 +20,7 @@ class NoteType extends AbstractType
         $builder
             ->add(
                 'message',
-                'oro_resizeable_rich_text',
+                OroResizeableRichTextType::class,
                 [
                     'required' => true,
                     'label'    => 'oro.note.message.label'
@@ -27,7 +28,7 @@ class NoteType extends AbstractType
             )
             ->add(
                 'attachment',
-                'oro_image',
+                ImageType::class,
                 [
                     'label' => 'oro.note.attachment.label',
                     'required' => false

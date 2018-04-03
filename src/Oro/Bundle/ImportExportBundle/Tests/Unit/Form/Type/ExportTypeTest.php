@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
@@ -24,10 +25,24 @@ class ExportTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->processorRegistry = $this->getMockBuilder(ProcessorRegistry::class)->getMock();
         $this->exportType = new ExportType($this->processorRegistry);
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    ExportType::class => $this->exportType
+                ],
+                []
+            ),
+        ];
     }
 
     /**
@@ -50,7 +65,7 @@ class ExportTypeTest extends FormIntegrationTestCase
             ->with(ProcessorRegistry::TYPE_EXPORT, $entityName)
             ->willReturn($processorAliasesFromRegistry);
 
-        $form = $this->factory->create($this->exportType, null, [
+        $form = $this->factory->create(ExportType::class, null, [
             'entityName' => $entityName,
             'processorAlias' => $processorAliasesPassedToForm
         ]);

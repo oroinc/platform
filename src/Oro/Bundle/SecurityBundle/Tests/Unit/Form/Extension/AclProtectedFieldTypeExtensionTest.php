@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -161,7 +162,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     public function testPreSubmitOnEmptyData()
     {
         $data = [];
-        $form = $this->factory->create('form', new CmsAddress(), []);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), []);
         $event = new FormEvent($form, $data);
         $this->extension->preSubmit($event);
         $this->assertCount(0, $event->getData());
@@ -176,7 +177,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $entity->street = 'Main street';
         $entity->zip = 78945;
         /** @var Form $form */
-        $form = $this->factory->create('form', $entity, $options);
+        $form = $this->factory->create(FormType::class, $entity, $options);
         $form->add('city');
         $form->add('street');
         $form->add('country');
@@ -251,7 +252,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $options = $this->prepareCorrectOptions(CmsAddress::class, $showRestricted);
         $view = new FormView();
         $view->children = ['city' => new FormView(), 'street' => new FormView(), 'country' => new FormView()];
-        $form = $this->factory->create('form', new CmsAddress(), $options);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), $options);
         $form->add('city');
         $form->add('street');
         $form->add('country');

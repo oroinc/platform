@@ -8,14 +8,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
 use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleMultiSelectTypeTest extends FormIntegrationTestCase
@@ -46,7 +46,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_jqueryselect2_hidden', $this->formType->getParent());
+        $this->assertEquals(OroJquerySelect2HiddenType::class, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -94,7 +94,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitEmptyData($submittedData, array $expected)
     {
-        $form = $this->factory->create($this->formType, null, ['entity_class' => Role::class]);
+        $form = $this->factory->create(RoleMultiSelectType::class, null, ['entity_class' => Role::class]);
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid());
@@ -141,7 +141,8 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    'oro_select2_hidden' => new Select2Type('hidden', 'oro_select2_hidden'),
+                    $this->formType,
+                    Select2HiddenType::class => new Select2Type('hidden', 'oro_select2_hidden'),
                     'oro_jqueryselect2_hidden' => new OroJquerySelect2HiddenType(
                         $this->em,
                         $searchRegistry,

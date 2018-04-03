@@ -34,7 +34,7 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
     {
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('submit')->with($this->request);
+        $form->expects($this->once())->method('handleRequest')->with($this->request);
         $form->expects($this->once())->method('isValid')->willReturn(true);
 
         /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
@@ -82,7 +82,7 @@ class DefaultFormProcessorTest extends \PHPUnit_Framework_TestCase
 
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('submit')->with($this->request);
+        $form->expects($this->once())->method('handleRequest')->with($this->request);
         $form->expects($this->once())->method('isValid')->willReturn(false);
 
         $context = new TransitionContext();

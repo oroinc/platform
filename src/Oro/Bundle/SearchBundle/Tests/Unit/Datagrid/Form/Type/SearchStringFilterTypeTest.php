@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class SearchStringFilterTypeTest extends AbstractTypeTestCase
 {
@@ -18,6 +19,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator             = $this->createMockTranslator();
+        $this->type = new SearchStringFilterType($translator);
 
         $this->formExtensions[] = new CustomFormExtension(
             [
@@ -25,10 +27,9 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
                 new TextFilterType($translator)
             ]
         );
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-
-        $this->type = new SearchStringFilterType($translator);
     }
 
     /**
@@ -51,7 +52,7 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(TextFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(TextFilterType::class, $this->type->getParent());
     }
 
     /**

@@ -52,6 +52,6 @@ class MultipleAssociationChoiceType extends BaseMultipleAssociationChoiceType
      */
     public function getParent()
     {
-        return 'oro_entity_extend_multiple_association_choice';
+        return BaseMultipleAssociationChoiceType::class;
     }
 }

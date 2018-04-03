@@ -7,6 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -32,20 +36,20 @@ class EnumValueType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('id', 'hidden')
-            ->add('label', 'text', [
+            ->add('id', HiddenType::class)
+            ->add('label', TextType::class, [
                 'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(),
                     new Assert\Length(['max' => 255]),
                 ],
             ])
-            ->add('priority', 'hidden', ['empty_data' => 9999]);
+            ->add('priority', HiddenType::class, ['empty_data' => 9999]);
 
         if ($options['allow_multiple_selection']) {
-            $builder->add('is_default', 'checkbox', ['required' => false]);
+            $builder->add('is_default', CheckboxType::class, ['required' => false]);
         } else {
-            $builder->add('is_default', 'radio', ['required' => false]);
+            $builder->add('is_default', RadioType::class, ['required' => false]);
         }
     }
 

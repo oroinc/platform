@@ -32,6 +32,7 @@ class SegmentChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('placeholder', 'oro.segment.form.segment_choice.placeholder');
+        $resolver->setDefault('choices_as_values', true);
         $resolver->setRequired('entityClass');
         $resolver->setNormalizer(
             'choices',

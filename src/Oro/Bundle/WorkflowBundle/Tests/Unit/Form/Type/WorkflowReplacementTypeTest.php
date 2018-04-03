@@ -4,15 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowReplacementTypeTest extends FormIntegrationTestCase
@@ -28,11 +27,10 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
      */
     public function setUp()
     {
-        parent::setUp();
-
         $this->helper = $this->createMock(WorkflowDeactivationHelper::class);
 
         $this->formType = new WorkflowReplacementType($this->helper);
+        parent::setUp();
     }
 
     public function testGetName()
@@ -94,7 +92,7 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
             ->with($workflowDefinition)
             ->willReturn(['workflow2' => 'workflow2', 'workflow3' => 'workflow3']);
 
-        $form = $this->factory->create($this->formType, [], ['workflow' => $workflowDefinition]);
+        $form = $this->factory->create(WorkflowReplacementType::class, [], ['workflow' => $workflowDefinition]);
         $form->submit($submittedData);
 
         $this->assertEquals($isValid, $form->isValid());
@@ -164,11 +162,8 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    OroChoiceType::NAME => new OroChoiceType(),
-                    'oro_select2_choice' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-                        'oro_select2_choice'
-                    )
+                    $this->formType,
+                    OroChoiceType::class => new OroChoiceType()
                 ],
                 []
             ),

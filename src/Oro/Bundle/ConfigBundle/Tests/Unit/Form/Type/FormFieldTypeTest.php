@@ -4,29 +4,15 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormFieldTypeTest extends TypeTestCase
 {
     const TEST_LABEL = 'label';
-
-    /** @var FormFieldType */
-    protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->formType = new FormFieldType();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        unset($this->formType);
-    }
 
     protected function getExtensions()
     {
@@ -41,7 +27,6 @@ class FormFieldTypeTest extends TypeTestCase
         ];
     }
 
-
     /**
      * @dataProvider buildFormOptionsProvider
      *
@@ -51,7 +36,7 @@ class FormFieldTypeTest extends TypeTestCase
      */
     public function testBuildForm($options, $expectedType, array $expectedOptions)
     {
-        $form = $this->factory->create($this->formType, array(), $options);
+        $form = $this->factory->create(FormFieldType::class, array(), $options);
 
         $this->assertTrue($form->has('value'));
         $this->assertTrue($form->has('use_parent_scope_value'));
@@ -76,7 +61,7 @@ class FormFieldTypeTest extends TypeTestCase
             ),
             'target field options from array'           => array(
                 'options'         => array(
-                    'target_field_type'    => 'choice',
+                    'target_field_type'    => ChoiceType::class,
                     'target_field_options' => array('label' => self::TEST_LABEL)
                 ),
                 'expectedType'    => 'choice',
@@ -87,7 +72,8 @@ class FormFieldTypeTest extends TypeTestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_config_form_field_type', $this->formType->getName());
+        $formType = new FormFieldType();
+        $this->assertEquals('oro_config_form_field_type', $formType->getName());
     }
 
     public function listenersDataProvider()
@@ -123,7 +109,8 @@ class FormFieldTypeTest extends TypeTestCase
             ->method('addEventListener')
             ->with(FormEvents::PRE_SET_DATA);
 
-        $this->formType->buildForm(
+        $formType = new FormFieldType();
+        $formType->buildForm(
             $builder,
             [
                 'parent_checkbox_label' => '',

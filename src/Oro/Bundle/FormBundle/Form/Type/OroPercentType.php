@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\PercentToLocalizedStringTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -32,7 +33,7 @@ class OroPercentType extends AbstractType
      */
     public function getParent()
     {
-        return 'percent';
+        return PercentType::class;
     }
 
     /**

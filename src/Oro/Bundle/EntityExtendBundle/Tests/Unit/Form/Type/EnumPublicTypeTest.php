@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -206,7 +207,7 @@ class EnumPublicTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'choice',
+            ChoiceType::class,
             $this->type->getParent()
         );
     }

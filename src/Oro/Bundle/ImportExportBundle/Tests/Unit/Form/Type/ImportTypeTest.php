@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -24,12 +25,11 @@ class ImportTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->processorRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->type = new ImportType($this->processorRegistry);
+        parent::setUp();
     }
 
     /**
@@ -51,7 +51,7 @@ class ImportTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        $form = $this->factory->create($this->type, null, $formOptions);
+        $form = $this->factory->create(ImportType::class, null, $formOptions);
 
         $this->assertTrue($form->has('file'));
         $this->assertEquals('file', $form->get('file')->getConfig()->getType()->getName());
@@ -104,6 +104,14 @@ class ImportTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        return [new ValidatorExtension(Validation::createValidator())];
+        return [
+            new PreloadedExtension(
+                [
+                    ImportType::class => $this->type
+                ],
+                []
+            ),
+            new ValidatorExtension(Validation::createValidator())
+        ];
     }
 }

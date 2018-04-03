@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -116,7 +118,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_extend_field_type',
+                FieldType::class,
                 $fieldConfigModel,
                 ['class_name' => $entityClassName]
             )
@@ -135,7 +137,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('create')
             ->with(
-                'oro_entity_config_type',
+                ConfigType::class,
                 null,
                 ['config_model' => $fieldConfigModel]
             )
@@ -154,7 +156,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
     }
@@ -169,7 +171,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form
@@ -190,7 +192,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form

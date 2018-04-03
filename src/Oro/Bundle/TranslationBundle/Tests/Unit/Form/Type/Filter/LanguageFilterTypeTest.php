@@ -50,7 +50,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EntityFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EntityFilterType::class, $this->type->getParent());
     }
 
     public function testFinishView()

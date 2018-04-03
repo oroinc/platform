@@ -92,7 +92,7 @@ class AttributeFamilyController extends Controller
     protected function update(AttributeFamily $attributeFamily, $message)
     {
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
-        $form = $this->createForm(AttributeFamilyType::NAME, $attributeFamily, $options);
+        $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
         $handler = $this->get('oro_form.model.update_handler');
 

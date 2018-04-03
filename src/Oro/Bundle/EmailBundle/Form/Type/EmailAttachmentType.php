@@ -7,6 +7,8 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -66,9 +68,9 @@ class EmailAttachmentType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('id', 'text');
-        $builder->add('type', 'text', ['required' => true]);
-        $builder->add('file', 'file');
+        $builder->add('id', TextType::class);
+        $builder->add('type', TextType::class, ['required' => true]);
+        $builder->add('file', FileType::class);
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
     }

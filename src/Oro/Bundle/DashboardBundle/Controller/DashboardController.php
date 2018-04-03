@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Form\Type\DashboardType;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
@@ -178,14 +179,14 @@ class DashboardController extends Controller
     protected function update(Request $request, DashboardModel $dashboardModel)
     {
         $form = $this->createForm(
-            $this->container->get('oro_dashboard.form.type.edit'),
+            DashboardType::class,
             $dashboardModel->getEntity(),
             [
                 'create_new' => !$dashboardModel->getId()
             ]
         );
 
-        if ($request->isMethod('POST') && $form->submit($request)->isValid()) {
+        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
             $this->getDashboardManager()->save($dashboardModel, true);
             $this->get('session')->getFlashBag()->add(
                 'success',

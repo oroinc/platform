@@ -77,7 +77,7 @@ class AutoResponseTemplateChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_email_template_list';
+        return EmailTemplateSelectType::class;
     }
 
     /**

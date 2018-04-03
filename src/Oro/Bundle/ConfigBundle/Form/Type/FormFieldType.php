@@ -4,6 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,7 +25,7 @@ class FormFieldType extends AbstractType
             [
                 'target_field_options' => [],
                 'use_parent_field_options' => [],
-                'target_field_type'    => 'text',
+                'target_field_type'    => TextType::class,
                 'resettable'           => true,
                 'parent_checkbox_label' => ''
             ]
@@ -51,10 +53,10 @@ class FormFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $useParentOptions = $options['use_parent_field_options'];
-        $useParentType    = 'oro_config_parent_scope_checkbox_type';
+        $useParentType    = ParentScopeCheckbox::class;
         if (!$options['resettable']) {
             $useParentOptions = ['data' => 0];
-            $useParentType    = 'hidden';
+            $useParentType    = HiddenType::class;
         }
         $useParentOptions['label'] = $options['parent_checkbox_label'];
 

@@ -10,7 +10,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -61,7 +63,7 @@ class FieldType extends AbstractType
     {
         $builder->add(
             'fieldName',
-            'text',
+            TextType::class,
             [
                 'label'       => 'oro.entity_extend.form.field_name.label',
                 'block'       => 'general',
@@ -79,7 +81,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'type',
-            'oro_select2_choice',
+            Select2ChoiceType::class,
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {

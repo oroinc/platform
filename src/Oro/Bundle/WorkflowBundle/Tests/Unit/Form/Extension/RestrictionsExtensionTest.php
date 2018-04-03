@@ -6,9 +6,10 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Form\Extension\RestrictionsExtension;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class RestrictionsExtensionTest extends FormIntegrationTestCase
@@ -153,6 +154,6 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        return [new PreloadedExtension([], ['form' => [$this->extension]])];
+        return [new PreloadedExtension([], [FormType::class => [$this->extension]])];
     }
 }

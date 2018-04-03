@@ -15,7 +15,7 @@ class ReminderType extends AbstractType
     {
         $builder->add(
             'method',
-            'oro_reminder_method',
+            MethodType::class,
             array(
                 'required' => true,
                 'attr'     => array('class' => 'method'),
@@ -24,7 +24,7 @@ class ReminderType extends AbstractType
 
         $builder->add(
             'interval',
-            'oro_reminder_interval',
+            ReminderIntervalType::class,
             array('required' => true)
         );
     }
