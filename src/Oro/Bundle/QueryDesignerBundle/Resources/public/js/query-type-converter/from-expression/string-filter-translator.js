@@ -28,12 +28,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        operatorMap: StringFilterTranslatorToExpression.prototype.operatorMap,
+        filterType: 'string',
 
         /**
          * @inheritDoc
          */
-        filterType: 'string',
+        operatorMap: StringFilterTranslatorToExpression.prototype.operatorMap,
 
         /**
          * Checks if node has correct type and value

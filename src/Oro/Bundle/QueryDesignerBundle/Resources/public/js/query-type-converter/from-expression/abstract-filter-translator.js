@@ -41,18 +41,18 @@ define(function(require) {
         constructor: AbstractFilterTranslator,
 
         /**
-         * Map object of possible expression's operation to its value in filter
-         * (has to defined in descendant FilterTranslatorFromExpression)
-         * @type {Object}
-         */
-        operatorMap: null,
-
-        /**
          * The filter type that has to be matched to `filterConfig.type`
          * (has to defined in descendant FilterTranslatorFromExpression)
          * @type {string}
          */
         filterType: void 0,
+
+        /**
+         * Map object of possible expression's operation to its value in filter
+         * (can be defined in descendant FilterTranslatorFromExpression)
+         * @type {Object}
+         */
+        operatorMap: null,
 
         /**
          * Takes attempt to translate ExpressionLanguage AST node to condition object.

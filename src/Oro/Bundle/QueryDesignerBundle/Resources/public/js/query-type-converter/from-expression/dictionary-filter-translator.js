@@ -27,12 +27,12 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        operatorMap: DictionaryFilterTranslatorToExpression.prototype.operatorMap,
+        filterType: 'dictionary',
 
         /**
          * @inheritDoc
          */
-        filterType: 'dictionary',
+        operatorMap: DictionaryFilterTranslatorToExpression.prototype.operatorMap,
 
         /**
          * Checks if node has correct type and value
@@ -41,7 +41,7 @@ define(function(require) {
          * @return {boolean}
          */
         checkValueNode: function(node) {
-            return node instanceof ConstantNode &&_.isString(node.attrs.value);
+            return node instanceof ConstantNode && _.isString(node.attrs.value);
         },
 
         /**
