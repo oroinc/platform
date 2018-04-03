@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
+ * Validates and prepares email template for sending
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class SendEmailTemplate extends AbstractSendEmail

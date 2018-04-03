@@ -8,6 +8,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Assigns|Return active user (current logged in system) action
+ */
 class AssignActiveUser extends AbstractAction
 {
     /** @var TokenStorageInterface */
