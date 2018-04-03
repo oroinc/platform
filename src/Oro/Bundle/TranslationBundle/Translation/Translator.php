@@ -69,9 +69,6 @@ class Translator extends BaseTranslator
     private $translationDomainProvider;
 
     /**
-     * @param TranslationDomainProvider $translationDomainProvider
-     * @param ServiceLink $strategyProviderLink
-     * @param null|string $installed
      * @param ContainerInterface $container
      * @param MessageSelector $messageSelector
      * @param null $defaultLocale
@@ -79,9 +76,6 @@ class Translator extends BaseTranslator
      * @param array $options
      */
     public function __construct(
-        TranslationDomainProvider $translationDomainProvider,
-        ServiceLink $strategyProviderLink,
-        $installed,
         ContainerInterface $container,
         MessageSelector $messageSelector,
         $defaultLocale = null,
@@ -102,9 +96,29 @@ class Translator extends BaseTranslator
         $this->messageSelector = $messageSelector;
         $this->originalOptions = $options;
         $this->resourceFiles = $options['resource_files'];
+    }
 
-        $this->translationDomainProvider = $translationDomainProvider;
+    /**
+     * @param ServiceLink $strategyProviderLink
+     */
+    public function setStrategyProviderLink(ServiceLink $strategyProviderLink)
+    {
         $this->strategyProviderLink = $strategyProviderLink;
+    }
+
+    /**
+     * @param TranslationDomainProvider $translationDomainProvider
+     */
+    public function setTranslationDomainProvider(TranslationDomainProvider $translationDomainProvider)
+    {
+        $this->translationDomainProvider = $translationDomainProvider;
+    }
+
+    /**
+     * @param $installed
+     */
+    public function setInstalled($installed)
+    {
         $this->installed = $installed;
     }
 
@@ -284,14 +298,16 @@ class Translator extends BaseTranslator
 
             /* @var $translator Translator */
             $translator = new static(
-                $this->translationDomainProvider,
-                $this->strategyProviderLink,
-                $this->installed,
                 $this->container,
                 $this->messageSelector,
+                $this->getLocale(),
                 $this->loaderIds,
                 $options
             );
+
+            $translator->setStrategyProviderLink($this->strategyProviderLink);
+            $translator->setTranslationDomainProvider($this->translationDomainProvider);
+            $translator->setInstalled($this->installed);
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
 
             $translator->warmUp($tmpDir);

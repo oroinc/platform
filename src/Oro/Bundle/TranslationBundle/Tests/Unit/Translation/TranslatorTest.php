@@ -217,6 +217,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $locale = 'en';
         $container  = $this->createMock(ContainerInterface::class);
+        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $strategyProvider = $this->getStrategyProvider($locale);
         $strategyProviderLink = new ServiceLink($strategyProvider);
@@ -224,9 +225,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
-                $translationDomainProvider,
-                $strategyProviderLink,
-                true,
                 $container,
                 new MessageSelector(),
                 'en',
@@ -235,6 +233,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ])
             ->setMethods(['addResource'])
             ->getMock();
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setInstalled(true);
 
         $translator->setLocale($locale);
 
@@ -252,6 +254,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $container = $this->createMock(ContainerInterface::class);
+        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translationDomainProvider->expects($this->once())
             ->method('getAvailableDomainsForLocales')
@@ -265,9 +268,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
-                $translationDomainProvider,
-                $strategyProviderLink,
-                true,
                 $container,
                 new MessageSelector(),
                 'en',
@@ -276,6 +276,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ])
             ->setMethods(['addResource'])
             ->getMock();
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderLink);
+        $translator->setInstalled(true);
+
 
         $translator->setLocale($locale);
         $translator->setDatabaseMetadataCache($databaseCache);
@@ -393,15 +398,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
 
         $translator = new Translator(
-            $translationDomainProvider,
-            $strategyProviderServiceLink,
-            true,
             $this->getContainer($loader),
             new MessageSelector(),
             'en',
             ['loader' => ['loader']],
             array_merge(['resource_files' => []], $options)
         );
+
+        $translator->setTranslationDomainProvider($translationDomainProvider);
+        $translator->setStrategyProviderLink($strategyProviderServiceLink);
+        $translator->setInstalled(true);
+
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');

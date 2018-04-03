@@ -25,14 +25,17 @@ class TranslatorDependencyPass implements CompilerPassInterface
             [new Reference('oro_translation.resource.cache')]
         );
 
-        $arguments = $translatorDef->getArguments();
-        array_unshift(
-            $arguments,
-            new Reference('oro_translation.provider.translation_domain'),
-            new Reference('oro_translation.strategy.provider_link'),
-            '%installed%'
+        $translatorDef->addMethodCall(
+            'setStrategyProviderLink',
+            [new Reference('oro_translation.strategy.provider_link')]
         );
 
-        $translatorDef->setArguments($arguments);
+        $translatorDef->addMethodCall(
+            'setTranslationDomainProvider',
+            [new Reference('oro_translation.provider.translation_domain')]
+        );
+
+        $isInstalled = $container->hasParameter('installed') && $container->getParameter('installed');
+        $translatorDef->addMethodCall('setInstalled', [$isInstalled]);
     }
 }
