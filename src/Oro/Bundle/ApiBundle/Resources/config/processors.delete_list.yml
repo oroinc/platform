@@ -70,7 +70,7 @@ services:
             - '@security.authorization_checker'
             - DELETE
         tags:
-            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -70 }
+            - { name: oro.api.processor, action: delete_list, group: data_security_check, priority: 10 }
 
     #
     # delete_data

@@ -157,6 +157,8 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
             return false;
         }
 
-        return $this->configBag->getConfig($entityClass, $version);
+        return $requestType->contains('frontend')
+            ? $this->configBag->getFrontendConfig($entityClass, $version)
+            : $this->configBag->getConfig($entityClass, $version);
     }
 }

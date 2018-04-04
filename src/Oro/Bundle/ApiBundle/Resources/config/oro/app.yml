@@ -25,7 +25,7 @@ security:
             context: main
 
 oro_api:
-    api_doc_views: ['default', 'rest_json_api', 'rest_plain']
+    api_doc_views: ['default', 'rest_json_api', 'rest_plain', 'frontend_rest_json_api']
     documentation_path: https://www.oroinc.com/doc/orocrm/current/book/data-api
 
     config_extensions:
@@ -180,6 +180,8 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
+                data_security_check:
+                    priority: -55
                 normalize_data:
                     priority: -60
                 finalize:
@@ -201,6 +203,8 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
+                data_security_check:
+                    priority: -55
                 normalize_data:
                     priority: -60
                 finalize:
@@ -220,6 +224,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 delete_data:
                     priority: -50
                 finalize:
@@ -241,6 +247,8 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
+                data_security_check:
+                    priority: -55
                 delete_data:
                     priority: -60
                 finalize:
@@ -260,6 +268,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 transform_data:
                     priority: -50
                 save_data:
@@ -283,6 +293,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 transform_data:
                     priority: -50
                 save_data:
@@ -308,6 +320,8 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
+                data_security_check:
+                    priority: -55
                 normalize_data:
                     priority: -60
                 finalize:
@@ -329,6 +343,8 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
+                data_security_check:
+                    priority: -55
                 normalize_data:
                     priority: -60
                 finalize:
@@ -348,6 +364,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 transform_data:
                     priority: -50
                 save_data:
@@ -369,6 +387,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 transform_data:
                     priority: -50
                 save_data:
@@ -390,6 +410,8 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
+                data_security_check:
+                    priority: -45
                 transform_data:
                     priority: -50
                 save_data:

@@ -60,13 +60,31 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
+     * @param string $group
+     *
+     * @return bool
+     */
+    private function isSupportedGroup($group)
+    {
+        if ($group === RestRouteOptionsResolver::ROUTE_GROUP
+            && !$this->docViewDetector->getRequestType()->isEmpty()
+            && !$this->docViewDetector->getRequestType()->contains('frontend')
+        ) {
+            return true;
+        }
+        if ($group === 'frontend_rest_api' && $this->docViewDetector->getRequestType()->contains('frontend')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
-        if ($route->getOption('group') !== RestRouteOptionsResolver::ROUTE_GROUP
-            || $this->docViewDetector->getRequestType()->isEmpty()
-        ) {
+        if (!$this->isSupportedGroup($route->getOption('group'))) {
             return;
         }
         $action = $route->getDefault('_action');

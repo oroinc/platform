@@ -27,6 +27,9 @@ class LoadFromConfigBag extends LoadSubresources
     /** @var ConfigBag */
     protected $configBag;
 
+    /** @var RequestType */
+    private $requestType;
+
     /**
      * @param ConfigLoaderFactory $configLoaderFactory
      * @param ConfigBag           $configBag
@@ -50,6 +53,8 @@ class LoadFromConfigBag extends LoadSubresources
     public function process(ContextInterface $context)
     {
         /** @var CollectSubresourcesContext $context */
+
+        $this->requestType = $context->getRequestType();
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
@@ -236,7 +241,9 @@ class LoadFromConfigBag extends LoadSubresources
     protected function getSubresourcesConfig($entityClass, $version)
     {
         $subresources = null;
-        $config = $this->configBag->getConfig($entityClass, $version);
+        $config = $this->requestType->contains('frontend')
+            ? $this->configBag->getFrontendConfig($entityClass, $version)
+            : $this->configBag->getConfig($entityClass, $version);
         if (null !== $config && !empty($config[ConfigUtil::SUBRESOURCES])) {
             $subresourcesLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
             $subresources = $subresourcesLoader->load($config[ConfigUtil::SUBRESOURCES]);

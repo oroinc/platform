@@ -417,6 +417,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - VIEW
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
@@ -427,6 +429,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - DELETE
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
@@ -443,6 +447,8 @@ services:
             - '@security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: update, group: security_check, priority: 5 }
@@ -457,6 +463,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - VIEW
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
@@ -467,6 +475,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - EDIT
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 10 }
@@ -480,6 +490,8 @@ services:
             - '@security.authorization_checker'
             - VIEW
             - true
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: add_relationship, group: security_check, priority: 5 }
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 5 }
@@ -605,15 +617,19 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -50 }
 
+    #
+    # data_security_check
+    #
+
     oro_api.subresource.parent_entity_object_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
         arguments:
             - '@security.authorization_checker'
             - EDIT
         tags:
-            - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -70 }
-            - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -70 }
-            - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -70 }
+            - { name: oro.api.processor, action: add_relationship, group: data_security_check, priority: 10 }
+            - { name: oro.api.processor, action: update_relationship, group: data_security_check, priority: 10 }
+            - { name: oro.api.processor, action: delete_relationship, group: data_security_check, priority: 10 }
 
     #
     # normalize_data

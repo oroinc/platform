@@ -30,6 +30,8 @@ class RestRequestTypeProvider implements RequestTypeProviderInterface, RestDocVi
                 return new RequestType([RequestType::REST, RequestType::JSON_API]);
             case self::PLAIN_VIEW:
                 return new RequestType([RequestType::REST]);
+            case 'frontend_rest_json_api':
+                return new RequestType([RequestType::REST, RequestType::JSON_API, 'frontend']);
         }
 
         return null;

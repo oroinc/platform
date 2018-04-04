@@ -173,7 +173,7 @@ services:
             - '@oro_api.entity_alias_resolver'
             - '@oro_api.resources_provider'
             - '@oro_api.subresources_provider'
-            - [[rest], [rest, json_api]]
+            - [[rest], [rest, json_api], [rest, json_api, frontend]]
         tags:
             - { name: kernel.cache_warmer }
 
@@ -550,6 +550,7 @@ services:
             - [setDefaultSectionsOpened, ['%nelmio_api_doc.default_sections_opened%']]
             - [setFileLocator, ['@file_locator']]
             - [setDocumentationPath, ['%oro_api.api_doc.path%']]
+            - [setWebBackendPrefix, ['%web_backend_prefix%']]
 
     oro_api.api_doc.formatter.html_formatter.composite:
         class: Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter
@@ -572,7 +573,6 @@ services:
 
     oro_api.api_doc.parser:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
-        public: false
         arguments:
             - '@file_locator'
 

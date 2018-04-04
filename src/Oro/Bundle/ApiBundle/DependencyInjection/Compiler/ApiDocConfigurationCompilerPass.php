@@ -110,6 +110,10 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
             'setFileLocator',
             [new Reference(self::FILE_LOCATOR_SERVICE)]
         );
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setWebBackendPrefix',
+            [$container->getParameter('web_backend_prefix')]
+        );
 
         // configure composite HTML formatter and set it as default one
         $compositeHtmlFormatterDef = $container->getDefinition(self::COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE);

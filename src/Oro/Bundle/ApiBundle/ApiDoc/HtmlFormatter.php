@@ -57,6 +57,18 @@ class HtmlFormatter extends AbstractFormatter
     /** @var string */
     protected $documentationPath;
 
+    /** @var string */
+    private $webBackendPrefix;
+
+    /**
+     * @internal Will be removed in 3.0
+     * @param string $webBackendPrefix
+     */
+    public function setWebBackendPrefix($webBackendPrefix)
+    {
+        $this->webBackendPrefix = $webBackendPrefix;
+    }
+
     /**
      * @param string $documentationPath
      */
@@ -225,7 +237,8 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'documentationPath'     => $this->documentationPath
+            'documentationPath'     => $this->documentationPath,
+            'webBackendPrefix'      => $this->webBackendPrefix
         ];
     }
 
