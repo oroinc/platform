@@ -24,7 +24,6 @@ navigation:
                             entities_list:
                                 children:
                                     entity_management:
-                            attributes_list: ~
 
     titles:
         oro_entityconfig_index: ~
