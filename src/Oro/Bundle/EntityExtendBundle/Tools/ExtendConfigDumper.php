@@ -16,8 +16,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
+ * Dumper for extended entity configs
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendConfigDumper
@@ -283,11 +286,12 @@ class ExtendConfigDumper
                 $filesystem->remove($aliasesPath);
             }
         } else {
-            $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
+            $baseCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
             if ($filesystem->exists($baseCacheDir)) {
-                $filesystem->remove([$baseCacheDir]);
+                $finder = new Finder();
+                $finder->files()->in($baseCacheDir);
+                $filesystem->remove($finder);
             }
-            $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         }
 
         foreach ($this->entityManagerBag->getEntityManagers() as $em) {
