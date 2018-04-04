@@ -55,7 +55,9 @@ define(function(require) {
         initialize: function(options) {
             this.pluginManager = new PluginManager(this);
             this.changeAppearanceEnabled = 'appearanceData' in options.metadata.state;
-            if (!options.enableFilters) {
+            if (!options.enableFilters ||
+                ('filters' in options.metadata && !options.metadata.filters.length)
+            ) {
                 options.builders = _.reject(options.builders, function(module) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
