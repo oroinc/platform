@@ -37,6 +37,8 @@ define(function(require) {
                             {value: '4'},
                             {value: '5'},
                             {value: '6'},
+                            {value: '7'},
+                            {value: '8'},
                             {value: '9'},
                             {value: '10'},
                             {value: 'filter_empty_option'},
@@ -67,136 +69,209 @@ define(function(require) {
         });
 
         describe('translates valid condition', function() {
-            var cases = [
-                [
-                    'equals or greater than',
+            var createLeftOperandAST = function() {
+                return new GetAttrNode(
+                    new NameNode('foo'),
+                    new ConstantNode('bar'),
+                    new ArgumentsNode(),
+                    GetAttrNode.PROPERTY_CALL
+                );
+            };
+
+            var cases = {
+                'equals or greater than': [
                     {
                         type: '1',
                         value: 10
                     },
-                    '>=',
-                    new ConstantNode(10)
+                    new BinaryNode(
+                        '>=',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
                 ],
-                [
-                    'greater than',
+                'greater than': [
                     {
                         type: '2',
-                        value: 10
+                        value: '10'
                     },
-                    '>',
-                    new ConstantNode(10)
+                    new BinaryNode(
+                        '>',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
                 ],
-                [
-                    'is equal to',
+                'is equal to': [
                     {
                         type: '3',
                         value: 10.5
                     },
-                    '=',
-                    new ConstantNode(10.5)
+                    new BinaryNode(
+                        '=',
+                        createLeftOperandAST(),
+                        new ConstantNode(10.5)
+                    )
                 ],
-                [
-                    'is not equals to',
+                'is not equals to': [
                     {
                         type: '4',
                         value: 10
                     },
-                    '!=',
-                    new ConstantNode(10)
+                    new BinaryNode(
+                        '!=',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
                 ],
-                [
-                    'equals or less than',
+                'equals or less than': [
                     {
                         type: '5',
-                        value: 10
+                        value: '10'
                     },
-                    '<=',
-                    new ConstantNode(10)
+                    new BinaryNode(
+                        '<=',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
                 ],
-                [
-                    'less than',
+                'less than': [
                     {
                         type: '6',
                         value: 10
                     },
-                    '<',
-                    new ConstantNode(10)
+                    new BinaryNode(
+                        '<',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
                 ],
-                // TODO: implement in BAP-16713
-                // [
-                //     'between',
-                //     {
-                //         type: '7',
-                //         value: '',
-                //         value_end: ''
-                //     }
-                // ],
-                // [
-                //     'not between',
-                //     {
-                //         type: '8',
-                //         value: '',
-                //         value_end: ''
-                //     }
-                // ],
-                [
-                    'is any of',
+                'between': [
+                    {
+                        type: '7',
+                        value: 10,
+                        value_end: 0
+                    },
+                    new BinaryNode(
+                        'and',
+                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(0)),
+                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                    )
+                ],
+                'not between': [
+                    {
+                        type: '8',
+                        value: '0',
+                        value_end: 10
+                    },
+                    new BinaryNode(
+                        'and',
+                        new BinaryNode('<', createLeftOperandAST(), new ConstantNode(0)),
+                        new BinaryNode('>', createLeftOperandAST(), new ConstantNode(10))
+                    )
+                ],
+                'range and value_end less them value': [
+                    {
+                        type: '7',
+                        value: 10,
+                        value_end: 1
+                    },
+                    new BinaryNode(
+                        'and',
+                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(1)),
+                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                    )
+                ],
+                'range and values are string': [
+                    {
+                        type: '7',
+                        value: '10',
+                        value_end: '1'
+                    },
+                    new BinaryNode(
+                        'and',
+                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(1)),
+                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                    )
+                ],
+                'range and value is empty': [
+                    {
+                        type: '8',
+                        value: '',
+                        value_end: 10
+                    },
+                    new BinaryNode(
+                        '<',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
+                ],
+                'range and value_end is empty': [
+                    {
+                        type: '8',
+                        value: 10,
+                        value_end: ''
+                    },
+                    new BinaryNode(
+                        '>',
+                        createLeftOperandAST(),
+                        new ConstantNode(10)
+                    )
+                ],
+                'is any of': [
                     {
                         type: '9',
                         value: '1, 2'
                     },
-                    'in',
-                    createArrayNode([1, 2])
+                    new BinaryNode(
+                        'in',
+                        createLeftOperandAST(),
+                        createArrayNode([1, 2])
+                    )
                 ],
-                [
-                    'is not any of',
+                'is not any of': [
                     {
                         type: '10',
                         value: '1, 2'
                     },
-                    'not in',
-                    createArrayNode([1, 2])
+                    new BinaryNode(
+                        'not in',
+                        createLeftOperandAST(),
+                        createArrayNode([1, 2])
+                    )
                 ],
-                [
-                    'is empty',
+                'is empty': [
                     {
                         type: 'filter_empty_option'
                     },
-                    '=',
-                    new ConstantNode(0)
+                    new BinaryNode(
+                        '=',
+                        createLeftOperandAST(),
+                        new ConstantNode(0)
+                    )
                 ],
-                [
-                    'is not empty',
+                'is not empty': [
                     {
                         type: 'filter_not_empty_option'
                     },
-                    '!=',
-                    new ConstantNode(0)
+                    new BinaryNode(
+                        '!=',
+                        createLeftOperandAST(),
+                        new ConstantNode(0)
+                    )
                 ]
-            ];
+            };
 
-            _.each(cases, function(testCase) {
-                it('when filter has `' + testCase[0] + '` type', function() {
+            _.each(cases, function(testCase, caseName) {
+                it('when filter has `' + caseName + '` type', function() {
                     var condition = {
                         columnName: 'bar',
                         criterion: {
                             filter: 'number',
-                            data: testCase[1]
+                            data: testCase[0]
                         }
                     };
 
-                    var expectedAST = new BinaryNode(
-                        testCase[2],
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        testCase[3]
-                    );
-
-                    expect(translator.tryToTranslate(condition)).toEqual(expectedAST);
+                    expect(translator.tryToTranslate(condition)).toEqual(testCase[1]);
                 });
             });
         });
