@@ -58,6 +58,7 @@ define(function(require) {
                 _.pick(localeSettings.settings, ['apiKey']),
                 this.options
             );
+
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
 
