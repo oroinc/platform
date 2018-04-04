@@ -268,4 +268,25 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             $config
         );
     }
+
+    public function testClearWithEntityEliasExists()
+    {
+        $fs = new Filesystem();
+        $entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
+        $fs->mkdir($entityCacheDir);
+        $aliasDataFile = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
+        $fs->touch($aliasDataFile);
+        $this->assertTrue($fs->exists($aliasDataFile));
+
+        $this->entityManagerBag->expects($this->once())
+            ->method('getEntityManagers')
+            ->willReturn([]);
+
+        $this->dumper->clear();
+
+        $this->assertFalse($fs->exists($aliasDataFile));
+        $this->assertTrue($fs->exists($entityCacheDir));
+
+        $fs->remove($entityCacheDir);
+    }
 }
