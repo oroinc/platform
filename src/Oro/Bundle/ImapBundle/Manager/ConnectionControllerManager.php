@@ -101,7 +101,7 @@ class ConnectionControllerManager
 
         $form = $this->formFactory->create(ConfigurationGmailType::class, null, ['csrf_protection' => false]);
         $form->setData($data);
-        $form->submit($request);
+        $form->handleRequest($request);
 
         if (!$form->isValid()) {
             throw new Exception("Incorrect setting for IMAP authentication");

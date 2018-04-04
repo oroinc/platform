@@ -86,7 +86,7 @@ class UserController extends Controller
         if ($request->getMethod() === 'POST') {
             $userApi->setApiKey($userApi->generateKey());
             $form->setData($userApi);
-            $form->submit($request);
+            $form->handleRequest($request);
 
             $responseData = ['data' => [], 'status' => 'success'];
             $status = Response::HTTP_OK;

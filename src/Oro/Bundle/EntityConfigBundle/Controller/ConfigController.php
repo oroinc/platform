@@ -104,7 +104,7 @@ class ConfigController extends Controller
         );
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 //persist data inside the form

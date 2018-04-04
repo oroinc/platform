@@ -57,7 +57,7 @@ class ImportExportController extends Controller
         $importForm = $this->getImportForm($entityName);
 
         if ($request->isMethod('POST')) {
-            $importForm->submit($request);
+            $importForm->handleRequest($request);
 
             if ($importForm->isValid()) {
                 /** @var ImportData $data */
@@ -130,7 +130,7 @@ class ImportExportController extends Controller
         }
 
         if ($entityName && null !== $importForm && $request->isMethod('POST')) {
-            $importForm->submit($request);
+            $importForm->handleRequest($request);
 
             if ($importForm->isValid()) {
                 /** @var ImportData $data */
@@ -187,7 +187,7 @@ class ImportExportController extends Controller
         $importForm = $this->getImportForm($entityName);
 
         if ($request->isMethod('POST')) {
-            $importForm->submit($request);
+            $importForm->handleRequest($request);
 
             if ($importForm->isValid()) {
                 /** @var ImportData $data */
@@ -343,7 +343,7 @@ class ImportExportController extends Controller
         ]);
 
         if ($request->isMethod('POST')) {
-            $exportForm->submit($request);
+            $exportForm->handleRequest($request);
 
             if ($exportForm->isValid()) {
                 /** @var ExportData $data */
@@ -382,7 +382,7 @@ class ImportExportController extends Controller
         $exportForm = $this->createForm(ExportTemplateType::class, null, ['entityName' => $entityName]);
 
         if ($request->isMethod('POST')) {
-            $exportForm->submit($request);
+            $exportForm->handleRequest($request);
 
             if ($exportForm->isValid()) {
                 $data = $exportForm->getData();

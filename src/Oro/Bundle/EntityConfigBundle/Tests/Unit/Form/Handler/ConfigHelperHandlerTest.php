@@ -156,7 +156,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->never())
-            ->method('submit');
+            ->method('handleRequest');
 
         $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
     }
@@ -171,7 +171,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form
@@ -192,7 +192,7 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->form
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->with($this->request);
 
         $this->form

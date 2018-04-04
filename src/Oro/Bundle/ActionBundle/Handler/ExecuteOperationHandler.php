@@ -93,7 +93,7 @@ class ExecuteOperationHandler
         $request = $this->requestStack->getCurrentRequest();
         if (null !== $request) {
             $executionForm = $this->formProvider->getOperationExecutionForm($operation, $data);
-            $executionForm->submit($request);
+            $executionForm->handleRequest($request);
             $isValidForm = $executionForm->isValid();
         }
         if (!$isValidForm || !$operation->isAvailable($data, $result->getValidationErrors())) {
