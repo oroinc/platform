@@ -3,18 +3,11 @@
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\TranslationBundle\Form\ChoiceList\TranslationChoiceLoader;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -96,8 +89,30 @@ class TranslatableEntityType extends AbstractType
 
         $resolver->setRequired(array('class'));
 
+        $resolver->setNormalizer('choice_label', function (Options $options, $value) {
+            if ($value) {
+                return $value;
+            }
+
+            return $options['property'] ?? null;
+        });
+
+        $resolver->setNormalizer('choice_value', function (Options $options, $value) {
+            if ($value) {
+                return $value;
+            }
+
+            return $this->registry->getManager()->getClassMetadata($options['class'])->getSingleIdentifierFieldName();
+        });
+
         $resolver->setNormalizer('choice_loader', function (Options $options) {
-            return new TranslationChoiceLoader($options['class'], $this->registry, $this->factory);
+            return new TranslationChoiceLoader(
+                $options['class'],
+                $options['query_builder'],
+                $this->registry,
+                $this->factory
+            );
         });
     }
 }
+

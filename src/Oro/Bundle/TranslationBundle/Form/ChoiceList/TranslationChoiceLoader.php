@@ -30,6 +30,11 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
     private $registry;
 
     /**
+     * @var QueryBuilder|null
+     */
+    private $queryBuilder;
+
+    /**
      * @var ChoiceListFactoryInterface
      */
     private $factory;
@@ -41,10 +46,12 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
      */
     public function __construct(
         string $className,
+        $queryBuilder,
         ManagerRegistry $registry,
         ChoiceListFactoryInterface $factory
     ) {
         $this->className = $className;
+        $this->queryBuilder = $queryBuilder;
         $this->registry = $registry;
         $this->factory = $factory;
     }
@@ -62,8 +69,8 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         $entityManager = $this->registry->getManager();
 
         // get query builder
-        if (!empty($options['query_builder'])) {
-            $queryBuilder = $options['query_builder'];
+        if (!empty($this->queryBuilder)) {
+            $queryBuilder = $this->queryBuilder;
             if ($queryBuilder instanceof \Closure) {
                 $queryBuilder = $queryBuilder($this->registry->getRepository($this->className));
             }
@@ -115,3 +122,4 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 }
+
