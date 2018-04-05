@@ -6,12 +6,10 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator');
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator', function() {
         var translator;
@@ -69,81 +67,48 @@ define(function(require) {
         });
 
         describe('translates valid condition', function() {
-            var createLeftOperandAST = function() {
-                return new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('bar'),
-                    new ArgumentsNode(),
-                    GetAttrNode.PROPERTY_CALL
-                );
-            };
-
             var cases = {
                 'equals or greater than': [
                     {
                         type: '1',
                         value: 10
                     },
-                    new BinaryNode(
-                        '>=',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'greater than': [
                     {
                         type: '2',
                         value: '10'
                     },
-                    new BinaryNode(
-                        '>',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'is equal to': [
                     {
                         type: '3',
                         value: 10.5
                     },
-                    new BinaryNode(
-                        '=',
-                        createLeftOperandAST(),
-                        new ConstantNode(10.5)
-                    )
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode(10.5))
                 ],
                 'is not equals to': [
                     {
                         type: '4',
                         value: 10
                     },
-                    new BinaryNode(
-                        '!=',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'equals or less than': [
                     {
                         type: '5',
                         value: '10'
                     },
-                    new BinaryNode(
-                        '<=',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'less than': [
                     {
                         type: '6',
                         value: 10
                     },
-                    new BinaryNode(
-                        '<',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'between': [
                     {
@@ -153,8 +118,8 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(0)),
-                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(0)),
+                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                     )
                 ],
                 'not between': [
@@ -165,8 +130,8 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('<', createLeftOperandAST(), new ConstantNode(0)),
-                        new BinaryNode('>', createLeftOperandAST(), new ConstantNode(10))
+                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(0)),
+                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
                     )
                 ],
                 'range and value_end less them value': [
@@ -177,8 +142,8 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(1)),
-                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(1)),
+                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                     )
                 ],
                 'range and values are string': [
@@ -189,8 +154,8 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createLeftOperandAST(), new ConstantNode(1)),
-                        new BinaryNode('<=', createLeftOperandAST(), new ConstantNode(10))
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(1)),
+                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
                     )
                 ],
                 'range and value is empty': [
@@ -199,11 +164,7 @@ define(function(require) {
                         value: '',
                         value_end: 10
                     },
-                    new BinaryNode(
-                        '<',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'range and value_end is empty': [
                     {
@@ -211,53 +172,33 @@ define(function(require) {
                         value: 10,
                         value_end: ''
                     },
-                    new BinaryNode(
-                        '>',
-                        createLeftOperandAST(),
-                        new ConstantNode(10)
-                    )
+                    new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
                 ],
                 'is any of': [
                     {
                         type: '9',
                         value: '1, 2'
                     },
-                    new BinaryNode(
-                        'in',
-                        createLeftOperandAST(),
-                        createArrayNode([1, 2])
-                    )
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([1, 2]))
                 ],
                 'is not any of': [
                     {
                         type: '10',
                         value: '1, 2'
                     },
-                    new BinaryNode(
-                        'not in',
-                        createLeftOperandAST(),
-                        createArrayNode([1, 2])
-                    )
+                    new BinaryNode('not in', createGetAttrNode('foo.bar'), createArrayNode([1, 2]))
                 ],
                 'is empty': [
                     {
                         type: 'filter_empty_option'
                     },
-                    new BinaryNode(
-                        '=',
-                        createLeftOperandAST(),
-                        new ConstantNode(0)
-                    )
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode(0))
                 ],
                 'is not empty': [
                     {
                         type: 'filter_not_empty_option'
                     },
-                    new BinaryNode(
-                        '!=',
-                        createLeftOperandAST(),
-                        new ConstantNode(0)
-                    )
+                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode(0))
                 ]
             };
 

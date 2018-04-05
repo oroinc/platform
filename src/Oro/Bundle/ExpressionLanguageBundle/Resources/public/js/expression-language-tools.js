@@ -6,6 +6,7 @@ define(function(require) {
     var ArgumentsNode = require('oroexpressionlanguage/js/library/node/arguments-node');
     var ArrayNode = require('oroexpressionlanguage/js/library/node/array-node');
     var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
+    var FunctionNode = require('oroexpressionlanguage/js/library/node/function-node');
     var GetAttrNode = require('oroexpressionlanguage/js/library/node/get-attr-node');
     var NameNode = require('oroexpressionlanguage/js/library/node/name-node');
     var Node = require('oroexpressionlanguage/js/library/node/node');
@@ -67,14 +68,17 @@ define(function(require) {
         },
 
         /**
-         * Creates chain of GetAttrNode on base of property names list
+         * Creates nested GetAttrNode's AST on base of property names list
          *
-         * @param {Array.<string>} props list of properties
-         *   like `['foo', 'bar', 'baz', 'qoo']` or `'foo.bar.baz.qoo'.split('.')`
+         * @param {Array.<string>|string} props list of properties
+         *   like `['foo', 'bar', 'baz', 'qoo']` or simply `'foo.bar.baz.qoo'`
          * @param {GetAttrNode|NameNode} [node]
          * @return {GetAttrNode}
          */
         createGetAttrNode: function(props, node) {
+            if (_.isString(props)) {
+                props = props.split('.');
+            }
             var name = props[0];
             if (!node) {
                 node = new NameNode(name);
@@ -90,6 +94,20 @@ define(function(require) {
                 return node;
             }
             return expressionLanguageTools.createGetAttrNode(props.slice(1), node);
+        },
+
+        /**
+         * Creates FunctionNode for provided function name and list of arguments (optional)
+         *
+         * @param {string} funcName
+         * @param {Array.<string|number|boolean|null|Node>} [args]
+         * @return {FunctionNode}
+         */
+        createFunctionNode: function(funcName, args) {
+            args = (args || []).map(function(value) {
+                return value instanceof Node ? value : new ConstantNode(value);
+            });
+            return new FunctionNode(funcName, new Node(args));
         }
     };
 

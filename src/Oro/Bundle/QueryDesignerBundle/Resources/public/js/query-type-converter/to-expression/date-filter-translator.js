@@ -7,8 +7,7 @@ define(function(require) {
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
-    var Node = ExpressionLanguageLibrary.Node;
+    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
 
     /**
      * @inheritDoc
@@ -293,11 +292,11 @@ define(function(require) {
             var rightOperandAST;
 
             if (partParams.propModifier) {
-                leftOperandAST = new FunctionNode(partParams.propModifier, new Node([leftOperandAST]));
+                leftOperandAST = createFunctionNode(partParams.propModifier, [leftOperandAST]);
             }
 
             if (partParams.variables && singleValue in partParams.variables) {
-                rightOperandAST = new FunctionNode(partParams.variables[singleValue], new Node([]));
+                rightOperandAST = createFunctionNode(partParams.variables[singleValue]);
             } else {
                 rightOperandAST = new ConstantNode(singleValue);
             }

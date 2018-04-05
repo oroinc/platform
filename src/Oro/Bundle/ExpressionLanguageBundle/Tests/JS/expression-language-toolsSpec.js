@@ -6,8 +6,10 @@ define(function(require) {
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
+    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
+    var Node = ExpressionLanguageLibrary.Node;
 
     describe('oroexpressionlanguage/js/expression-language-tools', function() {
         describe('isIndexedArrayNode', function() {
@@ -107,10 +109,12 @@ define(function(require) {
             var cases = {
                 'one element in list': [
                     ['foo'],
+                    'foo',
                     new NameNode('foo')
                 ],
                 'two elements in list': [
                     ['foo', 'bar'],
+                    'foo.bar',
                     new GetAttrNode(
                         new NameNode('foo'),
                         new ConstantNode('bar'),
@@ -120,6 +124,7 @@ define(function(require) {
                 ],
                 'four elements in list': [
                     ['foo', 'bar', 'baz', 'qoo'],
+                    'foo.bar.baz.qoo',
                     new GetAttrNode(
                         new GetAttrNode(
                             new GetAttrNode(
@@ -141,7 +146,38 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    expect(createGetAttrNode(testCase[0])).toEqual(testCase[1]);
+                    expect(createGetAttrNode(testCase[0])).toEqual(testCase[2]);
+                    expect(createGetAttrNode(testCase[1])).toEqual(testCase[2]);
+                });
+            });
+        });
+
+        describe('createFunctionNode', function() {
+            var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
+
+            var cases = {
+                'function without arguments': [
+                    ['foo'],
+                    new FunctionNode('foo', new Node([]))
+                ],
+                'function with arguments': [
+                    [
+                        'foo',
+                        ['bar', null, true, 3.14, new NameNode('bar')]
+                    ],
+                    new FunctionNode('foo', new Node([
+                        new ConstantNode('bar'),
+                        new ConstantNode(null),
+                        new ConstantNode(true),
+                        new ConstantNode(3.14),
+                        new NameNode('bar')
+                    ]))
+                ]
+            };
+
+            _.each(cases, function(testCase, caseName) {
+                it(caseName, function() {
+                    expect(createFunctionNode(testCase[0][0], testCase[0][1])).toEqual(testCase[1]);
                 });
             });
         });

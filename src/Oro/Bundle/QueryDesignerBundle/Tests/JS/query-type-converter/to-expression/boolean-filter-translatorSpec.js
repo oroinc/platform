@@ -6,11 +6,9 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator');
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', function() {
         var translator;
@@ -57,15 +55,6 @@ define(function(require) {
         });
 
         describe('test valid conditions', function() {
-            var createLeftOperandAST = function() {
-                return new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('bar'),
-                    new ArgumentsNode(),
-                    GetAttrNode.PROPERTY_CALL
-                );
-            };
-
             var cases = {
                 yes: [
                     {
@@ -73,7 +62,7 @@ define(function(require) {
                     },
                     new BinaryNode(
                         '==',
-                        createLeftOperandAST(),
+                        createGetAttrNode('foo.bar'),
                         new ConstantNode(true)
                     )
                 ],
@@ -83,7 +72,7 @@ define(function(require) {
                     },
                     new BinaryNode(
                         '==',
-                        createLeftOperandAST(),
+                        createGetAttrNode('foo.bar'),
                         new ConstantNode(false)
                     )
                 ]

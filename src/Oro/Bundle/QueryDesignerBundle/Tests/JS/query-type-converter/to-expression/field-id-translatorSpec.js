@@ -3,10 +3,7 @@ define(function(require) {
 
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator', function() {
         var entityStructureDataProviderMock;
@@ -34,17 +31,7 @@ define(function(require) {
         });
 
         it('translate valid fieldId to AST', function() {
-            var expectedAST = new GetAttrNode(
-                new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('bar'),
-                    new ArgumentsNode(),
-                    GetAttrNode.PROPERTY_CALL
-                ),
-                new ConstantNode('qux'),
-                new ArgumentsNode(),
-                GetAttrNode.PROPERTY_CALL
-            );
+            var expectedAST = createGetAttrNode('foo.bar.qux');
             expect(translator.translate('bar+Oro\\QuxClassName::qux')).toEqual(expectedAST);
         });
 
