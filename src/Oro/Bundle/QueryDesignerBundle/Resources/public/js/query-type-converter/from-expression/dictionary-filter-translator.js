@@ -40,7 +40,7 @@ define(function(require) {
          * @param {Node} node
          * @return {boolean}
          */
-        checkValueNode: function(node) {
+        checkValueAST: function(node) {
             return node instanceof ConstantNode && _.isString(node.attrs.value);
         },
 
@@ -51,7 +51,7 @@ define(function(require) {
             if (
                 node instanceof BinaryNode &&
                 this.resolveFieldAST(node) instanceof GetAttrNode &&
-                this.checkListOperandAST(node.nodes[1], this.checkValueNode)
+                this.checkListOperandAST(node.nodes[1], this.checkValueAST)
             ) {
                 var criterion = _.findKey(this.operatorMap, function(operator) {
                     return operator === node.attrs.operator;

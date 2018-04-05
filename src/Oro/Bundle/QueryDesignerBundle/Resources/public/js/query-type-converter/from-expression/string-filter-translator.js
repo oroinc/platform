@@ -49,7 +49,7 @@ define(function(require) {
          * @param {Node} node
          * @return {boolean}
          */
-        checkValueNode: function(node) {
+        checkValueAST: function(node) {
             return node instanceof ConstantNode && _.isString(node.attrs.value);
         },
 
@@ -69,17 +69,17 @@ define(function(require) {
                 return null;
             }
 
-            if (this.checkValueNode(valueNode)) {
+            if (this.checkValueAST(valueNode)) {
                 matchedParams =_.where(matchedParams, {hasArrayValue: false, valueModifier: void 0});
                 if (matchedParams.length > 0) {
                     params = _.findWhere(matchedParams, {value: valueNode.attrs.value}) || _.first(matchedParams);
                 }
-            } else if (this.checkListOperandAST(valueNode, this.checkValueNode)) {
+            } else if (this.checkListOperandAST(valueNode, this.checkValueAST)) {
                 params = _.findWhere(matchedParams, {hasArrayValue: true});
             } else if (
                 valueNode instanceof FunctionNode &&
                 valueNode.nodes[0].nodes.length === 1 &&
-                this.checkValueNode(valueNode.nodes[0].nodes[0])
+                this.checkValueAST(valueNode.nodes[0].nodes[0])
             ) {
                 params = _.findWhere(matchedParams, {valueModifier: valueNode.attrs.name});
             }

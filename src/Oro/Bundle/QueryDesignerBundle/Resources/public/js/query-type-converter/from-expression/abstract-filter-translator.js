@@ -67,7 +67,7 @@ define(function(require) {
             if (operatorParams) {
                 var filterConfig = this.getFilterConfig(node);
 
-                if (this.checkFilterType(filterConfig) && this.checkOperation(node, filterConfig, operatorParams)) {
+                if (this.checkFilterType(filterConfig) && this.checkOperation(filterConfig, operatorParams)) {
                     return this.translate(node, filterConfig, operatorParams);
                 }
             }
@@ -142,13 +142,12 @@ define(function(require) {
         /**
          * Checks if operation in binary node corresponds to possible choices of filter
          *
-         * @param {Node} node ExpressionLanguage AST node
          * @param {Object} filterConfig
          * @param {OperatorParams} operatorParams
          * @returns {boolean}
          * @protected
          */
-        checkOperation: function(node, filterConfig, operatorParams) {
+        checkOperation: function(filterConfig, operatorParams) {
             return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.criterion) !== -1;
         },
 
