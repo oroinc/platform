@@ -114,6 +114,14 @@ define(function(require) {
          */
         getFilterConfigsByType: function(filterType) {
             return _.where(this.filters, {type: filterType});
+        },
+
+        /**
+         * @param {string} filterName
+         * @returns {Object}
+         */
+        getFilterConfigByName: function(filterName) {
+            return _.findWhere(this.filters, {name: filterName});
         }
     };
 

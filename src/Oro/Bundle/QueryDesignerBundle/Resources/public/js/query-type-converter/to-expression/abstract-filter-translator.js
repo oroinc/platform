@@ -3,28 +3,13 @@ define(function(require) {
 
     var _ = require('underscore');
     var jsonSchemaValidator = require('oroui/js/tools/json-schema-validator');
+
     /**
      * Defines interface and implements base functionality of FilterTranslatorToExpression
      *
-     * @param {FieldIdTranslatorToExpression} fieldIdTranslator
-     * @param {FilterConfigProvider} filterConfigProvider
      * @constructor
-     * @throws TypeError if instance of FieldIdTranslatorToExpression is missing
      */
-    var AbstractFilterTranslator = function AbstractFilterTranslatorToExpression(
-        fieldIdTranslator,
-        filterConfigProvider
-    ) {
-        if (!fieldIdTranslator) {
-            throw new TypeError(
-                'Instance of `FieldIdTranslatorToExpression` is required for `FilterTranslatorToExpression`');
-        }
-        if (!filterConfigProvider) {
-            throw new TypeError( 'Instance of `FilterConfigProvider` is required for `FilterTranslatorToExpression`');
-        }
-        this.fieldIdTranslator = fieldIdTranslator;
-        this.filterConfigProvider = filterConfigProvider;
-    };
+    var AbstractFilterTranslator = function AbstractFilterTranslatorToExpression() {};
 
     Object.assign(AbstractFilterTranslator.prototype, {
         constructor: AbstractFilterTranslator,
@@ -49,34 +34,6 @@ define(function(require) {
         filterType: void 0,
 
         /**
-         * Builds JSON validation schema taking in account filter configuration
-         *
-         * @param {Object} filterConfigs
-         * @return {Object}
-         * @protected
-         */
-        getConditionSchema: function(filterConfigs) {
-            return {
-                type: 'object',
-                required: ['columnName', 'criterion'],
-                properties: {
-                    columnName: {type: 'string'},
-                    criterion: {
-                        type: 'object',
-                        required: ['data', 'filter'],
-                        properties: {
-                            filter: {
-                                'type': 'string',
-                                'enum': _.pluck(filterConfigs, 'name')
-                            },
-                            data: this.getFilterValueSchema(filterConfigs)
-                        }
-                    }
-                }
-            };
-        },
-
-        /**
          * Builds filter value's part of JSON validation schema
          *
          * @return {Object}
@@ -89,64 +46,52 @@ define(function(require) {
         },
 
         /**
-         * Takes condition object and checks if it has valid structure and can be translated to AST
+         * Takes filterValue object and filterConfig and checks if it has valid structure and can be translated to AST
          *
-         * @param {Object} condition
+         * @param {Object} filterValue
+         * @param {Object} filterConfig
          * @return {boolean}
          * @protected
          */
-        test: function(condition) {
-            var result = false;
-            var filterConfigs = this.filterConfigProvider.getFilterConfigsByType(this.filterType);
-            var schema = this.getConditionSchema(filterConfigs);
+        test: function(filterValue, filterConfig) {
+            var schema = this.getFilterValueSchema();
 
-            if (
-                filterConfigs &&
-                jsonSchemaValidator.validate(schema, condition) &&
-                condition.criterion.data.type in this.operatorMap
-            ) {
-                var config = _.findWhere(filterConfigs, {name: condition.criterion.filter});
-                result = config && this.testToConfig(condition, config);
-            }
-
-            return result;
+            return jsonSchemaValidator.validate(schema, filterValue) &&
+                this.testToOperatorMap(filterValue) &&
+                this.testToConfig(filterValue, filterConfig);
         },
 
         /**
-         * Check if the condition complies to the filter config
+         * Check if type of filter can be mapped to operator config
          *
-         * @param {Object} condition
+         * @param {Object} filterValue
+         * @return {boolean}
+         */
+        testToOperatorMap: function(filterValue) {
+            return filterValue.type in this.operatorMap;
+        },
+
+        /**
+         * Check if the filter type complies to the filter config
+         *
+         * @param {Object} filterValue
          * @param {Object} config
          * @return {boolean}
          */
-        testToConfig: function(condition, config) {
-            return _.pluck(config.choices, 'value').indexOf(condition.criterion.data.type) !== -1;
-        },
-
-        /**
-         * Takes condition object and translates it to ExpressionLanguage AST, if the condition passes the test.
-         * Otherwise returns null
-         *
-         * @param {Object} condition
-         * @return {Node|null} ExpressionLanguage AST node
-         */
-        tryToTranslate: function(condition) {
-            var result = null;
-            if (this.test(condition)) {
-                result = this.translate(condition);
-            }
-            return result;
+        testToConfig: function(filterValue, config) {
+            return _.any(config.choices, {value: filterValue.type});
         },
 
         /**
          * Takes condition object and translates it to ExpressionLanguage AST
          *
-         * @param {Object} condition
-         * @return {Node} ExpressionLanguage AST node
+         * @param {Node} leftOperand
+         * @param {Object} filterValue
+         * @return {Node|null} ExpressionLanguage AST node
          * @protected
          * @abstract
          */
-        translate: function(condition) {
+        translate: function(leftOperand, filterValue) {
             throw new Error('Method `translate` has to be defined in descendant FilterTranslatorToExpression');
         },
 

@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var StringFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var Node = ExpressionLanguageLibrary.Node;
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
@@ -17,57 +16,37 @@ define(function(require) {
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator', function() {
         var translator;
-        var filterConfigProviderMock;
+        var filterConfig;
 
         beforeEach(function() {
-            var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
-                jasmine.combineSpyObj('rootEntity', [
-                    jasmine.createSpy('get').and.returnValue('foo')
-                ])
-            ]);
+            translator = new StringFilterTranslator();
 
-            filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('getFilterConfigsByType').and.returnValue([
-                    {
-                        type: 'string',
-                        name: 'string',
-                        choices: [
-                            {value: '1'},
-                            {value: '2'},
-                            {value: '3'},
-                            {value: '4'},
-                            {value: '5'},
-                            {value: '6'},
-                            {value: '7'},
-                            {value: 'filter_empty_option'},
-                            {value: 'filter_not_empty_option'}
-                        ]
-                    }
-                ])
-            ]);
-
-            translator = new StringFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
+            filterConfig = {
+                type: 'string',
+                name: 'string',
+                choices: [
+                    {value: '1'},
+                    {value: '2'},
+                    {value: '3'},
+                    {value: '4'},
+                    {value: '5'},
+                    {value: '6'},
+                    {value: '7'},
+                    {value: 'filter_empty_option'},
+                    {value: 'filter_not_empty_option'}
+                ]
+            };
         });
 
-        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
-            translator.tryToTranslate({
-                columnName: 'bar',
-                criterion: {
-                    filter: 'string',
-                    data: {
-                        type: '3',
-                        value: 'baz'
-                    }
-                }
-            });
-            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('string');
+        it('can\'t translate condition because of unknown criterion type', function() {
+            expect(translator.test({type: 'qux', value: ''}, filterConfig)).toBe(false);
         });
 
-        describe('translates valid condition', function() {
+        it('can\'t translate condition because of missing value', function() {
+            expect(translator.test({type: '1'}, filterConfig)).toBe(false);
+        });
+
+        describe('translates valid filterValue', function() {
             var cases = [
                 [
                     // filter type
@@ -161,74 +140,17 @@ define(function(require) {
 
             _.each(cases, function(testCase) {
                 it('when filter has `' + testCase[0] + '` type', function() {
-                    var condition = {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'string',
-                            data: testCase[1]
-                        }
-                    };
-                    var expectedAST = new BinaryNode(
-                        testCase[2],
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        testCase[3]
+                    var leftOperand = new GetAttrNode(
+                        new NameNode('foo'),
+                        new ConstantNode('bar'),
+                        new ArgumentsNode(),
+                        GetAttrNode.PROPERTY_CALL
                     );
 
-                    expect(translator.tryToTranslate(condition)).toEqual(expectedAST);
-                });
-            });
-        });
+                    var expectedAST = new BinaryNode(testCase[2], leftOperand, testCase[3]);
 
-        describe('can\'t translate condition because of', function() {
-            var cases = {
-                'unknown filter': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'qux',
-                        data: {
-                            type: '1',
-                            value: 'baz'
-                        }
-                    }
-                },
-                'unknown criterion type': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'string',
-                        data: {
-                            type: 'qux',
-                            value: ''
-                        }
-                    }
-                },
-                'missing column name': {
-                    criterion: {
-                        filter: 'string',
-                        data: {
-                            type: '1',
-                            value: 'baz'
-                        }
-                    }
-                },
-                'missing value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'string',
-                        data: {
-                            type: '1'
-                        }
-                    }
-                }
-            };
-
-            _.each(cases, function(condition, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(condition)).toBe(null);
+                    expect(translator.test(testCase[1], filterConfig)).toBe(true);
+                    expect(translator.translate(leftOperand, testCase[1])).toEqual(expectedAST);
                 });
             });
         });

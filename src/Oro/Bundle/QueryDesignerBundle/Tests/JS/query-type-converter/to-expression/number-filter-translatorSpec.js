@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var NumberFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
@@ -15,55 +14,35 @@ define(function(require) {
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator', function() {
         var translator;
-        var filterConfigProviderMock;
+        var filterConfig;
 
         beforeEach(function() {
-            var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
-                jasmine.combineSpyObj('rootEntity', [
-                    jasmine.createSpy('get').and.returnValue('foo')
-                ])
-            ]);
+            filterConfig = {
+                type: 'number',
+                name: 'number',
+                choices: [
+                    {value: '1'},
+                    {value: '2'},
+                    {value: '3'},
+                    {value: '4'},
+                    {value: '5'},
+                    {value: '6'},
+                    {value: '9'},
+                    {value: '10'},
+                    {value: 'filter_empty_option'},
+                    {value: 'filter_not_empty_option'}
+                ]
+            };
 
-            filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('getFilterConfigsByType').and.returnValue([
-                    {
-                        type: 'number',
-                        name: 'number',
-                        choices: [
-                            {value: '1'},
-                            {value: '2'},
-                            {value: '3'},
-                            {value: '4'},
-                            {value: '5'},
-                            {value: '6'},
-                            {value: '9'},
-                            {value: '10'},
-                            {value: 'filter_empty_option'},
-                            {value: 'filter_not_empty_option'}
-                        ]
-                    }
-                ])
-            ]);
-
-            translator = new NumberFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
+            translator = new NumberFilterTranslator();
         });
 
-        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
-            translator.tryToTranslate({
-                columnName: 'bar',
-                criterion: {
-                    filter: 'number',
-                    data: {
-                        type: '3',
-                        value: 10
-                    }
-                }
-            });
-            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('number');
+        it('can\'t translate condition because of unknown criterion type', function() {
+            expect(translator.test({type: 'qux', value: 1}, filterConfig)).toBe(false);
+        });
+
+        it('can\'t translate condition because of missing criterion type', function() {
+            expect(translator.test({value: 1}, filterConfig)).toBe(false);
         });
 
         describe('translates valid condition', function() {
@@ -177,66 +156,17 @@ define(function(require) {
 
             _.each(cases, function(testCase) {
                 it('when filter has `' + testCase[0] + '` type', function() {
-                    var condition = {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'number',
-                            data: testCase[1]
-                        }
-                    };
-
-                    var expectedAST = new BinaryNode(
-                        testCase[2],
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        testCase[3]
+                    var leftOperand = new GetAttrNode(
+                        new NameNode('foo'),
+                        new ConstantNode('bar'),
+                        new ArgumentsNode(),
+                        GetAttrNode.PROPERTY_CALL
                     );
 
-                    expect(translator.tryToTranslate(condition)).toEqual(expectedAST);
-                });
-            });
-        });
+                    var expectedAST = new BinaryNode(testCase[2], leftOperand, testCase[3]);
 
-        describe('can\'t translate condition because of', function() {
-            var cases = {
-                'unknown filter': {
-                    columnName: 'foo',
-                    criterion: {
-                        filter: 'mynumber',
-                        data: {
-                            type: '1',
-                            value: 1
-                        }
-                    }
-                },
-                'unknown criterion type': {
-                    columnName: 'foo',
-                    criterion: {
-                        filter: 'number',
-                        data: {
-                            type: 'mynumber',
-                            value: 1
-                        }
-                    }
-                },
-                'missing column name': {
-                    criterion: {
-                        filter: 'number',
-                        data: {
-                            type: '1',
-                            value: 1
-                        }
-                    }
-                }
-            };
-
-            _.each(cases, function(condition, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(condition)).toBe(null);
+                    expect(translator.test(testCase[1], filterConfig)).toBe(true);
+                    expect(translator.translate(leftOperand, testCase[1])).toEqual(expectedAST);
                 });
             });
         });

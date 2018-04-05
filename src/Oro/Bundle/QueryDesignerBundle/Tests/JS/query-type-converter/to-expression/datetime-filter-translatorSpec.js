@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var DatetimeFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/datetime-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
@@ -14,9 +13,9 @@ define(function(require) {
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var Node = ExpressionLanguageLibrary.Node;
 
-    fdescribe('oroquerydesigner/js/query-type-converter/to-expression/datetime-filter-translator', function() {
+    describe('oroquerydesigner/js/query-type-converter/to-expression/datetime-filter-translator', function() {
         var translator;
-        var filterConfigProviderMock;
+        var filterConfig;
         var createGetFieldAST = function() {
             return new GetAttrNode(
                 new NameNode('foo'),
@@ -30,96 +29,67 @@ define(function(require) {
         };
 
         beforeEach(function() {
-            var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
-                jasmine.combineSpyObj('rootEntity', [
-                    jasmine.createSpy('get').and.returnValue('foo')
-                ])
-            ]);
-
-            filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('getFilterConfigsByType').and.returnValue([
-                    {
-                        type: 'datetime',
-                        name: 'datetime',
-                        choices: [
-                            {value: '1'},
-                            {value: '2'},
-                            {value: '3'},
-                            {value: '4'},
-                            {value: '5'},
-                            {value: '6'}
-                        ],
-                        dateParts: {
-                            value: 'value',
-                            dayofweek: 'day of week',
-                            week: 'week',
-                            day: 'day of month',
-                            month: 'month',
-                            quarter: 'quarter',
-                            dayofyear: 'day of year',
-                            year: 'year'
+            filterConfig = {
+                type: 'datetime',
+                name: 'datetime',
+                choices: [
+                    {value: '1'},
+                    {value: '2'},
+                    {value: '3'},
+                    {value: '4'},
+                    {value: '5'},
+                    {value: '6'}
+                ],
+                dateParts: {
+                    value: 'value',
+                    dayofweek: 'day of week',
+                    week: 'week',
+                    day: 'day of month',
+                    month: 'month',
+                    quarter: 'quarter',
+                    dayofyear: 'day of year',
+                    year: 'year'
+                },
+                externalWidgetOptions: {
+                    dateVars: {
+                        value: {
+                            1: 'now',
+                            2: 'today',
+                            3: 'start of the week',
+                            4: 'start of the month',
+                            5: 'start of the quarter',
+                            6: 'start of the year',
+                            17: 'current month without year',
+                            29: 'this day without year'
                         },
-                        externalWidgetOptions: {
-                            dateVars: {
-                                value: {
-                                    1: 'now',
-                                    2: 'today',
-                                    3: 'start of the week',
-                                    4: 'start of the month',
-                                    5: 'start of the quarter',
-                                    6: 'start of the year',
-                                    17: 'current month without year',
-                                    29: 'this day without year'
-                                },
-                                dayofweek: {
-                                    10: 'current day'
-                                },
-                                week: {
-                                    11: 'current week'
-                                },
-                                day: {
-                                    10: 'current day'
-                                },
-                                month: {
-                                    12: 'current month',
-                                    16: 'first month of quarter'
-                                },
-                                quarter: {
-                                    13: 'current quarter'
-                                },
-                                dayofyear: {
-                                    10: 'current day',
-                                    15: 'first day of quarter'
-                                },
-                                year: {
-                                    14: 'current year'
-                                }
-                            }
+                        dayofweek: {
+                            10: 'current day'
+                        },
+                        week: {
+                            11: 'current week'
+                        },
+                        day: {
+                            10: 'current day'
+                        },
+                        month: {
+                            12: 'current month',
+                            16: 'first month of quarter'
+                        },
+                        quarter: {
+                            13: 'current quarter'
+                        },
+                        dayofyear: {
+                            10: 'current day',
+                            15: 'first day of quarter'
+                        },
+                        year: {
+                            14: 'current year'
                         }
                     }
-                ])
-            ]);
-
-            translator = new DatetimeFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
-        });
-
-        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
-            translator.tryToTranslate({
-                columnName: 'bar',
-                criterion: {
-                    filter: 'datetime',
-                    data: {
-                        type: '3',
-                        value: {start: '2018-03-28 13:45', end: ''},
-                        part: 'value'
-                    }
                 }
-            });
-            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('datetime');
+            };
+
+            translator = new DatetimeFilterTranslator();
         });
 
         describe('translates valid condition', function() {
@@ -456,143 +426,62 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    var condition = {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'datetime',
-                            data: testCase[0]
-                        }
-                    };
-                    expect(translator.tryToTranslate(condition)).toEqual(testCase[1]);
+                    expect(translator.test(testCase[0], filterConfig)).toBe(true);
+                    expect(translator.translate(createGetFieldAST(), testCase[0])).toEqual(testCase[1]);
                 });
             });
         });
 
         describe('can\'t translate condition because of', function() {
             var cases = {
-                'unknown filter': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'qux',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
-                    }
-                },
                 'unknown criterion type': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: 'qux',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
-                    }
-                },
-                'missing column name': {
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
-                    }
+                    type: 'qux',
+                    value: {start: '2018-03-28 00:00', end: ''},
+                    part: 'value'
                 },
                 'missing value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            part: 'value'
-                        }
-                    }
+                    type: '3',
+                    part: 'value'
                 },
                 'missing end value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00'},
-                            part: 'value'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '2018-03-28 00:00'},
+                    part: 'value'
                 },
                 'incorrect datetime value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28', end: ''},
-                            part: 'value'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '2018-03-28', end: ''},
+                    part: 'value'
                 },
                 'missing part': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''}
-                        }
-                    }
+                    type: '3',
+                    value: {start: '2018-03-28 00:00', end: ''}
                 },
                 'unknown part': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'era'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '2018-03-28 00:00', end: ''},
+                    part: 'era'
                 },
                 'incorrect day of week part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '8', end: ''},
-                            part: 'dayofweek'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '8', end: ''},
+                    part: 'dayofweek'
                 },
                 'incorrect month part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '13', end: ''},
-                            part: 'month'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '13', end: ''},
+                    part: 'month'
                 },
                 'incorrect year part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '02018', end: ''},
-                            part: 'year'
-                        }
-                    }
+                    type: '3',
+                    value: {start: '02018', end: ''},
+                    part: 'year'
                 }
             };
 
-            _.each(cases, function(condition, caseName) {
+            _.each(cases, function(filterValue, caseName) {
                 it(caseName, function() {
-                    expect(translator.tryToTranslate(condition)).toBe(null);
+                    expect(translator.test(filterValue, filterConfig)).toBe(false);
                 });
             });
         });

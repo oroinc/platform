@@ -4,9 +4,9 @@ define(function(require) {
     var AbstractFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
+    var tools = ExpressionLanguageLibrary.tools;
 
     /**
      * @inheritDoc
@@ -110,30 +110,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        translate: function(condition) {
-            var operand;
-            var value = condition.criterion.data.value;
-            var params = this.operatorMap[condition.criterion.data.type];
+        translate: function(leftOperand, filterValue) {
+            var rightOperand;
+            var params = this.operatorMap[filterValue.type];
 
             if (params.isRange) {
-                operand = new ArrayNode();
-                this.splitValues(value).forEach(function(val) {
-                    operand.addElement(new ConstantNode(val));
-                });
-
+                rightOperand = tools.createArrayNode(this.splitValues(filterValue.value));
             // } else if (params.hasDoubleValue) {
             // TODO: implement in BAP-16713
             } else if (_.has(params, 'value')) {
-                operand = new ConstantNode(params.value);
+                rightOperand = new ConstantNode(params.value);
             } else {
-                operand = new ConstantNode(value);
+                rightOperand = new ConstantNode(filterValue.value);
             }
 
-            return new BinaryNode(
-                params.operator,
-                this.fieldIdTranslator.translate(condition.columnName),
-                operand
-            );
+            return new BinaryNode(params.operator, leftOperand, rightOperand);
         }
     });
 

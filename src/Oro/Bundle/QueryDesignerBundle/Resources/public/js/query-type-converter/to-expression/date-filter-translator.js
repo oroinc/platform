@@ -182,11 +182,11 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        testToConfig: function(condition, config) {
-            var part = condition.criterion.data.part;
-            var value = condition.criterion.data.value;
+        testToConfig: function(filterValue, config) {
+            var part = filterValue.part;
+            var value = filterValue.value;
             var result =
-                DateFilterTranslator.__super__.testToConfig.call(this, condition, config) &&
+                DateFilterTranslator.__super__.testToConfig.call(this, filterValue, config) &&
                 // check is filter part is available in config
                 _.has(config.dateParts, part);
 
@@ -214,41 +214,43 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        translate: function(condition) {
-            condition = this.normalizeCondition(condition);
+        translate: function(leftOperand, filterValue) {
+            filterValue = this.normalizeCondition(filterValue);
             var result;
-            var params = this.operatorMap[condition.criterion.data.type];
+            var params = this.operatorMap[filterValue.type];
 
             if (params.left && params.right) {
                 result = new BinaryNode(
                     params.operator,
-                    this.translateSingleValue(params.left, condition),
-                    this.translateSingleValue(params.right, condition)
+                    this.translateSingleValue(params.left, leftOperand, filterValue),
+                    // TODO: implement in expression language tools method to cloning of node and use clone instead
+                    // the same left operand
+                    this.translateSingleValue(params.right, leftOperand, filterValue)
                 );
             } else {
-                result = this.translateSingleValue(params, condition);
+                result = this.translateSingleValue(params, leftOperand, filterValue);
             }
 
             return result;
         },
 
         /**
-         * Normalizes conditions in case it is partial value of between of notBetween filter criterion
+         * Normalizes filterValue in case it is partial value of between of notBetween filter criterion
          *
-         * @param {Object} condition
+         * @param {Object} filterValue
          * @return {Object}
          */
-        normalizeCondition: function(condition) {
-            var type = String(condition.criterion.data.type);
-            var valueStart = condition.criterion.data.value.start;
-            var valueEnd = condition.criterion.data.value.end;
+        normalizeCondition: function(filterValue) {
+            var type = String(filterValue.type);
+            var valueStart = filterValue.value.start;
+            var valueEnd = filterValue.value.end;
 
             if (
                 [this.filterCriterion.between, this.filterCriterion.notBetween].indexOf(type) === -1 ||
                 valueStart && valueEnd
             ) {
                 // nothing to normalize
-                return condition;
+                return filterValue;
             } else if (this.filterCriterion.between === type) {
                 type = valueEnd ? this.filterCriterion.lessThan : this.filterCriterion.moreThan;
             } else if (this.filterCriterion.notBetween === type) {
@@ -266,43 +268,39 @@ define(function(require) {
             }
 
             return _.defaults({
-                criterion: _.defaults({
-                    data: _.defaults({
-                        type: type,
-                        value: {
-                            start: valueStart,
-                            end: valueEnd
-                        }
-                    }, condition.criterion.data)
-                }, condition.criterion)
-            }, condition);
+                type: type,
+                value: {
+                    start: valueStart,
+                    end: valueEnd
+                }
+            }, filterValue);
         },
 
         /**
          * Translates condition for a single value of pair 'start' and 'end'
          *
          * @param {Object} params
-         * @param {Object} condition
+         * @param {Node} leftOperand
+         * @param {Object} filterValue
          * @return {BinaryNode}
          * @protected
          */
-        translateSingleValue: function(params, condition) {
-            var partParams = this.partMap[condition.criterion.data.part];
-            var leftOperandAST = this.fieldIdTranslator.translate(condition.columnName);
-            var singleValue = condition.criterion.data.value[params.valueProp];
-            var rightOperandAST;
+        translateSingleValue: function(params, leftOperand, filterValue) {
+            var partParams = this.partMap[filterValue.part];
+            var singleValue = filterValue.value[params.valueProp];
+            var rightOperand;
 
             if (partParams.propModifier) {
-                leftOperandAST = new FunctionNode(partParams.propModifier, new Node([leftOperandAST]));
+                leftOperand = new FunctionNode(partParams.propModifier, new Node([leftOperand]));
             }
 
             if (partParams.variables && singleValue in partParams.variables) {
-                rightOperandAST = new FunctionNode(partParams.variables[singleValue], new Node([]));
+                rightOperand = new FunctionNode(partParams.variables[singleValue], new Node([]));
             } else {
-                rightOperandAST = new ConstantNode(singleValue);
+                rightOperand = new ConstantNode(singleValue);
             }
 
-            return new BinaryNode(params.operator, leftOperandAST, rightOperandAST);
+            return new BinaryNode(params.operator, leftOperand, rightOperand);
         }
     });
 

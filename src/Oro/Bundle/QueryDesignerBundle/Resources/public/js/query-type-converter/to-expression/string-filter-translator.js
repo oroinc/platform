@@ -5,10 +5,10 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var Node = ExpressionLanguageLibrary.Node;
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
+    var tools = ExpressionLanguageLibrary.tools;
 
     /**
      * @inheritDoc
@@ -86,17 +86,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        translate: function(condition) {
+        translate: function(leftOperand, filterValue) {
             var rightOperand;
-            var leftOperand = this.fieldIdTranslator.translate(condition.columnName);
-            var value = condition.criterion.data.value;
-            var params = this.operatorMap[condition.criterion.data.type];
+            var value = filterValue.value;
+            var params = this.operatorMap[filterValue.type];
 
             if (params.hasArrayValue) {
-                rightOperand = new ArrayNode();
-                this.splitValues(value).forEach(function(val) {
-                    rightOperand.addElement(new ConstantNode(val));
-                });
+                rightOperand = tools.createArrayNode(this.splitValues(value));
             } else if (params.valueModifier) {
                 rightOperand = new FunctionNode(
                     params.valueModifier,
@@ -105,7 +101,7 @@ define(function(require) {
             } else if ('value' in params) {
                 rightOperand = new ConstantNode(params.value);
             } else {
-                rightOperand = new ConstantNode(value);
+                rightOperand = new ConstantNode(filterValue.value);
             }
 
             return new BinaryNode(params.operator, leftOperand, rightOperand);

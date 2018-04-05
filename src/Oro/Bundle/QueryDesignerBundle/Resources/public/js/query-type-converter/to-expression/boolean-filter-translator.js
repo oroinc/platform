@@ -3,7 +3,6 @@ define(function(require) {
 
     var AbstractFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
-    var jsonSchemaValidator = require('oroui/js/tools/json-schema-validator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
@@ -50,28 +49,33 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        test: function(condition) {
-            var filterConfigs = this.filterConfigProvider.getFilterConfigsByType(this.filterType);
-            var schema = this.getConditionSchema(filterConfigs);
-
-            return jsonSchemaValidator.validate(schema, condition);
+        testToOperatorMap: function(filterValue) {
+            return !_.has(filterValue, 'type');
         },
 
         /**
          * @inheritDoc
          */
-        translate: function(condition) {
-            var value = this.convertToBoolean(condition.criterion.data.value);
+        testToConfig: function(filterValue, config) {
+            return _.any(config.choices, {value: filterValue.value});
+        },
+
+        /**
+         * @inheritDoc
+         */
+        translate: function(leftOperand, filterValue) {
+            var value = this.convertToBoolean(filterValue.value);
 
             return new BinaryNode(
                 this.operator,
-                this.fieldIdTranslator.translate(condition.columnName),
+                leftOperand,
                 new ConstantNode(value)
             );
         },
 
         /**
          * Convert criterion value to boolean
+         *
          * @param {string} value
          * @returns {boolean}
          */
