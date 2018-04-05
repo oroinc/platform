@@ -33,38 +33,23 @@ define(function(require) {
             );
         });
 
-
-        describe('check node structure', function() {
+        describe('rejects node structure because', function() {
             var cases = {
-                'improper AST': function() {
-                    return new ConstantNode('test');
-                },
-                'improper operation': function() {
-                    return new BinaryNode('>=', createGetAttrNode('foo.bar'), createArrayNode([1, 2]));
-                },
-                'improper left operand AST': function() {
-                    return new BinaryNode(
-                        'in',
-                        new ConstantNode('test'),
-                        createArrayNode([1, 2])
-                    );
-                },
-                'improper right operand AST': function() {
-                    return new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('test'));
-                },
-                'improper AST values in right operand': function() {
-                    return new BinaryNode(
-                        'in',
-                        createGetAttrNode('foo.bar'),
-                        createArrayNode([new NameNode('foo'), 2])
-                    );
-                }
+                'improper AST':
+                    new ConstantNode('test'),
+                'unsupported operation':
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), createArrayNode([1, 2])),
+                'improper left operand AST':
+                    new BinaryNode('in', new ConstantNode('test'), createArrayNode([1, 2])),
+                'improper right operand AST':
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('test')),
+                'improper AST values in right operand':
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([new NameNode('foo'), 2]))
             };
 
-            _.each(cases, function(cb, caseName) {
+            _.each(cases, function(ast, caseName) {
                 it(caseName, function() {
-                    var node = cb();
-                    expect(translator.tryToTranslate(node)).toBe(null);
+                    expect(translator.tryToTranslate(ast)).toBe(null);
                     expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
                 });
             });

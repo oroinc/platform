@@ -13,7 +13,7 @@ define(function(require) {
     var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
     var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
-    describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', function() {
+    describe('oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator', function() {
         var translator;
         var entityStructureDataProviderMock;
         var filterConfigProviderMock;

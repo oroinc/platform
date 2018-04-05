@@ -12,6 +12,14 @@ define(function(require) {
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
 
+    var operatorMap = _.mapObject(StringFilterTranslatorToExpression.prototype.operatorMap, function(val, key) {
+        return _.extend({
+            criterion: key,
+            hasArrayValue: false,
+            valueModifier: void 0
+        }, val);
+    });
+
     /**
      * @inheritDoc
      */
@@ -33,7 +41,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        operatorMap: StringFilterTranslatorToExpression.prototype.operatorMap,
+        operatorMap: operatorMap,
 
         /**
          * Checks if node has correct type and value
@@ -55,33 +63,25 @@ define(function(require) {
 
             var params;
             var valueNode = node.nodes[1];
-            var map = _.mapObject(this.operatorMap, function(val, key) {
-                return _.extend({
-                    type: key,
-                    hasArrayValue: false,
-                    valueModifier: void 0
-                }, val);
-            });
+            var matchedParams = _.where(this.operatorMap, {operator: node.attrs.operator});
 
-            map = _.where(map, {operator: node.attrs.operator});
-
-            if (map.length === 0) {
+            if (matchedParams.length === 0) {
                 return null;
             }
 
             if (this.checkValueNode(valueNode)) {
-                map =_.where(map, {hasArrayValue: false, valueModifier: void 0});
-                if (map.length > 0) {
-                    params = _.findWhere(map, {value: valueNode.attrs.value}) || _.first(map);
+                matchedParams =_.where(matchedParams, {hasArrayValue: false, valueModifier: void 0});
+                if (matchedParams.length > 0) {
+                    params = _.findWhere(matchedParams, {value: valueNode.attrs.value}) || _.first(matchedParams);
                 }
             } else if (this.checkListOperandAST(valueNode, this.checkValueNode)) {
-                params = _.findWhere(map, {hasArrayValue: true});
+                params = _.findWhere(matchedParams, {hasArrayValue: true});
             } else if (
                 valueNode instanceof FunctionNode &&
                 valueNode.nodes[0].nodes.length === 1 &&
                 this.checkValueNode(valueNode.nodes[0].nodes[0])
             ) {
-                params = _.findWhere(map, {valueModifier: valueNode.attrs.name});
+                params = _.findWhere(matchedParams, {valueModifier: valueNode.attrs.name});
             }
 
             return params || null;
@@ -110,7 +110,7 @@ define(function(require) {
                 criterion: {
                     filter: filterConfig.name,
                     data: {
-                        type: operatorParams.type,
+                        type: operatorParams.criterion,
                         value: value
                     }
                 }

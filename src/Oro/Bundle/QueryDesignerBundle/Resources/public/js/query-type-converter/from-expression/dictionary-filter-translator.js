@@ -53,12 +53,12 @@ define(function(require) {
                 this.resolveFieldAST(node) instanceof GetAttrNode &&
                 this.checkListOperandAST(node.nodes[1], this.checkValueNode)
             ) {
-                var type = _.findKey(this.operatorMap, function(operator) {
+                var criterion = _.findKey(this.operatorMap, function(operator) {
                     return operator === node.attrs.operator;
                 });
 
-                if (type) {
-                    return {type: type, operator: node.attrs.operator};
+                if (criterion) {
+                    return {criterion: criterion, operator: node.attrs.operator};
                 }
             }
 
@@ -76,7 +76,7 @@ define(function(require) {
                 criterion: {
                     filter: filterConfig.name,
                     data: {
-                        type: operatorParams.type,
+                        type: operatorParams.criterion,
                         value: _.map(node.nodes[1].getKeyValuePairs(), function(pair) {
                             return String(pair.value.attrs.value);
                         })

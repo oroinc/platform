@@ -7,7 +7,7 @@ define(function(require) {
 
     /**
      * @typedef {Object} OperatorParams
-     * @property {string} type - used for determine filter type
+     * @property {string} criterion - used for determine filter type
      * @property {string} operator
      * @property {string} [valueModifier] - contains function name in case operator expects it as right operand
      * @property {boolean} [hasArrayValue] - determine if operator expects array as right operand
@@ -149,7 +149,7 @@ define(function(require) {
          * @protected
          */
         checkOperation: function(node, filterConfig, operatorParams) {
-            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.type) !== -1;
+            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.criterion) !== -1;
         },
 
         /**
