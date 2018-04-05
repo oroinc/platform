@@ -58,8 +58,6 @@ define(function(require) {
                 });
             });
 
-            resetValidate(fields, params);
-
             return true;
         }
     ];
