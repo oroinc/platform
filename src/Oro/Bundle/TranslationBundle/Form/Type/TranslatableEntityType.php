@@ -97,10 +97,6 @@ class TranslatableEntityType extends AbstractType
         $resolver->setRequired(array('class'));
 
         $resolver->setNormalizer('choice_loader', function (Options $options) {
-            if (!empty($options['choices'])) {
-                return null;
-            }
-
             return new TranslationChoiceLoader($options['class'], $this->registry, $this->factory);
         });
     }
