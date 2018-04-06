@@ -1,10 +1,29 @@
-## 2.7.0 (Unreleased)
+## 3.0.0-beta (2018-03-30)
+[Show detailed list of changes](incompatibilities-3-0-beta.md)
 
 ### Added
 #### ApiBundle
 * Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
 
 ### Removed
+#### ApiBundle
+* Removed deprecated class `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext`
+* Removed deprecated class `Oro\Bundle\ApiBundle\Model\EntityDescriptor`
+
+#### EntityConfigBundle
+* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor`
+
+#### ImportExportBundle
+* Removed class `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` and corresponding service `oro_importexport.event_listener.export_join_listener`
+* Parameter `%oro_importexport.file.split_csv_file.size_of_batch%` was removed use `%oro_importexport.import.size_of_batch%` instead.
+
+#### InstallerBundle
+* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\InstallerBundle\CommandExecutor`
+
+#### UIBundle
+* Removed twig filter `oro_html_tag_trim` use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
+* Removed twig filter `oro_html_purify` use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
+
 #### WorkflowBundle
 * Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
 
@@ -26,11 +45,14 @@
     | oro_rest_api_post_relationship | OroApiBundle:RestApiRelationship:post | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
     | oro_rest_api_delete_relationship | OroApiBundle:RestApiRelationship:delete | oro_rest_api_relationship | OroApiBundle:RestApi:relationship |
 
+#### UIBundle
+* Twig filter `oro_tag_filter` was renamed to `oro_html_strip_tags`. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
+
 #### UserBundle
 * The `oro_rest_api_get_user_profile` route was removed, use `oro_rest_api_user_profile` route instead.
 * The `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver` and `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver` route option resolvers were removed in favor of [routing.yml](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#add-a-custom-route).
 
-## 2.6.0 (Unreleased)
+## 2.6.0 (2018-01-31)
 [Show detailed list of changes](incompatibilities-2-6.md)
 
 ### Added
@@ -606,7 +628,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 * Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager` method `bindParameters` is deprecated and will be removed.
 ### Removed
 #### ActionBundle
-* The `ButtonListener`<sup>[[?]](https://github.com/orocrm/platform/tree/2.1.0/src/Oro/Bundle/ActionBundle/Datagrid/EventListener/ButtonListener.php "Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener")</sup> class was removed. Logic was transferred to `DatagridActionButtonProvider`<sup>[[?]](https://github.com/laboro/dev/blob/maintenance/2.2/package/platform/src/Oro/Bundle/ActionBundle/Datagrid/Provider/DatagridActionButtonProvider.php "Oro\Bundle\ActionBundle\Datagrid\Provider\DatagridActionButtonProvider")</sup> class.
+* The `ButtonListener`<sup>[[?]](https://github.com/orocrm/platform/tree/2.1.0/src/Oro/Bundle/ActionBundle/Datagrid/EventListener/ButtonListener.php "Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener")</sup> class was removed. Logic was transferred to `DatagridActionButtonProvider`<sup>[[?]](https://github.com/oroinc/platform/blob/2.2.0/src/Oro/Bundle/ActionBundle/Datagrid/Provider/DatagridActionButtonProvider.php "Oro\Bundle\ActionBundle\Datagrid\Provider\DatagridActionButtonProvider")</sup> class.
 * Service `oro_action.datagrid.event_listener.button` was removed and new `oro_action.datagrid.action.button_provider` added with tag `oro_datagrid.extension.action.provider`
 #### DataGridBundle
 * Removed event `oro_datagrid.datagrid.extension.action.configure-actions.before`, now it is a call of `DatagridActionProviderInterface::hasActions`<sup>[[?]](https://github.com/orocrm/platform/tree/2.2.0/src/Oro/Bundle/DataGridBundle/Extension/Action/DatagridActionProviderInterface.php#L13 "Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface")</sup> of registered through a `oro_datagrid.extension.action.provider` tag services.

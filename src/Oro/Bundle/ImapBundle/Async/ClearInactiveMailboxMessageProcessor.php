@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
+use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-
-use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
+use Psr\Log\LoggerInterface;
 
 class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {

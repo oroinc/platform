@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
+use FOS\RestBundle\Util\Codes;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use FOS\RestBundle\Util\Codes;
-
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolationPerTest

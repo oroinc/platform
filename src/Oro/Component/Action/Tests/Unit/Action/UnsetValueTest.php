@@ -2,11 +2,10 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Action\UnsetValue;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class UnsetValueTest extends \PHPUnit_Framework_TestCase
 {

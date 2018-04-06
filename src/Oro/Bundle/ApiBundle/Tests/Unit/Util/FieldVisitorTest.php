@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
 use Oro\Bundle\ApiBundle\Util\FieldVisitor;
 
 class FieldVisitorTest extends \PHPUnit_Framework_TestCase

@@ -70,6 +70,13 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        constructor: function VariableDatePickerView() {
+            VariableDatePickerView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initializes variable-date-picker view
          * @param {Object} options
          */
@@ -268,9 +275,9 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dateValueHelper.isValid(value) ?
-                    this.dateValueHelper.formatRawValue(value) :
-                    VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
+                return this.dateValueHelper.isValid(value)
+                    ? this.dateValueHelper.formatRawValue(value)
+                    : VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
             }
 
             return this.getBackendPartFormattedValue();
@@ -301,9 +308,9 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dateValueHelper.isValid(value) ?
-                    this.dateValueHelper.formatDisplayValue(value) :
-                    VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
+                return this.dateValueHelper.isValid(value)
+                    ? this.dateValueHelper.formatDisplayValue(value)
+                    : VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
 
             return this.getFrontendPartFormattedDate();

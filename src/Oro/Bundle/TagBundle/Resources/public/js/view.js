@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var TagView;
     var _ = require('underscore');
     var $ = require('jquery');
     var Backbone = require('backbone');
@@ -11,13 +12,20 @@ define(function(require) {
      * @class   orotag.View
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    TagView = Backbone.View.extend({
         options: {
             filter: null
         },
 
         /** @property */
         template: require('tpl!../templates/tag-list.html'),
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function TagView() {
+            TagView.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * Constructor
@@ -74,4 +82,6 @@ define(function(require) {
             return this;
         }
     });
+
+    return TagView;
 });

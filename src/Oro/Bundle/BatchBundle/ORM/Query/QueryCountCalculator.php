@@ -3,9 +3,8 @@
 namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
-
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 

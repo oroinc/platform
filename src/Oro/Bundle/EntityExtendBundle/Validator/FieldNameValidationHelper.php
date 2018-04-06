@@ -3,15 +3,13 @@
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
 use Doctrine\Common\Inflector\Inflector;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldNameValidationHelper
 {

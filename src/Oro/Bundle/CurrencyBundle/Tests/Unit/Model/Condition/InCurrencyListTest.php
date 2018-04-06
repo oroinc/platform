@@ -4,12 +4,10 @@
 namespace Oro\Bundle\CurrencyBundle\Tests\Model\Condition;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\CurrencyBundle\Model\Condition\InCurrencyList;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class InCurrencyListTest extends \PHPUnit_Framework_TestCase
 {

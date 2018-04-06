@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Command;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 
 class CalendarDateCommand extends ContainerAwareCommand implements CronCommandInterface
 {

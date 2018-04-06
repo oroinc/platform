@@ -24,6 +24,16 @@ define(function(require) {
             }
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EnumValuesView() {
+            EnumValuesView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['multiple']));
             EnumValuesView.__super__.initialize.call(this, options);

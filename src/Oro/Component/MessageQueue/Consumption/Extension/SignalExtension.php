@@ -2,11 +2,10 @@
 
 namespace Oro\Component\MessageQueue\Consumption\Extension;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
+use Psr\Log\LoggerInterface;
 
 class SignalExtension extends AbstractExtension
 {

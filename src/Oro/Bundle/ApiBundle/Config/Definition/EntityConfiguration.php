@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class EntityConfiguration
 {

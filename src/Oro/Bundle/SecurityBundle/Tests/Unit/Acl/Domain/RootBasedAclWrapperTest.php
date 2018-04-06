@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
-
-use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
 
 class RootBasedAclWrapperTest extends \PHPUnit_Framework_TestCase
 {

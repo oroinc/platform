@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,7 +26,7 @@ class CountryType extends AbstractType
      */
     public function getParent()
     {
-        return 'country';
+        return SymfonyCountryType::class;
     }
 
     /**

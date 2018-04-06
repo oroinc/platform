@@ -3,7 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
-
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -11,11 +15,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/integration")
@@ -158,7 +157,7 @@ class IntegrationController extends Controller
         // take different form due to JS validation should be shown even in case when it was not validated on backend
         if ($isUpdateOnly) {
             $form = $this->get('form.factory')
-                ->createNamed('oro_integration_channel_form', 'oro_integration_channel_form', $form->getData());
+                ->createNamed('oro_integration_channel_form', ChannelType::class, $form->getData());
         }
 
         return $form;

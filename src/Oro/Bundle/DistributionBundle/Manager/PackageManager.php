@@ -18,9 +18,6 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
@@ -28,6 +25,7 @@ use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use Psr\Log\LoggerInterface;
 
 class PackageManager
 {

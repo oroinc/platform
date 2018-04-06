@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class EntityCreationTransformer extends EntityToIdTransformer
 {

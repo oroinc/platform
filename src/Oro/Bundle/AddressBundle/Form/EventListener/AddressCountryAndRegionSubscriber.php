@@ -3,14 +3,12 @@
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Oro\Bundle\AddressBundle\Entity\Country;
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 
 class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 {
@@ -86,6 +84,9 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 $config['auto_initialize'] = false;
             }
 
+            //@TODO Remove in scope BAP-16504
+            unset($config['cascade_validation']);
+
             $form->add(
                 $this->factory->createNamed(
                     'region',
@@ -117,12 +118,18 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             unset($config['choice_list']);
             unset($config['choices']);
 
+            //@TODO Remove in scope BAP-16504
+            unset($config['cascade_validation']);
+
             $config['country'] = $country;
             $config['query_builder'] = $this->getRegionClosure($country);
 
             if (array_key_exists('auto_initialize', $config)) {
                 $config['auto_initialize'] = false;
             }
+
+            //@TODO Remove in scope BAP-15236
+            unset($config['csrf_provider']);
 
             $form->add(
                 $this->factory->createNamed(

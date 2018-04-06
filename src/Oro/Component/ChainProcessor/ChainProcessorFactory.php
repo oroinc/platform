@@ -2,6 +2,9 @@
 
 namespace Oro\Component\ChainProcessor;
 
+/**
+ * Delegates creation of a processor to child factories.
+ */
 class ChainProcessorFactory implements ProcessorFactoryInterface
 {
     /** @var array */
@@ -22,8 +25,8 @@ class ChainProcessorFactory implements ProcessorFactoryInterface
         // sort by priority and flatten
         // we do it here due to performance reasons (it is expected that it will be only several factories,
         // but the getProcessor method will be called a lot of times)
-        krsort($this->factories);
-        $this->sortedFactories = call_user_func_array('array_merge', $this->factories);
+        \krsort($this->factories);
+        $this->sortedFactories = \array_merge(...$this->factories);
     }
 
     /**

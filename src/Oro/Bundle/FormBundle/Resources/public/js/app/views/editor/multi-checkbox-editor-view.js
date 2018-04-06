@@ -80,6 +80,13 @@ define(function(require) {
             'change:visibility': 'onShow'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiCheckboxEditorView() {
+            MultiCheckboxEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         onShow: function() {
             this.multiselect = this.$('select').multiselect({
                 autoOpen: true,

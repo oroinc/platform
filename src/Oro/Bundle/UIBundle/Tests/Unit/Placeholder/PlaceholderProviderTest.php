@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Placeholder;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\Config\Resolver\ResolverInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use Oro\Component\Config\Resolver\ResolverInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 {

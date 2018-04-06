@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Controller that allows to retrieve a new Sync authentication ticket for current logged user.

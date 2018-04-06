@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class SegmentQueryConverterFactory
 {

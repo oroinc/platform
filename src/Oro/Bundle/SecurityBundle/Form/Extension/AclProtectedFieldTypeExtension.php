@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
+use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormErrorIterator;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -85,10 +83,10 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             }
 
             if ($this->isViewGranted($entity, $childForm)) {
-                $view->children[$childName]->vars['read_only'] = true;
+                $view->children[$childName]->vars['attr']['readonly'] = true;
                 if (count($view->children[$childName]->children)) {
                     foreach ($view->children[$childName]->children as $child) {
-                        $child->vars['read_only'] = true;
+                        $child->vars['attr']['readonly'] = true;
                     }
                 }
             } else {

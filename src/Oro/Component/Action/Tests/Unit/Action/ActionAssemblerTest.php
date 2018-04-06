@@ -2,12 +2,12 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction;
-use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\TreeExecutor;
-use Oro\Component\Action\Action\ActionFactoryInterface;
+use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction;
+use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssemblerTest extends \PHPUnit_Framework_TestCase

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Symfony\Component\Form\FormView;
 
 class FormAccessorTest extends \PHPUnit_Framework_TestCase
 {

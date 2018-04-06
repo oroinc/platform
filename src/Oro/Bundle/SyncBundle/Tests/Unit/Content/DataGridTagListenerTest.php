@@ -3,13 +3,12 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Doctrine\ORM\Query\Expr\From;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\SyncBundle\Content\DataGridTagListener;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 

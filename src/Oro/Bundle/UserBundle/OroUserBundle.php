@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle;
 
+use Oro\Bundle\UserBundle\DependencyInjection\Compiler\EscapeWsseConfigurationPass;
+use Oro\Bundle\UserBundle\DependencyInjection\Compiler\PrivilegeCategoryPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\UserBundle\DependencyInjection\Compiler\PrivilegeCategoryPass;
-use Oro\Bundle\UserBundle\DependencyInjection\Compiler\EscapeWsseConfigurationPass;
 
 class OroUserBundle extends Bundle
 {

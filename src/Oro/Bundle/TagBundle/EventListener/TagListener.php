@@ -3,12 +3,10 @@
 namespace Oro\Bundle\TagBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TagListener implements ContainerAwareInterface
 {

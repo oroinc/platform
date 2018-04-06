@@ -5,10 +5,9 @@ namespace Oro\Bundle\TagBundle\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager as TagStorage;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 
 class TagImportManager
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Unit\Datagrid\Action;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonWidgetActionTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class LanguageFilterTest extends \PHPUnit_Framework_TestCase
 {

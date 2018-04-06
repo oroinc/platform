@@ -4,14 +4,12 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Translation\MessageCatalogue;
-
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
+use Symfony\Component\Translation\MessageCatalogue;
 
 class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\ExpressionLanguage\Expression;
-
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
+use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
-
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeGroupTypeTest extends BlockTypeTestCase
 {

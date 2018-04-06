@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Knp\Menu\MenuFactory;
-
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Cache\CacheProvider;
-
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Stub\UrlGeneratorStub;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

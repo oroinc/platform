@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Controller;
 
-use Symfony\Component\DomCrawler\Form;
-
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
@@ -12,6 +10,7 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Form;
 
 class LocalizationControllerTest extends WebTestCase
 {

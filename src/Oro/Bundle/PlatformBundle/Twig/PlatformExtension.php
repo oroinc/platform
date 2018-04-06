@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class PlatformExtension extends \Twig_Extension
 {

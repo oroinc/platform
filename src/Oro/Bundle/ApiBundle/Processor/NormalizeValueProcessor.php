@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 
+/**
+ * The main processor for "normalize_value" action.
+ */
 class NormalizeValueProcessor extends ActionProcessor
 {
     /**

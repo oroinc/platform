@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * @ORM\Entity

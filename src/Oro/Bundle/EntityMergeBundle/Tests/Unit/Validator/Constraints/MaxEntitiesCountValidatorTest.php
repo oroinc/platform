@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
 
+use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
 
 class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,15 +72,12 @@ class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($value, $addViolation)
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(ExecutionContext::class);
 
         $context->expects($this->$addViolation())
             ->method('addViolation');
 
-        $constraint = $this
-            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount');
+        $constraint = $this->createMock(MaxEntitiesCount::class);
         $this->validator->initialize($context);
 
         $this->validator->validate($value, $constraint);

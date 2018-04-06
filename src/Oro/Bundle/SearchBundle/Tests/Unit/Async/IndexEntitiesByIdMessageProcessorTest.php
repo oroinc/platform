@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor;
@@ -13,6 +11,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

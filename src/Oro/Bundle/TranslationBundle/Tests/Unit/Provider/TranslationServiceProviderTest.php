@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
-
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 {

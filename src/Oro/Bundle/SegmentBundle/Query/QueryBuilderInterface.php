@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 interface QueryBuilderInterface

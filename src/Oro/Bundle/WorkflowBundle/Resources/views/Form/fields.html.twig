@@ -39,14 +39,14 @@
         </div>
     </div>
 
-    <form method="{{ form.vars.method }}"
-          id="{{ form.vars.id }}"
-          name="{{ form.vars.name }}"
-          action="{{ app.request.uri }}"
-          data-collect="true"
-          class="form-dialog"
-          {{ form_enctype(form) }}
-    >
+    {{ form_start(form, {
+        'action': app.request.uri,
+        'attr': {
+            'id': form.vars.id,
+            'class': 'form-dialog',
+            'data-collect': 'true'
+        }
+    }) }}
         <fieldset class="form-horizontal">
             {{ form_widget(form) }}
         </fieldset>
@@ -59,6 +59,6 @@
             <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
             <button type="button" data-action-name="activate" class="btn btn-success">{{ 'oro.workflow.workflowdefinition.datagrid.activate'|trans }}</button>
         </div>
-    </form>
+    {{ form_end(form) }}
     {{ oro_form_js_validation(form) }}
 {% endblock %}

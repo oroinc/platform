@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ActionMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {

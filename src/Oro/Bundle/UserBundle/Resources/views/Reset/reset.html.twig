@@ -5,7 +5,12 @@
 
 {% block content %}
 <div class="container">
-    <form action="{{ path('oro_user_reset_reset', { token: token }) }}" {{ form_enctype(form) }} method="post" class="form-signin form-reset">
+    {{ form_start(form, {
+        'action': path('oro_user_reset_reset', { token: token }),
+        'attr': {
+            'class': 'form-signin form-reset'
+        }
+    }) }}
         <div class="title-box">
             <h2 class="title">{{ 'Password Reset'|trans }}</h2>
         </div>
@@ -21,6 +26,6 @@
                 <a href="{{ path('oro_user_security_login') }}" class="btn btn-large extra-btn-large">{{ 'Cancel'|trans }}</a>
             </div>
         </fieldset>
-    </form>
+    {{ form_end(form) }}
 </div>
 {% endblock %}

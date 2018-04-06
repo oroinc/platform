@@ -1,9 +1,8 @@
 <?php
 namespace Oro\Bundle\UserBundle\Datagrid;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Used in grid of roles to provide permissions for actions on level of each role in the grid.

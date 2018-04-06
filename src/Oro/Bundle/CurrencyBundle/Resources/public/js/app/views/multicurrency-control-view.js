@@ -7,8 +7,8 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     var formatter = require('orolocale/js/formatter/number');
     var BaseView = require('oroui/js/app/views/base/view');
-    MultiCurrencyControlView = BaseView.extend({
 
+    MultiCurrencyControlView = BaseView.extend({
         /**
          * @property {Object} keys are ISO3 of currencies and values are multipliers to use in convertation
          */
@@ -18,6 +18,13 @@ define(function(require) {
         events: {
             'change .value-field': 'render',
             'keyup .value-field': 'render'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiCurrencyControlView() {
+            MultiCurrencyControlView.__super__.constructor.apply(this, arguments);
         },
 
         /**

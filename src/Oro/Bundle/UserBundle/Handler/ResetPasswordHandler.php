@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\EmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Log\LoggerInterface;
 
 /**
  * Responsible for resetting user's password, setting auth_status to expired and sending reset token to the user

@@ -241,7 +241,8 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Akeneo\Bundle\BatchBundle\Item\InvalidItemException
-     * @expectedExceptionMessage Expecting to get 3 columns, actually got 2
+     * @expectedExceptionMessage Expecting to get 3 columns, actually got 2.
+     * Message also contains additional rows info but it is not possible to add it in annotation
      */
     public function testReadError()
     {

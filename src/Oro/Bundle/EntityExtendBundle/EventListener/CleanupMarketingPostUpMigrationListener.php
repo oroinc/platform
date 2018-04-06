@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-
 use Oro\Bundle\EntityExtendBundle\Migration\CleanupCampaignMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\CleanupMarketingListMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\CleanupTrackingMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CleanupMarketingPostUpMigrationListener
 {

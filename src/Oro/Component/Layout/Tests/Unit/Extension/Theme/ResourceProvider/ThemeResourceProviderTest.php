@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\ResourceProvider;
 
 use Doctrine\Common\Cache\Cache;
-
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;

@@ -2,14 +2,13 @@
 
 namespace Oro\Component\Action\Action;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * Show flash message

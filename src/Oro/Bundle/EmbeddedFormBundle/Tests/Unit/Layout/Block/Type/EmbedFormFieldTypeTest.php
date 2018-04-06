@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\Extension\PreloadedExtension;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension;
+use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Extension\PreloadedExtension;
+use Symfony\Component\Form\FormView;
 
 class EmbedFormFieldTypeTest extends BlockTypeTestCase
 {

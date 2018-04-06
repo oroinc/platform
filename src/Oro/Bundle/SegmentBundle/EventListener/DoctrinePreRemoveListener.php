@@ -5,7 +5,6 @@ namespace Oro\Bundle\SegmentBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class DoctrinePreRemoveListener

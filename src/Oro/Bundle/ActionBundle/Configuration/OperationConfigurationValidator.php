@@ -3,13 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Doctrine\Common\Collections\Collection;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OperationConfigurationValidator implements ConfigurationValidatorInterface
 {

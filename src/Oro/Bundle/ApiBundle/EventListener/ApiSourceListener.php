@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
-
 use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 

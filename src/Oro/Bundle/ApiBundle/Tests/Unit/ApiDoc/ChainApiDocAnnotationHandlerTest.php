@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\ApiBundle\ApiDoc\ApiDocAnnotationHandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler;
+use Symfony\Component\Routing\Route;
 
 class ChainApiDocAnnotationHandlerTest extends \PHPUnit_Framework_TestCase
 {

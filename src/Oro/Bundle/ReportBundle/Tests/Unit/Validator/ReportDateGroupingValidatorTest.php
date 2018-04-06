@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Validator;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
+use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint;
 use Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ReportDateGroupingValidatorTest extends \PHPUnit_Framework_TestCase
 {

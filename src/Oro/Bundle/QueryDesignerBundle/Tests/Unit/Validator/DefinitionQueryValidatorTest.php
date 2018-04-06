@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
-
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
 {

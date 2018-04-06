@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
-use Prophecy\Argument;
-
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\HttpFoundation\File\File as HttpFile;
-use Symfony\Component\Validator\Validation;
-
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Prophecy\Argument;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\HttpFoundation\File\File as HttpFile;
+use Symfony\Component\Validator\Validation;
 
 class ConfigFileTypeTest extends FormIntegrationTestCase
 {
@@ -41,10 +40,9 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->transformer = $this->prophesize(ConfigFileDataTransformer::class);
         $this->formType = new ConfigFileType($this->transformer->reveal());
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -69,7 +67,7 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
     {
         $this->addTransformerExpectations($transformerArgs);
 
-        $form = $this->factory->create($this->formType, $defaultData);
+        $form = $this->factory->create(ConfigFileType::class, $defaultData);
         $form->submit($submittedData);
 
         $this->assertEquals($expectedData, $form->getData());
@@ -102,6 +100,12 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         return [
+            new PreloadedExtension(
+                [
+                    ConfigFileType::class => $this->formType
+                ],
+                []
+            ),
             new ValidatorExtension(Validation::createValidator())
         ];
     }

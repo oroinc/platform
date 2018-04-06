@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\RequireJSBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroRequireJSExtension extends \Twig_Extension
 {

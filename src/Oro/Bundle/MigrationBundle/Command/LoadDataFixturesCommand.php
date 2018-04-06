@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
+use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
+use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
+use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
-use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
-
+/**
+ * This command load fixtures
+ *
+ * @package Oro\Bundle\MigrationBundle\Command
+ */
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:migration:data:load';
@@ -18,7 +23,10 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
     const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
 
+    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
     const MAIN_FIXTURES_PATH = 'Migrations/Data/ORM';
+
+    /** @deprecated since 2.6 please use oro_migration.locator.fixture_path_locator */
     const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
 
     /**
@@ -180,14 +188,22 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
 
     /**
      * @param InputInterface $input
+     *
      * @return string
      */
     protected function getFixtureRelativePath(InputInterface $input)
     {
-        $fixtureRelativePath = $this->getTypeOfFixtures($input) === self::DEMO_FIXTURES_TYPE
-            ? self::DEMO_FIXTURES_PATH
-            : self::MAIN_FIXTURES_PATH;
+        $fixtureType         = (string)$this->getTypeOfFixtures($input);
+        $fixtureRelativePath = $this->getFixturePathLocator()->getPath($fixtureType);
 
-        return str_replace('/', DIRECTORY_SEPARATOR, '/' . $fixtureRelativePath);
+        return str_replace('/', DIRECTORY_SEPARATOR, sprintf('/%s', $fixtureRelativePath));
+    }
+
+    /**
+     * @return FixturePathLocatorInterface
+     */
+    protected function getFixturePathLocator(): FixturePathLocatorInterface
+    {
+        return $this->getContainer()->get('oro_migration.locator.fixture_path_locator');
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 /**
  * Registers all possible ORM expressions that can be used in Criteria object.
@@ -67,7 +66,7 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
 
         $expressions = [];
         $services = DependencyInjectionUtil::sortByPriorityAndFlatten($services);
-        foreach ($services as [$expressionType, $serviceRef]) {
+        foreach ($services as list($expressionType, $serviceRef)) {
             $expressions[$expressionType] = $serviceRef;
         }
 

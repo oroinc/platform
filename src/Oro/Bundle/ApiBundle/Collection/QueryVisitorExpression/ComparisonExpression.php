@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
 /**

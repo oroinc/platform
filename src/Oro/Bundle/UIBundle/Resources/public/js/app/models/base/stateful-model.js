@@ -9,6 +9,16 @@ define(function(require) {
     var HistoryStateModel = require('../history-state-model');
 
     StatefulModel = BaseModel.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function StatefulModel() {
+            StatefulModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             var historyOptions = {};
             StatefulModel.__super__.initialize.apply(this, arguments);

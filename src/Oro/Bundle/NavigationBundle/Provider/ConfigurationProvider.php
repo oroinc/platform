@@ -3,15 +3,12 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\NavigationBundle\DependencyInjection\Configuration;
-
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class ConfigurationProvider
 {

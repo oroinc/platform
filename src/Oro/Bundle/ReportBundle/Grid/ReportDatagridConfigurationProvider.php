@@ -3,15 +3,13 @@
 namespace Oro\Bundle\ReportBundle\Grid;
 
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {

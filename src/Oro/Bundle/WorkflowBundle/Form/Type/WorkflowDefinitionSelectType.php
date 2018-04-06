@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
@@ -9,10 +13,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class WorkflowDefinitionSelectType extends AbstractType
 {
@@ -43,7 +43,7 @@ class WorkflowDefinitionSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'class' => 'OroWorkflowBundle:WorkflowDefinition',
-                'property' => 'label'
+                'choice_label' => 'label'
             ]
         );
 
@@ -102,7 +102,7 @@ class WorkflowDefinitionSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'entity';
+        return EntityType::class;
     }
 
     /**

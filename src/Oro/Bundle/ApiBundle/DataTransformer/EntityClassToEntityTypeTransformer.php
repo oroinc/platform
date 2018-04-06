@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DataTransformer;
 
-use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
 
 class EntityClassToEntityTypeTransformer implements DataTransformerInterface
 {

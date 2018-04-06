@@ -1,5 +1,4 @@
-Oro ExpressionLanguage Component
-================================
+# Oro ExpressionLanguage Component
 
 Oro ExpressionLanguage extends [Symfony ExpressionLanguage Component](https://symfony.com/doc/current/components/expression_language/introduction.html) to introduce expressions that are easier to use and that can additionally handle the collections of items.
 
@@ -31,7 +30,7 @@ Finally, we valuate a boolean parameter: `product.enabled`; it should be *true* 
 1. In Oro ExpressionLanguage, `==` operator was removed and the `===` and `!==` operators were replaced with '=' (which stands for *identical*) and '!=' (which stands for *not identical*) respectively.
 2. Oro ExpressionLanguage component uses *\Oro\Component\PropertyAccess\PropertyAccessor* to access the object properties.
 3. `all` and `any` methods were added for arrays and *\Traversable* objects. A nested expression can act as an arguments for these methods, like in `product.units.any(unit = 'item')`. Note there are no quotes around the expression. 
-3. `sum` method was added for arrays and *\Traversable* objects. Example, `lineItems.sum(lineItems.price)`. 
+3. `sum` method was added for arrays and *\Traversable* objects. Example, `lineItems.sum(lineItem.price)`. 
 4. Oro ExpressionLanguage does not allow to call custom methods (other than `any` and `all`).
 
 Other features of Symfony ExpressionLanguage have been gracefully inherited.

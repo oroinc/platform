@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -16,6 +13,9 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * Prepares JSON.API request data to be processed by Symfony Forms.
@@ -49,16 +49,19 @@ class NormalizeRequestData implements ProcessorInterface
         /** @var FormContext|SingleItemContext $context */
 
         $requestData = $context->getRequestData();
-        if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // the request data are already normalized
-            return;
-        }
-
-        $this->context = $context;
-        try {
-            $context->setRequestData($this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata()));
-        } finally {
-            $this->context = null;
+        if ($context->hasIdentifierFields()) {
+            if (array_key_exists(JsonApiDoc::DATA, $requestData)) {
+                $this->context = $context;
+                try {
+                    $context->setRequestData(
+                        $this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata())
+                    );
+                } finally {
+                    $this->context = null;
+                }
+            }
+        } elseif (array_key_exists(JsonApiDoc::META, $requestData)) {
+            $context->setRequestData($requestData[JsonApiDoc::META]);
         }
     }
 

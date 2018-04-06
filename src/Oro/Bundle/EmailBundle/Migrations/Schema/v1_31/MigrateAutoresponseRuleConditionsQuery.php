@@ -5,12 +5,10 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_31;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Psr\Log\LoggerInterface;
 
 class MigrateAutoresponseRuleConditionsQuery implements MigrationQuery, ConnectionAwareInterface
 {

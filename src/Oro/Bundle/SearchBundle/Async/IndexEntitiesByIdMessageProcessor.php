@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Async;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\AbstractIndexer;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformerInterface;
@@ -14,6 +11,8 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class IndexEntitiesByIdMessageProcessor implements
     MessageProcessorInterface,

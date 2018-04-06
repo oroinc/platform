@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntitySelectType extends AbstractType
 {
@@ -79,7 +79,7 @@ class EntitySelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return OroJquerySelect2HiddenType::class;
     }
 
     /**

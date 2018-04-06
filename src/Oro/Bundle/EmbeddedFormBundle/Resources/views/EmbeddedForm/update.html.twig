@@ -75,27 +75,19 @@
             'formErrors': form_errors(form) ? form_errors(form) : null,
             'dataBlocks': dataBlocks
         } %}
+        {% set componentOptions = {
+            'view': 'oroembeddedform/js/embedded-form-watcher',
+            'formTypeFieldId': '#' ~ form.formType.vars.id ,
+            'cssFieldId': '#' ~ form.css.vars.id,
+            'successMessageFieldId': '#' ~ form.successMessage.vars.id,
+            'defaultCss': defaultCss,
+            'defaultSuccessMessage': defaultSuccessMessage,
+            'forceDataLoading': form.formType.vars.value is empty ? true : false
+        } %}
 
-        <script type="text/javascript">
-            require(['oroembeddedform/js/embedded-form-watcher'],
-                function (EmbeddedFormWatcher) {
-                    var forceDataLoading;
-
-                    {% if form.formType.vars.value is empty %}
-                        forceDataLoading = true;
-                    {% else %}
-                        forceDataLoading = false;
-                    {% endif %}
-                    new EmbeddedFormWatcher({
-                        formTypeFieldId: {{ form.formType.vars.id|json_encode|raw }},
-                        cssFieldId: {{ form.css.vars.id|json_encode|raw }},
-                        successMessageFieldId: {{ form.successMessage.vars.id|json_encode|raw  }},
-                        defaultCss: {{ defaultCss|json_encode|raw }},
-                        defaultSuccessMessage: {{ defaultSuccessMessage|json_encode|raw }}
-                    }).startWatching(forceDataLoading);
-                });
-        </script>
-
+        <div data-page-component-module="oroui/js/app/components/view-component"
+             data-page-component-options="{{ componentOptions|json_encode }}">
+        </div>
         {{ parent() }}
     {% else %}
         <div class="container-fluid">

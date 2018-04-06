@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ApiConfiguration implements ConfigurationInterface
 {

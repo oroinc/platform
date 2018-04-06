@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,7 +16,7 @@ class EmailType extends AbstractType
     {
         $builder->add(
             'email',
-            'email',
+            SymfonyEmailType::class,
             array(
                 'label' => 'oro.user.email.label',
                 'required' => false,

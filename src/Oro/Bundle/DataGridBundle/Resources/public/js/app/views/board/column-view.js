@@ -27,6 +27,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function ColumnView() {
+            ColumnView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.cardView = options.cardView;
             this.readonly = options.readonly;

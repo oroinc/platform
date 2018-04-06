@@ -3,13 +3,11 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\DependencyInjection\Container;
 
 class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 {

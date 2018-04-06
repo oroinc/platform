@@ -1,8 +1,10 @@
 # OroApiBundle
 
-This bundle facilitates creation of different kinds of data APIs. It provides the default implementation that can be reused and easily tailored for any entity.
+OroApiBundle enables the Web API development framework for the application data. It provides the ability to define API in the YAML configuration files regardless of standards or formats. Out-of-the-box, the bundle opens REST API that conforms the JSON API specification and enables CRUD operations support for the application ORM entities.
 
-To achieve this, this bundle is implemented based on the following components: 
+## Overview
+
+The implementation of the OroApiBundle based on the following components:
 
 * [ChainProcessor](../../Component/ChainProcessor/) - Organizes data processing flow. 
 * [EntitySerializer](../../Component/EntitySerializer/) - Provides the fast access to entities data.

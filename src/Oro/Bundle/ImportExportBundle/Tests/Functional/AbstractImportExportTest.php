@@ -30,11 +30,13 @@ abstract class AbstractImportExportTest extends WebTestCase
 
     /**
      * @param ImportExportConfigurationInterface $configuration
-     * @param string                             $expectedCsvFilePath
+     * @param string $expectedCsvFilePath
+     * @param array $skippedColumns
      */
     protected function assertExportTemplateWorks(
         ImportExportConfigurationInterface $configuration,
-        string $expectedCsvFilePath
+        string $expectedCsvFilePath,
+        array $skippedColumns = []
     ) {
         $this->client->request(
             'GET',
@@ -46,12 +48,11 @@ abstract class AbstractImportExportTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        static::assertContains(
-            $this->getFileContent($expectedCsvFilePath),
-            $this->client->getResponse()->getContent()
+        $this->assertExportFileData(
+            $expectedCsvFilePath,
+            $this->client->getRequest()->attributes->get('fileName'),
+            $skippedColumns
         );
-
-        $this->deleteImportExportFile($this->client->getRequest()->attributes->get('fileName'));
     }
 
     /**
@@ -88,27 +89,7 @@ abstract class AbstractImportExportTest extends WebTestCase
         $job = $this->findJob($jobId);
         $exportedFilename = $job->getData()['file'];
 
-        $exportFileContent = $this->getImportExportFileContent($exportedFilename);
-        $this->deleteImportExportFile($exportedFilename);
-
-        if (empty($skippedColumns)) {
-            static::assertContains(
-                $this->getFileContent($expectedCsvFilePath),
-                $exportFileContent
-            );
-        } else {
-            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
-            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
-            $this->removedIgnoredColumnsFromData(
-                $exportedData,
-                $skippedColumns
-            );
-
-            static::assertEquals(
-                $expectedData,
-                $exportedData
-            );
-        }
+        $this->assertExportFileData($expectedCsvFilePath, $exportedFilename, $skippedColumns);
     }
 
     /**
@@ -490,5 +471,35 @@ abstract class AbstractImportExportTest extends WebTestCase
     protected function deleteTmpFile(string $filename)
     {
         unlink(FileManager::generateTmpFilePath($filename));
+    }
+
+    /**
+     * @param string $expectedCsvFilePath
+     * @param string $exportedFilename
+     * @param array $skippedColumns
+     */
+    protected function assertExportFileData($expectedCsvFilePath, $exportedFilename, array $skippedColumns)
+    {
+        $exportFileContent = $this->getImportExportFileContent($exportedFilename);
+        $this->deleteImportExportFile($exportedFilename);
+
+        if (empty($skippedColumns)) {
+            static::assertContains(
+                $this->getFileContent($expectedCsvFilePath),
+                $exportFileContent
+            );
+        } else {
+            $expectedData = $this->getParsedDataFromCSVFile($expectedCsvFilePath);
+            $exportedData = $this->getParsedDataFromCSVContent($exportFileContent);
+            $this->removedIgnoredColumnsFromData(
+                $exportedData,
+                $skippedColumns
+            );
+
+            static::assertEquals(
+                $expectedData,
+                $exportedData
+            );
+        }
     }
 }

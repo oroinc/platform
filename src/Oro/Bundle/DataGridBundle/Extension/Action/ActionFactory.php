@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ActionFactory
 {

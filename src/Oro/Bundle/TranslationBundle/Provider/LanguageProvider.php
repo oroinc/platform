@@ -4,14 +4,12 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
-
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Intl\Intl;
 
 class LanguageProvider
 {

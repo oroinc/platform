@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Symfony\Component\EventDispatcher\Event;
 
 class WorkflowChangesEvent extends Event
 {

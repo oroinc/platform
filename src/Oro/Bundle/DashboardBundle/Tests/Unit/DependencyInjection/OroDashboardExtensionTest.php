@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DashboardBundle\DependencyInjection\OroDashboardExtension;
+use Oro\Component\Config\CumulativeResourceManager;
 
 class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
 {

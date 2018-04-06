@@ -2,11 +2,10 @@
 
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\ProcessorBagConfigProvider;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\HelpBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class HelpExtension extends \Twig_Extension
 {

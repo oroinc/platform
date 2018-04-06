@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 class DoctrineClearWriter implements ItemWriterInterface
 {

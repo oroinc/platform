@@ -5,8 +5,8 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
-use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 

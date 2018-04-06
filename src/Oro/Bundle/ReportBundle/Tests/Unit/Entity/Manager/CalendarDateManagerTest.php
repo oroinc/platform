@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;

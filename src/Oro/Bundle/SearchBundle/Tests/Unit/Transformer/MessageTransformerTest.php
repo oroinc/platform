@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Transformer;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 

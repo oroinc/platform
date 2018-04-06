@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
@@ -12,15 +15,13 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
-
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -34,24 +35,25 @@ class EnumValueTypeTest extends TypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->type = new EnumValueType($this->getConfigProvider());
+        parent::setUp();
     }
 
     protected function getExtensions()
     {
-        $validator = new Validator(
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
             new LazyLoadingMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new IdentityTranslator()
+            new ConstraintValidatorFactory()
         );
 
         return [
             new PreloadedExtension(
-                [],
                 [
-                    'form' => [
+                    EnumValueType::class => $this->type
+                ],
+                [
+                    FormType::class => [
                         new FormTypeValidatorExtension($validator)
                     ]
                 ]
@@ -68,7 +70,7 @@ class EnumValueTypeTest extends TypeTestCase
      */
     public function testSubmit(array $inputData, array $expectedData)
     {
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($inputData['form']);
 
         $this->assertEquals($expectedData['valid'], $form->isValid());
@@ -82,7 +84,7 @@ class EnumValueTypeTest extends TypeTestCase
             'priority'   => 1
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
@@ -119,7 +121,7 @@ class EnumValueTypeTest extends TypeTestCase
             'priority'   => 1
         ];
 
-        $form = $this->factory->create($this->type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
@@ -159,7 +161,7 @@ class EnumValueTypeTest extends TypeTestCase
         );
 
         $type = new EnumValueType($configProvider);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(EnumValueType::class);
         $form->setParent($this->getConfiguredForm());
 
         $form->submit($inputData['form']);
@@ -350,7 +352,7 @@ class EnumValueTypeTest extends TypeTestCase
     }
 
     /**
-     * @return Validator
+     * @return RecursiveValidator
      */
     protected function getValidator()
     {
@@ -363,10 +365,10 @@ class EnumValueTypeTest extends TypeTestCase
                 $this->loadMetadata($meta);
             }));
 
-        $validator = new Validator(
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory(new IdentityTranslator()),
             new LazyLoadingMetadataFactory($loader),
-            $this->getConstraintValidatorFactory(),
-            new IdentityTranslator()
+            $this->getConstraintValidatorFactory()
         );
 
         return $validator;

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider;
 
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class WidgetConfigurationFormProvider
 {

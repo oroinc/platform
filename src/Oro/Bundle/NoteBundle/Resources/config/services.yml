@@ -16,7 +16,7 @@ services:
         class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - %oro_note.entity.class%
+            - '%oro_note.entity.class%'
             - '@doctrine.orm.entity_manager'
 
     oro_note.activity_list.provider:

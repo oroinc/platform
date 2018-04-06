@@ -7,9 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 
 class ChoiceFieldHelperTest extends \PHPUnit_Framework_TestCase

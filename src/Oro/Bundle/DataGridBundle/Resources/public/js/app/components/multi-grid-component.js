@@ -23,8 +23,19 @@ define(function(require) {
          *      - grid_query: grid parameters
          */
         options: {},
+
         contextView: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MultiGridComponent() {
+            MultiGridComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options;
             this.initView();

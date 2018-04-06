@@ -5,11 +5,11 @@ namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 
 /**
  * Manages reminder persistence

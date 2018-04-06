@@ -4,9 +4,8 @@ namespace Oro\Bundle\NotificationBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 
 class RecipientListRepository extends EntityRepository
 {

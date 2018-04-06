@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tools;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
-
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {

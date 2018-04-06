@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
+use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
 use Symfony\Component\HttpFoundation\Request;
 
 class MarkReadMassAction extends AbstractMassAction

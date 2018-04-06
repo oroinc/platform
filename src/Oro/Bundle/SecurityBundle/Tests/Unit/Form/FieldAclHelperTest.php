@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form;
 
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
-use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
+use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class FieldAclHelperTest extends FormIntegrationTestCase
 {
@@ -306,7 +306,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
 
     public function testAddFieldModificationDeniedFormErrorToFieldWithoutExistingErrors()
     {
-        $form = $this->factory->create('form', new CmsAddress(), ['data_class' => CmsAddress::class]);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), ['data_class' => CmsAddress::class]);
         $form->add('city');
 
         $this->fieldAclHelper->addFieldModificationDeniedFormError($form->get('city'));
@@ -326,7 +326,7 @@ class FieldAclHelperTest extends FormIntegrationTestCase
 
     public function testAddFieldModificationDeniedFormErrorToFieldWithExistingErrors()
     {
-        $form = $this->factory->create('form', new CmsAddress(), ['data_class' => CmsAddress::class]);
+        $form = $this->factory->create(FormType::class, new CmsAddress(), ['data_class' => CmsAddress::class]);
         $form->add('city')->addError(new FormError('city error'));
 
         $this->fieldAclHelper->addFieldModificationDeniedFormError($form->get('city'));

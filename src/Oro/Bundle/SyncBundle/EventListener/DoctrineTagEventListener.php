@@ -5,7 +5,6 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\SyncBundle\Content\TopicSender;
 
 class DoctrineTagEventListener

@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type;
 
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Util\BlockUtils;
-
-use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 
 abstract class AbstractFormType extends AbstractType
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 
+use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

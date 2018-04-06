@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
@@ -90,8 +92,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
             ->with(self::TEST_ENTITY)
             ->will($this->returnValue($this->repository));
 
-        parent::setUp();
-
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -107,13 +107,20 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
             );
 
         $this->formType = new OroEntityCreateOrSelectType($this->doctrineHelper);
+        parent::setUp();
     }
 
     protected function getExtensions()
     {
-        return array(
+        return [
+            new PreloadedExtension(
+                [
+                    OroEntityCreateOrSelectType::class => $this->formType
+                ],
+                []
+            ),
             new EntityCreateSelectFormExtension($this->managerRegistry)
-        );
+        ];
     }
 
     protected function tearDown()
@@ -143,7 +150,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         array $expectedOptions,
         array $expectedViewVars = array()
     ) {
-        $form = $this->factory->create($this->formType, $inputEntity, $inputOptions);
+        $form = $this->factory->create(OroEntityCreateOrSelectType::class, $inputEntity, $inputOptions);
         foreach ($expectedOptions as $name => $expectedValue) {
             $this->assertTrue($form->getConfig()->hasOption($name));
             $this->assertEquals($expectedValue, $form->getConfig()->getOption($name));
@@ -172,7 +179,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedEntity' => null,
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
-                    'create_entity_form_type' => 'text',
+                    'create_entity_form_type' => TextType::class,
                     'grid_name' => 'test-grid-name',
                     'view_widgets' => array(
                         array(
@@ -183,7 +190,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                    'create_entity_form_type' => 'text',
+                    'create_entity_form_type' => TextType::class,
                     'create_entity_form_options' => array(),
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
@@ -219,7 +226,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedEntity' => null,
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
-                    'create_entity_form_type' => 'text',
+                    'create_entity_form_type' => TextType::class,
                     'grid_name' => 'test-grid-name',
                     'view_widgets' => array(
                         array(
@@ -231,7 +238,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                     'data_class' => null,
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                    'create_entity_form_type' => 'text',
+                    'create_entity_form_type' => TextType::class,
                     'create_entity_form_options' => array(),
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
@@ -270,7 +277,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedEntity' => new TestEntity(),
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'create_entity_form_options' => array(
                         'test_option' => 'default_value'
                     ),
@@ -284,7 +291,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'create_entity_form_options' => array(
                         'test_option' => 'default_value'
                     ),
@@ -325,7 +332,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'key',
                     'view_widgets' => array(
@@ -337,7 +344,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'create_entity_form_options' => array(),
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'key',
@@ -376,7 +383,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedEntity' => new TestEntity(1),
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'grid_name' => 'test-grid-name',
                     'view_widgets' => array(
                         array(
@@ -389,7 +396,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                 'expectedOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                    'create_entity_form_type' => 'test_entity',
+                    'create_entity_form_type' => TestEntityType::class,
                     'create_entity_form_options' => array(),
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
@@ -433,7 +440,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
-        $this->factory->create($this->formType, null, $options);
+        $this->factory->create(OroEntityCreateOrSelectType::class, null, $options);
     }
 
     /**

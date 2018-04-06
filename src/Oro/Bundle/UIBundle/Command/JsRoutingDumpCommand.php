@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UIBundle\Command;
 
 use FOS\JsRoutingBundle\Command\DumpCommand;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

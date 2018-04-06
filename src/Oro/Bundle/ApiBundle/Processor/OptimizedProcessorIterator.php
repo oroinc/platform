@@ -80,7 +80,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
             $this->processors[$this->index][1]
         );
 
-        return $applicable !== ApplicableCheckerInterface::NOT_APPLICABLE;
+        return ApplicableCheckerInterface::NOT_APPLICABLE !== $applicable;
     }
 
     /**
@@ -91,7 +91,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
     protected function processSkippedGroups($skippedGroups)
     {
         $index = $this->index + 1;
-        while ($index <= $this->maxIndex && in_array($this->getGroupByIndex($index), $skippedGroups, true)) {
+        while ($index <= $this->maxIndex && \in_array($this->getGroupByIndex($index), $skippedGroups, true)) {
             $index++;
         }
         $this->index = $index - 1;
@@ -169,9 +169,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
      */
     protected function getGroupByIndex($index)
     {
-        return isset($this->processors[$index][1]['group'])
-            ? $this->processors[$index][1]['group']
-            : null;
+        return $this->processors[$index][1]['group'] ?? null;
     }
 
     /**

@@ -25,10 +25,10 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - oro_business_unit_form
-            - oro_business_unit
+            - Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
 
     oro_organization.form.type.business_unit:
-        class: %oro_organization.form.type.business_unit.class%
+        class: '%oro_organization.form.type.business_unit.class%'
         arguments:
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
@@ -36,7 +36,7 @@ services:
             - { name: form.type, alias: oro_business_unit }
 
     oro_organization.form.type.business_unit.api:
-        class: %oro_organization.form.type.business_unit.api.class%
+        class: '%oro_organization.form.type.business_unit.api.class%'
         arguments:
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
@@ -44,38 +44,38 @@ services:
             - { name: form.type, alias: business_unit }
 
     oro_organization.form.handler.business_unit:
-        class: %oro_organization.form.handler.business_unit.class%
+        class: '%oro_organization.form.handler.business_unit.class%'
         arguments:
             - '@oro_organization.form.business_unit'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.business_unit_tree_type:
-        class: %oro_organization.form.type.business_unit_tree_type.class%
+        class: '%oro_organization.form.type.business_unit_tree_type.class%'
         arguments:
             - '@oro_organization.business_unit_manager'
         tags:
             - { name: form.type, alias: oro_business_unit_tree }
 
     oro_organization.form.type.business_unit_tree_select_type:
-        class: %oro_organization.form.type.business_unit_tree_select_type.class%
+        class: '%oro_organization.form.type.business_unit_tree_select_type.class%'
         tags:
             - { name: form.type, alias: oro_business_unit_tree_select }
 
     oro_organization.form.business_unit.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["business_unit", "business_unit", null]
+        arguments: ["business_unit", Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType, null]
 
     oro_organization.form.handler.business_unit.api:
-        class: %oro_organization.form.handler.business_unit.class%
+        class: '%oro_organization.form.handler.business_unit.class%'
         arguments:
             - '@oro_organization.form.business_unit.api'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.businesS_unit_select:
-        class: %oro_organization.form.type.business_unit_select.class%
+        class: '%oro_organization.form.type.business_unit_select.class%'
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
@@ -86,7 +86,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete
         arguments:
             - '@doctrine.orm.entity_manager'
-            - %oro_organization.business_unit.entity.class%
+            - '%oro_organization.business_unit.entity.class%'
             - '@oro_organization.business_unit_manager'
         tags:
             - { name: form.type, alias: "oro_type_business_unit_select_autocomplete" }
@@ -95,7 +95,7 @@ services:
     # Organization
     #
     oro_organization.form.type.organization:
-        class: %oro_organization.form.type.organization.class%
+        class: '%oro_organization.form.type.organization.class%'
         arguments:
             - '@oro_security.token_accessor'
         tags:
@@ -106,22 +106,22 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - 'oro_organization_form'
-            - 'oro_organization'
+            - Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
 
     oro_organization.form.handler.organization:
-        class: %oro_organization.form.handler.organization.class%
+        class: '%oro_organization.form.handler.organization.class%'
         arguments:
             - '@oro_organization.form.organization'
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
     oro_organization.form.type.organization_select:
-        class: %oro_organization.form.type.organization_select.class%
+        class: '%oro_organization.form.type.organization_select.class%'
         tags:
             - { name: form.type, alias: oro_organization_select }
 
     oro_organization.form.type.organizations_select:
-        class: %oro_organization.form.type.organizations_select.class%
+        class: '%oro_organization.form.type.organizations_select.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_organization.business_unit_manager'
@@ -132,7 +132,7 @@ services:
     # Ownership
     #
     oro_organization.form.extension.owner:
-        class: %oro_organization.form.extension.owner.class%
+        class: '%oro_organization.form.extension.owner.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
@@ -148,7 +148,7 @@ services:
     # Organizations
     #
     oro_organization.form.extension.organization:
-        class: %oro_organization.form.extension.organization.class%
+        class: '%oro_organization.form.extension.organization.class%'
         arguments:
             - '@doctrine'
             - '@oro_security.token_accessor'
@@ -159,7 +159,7 @@ services:
     # Listeners
     #
     oro_organization.form.listener:
-        class: %oro_organization.form.listener.class%
+        class: '%oro_organization.form.listener.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
@@ -170,7 +170,7 @@ services:
     oro_organization.autocomplete.organization.search_handler:
         parent: oro_form.autocomplete.search_handler
         arguments:
-            - %oro_organization.organization.entity.class%
+            - '%oro_organization.organization.entity.class%'
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization, acl_resource: oro_organization_view }

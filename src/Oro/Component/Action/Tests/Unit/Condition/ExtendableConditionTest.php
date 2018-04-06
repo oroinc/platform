@@ -2,15 +2,14 @@
 
 namespace Oro\Component\Action\Tests\Unit\Condition;
 
+use Oro\Component\Action\Condition\ExtendableCondition;
+use Oro\Component\Action\Event\ExtendableConditionEvent;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Component\Action\Event\ExtendableConditionEvent;
-use Oro\Component\Action\Condition\ExtendableCondition;
-use Oro\Component\ConfigExpression\ContextAccessor;
 
 class ExtendableConditionTest extends \PHPUnit_Framework_TestCase
 {

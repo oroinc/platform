@@ -3,10 +3,8 @@
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
 /**

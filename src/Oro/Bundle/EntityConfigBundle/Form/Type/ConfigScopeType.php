@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -17,37 +17,25 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
  */
 class ConfigScopeType extends AbstractType
 {
-    /** @var array */
-    protected $items;
-
     /** @var ConfigInterface */
-    protected $config;
+    private $config;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var ConfigModel */
-    protected $configModel;
-
-    /** @var array */
-    protected $jsRequireOptions;
+    private $configModel;
 
     /**
-     * @param array             $items
-     * @param ConfigInterface   $config
-     * @param ConfigManager     $configManager
-     * @param ConfigModel       $configModel
+     * {@inheritdoc}
      */
-    public function __construct(
-        $items,
-        ConfigInterface $config,
-        ConfigManager $configManager,
-        ConfigModel $configModel
-    ) {
-        $this->items         = $items;
-        $this->config        = $config;
-        $this->configModel   = $configModel;
-        $this->configManager = $configManager;
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired(['items', 'config', 'config_model', 'config_manager']);
+        $resolver->setAllowedTypes('items', 'array');
+        $resolver->setAllowedTypes('config', ConfigInterface::class);
+        $resolver->setAllowedTypes('config_model', ConfigModel::class);
+        $resolver->setAllowedTypes('config_manager', ConfigManager::class);
     }
 
     /**
@@ -55,7 +43,11 @@ class ConfigScopeType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($this->items as $code => $config) {
+        $this->config = $options['config'];
+        $this->configModel = $options['config_model'];
+        $this->configManager = $options['config_manager'];
+
+        foreach ($options['items'] as $code => $config) {
             if (isset($config['form']['type'])) {
                 $options = isset($config['form']['options']) ? $config['form']['options'] : array();
 

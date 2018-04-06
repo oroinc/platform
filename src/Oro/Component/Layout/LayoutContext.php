@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LayoutContext implements ContextInterface

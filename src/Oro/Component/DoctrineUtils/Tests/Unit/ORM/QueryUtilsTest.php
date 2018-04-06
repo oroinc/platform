@@ -8,10 +8,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class QueryUtilsTest extends OrmTestCase
 {

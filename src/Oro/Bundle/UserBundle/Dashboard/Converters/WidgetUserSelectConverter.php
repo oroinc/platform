@@ -3,10 +3,9 @@
 namespace Oro\Bundle\UserBundle\Dashboard\Converters;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;

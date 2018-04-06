@@ -2,12 +2,11 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Component\ConfigExpression\Func;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\Yaml\Yaml;
 
 class EvaluateExpressionTest extends \PHPUnit_Framework_TestCase
 {

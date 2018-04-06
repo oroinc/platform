@@ -5,6 +5,13 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     FlowchartJsPlumbBaseView = BaseView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartJsPlumbBaseView() {
+            FlowchartJsPlumbBaseView.__super__.constructor.apply(this, arguments);
+        },
+
         id: function() {
             return 'jsplumb-' + this.cid;
         },

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\EventListener;
 
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
-
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
 class KeepAliveListener

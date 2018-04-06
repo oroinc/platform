@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
 use Doctrine\Common\Collections\Criteria;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;

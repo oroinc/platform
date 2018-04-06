@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Psr\Log\LoggerAwareInterface;
-
 use Guzzle\Http\Message\Response;
+use Psr\Log\LoggerAwareInterface;
 
 interface APIAdapterInterface extends LoggerAwareInterface
 {

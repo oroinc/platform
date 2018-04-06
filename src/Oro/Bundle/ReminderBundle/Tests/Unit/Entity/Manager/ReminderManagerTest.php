@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Collection;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;

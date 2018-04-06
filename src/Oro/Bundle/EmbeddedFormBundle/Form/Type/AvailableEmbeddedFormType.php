@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AvailableEmbeddedFormType extends AbstractType
@@ -54,6 +55,6 @@ class AvailableEmbeddedFormType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

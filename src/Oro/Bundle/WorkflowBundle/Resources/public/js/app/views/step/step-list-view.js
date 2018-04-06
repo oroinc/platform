@@ -14,6 +14,16 @@ define(function(require) {
             workflow: null
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function StepsListView() {
+            StepsListView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-list-template').html();

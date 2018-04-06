@@ -9,7 +9,6 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class AddActivityTargetTest extends \PHPUnit_Framework_TestCase

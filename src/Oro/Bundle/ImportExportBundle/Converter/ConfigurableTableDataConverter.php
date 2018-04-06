@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
-use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * ConfigurableTableDataConverter is a class that is responsible for the data conversion
+ *
  * @SuppressWarnings(PHPMD.NPathComplexity)
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -128,6 +129,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         if ($this->headerConversionRules === null) {
             $this->assertEntityName();
+            if ($this->translateUsingLocale && $this->configManager) {
+                $this->fieldHelper->setLocale($this->configManager->get('oro_locale.language'));
+            }
 
             $headerConversionRules = $this->getEntityRules(
                 $this->entityName,
@@ -511,7 +515,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         $fieldHeader = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'header', $field['label']);
 
-        return $fieldHeader;
+        return $fieldHeader ?: $field['label'];
     }
 
     /**

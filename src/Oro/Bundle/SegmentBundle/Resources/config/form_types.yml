@@ -5,7 +5,7 @@ parameters:
 
 services:
     oro_segment.form.type.segment:
-        class: %oro_segment.form.type.segment.class%
+        class: '%oro_segment.form.type.segment.class%'
         tags:
             - { name: form.type, alias: oro_segment }
 
@@ -30,10 +30,10 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - "oro_segment_form"
-            - "oro_segment"
+            - Oro\Bundle\SegmentBundle\Form\Type\SegmentType
 
     oro_segment.form.handler.segment:
-        class: %oro_segment.form.handler.segment.class%
+        class: '%oro_segment.form.handler.segment.class%'
         arguments:
             - '@oro_segment.form.segment'
             - '@request_stack'
@@ -41,7 +41,7 @@ services:
             - '@oro_segment.static_segment_manager'
 
     oro_segment.form.type.entity_choice:
-        class: %oro_segment.form.type.entity_choice.class%
+        class: '%oro_segment.form.type.entity_choice.class%'
         arguments:
             - '@oro_segment.entity_provider'
         tags:

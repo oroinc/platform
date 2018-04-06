@@ -10,7 +10,6 @@ namespace Oro\Bundle\EmailBundle\Mime;
 use \Zend\Mime\Decode as BaseDecode;
 use \Zend\Mime\Mime;
 use \Zend\Stdlib\ErrorHandler;
-
 use Oro\Bundle\EmailBundle\Mail\Headers;
 
 class Decode extends BaseDecode
@@ -44,13 +43,13 @@ class Decode extends BaseDecode
         // default is set new line
         if (strpos($message, $EOL . $EOL)) {
             list($headers, $body) = explode($EOL . $EOL, $message, 2);
-            // next is the standard new line
+        // next is the standard new line
         } elseif ($EOL != "\r\n" && strpos($message, "\r\n\r\n")) {
             list($headers, $body) = explode("\r\n\r\n", $message, 2);
-            // next is the other "standard" new line
+        // next is the other "standard" new line
         } elseif ($EOL != "\n" && strpos($message, "\n\n")) {
             list($headers, $body) = explode("\n\n", $message, 2);
-            // at last resort find anything that looks like a new line
+        // at last resort find anything that looks like a new line
         } else {
             ErrorHandler::start(E_NOTICE|E_WARNING);
             list($headers, $body) = preg_split("%([\r\n]+)\\1%U", $message, 2);

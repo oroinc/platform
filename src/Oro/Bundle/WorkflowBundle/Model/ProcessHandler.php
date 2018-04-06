@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessEvents;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ProcessHandler
 {

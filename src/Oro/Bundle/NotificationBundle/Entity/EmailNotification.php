@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\NotificationBundle\Model\ExtendEmailNotification;
 
 /**

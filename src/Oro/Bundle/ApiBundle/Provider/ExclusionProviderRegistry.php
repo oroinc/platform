@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the exclusion provider for a specific request type.
@@ -56,7 +55,7 @@ class ExclusionProviderRegistry
         }
 
         $exclusionProviderServiceId = null;
-        foreach ($this->exclusionProviders as [$serviceId, $expression]) {
+        foreach ($this->exclusionProviders as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $exclusionProviderServiceId = $serviceId;
                 break;

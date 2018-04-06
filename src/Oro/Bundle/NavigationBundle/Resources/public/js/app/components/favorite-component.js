@@ -12,6 +12,16 @@ define([
     FavoriteComponent = BaseBookmarkComponent.extend({
         typeName: 'favorite',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FavoriteComponent() {
+            FavoriteComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         _createSubViews: function() {
             this._createButtonView();
             this._createTabView();
@@ -42,7 +52,7 @@ define([
         _createTabView: function() {
             var options = this._options.tabOptions || {};
             var collection = this.collection;
-            var TabItemView = ItemView.extend({
+            var TabItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
                 template: this._options.tabItemTemplate
             });
 

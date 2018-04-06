@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_2;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
 {

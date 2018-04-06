@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
+use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
 
 class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +31,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'message',
-                'oro_resizeable_rich_text',
+                OroResizeableRichTextType::class,
                 [
                     'required' => true,
                     'label'    => 'oro.comment.message.label',
@@ -46,7 +47,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'attachment',
-                'oro_image',
+                ImageType::class,
                 ['label' => 'oro.comment.attachment.label', 'required' => false]
             )
             ->will($this->returnSelf());
@@ -70,7 +71,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with([
                 'data_class'      => Comment::ENTITY_NAME,
-                'intention'       => 'comment',
+                'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]);
 
@@ -81,6 +82,6 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
     public function testReturnFormName()
     {
         $formType = new CommentTypeApi($this->configManager);
-        $this->assertEquals(CommentTypeApi::FORM_NAME, $formType->getName());
+        $this->assertEquals('oro_comment_api', $formType->getName());
     }
 }

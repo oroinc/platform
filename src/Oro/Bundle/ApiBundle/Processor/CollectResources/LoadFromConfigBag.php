@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads resources for all entities configured in "Resources/config/oro/api.yml".

@@ -2,7 +2,7 @@ system_configuration:
     fields:
         some_field:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             options: []
 
     groups:

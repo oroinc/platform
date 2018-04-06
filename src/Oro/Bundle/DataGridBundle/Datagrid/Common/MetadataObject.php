@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
-use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Component\Config\Common\ConfigObject;
 
 class MetadataObject extends ConfigObject
 {

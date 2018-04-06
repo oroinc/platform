@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
 {

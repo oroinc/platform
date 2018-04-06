@@ -49,10 +49,10 @@ services:
     oro_integration.form.channel:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_integration_channel_form", "oro_integration_channel_form", null]
+        arguments: ["oro_integration_channel_form", Oro\Bundle\IntegrationBundle\Form\Type\ChannelType, null]
 
     oro_integration.form.type.channel:
-        class: %oro_integration.form.type.channel.class%
+        class: '%oro_integration.form.type.channel.class%'
         arguments:
             - '@oro_integration.form.subscriber.default_owner_subscriber'
             - '@oro_integration.form.subscriber.channel_subscriber'
@@ -60,7 +60,7 @@ services:
             - { name: form.type, alias: oro_integration_channel_form }
 
     oro_integration.form.type.oro_integration_type_select:
-        class: %oro_integration.form.type.oro_integration_type_select.class%
+        class: '%oro_integration.form.type.oro_integration_type_select.class%'
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@assets.packages'
@@ -68,29 +68,30 @@ services:
             - { name: form.type, alias: oro_integration_type_select }
 
     oro_integration.form.type.oro_integration_select:
-        class: %oro_integration.form.type.oro_integration_select.class%
+        class: '%oro_integration.form.type.oro_integration_select.class%'
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_integration.manager.types_registry'
             - '@assets.packages'
             - '@oro_security.acl_helper'
+            - '@form.choice_list_factory.default'
         tags:
             - { name: form.type, alias: oro_integration_select }
 
     oro_integration.form.subscriber.channel_subscriber:
-        class: %oro_integration.form.subscriber.channel_subscriber.class%
+        class: '%oro_integration.form.subscriber.channel_subscriber.class%'
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@oro_integration.provider.settings_provider'
 
     oro_integration.form.subscriber.default_owner_subscriber:
-        class: %oro_integration.form.subscriber.default_owner_subscriber.class%
+        class: '%oro_integration.form.subscriber.default_owner_subscriber.class%'
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_integration.manager.types_registry'
 
     oro_integration.form.handler.integration:
-        class: %oro_integration.form.handler.integration.class%
+        class: '%oro_integration.form.handler.integration.class%'
         arguments:
             - '@request_stack'
             - '@oro_integration.form.channel'
@@ -98,16 +99,16 @@ services:
             - '@event_dispatcher'
 
     oro_integration.manager.types_registry:
-        class: %oro_integration.manager.types_registry.class%
+        class: '%oro_integration.manager.types_registry.class%'
         arguments:
             - []
         lazy: true
 
     oro_integration.manager.fields_changes:
-        class: %oro_integration.manager.fields_changes.class%
+        class: '%oro_integration.manager.fields_changes.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
-            - %oro_integration.fields_changes.class%
+            - '%oro_integration.fields_changes.class%'
 
     oro_integration.manager.types_registry.link:
         tags:
@@ -115,7 +116,7 @@ services:
 
     # Import/export utils
     oro_integration.job_executor:
-        class: %oro_integration.job_executor.class%
+        class: '%oro_integration.job_executor.class%'
         arguments:
             - '@akeneo_batch.connectors'
             - '@akeneo_batch.job_repository'
@@ -125,7 +126,7 @@ services:
         lazy: true
 
     oro_integration.writer.persistent_batch_writer:
-        class: %oro_integration.writer.persistent_batch_writer.class%
+        class: '%oro_integration.writer.persistent_batch_writer.class%'
         arguments:
             - '@doctrine'
             - '@event_dispatcher'
@@ -133,18 +134,18 @@ services:
             - '@oro_integration.logger.strategy'
 
     oro_integration.reader.entity.by_id:
-        class: %oro_integration.reader.entity.by_id.class%
+        class: '%oro_integration.reader.entity.by_id.class%'
         parent: oro_importexport.reader.entity
 
     oro_integration.helper.default_owner_helper:
-        class: %oro_integration.helper.default_owner_helper.class%
+        class: '%oro_integration.helper.default_owner_helper.class%'
         arguments:
             - '@doctrine'
             - '@oro_security.owner.ownership_metadata_provider'
 
     # sync processor
     oro_integration.sync.processor:
-        class: %oro_integration.sync.processor.class%
+        class: '%oro_integration.sync.processor.class%'
         arguments:
           - '@doctrine'
           - '@oro_importexport.processor.registry'
@@ -155,26 +156,26 @@ services:
         lazy: true
 
     oro_integration.importexport.processor.import:
-        class: %oro_integration.importexport.processor.import.class%
+        class: '%oro_integration.importexport.processor.import.class%'
         parent: oro_importexport.processor.import_abstract
         abstract: true
         calls:
             - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.importexport.processor.export:
-        class: %oro_integration.importexport.processor.export.class%
+        class: '%oro_integration.importexport.processor.export.class%'
         parent: oro_importexport.processor.export_abstract
         abstract: true
         calls:
             - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.processor_registry:
-        class: %oro_integration.processor_registry.class%
+        class: '%oro_integration.processor_registry.class%'
         calls:
             - [setDefaultProcessor, ['@oro_integration.sync.processor']]
 
     oro_integration.provider.connector_context_mediator:
-        class: %oro_integration.provider.connector_context_mediator.class%
+        class: '%oro_integration.provider.connector_context_mediator.class%'
         arguments:
             - '@oro_integration.manager.types_registry.link'
             - '@doctrine'
@@ -182,16 +183,16 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_integration.logger.strategy:
-        class: %oro_integration.logger.strategy.class%
+        class: '%oro_integration.logger.strategy.class%'
         calls:
-            - [setDebug, [%kernel.debug%]]
+            - [setDebug, ['%kernel.debug%']]
 
     oro_integration.delete_manager:
-        class: %oro_integration.delete_manager.class%
+        class: '%oro_integration.delete_manager.class%'
         arguments: [ '@doctrine.orm.entity_manager' ]
 
     oro_integration.sync_scheduler:
-        class: %oro_integration.sync_scheduler.class%
+        class: '%oro_integration.sync_scheduler.class%'
         arguments:
             - '@oro_message_queue.message_producer'
 
@@ -216,23 +217,23 @@ services:
             - { name: oro_service_link,  service: oro_integration.sync_scheduler }
 
     oro_integration.provider.settings_provider:
-        class: %oro_integration.provider.settings_provider.class%
+        class: '%oro_integration.provider.settings_provider.class%'
         arguments:
             - []
             - '@oro_integration.config_resolver'
 
     oro_integration.config_resolver:
-        class: %oro_integration.config_resolver.class%
+        class: '%oro_integration.config_resolver.class%'
         arguments:
             - '@service_container'
 
     oro_integration.utils.form_utils:
-        class: %oro_integration.utils.form_utils.class%
+        class: '%oro_integration.utils.form_utils.class%'
         arguments:
             - '@oro_integration.manager.types_registry'
 
     oro_integration.datagrid.status_grid_helper:
-        class: %oro_integration.datagrid.status_grid_helper.class%
+        class: '%oro_integration.datagrid.status_grid_helper.class%'
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@translator'
@@ -241,14 +242,14 @@ services:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.oro-integration-status-grid, method: statusGridBuildAfter }
 
     oro_integration.event_listener.keep_avile:
-        class: %oro_integration.event_listener.keep_avile.class%
+        class: '%oro_integration.event_listener.keep_avile.class%'
         arguments:
             - '@akeneo_batch.job_repository'
         tags:
             - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 
     oro_integration.workflow.condition.has_active_integration:
-        class: %oro_integration.workflow.condition.has_active_integration.class%
+        class: '%oro_integration.workflow.condition.has_active_integration.class%'
         arguments:
             - '@doctrine'
         tags:
@@ -262,19 +263,19 @@ services:
             - [setFieldsChangesManager, ['@oro_integration.manager.fields_changes']]
 
     oro_integration.action.save_fields_changes:
-        class: %oro_integration.action.save_fields_changes.class%
+        class: '%oro_integration.action.save_fields_changes.class%'
         parent: oro_integration.action.abstract_fields_changes
         tags:
             - { name: oro_action.action, alias: save_fields_changes }
 
     oro_integration.action.remove_fields_changes:
-        class: %oro_integration.action.remove_fields_changes.class%
+        class: '%oro_integration.action.remove_fields_changes.class%'
         parent: oro_integration.action.abstract_fields_changes
         tags:
             - { name: oro_action.action, alias: remove_fields_changes }
 
     oro_integration.workflow.action.populate_integration_owner:
-        class: %oro_integration.workflow.action.populate_integration_owner.class%
+        class: '%oro_integration.workflow.action.populate_integration_owner.class%'
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_integration.helper.default_owner_helper'

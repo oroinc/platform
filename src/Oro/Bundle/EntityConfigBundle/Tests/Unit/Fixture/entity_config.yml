@@ -21,7 +21,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
 
@@ -60,7 +60,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
 
@@ -79,7 +79,7 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          datagrid
                             label:          "Datagrid search"
 
@@ -98,6 +98,6 @@ entity_config:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
-                            empty_value:    false
+                            placeholder:    false
                             block:          datagrid
                             label:          "Datagrid filter"

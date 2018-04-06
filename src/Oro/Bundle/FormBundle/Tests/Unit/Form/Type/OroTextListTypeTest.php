@@ -2,43 +2,28 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroTextListType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTextListTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroTextListType */
-    protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->formType = new OroTextListType();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->formType);
-    }
-
     public function testGetName()
     {
-        $this->assertEquals('oro_textlist', $this->formType->getName());
+        $formType = new OroTextListType();
+        $this->assertEquals('oro_textlist', $formType->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('text', $this->formType->getParent());
+        $formType = new OroTextListType();
+        $this->assertEquals(TextType::class, $formType->getParent());
     }
 
     public function testBuildForm()
     {
         // test empty default data
-        $form = $this->factory->create($this->formType, [], []);
+        $form = $this->factory->create(OroTextListType::class, [], []);
         $form->submit([]);
 
         $view = $form->createView();
@@ -49,7 +34,7 @@ class OroTextListTypeTest extends FormIntegrationTestCase
         }
 
         // test model converter
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(OroTextListType::class);
         $form->submit('test,one');
         $this->assertEquals(['test', 'one'], $form->getData());
     }

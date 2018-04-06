@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Handler;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 
 class DeleteHandler
 {

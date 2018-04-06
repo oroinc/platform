@@ -64,6 +64,6 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EnumFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EnumFilterType::class, $this->type->getParent());
     }
 }

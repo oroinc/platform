@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Serializer;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;

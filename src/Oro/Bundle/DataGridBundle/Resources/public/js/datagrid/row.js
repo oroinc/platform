@@ -27,7 +27,9 @@ define([
      */
     Row = Chaplin.CollectionView.extend({
         tagName: 'tr',
+
         autoRender: false,
+
         animationDuration: 0,
 
         /**
@@ -35,6 +37,7 @@ define([
          * This code supports perfomance fix.
          */
         delegateEvents: Backbone.View.prototype.delegateEvents,
+
         events: function() {
             var resultEvents = {};
 
@@ -73,6 +76,13 @@ define([
         /**
          * @inheritDoc
          */
+        constructor: function Row() {
+            Row.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
@@ -86,6 +96,9 @@ define([
                     cellOptions.model = _this.model;
                     var Cell = column.get('cell');
                     var cell = new Cell(cellOptions);
+                    cell.$el.attr({
+                        'data-column-label': column.get('label')
+                    });
                     if (column.has('align')) {
                         cell.$el.removeClass('align-left align-center align-right');
                         cell.$el.addClass('align-' + column.get('align'));

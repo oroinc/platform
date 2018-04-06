@@ -3,16 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
-
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityIdentifierTypeTest extends FormIntegrationTestCase
 {
@@ -38,13 +33,25 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $this->type = $this->getMockBuilder('Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType')
             ->setMethods(array('createEntitiesToIdsTransformer'))
             ->setConstructorArgs(array($this->getMockManagerRegistry()))
             ->getMock();
         $this->type->expects($this->any())->method('createEntitiesToIdsTransformer')
             ->will($this->returnValue($this->getMockEntitiesToIdsTransformer()));
+        parent::setUp();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension([
+                EntityIdentifierType::class => $this->type
+            ], [])
+        ];
     }
 
     /**
@@ -78,7 +85,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
             $this->addMockExpectedCalls($key, $calls);
         }
 
-        $form = $this->factory->create($this->getTestFormType(), null, $options);
+        $form = $this->factory->create(EntityIdentifierType::class, null, $options);
 
         $form->submit($bindData);
 
@@ -209,7 +216,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
 
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->factory->create($this->getTestFormType(), null, $options);
+        $this->factory->create(EntityIdentifierType::class, null, $options);
     }
 
     /**

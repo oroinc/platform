@@ -9,6 +9,7 @@ config:
             exports: 'Select2'
         'bootstrap-popover':
             deps:
+                - 'jquery'
                 - 'bootstrap-tooltip'
         'jquery.datepair':
             deps:
@@ -44,9 +45,6 @@ config:
             deps:
                 - 'jquery'
         'bootstrap-modal':
-            deps:
-                - 'jquery'
-        'bootstrap-popover':
             deps:
                 - 'jquery'
         'bootstrap-scrollspy':
@@ -148,11 +146,6 @@ config:
         'jquery.datepair': 'bundles/bowerassets/datepair/dist/jquery.datepair.js'
         'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
-        'cryptojs/enc-base64': 'bundles/bowerassets/crypto-js/enc-base64.js'
-        'cryptojs/pbkdf2': 'bundles/bowerassets/crypto-js/pbkdf2.js'
-        'cryptojs/hmac-sha256': 'bundles/bowerassets/crypto-js/hmac-sha256.js'
-        'cryptojs/sha1': 'bundles/bowerassets/crypto-js/sha1.js'
-        'cryptojs/hmac': 'bundles/bowerassets/crypto-js/hmac.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
@@ -217,10 +210,15 @@ config:
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
 
+        'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
+
         #layouts only
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
         'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
+        'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/layout-module
@@ -230,6 +228,7 @@ config:
         - oroui/js/app/modules/input-widgets
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
+        - oroui/js/app/modules/swipe-actions-module
 
         #layouts only
         - oroui/blank/js/app/modules/views-module

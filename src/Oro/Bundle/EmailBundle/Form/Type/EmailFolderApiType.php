@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class EmailFolderApiType extends AbstractType
 {
@@ -18,7 +20,7 @@ class EmailFolderApiType extends AbstractType
         $builder
             ->add(
                 'origin',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 [
                     'required' => false,
                     'class'    => 'OroEmailBundle:EmailOrigin',
@@ -27,7 +29,7 @@ class EmailFolderApiType extends AbstractType
             )
             ->add(
                 'fullName',
-                'text',
+                TextType::class,
                 [
                     'required'    => true,
                     'constraints' => [
@@ -38,7 +40,7 @@ class EmailFolderApiType extends AbstractType
             )
             ->add(
                 'name',
-                'text',
+                TextType::class,
                 [
                     'required'    => true,
                     'constraints' => [
@@ -49,7 +51,7 @@ class EmailFolderApiType extends AbstractType
             )
             ->add(
                 'type',
-                'choice',
+                ChoiceType::class,
                 [
                     'required'    => true,
                     'constraints' => [

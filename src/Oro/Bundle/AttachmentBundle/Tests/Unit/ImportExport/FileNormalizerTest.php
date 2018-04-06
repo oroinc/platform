@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 
 class FileNormalizerTest extends \PHPUnit_Framework_TestCase
 {

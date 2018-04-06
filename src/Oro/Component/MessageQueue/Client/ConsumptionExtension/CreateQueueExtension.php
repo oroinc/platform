@@ -2,9 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Client\ConsumptionExtension;
 
+use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 
 class CreateQueueExtension extends AbstractExtension

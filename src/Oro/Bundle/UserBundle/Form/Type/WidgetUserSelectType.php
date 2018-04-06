@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;

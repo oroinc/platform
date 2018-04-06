@@ -4,15 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-
-use Symfony\Component\Console\Input\Input;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\Console\Input\Input;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 {

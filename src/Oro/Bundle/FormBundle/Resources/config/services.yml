@@ -5,7 +5,7 @@ parameters:
 
 services:
     oro_form.validator.constraint_factory:
-        class: %oro_form.validator.constraint_factory.class%
+        class: '%oro_form.validator.constraint_factory.class%'
 
     oro_form.twig.form_extension:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
@@ -26,7 +26,7 @@ services:
             - '@oro_form.form.handler.default'
 
     oro_form.provider.html_tag_provider:
-        class: %oro_form.provider.html_tag_provider.class%
+        class: '%oro_form.provider.html_tag_provider.class%'
         arguments:
             - []
 
@@ -36,7 +36,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity.count_query.optimize, method: onOptimize }
 
     oro_form.event.event_dispatcher:
-        class: %oro_form.event.event_dispatcher.class%
+        class: '%oro_form.event.event_dispatcher.class%'
         arguments:
             - '@event_dispatcher'
 
@@ -53,6 +53,15 @@ services:
             - '@form.factory'
             - '@oro_form.registry.form_handler'
             - '@oro_form.registry.form_template_data_provider'
+
+    oro_form.update_handler:
+        class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
+        arguments:
+            - '@request_stack'
+            - '@session'
+            - '@oro_ui.router'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_form.update_factory'
 
     oro_form.update_handler:
         class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade

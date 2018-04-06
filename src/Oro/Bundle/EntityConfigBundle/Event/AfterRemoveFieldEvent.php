@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
 class AfterRemoveFieldEvent extends SymfonyEvent
 {

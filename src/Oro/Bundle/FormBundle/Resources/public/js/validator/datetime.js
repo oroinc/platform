@@ -44,8 +44,8 @@ define(function(require) {
     return [
         'DateTime',
         function(value, element, param) {
-            var format = element.getAttribute('data-format') === 'backend' ?
-                datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
+            var format = element.getAttribute('data-format') === 'backend'
+                ? datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
             var valueMoment = moment(String(value), format, true);
             return this.optional(element) ||
                 valueMoment.isValid() && between(valueMoment, param.min, param.max) === true;
@@ -54,8 +54,8 @@ define(function(require) {
             var message;
             var datetime;
             var value = this.elementValue(element);
-            var format = element.getAttribute('data-format') === 'backend' ?
-                datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
+            var format = element.getAttribute('data-format') === 'backend'
+                ? datetimeFormatter.getBackendDateTimeFormat() : datetimeFormatter.getDateTimeFormat();
             var valueMoment = moment(String(value), format, true);
             var placeholders = {};
             param = _.extend({}, defaultParam, param);

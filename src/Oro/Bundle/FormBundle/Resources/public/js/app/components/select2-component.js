@@ -18,6 +18,13 @@ define(function(require) {
         ViewType: Select2View,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function Select2Component() {
+            Select2Component.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @constructor
          * @param {Object} options
          */
@@ -248,8 +255,8 @@ define(function(require) {
     });
 
     function highlightSelection(str, selection) {
-        return str && selection && selection.term ?
-            str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;
+        return str && selection && selection.term
+            ? str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;
     }
 
     function getTitle(data, properties) {

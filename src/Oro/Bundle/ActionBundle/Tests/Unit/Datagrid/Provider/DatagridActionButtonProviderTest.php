@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Provider;
 
-use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
-
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
@@ -25,6 +23,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 
 class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
 {

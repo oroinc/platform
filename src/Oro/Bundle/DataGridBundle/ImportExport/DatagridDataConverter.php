@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
-
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {

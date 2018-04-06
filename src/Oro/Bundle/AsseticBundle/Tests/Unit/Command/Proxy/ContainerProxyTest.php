@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\Command\Proxy;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\AsseticBundle\Command\Proxy\ContainerProxy;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerProxyTest extends \PHPUnit_Framework_TestCase
 {

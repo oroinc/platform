@@ -58,6 +58,7 @@ define([
 
         /** @property */
         simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
+
         /** @property */
         closeButtonTemplate: _.template(
             '<li class="dropdown-close"><i class="fa-close hide-text">' + _.__('Close') + '</i></li>'

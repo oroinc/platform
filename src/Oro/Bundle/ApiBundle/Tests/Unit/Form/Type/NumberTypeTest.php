@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Form\Type\NumberType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class NumberTypeTest extends TypeTestCase
 {
@@ -13,7 +12,7 @@ class NumberTypeTest extends TypeTestCase
      */
     public function testWithValidValue($scale, $value, $expected)
     {
-        $form = $this->factory->create(new NumberType(), null, ['scale' => $scale]);
+        $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
         $this->assertTrue($form->isSynchronized());
         $this->assertSame($expected, $form->getData());
@@ -34,7 +33,7 @@ class NumberTypeTest extends TypeTestCase
      */
     public function testWithInvalidValue($scale, $value)
     {
-        $form = $this->factory->create(new NumberType(), null, ['scale' => $scale]);
+        $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
         $this->assertFalse($form->isSynchronized());
     }

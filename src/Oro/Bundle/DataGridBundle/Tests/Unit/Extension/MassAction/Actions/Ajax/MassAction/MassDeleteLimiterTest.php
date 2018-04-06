@@ -3,12 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassDelete;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class MassDeleteLimiterTest extends \PHPUnit_Framework_TestCase

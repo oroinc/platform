@@ -3,11 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
 {

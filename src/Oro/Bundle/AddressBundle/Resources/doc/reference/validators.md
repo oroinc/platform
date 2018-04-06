@@ -1,18 +1,17 @@
-Address Validators
-------------------
+## Address Validators
 
 OroAddressBundle has specific validators that can be used to validate addresses and address collection.
 
 ### Classes Description
 
-* **Validator \ Contraints \ ContainsPrimaryValidator** - checks that address collection always contains only one primary address;
-* **Validator \ Contraints \ ContainsPrimary** - contains error message for ContainsPrimaryValidator;
-* **Validator \ Contraints \ UniqueAddressTypesValidator** - checks that address collection has no more than one address for each address type;
-* **Validator \ Contraints \ UniqueAddressTypes** - contains error message for UniqueAddressTypesValidator.
+* **Validator \ Contraints \ ContainsPrimaryValidator** - checks an address collection to ensure that it contains only one primary address;
+* **Validator \ Contraints \ ContainsPrimary** - contains an error message for ContainsPrimaryValidator;
+* **Validator \ Contraints \ UniqueAddressTypesValidator** - checks an address collection to ensure that it has no more than one address per each address type;
+* **Validator \ Contraints \ UniqueAddressTypes** - contains an error message for UniqueAddressTypesValidator.
 
 ### Example Of Usage
 
-Validation configuration should be placed in file Resources/config/validation.yml in appropriate bundle.
+Validation configuration should be placed in the Resources/config/validation.yml file in the appropriate bundle.
 
 ```
 Oro\Bundle\ContactBundle\Entity\Contact:

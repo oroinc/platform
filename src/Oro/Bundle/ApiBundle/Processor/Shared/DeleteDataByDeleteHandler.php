@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 {

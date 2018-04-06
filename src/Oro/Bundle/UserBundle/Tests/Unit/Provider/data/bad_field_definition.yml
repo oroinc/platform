@@ -2,12 +2,12 @@ user_configuration:
     fields:
         some_field:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             options: []
 
         some_another_field:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
 
     groups:
         first_group:

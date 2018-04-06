@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\ApiBundle\Form\EventListener\CollectionListener;
 use Oro\Bundle\ApiBundle\Form\EventListener\ScalarCollectionEntryFactory;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ScalarCollectionType extends AbstractType
 {
@@ -35,7 +35,7 @@ class ScalarCollectionType extends AbstractType
     {
         $resolver->setDefaults([
             'by_reference'  => false,
-            'entry_type'    => 'text',
+            'entry_type'    => TextType::class,
             'entry_options' => []
         ]);
         $resolver->setRequired([

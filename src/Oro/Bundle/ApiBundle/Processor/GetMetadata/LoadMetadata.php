@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\AssociationMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Loads metadata for an entity.
@@ -58,25 +58,24 @@ class LoadMetadata implements ProcessorInterface
         }
 
         $entityMetadata = null;
+        $entityClass = $context->getClassName();
         $config = $context->getConfig();
-        if ($this->doctrineHelper->isManageableEntityClass($context->getClassName())) {
+        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $entityMetadata = $this->entityMetadataLoader->loadEntityMetadata(
-                $context->getClassName(),
+                $entityClass,
                 $config,
                 $context->getWithExcludedProperties(),
                 $context->getTargetAction()
             );
-        } elseif ($config->hasFields()) {
+        } else {
             $entityMetadata = $this->objectMetadataLoader->loadObjectMetadata(
-                $context->getClassName(),
+                $entityClass,
                 $config,
                 $context->getWithExcludedProperties(),
                 $context->getTargetAction()
             );
         }
-        if (null !== $entityMetadata) {
-            $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
-            $context->setResult($entityMetadata);
-        }
+        $this->associationMetadataLoader->completeAssociationMetadata($entityMetadata, $config, $context);
+        $context->setResult($entityMetadata);
     }
 }

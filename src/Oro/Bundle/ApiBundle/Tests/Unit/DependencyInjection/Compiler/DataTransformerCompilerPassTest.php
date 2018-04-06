@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
-use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass;
 
 class DataTransformerCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

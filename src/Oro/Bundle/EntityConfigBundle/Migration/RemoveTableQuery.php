@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Types\Type;
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveTableQuery extends ParametrizedMigrationQuery
 {

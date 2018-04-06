@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle\Entity\Composer;
 
-use Symfony\Component\Validator\Constraints as Assert;
 use Composer\Json\JsonFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class Config
 {

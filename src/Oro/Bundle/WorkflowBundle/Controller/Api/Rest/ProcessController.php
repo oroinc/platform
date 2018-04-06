@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
-
+use FOS\RestBundle\Util\Codes;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Symfony\Component\HttpFoundation\Response;
 
 /**

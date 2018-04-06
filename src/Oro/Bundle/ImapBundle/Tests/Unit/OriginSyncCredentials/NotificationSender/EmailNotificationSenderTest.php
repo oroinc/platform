@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\OriginSyncCredentials\NotificationSen
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;

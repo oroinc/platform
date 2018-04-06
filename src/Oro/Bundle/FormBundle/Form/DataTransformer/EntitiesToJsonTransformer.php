@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Form\DataTransformerInterface;
 
 class EntitiesToJsonTransformer implements DataTransformerInterface

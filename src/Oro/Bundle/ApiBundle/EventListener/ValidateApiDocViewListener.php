@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
+use Nelmio\ApiDocBundle\Controller\ApiDocController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Nelmio\ApiDocBundle\Controller\ApiDocController;
-
 /**
- * Checks whether the requested ApiDoc view is valid for REST API sandbox.
+ * Checks whether the requested API view is valid for REST API sandbox.
  * This implemented as a listener by several reasons:
  * * to avoid overriding of "NelmioApiDocBundle:layout.html.twig"
  *   template that uses "nelmio_api_doc_index" directly
@@ -40,7 +39,7 @@ class ValidateApiDocViewListener
             && !$this->isValidView($event->getRequest())
         ) {
             throw new NotFoundHttpException(sprintf(
-                'Invalid ApiDoc view "%s".',
+                'Invalid API view "%s".',
                 $this->getView($event->getRequest())
             ));
         }

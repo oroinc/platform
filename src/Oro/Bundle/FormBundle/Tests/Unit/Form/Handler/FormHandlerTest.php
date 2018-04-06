@@ -3,19 +3,19 @@
 namespace Oro\Bundle\FormBundle\Test\Unit\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class FormHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $eventDispatcher;
 
@@ -34,7 +34,7 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->form = $this->createMock(FormInterface::class);
-        $this->request = $this->createMock(Request::class);
+        $this->request = new Request();
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->handler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
@@ -46,12 +46,11 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData')
             ->with($entity);
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod('POST');
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(false));
@@ -69,12 +68,11 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData')
             ->with($entity);
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod('POST');
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -114,12 +112,11 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData')
             ->with($entity);
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod('POST');
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -148,12 +145,9 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateBeforeFormDataSetInterrupted()
     {
         $entity = (object)[];
-        $this->request->expects($this->never())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
         $this->form->expects($this->never())
-            ->method('submit')
-            ->with($this->request);
+            ->method('submit');
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -170,13 +164,10 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessFalseNotRequiredRequestMethod()
     {
         $entity = (object)[];
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('GET'));
+        $this->request->setMethod('GET');
 
         $this->form->expects($this->never())
-            ->method('submit')
-            ->with($this->request);
+            ->method('submit');
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -188,12 +179,9 @@ class FormHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateInterruptedBeforeFormSubmit()
     {
         $entity = (object)[];
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
         $this->form->expects($this->never())
-            ->method('submit')
-            ->with($this->request);
+            ->method('submit');
 
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')

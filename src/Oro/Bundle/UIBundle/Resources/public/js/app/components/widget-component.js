@@ -38,6 +38,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        constructor: function WidgetComponent() {
+            WidgetComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (options.initialized) {
                 // widget is initialized from server, there's nothing to do
@@ -85,7 +92,7 @@ define(function(require) {
             this.$element.on(eventName + '.' + this.cid, handler);
 
             mediator.on('widget_dialog:stateChange', _.bind(function(widget, data) {
-                if (this.previousWidgetData.id === widget.getWid()) {
+                if (this.previousWidgetData && this.previousWidgetData.id === widget.getWid()) {
                     this.previousWidgetData.open = data.state === 'minimized';
                     this.previousWidgetData.widget = widget;
                 }

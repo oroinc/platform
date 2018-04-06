@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class BigNumberDateHelper
 {

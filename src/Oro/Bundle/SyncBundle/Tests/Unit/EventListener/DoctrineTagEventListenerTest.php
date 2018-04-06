@@ -8,7 +8,6 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 use Oro\Bundle\SyncBundle\Content\TopicSender;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class BooleanTypeTest extends TypeTestCase
 {
@@ -13,7 +12,7 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithValidValue($value, $expected)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         $this->assertTrue($form->isSynchronized());
         $this->assertSame($expected, $form->getData());
@@ -42,7 +41,7 @@ class BooleanTypeTest extends TypeTestCase
      */
     public function testWithInvalidValue($value)
     {
-        $form = $this->factory->create(new BooleanType());
+        $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         $this->assertFalse($form->isSynchronized());
     }

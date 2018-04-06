@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
-
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class NameOrOrganizationValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,17 +54,41 @@ class NameOrOrganizationValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($data, $valid)
     {
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($valid ? $this->never() : $this->at(0))
-            ->method('addViolationAt')
-            ->with('firstName', $this->constraint->firstNameMessage);
+            ->method('buildViolation')
+            ->with($this->constraint->firstNameMessage)
+            ->willReturn($builder);
+        $builder->expects($valid ? $this->never() : $this->once())
+            ->method('atPath')
+            ->with('firstName')
+            ->willReturnSelf();
+        $builder->expects($valid ? $this->never() : $this->once())
+            ->method('addViolation');
 
+        $builder2 = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($valid ? $this->never() : $this->at(1))
-            ->method('addViolationAt')
-            ->with('lastName', $this->constraint->lastNameMessage);
+            ->method('buildViolation')
+            ->with($this->constraint->lastNameMessage)
+            ->willReturn($builder2);
+        $builder2->expects($valid ? $this->never() : $this->once())
+            ->method('atPath')
+            ->with('lastName')
+            ->willReturnSelf();
+        $builder2->expects($valid ? $this->never() : $this->once())
+            ->method('addViolation');
 
+        $builder3 = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($valid ? $this->never() : $this->at(2))
-            ->method('addViolationAt')
-            ->with('organization', $this->constraint->organizationMessage);
+            ->method('buildViolation')
+            ->with($this->constraint->organizationMessage)
+            ->willReturn($builder3);
+        $builder3->expects($valid ? $this->never() : $this->once())
+            ->method('atPath')
+            ->with('organization')
+            ->willReturnSelf();
+        $builder3->expects($valid ? $this->never() : $this->once())
+            ->method('addViolation');
 
         $this->validator->validate($data, $this->constraint);
     }

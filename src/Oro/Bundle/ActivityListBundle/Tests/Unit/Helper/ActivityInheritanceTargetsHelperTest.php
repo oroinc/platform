@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Helper;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 

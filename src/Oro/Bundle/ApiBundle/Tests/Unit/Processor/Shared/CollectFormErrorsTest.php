@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameValuePairType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CollectFormErrorsTest extends FormProcessorTestCase
 {
@@ -46,8 +48,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithoutFormConstraints()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text')
-            ->add('field2', 'text')
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class)
             ->getForm();
         $form->submit([]);
 
@@ -60,8 +62,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithEmptyData()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit([]);
 
@@ -82,8 +84,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithDataKeyWhichDoesNotRegisteredInForm()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit(
             [
@@ -116,7 +118,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $data = new $dataClass();
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
-            ->add('id', 'integer')
+            ->add('id', IntegerType::class)
             ->getForm();
         $form->setData($data);
         $form->submit(
@@ -144,7 +146,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $data = new $dataClass();
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
-            ->add('renamedTitle', 'text', ['property_path' => 'title'])
+            ->add('renamedTitle', TextType::class, ['property_path' => 'title'])
             ->getForm();
         $form->setData($data);
         $form->submit(
@@ -169,8 +171,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidPropertyValues()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
             ->getForm();
         $form->submit(
             [
@@ -201,7 +203,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidCollectionPropertyValue()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
             ->getForm();
         $form->submit(
             [
@@ -227,7 +229,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                'text',
+                TextType::class,
                 ['property_path' => '[field1]', 'constraints' => [new Constraints\All(new Constraints\NotNull())]]
             )
             ->getForm();
@@ -255,10 +257,10 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'      => 'text',
-                    'options'   => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'      => TextType::class,
+                    'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add' => true
                 ]
             )
@@ -287,11 +289,11 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                'collection',
+                CollectionType::class,
                 [
                     'property_path' => '[field1]',
-                    'type'          => 'text',
-                    'options'       => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'          => TextType::class,
+                    'entry_options'       => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add'     => true
                 ]
             )
@@ -320,10 +322,10 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => NameValuePairType::class,
+                    'entry_options'   => [
                         'name_options' => ['constraints' => [new Constraints\NotBlank()]]
                     ],
                     'allow_add' => true
@@ -358,10 +360,10 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'      => new NameValuePairType(),
-                    'options'   => [
+                    'entry_type'      => NameValuePairType::class,
+                    'entry_options'   => [
                         'name_options' => [
                             'constraints'    => [new Constraints\NotBlank()],
                             'error_bubbling' => true
@@ -403,7 +405,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
         $form = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'constraints' => [$rootLevelConstraint]])
-            ->add('field1', 'text')
+            ->add('field1', TextType::class)
             ->getForm();
         $form->submit(
             [

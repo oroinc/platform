@@ -2,21 +2,22 @@ parameters:
     oro_importexport.template_fixture.entity_registry.class:  Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry
     oro_importexport.template_fixture.manager.class:          Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager
     oro_importexport.action.execute_job.class:                Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction
-    oro_importexport.export.size_of_batch:                    5000
+    oro_importexport.import.size_of_batch: 100
+    oro_importexport.export.size_of_batch: 5000
 
 services:
     oro_importexport.template_fixture.entity_registry:
-        class: %oro_importexport.template_fixture.entity_registry.class%
+        class: '%oro_importexport.template_fixture.entity_registry.class%'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.template_fixture.manager:
-        class: %oro_importexport.template_fixture.manager.class%
+        class: '%oro_importexport.template_fixture.manager.class%'
         arguments:
             - '@oro_importexport.template_fixture.entity_registry'
 
     oro_importexport.action.execute_job:
-        class: %oro_importexport.action.execute_job.class%
+        class: '%oro_importexport.action.execute_job.class%'
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_importexport.job_executor'
@@ -70,10 +71,22 @@ services:
         arguments:
           - '@knp_gaufrette.filesystem_map'
 
-    oro_importexport.file.batch_file_manager:
+    oro_importexport.file.batch_file_manager.abstract:
         class: 'Oro\Bundle\ImportExportBundle\File\BatchFileManager'
+        abstract: true
         arguments:
           - '@oro_importexport.file.file_manager'
+
+    oro_importexport.file.batch_file_manager.import:
+        parent: oro_importexport.file.batch_file_manager.abstract
+        public: false
+        arguments:
+          - '%oro_importexport.import.size_of_batch%'
+
+    oro_importexport.file.batch_file_manager.export:
+        parent: oro_importexport.file.batch_file_manager.abstract
+        public: false
+        arguments:
           - '%oro_importexport.export.size_of_batch%'
 
     oro_importexport.job.context.aggregator_registry:
@@ -95,13 +108,6 @@ services:
             - '@oro_importexport.context_registry'
         tags:
             - { name: 'oro_importexport.job.context.aggregator' }
-
-    oro_importexport.event_listener.export_join_listener:
-        class: Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: oro.import_export.after_entity_page_loaded, method: onAfterEntityPageLoaded }
 
     oro_importexport.configuration.registry:
         class: 'Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistry'

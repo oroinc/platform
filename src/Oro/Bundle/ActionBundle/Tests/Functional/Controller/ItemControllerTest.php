@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
-use Symfony\Component\DomCrawler\Crawler;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ItemControllerTest extends WebTestCase
 {

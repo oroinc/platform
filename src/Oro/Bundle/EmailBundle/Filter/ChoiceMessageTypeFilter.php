@@ -3,18 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Component\PhpUtils\ArrayUtil;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ChoiceMessageTypeFilter extends ChoiceFilter
 {

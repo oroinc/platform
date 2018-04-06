@@ -3,12 +3,10 @@
 namespace Oro\Bundle\EntityPaginationBundle\Navigation;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityPaginationNavigation
 {

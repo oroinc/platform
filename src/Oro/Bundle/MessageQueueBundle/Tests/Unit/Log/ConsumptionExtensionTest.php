@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\ConsumptionExtension;
 
+use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
+use Oro\Bundle\MessageQueueBundle\Log\ConsumptionExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-
-use Oro\Bundle\MessageQueueBundle\Log\ConsumptionExtension;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 
 class ConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,11 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Class ChoicesGuesser

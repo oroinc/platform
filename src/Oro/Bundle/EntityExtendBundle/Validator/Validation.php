@@ -8,7 +8,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilderInterface;
 
 /**

@@ -6,6 +6,13 @@ define(function(require) {
     var ActionPermissionsFieldView = require('orouser/js/datagrid/action-permissions-field-view');
 
     WorkflowActionPermissionsFieldView = ActionPermissionsFieldView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowActionPermissionsFieldView() {
+            WorkflowActionPermissionsFieldView.__super__.constructor.apply(this, arguments);
+        },
+
         onAccessLevelChange: function(model) {
             // override to prevent marking 'Entity' permissions grid tabs as changed
             mediator.trigger('securityAccessLevelsComponent:link:click', {

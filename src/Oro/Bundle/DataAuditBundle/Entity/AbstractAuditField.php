@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
-use LogicException;
-
 use Doctrine\ORM\Mapping as ORM;
-
+use LogicException;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 /**

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
 class AttributeGroupCollectionType extends AbstractType
 {
@@ -19,8 +18,8 @@ class AttributeGroupCollectionType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'type' => AttributeGroupType::NAME,
-                'options' => [
+                'entry_type' => AttributeGroupType::class,
+                'entry_options' => [
                     'data_class' => AttributeGroup::class,
                 ],
                 'attr' => [
@@ -35,7 +34,7 @@ class AttributeGroupCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return CollectionType::NAME;
+        return CollectionType::class;
     }
 
     /**

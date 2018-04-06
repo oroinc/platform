@@ -14,6 +14,16 @@ define(function(require) {
             return 'jsplumb-overlay';
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function FlowchartJsPlumbOverlayView() {
+            FlowchartJsPlumbOverlayView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\Routing;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
+use Symfony\Component\Routing\Route;
 
 /**
  * As FOSRestBundle v1.7.1 generates a plural path for OPTIONS routes,

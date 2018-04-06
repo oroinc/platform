@@ -181,25 +181,29 @@ define([
         },
 
         _minScreenTypeChecker: function(minScreenType) {
+            if (minScreenType === 'any') {
+                return true;
+            }
+
             var viewport = this._getScreenByTypes(this.viewport.type);
             var minViewport = this._getScreenByTypes(minScreenType);
 
-            return minScreenType === 'any' || (
-                (_.isObject(viewport) && _.isObject(minViewport)) ?
-                    viewport.max >= minViewport.max :
-                    false
-            );
+            return (_.isObject(viewport) && _.isObject(minViewport))
+                ? viewport.max >= minViewport.max
+                : false;
         },
 
         _maxScreenTypeChecker: function(maxScreenType) {
+            if (maxScreenType === 'any') {
+                return true;
+            }
+
             var viewport = this._getScreenByTypes(this.viewport.type);
             var maxViewport = this._getScreenByTypes(maxScreenType);
 
-            return maxScreenType === 'any' || (
-                (_.isObject(viewport) && _.isObject(maxViewport)) ?
-                    viewport.max <= maxViewport.max :
-                    false
-            );
+            return (_.isObject(viewport) && _.isObject(maxViewport))
+                ? viewport.max <= maxViewport.max
+                : false;
         },
 
         _widthChecker: function(width) {

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldChoiceType extends AbstractType
 {
@@ -70,22 +70,25 @@ class EntityFieldChoiceType extends AbstractType
                 'choice_attr'          => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
-                'empty_value'          => '',
+                'placeholder'          => '',
                 'skip_load_entities'   => false,
                 'skip_load_data'       => false,
                 'configs'              => $defaultConfigs,
                 'translatable_options' => false
             ]
         );
-        $resolver->setNormalizers(
-            [
-                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
-                    return $this->configsNormalizer($options, $configs, $defaultConfigs);
-                },
-                'attr'    => function (Options $options, $attr) {
-                    return $this->attrNormalizer($options, $attr);
-                }
-            ]
+
+        $resolver->setNormalizer(
+            'configs',
+            function (Options $options, $configs) use ($defaultConfigs) {
+                return $this->configsNormalizer($options, $configs, $defaultConfigs);
+            }
+        )
+        ->setNormalizer(
+            'attr',
+            function (Options $options, $attr) {
+                return $this->attrNormalizer($options, $attr);
+            }
         );
     }
 
@@ -217,7 +220,7 @@ class EntityFieldChoiceType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

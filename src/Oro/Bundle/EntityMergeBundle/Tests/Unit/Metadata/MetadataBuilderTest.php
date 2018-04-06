@@ -3,12 +3,11 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
 {

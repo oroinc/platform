@@ -3,12 +3,15 @@
 namespace Oro\Bundle\SoapBundle\Form\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ApiFormHandler implements FormAwareInterface
 {
+    use RequestHandlerTrait;
+
     /**
      * @var FormInterface
      */
@@ -58,7 +61,8 @@ class ApiFormHandler implements FormAwareInterface
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
+
             if ($this->form->isValid()) {
                 return $this->onSuccess($entity) ?: $entity;
             }

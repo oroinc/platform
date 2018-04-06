@@ -33,7 +33,7 @@ class DefaultFormStartHandleProcessor implements ProcessorInterface
 
         if ($request->isMethod('POST')) {
             $form = $context->getForm();
-            $form->submit($request);
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $formAttributes = $this->getFormAttributes($form, $context->getTransition());
                 foreach ($formAttributes as $value) {

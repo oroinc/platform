@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
-use Symfony\Component\Form\Test\FormInterface;
-
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
+use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
-use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
+use Symfony\Component\Form\Test\FormInterface;
 
 class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
 {

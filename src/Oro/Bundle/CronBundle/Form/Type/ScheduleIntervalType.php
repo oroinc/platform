@@ -4,7 +4,6 @@ namespace Oro\Bundle\CronBundle\Form\Type;
 
 use Oro\Bundle\CronBundle\Entity\ScheduleIntervalInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -22,10 +21,10 @@ class ScheduleIntervalType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(self::ACTIVE_AT_FIELD, OroDateTimeType::NAME, [
+            ->add(self::ACTIVE_AT_FIELD, OroDateTimeType::class, [
                 'required' => false
             ])
-            ->add(self::DEACTIVATE_AT_FIELD, OroDateTimeType::NAME, [
+            ->add(self::DEACTIVATE_AT_FIELD, OroDateTimeType::class, [
                 'required' => false
             ]);
     }

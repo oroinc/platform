@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource;
 
-use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation as BaseLoadExtendedAssociation;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
@@ -11,6 +10,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Component\EntitySerializer\EntitySerializer;
 
 /**
  * Loads extended association data using the EntitySerializer component

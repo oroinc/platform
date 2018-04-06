@@ -14,6 +14,16 @@ define(function(require) {
 
         scopes: ['https://mail.google.com/'],
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function GoogleSyncCheckbox() {
+            GoogleSyncCheckbox.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.$clientIdElement = options._sourceElement
                 .closest('form[name="google_settings"]')

@@ -4,12 +4,10 @@ namespace Oro\Bundle\ImapBundle\Validator;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 class EmailFoldersValidator extends ConstraintValidator
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Model;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 class EmailFolderModel
 {

@@ -76,7 +76,7 @@ class ProcessorBag implements ProcessorBagInterface
      */
     public function getActions()
     {
-        return array_keys($this->configProvider->getProcessors());
+        return \array_keys($this->configProvider->getProcessors());
     }
 
     /**
@@ -85,11 +85,8 @@ class ProcessorBag implements ProcessorBagInterface
     public function getActionGroups($action)
     {
         $groups = $this->configProvider->getGroups();
-        if (!isset($groups[$action])) {
-            return [];
-        }
 
-        return $groups[$action];
+        return $groups[$action] ?? [];
     }
 
     /**
@@ -142,8 +139,8 @@ class ProcessorBag implements ProcessorBagInterface
     {
         if (!empty($this->additionalApplicableCheckers)) {
             $checkers = $this->additionalApplicableCheckers;
-            krsort($checkers);
-            $checkers = call_user_func_array('array_merge', $checkers);
+            \krsort($checkers);
+            $checkers = \array_merge(...$checkers);
             foreach ($checkers as $checker) {
                 $applicableChecker->addChecker($checker);
             }

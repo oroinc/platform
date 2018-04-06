@@ -1,10 +1,9 @@
-Oro Log Component
-====================
+# Oro Log Component
 
 `Oro Log Component` provides additional logger features to Psr\Log component
 
-OutputLogger
---------------
+## OutputLogger
+
  - implements Psr\Log\AbstractLogger
  - logs to Symfony\Component\Console\Output\OutputInterface
  - can be used with cli output

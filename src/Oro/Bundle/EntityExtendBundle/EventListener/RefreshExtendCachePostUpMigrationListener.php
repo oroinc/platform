@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\LoadEntityConfigStateMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigration;
-use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 

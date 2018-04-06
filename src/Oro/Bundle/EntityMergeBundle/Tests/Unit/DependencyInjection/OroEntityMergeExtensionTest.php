@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\EntityMergeBundle\DependencyInjection\OroEntityMergeExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityMergeBundle\DependencyInjection\OroEntityMergeExtension;
 
 class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
 {

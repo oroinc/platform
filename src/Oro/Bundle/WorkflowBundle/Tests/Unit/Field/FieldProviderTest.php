@@ -41,22 +41,22 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                 ]
@@ -75,22 +75,22 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                 ]
@@ -109,22 +109,22 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                 ]
@@ -143,22 +143,22 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                 ]
@@ -177,22 +177,22 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'field3',
                         'type' => 'string',
-                        'label' => 'A',
+                        'label' => 'A Translated',
                     ],
                     [
                         'name' => 'field4',
                         'type' => 'string',
-                        'label' => 'acme.entity.test.field4.label',
+                        'label' => 'acme.entity.test.field4.label Translated',
                     ],
                     [
                         'name' => 'field2',
                         'type' => 'string',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'C',
+                        'label' => 'C Translated',
                         'identifier' => true
                     ],
                 ]
@@ -211,30 +211,30 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'Test1field2',
                         'type' => 'string',
-                        'label' => 'A'
+                        'label' => 'A Translated'
                     ],
                     [
                         'name' => 'id',
                         'type' => 'integer',
-                        'label' => 'B',
+                        'label' => 'B Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-one',
-                        'label' => 'Rel11',
+                        'label' => 'Rel11 Translated',
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'ref-one',
-                        'label' => 'Rel11',
+                        'label' => 'Rel11 Translated',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test11',
                     ],
                     [
                         'name' => 'Acme\Entity\Test22::uni_rel1',
                         'type' => 'ref-one',
-                        'label' => 'UniRel1 (Test22 Label)',
+                        'label' => 'UniRel1 Translated (Test22 Label Translated)',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test22',
                     ]
@@ -254,30 +254,30 @@ class FieldProviderTest extends EntityFieldProviderTest
                     [
                         'name' => 'rel1',
                         'type' => 'ref-one',
-                        'label' => 'Enum Field',
+                        'label' => 'Enum Field Translated',
                     ],
                     [
                         'name' => 'rel1',
                         'type' => 'enum',
-                        'label' => 'Enum Field',
+                        'label' => 'Enum Field Translated',
                         'related_entity_name' => 'Acme\EnumValue1'
                     ],
                     [
                         'name' => 'field1',
                         'type' => 'integer',
-                        'label' => 'Field 1',
+                        'label' => 'Field 1 Translated',
                         'identifier' => true
                     ],
                     [
                         'name' => 'rel2',
                         'type' => 'multiEnum',
-                        'label' => 'Multi Enum Field',
+                        'label' => 'Multi Enum Field Translated',
                         'related_entity_name' => 'Acme\EnumValue2'
                     ],
                     [
                         'name' => 'virtual_relation',
                         'type' => 'oneToMany',
-                        'label' => 'acme.entity.test.virtual_relation.label',
+                        'label' => 'acme.entity.test.virtual_relation.label Translated',
                         'relation_type' => 'oneToMany',
                         'related_entity_name' => 'OtherEntity'
                     ]

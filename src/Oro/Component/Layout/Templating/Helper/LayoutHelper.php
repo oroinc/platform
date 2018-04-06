@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Layout\Templating\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
-
-use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Templating\TextHelper;
+use Oro\Component\Layout\Form\FormRendererInterface;
 use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Oro\Component\Layout\Templating\TextHelper;
+use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * LayoutHelper provides helpers to help display layout blocks

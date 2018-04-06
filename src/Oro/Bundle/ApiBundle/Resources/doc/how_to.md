@@ -15,6 +15,7 @@
  - [Add a Custom Controller](#add-a-custom-controller)
  - [Add a Custom Route](#add-a-custom-route)
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
+ - [Enable API for an Entity Without Identifier](#enable-api-for-an-entity-without-identifier)
  - [Enable Custom API](#enable-custom-api)
 
 
@@ -240,10 +241,6 @@ api:
                             property_path: sourceEntityClass
                         id:
                             property_path: sourceEntityId
-                sourceEntityClass:
-                    exclude: true
-                sourceEntityId:
-                    exclude: true
 ```
 
 Here is an example of how the nested association looks in JSON.API:
@@ -262,6 +259,8 @@ Here is an example of how the nested association looks in JSON.API:
   }
 }
 ```
+
+Please note that fields used in a nested association, in this example `sourceEntityClass` and `sourceEntityId`, are automatically excluded from the result and you do not need to mark them with `exclude` option. Moreover, they will be excluded even if you mark them with `exclude: false` in a configuration file.
 
 ## Configure an Extended Many-To-One Association
 
@@ -523,6 +522,118 @@ api:
                 id:
                     exclude: true
 ```
+
+## Enable API for an Entity Without Identifier
+
+Sometimes it is required to create API resource that does not have an identifier. An example of such API resources
+can be resources for registering a new account or logging in a user.
+
+The following steps describes how to create such API resources:
+
+- Create a PHP class that will represent API resource. Usualy such classes are named as models and located in
+  `Api/Model` directory. For example:
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Model;
+
+  class Account
+  {
+      /** @var string|null */
+      private $name;
+
+      /**
+       * @return string|null
+       */
+      public function getName()
+      {
+          return $this->name;
+      }
+
+      /**
+       * @param string|null $name
+       */
+      public function setName($name)
+      {
+          $this->name = $name;
+      }
+  }
+  ```
+
+- Desctibe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
+
+  ```yaml
+  api:
+      entity_aliases:
+          Acme\Bundle\AppBundle\Api\Model\Account:
+              alias: registeraccount
+              plural_alias: registeraccount
+      entities:
+          Acme\Bundle\AppBundle\Api\Model\Account:
+              fields:
+                  name:
+                      data_type: string
+                      description: The user name
+                      form_options:
+                          constraints:
+                              - NotBlank: ~
+              actions:
+                  create:
+                      description: Register a new account
+                  get: false
+                  update: false
+                  delete: false
+  ```
+
+- Register a route via `Resources/config/oro/routing.yml` configuration file in your bundle using
+ `OroApiBundle:RestApi:itemWithoutId` as a controller, e.g.:
+
+  ```yml
+  acme_rest_api_register_account:
+      path: /api/registeraccount
+      defaults:
+          _controller: OroApiBundle:RestApi:itemWithoutId
+          entity: registeraccount
+      options:
+          group: rest_api
+  ```
+
+- Create a processor to handle data, e.g.:
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Processor;
+
+  use Acme\Bundle\AppBundle\Api\Model\Account;
+  use Oro\Component\ChainProcessor\ContextInterface;
+  use Oro\Component\ChainProcessor\ProcessorInterface;
+
+  class RegisterAccount implements ProcessorInterface
+  {
+      /**
+       * {@inheritdoc}
+       */
+      public function process(ContextInterface $context)
+      {
+          /** @var Account $account */
+          $account = $context->getResult();
+
+          // implement registration of a new account
+      }
+  }
+  ```
+
+- Register a processor in the depencency injection container, e.g.:
+
+  ```yaml
+  services:
+      acme.api.register_account:
+          class: Acme\Bundle\AppBundle\Api\Processor\RegisterAccount
+          tags:
+              - { name: oro.api.processor, action: create, group: save_data, class: Acme\Bundle\AppBundle\Api\Model\Account }
+  ```
 
 ## Enable Custom API
 

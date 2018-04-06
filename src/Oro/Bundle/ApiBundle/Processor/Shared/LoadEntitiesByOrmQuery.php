@@ -4,11 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
-use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
  * Loads entities using ORM QueryBuilder object.

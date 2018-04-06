@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub;
 
 use Doctrine\Common\Inflector\Inflector;
-
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 
 trait LocalizedEntityTrait

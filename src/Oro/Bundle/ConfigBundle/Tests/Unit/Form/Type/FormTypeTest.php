@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormTypeTest extends TypeTestCase
 {
@@ -24,11 +24,6 @@ class FormTypeTest extends TypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->dispatcher = new EventDispatcher();
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
-
         $this->subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(['__construct', 'preSubmit'])
             ->disableOriginalConstructor()
@@ -36,14 +31,21 @@ class FormTypeTest extends TypeTestCase
         $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->form = new FormType($this->subscriber, $this->container);
+
+        parent::setUp();
+
+        $this->dispatcher = new EventDispatcher();
+        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
     protected function getExtensions()
     {
         return [
             new PreloadedExtension(
-                [],
-                ['form' => [new DataBlockExtension()]]
+                [
+                    $this->form
+                ],
+                [SymfonyFormType::class => [new DataBlockExtension()]]
             )
         ];
     }
@@ -53,7 +55,7 @@ class FormTypeTest extends TypeTestCase
         $this->subscriber->expects(self::once())
             ->method('preSubmit');
 
-        $form = $this->factory->create($this->form, null, ['block_config' => []]);
+        $form = $this->factory->create(FormType::class, null, ['block_config' => []]);
         $form->submit([]);
         $this->assertTrue($form->isSynchronized());
     }
@@ -61,7 +63,7 @@ class FormTypeTest extends TypeTestCase
     public function testAdditionalStaticConfigurator()
     {
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [
@@ -83,7 +85,7 @@ class FormTypeTest extends TypeTestCase
     public function testAdditionalStaticConfiguratorWithUndefinedMethodName()
     {
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [
@@ -104,7 +106,7 @@ class FormTypeTest extends TypeTestCase
             ->willReturn($this);
 
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [
@@ -129,7 +131,7 @@ class FormTypeTest extends TypeTestCase
             ->willReturn($this);
 
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [
@@ -152,7 +154,7 @@ class FormTypeTest extends TypeTestCase
             ->method('get');
 
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [
@@ -172,7 +174,7 @@ class FormTypeTest extends TypeTestCase
     public function testInvalidTypeOfAdditionalConfigurator()
     {
         $form = $this->factory->create(
-            $this->form,
+            FormType::class,
             null,
             [
                 'block_config' => [

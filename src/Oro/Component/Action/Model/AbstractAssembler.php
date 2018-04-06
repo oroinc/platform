@@ -3,8 +3,8 @@
 namespace  Oro\Component\Action\Model;
 
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 abstract class AbstractAssembler
 {

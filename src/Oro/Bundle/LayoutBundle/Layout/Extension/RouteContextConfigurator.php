@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 
 class RouteContextConfigurator implements ContextConfiguratorInterface
 {
@@ -44,6 +43,6 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['route_name' => ['string', 'null']]);
+            ->setAllowedTypes('route_name', ['string', 'null']);
     }
 }

@@ -7,13 +7,11 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
+use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
-use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
 
 /**
  * @RouteResource("sidebars")

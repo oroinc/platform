@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 
+/**
+ * The base class for subresource related action processors.
+ */
 class SubresourceProcessor extends RequestActionProcessor
 {
     /**

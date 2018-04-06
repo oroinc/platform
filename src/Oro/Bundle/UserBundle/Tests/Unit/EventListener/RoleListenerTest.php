@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\EventListener\RoleListener;
 use Oro\Component\DependencyInjection\ServiceLink;

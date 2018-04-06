@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension\Generator;
 
-use Symfony\Component\Yaml\Yaml;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\AddTreeGeneratorExtension;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Symfony\Component\Yaml\Yaml;
 
 class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
 {

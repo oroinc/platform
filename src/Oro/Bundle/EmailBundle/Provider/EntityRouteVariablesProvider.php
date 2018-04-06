@@ -3,11 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityRouteVariablesProvider implements EntityVariablesProviderInterface
 {

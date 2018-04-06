@@ -21,55 +21,55 @@ parameters:
 
 services:
     oro_filter.form.event_subscriber.date:
-        class: %oro_filter.form.event_subscriber.date.class%
+        class: '%oro_filter.form.event_subscriber.date.class%'
         arguments:
             - '@oro_filter.utils.date_filter_modifier'
             - '@oro_locale.settings'
 
     oro_filter.form.type.date_range:
-        class: %oro_filter.form.type.date_range.class%
+        class: '%oro_filter.form.type.date_range.class%'
         arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_date_range }
 
     oro_filter.form.type.datetime_range:
-        class: %oro_filter.form.type.datetime_range.class%
+        class: '%oro_filter.form.type.datetime_range.class%'
         arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_datetime_range }
 
     oro_filter.form.type.filter:
-        class: %oro_filter.form.type.filter.class%
+        class: '%oro_filter.form.type.filter.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_filter }
 
     oro_filter.form.type.filter.choice:
-        class: %oro_filter.form.type.filter.choice.class%
+        class: '%oro_filter.form.type.filter.choice.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_choice_filter }
 
     oro_filter.form.type.filter.text:
-        class: %oro_filter.form.type.filter.text.class%
+        class: '%oro_filter.form.type.filter.text.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_text_filter }
 
     oro_filter.form.type.filter.number:
-        class: %oro_filter.form.type.filter.number.class%
+        class: '%oro_filter.form.type.filter.number.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_number_filter }
 
     oro_filter.form.type.filter.number_range:
-        class: %oro_filter.form.type.filter.number_range.class%
+        class: '%oro_filter.form.type.filter.number_range.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_number_range_filter }
 
     oro_filter.form.type.filter.date_range:
-        class: %oro_filter.form.type.filter.date_range.class%
+        class: '%oro_filter.form.type.filter.date_range.class%'
         arguments:
             - '@translator'
             - '@oro_filter.provider.datemodifierprovider'
@@ -78,7 +78,7 @@ services:
             - { name: form.type, alias: oro_type_date_range_filter }
 
     oro_filter.form.type.filter.datetime_range:
-        class: %oro_filter.form.type.filter.datetime_range.class%
+        class: '%oro_filter.form.type.filter.datetime_range.class%'
         arguments:
             - '@translator'
             - '@oro_filter.provider.datemodifierprovider'
@@ -87,37 +87,37 @@ services:
             - { name: form.type, alias: oro_type_datetime_range_filter }
 
     oro_filter.form.type.filter.boolean:
-        class: %oro_filter.form.type.filter.boolean.class%
+        class: '%oro_filter.form.type.filter.boolean.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_boolean_filter }
 
     oro_filter.form.type.filter.entity:
-        class: %oro_filter.form.type.filter.entity.class%
+        class: '%oro_filter.form.type.filter.entity.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_entity_filter }
 
     oro_filter.form.type.filter.selectrow:
-        class: %oro_filter.form.type.filter.selectrow.class%
+        class: '%oro_filter.form.type.filter.selectrow.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_selectrow_filter }
 
     oro_filter.form.type.filter.many_to_many:
-        class: %oro_filter.form.type.filter.many_to_many.class%
+        class: '%oro_filter.form.type.filter.many_to_many.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_many_to_many_filter }
 
     oro_filter.form.type.filter.choice_tree:
-        class: %oro_filter.form.type.filter.choice_tree.class%
+        class: '%oro_filter.form.type.filter.choice_tree.class%'
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_choice_tree_filter }
 
     oro_filter.type.enum_filter:
-        class: %oro_filter.type.enum_filter.class%
+        class: '%oro_filter.type.enum_filter.class%'
         arguments:
             - '@translator'
             - '@oro_entity_extend.enum_value_provider'
@@ -125,7 +125,7 @@ services:
             - { name: form.type, alias: oro_enum_filter }
 
     oro_filter.type.dictionary_filter:
-        class: %oro_filter.type.dictionary_filter.class%
+        class: '%oro_filter.type.dictionary_filter.class%'
         arguments:
             - '@translator'
             - '@oro_entity_extend.enum_value_provider'

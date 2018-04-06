@@ -7,10 +7,10 @@
  */
 namespace Oro\Bundle\EmailBundle\Mail;
 
-use Oro\Bundle\EmailBundle\Mail\Header\HeaderLoader;
 use \Zend\Mail\Exception\RuntimeException;
-use \Zend\Mail\Headers as BaseHeaders;
 use \Zend\Mail\Header\HeaderInterface;
+use \Zend\Mail\Headers as BaseHeaders;
+use Oro\Bundle\EmailBundle\Mail\Header\HeaderLoader;
 
 class Headers extends BaseHeaders
 {

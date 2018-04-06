@@ -3,15 +3,12 @@
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
 use Gaufrette\Adapter\MetadataSupporter;
-
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
-
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 
 class FileManager extends GaufretteFileManager
 {

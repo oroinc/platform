@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\SearchBundle\Entity\Item;
-use Oro\Bundle\SearchBundle\Entity\IndexInteger;
-use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
 use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Entity\IndexInteger;
+use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Entity\Item;
 
 class ItemTest extends \PHPUnit_Framework_TestCase
 {

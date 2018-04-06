@@ -3,11 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 interface EmailBodyLoaderInterface
 {

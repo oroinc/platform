@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Symfony\Component\Routing\Router;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Symfony\Component\Routing\Router;
 
 class PrepareResultItemListener
 {

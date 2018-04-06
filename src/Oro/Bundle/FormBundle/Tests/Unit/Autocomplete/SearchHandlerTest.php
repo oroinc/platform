@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
+use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
-use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**

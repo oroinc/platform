@@ -7,13 +7,11 @@ use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
-    /** @var TextareaAssociationPropertyType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
         $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -21,7 +19,7 @@ class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
             ->method('getEntityClass')
             ->will($this->returnArgument(0));
 
-        $this->type = new TextareaAssociationPropertyType(
+        return new TextareaAssociationPropertyType(
             new AssociationTypeHelper($this->configManager, $entityClassResolver),
             $this->configManager
         );
@@ -31,7 +29,7 @@ class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
     {
         $this->assertEquals(
             'oro_entity_extend_association_property_textarea',
-            $this->type->getName()
+            $this->getFormType()->getName()
         );
     }
 
@@ -39,7 +37,7 @@ class TextareaAssociationPropertyTypeTest extends AssociationTypeTestCase
     {
         $this->assertEquals(
             'textarea',
-            $this->type->getParent()
+            $this->getFormType()->getParent()
         );
     }
 

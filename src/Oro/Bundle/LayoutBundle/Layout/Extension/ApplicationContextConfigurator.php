@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 
 class ApplicationContextConfigurator implements ContextConfiguratorInterface
 {
@@ -38,6 +37,6 @@ class ApplicationContextConfigurator implements ContextConfiguratorInterface
                     }
                 ]
             )
-            ->setAllowedTypes(['debug' => 'bool']);
+            ->setAllowedTypes('debug', 'bool');
     }
 }

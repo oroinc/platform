@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit;
 
+use Oro\Bundle\LayoutBundle\Layout\Block\Type;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
-
-use Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 /**
  * The base test case that helps testing block types

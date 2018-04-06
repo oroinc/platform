@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
@@ -53,7 +52,7 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-                    'intention'          => 'email_attachment',
+                    'csrf_token_id'      => 'email_attachment',
                 ]
             );
 

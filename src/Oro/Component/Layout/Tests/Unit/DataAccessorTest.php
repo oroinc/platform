@@ -69,7 +69,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedData         = new \stdClass();
 
         $this->context[$name] = 'other';
-        $this->context->getResolver()->setOptional([$name]);
+        $this->context->getResolver()->setDefined([$name]);
         $this->context->data()->set($name, $expectedData);
         $this->context->resolve();
 
@@ -87,7 +87,7 @@ class DataAccessorTest extends \PHPUnit_Framework_TestCase
         $expectedData         = new \stdClass();
 
         $this->context[$name] = 'other';
-        $this->context->getResolver()->setOptional([$name]);
+        $this->context->getResolver()->setDefined([$name]);
         $this->context->data()->set($name, $expectedData);
         $this->context->resolve();
 

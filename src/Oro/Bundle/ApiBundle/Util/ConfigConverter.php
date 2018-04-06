@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Component\EntitySerializer\ConfigConverter as BaseConfigConverter;
 use Oro\Component\EntitySerializer\EntityConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 class ConfigConverter extends BaseConfigConverter
 {

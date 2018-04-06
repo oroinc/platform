@@ -2,12 +2,11 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Component\Action\Event\ExecuteActionEvent;
 use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
 {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\PlatformBundle\Twig;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Twig\SerializerExtension as BaseSerializerExtension;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SerializerExtension extends BaseSerializerExtension

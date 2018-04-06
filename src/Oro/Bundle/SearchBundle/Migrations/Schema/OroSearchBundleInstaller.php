@@ -4,16 +4,14 @@ namespace Oro\Bundle\SearchBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
-use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
 use Oro\Bundle\SearchBundle\Migration\MysqlVersionCheckTrait;
+use Oro\Bundle\SearchBundle\Migration\UseMyIsamEngineQuery;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -38,7 +36,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -90,6 +88,8 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->addColumn('field', 'string', ['length' => 250]);
         $table->addColumn('value', 'decimal', ['precision' => 21, 'scale' => 6]);
         $table->addIndex(['item_id'], 'idx_e0b9bb33126f525e', []);
+        $table->addIndex(['field'], 'oro_search_index_decimal_field_idx');
+        $table->addIndex(['item_id', 'field'], 'oro_search_index_decimal_item_field_idx');
         $table->setPrimaryKey(['id']);
     }
 
@@ -106,6 +106,8 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->addColumn('field', 'string', ['length' => 250]);
         $table->addColumn('value', 'integer', []);
         $table->addIndex(['item_id'], 'idx_e04ba3ab126f525e', []);
+        $table->addIndex(['field'], 'oro_search_index_integer_field_idx');
+        $table->addIndex(['item_id', 'field'], 'oro_search_index_integer_item_field_idx');
         $table->setPrimaryKey(['id']);
     }
 
@@ -138,6 +140,8 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->addColumn('field', 'string', ['length' => 250]);
         $table->addColumn('value', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addIndex(['item_id'], 'idx_459f212a126f525e', []);
+        $table->addIndex(['field'], 'oro_search_index_datetime_field_idx');
+        $table->addIndex(['item_id', 'field'], 'oro_search_index_datetime_item_field_idx');
         $table->setPrimaryKey(['id']);
     }
 
@@ -177,6 +181,8 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         $table->addColumn('field', 'string', ['length' => 250]);
         $table->addColumn('value', 'text', []);
         $table->addIndex(['item_id'], 'idx_a0243539126f525e', []);
+        $table->addIndex(['field'], 'oro_search_index_text_field_idx');
+        $table->addIndex(['item_id', 'field'], 'oro_search_index_text_item_field_idx');
         $table->setPrimaryKey(['id']);
 
         if ($this->isMysqlPlatform() && !$this->isInnoDBFulltextIndexSupported()) {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Get;
 
 use Doctrine\ORM\Proxy\Proxy;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 

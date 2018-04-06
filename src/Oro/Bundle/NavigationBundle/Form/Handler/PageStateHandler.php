@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Handler;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
+use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
-
 class PageStateHandler
 {
+    use RequestHandlerTrait;
+
     /**
      * @var FormInterface
      */
@@ -67,7 +68,7 @@ class PageStateHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($entity);

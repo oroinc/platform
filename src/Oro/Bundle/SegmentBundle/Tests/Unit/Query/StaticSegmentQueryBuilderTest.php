@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 

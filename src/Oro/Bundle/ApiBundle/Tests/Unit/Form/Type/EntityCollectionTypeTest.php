@@ -3,17 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Validation;
-
-use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\Validator\Validation;
 
 class EntityCollectionTypeTest extends TypeTestCase
 {
@@ -23,14 +20,7 @@ class EntityCollectionTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         return [
-            new ValidatorExtension(Validation::createValidator()),
-            new PreloadedExtension(
-                [
-                    'oro_api_collection' => new CollectionType(),
-                    'collection_entry'   => new CollectionEntryType()
-                ],
-                []
-            )
+            new ValidatorExtension(Validation::createValidator())
         ];
     }
 
@@ -60,10 +50,10 @@ class EntityCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new EntityCollectionType(),
+            EntityCollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -81,6 +71,6 @@ class EntityCollectionTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $type = new EntityCollectionType();
-        $this->assertEquals('oro_api_collection', $type->getParent());
+        $this->assertEquals(CollectionType::class, $type->getParent());
     }
 }

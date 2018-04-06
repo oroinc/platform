@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectionType extends AbstractType
 {
@@ -47,6 +45,14 @@ class LocalizationSelectionType extends AbstractType
      * {@inheritDoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBlockPrefix()
     {
         return static::NAME;
     }
@@ -88,7 +94,7 @@ class LocalizationSelectionType extends AbstractType
             },
             'compact' => false,
             'full_localization_list' => false,
-            'empty_value' => '',
+            'placeholder' => '',
             'translatable_options' => false,
             'configs' => [
                 'placeholder' => 'oro.locale.localization.form.placeholder.select_localization',
@@ -135,7 +141,7 @@ class LocalizationSelectionType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

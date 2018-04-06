@@ -4,13 +4,13 @@ parameters:
 
 services:
     oro_workflow.security.acl.manager:
-        class: %oro_workflow.security.acl.manager.class%
+        class: '%oro_workflow.security.acl.manager.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry.system'
 
     oro_workflow.security.acl.voter.entity:
-        class: %oro_workflow.security.acl.voter.entity.class%
+        class: '%oro_workflow.security.acl.voter.entity.class%'
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.permission_registry'

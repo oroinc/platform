@@ -6,34 +6,35 @@ parameters:
 
 services:
     oro_importexport.data_converter.default:
-        class: %oro_importexport.data_converter.default.class%
+        class: '%oro_importexport.data_converter.default.class%'
 
     oro_importexport.data_converter.configurable:
-        class: %oro_importexport.data_converter.configurable.class%
+        class: '%oro_importexport.data_converter.configurable.class%'
         abstract: true
         arguments:
             - '@oro_entity.helper.field_helper'
             - '@oro_importexport.data_converter.relation_calculator'
         calls:
-            - [setDispatcher,  ['@event_dispatcher']]
+            - [setDispatcher, ['@event_dispatcher']]
+            - [setConfigManager, ['@oro_config.manager']]
 
     oro_importexport.data_converter.template_fixture.configurable:
-        class: %oro_importexport.data_converter.configurable.class%
+        class: '%oro_importexport.data_converter.configurable.class%'
         abstract: true
         arguments:
             - '@oro_entity.helper.field_helper'
             - '@oro_importexport.data_converter.template_fixture.relation_calculator'
         calls:
-            - [setDispatcher,  ['@event_dispatcher']]
+            - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.data_converter.relation_calculator:
-        class: %oro_importexport.data_converter.relation_calculator.class%
+        class: '%oro_importexport.data_converter.relation_calculator.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity.helper.field_helper'
 
     oro_importexport.data_converter.template_fixture.relation_calculator:
-        class: %oro_importexport.data_converter.template_fixture.relation_calculator.class%
+        class: '%oro_importexport.data_converter.template_fixture.relation_calculator.class%'
         arguments:
             - '@oro_importexport.template_fixture.manager'
             - '@oro_entity.helper.field_helper'

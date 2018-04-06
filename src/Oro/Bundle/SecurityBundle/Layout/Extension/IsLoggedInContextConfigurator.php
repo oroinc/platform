@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Layout\Extension;
 
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
 {
@@ -28,9 +28,7 @@ class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setRequired([self::OPTION_NAME])
-            ->setAllowedTypes([
-                self::OPTION_NAME => ['bool']
-            ]);
+            ->setAllowedTypes(self::OPTION_NAME, ['bool']);
 
         $context->set(self::OPTION_NAME, $this->tokenAccessor->hasUser());
     }

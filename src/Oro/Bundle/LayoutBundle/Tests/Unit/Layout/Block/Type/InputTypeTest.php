@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\BaseType;
-
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\InputType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
+use Oro\Component\Layout\Block\Type\BaseType;
 
 class InputTypeTest extends BlockTypeTestCase
 {

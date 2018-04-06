@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
-use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 
 class ConfigUtilTest extends \PHPUnit_Framework_TestCase
 {

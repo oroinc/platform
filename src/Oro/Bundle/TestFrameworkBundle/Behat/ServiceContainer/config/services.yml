@@ -113,7 +113,7 @@ services:
 
     oro_test.encoder.mcrypt:
         class: Oro\Bundle\SecurityBundle\Encoder\Mcrypt
-        arguments: [ %kernel.secret% ]
+        arguments: [ '%kernel.secret%' ]
 
     oro_test.faker.provider.xss:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Faker\Provider\XssProvider

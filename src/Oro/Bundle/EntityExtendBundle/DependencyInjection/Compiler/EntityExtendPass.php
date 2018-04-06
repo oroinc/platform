@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\EntityExtendConfiguration;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\EntityExtendConfiguration;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class EntityExtendPass implements CompilerPassInterface
 {

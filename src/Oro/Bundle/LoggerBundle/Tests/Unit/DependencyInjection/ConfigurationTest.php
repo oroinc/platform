@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

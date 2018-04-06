@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Action\ActionInterface;

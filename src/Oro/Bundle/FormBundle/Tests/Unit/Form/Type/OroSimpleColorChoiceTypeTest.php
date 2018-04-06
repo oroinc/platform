@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType;
 
 class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 {
@@ -115,7 +115,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->formType->getParent());
+        $this->assertEquals(ChoiceType::class, $this->formType->getParent());
     }
 
     public function testGetName()

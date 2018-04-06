@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class EmailAddressRecipientsTypeTest extends TypeTestCase
 {
@@ -18,8 +17,8 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
         $email->setEntityClass('entityClass_param');
         $email->setEntityId('entityId_param');
 
-        $form = $this->factory->createBuilder('form', $email)
-            ->add('to', EmailAddressRecipientsType::NAME)
+        $form = $this->factory->createBuilder(FormType::class, $email)
+            ->add('to', EmailAddressRecipientsType::class)
             ->getForm();
 
         $form->submit([]);

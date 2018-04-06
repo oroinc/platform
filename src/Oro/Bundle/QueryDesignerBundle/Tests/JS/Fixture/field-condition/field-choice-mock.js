@@ -13,7 +13,7 @@ define(function(require) {
 
         data: null,
 
-        constructor: function() {
+        constructor: function FieldChoiceMock() {
             FieldChoiceMock.lastCreatedInstance = this;
             this.data = _.clone(_data);
             spyOn(this, 'setValue').and.callThrough();

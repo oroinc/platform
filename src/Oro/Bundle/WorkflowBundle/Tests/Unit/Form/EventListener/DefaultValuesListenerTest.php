@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\Form\FormEvents;
 
 class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 {

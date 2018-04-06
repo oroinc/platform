@@ -41,6 +41,16 @@ define(function(require) {
 
         positionIncrementPx: 35,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WorkflowModel() {
+            WorkflowModel.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
