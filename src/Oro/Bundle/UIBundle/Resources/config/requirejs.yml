@@ -190,7 +190,6 @@ config:
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
-        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -292,6 +291,8 @@ config:
         'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
 
         'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery
