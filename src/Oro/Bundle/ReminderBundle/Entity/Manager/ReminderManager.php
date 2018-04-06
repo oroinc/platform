@@ -40,12 +40,12 @@ class ReminderManager
         if (!$entityId) {
             return;
         }
-        
+
         $reminders = $entity->getReminders();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
-        
+
         $persist = true;
         if ($reminders instanceof RemindersPersistentCollection) {
             if ($reminders->isDirty()) {
@@ -58,9 +58,9 @@ class ReminderManager
             }
             $persist = false;
         }
-        
-        $reminders = is_array($reminders) ?  new ArrayCollection($reminders) : $reminders;
-        
+
+        $reminders = is_array($reminders) ? new ArrayCollection($reminders) : $reminders;
+
         if ($reminders instanceof Collection) {
             if (!$reminders->isEmpty()) {
                 $reminderData = $entity->getReminderData();
