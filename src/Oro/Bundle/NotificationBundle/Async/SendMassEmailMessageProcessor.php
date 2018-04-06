@@ -13,9 +13,13 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
+use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
+use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /** @var DirectMailer */
     private $mailer;
@@ -29,27 +33,33 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     /** @var EmailRenderer */
     private $emailRenderer;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param DirectMailer    $mailer
-     * @param Processor       $processor
-     * @param ManagerRegistry $managerRegistry
-     * @param EmailRenderer   $emailRenderer
-     * @param LoggerInterface $logger
+     * @param DirectMailer             $mailer
+     * @param Processor                $processor
+     * @param ManagerRegistry          $managerRegistry
+     * @param EmailRenderer            $emailRenderer
+     * @param LoggerInterface          $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         DirectMailer $mailer,
         Processor $processor,
         ManagerRegistry $managerRegistry,
         EmailRenderer $emailRenderer,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->mailer = $mailer;
         $this->mailerProcessor = $processor;
         $this->managerRegistry = $managerRegistry;
         $this->emailRenderer = $emailRenderer;
+        $this->eventDispatcher = $eventDispatcher;
         $this->logger = $logger;
     }
 
@@ -95,6 +105,16 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
         //toDo: can possibly send duplicate replies. See BAP-12503
         $result = $this->mailer->send($emailMessage);
+
+        $spoolItem = new SpoolItem();
+        $spoolItem
+            ->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE)
+            ->setMessage($emailMessage);
+        $this->eventDispatcher->dispatch(
+            NotificationSentEvent::NAME,
+            new NotificationSentEvent($spoolItem, $result)
+        );
+
         if (!$result) {
             $this->logger->error('Cannot send message');
 
@@ -109,7 +129,7 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SEND_NOTIFICATION_EMAIL];
+        return [Topics::SEND_MASS_NOTIFICATION_EMAIL];
     }
 
     /**
@@ -121,24 +141,15 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     protected function renderTemplate($templateName, array $data)
     {
-        $emailTemplate = $this->findEmailTemplateByName($templateName);
-        if (! $emailTemplate instanceof EmailTemplateInterface) {
+        $emailTemplate = $this->managerRegistry
+            ->getManagerForClass(EmailTemplate::class)
+            ->getRepository(EmailTemplate::class)
+            ->findOneBy($templateName);
+
+        if (!$emailTemplate instanceof EmailTemplateInterface) {
             throw new \RuntimeException(sprintf('EmailTemplate not found by name "%s"', $templateName));
         }
 
         return $this->emailRenderer->compileMessage($emailTemplate, $data);
-    }
-
-    /**
-     * @param string $emailTemplateName
-     *
-     * @return EmailTemplateInterface
-     */
-    protected function findEmailTemplateByName($emailTemplateName)
-    {
-        return $this->managerRegistry
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class)
-            ->findByName($emailTemplateName);
     }
 }
