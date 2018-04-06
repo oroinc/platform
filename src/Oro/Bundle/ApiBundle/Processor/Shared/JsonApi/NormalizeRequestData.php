@@ -49,16 +49,19 @@ class NormalizeRequestData implements ProcessorInterface
         /** @var FormContext|SingleItemContext $context */
 
         $requestData = $context->getRequestData();
-        if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // the request data are already normalized
-            return;
-        }
-
-        $this->context = $context;
-        try {
-            $context->setRequestData($this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata()));
-        } finally {
-            $this->context = null;
+        if ($context->hasIdentifierFields()) {
+            if (array_key_exists(JsonApiDoc::DATA, $requestData)) {
+                $this->context = $context;
+                try {
+                    $context->setRequestData(
+                        $this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata())
+                    );
+                } finally {
+                    $this->context = null;
+                }
+            }
+        } elseif (array_key_exists(JsonApiDoc::META, $requestData)) {
+            $context->setRequestData($requestData[JsonApiDoc::META]);
         }
     }
 

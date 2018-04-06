@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -51,7 +52,7 @@ class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

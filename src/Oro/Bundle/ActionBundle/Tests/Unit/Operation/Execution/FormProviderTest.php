@@ -26,7 +26,7 @@ class FormProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->formType = new OperationExecutionType();
+        $this->formType = OperationExecutionType::class;
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
         $this->formProvider = new FormProvider($this->formFactory, $this->formType);

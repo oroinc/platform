@@ -335,7 +335,7 @@ services:
     oro_navigation.form.pagestate:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["pagestate", "pagestate", null]
+        arguments: ["pagestate", Oro\Bundle\NavigationBundle\Form\Type\PageStateType, null]
 
     oro_navigation.form.type.pagestate:
         class:                        '%oro_navigation.form.type.pagestate.class%'

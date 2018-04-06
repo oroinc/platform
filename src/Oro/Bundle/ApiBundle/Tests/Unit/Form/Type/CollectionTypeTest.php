@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -21,7 +21,7 @@ class CollectionTypeTest extends TypeTestCase
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension(
-                ['collection_entry' => new CollectionEntryType()],
+                [CollectionEntryType::class => new CollectionEntryType()],
                 []
             )
         ];
@@ -49,10 +49,10 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -91,10 +91,10 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -129,10 +129,10 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -168,10 +168,10 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -206,10 +206,10 @@ class CollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new CollectionType(),
+            CollectionType::class,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form = $formBuilder->getForm();
@@ -230,11 +230,11 @@ class CollectionTypeTest extends TypeTestCase
     public function testWithInvalidValue()
     {
         $form = $this->factory->create(
-            new CollectionType(),
+            CollectionType::class,
             null,
             [
                 'entry_data_class' => Group::class,
-                'entry_type'       => 'collection_entry'
+                'entry_type'       => CollectionEntryType::class
             ]
         );
         $form->submit('test');

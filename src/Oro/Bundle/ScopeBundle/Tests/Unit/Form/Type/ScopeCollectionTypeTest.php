@@ -44,7 +44,7 @@ class ScopeCollectionTypeTest extends FormIntegrationTestCase
         $options = $resolver->resolve();
 
         $this->assertArrayHasKey('entry_type', $options);
-        $this->assertEquals(ScopeType::NAME, $options['entry_type']);
+        $this->assertEquals(ScopeType::class, $options['entry_type']);
 
         $this->assertArrayHasKey('handle_primary', $options);
         $this->assertFalse($options['handle_primary']);

@@ -34,7 +34,7 @@ class ExtractEntityId implements ProcessorInterface
 
         $requestData = $context->getRequestData();
         if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // unexpected request data or they are already normalized
+            // unsupported request data or the data are already normalized
             return;
         }
 

@@ -4,11 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry;
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface;
-use Oro\Bundle\EntityConfigBundle\Attribute\Type\BooleanAttributeType;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -191,7 +191,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
     public function testGetExtendedType()
     {
-        $this->assertEquals('oro_entity_config_type', $this->extension->getExtendedType());
+        $this->assertEquals(ConfigType::class, $this->extension->getExtendedType());
     }
 
     public function testOnPostSetData()

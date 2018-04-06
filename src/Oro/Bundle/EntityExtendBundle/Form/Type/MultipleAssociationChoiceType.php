@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType as SymfonyChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -118,7 +119,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
      */
     public function getParent()
     {
-        return 'choice';
+        return SymfonyChoiceType::class;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\AttachmentBundle\Api\Processor\AddFileContentFormListener;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -37,8 +38,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
     {
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class);
 
         $this->fileManager->expects($this->never())
             ->method('writeToTemporaryFile');
@@ -61,8 +62,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
     {
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class);
 
         $this->fileManager->expects($this->never())
             ->method('writeToTemporaryFile');
@@ -88,8 +89,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class);
 
         $this->fileManager->expects($this->never())
             ->method('writeToTemporaryFile');
@@ -115,8 +116,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class);
 
         $this->fileManager->expects($this->never())
             ->method('writeToTemporaryFile');
@@ -140,8 +141,8 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
     {
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class);
 
         $this->fileManager->expects($this->never())
             ->method('writeToTemporaryFile');
@@ -168,9 +169,9 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text')
-            ->add('mimeType', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class)
+            ->add('mimeType', TextType::class);
 
         $this->fileManager->expects($this->once())
             ->method('writeToTemporaryFile')
@@ -202,9 +203,9 @@ class AddFileContentFormListenerTest extends FormProcessorTestCase
 
         $formBuilder = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'data_class' => File::class])
-            ->add('content', 'text', ['property_path' => 'file'])
-            ->add('originalFilename', 'text')
-            ->add('mimeType', 'text');
+            ->add('content', TextType::class, ['property_path' => 'file'])
+            ->add('originalFilename', TextType::class)
+            ->add('mimeType', TextType::class);
 
         $this->fileManager->expects($this->once())
             ->method('writeToTemporaryFile')

@@ -6,6 +6,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ChoiceFilterTypeTest extends AbstractTypeTestCase
 {
@@ -17,10 +19,11 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $this->type = new ChoiceFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-        $this->type = new ChoiceFilterType($translator);
     }
 
     /**
@@ -44,7 +47,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'choice',
+                    'field_type' => ChoiceType::class,
                     'field_options' => array(),
                     'operator_choices' => array(
                         ChoiceFilterType::TYPE_CONTAINS => 'oro.filter.form.label_type_contains',

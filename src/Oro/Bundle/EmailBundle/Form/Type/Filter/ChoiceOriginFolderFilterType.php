@@ -35,7 +35,7 @@ class ChoiceOriginFolderFilterType extends AbstractChoiceType
      */
     public function getParent()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 
     /**

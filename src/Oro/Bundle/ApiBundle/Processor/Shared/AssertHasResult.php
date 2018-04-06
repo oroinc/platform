@@ -24,7 +24,7 @@ class AssertHasResult implements ProcessorInterface
 
         if (!$context->hasResult()) {
             $responseStatusCode = $context->getResponseStatusCode();
-            if (null === $responseStatusCode || !$this->isResponseWithoutContent($responseStatusCode)) {
+            if (null === $responseStatusCode || !$this->isErrorResponseWithoutContent($responseStatusCode)) {
                 throw new RuntimeException('The result does not exist.');
             }
         }

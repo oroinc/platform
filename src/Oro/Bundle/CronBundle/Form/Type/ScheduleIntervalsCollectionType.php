@@ -18,7 +18,7 @@ class ScheduleIntervalsCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return CollectionType::NAME;
+        return CollectionType::class;
     }
 
     /**
@@ -27,7 +27,7 @@ class ScheduleIntervalsCollectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'entry_type' => ScheduleIntervalType::NAME,
+            'entry_type' => ScheduleIntervalType::class,
             'required' => false,
             'by_reference' => false
         ]);

@@ -25,12 +25,12 @@ services:
     oro_user.form.user:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_user_form", "oro_user_user", null]
+        arguments: ["oro_user_user_form", Oro\Bundle\UserBundle\Form\Type\UserType, null]
 
     oro_user.form.user.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["user", "user", null]
+        arguments: ["user", Oro\Bundle\UserBundle\Form\Type\UserApiType, null]
 
     oro_user.form.role:
         class: Symfony\Component\Form\Form
@@ -40,32 +40,32 @@ services:
     oro_user.form.role.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["role", "role", null]
+        arguments: ["role", Oro\Bundle\UserBundle\Form\Type\RoleApiType, null]
 
     oro_user.form.group:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_group_form", "oro_user_group"]
+        arguments: ["oro_user_group_form", Oro\Bundle\UserBundle\Form\Type\GroupType]
 
     oro_user.form.group.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["group", "group", null]
+        arguments: ["group", Oro\Bundle\UserBundle\Form\Type\GroupApiType, null]
 
     oro_user.form.reset:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_reset_form", "oro_user_reset", null, { validation_groups: [ResetPassword, Default] }]
+        arguments: ["oro_user_reset_form", Oro\Bundle\UserBundle\Form\Type\ResetType, null, { validation_groups: [ResetPassword, Default] }]
 
     oro_user.form.status:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_status_form", "oro_user_status", null]
+        arguments: ["oro_user_status_form", Oro\Bundle\UserBundle\Form\Type\StatusType, null]
 
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_emailsettings_form", "oro_user_emailsettings", null]
+        arguments: ["oro_user_emailsettings_form", Oro\Bundle\UserBundle\Form\Type\EmailSettingsType, null]
 
     oro_user.form.type.user:
         class: Oro\Bundle\UserBundle\Form\Type\UserType
@@ -109,7 +109,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - "oro_set_password_form"
-            - "oro_set_password"
+            - Oro\Bundle\UserBundle\Form\Type\SetPasswordType
 
     oro_user.form.type.email:
         class: '%oro_user.form.type.email.class%'
@@ -284,7 +284,7 @@ services:
             - '@oro_form.extension.js_validation.constraints_provider'
             - '@oro_user.provider.password_complexity_config_provider'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'repeated' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\RepeatedType }
 
     # Dashboard
     oro_user.form.type.widget_owners:

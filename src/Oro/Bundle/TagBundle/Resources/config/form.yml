@@ -18,7 +18,7 @@ services:
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_tag_tag_form", "oro_tag_tag"]
+        arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType]
 
     oro_tag.form.handler.tag:
         class: '%oro_tag.tag.form.handler.tag.class%'
@@ -80,7 +80,7 @@ services:
     oro_tag.form.tag.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_tag_tag_form", "oro_tag_tag", null]
+        arguments: ["oro_tag_tag_form", Oro\Bundle\TagBundle\Form\Type\TagType, null]
 
     oro_tag.form.handler.api:
         class: '%oro_tag.tag.form.handler.tag.class%'
@@ -123,7 +123,7 @@ services:
     oro_tag.form.taxonomy:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["oro_tag_taxonomy_form", "oro_tag_taxonomy"]
+        arguments: ["oro_tag_taxonomy_form", Oro\Bundle\TagBundle\Form\Type\TaxonomyType]
 
     oro_tag.form.handler.taxonomy:
         class: '%oro_tag.tag.form.handler.taxonomy.class%'

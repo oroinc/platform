@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntitySelectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,13 +28,21 @@ class TaxonomySelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_entity_select';
+        return EntitySelectType::class;
     }
 
     /**
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'oro_taxonomy_select';
     }

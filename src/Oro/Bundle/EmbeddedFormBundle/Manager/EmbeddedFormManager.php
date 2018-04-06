@@ -40,8 +40,6 @@ class EmbeddedFormManager
      */
     public function createForm($type, $data = null, $options = [])
     {
-        $type    = $this->getTypeInstance($type) ? : $type;
-
         return $this->formFactory->create($type, $data, $options);
     }
 

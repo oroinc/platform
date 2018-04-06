@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -74,7 +75,7 @@ class EnumSelectType extends AbstractEnumType
      */
     public function getParent()
     {
-        return 'oro_select2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 
     /**

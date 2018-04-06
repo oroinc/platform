@@ -886,14 +886,14 @@ services:
     oro_api.rest.set_http_response_status_code.created:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 201
+            - 201
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.no_content:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 204
+            - 204
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -30 }
@@ -904,7 +904,7 @@ services:
     oro_api.rest.set_http_response_status_code.not_allowed:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         arguments:
-           - 405
+            - 405
         tags:
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, priority: -30 }
 

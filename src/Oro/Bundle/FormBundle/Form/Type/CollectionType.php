@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType as SymfonyCollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -74,7 +75,7 @@ class CollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'collection';
+        return SymfonyCollectionType::class;
     }
 
     /**

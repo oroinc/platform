@@ -253,4 +253,4 @@ services:
         class: 'Oro\Bundle\ActionBundle\Operation\Execution\FormProvider'
         arguments:
             - '@form.factory'
-            - '@oro_action.form.type.operation_execution'
+            - Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType

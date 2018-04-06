@@ -3,6 +3,8 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
+use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,11 +43,11 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('file', 'oro_file');
+            ->with('file', FileType::class);
 
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('comment', 'textarea');
+            ->with('comment', TextareaType::class);
 
         $this->attachmentType->buildForm($builder, ['checkEmptyFile' => true, 'allowDelete' => true]);
     }

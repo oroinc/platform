@@ -74,18 +74,29 @@ class ErrorCompleter extends AbstractErrorCompleter
                 if (in_array($propertyPath, $metadata->getIdentifierFieldNames(), true)) {
                     $pointer[] = JsonApiDoc::ID;
                 } elseif (array_key_exists($propertyPath, $metadata->getFields())) {
-                    $pointer = [JsonApiDoc::ATTRIBUTES, $propertyPath];
+                    if ($metadata->hasIdentifierFields()) {
+                        $pointer = [JsonApiDoc::ATTRIBUTES, $propertyPath];
+                    } else {
+                        $pointer = [$propertyPath];
+                    }
                 } else {
                     $path = explode('.', $propertyPath);
                     if (array_key_exists($path[0], $metadata->getAssociations())) {
-                        $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
+                        if ($metadata->hasIdentifierFields()) {
+                            $pointer = $this->getAssociationPointer($path, $metadata->getAssociation($path[0]));
+                        } else {
+                            $pointer = [$propertyPath];
+                        }
                     } else {
                         $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
                         $error->setSource(null);
                     }
                 }
                 if (!empty($pointer)) {
-                    $source->setPointer(sprintf('/%s/%s', JsonApiDoc::DATA, implode('/', $pointer)));
+                    $dataSection = $metadata->hasIdentifierFields()
+                        ? JsonApiDoc::DATA
+                        : JsonApiDoc::META;
+                    $source->setPointer(sprintf('/%s/%s', $dataSection, implode('/', $pointer)));
                     $source->setPropertyPath(null);
                 }
             }

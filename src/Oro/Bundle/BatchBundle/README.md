@@ -1,10 +1,8 @@
-OroBatchBundle
-============
+# OroBatchBundle
 
-The bundle provides instruments for performing batch operations
+OroBatchBundle adds [AkeneoBatchBundle](https://github.com/akeneo/BatchBundle) to Oro applications and enables the batch architecture usage for data processing.
 
-Components
-----------
+## Components
 
 **BufferedIdentityQueryResultIterator**
 

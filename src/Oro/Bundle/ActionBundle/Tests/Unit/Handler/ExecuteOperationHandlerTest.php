@@ -293,7 +293,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($executionForm);
         $executionForm
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->willThrowException(new AlreadySubmittedException('form already submitted'));
 
         $definition = new OperationDefinition();

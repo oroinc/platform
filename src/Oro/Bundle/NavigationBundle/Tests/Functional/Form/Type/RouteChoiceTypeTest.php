@@ -34,7 +34,7 @@ class RouteChoiceTypeTest extends WebTestCase
      */
     public function testCreateView(array $options, array $expectedChoices)
     {
-        $form = $this->formFactory->create(RouteChoiceType::NAME, null, $options);
+        $form = $this->formFactory->create(RouteChoiceType::class, null, $options);
 
         $formView = $form->createView();
         $this->assertEquals($expectedChoices, $formView->vars['choices']);
