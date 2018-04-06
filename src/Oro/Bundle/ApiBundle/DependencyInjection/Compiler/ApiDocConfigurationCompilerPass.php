@@ -112,7 +112,7 @@ class ApiDocConfigurationCompilerPass implements CompilerPassInterface
         );
         $defaultHtmlFormatterDef->addMethodCall(
             'setWebBackendPrefix',
-            [$container->getParameter('web_backend_prefix')]
+            [$container->hasParameter('web_backend_prefix') ? $container->getParameter('web_backend_prefix') : '']
         );
 
         // configure composite HTML formatter and set it as default one

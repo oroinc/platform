@@ -550,7 +550,7 @@ services:
             - [setDefaultSectionsOpened, ['%nelmio_api_doc.default_sections_opened%']]
             - [setFileLocator, ['@file_locator']]
             - [setDocumentationPath, ['%oro_api.api_doc.path%']]
-            - [setWebBackendPrefix, ['%web_backend_prefix%']]
+            - [setWebBackendPrefix, ["@=container.hasParameter('web_backend_prefix') ? parameter('web_backend_prefix') : ''"]]
 
     oro_api.api_doc.formatter.html_formatter.composite:
         class: Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter
