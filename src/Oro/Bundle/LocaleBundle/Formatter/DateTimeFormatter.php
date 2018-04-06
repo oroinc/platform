@@ -3,9 +3,11 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * Format dates based on locale settings
+ */
 class DateTimeFormatter
 {
     const DEFAULT_DATE_TYPE = \IntlDateFormatter::MEDIUM;
