@@ -1,0 +1,7 @@
+trusted_data:
+    safe_methods:
+        Oro\Bundle\DashboardBundle\Helper\DateHelper:
+            getTimeZoneOffset: true
+    check_methods_safety:
+        Oro\Bundle\DashboardBundle\Helper\DateHelper:
+            getEnforcedTimezoneFunction: true

@@ -1,0 +1,20 @@
+trusted_data:
+    variables:
+        Oro\Bundle\ApiBundle\Util\EntityIdHelper:
+            applyEntityIdentifierRestriction:
+                propertyName: true
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
+            process:
+                parentJoinAlias: true
+            addJoinToParentEntity:
+                parentClassName: true
+                joinAlias: true
+    safe_methods:
+        Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery:
+            getJoinFieldName: true
+        Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig:
+            findFieldNameByPropertyPath: true
+            getIdentifierFieldNames: true
+    check_methods_safety:
+        Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor:
+            buildPlaceholder: true

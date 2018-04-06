@@ -1,0 +1,4 @@
+trusted_data:
+    safe_methods:
+        Oro\Bundle\NavigationBundle\Entity\Repository\PinbarTabRepository:
+            getNavigationItemClassName: true

@@ -1,0 +1,5 @@
+trusted_data:
+    variables:
+        Oro\Bundle\IntegrationBundle\Command\CleanupCommand:
+            processDeletion:
+                className: true

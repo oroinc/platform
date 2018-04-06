@@ -1,0 +1,11 @@
+trusted_data:
+    variables:
+        Oro\Bundle\UserBundle\Entity\Repository\UserRepository:
+            getPrimaryEmailsQb:
+                fullNameQueryPart: true
+            getSecondaryEmailsQb:
+                fullNameQueryPart: true
+    properties:
+        Oro\Bundle\UserBundle\Autocomplete\WidgetRoleSearchHandler:
+            getEntitiesByIds:
+                idFieldName: true

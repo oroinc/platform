@@ -1,0 +1,8 @@
+trusted_data:
+    variables:
+        Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository:
+            getBatchIterator:
+                fieldName: true
+    safe_methods:
+        Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter:
+            getFormattedNameDQL: true
