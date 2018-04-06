@@ -14,7 +14,7 @@ $loading-bar-animation-name: line-loader !default;
 $loading-bar-animation: $loading-bar-animation-name 5s forwards !default;
 $loading-bar-overflow: hidden !default;
 
-$loading-bar-point-background: lighten($loading-bar-background, 35%) !default;
+$loading-bar-point-background: lighten($loading-bar-background, 20%) !default;
 $loading-bar-point-box-shadow: 0 0 50px 50px $loading-bar-point-background !default;
 $loading-bar-point-width: 15% !default;
 $loading-bar-point-height: 100% !default;
