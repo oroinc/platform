@@ -1,0 +1,5 @@
+trusted_data:
+    variables:
+        Oro\Bundle\MigrationBundle\Event\MigrationEvent:
+            getData:
+                sql: true

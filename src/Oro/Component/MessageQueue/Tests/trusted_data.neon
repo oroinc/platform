@@ -1,0 +1,12 @@
+trusted_data:
+    variables:
+        Oro\Component\MessageQueue\Job\JobStorage:
+            createJobQueryBuilder:
+                alias: true
+    properties:
+        Oro\Component\MessageQueue\Job\JobStorage:
+            createJobQueryBuilder:
+                entityClass: true
+    safe_methods:
+        Oro\Component\MessageQueue\Transport\Dbal\DbalConnection:
+            getTableName: true

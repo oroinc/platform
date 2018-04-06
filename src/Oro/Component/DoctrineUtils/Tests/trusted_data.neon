@@ -1,0 +1,50 @@
+trusted_data:
+    variables:
+        Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil:
+            applyJoins:
+                condition: true
+    safe_methods:
+        Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder:
+            setMaxResults: true
+            setFirstResult: true
+        Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
+            getSQL: true
+            setParameter: true
+            setParameters: true
+            setMaxResults: true
+            setFirstResult: true
+    check_static_methods_safety:
+        Oro\Component\DoctrineUtils\ORM\QueryUtil:
+            cloneQuery: true
+            getExecutableSql: true
+            parseQuery: true
+    safe_static_methods:
+        Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil:
+            getSingleRootAlias: true
+            getSelectExprByAlias: true
+            getPageOffset: true
+            sprintf: true
+            getField: true
+            getSortOrder: true
+            generateParameterName: true
+    check_methods:
+        Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder:
+            addOrderBy: true
+            setAlias: true
+            addSelect: [0, 1]
+        Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder:
+            __all__: true
+            where: [0, 1]
+            orWhere: [0, 1]
+            andWhere: [0, 1]
+            having: [0, 1]
+            orHaving: [0, 1]
+            andHaving: [0, 1]
+            join: [0, 1, 3]
+            leftJoin: [0, 1, 3]
+            innerJoin: [0, 1, 3]
+    clear_static_methods:
+        Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil:
+            checkIdentifier: true
+            checkParameter: true
+            checkField: true
