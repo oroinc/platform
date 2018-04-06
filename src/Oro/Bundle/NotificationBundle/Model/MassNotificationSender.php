@@ -65,7 +65,9 @@ class MassNotificationSender
         $senderEmail = null,
         $senderName = null
     ) {
-        $senderName = $senderName ? : $senderEmail ? : $this->cm->get('oro_notification.email_notification_sender_name');
+        $senderName = $senderName
+            ? : $senderEmail
+            ? : $this->cm->get('oro_notification.email_notification_sender_name');
         $senderEmail = $senderEmail ? : $this->cm->get('oro_notification.email_notification_sender_email');
 
         $recipients = $this->getRecipientEmails();
