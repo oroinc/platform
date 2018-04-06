@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Utils;
 
-use Symfony\Component\Intl\Intl;
-
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
 use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Symfony\Component\Intl\Intl;
 
 class CurrencyNameHelperStub extends CurrencyNameHelper
 {

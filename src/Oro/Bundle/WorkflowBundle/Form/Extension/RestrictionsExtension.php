@@ -2,18 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Extension;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
-use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 class RestrictionsExtension extends AbstractTypeExtension
 {
@@ -103,7 +102,9 @@ class RestrictionsExtension extends AbstractTypeExtension
         $field = $restriction['field'];
         $mode  = $restriction['mode'];
         if ($mode === 'full') {
-            FormUtils::replaceField($form, $field, ['read_only' => true]);
+            FormUtils::replaceFieldOptionsRecursive($form, $field, [
+                'attr' => ['readonly' => true]
+            ]);
         } else {
             $values = $restriction['values'];
             if ($mode === 'disallow') {
@@ -128,7 +129,9 @@ class RestrictionsExtension extends AbstractTypeExtension
         if ($fieldForm->getConfig()->hasOption('excluded_values')) {
             FormUtils::replaceField($form, $field, ['excluded_values' => $disabledValues]);
         } else {
-            FormUtils::replaceField($form, $field, ['read_only' => true]);
+            FormUtils::replaceFieldOptionsRecursive($form, $field, [
+                'attr' => ['readonly' => true]
+            ]);
         }
     }
 }

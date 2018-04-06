@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
+use Symfony\Component\Form\FormEvents;
 
 class CommentSubscriberTest extends \PHPUnit_Framework_TestCase
 {

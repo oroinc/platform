@@ -1,11 +1,10 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\NavigationBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\NavigationBundle\DependencyInjection\Configuration;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

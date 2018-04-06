@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Collection;
 
-use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\ExpressionVisitor;
+use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\Query\Expr as ExpressionBuilder;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
-
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
 

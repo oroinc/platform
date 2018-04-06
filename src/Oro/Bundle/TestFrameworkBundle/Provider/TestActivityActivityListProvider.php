@@ -98,7 +98,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'   => '',

@@ -2,22 +2,21 @@
 
 namespace EntityExtendBundle\Tests\Unit\Form\Util;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util\Stub\Entity;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util\Stub\Entity;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DynamicFieldsHelperTest extends \PHPUnit_Framework_TestCase
 {

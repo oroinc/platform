@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
-
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemoverValidator;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 class HasAdderAndRemoverValidatorTest extends AbstractConstraintValidatorTest
 {

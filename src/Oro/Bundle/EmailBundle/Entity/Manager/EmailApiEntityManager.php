@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;

@@ -4,15 +4,13 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\ORM\Query\Expr as Expr;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;

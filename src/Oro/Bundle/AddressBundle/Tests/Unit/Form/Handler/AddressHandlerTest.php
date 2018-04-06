@@ -17,7 +17,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
     private $form;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Request
      */
     private $request;
 
@@ -39,7 +39,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->form = $this->createMock(FormInterface::class);
-        $this->request = $this->createMock(Request::class);
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->om = $this->createMock(ObjectManager::class);
@@ -53,9 +53,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData');
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit');
@@ -77,9 +75,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData');
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('GET'));
+        $this->request->setMethod('GET');
 
         $this->form->expects($this->never())
             ->method('submit');
@@ -100,9 +96,7 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('setData');
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $this->request->setMethod('POST');
 
         $this->form->expects($this->once())
             ->method('submit');

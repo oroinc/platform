@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Symfony\Component\Form\Guess\Guess;
-
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Guess\Guess;
 
 class ColumnOptionsGuesserChain implements ColumnOptionsGuesserInterface
 {

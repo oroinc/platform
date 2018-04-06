@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration\Schema;
 
-use Doctrine\DBAL\Schema\Table as BaseTable;
 use Doctrine\DBAL\Schema\Column as BaseColumn;
+use Doctrine\DBAL\Schema\Table as BaseTable;
 
 /**
  * The aim of this class is to provide a way extend doctrine Column class

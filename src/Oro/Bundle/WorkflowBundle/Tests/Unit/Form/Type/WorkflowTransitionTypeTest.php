@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
@@ -31,7 +30,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         return [
             new PreloadedExtension(
                 [
-                    WorkflowAttributesType::NAME => $this->createWorkflowAttributesType(),
+                    WorkflowAttributesType::class => $this->createWorkflowAttributesType(),
                 ],
                 []
             )
@@ -45,7 +44,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_workflow_attributes', $this->type->getParent());
+        $this->assertEquals(WorkflowAttributesType::class, $this->type->getParent());
     }
 
     public function testBuildForm()

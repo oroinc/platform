@@ -3,23 +3,19 @@
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class GridViewsExtension extends AbstractExtension
 {

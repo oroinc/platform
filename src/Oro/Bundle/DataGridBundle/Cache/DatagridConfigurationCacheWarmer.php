@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class DatagridConfigurationCacheWarmer implements CacheWarmerInterface
 {

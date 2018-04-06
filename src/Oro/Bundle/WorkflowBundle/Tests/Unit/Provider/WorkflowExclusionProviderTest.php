@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 

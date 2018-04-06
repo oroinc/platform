@@ -6,42 +6,47 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
+/**
+ * Give an additional chance to authorise user from session context if
+ * the current request is AJAX request (has X-CSRF-Header header)
+ * and it has session identifier in cookies.
+ * This is required because API can work in two modes, stateless and statefull.
+ * The statefull mode is used when API is called internally from web pages as AJAX request.
+ */
 class SecurityFirewallContextListener implements ListenerInterface
 {
     /** @var ListenerInterface */
-    protected $innerListener;
+    private $innerListener;
 
     /** @var array */
-    protected $sessionOptions;
+    private $sessionName;
 
     /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
     /**
      * @param ListenerInterface     $innerListener
-     * @param array                 $sessionOptions
+     * @param string                $sessionName
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
         ListenerInterface $innerListener,
-        array $sessionOptions,
+        string $sessionName,
         TokenStorageInterface $tokenStorage
     ) {
         $this->innerListener = $innerListener;
-        $this->sessionOptions = $sessionOptions;
+        $this->sessionName = $sessionName;
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(GetResponseEvent $event)
+    public function handle(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
-        // in case if has no token and cookies has session cookie and request has X-CSRF-Header header (ajax request) -
-        // give additional chance to authorise user from session context.
         if (null === $this->tokenStorage->getToken()
-            && $request->cookies->has($this->sessionOptions['name'])
+            && $request->cookies->has($this->sessionName)
             && $request->headers->has('X-CSRF-Header')
         ) {
             $this->innerListener->handle($event);

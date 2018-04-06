@@ -2,23 +2,20 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
-
-use Oro\Bundle\SoapBundle\Model\BinaryDataProviderInterface;
-use Oro\Bundle\SoapBundle\Handler\Context;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Handler\Context;
+use Oro\Bundle\SoapBundle\Model\BinaryDataProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @RouteResource("file")

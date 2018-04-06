@@ -3,14 +3,15 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Knp\Menu\ItemInterface;
-use Knp\Menu\Twig\Helper;
 use Knp\Menu\Provider\MenuProviderInterface;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Knp\Menu\Twig\Helper;
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Twig extension for menu & breadcrumbs rendering
+ */
 class MenuExtension extends \Twig_Extension
 {
     const MENU_NAME = 'oro_menu';
@@ -133,7 +134,7 @@ class MenuExtension extends \Twig_Extension
                 $invisibleChildrenCount = 0;
                 /** @var ItemInterface $child */
                 foreach ($filteredChildren as $child) {
-                    if (!$child->getLabel() || !$child->getExtra('isAllowed')) {
+                    if (!$child->getLabel() || !$child->getExtra('isAllowed') || !$child->isDisplayed()) {
                         $invisibleChildrenCount++;
                     }
                 }

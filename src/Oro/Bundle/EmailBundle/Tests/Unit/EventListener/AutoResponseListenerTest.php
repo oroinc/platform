@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class PreFlushConfigEvent extends Event
 {

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
-use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
 class ResourceFileImportProcessorTest extends \PHPUnit_Framework_TestCase

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigBag
 {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Validation;
 
-use Symfony\Component\DomCrawler\Form;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Form;
 
 class ReportValidationTest extends WebTestCase
 {

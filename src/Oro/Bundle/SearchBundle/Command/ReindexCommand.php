@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Command;
 
+use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).

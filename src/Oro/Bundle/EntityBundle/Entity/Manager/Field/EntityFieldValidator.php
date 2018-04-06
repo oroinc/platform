@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
-use FOS\RestBundle\Util\Codes;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldValidator
 {

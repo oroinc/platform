@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Writer;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;

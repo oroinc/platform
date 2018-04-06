@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 

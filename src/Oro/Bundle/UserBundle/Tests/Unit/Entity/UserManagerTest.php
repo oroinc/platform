@@ -5,16 +5,14 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
-
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class UserManagerTest extends \PHPUnit_Framework_TestCase
 {

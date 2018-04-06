@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Symfony\Component\Form\FormView;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class IntegrationTypeSelectType extends AbstractType
 {
@@ -69,7 +69,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataAuditBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AuditFieldExtension

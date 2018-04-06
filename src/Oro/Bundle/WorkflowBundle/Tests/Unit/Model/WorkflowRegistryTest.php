@@ -5,15 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SidebarBundle\Twig;
 
-use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SidebarExtension extends \Twig_Extension implements FeatureToggleableInterface
 {

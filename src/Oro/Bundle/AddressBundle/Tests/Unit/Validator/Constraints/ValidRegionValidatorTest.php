@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
-use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
+use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,7 +54,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
     public function testIsRegionValidNoCountry()
     {
         $this->context->expects($this->never())
-            ->method('addViolationAt');
+            ->method('buildViolation');
 
         $address = $this->createAddress();
         $this->validator->validate($address, $this->constraint);
@@ -71,7 +71,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $this->context->expects($this->never())
-            ->method('addViolationAt');
+            ->method('buildViolation');
 
         $address = $this->createAddress();
         $address->setCountry($country);
@@ -91,13 +91,21 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Country'));
 
+        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($this->once())
-            ->method('addViolationAt')
-            ->with(
-                'region',
-                $this->constraint->message,
-                ['{{ country }}' => 'Country']
-            );
+            ->method('buildViolation')
+            ->with($this->constraint->message)
+            ->willReturn($builder);
+        $builder->expects($this->once())
+            ->method('atPath')
+            ->with('region')
+            ->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('setParameters')
+            ->with(['{{ country }}' => 'Country'])
+            ->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('addViolation');
 
         $address = $this->createAddress();
         $address->setCountry($country);

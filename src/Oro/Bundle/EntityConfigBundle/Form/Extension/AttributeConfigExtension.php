@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
-
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -122,6 +122,6 @@ class AttributeConfigExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'oro_entity_config_type';
+        return ConfigType::class;
     }
 }

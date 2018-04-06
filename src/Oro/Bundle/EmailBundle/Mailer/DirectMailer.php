@@ -3,17 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Monolog\Logger;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
+use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -128,7 +126,7 @@ class DirectMailer extends \Swift_Mailer
         $port = $smtpSettings->getPort();
         $encryption = $smtpSettings->getEncryption();
 
-        if ($transport instanceof \Swift_SmtpTransport) {
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
             $transport->setHost($host);
             $transport->setPort($port);
             $transport->setEncryption($encryption);

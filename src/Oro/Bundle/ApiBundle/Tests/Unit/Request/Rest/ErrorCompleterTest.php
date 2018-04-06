@@ -2,27 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
+use Symfony\Component\HttpFoundation\Response;
 
 class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $exceptionTextExtractor;
+    private $exceptionTextExtractor;
 
     /** @var RequestType */
-    protected $requestType;
+    private $requestType;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadata;
+    private $metadata;
 
     /** @var ErrorCompleter */
-    protected $errorCompleter;
+    private $errorCompleter;
 
     protected function setUp()
     {
@@ -92,21 +91,21 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
         $expectedError->setDetail('test detail');
         $expectedError->setInnerException($exception);
 
-        $this->exceptionTextExtractor->expects($this->once())
+        $this->exceptionTextExtractor->expects(self::once())
             ->method('getExceptionStatusCode')
-            ->with($this->identicalTo($exception))
+            ->with(self::identicalTo($exception))
             ->willReturn($expectedError->getStatusCode());
-        $this->exceptionTextExtractor->expects($this->once())
+        $this->exceptionTextExtractor->expects(self::once())
             ->method('getExceptionCode')
-            ->with($this->identicalTo($exception))
+            ->with(self::identicalTo($exception))
             ->willReturn($expectedError->getCode());
-        $this->exceptionTextExtractor->expects($this->once())
+        $this->exceptionTextExtractor->expects(self::once())
             ->method('getExceptionType')
-            ->with($this->identicalTo($exception))
+            ->with(self::identicalTo($exception))
             ->willReturn($expectedError->getTitle());
-        $this->exceptionTextExtractor->expects($this->once())
+        $this->exceptionTextExtractor->expects(self::once())
             ->method('getExceptionText')
-            ->with($this->identicalTo($exception))
+            ->with(self::identicalTo($exception))
             ->willReturn($expectedError->getDetail());
 
         $this->errorCompleter->complete($error, $this->requestType);

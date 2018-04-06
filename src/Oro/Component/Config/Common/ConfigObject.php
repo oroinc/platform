@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Config\Common;
 
-use Symfony\Component\Config\Definition\Processor;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class ConfigObject implements \ArrayAccess, \IteratorAggregate
 {

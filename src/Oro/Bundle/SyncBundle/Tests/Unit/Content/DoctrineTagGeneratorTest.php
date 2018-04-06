@@ -3,11 +3,10 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;

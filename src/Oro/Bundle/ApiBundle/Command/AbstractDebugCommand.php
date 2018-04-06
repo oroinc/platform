@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * A base class for CLI commands that shows a different kind of debug information about Data API configuration.

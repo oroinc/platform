@@ -3,11 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;

@@ -1,10 +1,9 @@
 <?php
 namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
-use Oro\Bundle\UserBundle\Form\Type\EmailType;
 use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Form\Type\EmailType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EmailTypeTest extends FormIntegrationTestCase
 {
@@ -14,8 +13,7 @@ class EmailTypeTest extends FormIntegrationTestCase
             'email' => 'test@example.com',
         );
 
-        $type = new EmailType();
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(EmailType::class);
 
         $email = new Email();
         $email->setEmail($formData['email']);

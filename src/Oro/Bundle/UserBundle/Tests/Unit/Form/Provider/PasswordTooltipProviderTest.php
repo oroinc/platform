@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
+use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class PasswordTooltipProviderTest extends \PHPUnit_Framework_TestCase
 {

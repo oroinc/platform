@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle;
 
+use Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-use Oro\Bundle\FilterBundle\DependencyInjection\Compiler\FilterTypesPass;
 
 class OroFilterBundle extends Bundle
 {

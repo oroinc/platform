@@ -3,18 +3,20 @@
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class MergeFieldType extends AbstractType
 {
@@ -41,7 +43,7 @@ class MergeFieldType extends AbstractType
 
         $builder->add(
             'sourceEntity',
-            'entity',
+            EntityType::class,
             array(
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],
@@ -59,7 +61,7 @@ class MergeFieldType extends AbstractType
         if (count($mergeModes) > 1) {
             $builder->add(
                 'mode',
-                'choice',
+                ChoiceType::class,
                 array(
                     'choices'  => $this->getMergeValues($mergeModes),
                     'multiple' => false,
@@ -71,7 +73,7 @@ class MergeFieldType extends AbstractType
         } else {
             $builder->add(
                 'mode',
-                'hidden',
+                HiddenType::class,
                 array('data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes))
             );
         }
@@ -136,22 +138,17 @@ class MergeFieldType extends AbstractType
             )
         );
 
-        $resolver->setAllowedTypes(
-            array(
-                'metadata' => 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata',
-                'entities' => 'array',
-            )
-        );
+        $resolver->setAllowedTypes('metadata', 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata');
+        $resolver->setAllowedTypes('entities', 'array');
 
-        $resolver->setNormalizers(
-            array(
-                'label' => function (Options $options, $value) {
-                    if (!$value) {
-                        $value = $options['metadata']->get('label');
-                    }
-                    return $value;
+        $resolver->setNormalizer(
+            'label',
+            function (Options $options, $value) {
+                if (!$value) {
+                    $value = $options['metadata']->get('label');
                 }
-            )
+                return $value;
+            }
         );
     }
 

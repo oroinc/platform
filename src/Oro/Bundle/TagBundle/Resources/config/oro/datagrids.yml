@@ -71,7 +71,7 @@ datagrids:
                 taxonomyName:
                     data_name: tagTaxonomy.name
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
 
         filters:
             columns:
@@ -193,7 +193,7 @@ datagrids:
                 usage:
                     data_name: usage
             default:
-                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
         filters:
             columns:
                 name:

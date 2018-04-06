@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTypeInterface
 {
@@ -47,7 +47,7 @@ class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTyp
      */
     public function getParent()
     {
-        return NumberFilterType::NAME;
+        return NumberFilterType::class;
     }
 
     /**
@@ -56,7 +56,7 @@ class NumberRangeFilterType extends AbstractType implements NumberRangeFilterTyp
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('value_end', 'hidden') // range end
+            ->add('value_end', HiddenType::class) // range end
         ;
     }
 

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Component\Layout\LayoutContext;
-
 use Oro\Bundle\LayoutBundle\Layout\Extension\DataContextConfigurator;
+use Oro\Component\Layout\LayoutContext;
 
 class DataContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

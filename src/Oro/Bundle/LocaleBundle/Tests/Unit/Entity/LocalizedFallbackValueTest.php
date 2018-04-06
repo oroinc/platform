@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
-
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class LocalizedFallbackValueTest extends \PHPUnit_Framework_TestCase

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
+use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-
-use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Mode;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 abstract class AbstractMapper
 {

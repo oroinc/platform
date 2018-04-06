@@ -5,9 +5,9 @@ namespace Oro\Bundle\ImapBundle\Connector;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
+use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
-use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
 /**
  * A base class for connectors intended to work with email's servers through IMAP protocol.

@@ -5,22 +5,21 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
 use Symfony\Component\Validator\ValidatorInterface;
-
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
-use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class ImportStrategyHelper
 {
@@ -166,6 +165,7 @@ class ImportStrategyHelper
      */
     public function validateEntity($entity, $groups = null)
     {
+        // TODO: change to $violations = $this->validator->validate($entity, null, $groups); in scope of BAP-15236
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
             $errors = [];

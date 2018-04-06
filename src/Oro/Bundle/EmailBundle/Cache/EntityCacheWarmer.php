@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Cache;
 
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\KernelInterface;
-
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class EntityCacheWarmer extends CacheWarmer
 {

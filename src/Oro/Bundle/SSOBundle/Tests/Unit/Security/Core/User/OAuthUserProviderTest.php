@@ -3,15 +3,14 @@
 namespace Oro\Bundle\SSOBundle\Tests\Entity;
 
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
-
 use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
 use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
 {

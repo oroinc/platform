@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Class EmailThreadTest

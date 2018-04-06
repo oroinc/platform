@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * For "create" action adds NotNull validation constraint for "owner" field.

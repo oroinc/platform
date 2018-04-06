@@ -14,12 +14,12 @@ services:
             - { name: twig.extension }
 
     oro_windows.manager.windows_state_registry:
-        class: %oro_windows.manager.windows_state_registry.class%
+        class: '%oro_windows.manager.windows_state_registry.class%'
         arguments:
             - '@oro_windows.manager.windows_state'
 
     oro_windows.manager.windows_state.abstract:
-        class: %oro_windows.manager.windows_state.class%
+        class: '%oro_windows.manager.windows_state.class%'
         abstract: true
         arguments:
             - '@security.token_storage'
@@ -29,10 +29,10 @@ services:
     oro_windows.manager.windows_state:
         parent: oro_windows.manager.windows_state.abstract
         arguments:
-            - %oro_windows.entity.windows_state.class%
-            - %oro_user.entity.class%
+            - '%oro_windows.entity.windows_state.class%'
+            - '%oro_user.entity.class%'
 
     oro_windows.manager.windows_state_request:
-        class: %oro_windows.manager.windows_state_request.class%
+        class: '%oro_windows.manager.windows_state_request.class%'
         arguments:
             - '@request_stack'

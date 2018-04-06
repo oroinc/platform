@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class ChangeRoleSubscriberTest extends \PHPUnit_Framework_TestCase
 {

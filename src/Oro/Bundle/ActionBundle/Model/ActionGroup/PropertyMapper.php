@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model\ActionGroup;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 class PropertyMapper
 {

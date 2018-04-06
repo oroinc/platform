@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -14,7 +14,15 @@ define([
      */
     DateCell = DateTimeCell.extend({
         type: 'date',
-        className: 'date-cell'
+
+        className: 'date-cell',
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function DateCell() {
+            DateCell.__super__.constructor.apply(this, arguments);
+        }
     });
 
     return DateCell;

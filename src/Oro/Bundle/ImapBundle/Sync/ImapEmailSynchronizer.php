@@ -3,21 +3,20 @@
 namespace Oro\Bundle\ImapBundle\Sync;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Exception\InvalidCredentialsException;
 use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 

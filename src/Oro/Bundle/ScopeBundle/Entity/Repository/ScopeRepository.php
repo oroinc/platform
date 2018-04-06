@@ -5,7 +5,6 @@ namespace Oro\Bundle\ScopeBundle\Entity\Repository;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\ScopeBundle\Entity\Scope;

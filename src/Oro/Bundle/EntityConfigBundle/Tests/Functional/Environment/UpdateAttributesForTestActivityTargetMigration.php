@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;

@@ -8,10 +8,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Manage config fields
+ */
 class CreateUpdateConfigFieldHandler
 {
     /** @var ConfigHelperHandler */
@@ -123,7 +125,9 @@ class CreateUpdateConfigFieldHandler
             $this->configManager->persist($extendEntityConfig);
             $this->configManager->flush();
 
-            return $this->configHelperHandler->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
+            return $this
+                ->configHelperHandler->showClearCacheMessage()
+                ->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
         }
 
         return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);

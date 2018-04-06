@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\ButtonTypeInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -10,8 +12,6 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\SubmitButtonTypeInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApiResolvedFormType implements ResolvedFormTypeInterface
 {
@@ -24,6 +24,12 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     public function __construct(ResolvedFormTypeInterface $innerType)
     {
         $this->innerType = $innerType;
+    }
+
+    public function getBlockPrefix()
+    {
+        //@TODO  Uncomment in scope of BAP-16504
+        //return $this->innerType->getBlockPrefix();
     }
 
     /**

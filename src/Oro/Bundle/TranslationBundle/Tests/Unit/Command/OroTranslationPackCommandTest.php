@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-
-use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand;
+use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 {

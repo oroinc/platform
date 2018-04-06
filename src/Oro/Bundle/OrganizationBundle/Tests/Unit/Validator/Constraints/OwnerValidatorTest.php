@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
 
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OwnerValidatorTest extends AbstractConstraintValidatorTest
 {

@@ -8,6 +8,16 @@ define(function(require) {
     ReminderShowComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat(['reminderData']),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ReminderShowComponent() {
+            ReminderShowComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             reminderHandler.setReminders(this.reminderData);
             reminderHandler.showReminders();

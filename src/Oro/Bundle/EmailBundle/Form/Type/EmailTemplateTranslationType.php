@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailTemplateTranslationType extends AbstractType
 {
@@ -45,8 +44,7 @@ class EmailTemplateTranslationType extends AbstractType
         $resolver->setDefaults(
             [
                 'translatable_class'   => 'Oro\\Bundle\\EmailBundle\\Entity\\EmailTemplate',
-                'intention'            => 'emailtemplate_translation',
-                'cascade_validation'   => true,
+                'csrf_token_id'        => 'emailtemplate_translation',
                 'labels'               => [],
                 'content_options'      => [],
                 'subject_options'      => [],
@@ -56,11 +54,11 @@ class EmailTemplateTranslationType extends AbstractType
                             [
                                 'field_type' => 'text'
                             ],
-                            $options->get('subject_options')
+                            $options['subject_options']
                         ),
                         'content' => array_merge_recursive(
                             [
-                                'field_type'      => 'oro_email_template_rich_text',
+                                'field_type'      => EmailTemplateRichTextType::class,
                                 'attr'            => [
                                     'class'                => 'template-editor',
                                     'data-wysiwyg-enabled' => $isWysiwygEnabled,
@@ -69,7 +67,7 @@ class EmailTemplateTranslationType extends AbstractType
                                     'height'     => '250px'
                                 ]
                             ],
-                            $options->get('content_options')
+                            $options['content_options']
                         )
                     ];
                 },

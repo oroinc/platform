@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets an initial list of requests for configuration data.

@@ -6,7 +6,6 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType as BaseTextType;
@@ -48,12 +47,12 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'labels',
-            LocalizedFallbackValueCollectionType::NAME,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.labels.label',
                 'block' => 'settings',
                 'required' => true,
-                'options' => [
+                'entry_options' => [
                     'constraints' => [
                         new NotBlank(['message' => 'oro.entity_config.validator.attribute_family.labels.blank'])
                     ]
@@ -72,7 +71,7 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'image',
-            ImageType::NAME,
+            ImageType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.image.label',
                 'block' => 'settings',
@@ -82,12 +81,12 @@ class AttributeFamilyType extends AbstractType
 
         $builder->add(
             'attributeGroups',
-            AttributeGroupCollectionType::NAME,
+            AttributeGroupCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_family.attribute_groups.label',
                 'block' => 'attributes',
                 'required' => false,
-                'options' => [
+                'entry_options' => [
                     'attributeEntityClass' => $options['attributeEntityClass'],
                     'data_class' => AttributeGroup::class
                 ],

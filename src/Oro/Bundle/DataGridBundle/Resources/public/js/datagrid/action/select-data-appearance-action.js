@@ -21,6 +21,13 @@ define([
         collection: undefined,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function SelectDataAppearanceAction() {
+            SelectDataAppearanceAction.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * Initialize action
          *
          * @param {Object} options

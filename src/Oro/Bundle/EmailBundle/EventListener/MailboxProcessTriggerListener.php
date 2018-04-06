@@ -6,10 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
@@ -19,6 +15,8 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 class MailboxProcessTriggerListener extends MailboxEmailListener implements
     LoggerAwareInterface,

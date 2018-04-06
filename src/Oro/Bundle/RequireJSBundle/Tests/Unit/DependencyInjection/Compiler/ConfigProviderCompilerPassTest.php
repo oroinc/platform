@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\RequireJSBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
+use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\RequireJSBundle\DependencyInjection\Compiler\ConfigProviderCompilerPass;
-use Oro\Bundle\RequireJSBundle\Provider\Config as ConfigProvider;
 
 class ConfigProviderCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

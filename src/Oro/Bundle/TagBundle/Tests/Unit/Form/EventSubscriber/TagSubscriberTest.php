@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventSubscriber;
 
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
+use Symfony\Component\Form\FormEvents;
 
 class TagSubscriberTest extends \PHPUnit_Framework_TestCase
 {

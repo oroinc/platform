@@ -4,10 +4,8 @@ namespace Oro\Bundle\EntityBundle\DataCollector;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-
-use Symfony\Component\Stopwatch\Stopwatch;
-
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Expression;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\QueryException;
-
 use Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 

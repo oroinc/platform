@@ -3,14 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-
-use Symfony\Component\Form\AbstractExtension;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Symfony\Component\Form\AbstractExtension;
 
 class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
 {

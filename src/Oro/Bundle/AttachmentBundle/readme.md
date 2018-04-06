@@ -1,49 +1,46 @@
 # OroAttachmentBundle
 
-Manipulate attachments to entities
+OroAttachmentBundle introduces two entity field types: an image and a file, and enables their usage with the Oro extended entities.
 
-This bundle allows to add file and image field types to extend entities.
+## System Configuration
 
-## System configuration.
+In the system configuration, under `General Setup > Upload settings`, a user can configure supported mime types for files and image fields.
 
-In system configuration where is block `Upload settings`. In this block user can configure supported mime types for file and image field types.
+Each mime type should be set from a new line.
 
-Delimiter between each mime type is new line.
+Additionally, you can define mime types templates. For example, the `image/*` mime record supports all image file types.
 
-Additional you can set mime types templates. For example, mime record `image/*` will support all images file types.
+## File Type
 
-## File type
+File type enables to upload files to any entity.
 
-File type allows to upload file to entity.
+When creating a new file field type, a user should specify the maximum size of the file supported for this field.
 
-By create new file field type process, user should specify maximum file size for this field.
+On the entity record's details page, this field is displayed as a link to download this file.
 
-In view page this field will be displayed as the link for download this file.
+## Image Type
 
-## Image type
+Image file type enables to upload images to any entity.
 
-Image file type allows to upload images to entities.
+When creating a new image field type, a user should specify maximum size of the file supported for this field as well as its width and height to enable the thumbnail image preview.
 
-This field data will be shown as image thumb with link to download original image file.
+On the entity record's details page, this field is displayed as a thumbnail image with a link to download the original image file.
 
-By create new image field type process, user should specify maximum file size for this field and width and height of preview thumbnail of view page.
+## Storage Configuration
 
-## Storage configuration
+OroAttachmentBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) to provide a filesystem abstraction layer.
 
-OroAttachmentBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) for providing a filesystem abstraction layer.
+Based on the default configuration, it stores files in `app/attachment directory` of your project. A user can reconfigure these settings. You can find more information on the KnpGaufretteBundle configuration in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
 
-By default, it configured to store files in `app/attachment directory` of your project. User can reconfigure this settings. More info about KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
+Image thumbnail files are created from [LiipImagineBundle](https://github.com/liip/LiipImagineBundle) and are stored in the `web/media/cache/attachment` directory.
 
-Image thumbnails takes with [LiipImagineBundle](https://github.com/liip/LiipImagineBundle). Thumbnail files sores in `web/media/cache/attachment` directory.
+## ACL Protection
 
-## ACL protection
+Provides access to files and images of the entity which they are assigned to. A user should have view permissions to a parent record to be authorized to download attached files.
 
-Access to files and images takes from entity, where this field types assigned. To have access to download attached file, user should have view permission to parent record.
+## Migration Extension Usage Example
 
-
-## Migration Extension usage example
-
-It is possible to create image or file field via migrations with help of AttachmentExtension. For example:
+It is possible to create an image or a file field via migrations using AttachmentExtension. For example:
 
 ```
 <?php
@@ -89,7 +86,7 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
 
 ```
 
-Also you can enable attachments for entity, e.g.:
+Also, you can enable attachments for an entity, e.g.:
 
 ```
 <?php
@@ -130,49 +127,48 @@ class AcmeDemoBundle implements Migration, AttachmentExtensionAwareInterface
 }
 ```
 
-# Entity attachments
+# Entity Attachments
 
-Configurable entities can use attachments for adding additional files to records.
+Configurable entities can use attachments for adding additional files to their records.
 
-To turn attachments for entity, administrator should turn attachments in UI for current entity configuration.
+To enable attachments for an entity, an administrator should enable them in the current entity configuration.
 
-Additional, admin can set array with allowed mine types and maximum attached file size.
-If mime types was not set, the mime types from `Upload settings` (system configuration) will be used for validation.
+Additionally, admin can set array with allowed mine types and maximum sizes of the attached files.
 
-After the schema was updated, for current entity will be available button `Add attachment`.
+If no mime types were set, the mime types from `Upload settings` (system configuration) is used for validation.
 
-# Image formatters
+Once the schema is updated, the `Add attachment` button becomes available for the current entity.
 
-User can use 3 formatters for image type fields.
+# Image Formatters
 
-`image_encoded` returns img tag with embedded image content in src attribute. Additional parameters:
+A user can use 3 formatters for image type fields.
 
-- `alt` - custom alt attribute for img tag. By default - original file name.
+`image_encoded` returns an image tag with embedded image content in the src attribute. Additional parameters:
 
-- `height` - custom height attribute for img tag. Has no default value.
+- `alt` - a custom alt attribute for the image tag. By default, the original file name is used.
 
-- `width`- custom width attribute for img tag. Has no default value.
+- `height` - a custom height attribute for the image tag. There is no default value for this attribute.
 
-`image_link` returns link to the resized image (e.g. <a href='http://test.com/path/to/image.jpg'>image name</a>). Additional parameters:
+- `width`- custom width attribute for the image tag. There is no default value for this attribute.
 
-- `title` - custom image text value. By default - original file name.
+`image_link` returns a link to the resized image (e.g. <a href='http://test.com/path/to/image.jpg'>image name</a>). Additional parameters:
 
-- `height` - custom image height. By default - 100 px.
+- `title` - a custom image text value. By default, the original file name is used.
 
-- `width`- custom image width. By default - 100 px.
+- `height` - a custom image height. By default, it is 100 px.
 
-`image_src` returns url to the resized image (e.g. http://test.com/path/to/image.jpg). Additional parameters:
+- `width`- a custom image width. By default, it is 100 px.
 
-- `height` - custom image height. By default - 100 px.
+`image_src` returns the url to the resized image (e.g. http://test.com/path/to/image.jpg). Additional parameters:
 
-- `width`- custom image width. By default - 100 px.
+- `height` - a custom image height. By default, it is 100 px.
 
-# Debug images configuration
+- `width`- a custom image width. By default, it is 100 px.
 
-By default in `dev` environment images are served by front controller (`app_dev.php`).
-You can allow your web server to serve images instead of front controller in `dev` environment.
-It will boost performance on all platforms and stability on Windows. To disable
-debug images set option `debug_images` to `false` in config.yml file:
+# Debug Images Configuration
+
+By default, images are processed by front controller (`app_dev.php`) in the `dev` environment. However, you can also enable your web server to process images instead of front controllers. It helps boost performance on all platforms and stability on Windows. 
+To disable debug images, set the `debug_images` option to `false` in the config.yml file:
 
 ```yml
 oro_attachment:

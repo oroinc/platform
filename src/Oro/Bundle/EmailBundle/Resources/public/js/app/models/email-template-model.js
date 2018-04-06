@@ -12,6 +12,13 @@ define(function(require) {
             entity: '',
             id: '',
             name: ''
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailTemplateModel() {
+            EmailTemplateModel.__super__.constructor.apply(this, arguments);
         }
     });
 

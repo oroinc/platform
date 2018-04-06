@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeFilterType extends AbstractDateFilterType
 {
@@ -33,7 +32,7 @@ class DateRangeFilterType extends AbstractDateFilterType
      */
     public function getParent()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 
     /**
@@ -45,7 +44,7 @@ class DateRangeFilterType extends AbstractDateFilterType
 
         $resolver->setDefaults(
             array(
-                'field_type'       => DateRangeType::NAME,
+                'field_type'       => DateRangeType::class,
                 'widget_options'   => [
                     'showDatevariables' => true,
                     'showTime'          => false,

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Layout\Extension;
 
-use Oro\Component\Layout\ContextInterface;
-use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 
 class IsMobileContextConfigurator implements ContextConfiguratorInterface
 {
@@ -28,7 +28,7 @@ class IsMobileContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getResolver()
             ->setRequired(['is_mobile'])
-            ->setAllowedTypes(['is_mobile' => ['boolean']]);
+            ->setAllowedTypes('is_mobile', ['boolean']);
 
         $context->set('is_mobile', $this->userAgentProvider->getUserAgent()->isMobile());
     }

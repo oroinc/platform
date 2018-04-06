@@ -4,7 +4,10 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\PersistentCollection;
-
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -12,10 +15,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -157,10 +156,10 @@ class OrganizationsSelectType extends AbstractType
     {
         $builder->add(
             'organizations',
-            'entity',
+            EntityType::class,
             [
                 'class'    => 'OroOrganizationBundle:Organization',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple' => true
             ]
         );

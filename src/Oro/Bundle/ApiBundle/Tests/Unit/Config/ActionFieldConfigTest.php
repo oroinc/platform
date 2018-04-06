@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-
-use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 
 class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -142,14 +141,19 @@ class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddFormConstraint()
+    public function testFormConstraints()
     {
         $config = new ActionFieldConfig();
 
+        $this->assertNull($config->getFormOptions());
+        $this->assertNull($config->getFormConstraints());
+
         $config->addFormConstraint(new NotNull());
         $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull()], $config->getFormConstraints());
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 }

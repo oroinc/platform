@@ -6,7 +6,6 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;

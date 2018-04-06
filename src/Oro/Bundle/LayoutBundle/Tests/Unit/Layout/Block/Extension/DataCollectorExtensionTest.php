@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\DataCollectorExtension;
-
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;

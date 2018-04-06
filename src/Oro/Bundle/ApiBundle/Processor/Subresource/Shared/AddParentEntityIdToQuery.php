@@ -4,13 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Adds restriction by the primary entity identifier to the ORM QueryBuilder
@@ -57,6 +56,12 @@ class AddParentEntityIdToQuery implements ProcessorInterface
             $parentPath = array_slice($path, 0, -$i);
             if (empty($parentPath)) {
                 $parentClassName = $context->getParentClassName();
+                if (!$this->doctrineHelper->isManageableEntityClass($parentClassName)) {
+                    $parentResourceClass = $parentConfig->getParentResourceClass();
+                    if ($parentResourceClass && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)) {
+                        $parentClassName = $parentResourceClass;
+                    }
+                }
                 $isCollection = $context->isCollection();
             } else {
                 $parentFieldConfig = $parentConfig->findFieldByPath($parentPath, true);

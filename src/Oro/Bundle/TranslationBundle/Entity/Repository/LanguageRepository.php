@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class SearchListener
 {

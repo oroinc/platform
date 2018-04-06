@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/activity-list")

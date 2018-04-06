@@ -2,24 +2,25 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Handle User forms
  */
 class UserHandler extends AbstractUserHandler
 {
+    use RequestHandlerTrait;
+
     /** @var DelegatingEngine */
     protected $templating;
 
@@ -83,7 +84,7 @@ class UserHandler extends AbstractUserHandler
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
 
             if ($this->form->isValid()) {
                 $this->onSuccess($user);

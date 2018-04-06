@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Layout\Loader\Generator;
 
+use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
-use CG\Core\DefaultGeneratorStrategy;
-
-use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInterface
 {

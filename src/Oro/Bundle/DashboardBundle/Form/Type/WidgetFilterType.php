@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
+use Oro\Bundle\QueryDesignerBundle\Form\Type\FilterType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
 
 class WidgetFilterType extends AbstractType
 {
@@ -19,8 +20,8 @@ class WidgetFilterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('entity', 'hidden', ['data' => $options['entity']]);
-        $builder->add('definition', 'hidden', ['required' => false]);
+        $builder->add('entity', HiddenType::class, ['data' => $options['entity']]);
+        $builder->add('definition', HiddenType::class, ['required' => false]);
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
@@ -35,7 +36,7 @@ class WidgetFilterType extends AbstractType
                     'auto_initialize'    => false
                 ];
                 $form->add(
-                    $factory->createNamed('filter', 'oro_query_designer_filter', null, $filterOptions)
+                    $factory->createNamed('filter', FilterType::class, null, $filterOptions)
                 );
             }
         );

@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ErrorStatusCodesWithoutContentTrait;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Sets the status code for the HTTP response.
  */
 class SetHttpResponseStatusCode implements ProcessorInterface
 {
+    use ErrorStatusCodesWithoutContentTrait;
+
     /** @var int */
     private $defaultSuccessStatusCode;
 
@@ -37,11 +39,34 @@ class SetHttpResponseStatusCode implements ProcessorInterface
             return;
         }
 
+        $context->setResponseStatusCode($this->getResponseStatusCode($context));
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return int
+     */
+    private function getResponseStatusCode(Context $context): int
+    {
         $statusCode = $this->defaultSuccessStatusCode;
         if ($context->hasErrors()) {
             $statusCode = $this->computeErrorStatusCode($context->getErrors());
+        } elseif (!$context->hasResult() && !$this->isResponseWithoutContent($statusCode)) {
+            $statusCode = Response::HTTP_NO_CONTENT;
         }
-        $context->setResponseStatusCode($statusCode);
+
+        return $statusCode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function isResponseWithoutContent(int $statusCode): bool
+    {
+        return
+            Response::HTTP_NO_CONTENT === $statusCode
+            || $this->isErrorResponseWithoutContent($statusCode);
     }
 
     /**
@@ -49,15 +74,15 @@ class SetHttpResponseStatusCode implements ProcessorInterface
      *
      * @return int
      */
-    private function computeErrorStatusCode(array $errors)
+    private function computeErrorStatusCode(array $errors): int
     {
         $groupedCodes = [];
         foreach ($errors as $error) {
             $code = $error->getStatusCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
-            $groupCode = (int)floor($code / 100) * 100;
+            $groupCode = (int)\floor($code / 100) * 100;
 
-            if (!array_key_exists($groupCode, $groupedCodes)
-                || !in_array($code, $groupedCodes[$groupCode], true)
+            if (!\array_key_exists($groupCode, $groupedCodes)
+                || !\in_array($code, $groupedCodes[$groupCode], true)
             ) {
                 $groupedCodes[$groupCode][] = $code;
             }
@@ -65,10 +90,10 @@ class SetHttpResponseStatusCode implements ProcessorInterface
 
         $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         if (!empty($groupedCodes)) {
-            $maxGroup = max(array_keys($groupedCodes));
+            $maxGroup = \max(\array_keys($groupedCodes));
             $statusCode = $maxGroup;
-            if (count($groupedCodes[$maxGroup]) === 1) {
-                $statusCode = array_pop($groupedCodes[$maxGroup]);
+            if (\count($groupedCodes[$maxGroup]) === 1) {
+                $statusCode = \array_pop($groupedCodes[$maxGroup]);
             }
         }
 

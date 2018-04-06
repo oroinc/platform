@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model\Filter;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\TestActivityScopeProvider;
-
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
 {

@@ -8,15 +8,27 @@ define(function(require) {
 
     PermissionView = BaseView.extend({
         tagName: 'li',
+
         className: 'action-permissions__item dropdown',
+
         template: require('tpl!orouser/templates/datagrid/permission/permission-view.html'),
+
         events: {
             'shown.bs.dropdown': 'onDropdownOpen',
             'hide.bs.dropdown': 'onDropdownClose'
         },
+
         listen: {
             'change:access_level model': 'render'
         },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function PermissionView() {
+            PermissionView.__super__.constructor.apply(this, arguments);
+        },
+
         id: function() {
             return 'ActionPermissionsCell-' + this.cid;
         },

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\AddDateTimeFormatConverterCompilerPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\CurrentLocalizationPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\OroLocaleBundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroLocaleBundleTest extends \PHPUnit_Framework_TestCase
 {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;

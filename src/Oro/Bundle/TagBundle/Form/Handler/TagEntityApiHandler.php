@@ -4,13 +4,11 @@ namespace Oro\Bundle\TagBundle\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-
+use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class TagEntityApiHandler extends ApiFormHandler

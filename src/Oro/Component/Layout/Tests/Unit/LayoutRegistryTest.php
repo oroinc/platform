@@ -2,12 +2,12 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\LayoutRegistry;
-use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
-use Oro\Component\Layout\Block\Type\Options;
 
 class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 {

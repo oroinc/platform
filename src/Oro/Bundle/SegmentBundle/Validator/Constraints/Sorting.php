@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
 use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
+use Symfony\Component\Validator\Constraint;
 
 class Sorting extends Constraint
 {

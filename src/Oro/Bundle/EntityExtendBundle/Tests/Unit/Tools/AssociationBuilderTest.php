@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
-use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
-
+use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tests\Util\ReflectionUtil;
+use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 
 class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 {

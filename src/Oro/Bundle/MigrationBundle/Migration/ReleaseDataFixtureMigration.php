@@ -4,7 +4,6 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\MigrationBundle\Migrations\Schema\v1_0\OroMigrationBundle as MigrationBundleMigration10;
 
 class ReleaseDataFixtureMigration implements Migration

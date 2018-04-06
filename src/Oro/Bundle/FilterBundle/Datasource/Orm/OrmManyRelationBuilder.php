@@ -5,7 +5,6 @@ namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;

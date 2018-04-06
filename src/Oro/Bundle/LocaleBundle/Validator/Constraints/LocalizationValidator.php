@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Validator\Constraints;
 
+use Oro\Bundle\LocaleBundle\Entity;
+use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
-use Oro\Bundle\LocaleBundle\Validator\Constraints;
-use Oro\Bundle\LocaleBundle\Entity;
 
 class LocalizationValidator extends ConstraintValidator
 {

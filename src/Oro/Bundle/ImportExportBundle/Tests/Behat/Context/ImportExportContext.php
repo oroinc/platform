@@ -18,10 +18,10 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -349,7 +349,7 @@ class ImportExportContext extends OroFeatureContext implements
      * Example: When I download Data Template file
      *          And I see Account Customer name column
      *
-     * @Then /^(?:|I )see (?P<column>([\w\s.]+)) column$/
+     * @Then /^(?:|I )see (?P<column>([\w\s.+\/]+)) column$/
      */
     public function iSeeColumn($column)
     {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 
 class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase

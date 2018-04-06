@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
-use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 
 class ProcessorTest extends AbstractProcessorTest
 {

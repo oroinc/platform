@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CurrencyBundle\DoctrineExtension\Dbal\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Oro\DBAL\Types\MoneyType;
 
 class MoneyValueType extends MoneyType

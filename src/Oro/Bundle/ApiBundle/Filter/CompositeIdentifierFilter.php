@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-
+use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;

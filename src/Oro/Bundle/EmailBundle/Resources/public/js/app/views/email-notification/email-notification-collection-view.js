@@ -44,6 +44,16 @@ define(function(require) {
             'click button.mark-visible-as-read': 'onClickMarkVisibleAsRead'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationCollectionView() {
+            EmailNotificationCollectionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
             _.extend(this, _.pick(options, ['folderId', 'hasMarkAllButton', 'hasMarkVisibleButton']));

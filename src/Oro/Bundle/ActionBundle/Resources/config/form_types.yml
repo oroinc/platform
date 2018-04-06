@@ -5,7 +5,7 @@ parameters:
 
 services:
     oro_action.form.type.operation:
-        class: %oro_action.form.type.operation.class%
+        class: '%oro_action.form.type.operation.class%'
         arguments:
             - '@oro_action.form.event_listener.required_attributes'
             - '@oro_action.expression.context_accessor'
@@ -18,4 +18,4 @@ services:
             - { name: form.type, alias: oro_action_operation_execution }
 
     oro_action.form.event_listener.required_attributes:
-        class: %oro_action.form.event_listener.required_attributes.class%
+        class: '%oro_action.form.event_listener.required_attributes.class%'

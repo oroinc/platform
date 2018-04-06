@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -51,18 +52,14 @@ class EmailTemplateSelectType extends AbstractType
                 'selectedEntity'          => null,
                 'choices'                 => $choices,
                 'configs'                 => $defaultConfigs,
-                'empty_value'             => '',
+                'placeholder'             => '',
                 'empty_data'              => null,
                 'required'                => true,
                 'data_route'              => 'oro_api_get_emailtemplates',
                 'data_route_parameter'    => 'entityName'
             )
         );
-        $resolver->setNormalizers(
-            array(
-                'configs' => $configsNormalizer
-            )
-        );
+        $resolver->setNormalizer('configs', $configsNormalizer);
     }
 
     /**
@@ -97,6 +94,6 @@ class EmailTemplateSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_translatable_entity';
+        return Select2TranslatableEntityType::class;
     }
 }

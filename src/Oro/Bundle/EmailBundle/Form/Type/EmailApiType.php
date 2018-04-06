@@ -3,16 +3,21 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi;
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-
-use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class EmailApiType extends AbstractType
 {
@@ -26,21 +31,21 @@ class EmailApiType extends AbstractType
         $builder
             ->add(
                 'folders',
-                'collection',
+                CollectionType::class,
                 [
                     'required'       => false,
                     'allow_add'      => true,
-                    'type'           => 'oro_email_email_folder_api',
+                    'entry_type'     => EmailFolderApiType::class,
                     'error_bubbling' => false
                 ]
             )
-            ->add('from', 'oro_email_email_address_api', ['required' => false])
-            ->add('to', 'oro_email_email_address_api', ['required' => false, 'multiple' => true])
-            ->add('cc', 'oro_email_email_address_api', ['required' => false, 'multiple' => true])
-            ->add('bcc', 'oro_email_email_address_api', ['required' => false, 'multiple' => true])
+            ->add('from', EmailAddressApiType::class, ['required' => false])
+            ->add('to', EmailAddressApiType::class, ['required' => false, 'multiple' => true])
+            ->add('cc', EmailAddressApiType::class, ['required' => false, 'multiple' => true])
+            ->add('bcc', EmailAddressApiType::class, ['required' => false, 'multiple' => true])
             ->add(
                 'subject',
-                'text',
+                TextType::class,
                 [
                     'required'    => false,
                     'constraints' => [
@@ -48,24 +53,24 @@ class EmailApiType extends AbstractType
                     ]
                 ]
             )
-            ->add('body', 'text', ['required' => false])
+            ->add('body', TextType::class, ['required' => false])
             ->add(
                 'bodyType',
-                'hidden',
+                HiddenType::class,
                 ['required' => false, 'data_transformer' => 'oro_email.email_body_type_transformer']
             )
-            ->add('createdAt', 'oro_datetime', ['required' => false])
-            ->add('sentAt', 'oro_datetime', ['required' => false])
-            ->add('receivedAt', 'oro_datetime', ['required' => false])
-            ->add('internalDate', 'oro_datetime', ['required' => false])
+            ->add('createdAt', OroDateTimeType::class, ['required' => false])
+            ->add('sentAt', OroDateTimeType::class, ['required' => false])
+            ->add('receivedAt', OroDateTimeType::class, ['required' => false])
+            ->add('internalDate', OroDateTimeType::class, ['required' => false])
             ->add(
                 'importance',
-                'hidden',
+                HiddenType::class,
                 ['required' => false, 'data_transformer' => 'oro_email.email_importance_transformer']
             )
             ->add(
                 'head',
-                'choice',
+                ChoiceType::class,
                 [
                     'required' => false,
                     'choices'  => [
@@ -76,7 +81,7 @@ class EmailApiType extends AbstractType
             )
             ->add(
                 'seen',
-                'choice',
+                ChoiceType::class,
                 [
                     'required' => false,
                     'choices'  => [
@@ -87,7 +92,7 @@ class EmailApiType extends AbstractType
             )
             ->add(
                 'messageId',
-                'text',
+                TextType::class,
                 [
                     'required'    => false,
                     'constraints' => [
@@ -97,7 +102,7 @@ class EmailApiType extends AbstractType
             )
             ->add(
                 'xMessageId',
-                'text',
+                TextType::class,
                 [
                     'required'    => false,
                     'constraints' => [
@@ -107,7 +112,7 @@ class EmailApiType extends AbstractType
             )
             ->add(
                 'xThreadId',
-                'text',
+                TextType::class,
                 [
                     'required'    => false,
                     'constraints' => [
@@ -117,7 +122,7 @@ class EmailApiType extends AbstractType
             )
             ->add(
                 'thread',
-                'oro_entity_identifier',
+                EntityIdentifierType::class,
                 [
                     'required'       => false,
                     'class'          => 'OroEmailBundle:EmailThread',
@@ -125,7 +130,7 @@ class EmailApiType extends AbstractType
                     'error_bubbling' => false
                 ]
             )
-            ->add('refs', 'text', ['required' => false]);
+            ->add('refs', TextType::class, ['required' => false]);
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
@@ -140,7 +145,7 @@ class EmailApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'           => 'Oro\Bundle\EmailBundle\Form\Model\EmailApi',
-                'intention'            => 'email',
+                'csrf_token_id'        => 'email',
                 'csrf_protection'      => false
             ]
         );

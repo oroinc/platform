@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
+use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Builds the form builder based on the parent entity configuration
@@ -62,7 +63,7 @@ class BuildFormBuilder implements ProcessorInterface
         $formBuilder = $this->formHelper->createFormBuilder(
             'form',
             $context->getParentEntity(),
-            ['data_class' => $context->getParentClassName()],
+            ['data_class' => $this->getFormDataClass($context, $parentConfig)],
             $formEventSubscribers
         );
         $this->formHelper->addFormField(
@@ -73,5 +74,33 @@ class BuildFormBuilder implements ProcessorInterface
         );
 
         return $formBuilder;
+    }
+
+    /**
+     * @param ChangeRelationshipContext $context
+     * @param EntityDefinitionConfig    $parentConfig
+     *
+     * @return string
+     */
+    protected function getFormDataClass(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig)
+    {
+        $parentFormOptions = $parentConfig->getFormOptions();
+        if (null !== $parentFormOptions && array_key_exists('data_class', $parentFormOptions)) {
+            return $parentFormOptions['data_class'];
+        }
+
+        $dataClass = $context->getParentClassName();
+        $parentEntity = $context->getParentEntity();
+        if (is_object($parentEntity)) {
+            $parentResourceClass = $parentConfig->getParentResourceClass();
+            if ($parentResourceClass) {
+                $entityClass = ClassUtils::getClass($parentEntity);
+                if ($entityClass !== $dataClass && $entityClass === $parentResourceClass) {
+                    $dataClass = $parentResourceClass;
+                }
+            }
+        }
+
+        return $dataClass;
     }
 }

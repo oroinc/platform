@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
-use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
-
-use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Last step of web installation

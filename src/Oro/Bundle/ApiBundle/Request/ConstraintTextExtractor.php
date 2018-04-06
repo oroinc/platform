@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator;
-
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator;
 
 class ConstraintTextExtractor implements ConstraintTextExtractorInterface
 {

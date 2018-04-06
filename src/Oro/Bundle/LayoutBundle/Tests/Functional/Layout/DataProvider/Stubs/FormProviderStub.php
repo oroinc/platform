@@ -2,17 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs;
 
+use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider;
-
-use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 
 class FormProviderStub extends AbstractFormProvider
 {
     /**
-     * @param string $formName
      * @param string $routeName
      * @param mixed  $data
      * @param array  $options
@@ -21,7 +17,6 @@ class FormProviderStub extends AbstractFormProvider
      * @return FormInterface
      */
     public function getTestForm(
-        $formName,
         $routeName,
         $data = null,
         array $options = [],
@@ -29,13 +24,10 @@ class FormProviderStub extends AbstractFormProvider
     ) {
         $options = array_merge($this->getFormOptions($routeName), $options);
 
-        $form = new FormStub($formName);
-
-        return $this->getForm($form, $data, $options, $cacheKeyOptions);
+        return $this->getForm(LayoutFormStub::class, $data, $options, $cacheKeyOptions);
     }
 
     /**
-     * @param string $formName
      * @param string $routeName
      * @param mixed  $data
      * @param array  $options
@@ -44,7 +36,6 @@ class FormProviderStub extends AbstractFormProvider
      * @return FormView
      */
     public function getTestFormView(
-        $formName,
         $routeName,
         $data = null,
         array $options = [],
@@ -52,23 +43,18 @@ class FormProviderStub extends AbstractFormProvider
     ) {
         $options = array_merge($this->getFormOptions($routeName), $options);
 
-        $form = new FormStub($formName);
-
-        return $this->getFormView($form, $data, $options, $cacheKeyOptions);
+        return $this->getFormView(LayoutFormStub::class, $data, $options, $cacheKeyOptions);
     }
 
     /**
-     * @param string $formName
      * @param array  $formOptions
      * @param array  $cacheKeyOptions
      *
      * @return string
      */
-    public function getTestCacheKey($formName, array $formOptions = [], array $cacheKeyOptions = [])
+    public function getTestCacheKey(array $formOptions = [], array $cacheKeyOptions = [])
     {
-        $form = new FormStub($formName);
-
-        return $this->getCacheKey($form, $formOptions, $cacheKeyOptions);
+        return $this->getCacheKey(LayoutFormStub::class, $formOptions, $cacheKeyOptions);
     }
 
     /**

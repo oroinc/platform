@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;

@@ -8,6 +8,7 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -63,7 +64,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->context = $this->createMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->validator->initialize($this->context);
 
         $this->constraint = new QueryConstraint();

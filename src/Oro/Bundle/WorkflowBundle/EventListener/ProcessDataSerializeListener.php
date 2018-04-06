@@ -5,10 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Component\DependencyInjection\ServiceLink;
-
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ProcessDataSerializeListener

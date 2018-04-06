@@ -6,7 +6,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionScopeListener;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class WorkflowDefinitionScopeListenerTest extends \PHPUnit_Framework_TestCase

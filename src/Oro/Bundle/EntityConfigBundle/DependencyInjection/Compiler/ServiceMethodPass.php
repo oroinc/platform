@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * @deprecated since v 1.8

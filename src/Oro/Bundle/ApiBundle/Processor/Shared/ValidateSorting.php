@@ -3,12 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -18,6 +15,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Validates that requested sorting is supported.

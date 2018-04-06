@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Common\Annotations\Reader;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Mapping\MappingException;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
-
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
 use Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue;
-
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
+use Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder;
 use Oro\Component\DependencyInjection\ServiceLink;
 
 class DoctrineListener

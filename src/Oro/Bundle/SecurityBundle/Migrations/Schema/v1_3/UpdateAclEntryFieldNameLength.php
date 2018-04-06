@@ -3,12 +3,10 @@
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class UpdateAclEntryFieldNameLength implements Migration, ContainerAwareInterface
 {

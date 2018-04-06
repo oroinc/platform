@@ -1,6 +1,10 @@
 parameters:
     nelmio_api_doc.twig.extension.extra_markdown.class: Oro\Bundle\ApiBundle\Twig\MarkdownExtension
 
+    # The names of API views
+    # they are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.api_doc.views: []
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -11,7 +15,7 @@ services:
         arguments:
             - '@oro_api.processor_bag_config_provider'
             - '@oro_api.processor_factory'
-            - %kernel.debug%
+            - '%kernel.debug%'
             - '@oro_api.processor_applicable_checker_factory'
             - '@oro_api.processor_iterator_factory'
             - '@oro_api.processor_applicable_checker_factory.ungrouped'
@@ -182,6 +186,7 @@ services:
         arguments:
             - '@oro_api.collect_resources.processor'
             - '@oro_api.resources_cache'
+            - '@oro_api.resources_without_identifier_loader'
 
     oro_api.subresources_provider:
         class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider
@@ -204,6 +209,12 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
+
+    oro_api.resources_without_identifier_loader:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader
+        public: false
+        arguments:
+            - '@oro_api.action_processor_bag'
 
     oro_api.listener.update_schema:
         class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener
@@ -404,7 +415,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor
         public: false
         arguments:
-            - %kernel.debug%
+            - '%kernel.debug%'
             -
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
@@ -541,6 +552,19 @@ services:
                 'money_value': 'money'
                 'duration': 'integer'
 
+    oro_api.rest.doc_url_generator:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator
+        public: false
+        arguments:
+            - '@router'
+            - '%oro_api.api_doc.views%'
+            - ~ # default view; it is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestDocUrlGeneratorCompilerPass
+
+    oro_api.api_doc.security_context:
+        class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext
+        arguments:
+            - '@security.token_storage'
+
     oro_api.api_doc.formatter.html_formatter:
         class: Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter
         public: false
@@ -560,8 +584,8 @@ services:
             - [setAuthentication, ['%nelmio_api_doc.sandbox.authentication%']]
             - [setDefaultSectionsOpened, ['%nelmio_api_doc.default_sections_opened%']]
             - [setEnableFormatParameter, [false]]
+            - [setSecurityContext, ['@oro_api.api_doc.security_context']]
             - [setFileLocator, ['@file_locator']]
-            - [setDocumentationPath, ['%oro_api.api_doc.path%']]
 
     oro_api.api_doc.formatter.html_formatter.composite:
         class: Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter
@@ -581,12 +605,6 @@ services:
             - '@oro_api.rest.doc_data_type_converter'
         tags:
             - { name: nelmio_api_doc.extractor.parser }
-
-    oro_api.api_doc.parser:
-        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
-        public: false
-        arguments:
-            - '@file_locator'
 
     oro_api.rest.doc_view_detector:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
@@ -626,6 +644,31 @@ services:
     oro_api.resource_doc_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
         public: false
+
+    oro_api.resource_doc_parser_registry:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry
+        public: false
+        arguments:
+            - [] # parsers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
+
+    # a template for non defined explicitly parsers
+    # see Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
+    oro_api.resource_doc_parser.template:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
+        public: false
+        abstract: true
+        arguments:
+            - '@file_locator'
+
+    oro_api.resource_doc_parser.default:
+        class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
+        arguments:
+            - '@file_locator'
+        tags:
+            - { name: oro.api.resource_doc_parser, requestType: rest&json_api, priority: -10 }
+            - { name: oro.api.resource_doc_parser, requestType: rest, priority: -20 }
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory

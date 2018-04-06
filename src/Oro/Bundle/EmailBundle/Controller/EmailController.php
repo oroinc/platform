@@ -4,39 +4,35 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-
 use FOS\RestBundle\Util\Codes;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
-use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class EmailController

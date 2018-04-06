@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**

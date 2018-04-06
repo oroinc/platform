@@ -2,11 +2,10 @@
 
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\SimpleProcessorFactory;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 {

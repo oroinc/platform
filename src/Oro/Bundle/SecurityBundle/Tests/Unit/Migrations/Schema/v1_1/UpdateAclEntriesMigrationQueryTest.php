@@ -4,15 +4,13 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-
-use Symfony\Component\Security\Acl\Model\AclCacheInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {

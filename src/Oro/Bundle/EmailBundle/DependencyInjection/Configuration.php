@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * This is the class that validates and merges configuration from your app/config files

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MergeExtension extends \Twig_Extension
 {

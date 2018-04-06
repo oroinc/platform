@@ -3,18 +3,19 @@
 namespace Oro\Component\Testing\Unit;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseTestCase;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseTestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
+use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 class FormIntegrationTestCase extends BaseTestCase
 {
@@ -51,7 +52,7 @@ class FormIntegrationTestCase extends BaseTestCase
     }
 
     /**
-     * @return Validator
+     * @return RecursiveValidator
      */
     protected function getValidator()
     {
@@ -64,10 +65,10 @@ class FormIntegrationTestCase extends BaseTestCase
                 $this->loadMetadata($meta);
             }));
 
-        $validator = new Validator(
-            new ClassMetadataFactory($loader),
-            $this->getConstraintValidatorFactory(),
-            $this->getTranslator()
+        $validator = new RecursiveValidator(
+            new ExecutionContextFactory($this->getTranslator()),
+            new LazyLoadingMetadataFactory($loader),
+            $this->getConstraintValidatorFactory()
         );
 
         return $validator;

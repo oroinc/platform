@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\ResolvedFormType;
-
-use Oro\Component\Layout\Block\Type\Options;
-use Oro\Component\Layout\BlockBuilderInterface;
-
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder;
+use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockBuilderInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\ResolvedFormType;
 
 class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {

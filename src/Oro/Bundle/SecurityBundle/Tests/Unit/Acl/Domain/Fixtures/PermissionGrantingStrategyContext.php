@@ -4,8 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class PermissionGrantingStrategyContext implements PermissionGrantingStrategyContextInterface
 {

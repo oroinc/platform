@@ -15,7 +15,7 @@ class ReminderType extends AbstractType
     {
         $builder->add(
             'method',
-            'oro_reminder_method',
+            MethodType::class,
             array(
                 'required' => true,
                 'attr'     => array('class' => 'method'),
@@ -24,7 +24,7 @@ class ReminderType extends AbstractType
 
         $builder->add(
             'interval',
-            'oro_reminder_interval',
+            ReminderIntervalType::class,
             array('required' => true)
         );
     }
@@ -37,7 +37,7 @@ class ReminderType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class'           => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder',
-                'intention'            => 'reminder',
+                'csrf_token_id'        => 'reminder',
                 'error_bubbling'       => false,
             )
         );

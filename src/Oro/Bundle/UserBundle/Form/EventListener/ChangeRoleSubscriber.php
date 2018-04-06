@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormEvent;
-
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 /**
  * This class updates users (append/remove) according to submitted data

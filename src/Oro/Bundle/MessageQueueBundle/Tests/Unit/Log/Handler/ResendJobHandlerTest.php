@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
-use Psr\Log\LoggerInterface;
-
-use Oro\Component\MessageQueue\Job\Job;
 use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ResendJobHandler;
+use Oro\Component\MessageQueue\Job\Job;
+use Psr\Log\LoggerInterface;
 
 class ResendJobHandlerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Duplicator;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Component\Duplicator\Filter\FilterFactory;
 use Oro\Component\Duplicator\Matcher\MatcherFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DuplicatorFactory
 {

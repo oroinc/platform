@@ -2,37 +2,25 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
+use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validation;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var FallbackValueType
-     */
-    protected $formType;
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->formType = new FallbackValueType();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->formType);
-    }
-
     /**
      * @return array
      */
@@ -44,12 +32,13 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    FallbackPropertyType::NAME => new FallbackPropertyType($translator),
-                    TextTypeStub::NAME => new TextTypeStub(),
-                    OroRichTextTypeStub::NAME => new OroRichTextTypeStub()
+                    new FallbackPropertyType($translator),
+                    TextType::class => new TextTypeStub(),
+                    OroRichTextType::class => new OroRichTextTypeStub()
                 ],
                 []
-            )
+            ),
+            new ValidatorExtension(Validation::createValidator())
         ];
     }
 
@@ -71,11 +60,11 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $expectedData,
         array $expectedOptions
     ) {
-        $form = $this->factory->create($this->formType, $defaultData, $options);
+        $form = $this->factory->create(FallbackValueType::class, $defaultData, $options);
 
         $formConfig = $form->getConfig();
         $this->assertNull($formConfig->getOption('data_class'));
-        $this->assertEquals(FallbackPropertyType::NAME, $formConfig->getOption('fallback_type'));
+        $this->assertEquals(FallbackPropertyType::class, $formConfig->getOption('fallback_type'));
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($viewData, $form->getViewData());
@@ -91,13 +80,16 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
+    /**
+     * @return array
+     */
     public function submitDataProvider()
     {
         return [
             'percent with value' => [
                 'options' => [
-                    'type'    => 'percent',
-                    'options' => ['type' => 'integer'],
+                    'entry_type'    => PercentType::class,
+                    'entry_options' => ['type' => 'integer'],
                     'group_fallback_fields' => null
                 ],
                 'defaultData'   => 25,
@@ -108,7 +100,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'text with fallback' => [
                 'options' => [
-                    'type'              => TextTypeStub::NAME,
+                    'entry_type'              => FallbackPropertyType::class,
                     'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => false
                 ],
@@ -124,7 +116,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'integer as null' => [
                 'options' => [
-                    'type' => 'integer',
+                    'entry_type' => IntegerType::class,
                     'group_fallback_fields' => true
                 ],
                 'defaultData'   => null,
@@ -135,7 +127,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
             ],
             'richtext with fallback' => [
                 'options' => [
-                    'type'              => OroRichTextTypeStub::NAME,
+                    'entry_type'              => OroRichTextType::class,
                     'enabled_fallbacks' => [FallbackType::PARENT_LOCALIZATION],
                     'group_fallback_fields' => null
                 ],
@@ -160,13 +152,15 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
-        $this->formType->finishView($formView, $formMock, ['group_fallback_fields' => $groupFallbackFields]);
+        $formType = new FallbackValueType();
+        $formType->finishView($formView, $formMock, ['group_fallback_fields' => $groupFallbackFields]);
         $this->assertArrayHasKey('group_fallback_fields', $formView->vars);
         $this->assertEquals($groupFallbackFields, $formView->vars['group_fallback_fields']);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(FallbackValueType::NAME, $this->formType->getName());
+        $formType = new FallbackValueType();
+        $this->assertEquals(FallbackValueType::NAME, $formType->getName());
     }
 }

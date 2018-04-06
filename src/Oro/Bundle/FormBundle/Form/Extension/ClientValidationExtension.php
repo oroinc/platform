@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
-use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ClientValidationExtension extends AbstractTypeExtension
 {
@@ -20,7 +19,7 @@ class ClientValidationExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(array('client_validation'));
+        $resolver->setDefined('client_validation');
     }
 
     /**

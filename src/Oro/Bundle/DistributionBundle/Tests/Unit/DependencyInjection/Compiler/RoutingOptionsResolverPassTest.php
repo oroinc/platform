@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Compiler;
 
+use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\RoutingOptionsResolverPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-
-use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\RoutingOptionsResolverPass;
 
 class RoutingOptionsResolverPassTest extends \PHPUnit_Framework_TestCase
 {

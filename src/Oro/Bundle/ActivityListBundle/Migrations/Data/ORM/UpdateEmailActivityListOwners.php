@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class UpdateEmailActivityListOwners extends AbstractFixture implements ContainerAwareInterface
 {

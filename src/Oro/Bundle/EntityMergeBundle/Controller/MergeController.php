@@ -3,25 +3,23 @@
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\Validator\ValidatorInterface;
-
-use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
+use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ConstraintViolation;
+// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
+use Symfony\Component\Validator\ValidatorInterface;
 
 /**
  * @Route("/merge")
@@ -77,6 +75,7 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
+        // TODO: change to $this->getValidator()->validate($entityData, null, ['validateCount']) in scope of BAP-15236
         $constraintViolations = $this->getValidator()->validate($entityData, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {
@@ -91,7 +90,7 @@ class MergeController extends Controller
         }
 
         $form = $this->createForm(
-            'oro_entity_merge',
+            MergeType::class,
             $entityData,
             array(
                 'metadata' => $entityData->getMetadata(),
@@ -100,7 +99,7 @@ class MergeController extends Controller
         );
 
         if ($request->isMethod('POST')) {
-            $form->submit($request);
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $merger = $this->getEntityMerger();
 

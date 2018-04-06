@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the Data API resources configuratin bag
@@ -56,7 +55,7 @@ class ConfigBagRegistry
         }
 
         $configBagServiceId = null;
-        foreach ($this->configBags as [$serviceId, $expression]) {
+        foreach ($this->configBags as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $configBagServiceId = $serviceId;
                 break;

@@ -15,6 +15,13 @@ define(function(require) {
             'change [data-role="updateDatapicker"]': 'onChange'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetDateCompareView() {
+            WidgetDateCompareView.__super__.constructor.apply(this, arguments);
+        },
+
         onChange: function(e) {
             var state = e.currentTarget.checked ? 'enable' : 'disable';
             this.$(this.datepickerSelector).datepicker(state);

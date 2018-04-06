@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Makes sure that the "data" section in the result data is an array.

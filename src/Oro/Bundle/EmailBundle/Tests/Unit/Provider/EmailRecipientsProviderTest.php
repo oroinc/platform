@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 
 class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 {

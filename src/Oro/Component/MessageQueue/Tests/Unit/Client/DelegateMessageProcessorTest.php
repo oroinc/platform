@@ -1,12 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
+use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
-use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
 
 class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {

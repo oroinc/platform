@@ -3,12 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-
-use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReaderTest extends \PHPUnit_Framework_TestCase

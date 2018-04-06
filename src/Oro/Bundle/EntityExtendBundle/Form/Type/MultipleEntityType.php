@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType as SymfonyMultipleEntityType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
 class MultipleEntityType extends AbstractType
 {
@@ -43,7 +45,7 @@ class MultipleEntityType extends AbstractType
                     if (!$parentForm->has($propertyName)) {
                         $event->getForm()->getParent()->add(
                             $propertyName,
-                            'oro_entity_identifier',
+                            EntityIdentifierType::class,
                             [
                                 'class'    => $options['class'],
                                 'multiple' => false
@@ -90,6 +92,14 @@ class MultipleEntityType extends AbstractType
      */
     public function getName()
     {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
         return self::TYPE;
     }
 
@@ -98,6 +108,6 @@ class MultipleEntityType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_multiple_entity';
+        return SymfonyMultipleEntityType::class;
     }
 }

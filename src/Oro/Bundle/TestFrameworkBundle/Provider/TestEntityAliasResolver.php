@@ -3,11 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-
-use Symfony\Component\Debug\BufferingLogger;
-
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
+use Symfony\Component\Debug\BufferingLogger;
 
 /**
  * This class is used for testing that all entity aliases can be loaded without any errors.

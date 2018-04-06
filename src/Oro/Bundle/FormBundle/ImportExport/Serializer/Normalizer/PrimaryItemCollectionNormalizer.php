@@ -4,10 +4,8 @@ namespace Oro\Bundle\FormBundle\ImportExport\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
-use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
-
 use Oro\Bundle\FormBundle\Entity\PrimaryItem;
+use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer;
 
 class PrimaryItemCollectionNormalizer extends CollectionNormalizer
 {

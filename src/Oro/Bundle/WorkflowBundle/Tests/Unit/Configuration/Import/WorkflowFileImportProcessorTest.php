@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
-use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
 class WorkflowFileImportProcessorTest extends \PHPUnit_Framework_TestCase

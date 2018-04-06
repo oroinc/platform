@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 use Doctrine\Common\Cache\Cache;
-
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 class CsrfTokenStorage implements TokenStorageInterface

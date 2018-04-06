@@ -10,14 +10,14 @@ Retrieve a specific file record.
 
 ### get_list
 
-Retrieve a collection of file records.
+Retrieve a set of file records.
 
 {@inheritdoc}
 
 ### create
 
 Create a new file record.
-The created record is returned in the response.
+The created record is returned in the response body.
 
 {@inheritdoc}
 
@@ -92,8 +92,8 @@ Delete a specific file record.
 
 ### delete_list
 
-Delete a collection of file records.
-The list of records that will be deleted, could be limited by filters.
+Delete a set of file records.
+The list of records to be deleted can be limited by filters.
 
 {@inheritdoc}
 

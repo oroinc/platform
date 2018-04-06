@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 

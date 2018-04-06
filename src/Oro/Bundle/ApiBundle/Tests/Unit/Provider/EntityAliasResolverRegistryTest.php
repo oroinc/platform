@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityAliasResolverRegistryTest extends \PHPUnit_Framework_TestCase
 {

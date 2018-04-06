@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Layout\Form;
 
+use Oro\Component\Layout\ContextItemInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\ContextItemInterface;
 
 interface FormAccessorInterface extends ContextItemInterface
 {

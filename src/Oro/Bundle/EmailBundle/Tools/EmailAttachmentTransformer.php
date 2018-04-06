@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EmailAttachmentTransformer
 {

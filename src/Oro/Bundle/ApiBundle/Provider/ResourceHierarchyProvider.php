@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
 /**
  * Provides information about parent classes for which API configuration can be applied.
  */
 class ResourceHierarchyProvider
 {
     /**
-     * Gets parent classes for which API configuration can be applied for the given class.
+     * Gets parent classes for which API configuration can be applied.
      *
      * @param string $className
      *
      * @return string[]
      */
-    public function getParentClassNames($className)
+    public function getParentClassNames(string $className): array
     {
         $result = [];
 
@@ -24,10 +22,7 @@ class ResourceHierarchyProvider
         $parentClass = $reflection->getParentClass();
         while ($parentClass) {
             $parentClassName = $parentClass->getName();
-            // do not add an extended entity proxy to the list of parent classes
-            if (strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0) {
-                $result[] = $parentClassName;
-            }
+            $result[] = $parentClassName;
 
             $reflection  = new \ReflectionClass($parentClassName);
             $parentClass = $reflection->getParentClass();

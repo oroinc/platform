@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\AbstractExtension;
 use Oro\Bundle\FormBundle\Form\Type\Select2Type;
+use Symfony\Component\Form\AbstractExtension;
 
 class TestFormExtension extends AbstractExtension
 {

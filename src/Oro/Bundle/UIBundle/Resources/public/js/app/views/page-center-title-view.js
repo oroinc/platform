@@ -15,6 +15,13 @@ define(function(require) {
             'layout:reposition mediator': 'onLayoutReposition'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function PageCenterTitleView() {
+            PageCenterTitleView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             PageCenterTitleView.__super__.initialize.apply(this, arguments);
             this.$el.siblings().each(_.bind(function(index, el) {

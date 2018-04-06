@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter;
 
+use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
-
-use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {

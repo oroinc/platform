@@ -13,6 +13,16 @@ define(function(require) {
 
         template: _.template('<%=(count < 100 ? count : "99+") %>'),
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function UnreadEmailsCounterView() {
+            UnreadEmailsCounterView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.model = UnreadEmailsStateHolder.getModel();
             this.model.set('count', options.count);

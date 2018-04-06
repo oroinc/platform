@@ -3,14 +3,12 @@
 namespace Oro\Bundle\AttachmentBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AttachmentApiEntityManager extends ApiEntityManager
 {

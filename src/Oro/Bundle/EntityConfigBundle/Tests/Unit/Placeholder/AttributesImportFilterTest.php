@@ -5,13 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Placeholder;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributesImportFinishNotificationListener;
+use Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Placeholder\AttributesImportFilter;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Makes all new included entities persistent.

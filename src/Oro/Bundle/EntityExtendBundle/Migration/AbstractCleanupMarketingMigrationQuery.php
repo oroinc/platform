@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\DBAL\Types\Type;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrationQuery
 {

@@ -2,18 +2,15 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-
 use Doctrine\Common\Collections\Collection;
-
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Provider\Provider;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class WsseAuthProvider

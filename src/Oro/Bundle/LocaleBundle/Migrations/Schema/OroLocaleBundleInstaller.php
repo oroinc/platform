@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;

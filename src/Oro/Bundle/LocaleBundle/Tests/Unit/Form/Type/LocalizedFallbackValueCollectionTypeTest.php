@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectionTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,8 +37,8 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
     {
         $expectedOptions = [
             'field' => 'string',
-            'type' => 'text',
-            'options' => [],
+            'entry_type' => TextType::class,
+            'entry_options' => [],
         ];
 
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
@@ -57,15 +60,15 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
             ->method('add')
             ->with(
                 LocalizedFallbackValueCollectionType::FIELD_VALUES,
-                LocalizedPropertyType::NAME,
-                ['type' => $type, 'options' => $options]
+                LocalizedPropertyType::class,
+                ['entry_type' => $type, 'entry_options' => $options]
             )->willReturnSelf();
         $builder->expects($this->at(1))
             ->method('add')
             ->with(
                 LocalizedFallbackValueCollectionType::FIELD_IDS,
-                'collection',
-                ['type' => 'hidden']
+                CollectionType::class,
+                ['entry_type' => HiddenType::class]
             )->willReturnSelf();
         $builder->expects($this->once())
             ->method('addViewTransformer')
@@ -74,7 +77,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
 
         $this->type->buildForm(
             $builder,
-            ['type' => $type, 'options' => $options, 'field' => $field]
+            ['entry_type' => $type, 'entry_options' => $options, 'field' => $field]
         );
     }
 }

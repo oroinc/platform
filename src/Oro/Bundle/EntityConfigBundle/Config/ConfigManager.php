@@ -3,11 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\ORM\EntityManager;
-
 use Metadata\MetadataFactory;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -25,8 +21,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.

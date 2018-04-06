@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_7;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveOptionSetAttributesQuery extends ParametrizedMigrationQuery
 {

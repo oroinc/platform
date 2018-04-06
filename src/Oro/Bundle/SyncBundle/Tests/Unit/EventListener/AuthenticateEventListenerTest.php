@@ -2,20 +2,16 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
-use Psr\Log\LoggerInterface;
-
-use Ratchet\ConnectionInterface;
-use Ratchet\Wamp\WampConnection;
-use Ratchet\WebSocket\Version\RFC6455\Connection;
-
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\QueryString;
 use Guzzle\Http\Url;
-
 use JDare\ClankBundle\Event\ClientEvent;
-
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener;
+use Psr\Log\LoggerInterface;
+use Ratchet\ConnectionInterface;
+use Ratchet\Wamp\WampConnection;
+use Ratchet\WebSocket\Version\RFC6455\Connection;
 
 class AuthenticateEventListenerTest extends \PHPUnit_Framework_TestCase
 {

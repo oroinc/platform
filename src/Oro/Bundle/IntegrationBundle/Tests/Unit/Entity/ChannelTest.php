@@ -3,11 +3,9 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Util\Inflector;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use Oro\Component\Config\Common\ConfigObject;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Component\Config\Common\ConfigObject;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ChannelTest extends \PHPUnit_Framework_TestCase
 {

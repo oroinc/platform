@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\InstallerBundle\Form\Type;
 
+use Oro\Bundle\InstallerBundle\Form\Type\Configuration\DatabaseType;
+use Oro\Bundle\InstallerBundle\Form\Type\Configuration\MailerType;
+use Oro\Bundle\InstallerBundle\Form\Type\Configuration\SystemType;
+use Oro\Bundle\InstallerBundle\Form\Type\Configuration\WebsocketType;
+use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
 
 class ConfigurationType extends AbstractType
 {
@@ -20,7 +23,7 @@ class ConfigurationType extends AbstractType
         $builder
             ->add(
                 'database',
-                'oro_installer_configuration_database',
+                DatabaseType::class,
                 [
                     'label'       => 'form.configuration.database.header',
                     'constraints' => [
@@ -30,21 +33,21 @@ class ConfigurationType extends AbstractType
             )
             ->add(
                 'mailer',
-                'oro_installer_configuration_mailer',
+                MailerType::class,
                 [
                     'label' => 'form.configuration.mailer.header'
                 ]
             )
             ->add(
                 'websocket',
-                'oro_installer_configuration_websocket',
+                WebsocketType::class,
                 [
                     'label' => 'form.configuration.websocket.header'
                 ]
             )
             ->add(
                 'system',
-                'oro_installer_configuration_system',
+                SystemType::class,
                 [
                     'label' => 'form.configuration.system.header'
                 ]

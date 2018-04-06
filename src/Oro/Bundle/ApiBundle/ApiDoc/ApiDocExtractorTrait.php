@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Component\Routing\RouteCollectionUtil;
+use Symfony\Component\Routing\Route;
 
 /**
  * Common functionality for ApiDocExtractor and CachingApiDocExtractor.

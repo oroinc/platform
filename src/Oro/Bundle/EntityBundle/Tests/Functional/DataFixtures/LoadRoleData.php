@@ -4,11 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\UserBundle\Entity\Role;
 
 class LoadRoleData extends AbstractFixture implements ContainerAwareInterface
 {

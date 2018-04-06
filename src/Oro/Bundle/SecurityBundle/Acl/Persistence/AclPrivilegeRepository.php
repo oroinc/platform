@@ -3,24 +3,22 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
-use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
-use Symfony\Component\Security\Acl\Model\AclInterface;
-
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
-use Oro\Bundle\SecurityBundle\Model\AclPermission;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
+use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
+use Symfony\Component\Security\Acl\Model\AclInterface;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

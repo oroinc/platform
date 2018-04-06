@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 

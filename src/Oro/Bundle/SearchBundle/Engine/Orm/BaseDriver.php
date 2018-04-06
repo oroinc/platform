@@ -3,18 +3,16 @@
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Carbon\Carbon;
-
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;

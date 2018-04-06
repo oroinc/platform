@@ -8,7 +8,6 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
 
     var ButtonComponent = BaseComponent.extend({
-
         /**
          * @property {Object}
          */
@@ -20,6 +19,13 @@ define(function(require) {
          * @property {jQuery.Element}
          */
         $button: null,
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ButtonComponent() {
+            ButtonComponent.__super__.constructor.apply(this, arguments);
+        },
 
         /**
          * @inheritDoc

@@ -3,10 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\Query\Expr;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
-
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 class MailboxEntityNameProvider implements EntityNameProviderInterface
 {

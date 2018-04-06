@@ -8,8 +8,11 @@ define(function(require) {
 
     RolePermissionsActionView = BaseView.extend({
         className: 'dropdown',
+
         icon: '',
+
         autoRender: true,
+
         template: function() {
             return '<a data-toggle="dropdown" ' +
                 'class="dropdown-toggle role-permissions-action-launcher" href="javascript:void(0);">...</a>';
@@ -32,6 +35,16 @@ define(function(require) {
             'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown'
         },
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function RolePermissionsActionView() {
+            RolePermissionsActionView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['accessLevels', 'action']));
             RolePermissionsActionView.__super__.initialize.call(this, options);

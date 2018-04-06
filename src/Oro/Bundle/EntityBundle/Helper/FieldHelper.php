@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Helper;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
-
 use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
+ * Helper for getting fields and relations for the given entity
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
@@ -417,5 +417,13 @@ class FieldHelper
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->fieldProvider->setLocale($locale);
     }
 }

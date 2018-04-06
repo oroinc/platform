@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
-
 use Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 

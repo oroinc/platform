@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit;
 
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentDefinitionTestCase extends OrmQueryConverterTest
 {

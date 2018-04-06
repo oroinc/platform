@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Entity\Manager;
 
-use Oro\Bundle\AddressBundle\Entity\Manager\AddressManager;
 use Oro\Bundle\AddressBundle\Entity\Address;
+use Oro\Bundle\AddressBundle\Entity\Manager\AddressManager;
 
 class AddressManagerTest extends \PHPUnit_Framework_TestCase
 {

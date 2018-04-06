@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
-use Oro\Component\Layout\BlockView;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class AbstractLayoutBuilderTest extends WebTestCase
 {

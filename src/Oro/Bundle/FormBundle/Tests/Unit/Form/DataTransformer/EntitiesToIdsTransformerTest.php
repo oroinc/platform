@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase

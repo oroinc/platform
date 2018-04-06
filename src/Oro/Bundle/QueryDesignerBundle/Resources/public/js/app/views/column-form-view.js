@@ -12,6 +12,13 @@ define(function(require) {
 
         labelSelector: '[data-purpose=label]',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function ColumnFormView() {
+            ColumnFormView.__super__.constructor.apply(this, arguments);
+        },
+
         render: function() {
             ColumnFormView.__super__.render.call(this);
             this.listenTo(this.fieldChoiceView, 'change', this.onFieldsChange);

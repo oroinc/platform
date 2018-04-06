@@ -2,27 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AclRoleType extends AbstractType
 {
-    /**
-     * @var array privilege fields config
-     */
-    protected $privilegeConfig;
-
-    /**
-     * @param array $privilegeTypeConfig
-     */
-    public function __construct(array $privilegeTypeConfig)
-    {
-        $this->privilegeConfig = $privilegeTypeConfig;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -30,7 +19,7 @@ class AclRoleType extends AbstractType
     {
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'required' => true,
                 'label'    => 'oro.user.role.role.label'
@@ -39,7 +28,7 @@ class AclRoleType extends AbstractType
 
         $builder->add(
             'appendUsers',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => 'OroUserBundle:User',
                 'required' => false,
@@ -50,7 +39,7 @@ class AclRoleType extends AbstractType
 
         $builder->add(
             'removeUsers',
-            'oro_entity_identifier',
+            EntityIdentifierType::class,
             [
                 'class'    => 'OroUserBundle:User',
                 'required' => false,
@@ -60,7 +49,7 @@ class AclRoleType extends AbstractType
         );
         $builder->add(
             'privileges',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -77,7 +66,7 @@ class AclRoleType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => 'Oro\Bundle\UserBundle\Entity\Role',
-                'intention'  => 'role',
+                'csrf_token_id' => 'role',
             ]
         );
     }

@@ -3,9 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
@@ -14,9 +11,10 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
+use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class RolePrivilegeCapabilityProviderTest extends \PHPUnit_Framework_TestCase
 {

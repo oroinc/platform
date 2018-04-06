@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Command;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

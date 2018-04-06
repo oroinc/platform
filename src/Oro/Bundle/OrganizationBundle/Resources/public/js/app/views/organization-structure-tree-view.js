@@ -25,6 +25,16 @@ define([
 
         treeHandlers: {},
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function OrganizationStructureTreeView() {
+            OrganizationStructureTreeView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             OrganizationStructureTreeView.__super__.initialize.apply(this, arguments);
             _.each(this.requiredOptions, function(optionName) {

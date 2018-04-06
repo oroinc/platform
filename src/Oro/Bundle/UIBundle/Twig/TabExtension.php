@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Knp\Menu\MenuItem;
+use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
-
-use Knp\Menu\MenuItem;
-
-use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 
 class TabExtension extends \Twig_Extension
 {

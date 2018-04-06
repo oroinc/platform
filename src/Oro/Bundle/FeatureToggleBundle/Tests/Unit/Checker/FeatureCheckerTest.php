@@ -4,9 +4,9 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
-use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

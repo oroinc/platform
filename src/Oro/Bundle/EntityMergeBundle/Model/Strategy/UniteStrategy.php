@@ -2,13 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 

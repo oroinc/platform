@@ -14,15 +14,6 @@ services:
         tags:
             - { name: data_collector, template: OroApiBundle:Collector:api.html.twig, id: data_api }
 
-    oro_api.profiler.action_processor_bag:
-        class: Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag
-        public: false
-        decorates: oro_api.action_processor_bag
-        decoration_priority: -255 # should be at the top of the decoration chain
-        arguments:
-            - '@oro_api.profiler.action_processor_bag.inner'
-            - '@oro_api.profiler.logger'
-
     oro_api.profiler.processor_factory:
         class: Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory
         public: false

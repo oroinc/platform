@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;

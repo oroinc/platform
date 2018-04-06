@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async\Manager;
 
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
-use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
+use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class AssociationManagerTest extends \PHPUnit_Framework_TestCase

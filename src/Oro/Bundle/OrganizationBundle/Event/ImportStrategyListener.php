@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ImportStrategyListener
 {

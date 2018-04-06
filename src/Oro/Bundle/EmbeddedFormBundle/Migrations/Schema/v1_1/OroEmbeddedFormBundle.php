@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Schema\v1_1;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
-
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 

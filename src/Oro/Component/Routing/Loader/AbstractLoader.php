@@ -2,13 +2,12 @@
 
 namespace Oro\Component\Routing\Loader;
 
-use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
-
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
+use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 abstract class AbstractLoader extends Loader
 {

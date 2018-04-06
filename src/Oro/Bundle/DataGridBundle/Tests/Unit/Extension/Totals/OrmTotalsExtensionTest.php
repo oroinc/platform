@@ -2,63 +2,59 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Totals;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\Query\Expr\GroupBy;
+use Doctrine\ORM\Query\Expr\Select;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Totals\Configuration;
-
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OrmTotalsExtensionTest extends OrmTestCase
 {
-    /**
-     * @var OrmTotalsExtension
-     */
+    /** @var OrmTotalsExtension */
     protected $extension;
 
-    /**
-     * @var DatagridConfiguration
+    /** @var DatagridConfiguration
      */
     protected $config;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
-     */
+    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
-     */
+    /** @var NumberFormatter|\PHPUnit_Framework_MockObject_MockObject */
     protected $numberFormatter;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
-     */
+    /** @var DateTimeFormatter|\PHPUnit_Framework_MockObject_MockObject */
     protected $dateTimeFormatter;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
-     */
+    /** @var AclHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $aclHelper;
 
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->config = $this->getTestConfig();
+        $this->translator = $this->createMock(Translator::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->numberFormatter = $this->createMock(NumberFormatter::class);
+        $this->dateTimeFormatter = $this->createMock(DateTimeFormatter::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $this->config = $this->getTestConfig();
 
         $this->extension = new OrmTotalsExtension(
             $this->translator,
@@ -134,6 +130,39 @@ class OrmTotalsExtensionTest extends OrmTestCase
         $this->assertEquals(-250, $this->extension->getPriority());
     }
 
+    public function testVisitResult()
+    {
+        $config = $this->getTestConfig();
+        $result = $this->getTestResult();
+
+        $this->assertQueryBuilderCalled($config);
+
+        $this->extension->visitResult($config, $result);
+
+        $this->assertEquals(
+            [
+                'totalRecords' => 14,
+                'totals' => [
+                    'total' => [],
+                    'grand_total' => [
+                        'columns' => [
+                            'id' => [
+                                'total' => 10
+                            ],
+                            'name' => [
+                                'label' => 'Grand Total'
+                            ],
+                            'wonCount' => [
+                                'total' => 0.55
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $result->offsetGet('options')
+        );
+    }
+
     /**
      * @return DatagridConfiguration
      */
@@ -154,7 +183,9 @@ class OrmTotalsExtensionTest extends OrmTestCase
                             'name' => ['label' => 'Page Total']
                         ]
                     ],
-                    'grand_total' =>[
+                    'grand_total' => [
+                        'per_page' => false,
+                        'hide_if_one_page' => false,
                         'columns' => [
                             'id' => ['expr' => 'COUNT(a.id)'],
                             'name' => ['label' => 'Grand Total'],
@@ -188,5 +219,77 @@ class OrmTotalsExtensionTest extends OrmTestCase
                 'totalRecords' => 14
             ]
         ]);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function assertQueryBuilderCalled(DatagridConfiguration $config)
+    {
+        /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setFirstResult', 'setMaxResults', 'getScalarResult'])
+            ->getMockForAbstractClass();
+        $query->expects($this->any())
+            ->method('setFirstResult')
+            ->willReturnSelf();
+        $query->expects($this->any())
+            ->method('setMaxResults')
+            ->willReturnSelf();
+        $query->expects($this->any())
+            ->method('getScalarResult')
+            ->willReturnOnConsecutiveCalls([], [], [['id' => 10, 'wonCount' => 55]]);
+
+        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
+        $qb->expects($this->any())
+            ->method('select')
+            ->willReturnSelf();
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn(new Expr());
+
+        $having = new Andx(['id > 1', 'name is not null']);
+
+        $qb->expects($this->any())
+            ->method('getDQLPart')
+            ->willReturnMap(
+                [
+                    ['select', [new Select(['id', 'name', 'wonCount'])]],
+                    ['where', ''],
+                    ['groupBy', [new GroupBy(['id'])]],
+                    ['having', $having],
+                ]
+            );
+        $qb->expects($this->atLeastOnce())
+            ->method('andWhere')
+            ->with(new Func('id IN', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+            ->willReturnSelf();
+        $qb->expects($this->atLeastOnce())
+            ->method('resetDQLParts')
+            ->with(['groupBy', 'having'])
+            ->willReturnSelf();
+        $qb->expects($this->atLeastOnce())
+            ->method('getParameters')
+            ->willReturn([]);
+
+        $this->aclHelper->expects($this->any())
+            ->method('apply')
+            ->willReturnArgument(0);
+
+        /** @var OrmDatasource|\PHPUnit_Framework_MockObject_MockObject $datasource */
+        $datasource = $this->createMock(OrmDatasource::class);
+        $datasource->expects($this->any())
+            ->method('getQueryBuilder')
+            ->willReturn($qb);
+
+        $this->extension->visitDatasource($config, $datasource);
+
+        return $qb;
     }
 }

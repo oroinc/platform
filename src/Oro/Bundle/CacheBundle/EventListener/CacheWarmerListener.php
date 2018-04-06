@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\CacheBundle\EventListener;
 
+use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
+use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
-use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
-use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
 
 /**
  * Check are config resources is fresh and warm up the cache if needed

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
 {

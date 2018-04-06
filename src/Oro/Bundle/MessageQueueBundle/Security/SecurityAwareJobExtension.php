@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\AbstractExtension;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Adds the current security token to the root job.

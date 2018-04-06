@@ -3,9 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Loader;
 
 use Imagine\Image\ImageInterface;
-
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;

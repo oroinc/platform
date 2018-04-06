@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Handler;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
@@ -17,6 +16,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class UserHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $form;
 
@@ -50,7 +51,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->form = $this->createMock(FormInterface::class);
-        $this->request = $this->createMock(Request::class);
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->manager = $this->createMock(UserManager::class);
@@ -78,9 +79,7 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_GET);
+        $this->request->setMethod(Request::METHOD_GET);
 
         $this->manager->expects($this->never())
             ->method($this->anything());
@@ -93,13 +92,12 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setEmail('test@example.com');
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_POST);
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod(Request::METHOD_POST);
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -170,13 +168,12 @@ class UserHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $this->request->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_POST);
+        $this->request->initialize([], self::FORM_DATA);
+        $this->request->setMethod(Request::METHOD_POST);
 
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->request);
+            ->with(self::FORM_DATA);
         $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);

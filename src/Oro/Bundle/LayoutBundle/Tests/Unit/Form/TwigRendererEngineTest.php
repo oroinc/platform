@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
-use Symfony\Component\Form\FormView;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
+use Symfony\Component\Form\FormView;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {

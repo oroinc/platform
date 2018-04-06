@@ -3,14 +3,12 @@
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserImapConfigSubscriber implements EventSubscriberInterface
 {

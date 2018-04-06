@@ -4,9 +4,8 @@ namespace Oro\Bundle\LocaleBundle\ImportExport\Strategy;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
-
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;

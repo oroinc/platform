@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The registry that allows to get the entity alias resolver for a specific request type.
@@ -56,7 +55,7 @@ class EntityAliasResolverRegistry
         }
 
         $entityAliasResolverServiceId = null;
-        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
+        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 $entityAliasResolverServiceId = $serviceId;
                 break;
@@ -80,7 +79,7 @@ class EntityAliasResolverRegistry
      */
     public function warmUpCache()
     {
-        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
+        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);
             $entityAliasResolver->warmUpCache();
@@ -92,7 +91,7 @@ class EntityAliasResolverRegistry
      */
     public function clearCache()
     {
-        foreach ($this->entityAliasResolvers as [$serviceId, $expression]) {
+        foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);
             $entityAliasResolver->clearCache();

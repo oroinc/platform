@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Manager;
 
 use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;

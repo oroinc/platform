@@ -8,11 +8,10 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 

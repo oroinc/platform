@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Routing\Route;
 
 /**
  * An interface for classes that can be used to update ApiDoc annotation

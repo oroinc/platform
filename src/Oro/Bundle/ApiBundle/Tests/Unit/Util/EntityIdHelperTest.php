@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Query\Parameter;
-
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
-use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class EntityIdHelperTest extends OrmRelatedTestCase

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use Zend\Mail\Storage\Folder as BaseFolder;
-
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Zend\Mail\Storage\Folder as BaseFolder;
 
 class Folder extends BaseFolder
 {

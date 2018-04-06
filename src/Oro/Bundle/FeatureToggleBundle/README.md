@@ -1,10 +1,8 @@
-OroFeatureToggleBundle
-=========================
+# OroFeatureToggleBundle
 
-This bundle provide ability to manage system features. Feature is as a set of grouped functionality.
+OroFeatureToggleBundle provides the ability for the application users to enable or disable application features using the system configuration UI, and assists developers in managing the application flow, depending on the status of this feature.
 
-How to define new feature
--------------------------
+## How to define new feature
 
 Features are defined with configuration files place in `Resources/config/oro/features.yml`.
 Each feature consists of one required option - the label. Out of the box feature may be configured with next sections:
@@ -49,8 +47,7 @@ features:
             - oro:search:index
 ```
 
-Adding new options to feature configuration
---------------------------------------------
+## Adding new options to feature configuration
 
 Feature configuration may be extended with new configuration options. To add new configuration option feature configuration
  that implements ConfigurationExtensionInterface should be added and registered with `oro_feature.config_extension` tag.
@@ -90,8 +87,7 @@ services:
             - { name: oro_feature.config_extension }
 ```
 
-Helper functionality to check feature state
--------------------------------------------
+## Helper functionality to check feature state
 
 Feature state is determined by `FeatureChecker`. There are proxy classes that expose feature check functionality to
 layout updates, operations, workflows, processes and twig.
@@ -102,7 +98,7 @@ Feature resource types are nodes of feature configuration (routes, workflows, co
 resources are their values. Resource is disabled if it is included into at least one disabled feature. 
 Resource state is resolved by `public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)` 
 
-#### Layout updates
+### Layout updates
 
  - Check feature state `=data['feature'].isFeatureEnabled('feature_name')`
  - Check resource state `=data['feature'].isResourceEnabled('acme_product_view', 'routes')`
@@ -120,7 +116,7 @@ layout:
                 visible: '=data["feature"].isFeatureEnabled("product_feature")'
 ```
 
-#### Processes, workflows, operations
+### Processes, workflows, operations
 
 In Processes, workflows and operations config expression may be used to check feature state
 
@@ -141,13 +137,12 @@ In Processes, workflows and operations config expression may be used to check fe
     scope_identifier: $.scopeId
 ```
 
-#### Twig
+### Twig
 
  - Check feature state `feature_enabled($featureName, $scopeIdentifier = null)`
  - Check resource state `feature_resource_enabled($resource, $resourceType, $scopeIdentifier = null)`
 
-Including a service into a feature
----------------------------------
+## Including a service into a feature
 
 Service that need feature functionality needs to implement `FeatureToggleableInterface` interface.
 All checks are done by developer.
@@ -216,8 +211,7 @@ services:
         { name: oro_featuretogle.feature, feature: acme_feature }
 ```
 
-Feature state checking
-----------------------
+## Feature state checking
 
 Feature state is checked by feature voters. All voters are called each time you use the `isFeatureEnabled()` or `isResourceEnabled()` method on feature checker.
 Feature checker makes the decision based on configured strategy defined in system configuration or per feature, which can be: affirmative, consensus or unanimous.
@@ -280,8 +274,7 @@ services:
             - { name: oro_featuretogle.voter }
 ```
 
-Changing the Decision Strategy
-------------------------------
+## Changing the Decision Strategy
  
 There are three strategies available:
 
@@ -313,8 +306,8 @@ features:
 ```
 
 
-Using checker for commands
---------------------------
+## Using checker for commands
+
 Commands launched as subcommands cannot be skipped globally. To avoid running such commands, add an implementation of 
 FeatureCheckerAwareInterface to your parent command, import FeatureCheckerHolderTrait (via `use FeatureCheckerHolderTrait;`), and check the 
 feature status via featureChecker that is automatically injected into your command.

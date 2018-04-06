@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumNameType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumNameTypeTest extends TypeTestCase
 {
@@ -242,7 +242,7 @@ class EnumNameTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'text',
+            TextType::class,
             $this->type->getParent()
         );
     }

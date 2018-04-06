@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
-use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 
 class TypesPass implements CompilerPassInterface
 {

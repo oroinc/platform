@@ -3,9 +3,8 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
 class StringFilter extends AbstractFilter
 {
@@ -67,7 +66,7 @@ class StringFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return TextFilterType::NAME;
+        return TextFilterType::class;
     }
 
     /**

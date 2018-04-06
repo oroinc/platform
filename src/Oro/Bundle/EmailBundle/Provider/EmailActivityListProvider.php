@@ -4,12 +4,6 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
-
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -30,6 +24,10 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
@@ -147,7 +145,7 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes()
+    public function getRoutes($activityEntity)
     {
         return [
             'itemView'  => 'oro_email_view',
@@ -476,14 +474,19 @@ class EmailActivityListProvider implements
 
     /**
      * @param EmailOwnerInterface $owner
-     * @param $data
+     * @param array $data
      *
      * @return mixed
      */
-    protected function setOwnerLink($owner, $data)
+    protected function setOwnerLink($owner, array $data)
     {
-        $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
-            ->getRoute('view');
+        $route = null;
+        $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
+        
+        if (null !== $entityMetadata) {
+            $route = $entityMetadata->getRoute('view');
+        }
+        
         if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {

@@ -4,15 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;
 use Oro\Component\Action\Action\CreateObject as ComponentCreateObject;
 use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ContextAccessor;
 
 /**
  * Class CreateRelatedEntity.

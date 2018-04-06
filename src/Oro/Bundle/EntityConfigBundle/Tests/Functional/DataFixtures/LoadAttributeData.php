@@ -4,11 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\AddAttributesToTestActivityTargetMigration;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\UpdateAttributesForTestActivityTargetMigration;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
-
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

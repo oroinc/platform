@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 

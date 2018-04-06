@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagConfigChoiceType extends AbstractConfigType
 {
@@ -20,17 +19,16 @@ class TagConfigChoiceType extends AbstractConfigType
 
         $resolver->setDefaults(
             [
-                'empty_value' => false,
+                'placeholder' => false,
                 'choices'     => ['No', 'Yes']
             ]
         );
 
-        $resolver->setNormalizers(
-            [
-                'empty_value' => function (Options $options, $value) {
-                    return $this->isImplementsTaggable($options) ? 'Yes' : $value;
-                },
-            ]
+        $resolver->setNormalizer(
+            'placeholder',
+            function (Options $options, $value) {
+                return $this->isImplementsTaggable($options) ? 'Yes' : $value;
+            }
         );
     }
 
@@ -61,17 +59,17 @@ class TagConfigChoiceType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    protected function isReadOnly($options)
+    protected function isReadOnly(Options $options)
     {
         return $this->isImplementsTaggable($options) || parent::isReadOnly($options);
     }
 
     /**
-     * @param $options
+     * @param Options $options
      *
      * @return bool
      */
-    protected function isImplementsTaggable($options)
+    protected function isImplementsTaggable(Options $options)
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];

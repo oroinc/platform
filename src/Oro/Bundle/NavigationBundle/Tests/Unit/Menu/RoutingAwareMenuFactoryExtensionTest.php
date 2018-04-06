@@ -3,10 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\MenuFactory;
-
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
+use Symfony\Component\Routing\RouterInterface;
 
 class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 {

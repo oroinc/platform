@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-
 /**
- * Adds request types for all registered ApiDoc views to the Data API resources cache warmer.
+ * Adds request types for all registered API views to the Data API resources cache warmer.
  */
 class ResourcesCacheWarmerCompilerPass implements CompilerPassInterface
 {

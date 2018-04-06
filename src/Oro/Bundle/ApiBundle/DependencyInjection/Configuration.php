@@ -17,8 +17,9 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
-        $this->appendConfigFiles($node);
         $this->appendConfigOptions($node);
+        $this->appendConfigFilesNode($node);
+        $this->appendApiDocViewsNode($node);
         $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
         $this->appendFiltersNode($node);
@@ -33,7 +34,23 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    private function appendConfigFiles(NodeBuilder $node)
+    private function appendConfigOptions(NodeBuilder $node)
+    {
+        $node
+            ->integerNode('config_max_nesting_level')
+                ->info(
+                    'The maximum number of nesting target entities'
+                    . ' that can be specified in "Resources/config/oro/api.yml"'
+                )
+                ->min(0)
+                ->defaultValue(3)
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendConfigFilesNode(NodeBuilder $node)
     {
         $node
             ->arrayNode('config_files')
@@ -103,19 +120,11 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    private function appendConfigOptions(NodeBuilder $node)
+    private function appendApiDocViewsNode(NodeBuilder $node)
     {
         $node
-            ->integerNode('config_max_nesting_level')
-                ->info(
-                    'The maximum number of nesting target entities'
-                    . ' that can be specified in "Resources/config/oro/api.yml"'
-                )
-                ->min(0)
-                ->defaultValue(3)
-            ->end()
             ->arrayNode('api_doc_views')
-                ->info('All supported ApiDoc views')
+                ->info('All supported API views')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children()
@@ -129,6 +138,9 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('request_type')
                             ->info('The request type supported by this view.')
                             ->prototype('scalar')->end()
+                        ->end()
+                        ->scalarNode('documentation_path')
+                            ->info('The URL to the API documentation for this view.')
                         ->end()
                         ->scalarNode('html_formatter')
                             ->info('The HTML formatter that should be used by this view.')
@@ -146,11 +158,27 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->defaultValue(['default'])
             ->end()
             ->scalarNode('documentation_path')
-                ->info('The URL to the API documentation')
+                ->info(
+                    'The URL to the API documentation that should be used for API views'
+                    . ' that does not have own documentation.'
+                )
                 ->defaultNull()
+            ->end();
+        $node->end()
+            ->validate()
+                ->always(function (array $value) {
+                    $documentationPath = $value['documentation_path'];
+                    unset($value['documentation_path']);
+                    foreach ($value['api_doc_views'] as $key => $view) {
+                        if (!\array_key_exists('documentation_path', $view)) {
+                            $value['api_doc_views'][$key]['documentation_path'] = $documentationPath;
+                        }
+                    }
+
+                    return $value;
+                })
             ->end();
     }
 

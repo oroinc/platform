@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
-
-use Symfony\Component\Translation\TranslatorInterface;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -12,34 +10,32 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class EntityDescriptionProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassNameProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameProviderInterface */
+    private $entityClassNameProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    private $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    private $translator;
 
     /** @var EntityDescriptionProvider */
-    protected $entityDescriptionProvider;
+    private $entityDescriptionProvider;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->entityClassNameProvider = $this->createMock(EntityClassNameProviderInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $this->entityDescriptionProvider = new EntityDescriptionProvider(
             $this->entityClassNameProvider,

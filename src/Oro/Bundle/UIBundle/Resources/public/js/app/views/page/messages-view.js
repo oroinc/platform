@@ -27,6 +27,13 @@ define(function(require) {
          */
         route: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function MessagesView() {
+            MessagesView.__super__.constructor.apply(this, arguments);
+        },
+
         delegateEvents: function() {
             MessagesView.__super__.delegateEvents.call(this);
             $(window).on('beforeunload' + this.eventNamespace(), this.onBeforePageReload.bind(this));

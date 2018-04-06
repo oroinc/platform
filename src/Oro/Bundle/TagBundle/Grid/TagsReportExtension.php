@@ -9,10 +9,10 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\QueryDesignerBundle\Grid\QueryDesignerQueryConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider;
-use Oro\Bundle\TagBundle\Entity\Tag;
 
 class TagsReportExtension extends AbstractTagsExtension
 {

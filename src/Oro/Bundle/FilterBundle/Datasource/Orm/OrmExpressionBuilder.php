@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
 use Doctrine\ORM\Query\Expr;
-
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Expr\Coalesce;
 

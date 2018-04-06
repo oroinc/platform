@@ -7,13 +7,12 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
 use Oro\Component\Testing\Unit\EntityTrait;
-
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -488,6 +487,11 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('createSecondStepFieldForm')
             ->with($newFieldModel)
             ->willReturn($form);
+
+        $this->configHelperHandler
+            ->expects($this->once())
+            ->method('showClearCacheMessage')
+            ->willReturn($this->configHelperHandler);
 
         $redirectResponse = $this->expectsConfigSavingAndRedirect($newFieldModel, $extendEntityConfig);
 

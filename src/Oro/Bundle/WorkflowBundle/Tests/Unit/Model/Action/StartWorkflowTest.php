@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
-use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
-
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class StartWorkflowTest extends \PHPUnit_Framework_TestCase
 {

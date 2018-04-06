@@ -2,14 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Composer\Question\StrictConfirmationQuestion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
-
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
@@ -21,6 +16,10 @@ use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Command installs application with all schema and data migrations, prepares assets and application cache
@@ -91,7 +90,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('dialog'));
+        $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
+
         if (false === $input->isInteractive()) {
             $this->validate($input);
         }
@@ -168,7 +168,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             '<info>Ensure that at least one consumer service is running. ' .
             'Use the <comment>oro:message-queue:consume</comment> ' .
             'command to launch a consumer service instance. See ' .
-            '<comment>https://oroinc.com/doc/orocrm/current/book/installation#activating-background-tasks</comment> ' .
+            '<comment>' .
+            'https://oroinc.com/orocrm/doc/current/install-upgrade/post-install-steps#activate-background-tasks' .
+            '</comment> ' .
             'for more information.</info>'
         );
 
@@ -276,32 +278,29 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $options = [
             'user-name'      => [
                 'label'                  => 'Username',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
+                'options'                => [
+                    'constructorArgs' => [LoadAdminUserData::DEFAULT_ADMIN_USERNAME]
+                ],
                 'defaultValue'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             ],
             'user-email'     => [
                 'label'                  => 'Email',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$emailValidator],
+                'options'                => ['settings' => ['validator' => [$emailValidator]]],
                 'defaultValue'           => null,
             ],
             'user-firstname' => [
                 'label'                  => 'First name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$firstNameValidator],
+                'options'                => ['settings' => ['validator' => [$firstNameValidator]]],
                 'defaultValue'           => null,
             ],
             'user-lastname'  => [
                 'label'                  => 'Last name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$lastNameValidator],
+                'options'                => ['settings' => ['validator' => [$lastNameValidator]]],
                 'defaultValue'           => null,
             ],
             'user-password'  => [
                 'label'                  => 'Password',
-                'askMethod'              => 'askHiddenResponseAndValidate',
-                'additionalAskArguments' => [$passwordValidator],
+                'options'                => ['settings' => ['validator' => [$passwordValidator], 'hidden' => [true]]],
                 'defaultValue'           => null,
             ],
         ];
@@ -312,8 +311,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $optionData['defaultValue'],
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                $optionData['options']
             );
         }
 
@@ -353,8 +351,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $options = [
             'organization-name' => [
                 'label'                  => 'Organization name',
-                'askMethod'              => 'askAndValidate',
-                'additionalAskArguments' => [$organizationNameValidator],
+                'options'                => [
+                    'constructorArgs' => [$defaultOrganizationName],
+                    'settings' => ['validator' => [$organizationNameValidator]]
+                ],
                 'defaultValue'           => $defaultOrganizationName,
             ]
         ];
@@ -365,8 +365,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $optionData['defaultValue'],
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                $optionData['options']
             );
         }
 
@@ -393,8 +392,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'application-url' => [
                 'label'                  => 'Application URL',
                 'config_key'             => 'oro_ui.application_url',
-                'askMethod'              => 'ask',
-                'additionalAskArguments' => [],
             ]
         ];
 
@@ -406,8 +403,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $defaultValue,
-                $optionData['askMethod'],
-                $optionData['additionalAskArguments']
+                ['constructorArgs' => [$defaultValue]]
             );
 
             // update setting if it's not empty and not equal to default value
@@ -487,8 +483,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'sample-data',
             'Load sample data (y/n)',
             false,
-            'askConfirmation',
-            [false]
+            [
+                'class' => StrictConfirmationQuestion::class,
+                'constructorArgs' => [false]
+            ]
         );
         if ($isDemo) {
             // load demo fixtures

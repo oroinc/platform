@@ -3,7 +3,6 @@
 namespace Oro\Bundle\QueryDesignerBundle\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\Model\ExpressionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\Restriction;

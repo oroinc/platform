@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
 {

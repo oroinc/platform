@@ -7,6 +7,16 @@ define([
     var ActivityContextActivityView;
 
     ActivityContextActivityView = BaseView.extend({
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActivityContextActivityView() {
+            ActivityContextActivityView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function() {
             this.on('render', function() {
                 var $icons = this.$el.find('i.fa-close');

@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\EventListener;
 
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerAwareInterface;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class ConsoleCommandListener
 {

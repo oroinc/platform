@@ -4,15 +4,13 @@ namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Checks whether an access to a resource is granted.

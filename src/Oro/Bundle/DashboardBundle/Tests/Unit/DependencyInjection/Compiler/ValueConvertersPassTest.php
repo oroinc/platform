@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
-
 use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\ValueConvertersPass;
+use Symfony\Component\DependencyInjection\Definition;
 
 class ValueConvertersPassTest extends \PHPUnit_Framework_TestCase
 {

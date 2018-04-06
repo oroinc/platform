@@ -2,18 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
-use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
+use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class JobExecutorTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,6 +1,7 @@
 Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     constraints:
         - Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner: ~
+        - Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit: ~
     properties:
         name:
             - NotBlank:     ~

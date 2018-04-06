@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-
-use Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 

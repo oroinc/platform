@@ -12,12 +12,13 @@ use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * Provides a set of steps to test navigation related functionality.
+ */
 class FeatureContext extends OroFeatureContext implements
     OroPageObjectAware,
     KernelAwareContext
@@ -42,7 +43,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function menuMustBeOnLeftSide()
     {
-        self::assertFalse($this->createElement('MainMenu')->hasClass('main-menu-top'));
+        self::assertFalse($this->getMainMenu()->hasClass('main-menu-top'));
     }
 
     /**
@@ -51,7 +52,35 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function menuMustBeOnRightSide()
     {
-        self::assertTrue($this->createElement('MainMenu')->hasClass('main-menu-top'));
+        self::assertTrue($this->getMainMenu()->hasClass('main-menu-top'));
+    }
+
+    /**
+     * Assert that menu is on left side and minimized
+     *
+     * @Then menu must be minimized
+     * @Then menu is minimized
+     */
+    public function menuMustBeLeftAndMinimized()
+    {
+        $mainMenuContainer = $this->getMainMenu()->getParent();
+
+        self::assertTrue($mainMenuContainer->hasClass('main-menu-sided'));
+        self::assertTrue($mainMenuContainer->hasClass('minimized'));
+    }
+
+    /**
+     * Assert that menu is on left side and expanded
+     *
+     * @Then menu must be expanded
+     * @Then menu is expanded
+     */
+    public function menuMustBeLeftAndExpanded()
+    {
+        $mainMenuContainer = $this->getMainMenu()->getParent();
+
+        self::assertTrue($mainMenuContainer->hasClass('main-menu-sided'));
+        self::assertFalse($mainMenuContainer->hasClass('minimized'));
     }
 
     /**
@@ -180,8 +209,7 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function goToPages(TableNode $table)
     {
-        /** @var MainMenu $menu */
-        $menu = $this->createElement('MainMenu');
+        $menu = $this->getMainMenu();
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();
         $pages = $table->getColumn(0);
@@ -501,9 +529,7 @@ class FeatureContext extends OroFeatureContext implements
     public function iShouldSeeOrNotInMainMenu($negotiation, $path)
     {
         $isMenuItemVisibleExpectation = empty(trim($negotiation));
-        /** @var MainMenu $mainMenu */
-        $mainMenu = $this->createElement('MainMenu');
-        $hasLink = $mainMenu->hasLink($path);
+        $hasLink = $this->getMainMenu()->hasLink($path);
 
         self::assertSame($isMenuItemVisibleExpectation, $hasLink);
     }
@@ -534,5 +560,13 @@ class FeatureContext extends OroFeatureContext implements
         $menuTree = $this->createElement('MenuTree');
         self::assertTrue($menuTree->isValid());
         $menuTree->clickLink($record);
+    }
+
+    /**
+     * @return MainMenu
+     */
+    private function getMainMenu()
+    {
+        return $this->createElement('MainMenu');
     }
 }

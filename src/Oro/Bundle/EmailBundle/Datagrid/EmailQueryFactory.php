@@ -5,20 +5,18 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Filter\EmailStringFilter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactory
 {

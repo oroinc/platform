@@ -5,14 +5,17 @@ namespace Oro\Bundle\CurrencyBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents entity which stores value and currency as price item
  * @ORM\Embeddable()
  */
 class Price implements CurrencyAwareInterface, \JsonSerializable
 {
+    const MAX_VALUE_SCALE = 4;
+
     use CurrencyAwareTrait;
 
     /**
-     * @var string
+     * @var float
      *
      * @ORM\Column(name="value", type="money", nullable=true)
      */
@@ -34,7 +37,7 @@ class Price implements CurrencyAwareInterface, \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return float
      */
     public function getValue()
     {

@@ -14,17 +14,16 @@ use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ACLHelper
  * This class analyse input query for acl and mark it with ORO_ACL_WALKER if it need to be ACL protected.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -34,7 +33,7 @@ class AclHelper
     const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
     const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
-    /** @var OwnershipConditionDataBuilder */
+    /** @var AclConditionDataBuilderInterface */
     protected $builder;
 
     /** @var EntityManager */
@@ -53,12 +52,12 @@ class AclHelper
     private $checkRootEntity = true;
 
     /**
-     * @param OwnershipConditionDataBuilder $builder
+     * @param AclConditionDataBuilderInterface $builder
      * @param EventDispatcherInterface      $eventDispatcher
      * @param AclConditionalFactorBuilder   $aclConditionFactorBuilder
      */
     public function __construct(
-        OwnershipConditionDataBuilder $builder,
+        AclConditionDataBuilderInterface $builder,
         EventDispatcherInterface $eventDispatcher,
         AclConditionalFactorBuilder $aclConditionFactorBuilder
     ) {

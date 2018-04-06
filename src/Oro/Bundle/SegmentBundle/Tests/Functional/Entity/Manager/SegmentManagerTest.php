@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
 use Doctrine\ORM\EntityRepository;
-
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;

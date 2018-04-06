@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerTest extends WebTestCase
 {

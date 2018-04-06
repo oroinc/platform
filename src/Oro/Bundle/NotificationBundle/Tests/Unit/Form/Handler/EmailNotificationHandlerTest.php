@@ -4,15 +4,15 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler;
-
 class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 {
+    const FORM_DATA = ['field' => 'value'];
+
     /** @var FormInterface |\PHPUnit_Framework_MockObject_MockObject*/
     protected $form;
 
@@ -111,12 +111,16 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessValidData()
     {
+        $this->form->expects($this->any())->method('getName')->willReturn('formName');
         $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once())->method('submit')->with($this->request);
+        $this->form->expects($this->once())->method('submit')->with(self::FORM_DATA);
         $this->form->expects($this->once())->method('isValid')->willReturn(true);
 
+        $this->request->initialize([], [
+            EmailNotificationHandler::SUBMIT_MARKER => true,
+            'formName' => self::FORM_DATA
+        ]);
         $this->request->setMethod('POST');
-        $this->request->request->set(EmailNotificationHandler::SUBMIT_MARKER, true);
 
         $this->manager->expects($this->once())->method('persist')->with($this->entity);
         $this->manager->expects($this->once())->method('flush');

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
-use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -16,7 +14,12 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Component\ChainProcessor\ParameterBagInterface;
 
+/**
+ * An interface for base execution context for Data API processors.
+ */
 interface ContextInterface extends ComponentContextInterface
 {
     /**
@@ -54,6 +57,13 @@ interface ContextInterface extends ComponentContextInterface
      * @param string $className
      */
     public function setClassName($className);
+
+    /**
+     * Checks whether metadata of an entity has at least one identifier field.
+     *
+     * @return bool
+     */
+    public function hasIdentifierFields();
 
     /**
      * Gets request headers.

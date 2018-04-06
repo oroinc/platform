@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 {

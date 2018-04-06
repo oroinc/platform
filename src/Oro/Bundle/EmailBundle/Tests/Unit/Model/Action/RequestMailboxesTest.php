@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Model\Action\RequestMailboxes;
-
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class RequestMailboxesTest extends \PHPUnit_Framework_TestCase

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigExtension extends \Twig_Extension
 {

@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Command;
 
+use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
+use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\ActionBundle\Helper\DocCommentParser;
-
-use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
 abstract class AbstractDebugCommand extends ContainerAwareCommand
 {

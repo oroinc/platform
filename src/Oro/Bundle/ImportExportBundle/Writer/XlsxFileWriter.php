@@ -4,13 +4,11 @@ namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-
 use Liuggio\ExcelBundle\Factory as ExcelFactory;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareInterface
 {

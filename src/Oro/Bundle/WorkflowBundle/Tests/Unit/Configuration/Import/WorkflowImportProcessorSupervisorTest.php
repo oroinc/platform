@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
+use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisor;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import\Stub\StubWorkflowImportCallbackProcessor;
 
 class WorkflowImportProcessorSupervisorTest extends \PHPUnit_Framework_TestCase

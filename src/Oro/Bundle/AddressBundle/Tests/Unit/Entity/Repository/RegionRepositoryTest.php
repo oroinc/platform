@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\AbstractQuery;
-
-use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 use Oro\Bundle\AddressBundle\Entity\Country;
+use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 
 class RegionRepositoryTest extends \PHPUnit_Framework_TestCase
 {

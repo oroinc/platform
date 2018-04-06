@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\ConstraintViolationList;
-
-use Oro\Bundle\DataAuditBundle\Form\Type\FilterType as AuditFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FilterTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $validator = $this->createMock('Symfony\Component\Validator\ValidatorInterface');
+        $validator = $this->createMock(ValidatorInterface::class);
         $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
         $this->factory = Forms::createFormFactoryBuilder()
@@ -54,8 +54,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $type = new AuditFilterType();
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(AuditFilterType::class);
         $form->submit($formData);
         
         $this->assertTrue($form->isValid());

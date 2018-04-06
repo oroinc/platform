@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
-
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
 /**

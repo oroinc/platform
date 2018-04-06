@@ -5,15 +5,13 @@ namespace Oro\Bundle\EntityConfigBundle\Audit;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Audit entity config changes

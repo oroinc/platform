@@ -15,9 +15,21 @@ define(function(require) {
 
     EmailNotificationComponent = BaseComponent.extend({
         view: null,
+
         collection: null,
+
         countModel: null,
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function EmailNotificationComponent() {
+            EmailNotificationComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['countModel']));
             if (this.countModel instanceof Backbone.Model === false) {

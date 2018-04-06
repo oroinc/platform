@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Util\Codes;
-
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("email_activity_relation")

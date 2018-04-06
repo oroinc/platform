@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * The abstract class for form types are used to work with entity config attributes
@@ -48,7 +48,7 @@ abstract class AbstractAssociationType extends AbstractConfigType
     /**
      * {@inheritdoc}
      */
-    protected function isReadOnly($options)
+    protected function isReadOnly(Options $options)
     {
         /** @var EntityConfigId $configId */
         $configId  = $options['config_id'];

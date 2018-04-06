@@ -2,13 +2,12 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Component\MessageQueue\Client\CreateQueuesCommand;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
 
 class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
 {

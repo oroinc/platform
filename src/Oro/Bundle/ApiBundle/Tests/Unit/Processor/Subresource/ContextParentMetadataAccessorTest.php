@@ -4,47 +4,64 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 
 class ContextParentMetadataAccessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $context;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourceContext */
+    private $context;
 
     /** @var ContextParentMetadataAccessor */
-    protected $metadataAccessor;
+    private $metadataAccessor;
 
     protected function setUp()
     {
-        $this->context = $this->getMockBuilder('Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->context = $this->createMock(SubresourceContext::class);
 
         $this->metadataAccessor = new ContextParentMetadataAccessor($this->context);
     }
 
     public function testGetMetadataForContextParentClass()
     {
-        $className = 'Test\Entity';
+        $className = User::class;
         $metadata = new EntityMetadata();
 
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentClassName')
             ->willReturn($className);
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentMetadata')
             ->willReturn($metadata);
 
-        $this->assertSame($metadata, $this->metadataAccessor->getMetadata($className));
+        self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
+    }
+
+    public function testGetMetadataForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity()
+    {
+        $className = User::class;
+        $metadata = new EntityMetadata();
+
+        $this->context->expects(self::once())
+            ->method('getParentClassName')
+            ->willReturn(UserProfile::class);
+        $this->context->expects(self::once())
+            ->method('getParentMetadata')
+            ->willReturn($metadata);
+
+        self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
     public function testGetMetadataForNotContextParentClass()
     {
-        $this->context->expects($this->once())
+        $this->context->expects(self::once())
             ->method('getParentClassName')
-            ->willReturn('Test\Entity1');
-        $this->context->expects($this->never())
+            ->willReturn(User::class);
+        $this->context->expects(self::never())
             ->method('getParentMetadata');
 
-        $this->assertNull($this->metadataAccessor->getMetadata('Test\Entity2'));
+        self::assertNull($this->metadataAccessor->getMetadata(Product::class));
     }
 }

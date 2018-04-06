@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 class JsRoutingDumpListener
 {

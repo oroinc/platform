@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;

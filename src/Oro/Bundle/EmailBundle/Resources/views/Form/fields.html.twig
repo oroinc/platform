@@ -183,7 +183,10 @@
     <div class="folder-tree-widget"
          data-page-component-module="oroemail/js/app/components/folder-tree-component"
          data-page-component-options="{{ options|json_encode }}">
-        <input class="check-all" type="checkbox"/><label class="folder-label">{{ "oro.email.imap.folder.checkAll"|trans }}</label>
+        <label class="folder-label">
+            <input class="check-all" type="checkbox">
+            {{ "oro.email.imap.folder.checkAll"|trans }}
+        </label>
         <div class="folder-list">
             {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
                 {{ _self.renderFolder(key, folder, form.vars.full_name) }}
@@ -320,8 +323,10 @@
 {% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
     {% if maxDepth %}
         <div>
-            <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
-            <label class="folder-label">{{ folder.name }}</label>
+            <label class="folder-label">
+                <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+                {{ folder.name }}
+            </label>
             <input type="hidden" data-name="fullName" value="{{ folder.fullName }}">
             <input type="hidden" data-name="name" value="{{ folder.name }}">
             <input type="hidden" data-name="type" value="{{ folder.type }}">

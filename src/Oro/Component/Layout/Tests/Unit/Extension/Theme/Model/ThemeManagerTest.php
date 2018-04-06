@@ -3,11 +3,10 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
 class ThemeManagerTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\CronBundle\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer;
-use Oro\Bundle\FilterBundle\Filter\StringFilter;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Component\DoctrineUtils\ORM\DqlUtil;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class CommandWithArgsFilter extends StringFilter
 {

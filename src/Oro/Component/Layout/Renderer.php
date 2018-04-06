@@ -2,10 +2,9 @@
 
 namespace Oro\Component\Layout;
 
-use Symfony\Component\Form\FormView;
-
-use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Form\FormRendererInterface;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
+use Symfony\Component\Form\FormView;
 
 /**
  * Heavily inspired by FormRenderer class

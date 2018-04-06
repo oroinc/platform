@@ -33,14 +33,14 @@ parameters:
 
 services:
     oro_entity_extend.type.entity:
-        class:                                                  %oro_entity_extend.type.entity.class%
+        class:                                                  '%oro_entity_extend.type.entity.class%'
         arguments:
             - '@oro_entity_extend.db_id_name_generator'
         tags:
             - { name: form.type, alias: oro_entity_extend_entity_type }
 
     oro_entity_extend.type.field:
-        class:                                                  %oro_entity_extend.type.field.class%
+        class:                                                  '%oro_entity_extend.type.field.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
@@ -50,22 +50,28 @@ services:
             - { name: form.type, alias: oro_entity_extend_field_type }
 
     oro_entity_extend.type.relation:
-        class:                                                  %oro_entity_extend.type.relation.class%
+        class:                                                  '%oro_entity_extend.type.relation.class%'
         arguments:
             - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.type.target_field_type'
         tags:
             - { name: form.type, alias: oro_entity_relation_type }
 
     oro_entity_extend.type.target_field_type:
-        class: %oro_entity_extend.type.target_field_type.class%
+        class: '%oro_entity_extend.type.target_field_type.class%'
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_entity_target_field_type}
 
+    oro_entity_extend.type.target_type:
+        class: Oro\Bundle\EntityExtendBundle\Form\Type\TargetType
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: form.type }
+
     oro_entity_extend.type.integer:
-        class: %oro_entity_extend.type.integer.class%
+        class: '%oro_entity_extend.type.integer.class%'
         arguments:
             - '@oro_entity_config.config_type_helper'
             - '@oro_entity_config.config_manager'
@@ -73,7 +79,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_integer }
 
     oro_entity_extend.type.text:
-        class: %oro_entity_extend.type.text.class%
+        class: '%oro_entity_extend.type.text.class%'
         arguments:
             - '@oro_entity_config.config_type_helper'
             - '@oro_entity_config.config_manager'
@@ -81,7 +87,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_text }
 
     oro_entity_extend.type.textarea:
-        class: %oro_entity_extend.type.textarea.class%
+        class: '%oro_entity_extend.type.textarea.class%'
         arguments:
             - '@oro_entity_config.config_type_helper'
             - '@oro_entity_config.config_manager'
@@ -89,7 +95,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_textarea }
 
     oro_entity_extend.type.choice:
-        class: %oro_entity_extend.type.choice.class%
+        class: '%oro_entity_extend.type.choice.class%'
         arguments:
             - '@oro_entity_config.config_type_helper'
             - '@oro_entity_config.config_manager'
@@ -97,14 +103,14 @@ services:
             - { name: form.type, alias: oro_entity_extend_choice }
 
     oro_entity_extend.association_type_helper:
-        class: %oro_entity_extend.association_type_helper.class%
+        class: '%oro_entity_extend.association_type_helper.class%'
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity.orm.entity_class_resolver'
 
     oro_entity_extend.type.association_choice:
-        class: %oro_entity_extend.type.association_choice.class%
+        class: '%oro_entity_extend.type.association_choice.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -112,7 +118,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_association_choice }
 
     oro_entity_extend.type.multiple_association_choice:
-        class: %oro_entity_extend.type.multiple_association_choice.class%
+        class: '%oro_entity_extend.type.multiple_association_choice.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -120,7 +126,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_multiple_association_choice }
 
     oro_entity_extend.type.association.integer:
-        class: %oro_entity_extend.type.association.integer.class%
+        class: '%oro_entity_extend.type.association.integer.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -128,7 +134,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_association_property_integer }
 
     oro_entity_extend.type.association.text:
-        class: %oro_entity_extend.type.association.text.class%
+        class: '%oro_entity_extend.type.association.text.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -136,7 +142,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_association_property_text }
 
     oro_entity_extend.type.association.textarea:
-        class: %oro_entity_extend.type.association.textarea.class%
+        class: '%oro_entity_extend.type.association.textarea.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -144,7 +150,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_association_property_textarea }
 
     oro_entity_extend.type.association.choice:
-        class: %oro_entity_extend.type.association.choice.class%
+        class: '%oro_entity_extend.type.association.choice.class%'
         arguments:
             - '@oro_entity_extend.association_type_helper'
             - '@oro_entity_config.config_manager'
@@ -152,7 +158,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_association_property_choice }
 
     oro_entity_extend.type.unique_key_collection_type:
-        class: %oro_entity_extend.type.unique_key_collection_type.class%
+        class: '%oro_entity_extend.type.unique_key_collection_type.class%'
         arguments:
             - '@oro_entity_config.provider.extend'
             - '@oro_entity_config.provider.entity'
@@ -160,27 +166,27 @@ services:
             - { name: form.type, alias: oro_entity_extend_unique_key_collection_type }
 
     oro_entity_extend.enum_type_helper:
-        class: %oro_entity_extend.enum_type_helper.class%
+        class: '%oro_entity_extend.enum_type_helper.class%'
         public: false
         arguments:
             - '@oro_entity_config.config_manager'
 
     oro_entity_extend.type.enum_value:
-        class: %oro_entity_extend.type.enum_value.class%
+        class: '%oro_entity_extend.type.enum_value.class%'
         arguments:
             - '@oro_entity_config.provider.enum'
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_value }
 
     oro_entity_extend.type.enum_value_collection:
-        class: %oro_entity_extend.type.enum_value_collection.class%
+        class: '%oro_entity_extend.type.enum_value_collection.class%'
         arguments:
             - '@oro_entity_extend.enum_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_value_collection }
 
     oro_entity_extend.type.enum_name:
-        class: %oro_entity_extend.type.enum_name.class%
+        class: '%oro_entity_extend.type.enum_name.class%'
         arguments:
             - '@oro_entity_extend.enum_type_helper'
             - '@oro_entity_extend.db_id_name_generator'
@@ -188,7 +194,7 @@ services:
             - { name: form.type, alias: oro_entity_extend_enum_name }
 
     oro_entity_extend.type.enum_public:
-        class: %oro_entity_extend.type.enum_public.class%
+        class: '%oro_entity_extend.type.enum_public.class%'
         arguments:
             - '@oro_entity_extend.enum_type_helper'
         tags:
@@ -202,14 +208,14 @@ services:
             - '@oro_entity_extend.enum_synchronizer'
 
     oro_entity_extend.entity_config_type.extension.enum:
-        class: %oro_entity_extend.entity_config_type.extension.enum.class%
+        class: '%oro_entity_extend.entity_config_type.extension.enum.class%'
         arguments:
             - '@oro_entity_extend.entity_config_type.enum.subscriber'
         tags:
-            - { name: form.type_extension, alias: oro_entity_config_type }
+            - { name: form.type_extension, extended_type: Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType, alias: oro_entity_config_type }
 
     oro_entity_extend.type.enum_choice:
-        class: %oro_entity_extend.type.enum_choice.class%
+        class: '%oro_entity_extend.type.enum_choice.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
@@ -224,7 +230,7 @@ services:
             - { name: form.type, alias: oro_enum_id_choice }
 
     oro_entity_extend.type.enum_select:
-        class: %oro_entity_extend.type.enum_select.class%
+        class: '%oro_entity_extend.type.enum_select.class%'
         arguments:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
@@ -232,7 +238,7 @@ services:
             - { name: form.type, alias: oro_enum_select }
 
     oro_entity_extend.form.guesser.extend_field:
-        class: %oro_entity_extend.form.guesser.extend_field.class%
+        class: '%oro_entity_extend.form.guesser.extend_field.class%'
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
@@ -269,7 +275,7 @@ services:
             - { name: form.type_guesser, priority: 15 }
 
     oro_entity_extend.type.multiple_entity:
-        class: %oro_entity_extend.type.multiple_entity.class%
+        class: '%oro_entity_extend.type.multiple_entity.class%'
         arguments:
             - '@router'
         tags:

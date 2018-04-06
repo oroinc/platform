@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
+use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class SegmentTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +39,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'entity',
-                'oro_segment_entity_choice',
+                SegmentEntityChoiceType::class,
                 ['required' => true]
             )
             ->will($this->returnSelf());
@@ -44,12 +48,12 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'type',
-                'entity',
+                EntityType::class,
                 [
                     'class'       => 'OroSegmentBundle:SegmentType',
-                    'property'    => 'label',
+                    'choice_label' => 'label',
                     'required'    => true,
-                    'empty_value' => 'oro.segment.form.choose_segment_type',
+                    'placeholder' => 'oro.segment.form.choose_segment_type',
                     'tooltip'     => 'oro.segment.type.tooltip_text'
                 ]
             )
@@ -77,7 +81,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'definition',
-                'hidden',
+                HiddenType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -96,9 +100,9 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
                         'exclude_fields' => ['relation_type'],
                     ],
                     'column_column_choice_type'   => 'hidden',
-                    'filter_column_choice_type'   => 'oro_entity_field_select',
+                    'filter_column_choice_type'   => EntityFieldSelectType::class,
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
-                    'intention'                   => 'segment',
+                    'csrf_token_id'               => 'segment',
                     'query_type'                  => 'segment',
                 ]
             );

@@ -11,6 +11,13 @@ define(function(require) {
         el: null,
 
         /**
+         * @inheritDoc
+         */
+        constructor: function AttributeGroupTabContentComponent() {
+            AttributeGroupTabContentComponent.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

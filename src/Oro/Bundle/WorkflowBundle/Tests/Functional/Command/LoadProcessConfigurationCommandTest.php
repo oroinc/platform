@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;

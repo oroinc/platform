@@ -3,18 +3,17 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 
 class WorkflowSelectType extends AbstractType
 {
@@ -57,7 +56,7 @@ class WorkflowSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -80,9 +79,9 @@ class WorkflowSelectType extends AbstractType
                 }
 
                 $entityClass = $options['entity_class'];
-                if (!$entityClass && $options->has('config_id')) {
+                if (!$entityClass && isset($options['config_id'])) {
                     $configId = $options['config_id'];
-                    if ($configId && $configId instanceof ConfigIdInterface) {
+                    if ($configId instanceof ConfigIdInterface) {
                         $entityClass = $configId->getClassName();
                     }
                 }

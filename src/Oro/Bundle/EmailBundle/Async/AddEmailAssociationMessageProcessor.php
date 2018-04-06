@@ -3,7 +3,6 @@ namespace Oro\Bundle\EmailBundle\Async;
 
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;

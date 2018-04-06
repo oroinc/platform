@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig\JsonApi;
 
-use Symfony\Component\HttpFoundation\Response;
-
-use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AbstractAddStatusCodes;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Adds possible status codes specific for REST API conforms JSON.API specification.

@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\PreloadedExtension;
-
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\LocaleBundle\Form\Type\FormattingSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
+use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class LocalizationTypeTest extends FormIntegrationTestCase
 {
@@ -41,10 +40,9 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-        parent::setUp();
-
         $this->formType = new LocalizationType();
         $this->formType->setDataClass(static::DATA_CLASS);
+        parent::setUp();
     }
 
     public function testGetName()
@@ -61,7 +59,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($defaultData, array $submittedData, $expectedData)
     {
-        $form = $this->factory->create($this->formType, $defaultData);
+        $form = $this->factory->create(LocalizationType::class, $defaultData);
 
         $formConfig = $form->getConfig();
         $this->assertEquals(static::DATA_CLASS, $formConfig->getOption('data_class'));
@@ -166,17 +164,18 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
-                    LanguageSelectType::NAME => new EntityType($languages, LanguageSelectType::NAME),
-                    FormattingSelectType::NAME => new FormattingSelectTypeStub(),
-                    LocalizationParentSelectType::NAME => new EntityType(
+                    LocalizationType::class => $this->formType,
+                    LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
+                    LanguageSelectType::class => new EntityType($languages, LanguageSelectType::NAME),
+                    FormattingSelectType::class => new FormattingSelectTypeStub(),
+                    LocalizationParentSelectType::class => new EntityType(
                         [
                             '1' => $this->getEntity(Localization::class, ['id' => 1])
                         ],
                         LocalizationParentSelectType::NAME
                     ),
                 ],
-                ['form' => [new StripTagsExtension($helper)]]
+                [FormType::class => [new StripTagsExtension($helper)]]
             )
         ];
     }

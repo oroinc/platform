@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-
-use Oro\Bundle\UserBundle\Entity\User;
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * EmailNotification
@@ -253,10 +251,9 @@ class RecipientList
 
         if ($notValid) {
             $propertyPath = $context->getPropertyPath() . '.recipientList';
-            $context->addViolationAt(
-                $propertyPath,
-                'oro.notification.validators.recipient_list.empty.message'
-            );
+            $context->buildViolation('oro.notification.validators.recipient_list.empty.message')
+                ->atPath($propertyPath)
+                ->addViolation();
         }
     }
 

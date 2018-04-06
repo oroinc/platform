@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
-use Symfony\Component\Routing\Route;
-
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Routing\Route;
 
 class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface
 {

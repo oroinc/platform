@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
-use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -123,9 +123,11 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $entityMetadata = new EntityMetadata();
         $this->assertEmpty($entityMetadata->getIdentifierFieldNames());
+        $this->assertFalse($entityMetadata->hasIdentifierFields());
 
         $entityMetadata->setIdentifierFieldNames(['id']);
         $this->assertEquals(['id'], $entityMetadata->getIdentifierFieldNames());
+        $this->assertTrue($entityMetadata->hasIdentifierFields());
     }
 
     public function testInheritedType()

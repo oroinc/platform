@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
@@ -13,9 +11,13 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ActivityListChainProvider */
@@ -291,9 +293,6 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
                     'icon'     => 'test_icon',
                     'label'    => 'test_label',
                     'template' => 'test_template.js.twig',
-                    'routes'   => [
-                        'delete' => 'test_delete_route'
-                    ],
                     'has_comments' => true,
                 ]
             ],

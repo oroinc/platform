@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-
 use Liuggio\ExcelBundle\Factory as ExcelFactory;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;

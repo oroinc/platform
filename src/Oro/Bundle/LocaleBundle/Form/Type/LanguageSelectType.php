@@ -3,15 +3,13 @@
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LanguageSelectType extends AbstractType
 {
@@ -52,7 +50,7 @@ class LanguageSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'empty_value' => '',
+            'placeholder' => '',
             'choices' => $this->provider->getLanguageChoices(true),
             'translatable_options' => false,
             'configs' => [
@@ -66,7 +64,7 @@ class LanguageSelectType extends AbstractType
      */
     public function getParent()
     {
-        return OroChoiceType::NAME;
+        return OroChoiceType::class;
     }
 
     /**

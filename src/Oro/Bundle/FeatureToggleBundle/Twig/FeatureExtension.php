@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class FeatureExtension extends \Twig_Extension
 {

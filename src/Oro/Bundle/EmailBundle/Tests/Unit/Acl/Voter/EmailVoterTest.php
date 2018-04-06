@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-
+use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EmailVoterTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,48 +35,6 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->authorizationChecker);
 
         $this->emailVoter = new EmailVoter($this->container);
-    }
-
-    /**
-     * @param $attribute
-     * @param $isSupported
-     * @dataProvider attributeProvider
-     */
-    public function testSupportsAttribute($attribute, $isSupported)
-    {
-        $this->assertEquals($isSupported, $this->emailVoter->supportsAttribute($attribute));
-    }
-
-    public function attributeProvider()
-    {
-        return [
-            ['VIEW', true],
-            ['EDIT', true],
-            ['CREATE', false],
-            ['DELETE', false],
-        ];
-    }
-
-    /**
-     * @param $class
-     * @param $isSupported
-     * @dataProvider classProvider
-     */
-    public function testSupportsClass($class, $isSupported)
-    {
-        $this->assertEquals($isSupported, $this->emailVoter->supportsClass($class));
-    }
-
-    public function classProvider()
-    {
-        return [
-            ['Oro\Bundle\EmailBundle\Entity\Email', true],
-            ['Oro\Bundle\EmailBundle\Entity\EmailBody', true],
-            ['Oro\Bundle\EmailBundle\Entity\EmailAttachment', true],
-            [EmailBody::CLASS_NAME, true],
-            [EmailAttachment::CLASS_NAME, true],
-            ['Some\Unsupported\Class', false]
-        ];
     }
 
     /**

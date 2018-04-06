@@ -5,7 +5,6 @@ namespace Oro\Bundle\SegmentBundle\Entity\Repository;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;

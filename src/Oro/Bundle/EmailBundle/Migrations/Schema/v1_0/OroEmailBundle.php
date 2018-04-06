@@ -3,10 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
-
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * ORO Migration that creates base Email database structure
+ */
 class OroEmailBundle implements Migration
 {
     /**
@@ -298,7 +300,7 @@ class OroEmailBundle implements Migration
             $schema->getTable('oro_email_body'),
             ['body_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_email_attachment **/
     }
@@ -316,7 +318,7 @@ class OroEmailBundle implements Migration
             $schema->getTable('oro_email_attachment'),
             ['attachment_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_email_attachment_content **/
     }
@@ -352,7 +354,7 @@ class OroEmailBundle implements Migration
             $schema->getTable('oro_email_origin'),
             ['origin_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_email_folder **/
     }

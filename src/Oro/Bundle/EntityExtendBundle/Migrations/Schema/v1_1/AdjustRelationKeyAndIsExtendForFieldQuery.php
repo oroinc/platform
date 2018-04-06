@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 /**
  * Currently there are extend.is_extend and extend.extend attributes for entity field,

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
-use Zend\Mail\Header\GenericHeader;
-use Zend\Mail\Headers;
-
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
+use Zend\Mail\Header\GenericHeader;
+use Zend\Mail\Headers;
 
 class AttachmentTest extends \PHPUnit_Framework_TestCase
 {

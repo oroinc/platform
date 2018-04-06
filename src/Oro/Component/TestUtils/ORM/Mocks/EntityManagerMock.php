@@ -3,11 +3,9 @@
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
 use Doctrine\Common\EventManager;
-
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Proxy\ProxyFactory;
-use Doctrine\ORM\Configuration;
-
 use Symfony\Component\Filesystem\Filesystem;
 
 /**

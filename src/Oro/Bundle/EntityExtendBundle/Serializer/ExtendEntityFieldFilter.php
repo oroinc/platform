@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Serializer;
 
-use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 
 class ExtendEntityFieldFilter implements EntityFieldFilterInterface
 {

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 
 class UpdateFactory
 {

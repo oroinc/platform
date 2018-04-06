@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Psr\Log\LoggerInterface;
 
 class RemoveFieldQuery extends ParametrizedMigrationQuery
 {

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Options;
-
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowTransitionType extends AbstractType
 {
@@ -33,7 +32,7 @@ class WorkflowTransitionType extends AbstractType
      */
     public function getParent()
     {
-        return WorkflowAttributesType::NAME;
+        return WorkflowAttributesType::class;
     }
 
     /**
@@ -47,11 +46,7 @@ class WorkflowTransitionType extends AbstractType
     {
         $resolver->setRequired(array('workflow_item', 'transition_name'));
 
-        $resolver->setAllowedTypes(
-            array(
-                'transition_name' => 'string',
-            )
-        );
+        $resolver->setAllowedTypes('transition_name', 'string');
 
         $resolver->setNormalizer(
             'constraints',

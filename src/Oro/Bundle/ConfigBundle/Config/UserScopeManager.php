@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * User config scope

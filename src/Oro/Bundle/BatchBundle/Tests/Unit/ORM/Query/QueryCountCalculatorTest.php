@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
-
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\ORM\SqlQuery;
 

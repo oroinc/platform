@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,12 +15,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
-
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
-    public const API_DOC_PATH_PARAMETER_NAME  = 'oro_api.api_doc.path';
     public const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
 
     private const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
@@ -169,7 +167,6 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
-        $container->setParameter(self::API_DOC_PATH_PARAMETER_NAME, $config['documentation_path']);
         $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, array_keys($config['api_doc_views']));
     }
 
@@ -184,6 +181,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             self::ACTION_PROCESSOR_BAG_SERVICE_ID
         );
         if (null !== $actionProcessorBagServiceDef) {
+            $debug = $container->getParameter('kernel.debug');
             $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
             foreach ($config['actions'] as $action => $actionConfig) {
                 if (empty($actionConfig['processor_service_id'])) {
@@ -201,6 +199,25 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                     'addProcessor',
                     [new Reference($actionProcessorServiceId)]
                 );
+
+                // decorate with TraceableActionProcessor
+                if ($debug) {
+                    $actionProcessorDecoratorServiceId = $actionProcessorServiceId . '.oro_api.profiler';
+                    $container
+                        ->setDefinition(
+                            $actionProcessorDecoratorServiceId,
+                            new Definition(
+                                'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor',
+                                [
+                                    new Reference($actionProcessorDecoratorServiceId . '.inner'),
+                                    new Reference('oro_api.profiler.logger')
+                                ]
+                            )
+                        )
+                        // should be at the top of the decoration chain
+                        ->setDecoratedService($actionProcessorServiceId, null, -255)
+                        ->setPublic(false);
+                }
             }
         }
     }
