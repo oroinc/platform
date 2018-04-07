@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 class LoadAccessibleResourcesTest extends \PHPUnit_Framework_TestCase
 {
     /** @var LoadAccessibleResources */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -19,14 +19,14 @@ class LoadAccessibleResourcesTest extends \PHPUnit_Framework_TestCase
     public function testProcessWhenAccessibleResourcesAreAlreadyBuilt()
     {
         $context = new CollectResourcesContext();
-        $context->setAccessibleResources(['Test\Entity1']);
+        $context->setAccessibleResources(['Test\Entity']);
 
         $this->processor->process($context);
 
-        $this->assertEquals(['Test\Entity1'], $context->getAccessibleResources());
+        self::assertEquals(['Test\Entity'], $context->getAccessibleResources());
     }
 
-    public function testProcess()
+    public function testProcessAccessibleResource()
     {
         $context = new CollectResourcesContext();
 

@@ -3,10 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
+/**
+ * Provides utility methods to work with manageable entities.
+ */
 class DoctrineHelper extends BaseHelper
 {
     /** @var array */
@@ -57,30 +59,6 @@ class DoctrineHelper extends BaseHelper
         }
 
         return $metadata;
-    }
-
-    /**
-     * Gets ORDER BY expression that can be used to sort a collection by entity identifier.
-     *
-     * @param string $entityClass
-     * @param bool   $desc
-     *
-     * @return array|null
-     */
-    public function getOrderByIdentifier($entityClass, $desc = false)
-    {
-        $idFieldNames = $this->getEntityIdentifierFieldNamesForClass($entityClass);
-        if (empty($idFieldNames)) {
-            return null;
-        }
-
-        $orderBy = [];
-        $order = $desc ? Criteria::DESC : Criteria::ASC;
-        foreach ($idFieldNames as $idFieldName) {
-            $orderBy[$idFieldName] = $order;
-        }
-
-        return $orderBy;
     }
 
     /**

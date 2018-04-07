@@ -2,23 +2,29 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Delete;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 
 /**
- * Deletes entity by DeleteHandler.
+ * Deletes an entity by DeleteHandler.
  */
 class DeleteDataByDeleteHandler extends BaseProcessor
 {
     /**
      * {@inheritdoc}
      */
-    protected function processDelete(Context $context, DeleteHandler $handler)
+    protected function processDelete($data, DeleteHandler $handler, EntityManagerInterface $em)
     {
-        $handler->processDelete(
-            $context->getResult(),
-            $this->doctrineHelper->getEntityManagerForClass($context->getClassName())
-        );
+        if (!\is_object($data)) {
+            throw new \RuntimeException(
+                \sprintf(
+                    'The result property of the Context should be an object, "%s" given.',
+                    \is_object($data) ? \get_class($data) : \gettype($data)
+                )
+            );
+        }
+
+        $handler->processDelete($data, $em);
     }
 }

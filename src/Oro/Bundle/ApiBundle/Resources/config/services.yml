@@ -195,10 +195,6 @@ services:
             - '@oro_api.resources_provider'
             - '@oro_api.resources_cache'
 
-    oro_api.resource_hierarchy_provider:
-        class: Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider
-        public: false
-
     oro_api.resources_cache:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
         arguments:

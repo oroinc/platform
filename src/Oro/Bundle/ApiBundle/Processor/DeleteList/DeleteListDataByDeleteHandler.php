@@ -2,42 +2,39 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 
 /**
- * Deletes entities by DeleteHandler.
+ * Deletes a list of entities by DeleteHandler.
  */
 class DeleteListDataByDeleteHandler extends BaseProcessor
 {
     /**
      * {@inheritdoc}
      */
-    protected function processDelete(Context $context, DeleteHandler $handler)
+    protected function processDelete($data, DeleteHandler $handler, EntityManagerInterface $em)
     {
         /** @var DeleteListContext $context */
 
-        $entities = $context->getResult();
-        if (!is_array($entities) && !$entities instanceof \Traversable) {
-            throw new RuntimeException(
-                sprintf(
+        if (!\is_array($data) && !$data instanceof \Traversable) {
+            throw new \RuntimeException(
+                \sprintf(
                     'The result property of the Context should be array or Traversable, "%s" given.',
-                    is_object($entities) ? get_class($entities) : gettype($entities)
+                    \is_object($data) ? \get_class($data) : \gettype($data)
                 )
             );
         }
 
-        $entityManager = $this->doctrineHelper->getEntityManagerForClass($context->getClassName());
-        $entityManager->getConnection()->beginTransaction();
+        $em->getConnection()->beginTransaction();
         try {
-            foreach ($entities as $entity) {
-                $handler->processDelete($entity, $entityManager);
+            foreach ($data as $entity) {
+                $handler->processDelete($entity, $em);
             }
-            $entityManager->getConnection()->commit();
+            $em->getConnection()->commit();
         } catch (\Exception $e) {
-            $entityManager->getConnection()->rollBack();
+            $em->getConnection()->rollBack();
 
             throw $e;
         }
