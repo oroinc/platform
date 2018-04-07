@@ -7,17 +7,26 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class NullValueTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $innerTransformer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerInterface */
+    private $innerTransformer;
 
     /** @var NullValueTransformer */
-    protected $nullValueTransformer;
+    private $nullValueTransformer;
 
     protected function setUp()
     {
         $this->innerTransformer = $this->createMock(DataTransformerInterface::class);
 
         $this->nullValueTransformer = new NullValueTransformer($this->innerTransformer);
+    }
+
+    public function testInnerTransformerGetterAndSetter()
+    {
+        self::assertSame($this->innerTransformer, $this->nullValueTransformer->getInnerTransformer());
+
+        $anotherInnerTransformer = $this->createMock(DataTransformerInterface::class);
+        $this->nullValueTransformer->setInnerTransformer($anotherInnerTransformer);
+        self::assertSame($anotherInnerTransformer, $this->nullValueTransformer->getInnerTransformer());
     }
 
     public function testTransformForNull()
