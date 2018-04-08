@@ -7,31 +7,28 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class NormalizeMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var NormalizeMetadata */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->processor = new NormalizeMetadata(
             $this->doctrineHelper,
@@ -109,18 +106,18 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1'        => null,
-                'field2'        => [
+                'field1'       => null,
+                'field2'       => [
                     'exclude' => true
                 ],
-                'field3'        => [
+                'field3'       => [
                     'property_path' => 'realField3'
                 ],
-                'association1'  => null,
-                'association2'  => [
+                'association1' => null,
+                'association2' => [
                     'exclude' => true
                 ],
-                'association3'  => [
+                'association3' => [
                     'property_path' => 'realAssociation3'
                 ],
             ]
@@ -144,7 +141,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata('association4', 'Test\Association4Target')
         );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -163,7 +160,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessWhenExcludedPropertiesShouldNotBeRemoved()
@@ -171,8 +168,8 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1'        => null,
-                'field2'        => [
+                'field1' => null,
+                'field2' => [
                     'exclude' => true
                 ],
             ]
@@ -182,7 +179,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata->addField($this->createFieldMetadata('field1'));
         $metadata->addField($this->createFieldMetadata('field2'));
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -196,7 +193,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
         $expectedMetadata->addField($this->createFieldMetadata('field2'));
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessLinkedPropertiesForFieldWithoutPropertyPath()
@@ -204,7 +201,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1'       => null,
+                'field1' => null,
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -213,7 +210,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata->setClassName(self::TEST_CLASS_NAME);
         $metadata->addField($this->createFieldMetadata('field1'));
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -226,7 +223,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessLinkedPropertiesForRenamedField()
@@ -234,7 +231,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field2'       => [
+                'field2' => [
                     'property_path' => 'realField2'
                 ],
             ]
@@ -245,7 +242,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata->setClassName(self::TEST_CLASS_NAME);
         $metadata->addField($this->createFieldMetadata('field2'));
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
@@ -258,7 +255,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
         $expectedMetadata->addField($this->createFieldMetadata('field2'));
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessLinkedPropertiesForAssociationWithPropertyPath()
@@ -289,7 +286,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     /**
@@ -321,28 +318,28 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association41ClassMetadata = $this->getClassMetadataMock('Test\Association41Target');
-        $association41ClassMetadata->expects($this->once())
+        $association41ClassMetadata->expects(self::once())
             ->method('hasAssociation')
             ->with('association411')
             ->willReturn(true);
-        $association41ClassMetadata->expects($this->once())
+        $association41ClassMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('association411')
             ->willReturn('Test\Association411Target');
-        $association41ClassMetadata->expects($this->once())
+        $association41ClassMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('association411')
             ->willReturn(false);
-        $association41ClassMetadata->expects($this->once())
+        $association41ClassMetadata->expects(self::once())
             ->method('getAssociationMapping')
             ->with('association411')
             ->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
 
         $association411ClassMetadata = $this->getClassMetadataMock('Test\Association411Target');
-        $association411ClassMetadata->expects($this->once())
+        $association411ClassMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $association411ClassMetadata->expects($this->once())
+        $association411ClassMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
@@ -350,20 +347,20 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $association411TargetMetadata = new EntityMetadata();
         $association411TargetMetadata->setClassName('Test\Association411Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, ['association41'])
             ->willReturn($association41ClassMetadata);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with('Test\Association411Target')
             ->willReturn($association411ClassMetadata);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 'Test\Association411Target',
@@ -397,7 +394,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             $this->createAssociationMetadata('association411', 'Test\Association411Target')
         );
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndWithoutConfigForTargetField()
@@ -405,7 +402,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field5'       => [
+                'field5' => [
                     'property_path' => 'association51.field511'
                 ],
             ]
@@ -416,24 +413,24 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata->setClassName(self::TEST_CLASS_NAME);
 
         $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
-        $association51ClassMetadata->expects($this->once())
+        $association51ClassMetadata->expects(self::once())
             ->method('hasAssociation')
             ->with('field511')
             ->willReturn(false);
-        $association51ClassMetadata->expects($this->once())
+        $association51ClassMetadata->expects(self::once())
             ->method('hasField')
             ->with('field511')
             ->willReturn(true);
-        $association51ClassMetadata->expects($this->once())
+        $association51ClassMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('field511')
             ->willReturn('string');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, ['association51'])
             ->willReturn($association51ClassMetadata);
@@ -447,7 +444,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
         $expectedField5->setPropertyPath('field511');
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation()
@@ -455,7 +452,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field6'       => [
+                'field6' => [
                     'property_path' => 'field61.field611'
                 ],
             ]
@@ -465,11 +462,11 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $metadata = new EntityMetadata();
         $metadata->setClassName(self::TEST_CLASS_NAME);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, ['field61'])
             ->willReturn(null);
@@ -481,7 +478,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata = new EntityMetadata();
         $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     /**
@@ -495,7 +492,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 'linkedAssociation1' => [
                     'property_path' => 'realAssociation1.realAssociation11'
                 ],
-                'association1' => [
+                'association1'       => [
                     'exclude'       => true,
                     'property_path' => 'realAssociation1',
                     'fields'        => [
@@ -525,28 +522,28 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('hasAssociation')
             ->with('realAssociation11')
             ->willReturn(true);
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('realAssociation11')
             ->willReturn('Test\Association11Target');
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('realAssociation11')
             ->willReturn(false);
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('getAssociationMapping')
             ->with('realAssociation11')
             ->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
 
         $association11ClassMetadata = $this->getClassMetadataMock('Test\Association11Target');
-        $association11ClassMetadata->expects($this->once())
+        $association11ClassMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $association11ClassMetadata->expects($this->once())
+        $association11ClassMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
@@ -554,20 +551,20 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $association11TargetMetadata = new EntityMetadata();
         $association11TargetMetadata->setClassName('Test\Association11Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, ['realAssociation1'])
             ->willReturn($association1ClassMetadata);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with('Test\Association11Target')
             ->willReturn($association11ClassMetadata);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 'Test\Association11Target',
@@ -581,7 +578,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 $this->context->getExtras(),
                 false
             )
-         ->willReturn($association11TargetMetadata);
+            ->willReturn($association11TargetMetadata);
 
         $this->context->setConfig($configObject);
         $this->context->setResult($metadata);
@@ -602,7 +599,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedLinkedAssociation1->setTargetMetadata($association11TargetMetadata);
         $expectedMetadata->addAssociation($expectedLinkedAssociation1);
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
     /**
@@ -616,7 +613,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 'linkedAssociation1' => [
                     'property_path' => 'realAssociation1.realAssociation11',
                 ],
-                'association1' => [
+                'association1'       => [
                     'exclude'       => true,
                     'property_path' => 'realAssociation1',
                     'fields'        => [
@@ -625,7 +622,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                             'collapse'         => true,
                             'exclusion_policy' => 'all',
                             'property_path'    => 'realAssociation11',
-                            'fields'        => [
+                            'fields'           => [
                                 'name' => null
                             ]
                         ]
@@ -649,28 +646,28 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
 
         $association1ClassMetadata = $this->getClassMetadataMock('Test\Association1Target');
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('hasAssociation')
             ->with('realAssociation11')
             ->willReturn(true);
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('realAssociation11')
             ->willReturn('Test\Association11Target');
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('realAssociation11')
             ->willReturn(true);
-        $association1ClassMetadata->expects($this->once())
+        $association1ClassMetadata->expects(self::once())
             ->method('getAssociationMapping')
             ->with('realAssociation11')
             ->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
 
         $association11ClassMetadata = $this->getClassMetadataMock('Test\Association11Target');
-        $association11ClassMetadata->expects($this->once())
+        $association11ClassMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $association11ClassMetadata->expects($this->once())
+        $association11ClassMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
@@ -678,20 +675,20 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $association11TargetMetadata = new EntityMetadata();
         $association11TargetMetadata->setClassName('Test\Association11Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('findEntityMetadataByPath')
             ->with(self::TEST_CLASS_NAME, ['realAssociation1'])
             ->willReturn($association1ClassMetadata);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with('Test\Association11Target')
             ->willReturn($association11ClassMetadata);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 'Test\Association11Target',
@@ -727,6 +724,6 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedLinkedAssociation1->setTargetMetadata($association11TargetMetadata);
         $expectedMetadata->addAssociation($expectedLinkedAssociation1);
 
-        $this->assertEquals($expectedMetadata, $this->context->getResult());
+        self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 }

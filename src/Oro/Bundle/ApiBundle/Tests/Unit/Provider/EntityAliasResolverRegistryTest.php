@@ -46,7 +46,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a entity alias resolver for the request "rest,another".
+     * @expectedExceptionMessage Cannot find an entity alias resolver for the request "rest,another".
      */
     public function testGetEntityAliasResolverForUnsupportedRequestType()
     {

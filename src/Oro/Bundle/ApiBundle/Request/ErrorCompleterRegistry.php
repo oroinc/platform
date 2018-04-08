@@ -47,7 +47,7 @@ class ErrorCompleterRegistry
      *
      * @throws \LogicException if an error completer does not exist for the given request type
      */
-    public function getErrorCompleter(RequestType $requestType)
+    public function getErrorCompleter(RequestType $requestType): ErrorCompleterInterface
     {
         $errorCompleterServiceId = null;
         foreach ($this->errorCompleters as list($serviceId, $expression)) {

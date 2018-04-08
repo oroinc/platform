@@ -21,7 +21,7 @@ class ExclusionProviderRegistry
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /** @var ExclusionProviderInterface[] [request type => exclusion provider, ...] */
+    /** @var ExclusionProviderInterface[] [request type => ExclusionProviderInterface, ...] */
     private $cache = [];
 
     /**
@@ -50,8 +50,9 @@ class ExclusionProviderRegistry
      */
     public function getExclusionProvider(RequestType $requestType): ExclusionProviderInterface
     {
-        if (isset($this->cache[(string)$requestType])) {
-            return $this->cache[(string)$requestType];
+        $cacheKey = (string)$requestType;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
         }
 
         $exclusionProviderServiceId = null;
@@ -63,13 +64,13 @@ class ExclusionProviderRegistry
         }
         if (null === $exclusionProviderServiceId) {
             throw new \LogicException(
-                sprintf('Cannot find a exclusion provider for the request "%s".', (string)$requestType)
+                sprintf('Cannot find an exclusion provider for the request "%s".', (string)$requestType)
             );
         }
 
         /** @var ExclusionProviderInterface $exclusionProvider */
         $exclusionProvider = $this->container->get($exclusionProviderServiceId);
-        $this->cache[(string)$requestType] = $exclusionProvider;
+        $this->cache[$cacheKey] = $exclusionProvider;
 
         return $exclusionProvider;
     }
