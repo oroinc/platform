@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
