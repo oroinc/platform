@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -33,9 +34,7 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 
 /**
@@ -199,6 +198,16 @@ class EmailController extends Controller
                 $this->get('doctrine')->getManager(),
                 $entity
             );
+            $targetActivityClass = $this->getRequest()->get('targetActivityClass');
+            $targetActivityId = $this->getRequest()->get('targetActivityId');
+            if ($targetActivityClass && $targetActivityId) {
+                $emails = $this->get('oro_activity_list.manager')->filterGroupedEntitiesByActivityLists(
+                    $emails,
+                    $entity,
+                    $targetActivityClass,
+                    $targetActivityId
+                );
+            }
         }
 
         $emails = array_filter($emails, function ($email) {
