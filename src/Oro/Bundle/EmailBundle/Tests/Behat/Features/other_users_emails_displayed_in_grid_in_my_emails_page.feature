@@ -22,7 +22,6 @@ Feature: Other users emails displayed in grid in My Emails page
     | Body    | Test mail body |
     When I click "Send"
     Then I should see "The email was sent" flash message
-    And I wait for action
     And should see following grid:
     | Contact  | Subject                  |
     | John Doe | Test mail Test mail body |
@@ -31,4 +30,4 @@ Feature: Other users emails displayed in grid in My Emails page
     Given I proceed as the User2
     And login as "Samantha1@example.com" user
     When click My Emails in user menu
-    Then I should not see "test@example.com"
+    Then I should not see "John Doe"
