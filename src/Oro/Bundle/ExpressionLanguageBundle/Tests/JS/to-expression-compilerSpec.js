@@ -34,7 +34,7 @@ define(function(require) {
     }
 
     describe('oroexpressionlanguage/js/to-expression-compiler', function() {
-        describe('parse AST', function() {
+        describe('compile expression from AST', function() {
             var cases = [
                 [
                     new NameNode('foo'),

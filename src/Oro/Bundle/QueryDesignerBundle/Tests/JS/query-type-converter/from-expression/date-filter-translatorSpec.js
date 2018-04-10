@@ -2,204 +2,198 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var DatetimeFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/to-expression/datetime-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
+    var DateFilterTranslator =
+        require('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator');
+    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
+    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
     var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
-    describe('oroquerydesigner/js/query-type-converter/to-expression/datetime-filter-translator', function() {
+    describe('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator', function() {
         var translator;
+        var entityStructureDataProviderMock;
         var filterConfigProviderMock;
 
         beforeEach(function() {
-            var entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getRelativePropertyPathByPath').and.returnValue('bar'),
+            entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
+                jasmine.createSpy('getPathByRelativePropertyPath').and.returnValue('bar'),
+                jasmine.createSpy('getFieldSignatureSafely'),
                 jasmine.combineSpyObj('rootEntity', [
                     jasmine.createSpy('get').and.returnValue('foo')
                 ])
             ]);
-            filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getFilterConfigsByType']);
 
-            translator = new DatetimeFilterTranslator(
+            filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getApplicableFilterConfig']);
+
+            translator = new DateFilterTranslator(
                 new FieldIdTranslator(entityStructureDataProviderMock),
                 filterConfigProviderMock
             );
         });
 
-        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
-            translator.tryToTranslate({
-                columnName: 'bar',
-                criterion: {
-                    filter: 'datetime',
-                    data: {
-                        type: '3',
-                        value: {start: '2018-03-28 13:45', end: ''},
-                        part: 'value'
-                    }
-                }
+        describe('rejects node structure because', function() {
+            var cases = {
+                'improper AST':
+                    new ConstantNode('test'),
+                'unsupported operation':
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
+                'improper left operand AST':
+                    new BinaryNode('=', new ConstantNode('test'), new ConstantNode('2018-04-03')),
+                'unsupported function call in left operand (unsupported date part)':
+                    new BinaryNode('=',
+                        createFunctionNode('dateISO', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('2018-04-03')
+                    ),
+                'improper right operand AST':
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ArrayNode()),
+                'improper value of right operand':
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('Apr 3, 2018')),
+                'unsupported function call in right operand (unsupported variable)':
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('rightNow')),
+                'different fields in the between operation':
+                    new BinaryNode('and',
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
+                        new BinaryNode('<=', createGetAttrNode('foo.qux'), new ConstantNode('2018-04-07'))
+                    ),
+                'invalid pair operators in the not between operation':
+                    new BinaryNode('and',
+                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-07'))
+                    )
+            };
+
+            _.each(cases, function(ast, caseName) {
+                it(caseName, function() {
+                    expect(translator.tryToTranslate(ast)).toBe(null);
+                    expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
+                });
             });
-            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('datetime');
         });
 
-        describe('translates valid condition', function() {
+        describe('valid node structure', function() {
             beforeEach(function() {
-                filterConfigProviderMock.getFilterConfigsByType.and.returnValue([
-                    {
-                        type: 'datetime',
-                        name: 'datetime',
-                        choices: [
-                            {value: '1'},
-                            {value: '2'},
-                            {value: '3'},
-                            {value: '4'},
-                            {value: '5'},
-                            {value: '6'}
-                        ],
-                        dateParts: {
-                            value: 'value',
-                            dayofweek: 'day of week',
-                            week: 'week',
-                            day: 'day of month',
-                            month: 'month',
-                            quarter: 'quarter',
-                            dayofyear: 'day of year',
-                            year: 'year'
-                        },
-                        externalWidgetOptions: {
-                            dateVars: {
-                                value: {
-                                    1: 'now',
-                                    2: 'today',
-                                    3: 'start of the week',
-                                    4: 'start of the month',
-                                    5: 'start of the quarter',
-                                    6: 'start of the year',
-                                    17: 'current month without year',
-                                    29: 'this day without year'
-                                },
-                                dayofweek: {
-                                    10: 'current day'
-                                },
-                                week: {
-                                    11: 'current week'
-                                },
-                                day: {
-                                    10: 'current day'
-                                },
-                                month: {
-                                    12: 'current month',
-                                    16: 'first month of quarter'
-                                },
-                                quarter: {
-                                    13: 'current quarter'
-                                },
-                                dayofyear: {
-                                    10: 'current day',
-                                    15: 'first day of quarter'
-                                },
-                                year: {
-                                    14: 'current year'
-                                }
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '1'},
+                        {value: '2'},
+                        {value: '3'},
+                        {value: '4'},
+                        {value: '5'},
+                        {value: '6'}
+                    ],
+                    dateParts: {
+                        value: 'value',
+                        dayofweek: 'day of week',
+                        week: 'week',
+                        day: 'day of month',
+                        month: 'month',
+                        quarter: 'quarter',
+                        dayofyear: 'day of year',
+                        year: 'year'
+                    },
+                    externalWidgetOptions: {
+                        dateVars: {
+                            value: {
+                                1: 'now',
+                                2: 'today',
+                                3: 'start of the week',
+                                4: 'start of the month',
+                                5: 'start of the quarter',
+                                6: 'start of the year',
+                                17: 'current month without year',
+                                29: 'this day without year'
+                            },
+                            dayofweek: {
+                                10: 'current day'
+                            },
+                            week: {
+                                11: 'current week'
+                            },
+                            day: {
+                                10: 'current day'
+                            },
+                            month: {
+                                12: 'current month',
+                                16: 'first month of quarter'
+                            },
+                            quarter: {
+                                13: 'current quarter'
+                            },
+                            dayofyear: {
+                                10: 'current day',
+                                15: 'first day of quarter'
+                            },
+                            year: {
+                                14: 'current year'
                             }
                         }
                     }
-                ]);
+                });
             });
 
             var cases = {
-                'value part between start and end datetimes': [
-                    // condition filter data
+                'value part between start and end dates': [
+                    // expected condition filter data
                     {
                         type: '1',
-                        value: {start: '2018-03-01 00:00', end: '2018-03-31 00:00'},
+                        value: {start: '2018-03-01', end: '2018-03-31'},
                         part: 'value'
                     },
-                    // expected AST
+                    // provided AST
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00')),
-                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
+                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                     )
                 ],
-                'value part between with empty start datetime and valuable end datetime': [
-                    {
-                        type: '1',
-                        value: {start: '', end: '2018-03-31 00:00'},
-                        part: 'value'
-                    },
-                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
-                ],
-                'value part between with valuable start datetime and empty end datetime': [
-                    {
-                        type: '1',
-                        value: {start: '2018-03-01 00:00', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00'))
-                ],
-                'value part not between start and end datetimes': [
+                'value part not between start and end dates': [
                     {
                         type: '2',
-                        value: {start: '2018-03-01 00:00', end: '2018-03-31 00:00'},
+                        value: {start: '2018-03-01', end: '2018-03-31'},
                         part: 'value'
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00')),
-                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
+                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
+                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                     )
                 ],
-                'value part not between empty start datetime and valuable end datetime': [
-                    {
-                        type: '2',
-                        value: {start: '', end: '2018-03-31 00:00'},
-                        part: 'value'
-                    },
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
-                ],
-                'value part not between valuable start datetime and empty end datetime': [
-                    {
-                        type: '2',
-                        value: {start: '2018-03-01 00:00', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00'))
-                ],
-                'value part later than the datetime': [
+                'value part later than the date': [
                     {
                         type: '3',
-                        value: {start: '2018-03-01 00:00', end: ''},
+                        value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00'))
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
-                'value part earlier than the datetime': [
+                'value part earlier than the date': [
                     {
                         type: '4',
-                        value: {start: '', end: '2018-03-31 00:00'},
+                        value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
+                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
-                'value part equals to the datetime': [
+                'value part equals to the date': [
                     {
                         type: '5',
-                        value: {start: '2018-03-01 00:00', end: ''},
+                        value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01 00:00'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
-                'value part not equals to the datetime': [
+                'value part not equals to the date': [
                     {
                         type: '6',
-                        value: {start: '', end: '2018-03-31 00:00'},
+                        value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31 00:00'))
+                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
                 'value part equals to now': [
                     {
@@ -463,143 +457,134 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    var condition = {
+                    var expectedCondition = {
                         columnName: 'bar',
                         criterion: {
-                            filter: 'datetime',
+                            filter: 'date',
                             data: testCase[0]
                         }
                     };
-                    expect(translator.tryToTranslate(condition)).toEqual(testCase[1]);
+                    expect(translator.tryToTranslate(testCase[1])).toEqual(expectedCondition);
                 });
             });
         });
 
-        describe('can\'t translate condition because of', function() {
-            var cases = {
-                'unknown filter': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'qux',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
+        describe('filter config is taken in account', function() {
+            it('unavailable filter criteria', function() {
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '1'}
+                    ],
+                    dateParts: {
+                        value: 'value'
                     }
-                },
-                'unknown criterion type': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: 'qux',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
-                    }
-                },
-                'missing column name': {
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'value'
-                        }
-                    }
-                },
-                'missing value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            part: 'value'
-                        }
-                    }
-                },
-                'missing end value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00'},
-                            part: 'value'
-                        }
-                    }
-                },
-                'incorrect datetime value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28', end: ''},
-                            part: 'value'
-                        }
-                    }
-                },
-                'missing part': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''}
-                        }
-                    }
-                },
-                'unknown part': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '2018-03-28 00:00', end: ''},
-                            part: 'era'
-                        }
-                    }
-                },
-                'incorrect day of week part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '8', end: ''},
-                            part: 'dayofweek'
-                        }
-                    }
-                },
-                'incorrect month part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '13', end: ''},
-                            part: 'month'
-                        }
-                    }
-                },
-                'incorrect year part value': {
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'datetime',
-                        data: {
-                            type: '3',
-                            value: {start: '02018', end: ''},
-                            part: 'year'
-                        }
-                    }
-                }
-            };
+                });
+                var ast = new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'));
+                expect(translator.tryToTranslate(ast)).toEqual(null);
+            });
 
-            _.each(cases, function(condition, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(condition)).toBe(null);
+            it('unavailable date part', function() {
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '5'}
+                    ],
+                    dateParts: {
+                        value: 'value'
+                    }
+                });
+                var ast = new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('1')
+                );
+                expect(translator.tryToTranslate(ast)).toEqual(null);
+            });
+
+            it('variables are not allowed', function() {
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '5'}
+                    ],
+                    dateParts: {
+                        value: 'value',
+                        month: 'month'
+                    }
+                });
+                var ast = new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('firstMonthOfCurrentQuarter')
+                );
+                expect(translator.tryToTranslate(ast)).toEqual(null);
+            });
+
+            it('unavailable date variable', function() {
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '5'}
+                    ],
+                    dateParts: {
+                        value: 'value',
+                        month: 'month'
+                    },
+                    externalWidgetOptions: {
+                        dateVars: {
+                            month: {
+                                12: 'current month'
+                            }
+                        }
+                    }
+                });
+                var ast = new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('firstMonthOfCurrentQuarter')
+                );
+                expect(translator.tryToTranslate(ast)).toEqual(null);
+            });
+
+            it('available date part and variable', function() {
+                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                    type: 'date',
+                    name: 'date',
+                    choices: [
+                        {value: '5'}
+                    ],
+                    dateParts: {
+                        value: 'value',
+                        month: 'month'
+                    },
+                    externalWidgetOptions: {
+                        dateVars: {
+                            month: {
+                                12: 'current month',
+                                16: 'first month of quarter'
+                            }
+                        }
+                    }
+                });
+                var ast = new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('firstMonthOfCurrentQuarter')
+                );
+                expect(translator.tryToTranslate(ast)).toEqual({
+                    columnName: 'bar',
+                    criterion: {
+                        filter: 'date',
+                        data: {
+                            type: '5',
+                            part: 'month',
+                            value: {
+                                start: '{{16}}',
+                                end: ''
+                            }
+                        }
+                    }
                 });
             });
         });

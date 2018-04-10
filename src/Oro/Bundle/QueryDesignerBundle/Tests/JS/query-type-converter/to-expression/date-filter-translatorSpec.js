@@ -22,9 +22,32 @@ define(function(require) {
                     jasmine.createSpy('get').and.returnValue('foo')
                 ])
             ]);
+            filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getFilterConfigsByType']);
 
-            filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('getFilterConfigsByType').and.returnValue([
+            translator = new DateFilterTranslator(
+                new FieldIdTranslator(entityStructureDataProviderMock),
+                filterConfigProviderMock
+            );
+        });
+
+        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
+            translator.tryToTranslate({
+                columnName: 'bar',
+                criterion: {
+                    filter: 'date',
+                    data: {
+                        type: '3',
+                        value: {start: '2018-03-28', end: ''},
+                        part: 'value'
+                    }
+                }
+            });
+            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('date');
+        });
+
+        describe('translates valid condition', function() {
+            beforeEach(function() {
+                filterConfigProviderMock.getFilterConfigsByType.and.returnValue([
                     {
                         type: 'date',
                         name: 'date',
@@ -84,33 +107,10 @@ define(function(require) {
                             }
                         }
                     }
-                ])
-            ]);
-
-            translator = new DateFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
-        });
-
-        it('calls filter provider\'s method `getFilterConfigsByType` with correct filter type', function() {
-            translator.tryToTranslate({
-                columnName: 'bar',
-                criterion: {
-                    filter: 'date',
-                    data: {
-                        type: '3',
-                        value: {start: '2018-03-28', end: ''},
-                        part: 'value'
-                    }
-                }
+                ]);
             });
-            expect(filterConfigProviderMock.getFilterConfigsByType).toHaveBeenCalledWith('date');
-        });
 
-        describe('translates valid condition', function() {
             var cases = {
-                // filter type
                 'value part between start and end dates': [
                     // condition filter data
                     {
