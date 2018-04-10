@@ -24,6 +24,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class RegisterDynamicFilters extends RegisterFilters
 {
+    private const FILTER_GROUP = 'filter';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -52,8 +54,9 @@ class RegisterDynamicFilters extends RegisterFilters
     {
         /** @var Context $context */
 
+        $filterGroup = $this->getFilterGroup();
         $allFilterValues = $context->getFilterValues();
-        $filterValues = $allFilterValues->getGroup('filter');
+        $filterValues = $allFilterValues->getGroup($filterGroup);
         if (!empty($filterValues)) {
             $filters = $context->getFilters();
             $knownFilterKeys = [];
@@ -61,10 +64,14 @@ class RegisterDynamicFilters extends RegisterFilters
             foreach ($filters as $filterKey => $filter) {
                 if ($filter instanceof SelfIdentifiableFilterInterface) {
                     try {
-                        $actualFilterKey = $filter->searchFilterKey($filterValues);
-                        if ($actualFilterKey) {
-                            $knownFilterKeys[$actualFilterKey] = true;
-                            $renameMap[$filterKey] = $actualFilterKey;
+                        $actualFilterKeys = $filter->searchFilterKeys($filterValues);
+                        if (!empty($actualFilterKeys)) {
+                            foreach ($actualFilterKeys as $actualFilterKey) {
+                                $knownFilterKeys[$actualFilterKey] = true;
+                                $renameMap[$filterKey][] = $actualFilterKey;
+                            }
+                        } else {
+                            $renameMap[$filterKey] = null;
                         }
                     } catch (InvalidFilterValueKeyException $e) {
                         $context->addError(
@@ -79,6 +86,14 @@ class RegisterDynamicFilters extends RegisterFilters
                     }
                 } elseif ($allFilterValues->has($filterKey)) {
                     $knownFilterKeys[$filterKey] = true;
+                } else {
+                    $groupedFilterKey = \sprintf('%s[%s]', $filterGroup, $filterKey);
+                    if ($allFilterValues->has($groupedFilterKey)) {
+                        $knownFilterKeys[$groupedFilterKey] = true;
+                        $renameMap[$filterKey][] = $groupedFilterKey;
+                    } else {
+                        $renameMap[$filterKey] = null;
+                    }
                 }
             }
             $this->renameFilters($filters, $renameMap);
@@ -87,15 +102,27 @@ class RegisterDynamicFilters extends RegisterFilters
     }
 
     /**
+     * @return string
+     */
+    protected function getFilterGroup(): string
+    {
+        return self::FILTER_GROUP;
+    }
+
+    /**
      * @param FilterCollection $filters
      * @param array            $renameMap
      */
     protected function renameFilters($filters, $renameMap)
     {
-        foreach ($renameMap as $filterKey => $newFilterKey) {
-            $filter = $filters->get($filterKey);
+        foreach ($renameMap as $filterKey => $newFilterKeys) {
+            if (null !== $newFilterKeys) {
+                $filter = $filters->get($filterKey);
+                foreach ($newFilterKeys as $newFilterKey) {
+                    $filters->add($newFilterKey, $filter);
+                }
+            }
             $filters->remove($filterKey);
-            $filters->add($newFilterKey, $filter);
         }
     }
 
@@ -169,9 +196,9 @@ class RegisterDynamicFilters extends RegisterFilters
         $associationPropertyPath = null;
         $isCollection = false;
 
-        $path = explode('.', $propertyPath);
-        if (count($path) > 1) {
-            $fieldName = array_pop($path);
+        $path = \explode('.', $propertyPath);
+        if (\count($path) > 1) {
+            $fieldName = \array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
                 list($filtersConfig, $associationPropertyPath, $isCollection) = $associationInfo;
@@ -247,6 +274,6 @@ class RegisterDynamicFilters extends RegisterFilters
             $associationPath[] = $associationPropertyPath;
         }
 
-        return [$filters, implode('.', $associationPath), $isCollection];
+        return [$filters, \implode('.', $associationPath), $isCollection];
     }
 }

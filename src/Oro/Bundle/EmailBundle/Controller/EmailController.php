@@ -21,9 +21,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -35,9 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * Class EmailController
- *
- * @package Oro\Bundle\EmailBundle\Controller
+ * The controller for the email related functionality.
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -201,6 +197,16 @@ class EmailController extends Controller
                 $this->get('doctrine')->getManager(),
                 $entity
             );
+            $targetActivityClass = $request->get('targetActivityClass');
+            $targetActivityId = $request->get('targetActivityId');
+            if ($targetActivityClass && $targetActivityId) {
+                $emails = $this->get('oro_activity_list.manager')->filterGroupedEntitiesByActivityLists(
+                    $emails,
+                    $entity,
+                    $targetActivityClass,
+                    $targetActivityId
+                );
+            }
         }
 
         $emails = array_filter($emails, function ($email) {

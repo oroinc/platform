@@ -13,11 +13,13 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * The entity that is used to store a relation between an entity record and an activity entity record
+ * to be able to retrieve activities in the chronological order.
+ *
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
  *     @ORM\Index(name="al_related_activity_class", columns={"related_activity_class"}),
  *     @ORM\Index(name="al_related_activity_id", columns={"related_activity_id"}),
- *     @ORM\Index(name="al_is_head", columns={"is_head"}),
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @Config(
@@ -104,13 +106,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
      * @ORM\Column(name="description", type="text", nullable=true)
      */
     protected $description;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
-     */
-    protected $head = true;
 
     /**
      * @var string
@@ -341,30 +336,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     public function setDescription($description)
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Get head item in the thread
-     *
-     * @return bool
-     */
-    public function isHead()
-    {
-        return $this->head;
-    }
-
-    /**
-     * Set head flag
-     *
-     * @param boolean $head
-     *
-     * @return self
-     */
-    public function setHead($head)
-    {
-        $this->head = (bool)$head;
 
         return $this;
     }

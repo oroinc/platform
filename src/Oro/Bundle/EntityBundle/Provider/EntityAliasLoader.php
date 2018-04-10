@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
+/**
+ * Loads entity aliases from the registered providers to EntityAliasStorage.
+ */
 class EntityAliasLoader
 {
     /** @var EntityClassProviderInterface[] */
