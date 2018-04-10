@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * A set of reusable utility methods to get data related to ActivityList entity from the database.
+ */
 class ActivityListRepository extends EntityRepository
 {
     /**
@@ -15,7 +18,6 @@ class ActivityListRepository extends EntityRepository
      * @param array          $activityClasses Selected activity types
      * @param \DateTime|bool $dateFrom        Date from
      * @param \DateTime|bool $dateTo          Date to
-     * @param boolean        $grouping        Do grouping
      *
      * @return QueryBuilder
      */
@@ -24,10 +26,9 @@ class ActivityListRepository extends EntityRepository
         $entityId,
         $activityClasses = [],
         $dateFrom = null,
-        $dateTo = null,
-        $grouping = false
+        $dateTo = null
     ) {
-        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $grouping);
+        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId);
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))
@@ -48,17 +49,13 @@ class ActivityListRepository extends EntityRepository
     }
 
     /**
-     * @param string  $entityClass
-     * @param integer|integer[] $entityIds
-     * @param boolean $grouping
+     * @param string    $entityClass
+     * @param int|int[] $entityIds
      *
      * @return QueryBuilder
      */
-    public function getBaseActivityListQueryBuilder(
-        $entityClass,
-        $entityIds,
-        $grouping = false
-    ) {
+    public function getBaseActivityListQueryBuilder($entityClass, $entityIds)
+    {
         if (is_scalar($entityIds)) {
             $entityIds = [$entityIds];
         }
@@ -73,10 +70,6 @@ class ActivityListRepository extends EntityRepository
             $queryBuilder
                 ->where('r.id = :entityId')
                 ->setParameter('entityId', reset($entityIds));
-        }
-
-        if ($grouping) {
-            $queryBuilder->andWhere('activity.head = true');
         }
 
         return $queryBuilder;
