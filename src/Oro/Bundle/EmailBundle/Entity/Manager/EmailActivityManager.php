@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
@@ -12,13 +13,17 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
+/**
+ * Provides a set of methods to simplify managing associations between the Email as the activity entity
+ * and other entities this activity is related to.
+ */
 class EmailActivityManager
 {
     /** @var ActivityManager */
     protected $activityManager;
 
     /** @var EmailActivityListProvider */
-    protected $activityListProvider;
+    protected $emailActivityListProvider;
 
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
@@ -164,25 +169,50 @@ class EmailActivityManager
     {
         $thread = $email->getThread();
         if ($thread) {
-            $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-            $contexts      = $this->emailActivityListProvider->getTargetEntities($email);
-            // from email to thread emails
+            $contexts = $this->emailActivityListProvider->getTargetEntities($email);
             if (count($contexts) > 0) {
+                // from email to thread emails
+                $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
                 foreach ($relatedEmails as $relatedEmail) {
                     if ($email->getId() !== $relatedEmail->getId()) {
                         $this->changeContexts($relatedEmail, $contexts);
                     }
                 }
             } else {
-                // from thread to email
-                $relatedEmails = $this->emailThreadProvider->getEmailReferences($this->em, $email);
-                if (count($relatedEmails) > 0) {
-                    $parentEmail = $relatedEmails[0];
-                    $contexts    = $this->emailActivityListProvider->getTargetEntities($parentEmail);
-                    $this->changeContexts($email, $contexts);
+                // add contexts that added manually to referenced emails to this email
+                $referencedCustomContexts = $this->getCustomContextsOfReferencedEmails($email);
+                if (!empty($referencedCustomContexts)) {
+                    $this->changeContexts($email, $referencedCustomContexts);
                 }
             }
         }
+    }
+
+
+    /**
+     * Returns contexts of all referenced emails excluding contexts
+     * related to senders and recipients of these emails.
+     * It means that only contexts added manually will be returned.
+     *
+     * @param Email $email
+     *
+     * @return array
+     */
+    private function getCustomContextsOfReferencedEmails(Email $email)
+    {
+        $referencedContexts = [];
+        $referencedEmails = $this->emailThreadProvider->getEmailReferences($this->em, $email);
+        foreach ($referencedEmails as $referencedEmail) {
+            $sendersAndRecipients = [];
+            $this->addRecipientOwners($sendersAndRecipients, $referencedEmail);
+            $this->addSenderOwner($sendersAndRecipients, $referencedEmail);
+            $allContexts = $this->emailActivityListProvider->getTargetEntities($referencedEmail);
+            $customContexts = $this->getContextsDiff($allContexts, $sendersAndRecipients);
+
+            $referencedContexts = array_merge($referencedContexts, $customContexts);
+        }
+
+        return $referencedContexts;
     }
 
     /**
@@ -191,12 +221,7 @@ class EmailActivityManager
      */
     protected function addContextsToThread(Email $email, $contexts)
     {
-        $thread = $email->getThread();
-        if ($thread) {
-            $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-        } else {
-            $relatedEmails = [$email];
-        }
+        $relatedEmails = [$email];
         if (count($contexts) > 0) {
             foreach ($relatedEmails as $relatedEmail) {
                 foreach ($contexts as $context) {
@@ -226,34 +251,68 @@ class EmailActivityManager
     }
 
     /**
+     * Returns all items from $contexts that do not exist in $anotherContexts.
+     *
      * @param array $contexts
      * @param array $anotherContexts
-     * @return array
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @return array
      */
     public function getContextsDiff(array $contexts, array $anotherContexts)
     {
         $result = [];
-
         foreach ($contexts as $context) {
-            $isPresentInContexts = false;
-            foreach ($anotherContexts as $anotherContext) {
-                if (is_object($anotherContext) && is_object($context)
-                    && get_class($context) === get_class($anotherContext)
-                    && $context->getId() === $anotherContext->getId()
-                ) {
-                    $isPresentInContexts = true;
-                } elseif (is_string($anotherContext) && is_string($context) && $anotherContext == $context) {
-                    $isPresentInContexts = true;
-                }
-            }
-
-            if (!$isPresentInContexts) {
+            if (!$this->isInContext($context, $anotherContexts)) {
                 $result[] = $context;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Checks if $needle exists in $haystack.
+     *
+     * @param mixed $needle
+     * @param array $haystack
+     *
+     * @return bool
+     */
+    private function isInContext($needle, array $haystack)
+    {
+        foreach ($haystack as $haystackItem) {
+            if ($this->areContextsEqual($needle, $haystackItem)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if two context items are equal.
+     *
+     * @param mixed $item1
+     * @param mixed $item2
+     *
+     * @return bool
+     */
+    private function areContextsEqual($item1, $item2)
+    {
+        if (is_object($item1)
+            && is_object($item2)
+            && ClassUtils::getClass($item1) === ClassUtils::getClass($item2)
+            && $item1->getId() === $item2->getId()
+        ) {
+            return true;
+        }
+        if (is_string($item1)
+            && is_string($item2)
+            && $item1 === $item2
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
