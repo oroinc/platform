@@ -92,64 +92,70 @@ define(function(require) {
             value: {
                 valuePattern: /^\d{4}-\d{2}-\d{2}$/,
                 variables: {
-                    '{{1}}': 'now',
-                    '{{2}}': 'today',
-                    '{{3}}': 'startOfTheWeek',
-                    '{{4}}': 'startOfTheMonth',
-                    '{{5}}': 'startOfTheQuarter',
-                    '{{6}}': 'startOfTheYear',
-                    '{{17}}': 'currentMonthWithoutYear',
-                    '{{29}}': 'thisDayWithoutYear'
+                    1: 'now',
+                    2: 'today',
+                    3: 'startOfTheWeek',
+                    4: 'startOfTheMonth',
+                    5: 'startOfTheQuarter',
+                    6: 'startOfTheYear',
+                    17: 'currentMonthWithoutYear',
+                    29: 'thisDayWithoutYear'
                 }
             },
             dayofweek: {
                 propModifier: 'dayOfWeek',
                 valuePattern: /^[1-7]$/,
                 variables: {
-                    '{{10}}': 'currentDayOfWeek'
+                    10: 'currentDayOfWeek'
                 }
             },
             week: {
                 propModifier: 'week',
                 variables: {
-                    '{{11}}': 'currentWeek'
+                    11: 'currentWeek'
                 }
             },
             day: {
                 propModifier: 'dayOfMonth',
                 variables: {
-                    '{{10}}': 'currentDayOfMonth'
+                    10: 'currentDayOfMonth'
                 }
             },
             month: {
                 propModifier: 'month',
                 valuePattern: /^([1-9]|1[0-2])$/,
                 variables: {
-                    '{{12}}': 'currentMonth',
-                    '{{16}}': 'firstMonthOfCurrentQuarter'
+                    12: 'currentMonth',
+                    16: 'firstMonthOfCurrentQuarter'
                 }
             },
             quarter: {
                 propModifier: 'quarter',
                 variables: {
-                    '{{13}}': 'currentQuarter'
+                    13: 'currentQuarter'
                 }
             },
             dayofyear: {
                 propModifier: 'dayOfYear',
                 variables: {
-                    '{{10}}': 'currentDayOfYear',
-                    '{{15}}': 'firstDayOfCurrentQuarter'
+                    10: 'currentDayOfYear',
+                    15: 'firstDayOfCurrentQuarter'
                 }
             },
             year: {
                 propModifier: 'year',
                 valuePattern: /^\d{4}$/,
                 variables: {
-                    '{{14}}': 'currentYear'
+                    14: 'currentYear'
                 }
             }
         },
+
+        /**
+         * Variable value's mask
+         * @type {RegExp}
+         */
+        variablePattern: /^{{(\d{1,2})}}$/,
 
         /**
          * @inheritDoc
@@ -197,14 +203,20 @@ define(function(require) {
                     // at least some of two values is not empty
                     (value.start || value.end) &&
                     _.all(value, function(singleValue) {
+                        var variableMatch;
                         return singleValue === '' ||
                             // filter part has restriction for value by patter and the value matches it
                             (!partParams.valuePattern || partParams.valuePattern.test(singleValue)) ||
-                            // if is variable known by translator
-                            (!partParams.variables || singleValue in partParams.variables &&
-                            // if is variable available in filter config
-                            varsConfig && singleValue.substring(2, singleValue.length - 2) in varsConfig);
-                    });
+                            (
+                                !partParams.variables ||
+                                // value matches to variable mask
+                                (variableMatch = singleValue.match(this.variablePattern)) !== null &&
+                                // if is variable known by translator
+                                variableMatch[1] in partParams.variables &&
+                                // if is variable available in filter config
+                                varsConfig && variableMatch[1] in varsConfig
+                            );
+                    }, this);
             }
 
             return result;
@@ -290,13 +302,18 @@ define(function(require) {
             var leftOperandAST = this.fieldIdTranslator.translate(condition.columnName);
             var singleValue = condition.criterion.data.value[params.valueProp];
             var rightOperandAST;
+            var variableMatch;
 
             if (partParams.propModifier) {
                 leftOperandAST = createFunctionNode(partParams.propModifier, [leftOperandAST]);
             }
 
-            if (partParams.variables && singleValue in partParams.variables) {
-                rightOperandAST = createFunctionNode(partParams.variables[singleValue]);
+            if (
+                partParams.variables &&
+                (variableMatch = singleValue.match(this.variablePattern)) !== null &&
+                variableMatch[1] in partParams.variables
+            ) {
+                rightOperandAST = createFunctionNode(partParams.variables[variableMatch[1]]);
             } else {
                 rightOperandAST = new ConstantNode(singleValue);
             }

@@ -48,6 +48,7 @@ define(function(require) {
          *
          * @param {Node} node
          * @return {boolean}
+         * @protected
          */
         checkValueAST: function(node) {
             return node instanceof ConstantNode && _.isString(node.attrs.value);
@@ -57,7 +58,7 @@ define(function(require) {
          * @inheritDoc
          */
         resolveOperatorParams: function(node) {
-            if (!(node instanceof BinaryNode && this.resolveFieldAST(node) instanceof GetAttrNode)) {
+            if (!(node instanceof BinaryNode && node.nodes[0] instanceof GetAttrNode)) {
                 return null;
             }
 

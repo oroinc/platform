@@ -39,6 +39,7 @@ define(function(require) {
          *
          * @param {Node} node
          * @return {boolean}
+         * @protected
          */
         checkValueAST: function(node) {
             return node instanceof ConstantNode && _.isString(node.attrs.value);
@@ -50,7 +51,7 @@ define(function(require) {
         resolveOperatorParams: function(node) {
             if (
                 node instanceof BinaryNode &&
-                this.resolveFieldAST(node) instanceof GetAttrNode &&
+                node.nodes[0] instanceof GetAttrNode &&
                 this.checkListOperandAST(node.nodes[1], this.checkValueAST)
             ) {
                 var criterion = _.findKey(this.operatorMap, function(operator) {
