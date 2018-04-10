@@ -108,6 +108,29 @@ define(function(require) {
                 return value instanceof Node ? value : new ConstantNode(value);
             });
             return new FunctionNode(funcName, new Node(args));
+        },
+
+
+        /**
+         * Compares two nodes of AST and returns true if they have the same type, structure and attributes
+         *
+         * @param {Node} node1
+         * @param {Node} node2
+         * @return {boolean}
+         */
+        compareAST: function(node1, node2) {
+            return node1 instanceof Node &&
+                node2 instanceof Node &&
+                node1.constructor === node2.constructor &&
+                // same set of attributes
+                _.every(node1.attrs, function(value, name) {
+                    return node2.attrs[name] === value;
+                }) &&
+                // same sub-nodes
+                node1.nodes.length === node2.nodes.length &&
+                _.every(node1.nodes, function(node, index) {
+                    return expressionLanguageTools.compareAST(node, node2.nodes[index]);
+                });
         }
     };
 

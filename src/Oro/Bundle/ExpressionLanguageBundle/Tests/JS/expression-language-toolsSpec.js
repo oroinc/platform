@@ -181,5 +181,74 @@ define(function(require) {
                 });
             });
         });
+
+        describe('compareAST', function() {
+            var compareAST = ExpressionLanguageLibrary.tools.compareAST;
+
+            var cases = {
+                'different types of node': [
+                    // first node
+                    (function() {
+                        var node = new ArgumentsNode();
+                        node.addElement(new ConstantNode('foo'));
+                        return node;
+                    })(),
+                    // second node
+                    (function() {
+                        var node = new ArrayNode();
+                        node.addElement(new ConstantNode('foo'));
+                        return node;
+                    })(),
+                    // result
+                    false
+                ],
+                'compare with not a node': [
+                    ['foo'],
+                    (function() {
+                        var node = new ArrayNode();
+                        node.addElement(new ConstantNode('foo'));
+                        return node;
+                    })(),
+                    false
+                ],
+                'different attributes': [
+                    new ConstantNode(42),
+                    new ConstantNode('42'),
+                    false
+                ],
+                'different sub-nodes': [
+                    new FunctionNode('foo', new Node([
+                        new ConstantNode('bar')
+                    ])),
+                    new FunctionNode('foo', new Node([
+                        new NameNode('bar')
+                    ])),
+                    false
+                ],
+                'identical AST': [
+                    new FunctionNode('foo', new Node([
+                        (function() {
+                            var node = new ArrayNode();
+                            node.addElement(new ConstantNode('foo'));
+                            return node;
+                        })()
+                    ])),
+                    new FunctionNode('foo', new Node([
+                        (function() {
+                            var node = new ArrayNode();
+                            node.addElement(new ConstantNode('foo'));
+                            return node;
+                        })()
+                    ])),
+                    true
+                ]
+            };
+
+            _.each(cases, function(testCase, caseName) {
+                it(caseName, function() {
+                    expect(compareAST(testCase[0], testCase[1])).toEqual(testCase[2]);
+                });
+            });
+        });
     });
 });
