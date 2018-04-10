@@ -118,6 +118,7 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test4@example.com', $bcc[4]->getName());
         $this->assertEquals('test4@example.com', $bcc[4]->getEmailAddress()->getEmail());
         $this->assertCount(2, $bcc);
+        $this->assertTrue($emailUser->getEmail()->getEmailUsers()->contains($emailUser));
     }
 
     public function testToRecipient()

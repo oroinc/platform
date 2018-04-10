@@ -433,6 +433,8 @@ services:
         arguments:
             - %oro_email.email.entity.class%
             - '@doctrine.orm.entity_manager'
+        calls:
+            - [setEmailQueryFactory, ['@oro_email.datagrid_query_factory']]
 
     oro_email.manager.email_origin.api:
         class: %oro_email.manager.email_origin.api.class%

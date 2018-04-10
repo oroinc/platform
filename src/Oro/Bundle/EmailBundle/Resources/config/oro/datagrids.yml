@@ -311,6 +311,7 @@ datagrids:
     dashboard-recent-emails-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - eu.id AS id

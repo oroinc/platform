@@ -4,21 +4,51 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
+/**
+ * API manager that works with Email API resources
+ */
 class EmailApiEntityManager extends ApiEntityManager
 {
+    /** @var EmailQueryFactory */
+    private $emailQueryFactory;
+
     /**
-     * @param string          $class
-     * @param ObjectManager   $om
+     * @param string        $class
+     * @param ObjectManager $om
      */
     public function __construct(
         $class,
         ObjectManager $om
     ) {
         parent::__construct($class, $om);
+    }
+
+    /**
+     * @param EmailQueryFactory $emailQueryFactory
+     */
+    public function setEmailQueryFactory(EmailQueryFactory $emailQueryFactory)
+    {
+        $this->emailQueryFactory = $emailQueryFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
+    {
+        $qb = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
+        if ($this->emailQueryFactory) {
+            $qb->join('e.emailUsers', 'eu');
+            // email API list query should return the same result as my emails page.
+            $this->emailQueryFactory->applyAcl($qb);
+        }
+
+        return $qb;
     }
 
     /**
