@@ -1,23 +1,38 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NestedAssociationTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class NestedAssociationTransformerTest extends OrmRelatedTestCase
 {
     /**
+     * @param AssociationMetadata $metadata
+     *
+     * @return NestedAssociationTransformer
+     */
+    private function getNestedAssociationTransformer(AssociationMetadata $metadata)
+    {
+        return new NestedAssociationTransformer(
+            $this->doctrineHelper,
+            new EntityLoader($this->doctrine),
+            $metadata
+        );
+    }
+
+    /**
      * @param string[] $acceptableTargetClassNames
      *
      * @return AssociationMetadata
      */
-    protected function getAssociationMetadata(array $acceptableTargetClassNames = [])
+    private function getAssociationMetadata(array $acceptableTargetClassNames = [])
     {
         $metadata = new AssociationMetadata();
         $metadata->setAcceptableTargetClassNames($acceptableTargetClassNames);
@@ -28,8 +43,8 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testTransform()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
-        $this->assertNull($transformer->transform(new \stdClass()));
+        $transformer = $this->getNestedAssociationTransformer($metadata);
+        self::assertNull($transformer->transform(new \stdClass()));
     }
 
     /**
@@ -38,8 +53,8 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformForEmptyValue($value, $expected)
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
-        $this->assertEquals($expected, $transformer->reverseTransform($value));
+        $transformer = $this->getNestedAssociationTransformer($metadata);
+        self::assertEquals($expected, $transformer->reverseTransform($value));
     }
 
     public function reverseTransformForEmptyValueDataProvider()
@@ -54,7 +69,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransform()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -74,7 +89,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             new EntityIdentifier($entity->getId(), get_class($entity)),
             $transformer->reverseTransform($value)
         );
@@ -83,7 +98,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformForEntityWithCompositeKey()
     {
         $metadata = $this->getAssociationMetadata([CompositeKeyEntity::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = [
             'class' => CompositeKeyEntity::class,
@@ -109,7 +124,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_STR]
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             new EntityIdentifier(['id' => $entity->getId(), 'title' => $entity->getTitle()], get_class($entity)),
             $transformer->reverseTransform($value)
         );
@@ -124,7 +139,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenEntityNotFound()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = ['class' => Group::class, 'id' => 123];
 
@@ -148,7 +163,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
     {
         $metadata = $this->getAssociationMetadata([CompositeKeyEntity::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = [
             'class' => CompositeKeyEntity::class,
@@ -175,7 +190,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenInvalidValueType()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
         $transformer->reverseTransform(123);
     }
 
@@ -186,7 +201,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenValueDoesNotHaveClass()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
         $transformer->reverseTransform(['id' => 123]);
     }
 
@@ -197,8 +212,8 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenValueDoesNotHaveId()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
-        $transformer->reverseTransform(['class' => 'Test\Class']);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
+        $transformer->reverseTransform(['class' => Group::class]);
     }
 
     /**
@@ -209,42 +224,43 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     {
         $metadata = $this->getAssociationMetadata([]);
         $metadata->setEmptyAcceptableTargetsAllowed(false);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
-        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
+        $transformer->reverseTransform(['class' => Group::class, 'id' => 123]);
     }
 
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The "Test\Class" class is not acceptable. Acceptable classes: Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group.
+     * @expectedExceptionMessage The "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" class is not acceptable. Acceptable classes: Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group.
      */
     // @codingStandardsIgnoreEnd
     public function testReverseTransformForNotAcceptableEntity()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
-        $this->notManageableClassNames = ['Test\Class'];
-        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+        $transformer->reverseTransform(['class' => User::class, 'id' => 123]);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The "Test\Class" class must be a managed Doctrine entity.
+     * @expectedExceptionMessage The "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" class must be a managed Doctrine entity.
      */
+    // @codingStandardsIgnoreEnd
     public function testReverseTransformForNotManageableEntity()
     {
-        $metadata = $this->getAssociationMetadata(['Test\Class']);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
-        $this->notManageableClassNames = ['Test\Class'];
-        $transformer->reverseTransform(['class' => 'Test\Class', 'id' => 123]);
+        $this->notManageableClassNames = [Group::class];
+        $transformer->reverseTransform(['class' => Group::class, 'id' => 123]);
     }
 
     public function testReverseTransformWhenAnyEntityTypeIsAcceptable()
     {
         $metadata = $this->getAssociationMetadata([]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -264,7 +280,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             new EntityIdentifier($entity->getId(), get_class($entity)),
             $transformer->reverseTransform($value)
         );
@@ -279,7 +295,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
-        $transformer = new NestedAssociationTransformer($this->doctrine, new EntityLoader($this->doctrine), $metadata);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
 
         $value = ['class' => Group::class, 'id' => ['primary' => 1]];
 

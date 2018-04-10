@@ -27,9 +27,7 @@ class CompoundObjectTypeTest extends TypeTestCase
     {
         return [
             new PreloadedExtension(
-                [
-                    new CompoundObjectType($this->getFormHelper()),
-                ],
+                [new CompoundObjectType($this->getFormHelper())],
                 []
             )
         ];
@@ -65,8 +63,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForRenamedField()
@@ -89,8 +87,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['renamedName' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForFieldWithFormType()
@@ -112,8 +110,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['id' => '123']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame(123, $data->getId());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame(123, $data->getId());
     }
 
     public function testBuildFormForFieldWithFormOptions()
@@ -135,8 +133,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['renamedName' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForIgnoredField()
@@ -159,8 +157,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getName());
     }
 
     public function testBuildFormForFieldIgnoredOnlyForGetActions()
@@ -183,8 +181,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['name' => 'testName']);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals('testName', $data->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals('testName', $data->getName());
     }
 
     public function testBuildFormForAssociation()
@@ -206,8 +204,8 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getOwner());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getOwner());
     }
 
     public function testBuildFormForAssociationAsField()
@@ -231,9 +229,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNotNull($data->getOwner());
-        $this->assertSame('testName', $data->getOwner()->getName());
+        self::assertTrue($form->isSynchronized());
+        self::assertNotNull($data->getOwner());
+        self::assertSame('testName', $data->getOwner()->getName());
     }
 
     public function testCreateNestedObject()
@@ -264,8 +262,8 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => ['value' => 'testPriceValue']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('testPriceValue', $data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenValueIsNotSubmitted()
@@ -296,8 +294,8 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit([]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenSubmittedValueIsNull()
@@ -328,8 +326,8 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => null]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray()
@@ -360,8 +358,8 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => []]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
     }
 
     public function testUpdateNestedObject()
@@ -393,9 +391,9 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => ['value' => 'newPriceValue']], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('newPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('newPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenValueIsNotSubmitted()
@@ -427,9 +425,9 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit([], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('oldPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('oldPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenSubmittedValueIsNull()
@@ -461,9 +459,9 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => null], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertNull($data->getPrice()->getValue());
-        $this->assertNull($data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
+        self::assertNull($data->getPrice()->getCurrency());
     }
 
     public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray()
@@ -495,8 +493,8 @@ class CompoundObjectTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
         $form->submit(['price' => []], false);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame('oldPriceValue', $data->getPrice()->getValue());
-        $this->assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame('oldPriceValue', $data->getPrice()->getValue());
+        self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 }

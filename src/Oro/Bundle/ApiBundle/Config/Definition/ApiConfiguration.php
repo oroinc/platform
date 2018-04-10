@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines a schema of "Resources/config/oro/api.yml" files.
+ */
 class ApiConfiguration implements ConfigurationInterface
 {
     const EXCLUSIONS_SECTION     = 'exclusions';
@@ -33,9 +36,7 @@ class ApiConfiguration implements ConfigurationInterface
     public function __construct(ConfigExtensionRegistry $extensionRegistry, $maxNestingLevel = null)
     {
         $this->settings = $extensionRegistry->getConfigurationSettings();
-        $this->maxNestingLevel = null !== $maxNestingLevel
-            ? $maxNestingLevel
-            : $extensionRegistry->getMaxNestingLevel();
+        $this->maxNestingLevel = $maxNestingLevel ?? $extensionRegistry->getMaxNestingLevel();
     }
 
     /**

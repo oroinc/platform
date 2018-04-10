@@ -21,7 +21,7 @@ class EntityAliasResolverRegistry
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /** @var EntityAliasResolver[] [request type => entity alias resolver, ...] */
+    /** @var EntityAliasResolver[] [request type => EntityAliasResolver, ...] */
     private $cache = [];
 
     /**
@@ -50,8 +50,9 @@ class EntityAliasResolverRegistry
      */
     public function getEntityAliasResolver(RequestType $requestType): EntityAliasResolver
     {
-        if (isset($this->cache[(string)$requestType])) {
-            return $this->cache[(string)$requestType];
+        $cacheKey = (string)$requestType;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
         }
 
         $entityAliasResolverServiceId = null;
@@ -63,13 +64,13 @@ class EntityAliasResolverRegistry
         }
         if (null === $entityAliasResolverServiceId) {
             throw new \LogicException(
-                sprintf('Cannot find a entity alias resolver for the request "%s".', (string)$requestType)
+                sprintf('Cannot find an entity alias resolver for the request "%s".', (string)$requestType)
             );
         }
 
         /** @var EntityAliasResolver $entityAliasResolver */
         $entityAliasResolver = $this->container->get($entityAliasResolverServiceId);
-        $this->cache[(string)$requestType] = $entityAliasResolver;
+        $this->cache[$cacheKey] = $entityAliasResolver;
 
         return $entityAliasResolver;
     }
@@ -77,8 +78,9 @@ class EntityAliasResolverRegistry
     /**
      * Warms up the cache of all entity alias resolvers.
      */
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
+        $this->cache = [];
         foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);
@@ -89,8 +91,9 @@ class EntityAliasResolverRegistry
     /**
      * Clears the cache of all entity alias resolvers.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
+        $this->cache = [];
         foreach ($this->entityAliasResolvers as list($serviceId, $expression)) {
             /** @var EntityAliasResolver $entityAliasResolver */
             $entityAliasResolver = $this->container->get($serviceId);

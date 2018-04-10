@@ -399,4 +399,14 @@
     }
 }
 
+@mixin keyframe($animation-name) {
+    @-webkit-keyframes $animation-name {
+        @content;
+    }
+
+    @keyframes $animation-name {
+        @content;
+    }
+}
+
 @import 'mixins-for-components';

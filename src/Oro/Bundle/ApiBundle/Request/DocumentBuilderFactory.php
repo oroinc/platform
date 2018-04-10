@@ -47,7 +47,7 @@ class DocumentBuilderFactory
      *
      * @throws \LogicException if a document builder cannot be created for the given request type
      */
-    public function createDocumentBuilder(RequestType $requestType)
+    public function createDocumentBuilder(RequestType $requestType): DocumentBuilderInterface
     {
         $documentBuilderServiceId = null;
         foreach ($this->documentBuilders as list($serviceId, $expression)) {

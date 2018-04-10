@@ -36,14 +36,17 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         if (isset($this->exclusions[$entityClass])) {
             return false;
         }
+
         if (!isset($this->entityAliases[$entityClass])) {
             return null;
         }
 
-        return new EntityAlias(
-            $this->entityAliases[$entityClass]['alias'],
-            $this->entityAliases[$entityClass]['plural_alias']
-        );
+        $aliases = $this->entityAliases[$entityClass];
+        if (empty($aliases)) {
+            return null;
+        }
+
+        return new EntityAlias($aliases['alias'], $aliases['plural_alias']);
     }
 
     /**
