@@ -389,6 +389,9 @@ class EmailController extends Controller
      */
     public function replyAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createReplyEmailModel($email);
         return $this->process($emailModel);
     }
@@ -408,6 +411,9 @@ class EmailController extends Controller
      */
     public function replyAllAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createReplyAllEmailModel($email);
         return $this->process($emailModel);
     }
@@ -424,6 +430,9 @@ class EmailController extends Controller
      */
     public function forwardAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createForwardEmailModel($email);
         return $this->process($emailModel);
     }
