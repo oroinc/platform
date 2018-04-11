@@ -131,6 +131,30 @@ define(function(require) {
                 _.every(node1.nodes, function(node, index) {
                     return expressionLanguageTools.compareAST(node, node2.nodes[index]);
                 });
+        },
+
+        cloneAST: function(node) {
+            var args = [];
+
+            _.each(node.nodes, function(node) {
+                if (node instanceof NameNode) {
+                    args.push('name' in node.attrs
+                        ? new NameNode(node.attrs.name)
+                        : new NameNode()
+                    );
+                } else if (node instanceof ConstantNode) {
+                    args.push('value' in node.attrs
+                        ? new ConstantNode(node.attrs.value)
+                        : new ConstantNode()
+                    );
+                } else if (node instanceof ArgumentsNode) {
+                    args.push(new ArgumentsNode());
+                }
+            }, this);
+
+            args.push(node.attrs.type);
+
+            return new (Function.prototype.bind.apply(GetAttrNode, [null].concat(args)))();
         }
     };
 

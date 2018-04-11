@@ -234,9 +234,7 @@ define(function(require) {
                 result = new BinaryNode(
                     operatorParams.operator,
                     this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
-                    // TODO: implement in expression language tools method to cloning of node and use clone instead
-                    // the same left operand
-                    this.translateSingleValue(leftOperand, filterValue, operatorParams.right)
+                    this.translateSingleValue(tools.cloneAST(leftOperand), filterValue, operatorParams.right)
                 );
             } else {
                 result = this.translateSingleValue(leftOperand, filterValue, operatorParams);

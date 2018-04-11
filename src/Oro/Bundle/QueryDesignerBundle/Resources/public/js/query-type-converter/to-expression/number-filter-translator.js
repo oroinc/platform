@@ -153,7 +153,7 @@ define(function(require) {
                 result = new BinaryNode(
                     operatorParams.operator,
                     this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
-                    this.translateSingleValue(leftOperand, filterValue, operatorParams.right)
+                    this.translateSingleValue(tools.cloneAST(leftOperand), filterValue, operatorParams.right)
                 );
             } else {
                 result = this.translateSingleValue(leftOperand, filterValue, operatorParams);
