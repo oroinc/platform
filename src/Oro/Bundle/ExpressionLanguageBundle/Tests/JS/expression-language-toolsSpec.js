@@ -156,28 +156,27 @@ define(function(require) {
             var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
 
             var cases = {
-                'function without arguments': [
-                    ['foo'],
-                    new FunctionNode('foo', new Node([]))
-                ],
-                'function with arguments': [
-                    [
-                        'foo',
-                        ['bar', null, true, 3.14, new NameNode('bar')]
-                    ],
-                    new FunctionNode('foo', new Node([
+                'function without arguments': {
+                    funcName: 'foo',
+                    funcArgs: void 0,
+                    exected: new FunctionNode('foo', new Node([]))
+                },
+                'function with arguments': {
+                    funcName: 'foo',
+                    funcArgs: ['bar', null, true, 3.14, new NameNode('bar')],
+                    exected: new FunctionNode('foo', new Node([
                         new ConstantNode('bar'),
                         new ConstantNode(null),
                         new ConstantNode(true),
                         new ConstantNode(3.14),
                         new NameNode('bar')
                     ]))
-                ]
+                }
             };
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    expect(createFunctionNode(testCase[0][0], testCase[0][1])).toEqual(testCase[1]);
+                    expect(createFunctionNode(testCase.funcName, testCase.funcArgs)).toEqual(testCase.exected);
                 });
             });
         });
