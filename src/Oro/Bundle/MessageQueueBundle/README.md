@@ -162,7 +162,7 @@ In the all cases above the interrupted consumer should be re-run. So you must ke
 `oro:message-queue:consume` command and to do this best we advise you to delegate this responsibility 
 to [Supervisord](http://supervisord.org/). With next program configuration supervisord keeps running 
 four simultaneous instances of `oro:message-queue:consume` command and cares about relaunch if instance 
-has dead by any reason.
+has dead by any reason. Pay attention that the [program name](http://supervisord.org/configuration.html#program-x-section-settings) defined in the `[program:oro_message_consumer]` must be unique from any other instances deployed on the same supervisord server even if they are only for staging purposes only. You can set by example something like `[program:prod_oro_message_consumer]` and `[program:dev_oro_message_consumer]`.
 
 ```ini
 [program:oro_message_consumer]
