@@ -41,7 +41,9 @@ config:
         'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/expression-functions-provider': 'bundles/oroquerydesigner/js/query-type-converter/expression-functions-provider.js'
         'oroquerydesigner/js/query-type-converter/filter-config-provider': 'bundles/oroquerydesigner/js/query-type-converter/filter-config-provider.js'
+        'oroquerydesigner/js/query-type-converter/filter-translators-manager': 'bundles/oroquerydesigner/js/query-type-converter/filter-translators-manager.js'
 
     appmodules:
         - oroquerydesigner/js/app/modules/validator-constraints-module
         - oroquerydesigner/js/app/modules/entity-filter-preset-module
+        - oroquerydesigner/js/app/modules/filter-translators-module
