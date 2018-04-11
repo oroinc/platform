@@ -14,24 +14,24 @@ define(function(require) {
     Object.assign(AbstractFilterTranslator.prototype, {
         constructor: AbstractFilterTranslator,
         /**
-         * Character that is used in filter value to input plural values in text field
-         * @type {string}
-         */
-        valuesSeparator: ',',
-
-        /**
-         * Map object of possible filter criteria value to expression's operation
-         * (can to be defined in descendant FilterTranslatorToExpression)
-         * @type {Object}
-         */
-        operatorMap: null,
-
-        /**
          * The filter type that has to be matched to `filterConfig.type`
          * (has to be defined in descendant FilterTranslatorToExpression)
          * @type {string}
          */
         filterType: void 0,
+
+        /**
+         * Map object of possible filter criteria value to expression's operation
+         * (can be defined in descendant FilterTranslatorToExpression)
+         * @type {Object}
+         */
+        operatorMap: null,
+
+        /**
+         * Character that is used in filter value to input plural values in text field
+         * @type {string}
+         */
+        valuesSeparator: ',',
 
         /**
          * Builds filter value's part of JSON validation schema

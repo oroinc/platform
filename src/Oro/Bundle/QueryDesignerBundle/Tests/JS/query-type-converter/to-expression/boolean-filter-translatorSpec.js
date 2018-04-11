@@ -5,11 +5,9 @@ define(function(require) {
     var BooleanFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
+    var tools = ExpressionLanguageLibrary.tools;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', function() {
         var translator;
@@ -50,12 +48,7 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it('when field value is `' + caseName +'`', function() {
-                    var leftOperand = new GetAttrNode(
-                        new NameNode('foo'),
-                        new ConstantNode('bar'),
-                        new ArgumentsNode(),
-                        GetAttrNode.PROPERTY_CALL
-                    );
+                    var leftOperand = tools.createGetAttrNode('foo.bar');
                     var expectedAST = new BinaryNode('==', leftOperand, testCase[1]);
 
                     expect(translator.test(testCase[0], filterConfig)).toBe(true);

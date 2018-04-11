@@ -27,21 +27,22 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        operatorMap: DictionaryFilterTranslatorToExpression.prototype.operatorMap,
+        filterType: 'dictionary',
 
         /**
          * @inheritDoc
          */
-        filterType: 'dictionary',
+        operatorMap: DictionaryFilterTranslatorToExpression.prototype.operatorMap,
 
         /**
          * Checks if node has correct type and value
          *
          * @param {Node} node
          * @return {boolean}
+         * @protected
          */
-        checkValueNode: function(node) {
-            return node instanceof ConstantNode &&_.isString(node.attrs.value);
+        checkValueAST: function(node) {
+            return node instanceof ConstantNode && _.isString(node.attrs.value);
         },
 
         /**
@@ -50,15 +51,15 @@ define(function(require) {
         resolveOperatorParams: function(node) {
             if (
                 node instanceof BinaryNode &&
-                this.resolveFieldAST(node) instanceof GetAttrNode &&
-                this.checkListOperandAST(node.nodes[1], this.checkValueNode)
+                node.nodes[0] instanceof GetAttrNode &&
+                this.checkListOperandAST(node.nodes[1], this.checkValueAST)
             ) {
-                var type = _.findKey(this.operatorMap, function(operator) {
+                var criterion = _.findKey(this.operatorMap, function(operator) {
                     return operator === node.attrs.operator;
                 });
 
-                if (type) {
-                    return {type: type, operator: node.attrs.operator};
+                if (criterion) {
+                    return {criterion: criterion, operator: node.attrs.operator};
                 }
             }
 
@@ -76,7 +77,7 @@ define(function(require) {
                 criterion: {
                     filter: filterConfig.name,
                     data: {
-                        type: operatorParams.type,
+                        type: operatorParams.criterion,
                         value: _.map(node.nodes[1].getKeyValuePairs(), function(pair) {
                             return String(pair.value.attrs.value);
                         })

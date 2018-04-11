@@ -6,16 +6,14 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator');
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var Node = ExpressionLanguageLibrary.Node;
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
-    describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', function() {
+    describe('oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator', function() {
         var translator;
         var entityStructureDataProviderMock;
         var filterConfigProviderMock;
@@ -54,46 +52,55 @@ define(function(require) {
 
         describe('rejects node structure because', function() {
             var cases = {
-                'unsupported operation': ['>=', new ConstantNode('baz')],
-                'improper right operand AST': ['=', new NameNode('baz')],
-                'operation `in` expects ArrayNode as right operand': ['in', new ConstantNode('baz')],
-                'operation `=` expects ConstantNode as right operand': ['=', createArrayNode(['baz'])],
-                'improper value in ArrayNode of right operand': ['in', createArrayNode([new NameNode('foo'), 2])],
-                'improper type of ArrayNode of right operand': ['in', createArrayNode({foo: 1})],
-                'operation `matches` expects FunctionNode as right operand': ['matches', new ConstantNode('baz')],
-                'improper value modifier for `matches` operator': ['matches', new FunctionNode('foo', new Node())],
+                'unsupported operation': [
+                    '>=',
+                    new ConstantNode('baz')
+                ],
+                'improper right operand AST': [
+                    '=',
+                    new NameNode('baz')
+                ],
+                'operation `in` expects ArrayNode as right operand': [
+                    'in',
+                    new ConstantNode('baz')
+                ],
+                'operation `=` expects ConstantNode as right operand': [
+                    '=',
+                    createArrayNode(['baz'])
+                ],
+                'improper value in ArrayNode of right operand': [
+                    'in',
+                    createArrayNode([new NameNode('foo'), 2])
+                ],
+                'improper type of ArrayNode of right operand': [
+                    'in',
+                    createArrayNode({foo: 1})
+                ],
+                'operation `matches` expects FunctionNode as right operand': [
+                    'matches',
+                    new ConstantNode('baz')
+                ],
+                'improper value modifier for `matches` operator': [
+                    'matches',
+                    createFunctionNode('foo')
+                ],
                 'value modifier expects to have an argument': [
                     'matches',
-                    new FunctionNode('containsRegExp', new Node([]))
+                    createFunctionNode('containsRegExp')
                 ],
                 'value modifier expects to have only argument': [
                     'matches',
-                    new FunctionNode('containsRegExp', new Node([
-                        new ConstantNode('foo'),
-                        new ConstantNode('bar')
-                    ]))
+                    createFunctionNode('containsRegExp', ['foo', 'bar'])
                 ],
                 'value modifier expects ConstantNode as argument': [
                     'matches',
-                    new FunctionNode('containsRegExp', new Node([
-                        createArrayNode(['foo'])
-                    ]))
+                    createFunctionNode('containsRegExp', [createArrayNode(['foo'])])
                 ]
             };
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    var node = new BinaryNode(
-                        testCase[0],
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        testCase[1]
-                    );
-
+                    var node = new BinaryNode(testCase[0], createGetAttrNode('foo.bar'), testCase[1]);
                     expect(translator.tryToTranslate(node)).toBe(null);
                     expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
                 });
@@ -112,7 +119,7 @@ define(function(require) {
                     'matches',
 
                     // BinaryNode right operand
-                    new FunctionNode('containsRegExp', new Node([new ConstantNode('baz')])),
+                    createFunctionNode('containsRegExp', ['baz']),
 
                     // expected condition filter data
                     {
@@ -122,7 +129,7 @@ define(function(require) {
                 ],
                 'having `not matches` operator with `containsRegExp` value modifier': [
                     'not matches',
-                    new FunctionNode('containsRegExp', new Node([new ConstantNode('baz')])),
+                    createFunctionNode('containsRegExp', ['baz']),
                     {
                         type: '2',
                         value: 'baz'
@@ -138,7 +145,7 @@ define(function(require) {
                 ],
                 'having `matches` operator with `startWithRegExp` value modifier': [
                     'matches',
-                    new FunctionNode('startWithRegExp', new Node([new ConstantNode('baz')])),
+                    createFunctionNode('startWithRegExp', ['baz']),
                     {
                         type: '4',
                         value: 'baz'
@@ -146,7 +153,7 @@ define(function(require) {
                 ],
                 'having `matches` operator with `endWithRegExp` value modifier': [
                     'matches',
-                    new FunctionNode('endWithRegExp', new Node([new ConstantNode('baz')])),
+                    createFunctionNode('endWithRegExp', ['baz']),
                     {
                         type: '5',
                         value: 'baz'
@@ -188,16 +195,7 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    var node = new BinaryNode(
-                        testCase[0],
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        testCase[1]
-                    );
+                    var node = new BinaryNode(testCase[0], createGetAttrNode('foo.bar'), testCase[1]);
                     var expectedCondition = {
                         columnName: 'bar',
                         criterion: {

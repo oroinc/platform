@@ -5,14 +5,11 @@ define(function(require) {
     var StringFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var Node = ExpressionLanguageLibrary.Node;
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
+    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator', function() {
         var translator;
@@ -62,7 +59,7 @@ define(function(require) {
                     'matches',
 
                     // expected right operand
-                    new FunctionNode('containsRegExp', new Node([new ConstantNode('baz')]))
+                    createFunctionNode('containsRegExp', ['baz'])
                 ],
                 [
                     'not contains',
@@ -71,7 +68,7 @@ define(function(require) {
                         value: 'baz'
                     },
                     'not matches',
-                    new FunctionNode('containsRegExp', new Node([new ConstantNode('baz')]))
+                    createFunctionNode('containsRegExp', ['baz'])
                 ],
                 [
                     'is equal to',
@@ -89,7 +86,7 @@ define(function(require) {
                         value: 'baz'
                     },
                     'matches',
-                    new FunctionNode('startWithRegExp', new Node([new ConstantNode('baz')]))
+                    createFunctionNode('startWithRegExp', ['baz'])
                 ],
                 [
                     'ends with',
@@ -98,7 +95,7 @@ define(function(require) {
                         value: 'baz'
                     },
                     'matches',
-                    new FunctionNode('endWithRegExp', new Node([new ConstantNode('baz')]))
+                    createFunctionNode('endWithRegExp', ['baz'])
                 ],
                 [
                     'is any of',
@@ -140,17 +137,12 @@ define(function(require) {
 
             _.each(cases, function(testCase) {
                 it('when filter has `' + testCase[0] + '` type', function() {
-                    var leftOperand = new GetAttrNode(
-                        new NameNode('foo'),
-                        new ConstantNode('bar'),
-                        new ArgumentsNode(),
-                        GetAttrNode.PROPERTY_CALL
-                    );
-
+                    var filterValue = testCase[1];
+                    var leftOperand = createGetAttrNode('foo.bar');
                     var expectedAST = new BinaryNode(testCase[2], leftOperand, testCase[3]);
 
-                    expect(translator.test(testCase[1], filterConfig)).toBe(true);
-                    expect(translator.translate(leftOperand, testCase[1])).toEqual(expectedAST);
+                    expect(translator.test(filterValue, filterConfig)).toBe(true);
+                    expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
                 });
             });
         });

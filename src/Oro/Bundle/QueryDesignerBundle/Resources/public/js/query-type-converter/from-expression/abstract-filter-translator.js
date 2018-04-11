@@ -7,7 +7,7 @@ define(function(require) {
 
     /**
      * @typedef {Object} OperatorParams
-     * @property {string} type - used for determine filter type
+     * @property {string} criterion - used for determine filter type
      * @property {string} operator
      * @property {string} [valueModifier] - contains function name in case operator expects it as right operand
      * @property {boolean} [hasArrayValue] - determine if operator expects array as right operand
@@ -41,18 +41,18 @@ define(function(require) {
         constructor: AbstractFilterTranslator,
 
         /**
-         * Map object of possible expression's operation to its value in filter
-         * (has to defined in descendant FilterTranslatorFromExpression)
-         * @type {Object}
-         */
-        operatorMap: null,
-
-        /**
          * The filter type that has to be matched to `filterConfig.type`
          * (has to defined in descendant FilterTranslatorFromExpression)
          * @type {string}
          */
         filterType: void 0,
+
+        /**
+         * Map object of possible expression's operation to its value in filter
+         * (can be defined in descendant FilterTranslatorFromExpression)
+         * @type {Object}
+         */
+        operatorMap: null,
 
         /**
          * Takes attempt to translate ExpressionLanguage AST node to condition object.
@@ -67,7 +67,7 @@ define(function(require) {
             if (operatorParams) {
                 var filterConfig = this.getFilterConfig(node);
 
-                if (this.checkFilterType(filterConfig) && this.checkOperation(node, filterConfig, operatorParams)) {
+                if (this.checkFilterType(filterConfig) && this.checkOperation(filterConfig, operatorParams)) {
                     return this.translate(node, filterConfig, operatorParams);
                 }
             }
@@ -142,14 +142,13 @@ define(function(require) {
         /**
          * Checks if operation in binary node corresponds to possible choices of filter
          *
-         * @param {Node} node ExpressionLanguage AST node
          * @param {Object} filterConfig
          * @param {OperatorParams} operatorParams
          * @returns {boolean}
          * @protected
          */
-        checkOperation: function(node, filterConfig, operatorParams) {
-            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.type) !== -1;
+        checkOperation: function(filterConfig, operatorParams) {
+            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.criterion) !== -1;
         },
 
         /**

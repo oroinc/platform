@@ -3,7 +3,6 @@ define(function(require) {
 
     var ToExpressionCompiler = require('oroexpressionlanguage/js/to-expression-compiler');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var Node = ExpressionLanguageLibrary.Node;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
@@ -11,8 +10,8 @@ define(function(require) {
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
     var UnaryNode = ExpressionLanguageLibrary.UnaryNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
 
     function createGetAttrNode(node, item, type) {
         return new GetAttrNode(node, new ConstantNode(item), new ArgumentsNode(), type);
@@ -35,7 +34,7 @@ define(function(require) {
     }
 
     describe('oroexpressionlanguage/js/to-expression-compiler', function() {
-        describe('parse AST', function() {
+        describe('compile expression from AST', function() {
             var cases = [
                 [
                     new NameNode('foo'),
@@ -241,14 +240,7 @@ define(function(require) {
                     {foo: 'bar'}
                 ],
                 [
-                    new FunctionNode(
-                        'foo',
-                        new Node([
-                            new ConstantNode('arg1'),
-                            new ConstantNode(2),
-                            new ConstantNode(true)
-                        ])
-                    ),
+                    createFunctionNode('foo', ['arg1', 2, true]),
                     'foo("arg1", 2, true)'
                 ]
             ];

@@ -6,12 +6,11 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator');
     var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', function() {
         var translator;
@@ -34,61 +33,23 @@ define(function(require) {
             );
         });
 
-
-        describe('check node structure', function() {
+        describe('rejects node structure because', function() {
             var cases = {
-                'improper AST': function() {
-                    return new ConstantNode('test');
-                },
-                'improper operation': function() {
-                    return new BinaryNode(
-                        '>=',
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        createArrayNode([1, 2])
-                    );
-                },
-                'improper left operand AST': function() {
-                    return new BinaryNode(
-                        'in',
-                        new ConstantNode('test'),
-                        createArrayNode([1, 2])
-                    );
-                },
-                'improper right operand AST': function() {
-                    return new BinaryNode(
-                        'in',
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        new ConstantNode('test')
-                    );
-                },
-                'improper AST values in right operand': function() {
-                    return new BinaryNode(
-                        'in',
-                        new GetAttrNode(
-                            new NameNode('foo'),
-                            new ConstantNode('bar'),
-                            new ArgumentsNode(),
-                            GetAttrNode.PROPERTY_CALL
-                        ),
-                        createArrayNode([new NameNode('foo'), 2])
-                    );
-                }
+                'improper AST':
+                    new ConstantNode('test'),
+                'unsupported operation':
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), createArrayNode([1, 2])),
+                'improper left operand AST':
+                    new BinaryNode('in', new ConstantNode('test'), createArrayNode([1, 2])),
+                'improper right operand AST':
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('test')),
+                'improper AST values in right operand':
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([new NameNode('foo'), 2]))
             };
 
-            _.each(cases, function(cb, caseName) {
+            _.each(cases, function(ast, caseName) {
                 it(caseName, function() {
-                    var node = cb();
-                    expect(translator.tryToTranslate(node)).toBe(null);
+                    expect(translator.tryToTranslate(ast)).toBe(null);
                     expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
                 });
             });
@@ -98,16 +59,7 @@ define(function(require) {
             var node;
 
             beforeEach(function() {
-                node = new BinaryNode(
-                    'in',
-                    new GetAttrNode(
-                        new NameNode('foo'),
-                        new ConstantNode('bar'),
-                        new ArgumentsNode(),
-                        GetAttrNode.PROPERTY_CALL
-                    ),
-                    createArrayNode(['1', '2'])
-                );
+                node = new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode(['1', '2']));
             });
 
             var cases = {

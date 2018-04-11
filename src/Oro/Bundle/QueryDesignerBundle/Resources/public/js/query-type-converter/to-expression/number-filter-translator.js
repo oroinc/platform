@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
     var AbstractFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
@@ -49,20 +50,34 @@ define(function(require) {
                 operator: '<'
             },
             7: { // TYPE_BETWEEN (between)
+                left: {
+                    operator: '>=',
+                    valueProp: 'value'
+                },
                 operator: 'and',
-                hasDoubleValue: true
+                right: {
+                    operator: '<=',
+                    valueProp: 'value_end'
+                }
             },
             8: { // TYPE_NOT_BETWEEN (not between)
+                left: {
+                    operator: '<',
+                    valueProp: 'value'
+                },
                 operator: 'and',
-                hasDoubleValue: true
+                right: {
+                    operator: '>',
+                    valueProp: 'value_end'
+                }
             },
             9: { // TYPE_IN (is any of)
                 operator: 'in',
-                isRange: true
+                hasArrayValue: true
             },
             10: { // TYPE_NOT_IN (is not any of)
                 operator: 'not in',
-                isRange: true
+                hasArrayValue: true
             },
             filter_empty_option: { // TYPE_EMPTY (is empty)
                 operator: '=',
@@ -72,6 +87,25 @@ define(function(require) {
                 operator: '!=',
                 value: 0
             }
+        },
+
+        /**
+         * Mnemonics of filter value types (filter's criteria)
+         * @type {Object}
+         */
+        filterCriterion: {
+            equalOrMoreThan: '1',
+            moreThan: '2',
+            equal: '3',
+            notEqual: '4',
+            equalOrLessThan: '5',
+            lessThan: '6',
+            between: '7',
+            notBetween: '8',
+            anyOf: '9',
+            notAnyOf: '10',
+            empty: 'filter_empty_option',
+            notEmpty: 'filter_not_empty_option'
         },
 
         /**
@@ -103,7 +137,7 @@ define(function(require) {
             var array = NumberFilterTranslator.__super__.splitValues.apply(this, arguments);
 
             return _.map(array, function(item) {
-                return parseInt(item, 10);
+                return Number(item);
             });
         },
 
@@ -111,20 +145,112 @@ define(function(require) {
          * @inheritDoc
          */
         translate: function(leftOperand, filterValue) {
-            var rightOperand;
+            filterValue = this.normalizeFilterValue(filterValue);
             var params = this.operatorMap[filterValue.type];
+            var result;
 
-            if (params.isRange) {
-                rightOperand = tools.createArrayNode(this.splitValues(filterValue.value));
-            // } else if (params.hasDoubleValue) {
-            // TODO: implement in BAP-16713
-            } else if (_.has(params, 'value')) {
-                rightOperand = new ConstantNode(params.value);
+            if (params.left && params.right) {
+                result = new BinaryNode(
+                    params.operator,
+                    this.translateSingleValue(params.left, leftOperand, filterValue),
+                    this.translateSingleValue(params.right, leftOperand, filterValue)
+                );
             } else {
-                rightOperand = new ConstantNode(filterValue.value);
+                result = this.translateSingleValue(params, leftOperand, filterValue);
+            }
+
+            return result;
+        },
+
+        /**
+         * Translates single value to AST
+         *
+         * @param {Object} params
+         * @param {Node} leftOperand
+         * @param {Object} filterValue
+         * @return {BinaryNode}
+         * @protected
+         */
+        translateSingleValue: function(params, leftOperand, filterValue) {
+            var rightOperand;
+            var value = filterValue[params.valueProp || 'value'];
+
+            if (params.hasArrayValue) {
+                rightOperand = tools.createArrayNode(value);
+            } else {
+                if (_.has(params, 'value')) {
+                    value = params.value;
+                }
+
+                rightOperand = new ConstantNode(value);
             }
 
             return new BinaryNode(params.operator, leftOperand, rightOperand);
+        },
+
+        /**
+         * Normalizes filterValue in case it is partial value of between of notBetween filter criterion
+         *
+         * @param {Object} filterValue
+         * @return {Object}
+         */
+        normalizeFilterValue: function(filterValue) {
+            var type = String(filterValue.type);
+            var params = this.operatorMap[type];
+            var normalizedValues = _.map([filterValue.value, filterValue.value_end], function(val) {
+                if (!_.isUndefined(val)) {
+                    if (params.hasArrayValue) {
+                        return this.splitValues(val);
+                    // skip empty value
+                    } else if (_.isString(val) && !_.isEmpty(_.trim(val))) {
+                        return Number(val);
+                    } else {
+                        return val;
+                    }
+                }
+            }, this);
+            var value = normalizedValues[0];
+            var valueEnd = normalizedValues[1];
+
+            if (
+                [this.filterCriterion.between, this.filterCriterion.notBetween].indexOf(type) === -1 ||
+                _.isNumber(value) && _.isNumber(valueEnd)
+            ) {
+                // when valueEnd is lower than value
+                if (valueEnd < value) {
+                    var _valueEnd = valueEnd;
+
+                    valueEnd = value;
+                    value = _valueEnd;
+                } else {
+                    if (!_.isUndefined(filterValue.value)) {
+                        filterValue = _.defaults({
+                            value: value
+                        }, filterValue);
+                    }
+
+                    return filterValue;
+                }
+            } else if (!_.isUndefined(value) && !_.isUndefined(valueEnd)) {
+                if (valueEnd) {
+                    type = type === this.filterCriterion.between
+                        ? this.filterCriterion.moreThan
+                        : this.filterCriterion.lessThan;
+
+                    value = valueEnd;
+                    valueEnd = 0;
+                } else {
+                    type = type === this.filterCriterion.between
+                        ? this.filterCriterion.lessThan
+                        : this.filterCriterion.moreThan;
+                }
+            }
+
+            return _.defaults({
+                type: type,
+                value: value,
+                value_end: valueEnd
+            }, filterValue);
         }
     });
 

@@ -4,10 +4,8 @@ define(function(require) {
     var AbstractFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var Node = ExpressionLanguageLibrary.Node;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
     var tools = ExpressionLanguageLibrary.tools;
 
     /**
@@ -94,10 +92,7 @@ define(function(require) {
             if (params.hasArrayValue) {
                 rightOperand = tools.createArrayNode(this.splitValues(value));
             } else if (params.valueModifier) {
-                rightOperand = new FunctionNode(
-                    params.valueModifier,
-                    new Node([new ConstantNode(value)])
-                );
+                rightOperand = tools.createFunctionNode(params.valueModifier, [value]);
             } else if ('value' in params) {
                 rightOperand = new ConstantNode(params.value);
             } else {

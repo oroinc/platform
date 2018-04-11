@@ -5,28 +5,14 @@ define(function(require) {
     var DateFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
-    var Node = ExpressionLanguageLibrary.Node;
+    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/date-filter-translator', function() {
         var translator;
         var filterConfig;
-        var createGetFieldAST = function() {
-            return new GetAttrNode(
-                new NameNode('foo'),
-                new ConstantNode('bar'),
-                new ArgumentsNode(),
-                GetAttrNode.PROPERTY_CALL
-            );
-        };
-        var createFuncCallAST = function(funcName) {
-            return new FunctionNode(funcName, new Node(_.rest(arguments)));
-        };
 
         beforeEach(function() {
             filterConfig = {
@@ -92,9 +78,8 @@ define(function(require) {
             translator = new DateFilterTranslator();
         });
 
-        describe('translates valid condition', function() {
+        describe('valid date filter values', function() {
             var cases = {
-                // filter type
                 'value part between start and end dates': [
                     // condition filter data
                     {
@@ -105,8 +90,8 @@ define(function(require) {
                     // expected AST
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createGetFieldAST(), new ConstantNode('2018-03-01')),
-                        new BinaryNode('<=', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
+                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                     )
                 ],
                 'value part between with empty start date and valuable end date': [
@@ -115,7 +100,7 @@ define(function(require) {
                         value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('<=', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
                 'value part between with valuable start date and empty end date': [
                     {
@@ -123,7 +108,7 @@ define(function(require) {
                         value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('>=', createGetFieldAST(), new ConstantNode('2018-03-01'))
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
                 'value part not between start and end dates': [
                     {
@@ -133,8 +118,8 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('<', createGetFieldAST(), new ConstantNode('2018-03-01')),
-                        new BinaryNode('>', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
+                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                     )
                 ],
                 'value part not between empty start date and valuable end date': [
@@ -143,7 +128,7 @@ define(function(require) {
                         value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('>=', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
                 'value part not between valuable start date and empty end date': [
                     {
@@ -151,7 +136,7 @@ define(function(require) {
                         value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('<=', createGetFieldAST(), new ConstantNode('2018-03-01'))
+                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
                 'value part later than the date': [
                     {
@@ -159,7 +144,7 @@ define(function(require) {
                         value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('>=', createGetFieldAST(), new ConstantNode('2018-03-01'))
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
                 'value part earlier than the date': [
                     {
@@ -167,7 +152,7 @@ define(function(require) {
                         value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('<=', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
                 'value part equals to the date': [
                     {
@@ -175,7 +160,7 @@ define(function(require) {
                         value: {start: '2018-03-01', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), new ConstantNode('2018-03-01'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
                 ],
                 'value part not equals to the date': [
                     {
@@ -183,7 +168,7 @@ define(function(require) {
                         value: {start: '', end: '2018-03-31'},
                         part: 'value'
                     },
-                    new BinaryNode('!=', createGetFieldAST(), new ConstantNode('2018-03-31'))
+                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
                 ],
                 'value part equals to now': [
                     {
@@ -191,7 +176,7 @@ define(function(require) {
                         value: {start: '{{1}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('now'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('now'))
                 ],
                 'value part equals to today': [
                     {
@@ -199,7 +184,7 @@ define(function(require) {
                         value: {start: '{{2}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('today'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('today'))
                 ],
                 'value part equals to start of the week': [
                     {
@@ -207,7 +192,7 @@ define(function(require) {
                         value: {start: '{{3}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('startOfTheWeek'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheWeek'))
                 ],
                 'value part equals to start of the month': [
                     {
@@ -215,7 +200,7 @@ define(function(require) {
                         value: {start: '{{4}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('startOfTheMonth'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheMonth'))
                 ],
                 'value part equals to start of the quarter': [
                     {
@@ -223,7 +208,7 @@ define(function(require) {
                         value: {start: '{{5}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('startOfTheQuarter'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheQuarter'))
                 ],
                 'value part equals to start of the year': [
                     {
@@ -231,7 +216,7 @@ define(function(require) {
                         value: {start: '{{6}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('startOfTheYear'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheYear'))
                 ],
                 'value part equals to current month without year': [
                     {
@@ -239,7 +224,7 @@ define(function(require) {
                         value: {start: '{{17}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('currentMonthWithoutYear'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('currentMonthWithoutYear'))
                 ],
                 'value part equals to this day without year': [
                     {
@@ -247,7 +232,7 @@ define(function(require) {
                         value: {start: '{{29}}', end: ''},
                         part: 'value'
                     },
-                    new BinaryNode('=', createGetFieldAST(), createFuncCallAST('thisDayWithoutYear'))
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('thisDayWithoutYear'))
                 ],
                 'day of week part equals to value': [
                     {
@@ -255,7 +240,10 @@ define(function(require) {
                         value: {start: '7', end: ''},
                         part: 'dayofweek'
                     },
-                    new BinaryNode('=', createFuncCallAST('dayOfWeek', createGetFieldAST()), new ConstantNode('7'))
+                    new BinaryNode('=',
+                        createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('7')
+                    )
                 ],
                 'day of week part equals to current day of week': [
                     {
@@ -264,8 +252,8 @@ define(function(require) {
                         part: 'dayofweek'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('dayOfWeek', createGetFieldAST()),
-                        createFuncCallAST('currentDayOfWeek')
+                        createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentDayOfWeek')
                     )
                 ],
                 'week part equals to value': [
@@ -274,7 +262,10 @@ define(function(require) {
                         value: {start: '5', end: ''},
                         part: 'week'
                     },
-                    new BinaryNode('=', createFuncCallAST('week', createGetFieldAST()), new ConstantNode('5'))
+                    new BinaryNode('=',
+                        createFunctionNode('week', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('5')
+                    )
                 ],
                 'week part equals to current week': [
                     {
@@ -283,8 +274,8 @@ define(function(require) {
                         part: 'week'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('week', createGetFieldAST()),
-                        createFuncCallAST('currentWeek')
+                        createFunctionNode('week', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentWeek')
                     )
                 ],
                 'day of month part equals to value': [
@@ -293,7 +284,10 @@ define(function(require) {
                         value: {start: '1', end: ''},
                         part: 'day'
                     },
-                    new BinaryNode('=', createFuncCallAST('dayOfMonth', createGetFieldAST()), new ConstantNode('1'))
+                    new BinaryNode('=',
+                        createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('1')
+                    )
                 ],
                 'day of month part equals to current day of month': [
                     {
@@ -302,8 +296,8 @@ define(function(require) {
                         part: 'day'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('dayOfMonth', createGetFieldAST()),
-                        createFuncCallAST('currentDayOfMonth')
+                        createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentDayOfMonth')
                     )
                 ],
                 'month part equals to value': [
@@ -312,7 +306,10 @@ define(function(require) {
                         value: {start: '2', end: ''},
                         part: 'month'
                     },
-                    new BinaryNode('=', createFuncCallAST('month', createGetFieldAST()), new ConstantNode('2'))
+                    new BinaryNode('=',
+                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('2')
+                    )
                 ],
                 'month part equals to current month': [
                     {
@@ -321,8 +318,8 @@ define(function(require) {
                         part: 'month'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('month', createGetFieldAST()),
-                        createFuncCallAST('currentMonth')
+                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentMonth')
                     )
                 ],
                 'month part equals to first month of current quarter': [
@@ -332,8 +329,8 @@ define(function(require) {
                         part: 'month'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('month', createGetFieldAST()),
-                        createFuncCallAST('firstMonthOfCurrentQuarter')
+                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('firstMonthOfCurrentQuarter')
                     )
                 ],
                 'quarter part equals to value': [
@@ -342,7 +339,10 @@ define(function(require) {
                         value: {start: '1', end: ''},
                         part: 'quarter'
                     },
-                    new BinaryNode('=', createFuncCallAST('quarter', createGetFieldAST()), new ConstantNode('1'))
+                    new BinaryNode('=',
+                        createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('1')
+                    )
                 ],
                 'quarter part equals to current quarter': [
                     {
@@ -351,8 +351,8 @@ define(function(require) {
                         part: 'quarter'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('quarter', createGetFieldAST()),
-                        createFuncCallAST('currentQuarter')
+                        createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentQuarter')
                     )
                 ],
                 'day of year part equals to value': [
@@ -361,7 +361,10 @@ define(function(require) {
                         value: {start: '32', end: ''},
                         part: 'dayofyear'
                     },
-                    new BinaryNode('=', createFuncCallAST('dayOfYear', createGetFieldAST()), new ConstantNode('32'))
+                    new BinaryNode('=',
+                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('32')
+                    )
                 ],
                 'day of year part equals to current day of year': [
                     {
@@ -370,8 +373,8 @@ define(function(require) {
                         part: 'dayofyear'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('dayOfYear', createGetFieldAST()),
-                        createFuncCallAST('currentDayOfYear')
+                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentDayOfYear')
                     )
                 ],
                 'day of year part equals to first day of current quarter': [
@@ -381,8 +384,8 @@ define(function(require) {
                         part: 'dayofyear'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('dayOfYear', createGetFieldAST()),
-                        createFuncCallAST('firstDayOfCurrentQuarter')
+                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('firstDayOfCurrentQuarter')
                     )
                 ],
                 'year part equals to value': [
@@ -391,7 +394,10 @@ define(function(require) {
                         value: {start: '1981', end: ''},
                         part: 'year'
                     },
-                    new BinaryNode('=', createFuncCallAST('year', createGetFieldAST()), new ConstantNode('1981'))
+                    new BinaryNode('=',
+                        createFunctionNode('year', [createGetAttrNode('foo.bar')]),
+                        new ConstantNode('1981')
+                    )
                 ],
                 'year part equals to current year': [
                     {
@@ -400,8 +406,8 @@ define(function(require) {
                         part: 'year'
                     },
                     new BinaryNode('=',
-                        createFuncCallAST('year', createGetFieldAST()),
-                        createFuncCallAST('currentYear')
+                        createFunctionNode('year', [createGetAttrNode('foo.bar')]),
+                        createFunctionNode('currentYear')
                     )
                 ],
                 'year part between some year and current year': [
@@ -413,12 +419,12 @@ define(function(require) {
                     new BinaryNode(
                         'and',
                         new BinaryNode('>=',
-                            createFuncCallAST('year', createGetFieldAST()),
+                            createFunctionNode('year', [createGetAttrNode('foo.bar')]),
                             new ConstantNode('1981')
                         ),
                         new BinaryNode('<=',
-                            createFuncCallAST('year', createGetFieldAST()),
-                            createFuncCallAST('currentYear')
+                            createFunctionNode('year', [createGetAttrNode('foo.bar')]),
+                            createFunctionNode('currentYear')
                         )
                     )
                 ]
@@ -426,8 +432,12 @@ define(function(require) {
 
             _.each(cases, function(testCase, caseName) {
                 it(caseName, function() {
-                    expect(translator.test(testCase[0], filterConfig)).toBe(true);
-                    expect(translator.translate(createGetFieldAST(), testCase[0])).toEqual(testCase[1]);
+                    var leftOperand = createGetAttrNode('foo.bar');
+                    var filterValue = testCase[0];
+                    var expectedAST = testCase[1];
+
+                    expect(translator.test(filterValue, filterConfig)).toBe(true);
+                    expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
                 });
             });
         });
