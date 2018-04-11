@@ -24,6 +24,7 @@ config:
 
         'oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator.js'
+        'oroquerydesigner/js/query-type-converter/from-expression/datetime-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/datetime-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/field-id-translator.js'
         'oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator.js'
