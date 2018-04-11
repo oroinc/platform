@@ -23,6 +23,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * The builder that simplifies creation of the email related entities.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailEntityBuilder
@@ -105,6 +107,7 @@ class EmailEntityBuilder
         $email = $this->email($subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
         $emailUser->setReceivedAt($receivedAt);
         $emailUser->setEmail($email);
+        $email->addEmailUser($emailUser);
         if ($owner !== null) {
             if ($owner instanceof User) {
                 $emailUser->setOwner($owner);

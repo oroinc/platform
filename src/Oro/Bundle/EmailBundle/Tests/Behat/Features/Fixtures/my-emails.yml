@@ -2,6 +2,9 @@ Oro\Bundle\EmailBundle\Entity\EmailBody:
   emailBody1:
     bodyContent: '<sentences(3, true)>'
     bodyIsText: true
+  emailBody2:
+    bodyContent: '<sentences(3, true)>'
+    bodyIsText: true
 
 Oro\Bundle\UserBundle\Entity\User:
   userCharlie:
@@ -51,6 +54,16 @@ Oro\Bundle\EmailBundle\Entity\Email:
     internalDate: '<(new DateTime("2010-10-31"))>'
     messageId: fsdfasdf
     emailUsers: ['@adminEmailUser1']
+  email:
+    subject: 'Re: There is no spoon'
+    emailBody: '@emailBody2'
+    sentAt: '<(new DateTime("2010-11-01"))>'
+    fromName: '@adminEmailAddress'
+    fromEmailAddress: '@adminEmailAddress'
+    internalDate: '<(new DateTime("2010-11-01"))>'
+    messageId: fsdfasdf
+    emailUsers: ['@adminEmailUser1']
+
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
   adminEmailUser1:
