@@ -4,11 +4,13 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Form\DependencyInjection\FormPass;
 
 /**
  * Configures all services required for Data API forms.
@@ -91,10 +93,19 @@ class FormCompilerPass implements CompilerPassInterface
                 self::API_FORM_TYPE_GUESSER_TAG
             );
 
-            // load form types, form type extensions and form type guessers for Data API form extension
-            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container));
-            $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
-            $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
+            $symfonyFormPass = new FormPass(
+                self::API_FORM_EXTENSION_SERVICE_ID,
+                self::API_FORM_TYPE_TAG,
+                self::API_FORM_TYPE_EXTENSION_TAG,
+                self::API_FORM_TYPE_GUESSER_TAG
+            );
+
+            // Make extension definition compatible to compiler pass
+            $apiFormExtensionDef->setArgument(2, new IteratorArgument([]));
+            $symfonyFormPass->process($container);
+
+            // load form type guessers sorted by priority for Data API form extension
+            $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeGuessers($container));
         }
         if ($container->hasDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)) {
             $dataTypeMappings = [];
@@ -198,51 +209,20 @@ class FormCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      *
-     * @return array
-     */
-    private function getApiFormTypes(ContainerBuilder $container)
-    {
-        $types = [];
-        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $serviceId => $tag) {
-            $alias = DependencyInjectionUtil::getAttribute($tag[0], 'alias', $serviceId);
-            $types[$alias] = $serviceId;
-        }
-
-        return $types;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function getApiFormTypeExtensions(ContainerBuilder $container)
-    {
-        $typeExtensions = [];
-        foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_EXTENSION_TAG) as $serviceId => $tag) {
-            $alias = DependencyInjectionUtil::getAttribute($tag[0], $this->getTagKeyForExtension(), $serviceId);
-            $typeExtensions[$alias][] = $serviceId;
-        }
-
-        return $typeExtensions;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
+     * @return IteratorArgument
      */
     private function getApiFormTypeGuessers(ContainerBuilder $container)
     {
         $guessers = [];
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_GUESSER_TAG) as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                $guessers[$serviceId] = DependencyInjectionUtil::getPriority($tag);
+                $guessers[DependencyInjectionUtil::getPriority($tag)][] = new Reference($serviceId);
             }
         }
-        arsort($guessers, SORT_NUMERIC);
 
-        return array_keys($guessers);
+        krsort($guessers);
+
+        return new IteratorArgument(array_merge(...$guessers));
     }
 
     /**
