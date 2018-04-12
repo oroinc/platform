@@ -195,6 +195,58 @@ class RestJsonApiSupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
+    public function testShouldAcceptTimezoneInDateTimeField()
+    {
+        $inputDateTime = '2017-01-21T10:20:30+05:00';
+        $utcDateTime = '2017-01-21T05:20:30+0000';
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldDateTime' => $inputDateTime
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
+
+        $expectedResponseData = $data;
+        $expectedResponseData['data']['attributes']['fieldDateTime'] = str_replace('+0000', 'Z', $utcDateTime);
+        $this->assertResponseContains($expectedResponseData, $response);
+
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
+        self::assertEquals($utcDateTime, $entity->fieldDateTime->format('Y-m-d\TH:i:sO'));
+    }
+
+    public function testShouldAcceptDateOnlyInDateTimeField()
+    {
+        $inputDateTime = '2017-01-21';
+        $utcDateTime = '2017-01-21T00:00:00+0000';
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => '<toString(@TestItem1->id)>',
+                'attributes' => [
+                    'fieldDateTime' => $inputDateTime
+                ]
+            ]
+        ];
+
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
+
+        $expectedResponseData = $data;
+        $expectedResponseData['data']['attributes']['fieldDateTime'] = str_replace('+0000', 'Z', $utcDateTime);
+        $this->assertResponseContains($expectedResponseData, $response);
+
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getResourceId($response));
+        self::assertEquals($utcDateTime, $entity->fieldDateTime->format('Y-m-d\TH:i:sO'));
+    }
+
     public function testMoneyShouldBeRounded()
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
