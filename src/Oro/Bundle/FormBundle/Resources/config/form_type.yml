@@ -167,6 +167,7 @@ services:
             - %kernel.cache_dir%
         calls:
             - [setAssetHelper, ['@assets.packages']]
+            - [setContext, ['@assets.context']]
         tags:
             - { name: form.type, alias: oro_rich_text }
 

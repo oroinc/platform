@@ -5,8 +5,8 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\Asset\PathPackage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -30,6 +30,9 @@ class OroRichTextType extends AbstractType
 
     /** @var HtmlTagProvider */
     protected $htmlTagProvider;
+
+    /** @var ContextInterface */
+    protected $context;
 
     /** @var string */
     protected $cacheDir;
@@ -78,6 +81,14 @@ class OroRichTextType extends AbstractType
     }
 
     /**
+     * @param ContextInterface $context
+     */
+    public function setContext(ContextInterface $context)
+    {
+        $this->context = $context;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -104,12 +115,11 @@ class OroRichTextType extends AbstractType
              * without any formatting - we have to calculate formatted version url's parameter to be used inside
              * WYSIWYG editor.
              */
-            /** @var PathPackage $routing */
-            $routing = $this->assetHelper->getPackage();
-
-            $assetsBaseUrl = $routing->getBasePath();
-            $assetsVersionBaseUrl = $routing->getUrl('/');
+            $assetsVersionBaseUrl   = $this->assetHelper->getUrl('/');
             $assetsVersionFormatted = substr($assetsVersionBaseUrl, strrpos($assetsVersionBaseUrl, '/') + 1);
+        }
+        if ($this->context) {
+            $assetsBaseUrl = ltrim($this->context->getBasePath() . '/', '/');
         }
 
         $defaultWysiwygOptions = [
