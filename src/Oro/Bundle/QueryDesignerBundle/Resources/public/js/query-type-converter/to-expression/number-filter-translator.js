@@ -12,9 +12,9 @@ define(function(require) {
     /**
      * @inheritDoc
      */
-    function NumberFilterTranslator() {
+    var NumberFilterTranslator = function NumberFilterTranslatorToExpression() {
         NumberFilterTranslator.__super__.constructor.apply(this, arguments);
-    }
+    };
 
     NumberFilterTranslator.prototype = Object.create(AbstractFilterTranslator.prototype);
     NumberFilterTranslator.__super__ = AbstractFilterTranslator.prototype;
@@ -146,17 +146,17 @@ define(function(require) {
          */
         translate: function(leftOperand, filterValue) {
             filterValue = this.normalizeFilterValue(filterValue);
-            var params = this.operatorMap[filterValue.type];
+            var operatorParams = this.operatorMap[filterValue.type];
             var result;
 
-            if (params.left && params.right) {
+            if (operatorParams.left && operatorParams.right) {
                 result = new BinaryNode(
-                    params.operator,
-                    this.translateSingleValue(params.left, leftOperand, filterValue),
-                    this.translateSingleValue(params.right, leftOperand, filterValue)
+                    operatorParams.operator,
+                    this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
+                    this.translateSingleValue(leftOperand, filterValue, operatorParams.right)
                 );
             } else {
-                result = this.translateSingleValue(params, leftOperand, filterValue);
+                result = this.translateSingleValue(leftOperand, filterValue, operatorParams);
             }
 
             return result;
@@ -165,27 +165,27 @@ define(function(require) {
         /**
          * Translates single value to AST
          *
-         * @param {Object} params
          * @param {Node} leftOperand
          * @param {Object} filterValue
+         * @param {Object} operatorParams
          * @return {BinaryNode}
          * @protected
          */
-        translateSingleValue: function(params, leftOperand, filterValue) {
+        translateSingleValue: function(leftOperand, filterValue, operatorParams) {
             var rightOperand;
-            var value = filterValue[params.valueProp || 'value'];
+            var value = filterValue[operatorParams.valueProp || 'value'];
 
-            if (params.hasArrayValue) {
+            if (operatorParams.hasArrayValue) {
                 rightOperand = tools.createArrayNode(value);
             } else {
-                if (_.has(params, 'value')) {
-                    value = params.value;
+                if (_.has(operatorParams, 'value')) {
+                    value = operatorParams.value;
                 }
 
                 rightOperand = new ConstantNode(value);
             }
 
-            return new BinaryNode(params.operator, leftOperand, rightOperand);
+            return new BinaryNode(operatorParams.operator, leftOperand, rightOperand);
         },
 
         /**
@@ -196,10 +196,10 @@ define(function(require) {
          */
         normalizeFilterValue: function(filterValue) {
             var type = String(filterValue.type);
-            var params = this.operatorMap[type];
+            var operatorParams = this.operatorMap[type];
             var normalizedValues = _.map([filterValue.value, filterValue.value_end], function(val) {
                 if (!_.isUndefined(val)) {
-                    if (params.hasArrayValue) {
+                    if (operatorParams.hasArrayValue) {
                         return this.splitValues(val);
                     // skip empty value
                     } else if (_.isString(val) && !_.isEmpty(_.trim(val))) {

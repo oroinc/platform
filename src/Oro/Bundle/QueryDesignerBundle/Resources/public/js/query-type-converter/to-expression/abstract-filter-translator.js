@@ -75,15 +75,15 @@ define(function(require) {
          * Check if the filter type complies to the filter config
          *
          * @param {Object} filterValue
-         * @param {Object} config
+         * @param {Object} filterConfig
          * @return {boolean}
          */
-        testToConfig: function(filterValue, config) {
-            return _.any(config.choices, {value: filterValue.type});
+        testToConfig: function(filterValue, filterConfig) {
+            return _.any(filterConfig.choices, {value: String(filterValue.type)});
         },
 
         /**
-         * Takes condition object and translates it to ExpressionLanguage AST
+         * Takes filterValue and translates it to ExpressionLanguage AST with provided leftOperand
          *
          * @param {Node} leftOperand
          * @param {Object} filterValue

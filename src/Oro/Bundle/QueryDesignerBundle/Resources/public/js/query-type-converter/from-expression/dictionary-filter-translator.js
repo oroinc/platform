@@ -54,8 +54,8 @@ define(function(require) {
                 node.nodes[0] instanceof GetAttrNode &&
                 this.checkListOperandAST(node.nodes[1], this.checkValueAST)
             ) {
-                var criterion = _.findKey(this.operatorMap, function(operator) {
-                    return operator === node.attrs.operator;
+                var criterion = _.findKey(this.operatorMap, function(operatorParams) {
+                    return operatorParams.operator === node.attrs.operator;
                 });
 
                 if (criterion) {

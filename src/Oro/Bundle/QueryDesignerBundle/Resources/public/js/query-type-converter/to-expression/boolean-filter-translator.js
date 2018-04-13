@@ -1,19 +1,19 @@
 define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
     var AbstractFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var _ = require('underscore');
 
     /**
      * @inheritDoc
      */
-    function BooleanFilterTranslator() {
+    var BooleanFilterTranslator = function BooleanFilterTranslatorToExpression() {
         BooleanFilterTranslator.__super__.constructor.apply(this, arguments);
-    }
+    };
 
     BooleanFilterTranslator.prototype = Object.create(AbstractFilterTranslator.prototype);
     BooleanFilterTranslator.__super__ = AbstractFilterTranslator.prototype;
@@ -48,6 +48,7 @@ define(function(require) {
             return {
                 type: 'object',
                 required: ['value'],
+                additionalProperties: false,
                 properties: {
                     value: {
                         type: 'string'
@@ -60,37 +61,25 @@ define(function(require) {
          * @inheritDoc
          */
         testToOperatorMap: function(filterValue) {
-            return !_.has(filterValue, 'type');
+            // nothing to check
+            return true;
         },
 
         /**
          * @inheritDoc
          */
-        testToConfig: function(filterValue, config) {
-            return _.any(config.choices, {value: filterValue.value});
+        testToConfig: function(filterValue, filterConfig) {
+            return _.any(filterConfig.choices, {value: filterValue.value});
         },
 
         /**
          * @inheritDoc
          */
         translate: function(leftOperand, filterValue) {
-            var value = this.convertToBoolean(filterValue.value);
+            var value = filterValue.value === this.valueMap['true'];
+            var rightOperand = new ConstantNode(value);
 
-            return new BinaryNode(
-                this.operator,
-                leftOperand,
-                new ConstantNode(value)
-            );
-        },
-
-        /**
-         * Convert criterion value to boolean
-         *
-         * @param {string} value
-         * @returns {boolean}
-         */
-        convertToBoolean: function(value) {
-            return value === this.valueMap['true'];
+            return new BinaryNode(this.operator, leftOperand, rightOperand);
         }
     });
 

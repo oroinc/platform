@@ -187,16 +187,16 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        testToConfig: function(filterValue, config) {
+        testToConfig: function(filterValue, filterConfig) {
             var part = filterValue.part;
             var value = filterValue.value;
             var result =
-                DateFilterTranslator.__super__.testToConfig.call(this, filterValue, config) &&
+                DateFilterTranslator.__super__.testToConfig.call(this, filterValue, filterConfig) &&
                 // check is filter part is available in config
-                _.has(config.dateParts, part);
+                _.has(filterConfig.dateParts, part);
 
             if (result) {
-                var varsConfig = _.result(_.result(config.externalWidgetOptions, 'dateVars'), part, {});
+                var varsConfig = _.result(_.result(filterConfig.externalWidgetOptions, 'dateVars'), part, {});
                 var partParams = this.partMap[part];
 
                 result =
@@ -226,20 +226,20 @@ define(function(require) {
          * @inheritDoc
          */
         translate: function(leftOperand, filterValue) {
-            filterValue = this.normalizeCondition(filterValue);
+            filterValue = this.normalizeFilterValue(filterValue);
             var result;
-            var params = this.operatorMap[filterValue.type];
+            var operatorParams = this.operatorMap[filterValue.type];
 
-            if (params.left && params.right) {
+            if (operatorParams.left && operatorParams.right) {
                 result = new BinaryNode(
-                    params.operator,
-                    this.translateSingleValue(params.left, leftOperand, filterValue),
+                    operatorParams.operator,
+                    this.translateSingleValue(leftOperand, filterValue, operatorParams.left),
                     // TODO: implement in expression language tools method to cloning of node and use clone instead
                     // the same left operand
-                    this.translateSingleValue(params.right, leftOperand, filterValue)
+                    this.translateSingleValue(leftOperand, filterValue, operatorParams.right)
                 );
             } else {
-                result = this.translateSingleValue(params, leftOperand, filterValue);
+                result = this.translateSingleValue(leftOperand, filterValue, operatorParams);
             }
 
             return result;
@@ -251,7 +251,7 @@ define(function(require) {
          * @param {Object} filterValue
          * @return {Object}
          */
-        normalizeCondition: function(filterValue) {
+        normalizeFilterValue: function(filterValue) {
             var type = String(filterValue.type);
             var valueStart = filterValue.value.start;
             var valueEnd = filterValue.value.end;
@@ -288,17 +288,17 @@ define(function(require) {
         },
 
         /**
-         * Translates condition for a single value of pair 'start' and 'end'
+         * Translates a single part of pair 'start' and 'end' value of filter
          *
-         * @param {Object} params
          * @param {Node} leftOperand
          * @param {Object} filterValue
+         * @param {Object} operatorParams
          * @return {BinaryNode}
          * @protected
          */
-        translateSingleValue: function(params, leftOperand, filterValue) {
+        translateSingleValue: function(leftOperand, filterValue, operatorParams) {
             var partParams = this.partMap[filterValue.part];
-            var singleValue = filterValue.value[params.valueProp];
+            var singleValue = filterValue.value[operatorParams.valueProp];
             var rightOperand;
             var variableMatch;
 
@@ -316,7 +316,7 @@ define(function(require) {
                 rightOperand = new ConstantNode(singleValue);
             }
 
-            return new BinaryNode(params.operator, leftOperand, rightOperand);
+            return new BinaryNode(operatorParams.operator, leftOperand, rightOperand);
         }
     });
 

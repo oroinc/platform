@@ -87,19 +87,19 @@ define(function(require) {
         translate: function(leftOperand, filterValue) {
             var rightOperand;
             var value = filterValue.value;
-            var params = this.operatorMap[filterValue.type];
+            var operatorParams = this.operatorMap[filterValue.type];
 
-            if (params.hasArrayValue) {
+            if (operatorParams.hasArrayValue) {
                 rightOperand = tools.createArrayNode(this.splitValues(value));
-            } else if (params.valueModifier) {
-                rightOperand = tools.createFunctionNode(params.valueModifier, [value]);
-            } else if ('value' in params) {
-                rightOperand = new ConstantNode(params.value);
+            } else if (operatorParams.valueModifier) {
+                rightOperand = tools.createFunctionNode(operatorParams.valueModifier, [value]);
+            } else if ('value' in operatorParams) {
+                rightOperand = new ConstantNode(operatorParams.value);
             } else {
                 rightOperand = new ConstantNode(filterValue.value);
             }
 
-            return new BinaryNode(params.operator, leftOperand, rightOperand);
+            return new BinaryNode(operatorParams.operator, leftOperand, rightOperand);
         }
     });
 

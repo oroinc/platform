@@ -49,7 +49,7 @@ define(function(require) {
             _.each(cases, function(testCase, caseName) {
                 it('when field value is `' + caseName +'`', function() {
                     var leftOperand = tools.createGetAttrNode('foo.bar');
-                    var expectedAST = new BinaryNode('==', leftOperand, testCase[1]);
+                    var expectedAST = new BinaryNode('=', leftOperand, testCase[1]);
 
                     expect(translator.test(testCase[0], filterConfig)).toBe(true);
                     expect(translator.translate(leftOperand, testCase[0])).toEqual(expectedAST);

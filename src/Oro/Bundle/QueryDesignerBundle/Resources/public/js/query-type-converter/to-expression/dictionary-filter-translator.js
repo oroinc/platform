@@ -5,6 +5,7 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
+    var tools = ExpressionLanguageLibrary.tools;
 
     /**
      * @inheritDoc
@@ -24,11 +25,22 @@ define(function(require) {
          */
         filterType: 'dictionary',
 
+        /**
+         * @inheritDoc
+         */
         operatorMap: {
-            1: 'in', // TYPE_IN (is any of)
-            2: 'not in', // TYPE_NOT_IN (is not any of)
-            3: '=', // EQUAL
-            4: '!=' // NOT_EQUAL
+            1: { // TYPE_IN (is any of)
+                operator: 'in'
+            },
+            2: { // TYPE_NOT_IN (is not any of)
+                operator: 'not in'
+            },
+            3: { // EQUAL
+                operator: '='
+            },
+            4: { // NOT_EQUAL
+                operator: '!='
+            }
         },
 
         /**
@@ -53,11 +65,10 @@ define(function(require) {
          * @inheritDoc
          */
         translate: function(leftOperand, filterValue) {
-            return new BinaryNode(
-                this.operatorMap[filterValue.type],
-                leftOperand,
-                ExpressionLanguageLibrary.tools.createArrayNode(filterValue.value)
-            );
+            var operatorParams = this.operatorMap[filterValue.type];
+            var rightOperand = tools.createArrayNode(filterValue.value);
+
+            return new BinaryNode(operatorParams.operator, leftOperand, rightOperand);
         }
     });
 
