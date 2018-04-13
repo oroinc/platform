@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var NumberFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
@@ -12,84 +11,91 @@ define(function(require) {
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator', function() {
         var translator;
-        var filterConfig;
+        var filterConfig = {
+            type: 'number',
+            name: 'number',
+            choices: [
+                {value: '1'},
+                {value: '2'},
+                {value: '3'},
+                {value: '4'},
+                {value: '5'},
+                {value: '6'},
+                {value: '7'},
+                {value: '8'},
+                {value: '9'},
+                {value: '10'},
+                {value: 'filter_empty_option'},
+                {value: 'filter_not_empty_option'}
+            ]
+        };
 
         beforeEach(function() {
-            filterConfig = {
-                type: 'number',
-                name: 'number',
-                choices: [
-                    {value: '1'},
-                    {value: '2'},
-                    {value: '3'},
-                    {value: '4'},
-                    {value: '5'},
-                    {value: '6'},
-                    {value: '7'},
-                    {value: '8'},
-                    {value: '9'},
-                    {value: '10'},
-                    {value: 'filter_empty_option'},
-                    {value: 'filter_not_empty_option'}
-                ]
-            };
-
             translator = new NumberFilterTranslator();
         });
 
-        it('can\'t translate condition because of unknown criterion type', function() {
-            expect(translator.test({type: 'qux', value: 1}, filterConfig)).toBe(false);
-        });
-
-        it('can\'t translate condition because of missing criterion type', function() {
-            expect(translator.test({value: 1}, filterConfig)).toBe(false);
-        });
-
-        describe('translates valid condition', function() {
+        describe('can not translate filter value', function() {
             var cases = {
-                'equals or greater than': [
+                'when criterion type is unknown': [{
+                    type: 'qux',
+                    value: 1
+                }],
+                'when missing criterion type': [{
+                    value: 1
+                }]
+            };
+
+            jasmine.itEachCase(cases, function(filterValue) {
+                expect(translator.test(filterValue, filterConfig)).toBe(false);
+            });
+        });
+
+        describe('translate filter value', function() {
+            var createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
+            var cases = {
+                'when filter has `equals or greater than` type': [
                     {
                         type: '1',
                         value: 10
                     },
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('>=', createLeftOperand(), new ConstantNode(10))
                 ],
-                'greater than': [
+                'when filter has `greater than` type': [
                     {
                         type: '2',
                         value: '10'
                     },
-                    new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('>', createLeftOperand(), new ConstantNode(10))
                 ],
-                'is equal to': [
+                'when filter has `is equal to` type': [
                     {
                         type: '3',
                         value: 10.5
                     },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode(10.5))
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode(10.5))
                 ],
-                'is not equals to': [
+                'when filter has `is not equals to` type': [
                     {
                         type: '4',
                         value: 10
                     },
-                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('!=', createLeftOperand(), new ConstantNode(10))
                 ],
-                'equals or less than': [
+                'when filter has `equals or less than` type': [
                     {
                         type: '5',
                         value: '10'
                     },
-                    new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('<=', createLeftOperand(), new ConstantNode(10))
                 ],
-                'less than': [
+                'when filter has `less than` type': [
                     {
                         type: '6',
                         value: 10
                     },
-                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('<', createLeftOperand(), new ConstantNode(10))
                 ],
-                'between': [
+                'when filter has `between` type': [
                     {
                         type: '7',
                         value: 10,
@@ -97,11 +103,11 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(0)),
-                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                        new BinaryNode('>=', createLeftOperand(), new ConstantNode(0)),
+                        new BinaryNode('<=', createLeftOperand(), new ConstantNode(10))
                     )
                 ],
-                'not between': [
+                'when filter has `not between` type': [
                     {
                         type: '8',
                         value: '0',
@@ -109,11 +115,11 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(0)),
-                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                        new BinaryNode('<', createLeftOperand(), new ConstantNode(0)),
+                        new BinaryNode('>', createLeftOperand(), new ConstantNode(10))
                     )
                 ],
-                'range and value_end less them value': [
+                'when filter has `range and value_end less them value` type': [
                     {
                         type: '7',
                         value: 10,
@@ -121,11 +127,11 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(1)),
-                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                        new BinaryNode('>=', createLeftOperand(), new ConstantNode(1)),
+                        new BinaryNode('<=', createLeftOperand(), new ConstantNode(10))
                     )
                 ],
-                'range and values are string': [
+                'when filter has `range and values are string` type': [
                     {
                         type: '7',
                         value: '10',
@@ -133,63 +139,59 @@ define(function(require) {
                     },
                     new BinaryNode(
                         'and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode(1)),
-                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                        new BinaryNode('>=', createLeftOperand(), new ConstantNode(1)),
+                        new BinaryNode('<=', createLeftOperand(), new ConstantNode(10))
                     )
                 ],
-                'range and value is empty': [
+                'when filter has `range and value is empty` type': [
                     {
                         type: '8',
                         value: '',
                         value_end: 10
                     },
-                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('<', createLeftOperand(), new ConstantNode(10))
                 ],
-                'range and value_end is empty': [
+                'when filter has `range and value_end is empty` type': [
                     {
                         type: '8',
                         value: 10,
                         value_end: ''
                     },
-                    new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode(10))
+                    new BinaryNode('>', createLeftOperand(), new ConstantNode(10))
                 ],
-                'is any of': [
+                'when filter has `is any of` type': [
                     {
                         type: '9',
                         value: '1, 2'
                     },
-                    new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([1, 2]))
+                    new BinaryNode('in', createLeftOperand(), createArrayNode([1, 2]))
                 ],
-                'is not any of': [
+                'when filter has `is not any of` type': [
                     {
                         type: '10',
                         value: '1, 2'
                     },
-                    new BinaryNode('not in', createGetAttrNode('foo.bar'), createArrayNode([1, 2]))
+                    new BinaryNode('not in', createLeftOperand(), createArrayNode([1, 2]))
                 ],
-                'is empty': [
+                'when filter has `is empty` type': [
                     {
                         type: 'filter_empty_option'
                     },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode(0))
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode(0))
                 ],
-                'is not empty': [
+                'when filter has `is not empty` type': [
                     {
                         type: 'filter_not_empty_option'
                     },
-                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode(0))
+                    new BinaryNode('!=', createLeftOperand(), new ConstantNode(0))
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it('when filter has `' + caseName + '` type', function() {
-                    var leftOperand = createGetAttrNode('foo.bar');
-                    var filterValue = testCase[0];
-                    var expectedAST = testCase[1];
+            jasmine.itEachCase(cases, function(filterValue, expectedAST) {
+                var leftOperand = createLeftOperand();
 
-                    expect(translator.test(filterValue, filterConfig)).toBe(true);
-                    expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
-                });
+                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });
     });

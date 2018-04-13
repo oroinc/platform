@@ -1,59 +1,61 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var BooleanFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var tools = ExpressionLanguageLibrary.tools;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', function() {
         var translator;
-        var filterConfig;
+        var filterConfig = {
+            type: 'boolean',
+            name: 'boolean',
+            choices: [
+                {value: '1'},
+                {value: '2'}
+            ]
+        };
 
         beforeEach(function() {
             translator = new BooleanFilterTranslator();
-
-            filterConfig = {
-                type: 'boolean',
-                name: 'boolean',
-                choices: [
-                    {value: '1'},
-                    {value: '2'}
-                ]
-            };
         });
 
-        it('can\'t translate condition because of incorrect value type', function() {
-            expect(translator.test({value: ['1', '2']}, filterConfig)).toBe(false);
-        });
-
-        it('can\'t translate condition because of missing value', function() {
-            expect(translator.test({type: '1'}, filterConfig)).toBe(false);
-        });
-
-        describe('can translate filterValue', function() {
+        describe('can not translate filter value', function() {
             var cases = {
-                yes: [
-                    {value: '1'},
-                    new ConstantNode(true)
+                'when incorrect value type': [
+                    {value: ['1', '2']}
                 ],
-                no: [
-                    {value: '2'},
-                    new ConstantNode(false)
+                'when unknown value': [
+                    {value: '3'}
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it('when field value is `' + caseName +'`', function() {
-                    var leftOperand = tools.createGetAttrNode('foo.bar');
-                    var expectedAST = new BinaryNode('=', leftOperand, testCase[1]);
+            jasmine.itEachCase(cases, function(filterValue) {
+                expect(translator.test(filterValue, filterConfig)).toBe(false);
+            });
+        });
 
-                    expect(translator.test(testCase[0], filterConfig)).toBe(true);
-                    expect(translator.translate(leftOperand, testCase[0])).toEqual(expectedAST);
-                });
+        describe('translate filter value', function() {
+            var createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
+            var cases = {
+                'when field value is `yes`': [
+                    {value: '1'},
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode(true))
+                ],
+                'when field value is `no`': [
+                    {value: '2'},
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode(false))
+                ]
+            };
+
+            jasmine.itEachCase(cases, function(filterValue, expectedAST) {
+                var leftOperand = createLeftOperand();
+
+                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });
     });

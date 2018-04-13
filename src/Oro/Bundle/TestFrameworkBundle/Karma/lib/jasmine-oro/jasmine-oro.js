@@ -1,4 +1,4 @@
-(function(jasmine) {
+(function(j$) {
     'use strict';
 
     /**
@@ -9,10 +9,10 @@
      * @param {Array.<Function|Object>} props - Array of spy functions or spy objects.
      * @return {Object}
      */
-    jasmine.combineSpyObj = function(baseName, props) {
-        var baseNameIsCollection = jasmine.isObject_(baseName) || jasmine.isArray_(baseName);
+    j$.combineSpyObj = function(baseName, props) {
+        var baseNameIsCollection = j$.isObject_(baseName) || j$.isArray_(baseName);
 
-        if (baseNameIsCollection && jasmine.util.isUndefined(props)) {
+        if (baseNameIsCollection && j$.util.isUndefined(props)) {
             props = baseName;
             baseName = 'unknown';
         }
@@ -20,23 +20,23 @@
         var obj = {};
         var spiesWereSet = false;
 
-        if (!jasmine.isArray_(props)) {
+        if (!j$.isArray_(props)) {
             throw new Error('combineSpyObj requires a array of spies or spyObjects to combine spies object');
         }
 
         props.forEach(function(prop) {
             var methodName;
 
-            if (jasmine.isSpy(prop)) {
+            if (j$.isSpy(prop)) {
                 methodName = prop.and.identity();
                 prop.and.identity = function() {
                     return baseName + '.' + methodName;
                 };
                 obj[methodName] = prop;
                 spiesWereSet = true;
-            } else if (jasmine.isObject_(prop)) {
+            } else if (j$.isObject_(prop)) {
                 for (var propName in prop) {
-                    if (prop.hasOwnProperty(propName) && jasmine.isSpy(prop[propName])) {
+                    if (prop.hasOwnProperty(propName) && j$.isSpy(prop[propName])) {
                         var identity = prop[propName].and.identity();
                         methodName = identity.substr(0, identity.indexOf('.'));
                         obj[methodName] = prop;
@@ -52,5 +52,60 @@
         }
 
         return obj;
+    };
+
+    var itSyncCase = function(name, handler, args) {
+        it(name, function() {
+            handler.apply(this, args);
+        });
+    };
+
+    var itAsyncCase = function(name, handler, args) {
+        it(name, function(done) {
+            handler.apply(this, [done].concat(args));
+        });
+    };
+
+    /**
+     * Implements approach for tests data provider
+     *
+     * @param {Object.<string, Array>} cases
+     * @param {Function} caseHandler
+     */
+    j$.itEachCase = function(cases, caseHandler) {
+        if (!j$.isObject_(cases)) {
+            throw new Error('itEachCase expects a object as first argument; received ' + j$.getType_(cases));
+        }
+        if (!j$.isFunction_(caseHandler)) {
+            throw new Error('itEachCase expects a function as second argument; received ' + j$.getType_(caseHandler));
+        }
+
+        var casesNames = Object.keys(cases);
+        var handlerArgsLength = caseHandler.length;
+        var caseArgsLength = cases[casesNames[0]].length;
+        var method;
+        switch (handlerArgsLength - caseArgsLength) {
+            case 0:
+                method = itSyncCase;
+                break;
+            case 1:
+                method = itAsyncCase;
+                break;
+            default:
+                throw new Error('itEachCase expects cases to have ' + (handlerArgsLength) + ' arguments');
+        }
+
+        casesNames.forEach(function(caseName) {
+            var caseArgs = cases[caseName];
+            if (!j$.isArray_(caseArgs)) {
+                throw new Error('itEachCase expects all case arguments to be an array; ' +
+                    'received ' + j$.getType_(caseArgs) + ' in case "' + caseName + '"');
+            } else if (caseArgs.length !== caseArgsLength) {
+                throw new Error('itEachCase expects all case to have ' + (caseArgsLength) + ' arguments; ' +
+                    'received ' + caseArgs.length + ' arguments in case "' + caseName + '"');
+            }
+
+            method(caseName, caseHandler, caseArgs);
+        });
     };
 })(window.jasmine);

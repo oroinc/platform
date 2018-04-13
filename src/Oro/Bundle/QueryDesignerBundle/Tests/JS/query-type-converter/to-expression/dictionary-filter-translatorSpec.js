@@ -1,81 +1,65 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var DictionaryFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
     var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
+    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator', function() {
         var translator;
-        var filterConfigs = null;
-
-        function createGetFieldAST() {
-            return new GetAttrNode(
-                new NameNode('foo'),
-                new ConstantNode('bar'),
-                new ArgumentsNode(),
-                GetAttrNode.PROPERTY_CALL
-            );
-        }
+        var filterConfigs = {
+            'dictionary': {
+                type: 'dictionary',
+                name: 'dictionary',
+                choices: [{value: '1'}, {value: '2'}]
+            },
+            'enum': {
+                type: 'dictionary',
+                name: 'enum',
+                choices: [{value: '1'}, {value: '2'}]
+            },
+            'tag': {
+                type: 'dictionary',
+                name: 'tag',
+                choices: [{value: '1'}, {value: '2'}, {value: '3'}]
+            },
+            'multicurrency': {
+                type: 'dictionary',
+                name: 'multicurrency',
+                choices: [{value: '1'}, {value: '2'}]
+            }
+        };
 
         beforeEach(function() {
-            filterConfigs = {
-                'dictionary': {
-                    type: 'dictionary',
-                    name: 'dictionary',
-                    choices: [{value: '1'}, {value: '2'}]
-                },
-                'enum': {
-                    type: 'dictionary',
-                    name: 'enum',
-                    choices: [{value: '1'}, {value: '2'}]
-                },
-                'tag': {
-                    type: 'dictionary',
-                    name: 'tag',
-                    choices: [{value: '1'}, {value: '2'}, {value: '3'}]
-                },
-                'multicurrency': {
-                    type: 'dictionary',
-                    name: 'multicurrency',
-                    choices: [{value: '1'}, {value: '2'}]
-                }
-            };
-
             translator = new DictionaryFilterTranslator();
         });
 
-        describe('test valid conditions', function() {
+        describe('test filter value against filter config', function() {
             var cases = {
                 'dictionary filter': [
-                    'dictionary',
                     {
                         type: '1',
                         value: ['3', '5', '6'],
                         params: {
                             'class': 'Oro\\Entity\\User'
                         }
-                    }
+                    },
+                    filterConfigs['dictionary']
                 ],
                 'enum filter': [
-                    'enum',
                     {
                         type: '2',
                         value: ['expired', 'locked'],
                         params: {
                             'class': 'Extend\\Entity\\Status'
                         }
-                    }
+                    },
+                    filterConfigs['enum']
                 ],
                 'tag filter': [
-                    'tag',
                     {
                         type: '3',
                         value: ['6', '5'],
@@ -83,66 +67,58 @@ define(function(require) {
                             'class': 'Oro\\Entity\\Tag',
                             'entityClass': 'Oro\\Entity\\User'
                         }
-                    }
+                    },
+                    filterConfigs['tag']
                 ],
                 'multicurrency filter': [
-                    'multicurrency',
-                    {
-                        type: '1',
-                        value: ['UAH', 'EUR']
-                    }
-                ]
-            };
-
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    var filterConfig = filterConfigs[testCase[0]];
-
-                    expect(translator.test(testCase[1], filterConfig)).toBe(true);
-                });
-            });
-        });
-
-        describe('test invalid conditions', function() {
-            var cases = {
-                'unknown criterion type': [
-                    'enum',
-                    {
-                        type: '3',
-                        value: ['1', '2']
-                    }
-                ],
-                'invalid value': [
-                    'multicurrency',
-                    {
-                        type: '1',
-                        value: {1: 'UAH', 2: 'EUR'}
-                    }
-                ]
-            };
-
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    var filterConfig = filterConfigs[testCase[0]];
-
-                    expect(translator.test(testCase[1], filterConfig)).toBe(false);
-                });
-            });
-        });
-
-        describe('test invalid conditions', function() {
-            var cases = {
-                'translate `is any of` condition': [
-                    'multicurrency',
                     {
                         type: '1',
                         value: ['UAH', 'EUR']
                     },
-                    'in',
-                    createArrayNode(['UAH', 'EUR'])
+                    filterConfigs['multicurrency']
+                ]
+            };
+
+            jasmine.itEachCase(cases, function(filterValue, filterConfig) {
+                expect(translator.test(filterValue, filterConfig)).toBe(true);
+            });
+        });
+
+        describe('can not translate filter value', function() {
+            var cases = {
+                'when unknown criterion type': [
+                    {
+                        type: '3',
+                        value: ['1', '2']
+                    },
+                    filterConfigs['enum']
                 ],
-                'translate `is not any of` condition': [
-                    'dictionary',
+                'when invalid value': [
+                    {
+                        type: '1',
+                        value: {1: 'UAH', 2: 'EUR'}
+                    },
+                    filterConfigs['multicurrency']
+                ]
+            };
+
+            jasmine.itEachCase(cases, function(filterValue, filterConfig) {
+                expect(translator.test(filterValue, filterConfig)).toBe(false);
+            });
+        });
+
+        describe('translate filter value', function() {
+            var createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
+            var cases = {
+                'when filter has `is any of` filter value': [
+                    {
+                        type: '1',
+                        value: ['UAH', 'EUR']
+                    },
+                    filterConfigs['multicurrency'],
+                    new BinaryNode('in', createLeftOperand(), createArrayNode(['UAH', 'EUR']))
+                ],
+                'when filter has `is not any of` filter value': [
                     {
                         type: '2',
                         value: ['3', '5'],
@@ -150,11 +126,10 @@ define(function(require) {
                             'class': 'Oro\\Entity\\User'
                         }
                     },
-                    'not in',
-                    createArrayNode(['3', '5'])
+                    filterConfigs['dictionary'],
+                    new BinaryNode('not in', createLeftOperand(), createArrayNode(['3', '5']))
                 ],
-                'translate `equal` condition': [
-                    'tag',
+                'when filter has `equal` filter value': [
                     {
                         type: '3',
                         value: ['6', '5'],
@@ -163,23 +138,16 @@ define(function(require) {
                             'entityClass': 'Oro\\Entity\\User'
                         }
                     },
-                    '=',
-                    createArrayNode(['6', '5'])
+                    filterConfigs['tag'],
+                    new BinaryNode('=', createLeftOperand(), createArrayNode(['6', '5']))
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    var filterConfig = filterConfigs[testCase[0]];
-                    var expectedAST = new BinaryNode(
-                        testCase[2],
-                        createGetFieldAST(),
-                        testCase[3]
-                    );
+            jasmine.itEachCase(cases, function(filterValue, filterConfig, expectedAST) {
+                var leftOperand = createLeftOperand();
 
-                    expect(translator.test(testCase[1], filterConfig)).toBe(true);
-                    expect(translator.translate(createGetFieldAST(), testCase[1])).toEqual(expectedAST);
-                });
+                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });
     });

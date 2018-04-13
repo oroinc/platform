@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var StringFilterTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
@@ -13,137 +12,115 @@ define(function(require) {
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator', function() {
         var translator;
-        var filterConfig;
+        var filterConfig = {
+            type: 'string',
+            name: 'string',
+            choices: [
+                {value: '1'},
+                {value: '2'},
+                {value: '3'},
+                {value: '4'},
+                {value: '5'},
+                {value: '6'},
+                {value: '7'},
+                {value: 'filter_empty_option'},
+                {value: 'filter_not_empty_option'}
+            ]
+        };
 
         beforeEach(function() {
             translator = new StringFilterTranslator();
+        });
 
-            filterConfig = {
-                type: 'string',
-                name: 'string',
-                choices: [
-                    {value: '1'},
-                    {value: '2'},
-                    {value: '3'},
-                    {value: '4'},
-                    {value: '5'},
-                    {value: '6'},
-                    {value: '7'},
-                    {value: 'filter_empty_option'},
-                    {value: 'filter_not_empty_option'}
-                ]
+        describe('can not translate filter value', function() {
+            var cases = {
+                'when criterion type is unknown': [{
+                    type: 'qux',
+                    value: 'test'
+                }],
+                'when missing criterion type': [{
+                    value: 'test'
+                }]
             };
+
+            jasmine.itEachCase(cases, function(filterValue) {
+                expect(translator.test(filterValue, filterConfig)).toBe(false);
+            });
         });
 
-        it('can\'t translate condition because of unknown criterion type', function() {
-            expect(translator.test({type: 'qux', value: ''}, filterConfig)).toBe(false);
-        });
-
-        it('can\'t translate condition because of missing value', function() {
-            expect(translator.test({type: '1'}, filterConfig)).toBe(false);
-        });
-
-        describe('translates valid filterValue', function() {
-            var cases = [
-                [
-                    // filter type
-                    'contains',
-
-                    // condition filter data
+        describe('translate filter value', function() {
+            var createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
+            var cases = {
+                'when filter has `contains` type': [
                     {
                         type: '1',
                         value: 'baz'
                     },
-
-                    // expected operator
-                    'matches',
-
-                    // expected right operand
-                    createFunctionNode('containsRegExp', ['baz'])
+                    new BinaryNode('matches', createLeftOperand(), createFunctionNode('containsRegExp', ['baz']))
                 ],
-                [
-                    'not contains',
+                'when filter has `not contains` type': [
                     {
                         type: '2',
                         value: 'baz'
                     },
-                    'not matches',
-                    createFunctionNode('containsRegExp', ['baz'])
+                    new BinaryNode('not matches', createLeftOperand(), createFunctionNode('containsRegExp', ['baz']))
                 ],
-                [
-                    'is equal to',
+                'when filter has `is equal to` type': [
                     {
                         type: '3',
                         value: 'baz'
                     },
-                    '=',
-                    new ConstantNode('baz')
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode('baz'))
                 ],
-                [
-                    'starts with',
+                'when filter has `starts with` type': [
                     {
                         type: '4',
                         value: 'baz'
                     },
-                    'matches',
-                    createFunctionNode('startWithRegExp', ['baz'])
+                    new BinaryNode('matches', createLeftOperand(), createFunctionNode('startWithRegExp', ['baz']))
                 ],
-                [
-                    'ends with',
+                'when filter has `ends with` type': [
                     {
                         type: '5',
                         value: 'baz'
                     },
-                    'matches',
-                    createFunctionNode('endWithRegExp', ['baz'])
+                    new BinaryNode('matches', createLeftOperand(), createFunctionNode('endWithRegExp', ['baz']))
                 ],
-                [
-                    'is any of',
+                'when filter has `is any of` type': [
                     {
                         type: '6',
                         value: 'baz, qux'
                     },
-                    'in',
-                    createArrayNode(['baz', 'qux'])
+                    new BinaryNode('in', createLeftOperand(), createArrayNode(['baz', 'qux']))
                 ],
-                [
-                    'is not any of',
+                'when filter has `is not any of` type': [
                     {
                         type: '7',
                         value: 'baz, qux'
                     },
-                    'not in',
-                    createArrayNode(['baz', 'qux'])
+                    new BinaryNode('not in', createLeftOperand(), createArrayNode(['baz', 'qux']))
                 ],
-                [
-                    'is empty',
+                'when filter has `is empty` type': [
                     {
                         type: 'filter_empty_option',
                         value: 'qux'
                     },
-                    '=',
-                    new ConstantNode('')
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode(''))
                 ],
-                [
-                    'is not empty',
+                'when filter has `is not empty` type': [
                     {
                         type: 'filter_not_empty_option',
                         value: 'qux'
                     },
-                    '!=',
-                    new ConstantNode('')
+                    new BinaryNode('!=', createLeftOperand(), new ConstantNode(''))
                 ]
-            ];
+            };
 
-            _.each(cases, function(testCase) {
-                it('when filter has `' + testCase[0] + '` type', function() {
-                    var filterValue = testCase[1];
-                    var leftOperand = createGetAttrNode('foo.bar');
-                    var expectedAST = new BinaryNode(testCase[2], leftOperand, testCase[3]);
+            jasmine.itEachCase(cases, function(filterValue, expectedAST) {
+                var leftOperand = createLeftOperand();
 
-                    expect(translator.test(filterValue, filterConfig)).toBe(true);
-                    expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
-                });
+                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });
     });
