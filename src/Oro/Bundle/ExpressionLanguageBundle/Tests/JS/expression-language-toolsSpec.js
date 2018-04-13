@@ -1,15 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
+    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
+    var ConditionalNode = ExpressionLanguageLibrary.ConditionalNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
     var FunctionNode = ExpressionLanguageLibrary.FunctionNode;
     var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
     var NameNode = ExpressionLanguageLibrary.NameNode;
     var Node = ExpressionLanguageLibrary.Node;
+    var UnaryNode = ExpressionLanguageLibrary.UnaryNode;
 
     describe('oroexpressionlanguage/js/expression-language-tools', function() {
         describe('isIndexedArrayNode', function() {
@@ -50,10 +52,8 @@ define(function(require) {
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    expect(isIndexedArrayNode(testCase[0])).toEqual(testCase[1]);
-                });
+            jasmine.itEachCase(cases, function(node, expectedResult) {
+                expect(isIndexedArrayNode(node)).toEqual(expectedResult);
             });
         });
 
@@ -96,10 +96,8 @@ define(function(require) {
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    expect(createArrayNode(testCase[0])).toEqual(testCase[1]);
-                });
+            jasmine.itEachCase(cases, function(data, expectedResult) {
+                expect(createArrayNode(data)).toEqual(expectedResult);
             });
         });
 
@@ -144,11 +142,9 @@ define(function(require) {
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    expect(createGetAttrNode(testCase[0])).toEqual(testCase[2]);
-                    expect(createGetAttrNode(testCase[1])).toEqual(testCase[2]);
-                });
+            jasmine.itEachCase(cases, function(array, string, expectedResult) {
+                expect(createGetAttrNode(array)).toEqual(expectedResult);
+                expect(createGetAttrNode(string)).toEqual(expectedResult);
             });
         });
 
@@ -156,28 +152,26 @@ define(function(require) {
             var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
 
             var cases = {
-                'function without arguments': {
-                    funcName: 'foo',
-                    funcArgs: void 0,
-                    exected: new FunctionNode('foo', new Node([]))
-                },
-                'function with arguments': {
-                    funcName: 'foo',
-                    funcArgs: ['bar', null, true, 3.14, new NameNode('bar')],
-                    exected: new FunctionNode('foo', new Node([
+                'function without arguments': [
+                    'foo',
+                    void 0,
+                    new FunctionNode('foo', new Node([]))
+                ],
+                'function with arguments': [
+                    'foo',
+                    ['bar', null, true, 3.14, new NameNode('bar')],
+                    new FunctionNode('foo', new Node([
                         new ConstantNode('bar'),
                         new ConstantNode(null),
                         new ConstantNode(true),
                         new ConstantNode(3.14),
                         new NameNode('bar')
                     ]))
-                }
+                ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    expect(createFunctionNode(testCase.funcName, testCase.funcArgs)).toEqual(testCase.exected);
-                });
+            jasmine.itEachCase(cases, function(funcName, funcArgs, expectedResult) {
+                expect(createFunctionNode(funcName, funcArgs)).toEqual(expectedResult);
             });
         });
 
@@ -243,10 +237,108 @@ define(function(require) {
                 ]
             };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    expect(compareAST(testCase[0], testCase[1])).toEqual(testCase[2]);
-                });
+            jasmine.itEachCase(cases, function(firstNode, secondNode, expectedResult) {
+                expect(compareAST(firstNode, secondNode)).toEqual(expectedResult);
+            });
+        });
+
+        describe('cloneAST', function() {
+            var originalAST;
+            var clonedAST;
+
+            beforeEach(function() {
+                originalAST = new ConditionalNode(
+                    new BinaryNode(
+                        '>=',
+                        new NameNode('quz'),
+                        new ConstantNode(42)
+                    ),
+                    new GetAttrNode(
+                        new GetAttrNode(
+                            new GetAttrNode(
+                                new NameNode('foo'),
+                                new ConstantNode('bar'),
+                                new ArgumentsNode(),
+                                GetAttrNode.PROPERTY_CALL
+                            ),
+                            new ConstantNode('baz'),
+                            new ArgumentsNode(),
+                            GetAttrNode.ARRAY_CALL
+                        ),
+                        new ConstantNode('baq'),
+                        (function() {
+                            var node = new ArgumentsNode();
+                            node.addElement(new NameNode('bar'));
+                            node.addElement(new ConstantNode(42));
+                            return node;
+                        })(),
+                        GetAttrNode.METHOD_CALL
+                    ),
+                    new FunctionNode('foo', new Node([
+                        new UnaryNode('not', new NameNode('bar')),
+                        (function() {
+                            var node = new ArrayNode();
+                            node.addElement(new ConstantNode('foo'));
+                            node.addElement(new NameNode('bar'), new ConstantNode(true));
+                            return node;
+                        })()
+                    ]))
+                );
+                clonedAST = ExpressionLanguageLibrary.tools.cloneAST(originalAST);
+            });
+
+            it('AST is identical', function() {
+                expect(clonedAST).toEqual(originalAST);
+            });
+
+            it('ConditionalNode is a different instances', function() {
+                expect(clonedAST).toEqual(jasmine.any(ConditionalNode));
+                expect(clonedAST).not.toBe(originalAST);
+            });
+
+            it('BinaryNode is a different instances', function() {
+                expect(clonedAST.nodes[0]).toEqual(jasmine.any(BinaryNode));
+                expect(clonedAST.nodes[0]).not.toBe(originalAST.nodes[0]);
+            });
+
+            it('NameNode is a different instances', function() {
+                expect(clonedAST.nodes[0].nodes[0]).toEqual(jasmine.any(NameNode));
+                expect(clonedAST.nodes[0].nodes[0]).not.toBe(originalAST.nodes[0].nodes[0]);
+            });
+
+            it('ConstantNode is a different instances', function() {
+                expect(clonedAST.nodes[0].nodes[1]).toEqual(jasmine.any(ConstantNode));
+                expect(clonedAST.nodes[0].nodes[1]).not.toBe(originalAST.nodes[0].nodes[1]);
+            });
+
+            it('GetAttrNode is a different instances', function() {
+                expect(clonedAST.nodes[1]).toEqual(jasmine.any(GetAttrNode));
+                expect(clonedAST.nodes[1]).not.toBe(originalAST.nodes[1]);
+            });
+
+            it('ArgumentsNode is a different instances', function() {
+                expect(clonedAST.nodes[1].nodes[2]).toEqual(jasmine.any(ArgumentsNode));
+                expect(clonedAST.nodes[1].nodes[2]).not.toBe(originalAST.nodes[1].nodes[2]);
+            });
+
+            it('FunctionNode is a different instances', function() {
+                expect(clonedAST.nodes[2]).toEqual(jasmine.any(FunctionNode));
+                expect(clonedAST.nodes[2]).not.toBe(originalAST.nodes[2]);
+            });
+
+            it('Node is a different instances', function() {
+                expect(clonedAST.nodes[2].nodes[0]).toEqual(jasmine.any(Node));
+                expect(clonedAST.nodes[2].nodes[0]).not.toBe(originalAST.nodes[2].nodes[0]);
+            });
+
+            it('UnaryNode is a different instances', function() {
+                expect(clonedAST.nodes[2].nodes[0].nodes[0]).toEqual(jasmine.any(UnaryNode));
+                expect(clonedAST.nodes[2].nodes[0].nodes[0]).not.toBe(originalAST.nodes[2].nodes[0].nodes[0]);
+            });
+
+            it('ArrayNode is a different instances', function() {
+                expect(clonedAST.nodes[2].nodes[0].nodes[1]).toEqual(jasmine.any(ArrayNode));
+                expect(clonedAST.nodes[2].nodes[0].nodes[1]).not.toBe(originalAST.nodes[2].nodes[0].nodes[1]);
             });
         });
     });

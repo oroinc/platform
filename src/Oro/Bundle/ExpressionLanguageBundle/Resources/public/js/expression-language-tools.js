@@ -134,27 +134,46 @@ define(function(require) {
         },
 
         cloneAST: function(node) {
-            var args = [];
+            var result;
+            var args;
+            var Constructor = node.constructor;
 
-            _.each(node.nodes, function(node) {
-                if (node instanceof NameNode) {
-                    args.push('name' in node.attrs
-                        ? new NameNode(node.attrs.name)
-                        : new NameNode()
+            switch (Constructor.name) {
+                case 'ArgumentsNode':
+                case 'ArrayNode':
+                    result = new Constructor();
+                    node.getKeyValuePairs().forEach(function(pair) {
+                        result.addElement(
+                            expressionLanguageTools.cloneAST(pair.value),
+                            expressionLanguageTools.cloneAST(pair.key)
+                        );
+                    });
+                    result.index = node.index;
+                    break;
+                case 'Node':
+                    result = new Node(
+                        node.nodes.map(expressionLanguageTools.cloneAST),
+                        Object.assign({}, node.attrs)
                     );
-                } else if (node instanceof ConstantNode) {
-                    args.push('value' in node.attrs
-                        ? new ConstantNode(node.attrs.value)
-                        : new ConstantNode()
-                    );
-                } else if (node instanceof ArgumentsNode) {
-                    args.push(new ArgumentsNode());
-                }
-            }, this);
+                    break;
+                case 'GetAttrNode':
+                    args = node.nodes.map(expressionLanguageTools.cloneAST).concat(Object.values(node.attrs));
+                    result = new (Function.prototype.bind.apply(Constructor, [null].concat(args)))();
+                    break;
+                case 'BinaryNode':
+                case 'ConditionalNode':
+                case 'ConstantNode':
+                case 'FunctionNode':
+                case 'NameNode':
+                case 'UnaryNode':
+                    args = Object.values(node.attrs).concat(node.nodes.map(expressionLanguageTools.cloneAST));
+                    result = new (Function.prototype.bind.apply(Constructor, [null].concat(args)))();
+                    break;
+                default:
+                    throw new Error('Can not clone unknown type of AST node `' + node.constructor.name + '`');
+            }
 
-            args.push(node.attrs.type);
-
-            return new (Function.prototype.bind.apply(GetAttrNode, [null].concat(args)))();
+            return result;
         }
     };
 
