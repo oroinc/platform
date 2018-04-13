@@ -27,9 +27,19 @@ define(function(require) {
         filterType: 'boolean',
 
         /**
-         * @inheritDoc
+         * Used in expression BinaryNode
+         * @type {String}
          */
-        operator: '==',
+        operator: '=',
+
+        /**
+         * Map expression value to filter value
+         * @type {Object.<string, string>}
+         */
+        valueMap: {
+            'true': '1',
+            'false': '2'
+        },
 
         /**
          * @inheritDoc
@@ -80,7 +90,7 @@ define(function(require) {
          * @returns {boolean}
          */
         convertToBoolean: function(value) {
-            return _.isEqual(value, '1');
+            return value === this.valueMap['true'];
         }
     });
 
