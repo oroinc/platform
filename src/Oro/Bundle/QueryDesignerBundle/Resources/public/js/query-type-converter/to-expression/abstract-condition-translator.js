@@ -2,35 +2,11 @@ define(function(require) {
     'use strict';
 
     var jsonSchemaValidator = require('oroui/js/tools/json-schema-validator');
-    var StringFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator');
 
     /**
      * Defines interface and implements base functionality of ConditionTranslatorToExpression
-     *
-     * @param {FieldIdTranslatorToExpression} fieldIdTranslator
-     * @param {FilterConfigProvider} filterConfigProvider
-     * @constructor
-     * @throws TypeError if instance of FieldIdTranslatorToExpression is missing
      */
-    var AbstractConditionTranslator = function AbstractConditionTranslatorToExpression(
-        fieldIdTranslator,
-        filterConfigProvider
-    ) {
-        if (!fieldIdTranslator) {
-            throw new TypeError(
-                'Instance of `FieldIdTranslatorToExpression` is required for `FilterTranslatorToExpression`');
-        }
-        if (!filterConfigProvider) {
-            throw new TypeError( 'Instance of `FilterConfigProvider` is required for `FilterTranslatorToExpression`');
-        }
-        this.fieldIdTranslator = fieldIdTranslator;
-        this.filterConfigProvider = filterConfigProvider;
-        // TODO: move store of available filter translators to separate module
-        this.filterTranslators = {
-            string: new StringFilterTranslator()
-        };
-    };
+    var AbstractConditionTranslator = function AbstractConditionTranslatorToExpression() {};
 
     Object.assign(AbstractConditionTranslator.prototype, {
         constructor: AbstractConditionTranslator,
@@ -56,25 +32,7 @@ define(function(require) {
          */
         test: function(condition) {
             var schema = this.getConditionSchema();
-
             return jsonSchemaValidator.validate(schema, condition);
-        },
-
-        /**
-         * Finds appropriate filter translate
-         * @param {Object} condition
-         * @return {AbstractFilterTranslator|null}
-         * @protected
-         */
-        resolveFilterTranslator: function(condition) {
-            var filterConfig = this.filterConfigProvider.getFilterConfigByName(condition.criterion.filter);
-            var filterTranslator = this.filterTranslators[filterConfig.type];
-
-            if (filterTranslator && filterTranslator.test(condition.criterion.data, filterConfig)) {
-                return filterTranslator;
-            }
-
-            return null;
         },
 
         /**
@@ -87,24 +45,20 @@ define(function(require) {
         tryToTranslate: function(condition) {
             var result = null;
             if (this.test(condition)) {
-                var filterTranslator = this.resolveFilterTranslator(condition);
-                if (filterTranslator) {
-                    result = this.translate(condition, filterTranslator);
-                }
+                result = this.translate(condition);
             }
             return result;
         },
 
         /**
-         * Takes condition object and appropriated filter translator translates it to ExpressionLanguage AST
+         * Takes condition object and translates it to ExpressionLanguage AST
          *
          * @param {Object} condition
-         * @param {AbstractFilterTranslator} filterTranslator
          * @return {Node|null} ExpressionLanguage AST node
          * @protected
          * @abstract
          */
-        translate: function(condition, filterTranslator) {
+        translate: function(condition) {
             throw new Error('Method `translate` has to be defined in descendant FilterTranslatorToExpression');
         }
     });
