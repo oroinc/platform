@@ -106,6 +106,10 @@ class TranslatableEntityType extends AbstractType
         });
 
         $resolver->setNormalizer('choice_loader', function (Options $options) {
+            if (null !== $options['choices']) {
+                return null;
+            }
+
             return new TranslationChoiceLoader(
                 $options['class'],
                 $options['query_builder'],
