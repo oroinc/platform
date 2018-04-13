@@ -1,81 +1,71 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var exposure = require('requirejs-exposure')
-        .disclose('oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator');
     var FieldConditionTranslator =
         require('oroquerydesigner/js/query-type-converter/to-expression/field-condition-translator');
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArgumentsNode = ExpressionLanguageLibrary.ArgumentsNode;
     var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
+    var createLeftOperand = ExpressionLanguageLibrary.tools.createGetAttrNode.bind(null, 'foo.bar');
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/field-condition-translator', function() {
         var translator;
         var filterConfigProviderMock;
         var stringFilterTranslatorMock;
         var fieldIdTranslatorMock;
-
-        function createGetFieldAST() {
-            return new GetAttrNode(
-                new NameNode('foo'),
-                new ConstantNode('bar'),
-                new ArgumentsNode(),
-                GetAttrNode.PROPERTY_CALL
-            );
-        }
-
-        function getFilterConfig() {
-            return {
+        var filterConfigs = {
+            string: {
                 type: 'string',
                 name: 'string',
                 choices: [
                     {value: '1'},
                     {value: '2'},
-                    {value: '3'},
-                    {value: '4'},
-                    {value: '5'},
-                    {value: '6'},
-                    {value: '7'},
-                    {value: 'filter_empty_option'},
-                    {value: 'filter_not_empty_option'}
+                    {value: '3'}
                 ]
-            };
-        }
+            },
+            number: {
+                type: 'number',
+                name: 'number',
+                choices: [
+                    {value: '1'},
+                    {value: '2'},
+                    {value: '3'}
+                ]
+            }
+        };
 
         beforeEach(function() {
-            fieldIdTranslatorMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('translate').and.returnValue(createGetFieldAST())
+            fieldIdTranslatorMock = jasmine.combineSpyObj('fieldIdTranslator', [
+                jasmine.createSpy('translate').and.returnValue(createLeftOperand())
             ]);
 
             filterConfigProviderMock = jasmine.combineSpyObj('filterConfigProvider', [
-                jasmine.createSpy('getFilterConfigByName').and.returnValue(getFilterConfig())
+                jasmine.createSpy('getFilterConfigByName').and.callFake(function(name) {
+                    return filterConfigs[name];
+                })
             ]);
 
-            stringFilterTranslatorMock = jasmine.combineSpyObj('filterConfigProvider', [
+            stringFilterTranslatorMock = jasmine.combineSpyObj('stringFilterTranslator', [
                 jasmine.createSpy('test').and.returnValue(true),
-                jasmine.createSpy('translate').and.returnValue(new BinaryNode(
-                    '=',
-                    createGetFieldAST(),
-                    new ConstantNode('baz')
-                ))
+                jasmine.createSpy('translate').and.returnValue(
+                    new BinaryNode('=', createLeftOperand(), new ConstantNode('baz'))
+                )
             ]);
 
-            exposure.substitute('StringFilterTranslator').by(function() {
-                return stringFilterTranslatorMock;
-            });
+            var filterTranslators = {
+                string: function() {
+                    return stringFilterTranslatorMock;
+                }
+            };
 
-            translator = new FieldConditionTranslator(fieldIdTranslatorMock, filterConfigProviderMock);
+            translator = new FieldConditionTranslator(
+                fieldIdTranslatorMock,
+                filterConfigProviderMock,
+                filterTranslators
+            );
         });
 
-        afterEach(function() {
-            exposure.recover('StringFilterTranslator');
-        });
-
-        it('doesn\'t call filter provider when condition structure doesn\'t fit', function() {
+        it('does not call filter provider when condition structure is not valid', function() {
             translator.tryToTranslate({
                 foo: 'bar'
             });
@@ -107,13 +97,10 @@ define(function(require) {
                     }
                 }
             });
-            expect(stringFilterTranslatorMock.test).toHaveBeenCalledWith(
-                {
-                    type: '3',
-                    value: 'baz'
-                },
-                getFilterConfig()
-            );
+            expect(stringFilterTranslatorMock.test).toHaveBeenCalledWith({
+                type: '3',
+                value: 'baz'
+            });
         });
 
         it('calls field id translator\'s method `translate` with correct column name', function() {
@@ -131,7 +118,7 @@ define(function(require) {
         });
 
         it('translates condition to appropriate AST', function() {
-            var resultAST = translator.tryToTranslate({
+            var result = translator.tryToTranslate({
                 columnName: 'bar',
                 criterion: {
                     filter: 'string',
@@ -141,21 +128,17 @@ define(function(require) {
                     }
                 }
             });
-            var expectedAST = new BinaryNode(
-                '=',
-                createGetFieldAST(),
-                new ConstantNode('baz')
-            );
+            var expectedAST = new BinaryNode('=', createLeftOperand(), new ConstantNode('baz'));
 
-            expect(resultAST).toEqual(expectedAST);
+            expect(result).toEqual(expectedAST);
         });
 
-        describe('can\'t translate condition because of', function() {
+        describe('can not translate condition because of', function() {
             var cases = {
-                'unknown condition structure': {
+                'invalid condition structure': [{
                     foo: 'bar'
-                },
-                'missing column name': {
+                }],
+                'missing column name': [{
                     criterion: {
                         filter: 'string',
                         data: {
@@ -163,13 +146,31 @@ define(function(require) {
                             value: 'baz'
                         }
                     }
-                }
+                }],
+                'unknown filter type': [{
+                    columnName: 'baz',
+                    criterion: {
+                        filter: 'oddnumber',
+                        data: {
+                            type: '3',
+                            value: 7
+                        }
+                    }
+                }],
+                'unavailable filter translator': [{
+                    columnName: 'baz',
+                    criterion: {
+                        filter: 'number',
+                        data: {
+                            type: '3',
+                            value: 7
+                        }
+                    }
+                }]
             };
 
-            _.each(cases, function(condition, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(condition)).toBeNull();
-                });
+            jasmine.itEachCase(cases, function(condition) {
+                expect(translator.tryToTranslate(condition)).toBeNull();
             });
         });
     });

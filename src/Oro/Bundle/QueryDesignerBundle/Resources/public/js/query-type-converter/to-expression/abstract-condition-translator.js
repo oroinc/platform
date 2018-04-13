@@ -109,8 +109,5 @@ define(function(require) {
         }
     });
 
-    /**
-     * @export oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator
-     */
     return AbstractConditionTranslator;
 });
