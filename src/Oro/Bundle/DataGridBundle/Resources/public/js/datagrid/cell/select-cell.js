@@ -72,7 +72,7 @@ define([
          * @inheritDoc
          */
         enterEditMode: function() {
-            if (this.column.get('editable')) {
+            if (this.isEditableColumn()) {
                 SelectCell.__super__.enterEditMode.apply(this, arguments);
             }
         },
