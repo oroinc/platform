@@ -229,15 +229,16 @@ define(function(require) {
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
-            var valueEnd = _.isString(data.value_end) ? this.formatter.toRaw(data.value_end) : data.value_end;
-            this._setInputValue(this.criteriaValueSelectors.value_end, valueEnd);
+            NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+
+            this._setInputValue(this.criteriaValueSelectors.value_end, data.value_end);
             var $typeInput = this.$(this.criteriaValueSelectors.type);
             if ($typeInput.length && data.type !== $typeInput.val()) {
                 this._setInputValue(this.criteriaValueSelectors.type, data.type);
                 this._updateTypeDropdown(data.type);
             }
 
-            return NumberRangeFilter.__super__._writeDOMValue.apply(this, arguments);
+            return this;
         },
 
         /**
@@ -292,6 +293,22 @@ define(function(require) {
             formatted.value_end = this._toDisplayValue(data.value_end);
 
             return formatted;
+        },
+
+        /**
+         * @inheritDoc
+         * @returns {boolean}
+         * @private
+         */
+        _isValid: function() {
+            var rawValue = this.formatter.toRaw(this._readDOMValue().value_end);
+            var validValueEnd = rawValue === void 0 || this._checkNumberRules(rawValue);
+
+            if (!validValueEnd) {
+                return false;
+            } else {
+                return NumberRangeFilter.__super__._isValid.apply(this, arguments);
+            }
         }
     });
 
