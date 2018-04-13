@@ -72,7 +72,7 @@ define(function(require) {
         };
 
         beforeEach(function() {
-            translator = new DateFilterTranslator();
+            translator = new DateFilterTranslator(filterConfig);
         });
 
         describe('can not translate filter value', function() {
@@ -123,7 +123,7 @@ define(function(require) {
             };
 
             jasmine.itEachCase(cases, function(filterValue) {
-                expect(translator.test(filterValue, filterConfig)).toBe(false);
+                expect(translator.test(filterValue)).toBe(false);
             });
         });
 
@@ -483,7 +483,7 @@ define(function(require) {
             jasmine.itEachCase(cases, function(filterValue, expectedAST) {
                 var leftOperand = createLeftOperand();
 
-                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.test(filterValue)).toBe(true);
                 expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });

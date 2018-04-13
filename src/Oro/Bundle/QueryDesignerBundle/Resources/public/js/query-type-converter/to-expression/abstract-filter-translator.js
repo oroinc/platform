@@ -7,9 +7,16 @@ define(function(require) {
     /**
      * Defines interface and implements base functionality of FilterTranslatorToExpression
      *
+     * @param filterConfig
      * @constructor
+     * @throws TypeError if filterConfig is missing
      */
-    var AbstractFilterTranslator = function AbstractFilterTranslatorToExpression() {};
+    var AbstractFilterTranslator = function AbstractFilterTranslatorToExpression(filterConfig) {
+        if (!filterConfig) {
+            throw new TypeError('`filterConfig` is required for `FilterTranslatorToExpression`');
+        }
+        this.filterConfig = filterConfig;
+    };
 
     Object.assign(AbstractFilterTranslator.prototype, {
         constructor: AbstractFilterTranslator,
@@ -46,19 +53,18 @@ define(function(require) {
         },
 
         /**
-         * Takes filterValue object and filterConfig and checks if it has valid structure and can be translated to AST
+         * Takes filterValue object and checks if it has valid structure and can be translated to AST
          *
          * @param {Object} filterValue
-         * @param {Object} filterConfig
          * @return {boolean}
          * @protected
          */
-        test: function(filterValue, filterConfig) {
+        test: function(filterValue) {
             var schema = this.getFilterValueSchema();
 
             return jsonSchemaValidator.validate(schema, filterValue) &&
                 this.testToOperatorMap(filterValue) &&
-                this.testToConfig(filterValue, filterConfig);
+                this.testToConfig(filterValue);
         },
 
         /**
@@ -75,11 +81,10 @@ define(function(require) {
          * Check if the filter type complies to the filter config
          *
          * @param {Object} filterValue
-         * @param {Object} filterConfig
          * @return {boolean}
          */
-        testToConfig: function(filterValue, filterConfig) {
-            return _.any(filterConfig.choices, {value: String(filterValue.type)});
+        testToConfig: function(filterValue) {
+            return _.any(this.filterConfig.choices, {value: String(filterValue.type)});
         },
 
         /**

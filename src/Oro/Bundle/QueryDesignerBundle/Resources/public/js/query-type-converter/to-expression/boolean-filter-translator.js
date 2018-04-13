@@ -68,8 +68,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        testToConfig: function(filterValue, filterConfig) {
-            return _.any(filterConfig.choices, {value: filterValue.value});
+        testToConfig: function(filterValue) {
+            return _.any(this.filterConfig.choices, {value: filterValue.value});
         },
 
         /**

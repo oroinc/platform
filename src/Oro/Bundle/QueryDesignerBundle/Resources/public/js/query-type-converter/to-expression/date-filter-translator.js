@@ -187,16 +187,16 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        testToConfig: function(filterValue, filterConfig) {
+        testToConfig: function(filterValue) {
             var part = filterValue.part;
             var value = filterValue.value;
             var result =
-                DateFilterTranslator.__super__.testToConfig.call(this, filterValue, filterConfig) &&
+                DateFilterTranslator.__super__.testToConfig.call(this, filterValue) &&
                 // check is filter part is available in config
-                _.has(filterConfig.dateParts, part);
+                _.has(this.filterConfig.dateParts, part);
 
             if (result) {
-                var varsConfig = _.result(_.result(filterConfig.externalWidgetOptions, 'dateVars'), part, {});
+                var varsConfig = _.result(_.result(this.filterConfig.externalWidgetOptions, 'dateVars'), part, {});
                 var partParams = this.partMap[part];
 
                 result =

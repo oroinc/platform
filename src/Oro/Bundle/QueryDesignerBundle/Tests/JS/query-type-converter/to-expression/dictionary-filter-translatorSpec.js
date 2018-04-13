@@ -9,7 +9,6 @@ define(function(require) {
     var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
 
     describe('oroquerydesigner/js/query-type-converter/to-expression/dictionary-filter-translator', function() {
-        var translator;
         var filterConfigs = {
             'dictionary': {
                 type: 'dictionary',
@@ -32,10 +31,6 @@ define(function(require) {
                 choices: [{value: '1'}, {value: '2'}]
             }
         };
-
-        beforeEach(function() {
-            translator = new DictionaryFilterTranslator();
-        });
 
         describe('test filter value against filter config', function() {
             var cases = {
@@ -80,7 +75,9 @@ define(function(require) {
             };
 
             jasmine.itEachCase(cases, function(filterValue, filterConfig) {
-                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                var translator = new DictionaryFilterTranslator(filterConfig);
+
+                expect(translator.test(filterValue)).toBe(true);
             });
         });
 
@@ -103,7 +100,9 @@ define(function(require) {
             };
 
             jasmine.itEachCase(cases, function(filterValue, filterConfig) {
-                expect(translator.test(filterValue, filterConfig)).toBe(false);
+                var translator = new DictionaryFilterTranslator(filterConfig);
+
+                expect(translator.test(filterValue)).toBe(false);
             });
         });
 
@@ -144,9 +143,10 @@ define(function(require) {
             };
 
             jasmine.itEachCase(cases, function(filterValue, filterConfig, expectedAST) {
+                var translator = new DictionaryFilterTranslator(filterConfig);
                 var leftOperand = createLeftOperand();
 
-                expect(translator.test(filterValue, filterConfig)).toBe(true);
+                expect(translator.test(filterValue)).toBe(true);
                 expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
             });
         });
