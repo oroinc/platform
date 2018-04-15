@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The metadata loader for non manageable entities.
+ */
 class ObjectMetadataLoader
 {
     /** @var ObjectMetadataFactory */
