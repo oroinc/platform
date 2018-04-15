@@ -2,7 +2,7 @@
     <select multiple>
         <% _.each(options, function (option) { %>
         <option value="<%= option.id %>" title="<%- option.text %>"
-        <% if (_.indexOf(value, option.id) !== -1) { %> selected="selected"<% } %>>
+        <% if (_.indexOf(value.split(','), option.id) !== -1) { %> selected="selected"<% } %>>
         <%- option.text %>
         </option>
         <% }); %>
