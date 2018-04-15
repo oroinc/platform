@@ -58,7 +58,7 @@ define([
                     return isNaN(zIndex) ? 0 : zIndex;
                 }));
 
-                this.menu.css('zIndex', zIndex + 2);
+                this.menu.css('zIndex', zIndex - 2);
 
                 mask.show(zIndex + 1)
                     .onhide($.proxy(this.close, this));
