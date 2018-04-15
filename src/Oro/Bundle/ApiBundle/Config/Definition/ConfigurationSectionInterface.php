@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * Represents the configuration section builder.
+ */
 interface ConfigurationSectionInterface
 {
     /**
@@ -11,21 +14,21 @@ interface ConfigurationSectionInterface
      *
      * @param NodeBuilder $node
      */
-    public function configure(NodeBuilder $node);
+    public function configure(NodeBuilder $node): void;
 
     /**
-     * Checks if section can be added to the given configuration section
+     * Checks if this section can be added to the given configuration section.
      *
      * @param string $section Configuration section, e.g. entities.entity, relations.entity, etc.
      *
      * @return bool
      */
-    public function isApplicable($section);
+    public function isApplicable(string $section): bool;
 
     /**
-     * Injects the configuration settings
+     * Injects the configuration settings.
      *
      * @param ConfigurationSettingsInterface $settings
      */
-    public function setSettings(ConfigurationSettingsInterface $settings);
+    public function setSettings(ConfigurationSettingsInterface $settings): void;
 }

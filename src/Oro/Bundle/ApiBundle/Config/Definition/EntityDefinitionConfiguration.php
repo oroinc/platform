@@ -6,12 +6,15 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "entities" section.
+ */
 class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
 {
     /**
      * {@inheritdoc}
      */
-    public function configureEntityNode(NodeBuilder $node)
+    public function configureEntityNode(NodeBuilder $node): void
     {
         parent::configureEntityNode($node);
         $node
@@ -36,7 +39,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     /**
      * {@inheritdoc}
      */
-    protected function postProcessConfig(array $config)
+    protected function postProcessConfig(array $config): array
     {
         $config = parent::postProcessConfig($config);
         if (empty($config[EntityDefinitionConfig::IDENTIFIER_FIELD_NAMES])) {
@@ -52,7 +55,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
     /**
      * {@inheritdoc}
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         parent::configureFieldNode($node);
         $node

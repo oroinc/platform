@@ -13,15 +13,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class ApiConfiguration implements ConfigurationInterface
 {
-    const EXCLUSIONS_SECTION     = 'exclusions';
-    const INCLUSIONS_SECTION     = 'inclusions';
-    const ENTITY_ATTRIBUTE       = 'entity';
-    const FIELD_ATTRIBUTE        = 'field';
-    const ENTITY_ALIASES_SECTION = 'entity_aliases';
-    const ENTITIES_SECTION       = 'entities';
-    const RELATIONS_SECTION      = 'relations';
+    public const EXCLUSIONS_SECTION     = 'exclusions';
+    public const INCLUSIONS_SECTION     = 'inclusions';
+    public const ENTITY_ATTRIBUTE       = 'entity';
+    public const FIELD_ATTRIBUTE        = 'field';
+    public const ENTITY_ALIASES_SECTION = 'entity_aliases';
+    public const ENTITIES_SECTION       = 'entities';
+    public const RELATIONS_SECTION      = 'relations';
 
-    const ROOT_NODE = 'api';
+    public const ROOT_NODE = 'api';
 
     /** @var ConfigurationSettingsInterface */
     protected $settings;
@@ -33,7 +33,7 @@ class ApiConfiguration implements ConfigurationInterface
      * @param ConfigExtensionRegistry $extensionRegistry
      * @param int|null                $maxNestingLevel
      */
-    public function __construct(ConfigExtensionRegistry $extensionRegistry, $maxNestingLevel = null)
+    public function __construct(ConfigExtensionRegistry $extensionRegistry, ?int $maxNestingLevel = null)
     {
         $this->settings = $extensionRegistry->getConfigurationSettings();
         $this->maxNestingLevel = $maxNestingLevel ?? $extensionRegistry->getMaxNestingLevel();
@@ -42,11 +42,11 @@ class ApiConfiguration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root(self::ROOT_NODE);
-        $children    = $rootNode->children();
+        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $children = $rootNode->children();
 
         $this->addEntityAliasesSection($children);
 
@@ -79,9 +79,9 @@ class ApiConfiguration implements ConfigurationInterface
      * @return EntityConfiguration
      */
     protected function createEntityConfiguration(
-        $sectionName,
+        string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection
-    ) {
+    ): EntityConfiguration {
         return new EntityConfiguration(
             $sectionName,
             $definitionSection,
@@ -95,7 +95,7 @@ class ApiConfiguration implements ConfigurationInterface
      *
      * @return NodeBuilder
      */
-    protected function addEntityAliasesSection(NodeBuilder $parentNode)
+    protected function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode(self::ENTITY_ALIASES_SECTION)
@@ -114,7 +114,7 @@ class ApiConfiguration implements ConfigurationInterface
      *
      * @return NodeBuilder
      */
-    protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration)
+    protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode($configuration->getSectionName())
@@ -131,14 +131,14 @@ class ApiConfiguration implements ConfigurationInterface
      *
      * @return array
      */
-    protected function postProcessConfig(array $config)
+    protected function postProcessConfig(array $config): array
     {
         $config[self::EXCLUSIONS_SECTION] = [];
         $config[self::INCLUSIONS_SECTION] = [];
         if (!empty($config[self::ENTITIES_SECTION])) {
             foreach ($config[self::ENTITIES_SECTION] as $entityClass => &$entityConfig) {
                 if (!empty($entityConfig)) {
-                    if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
+                    if (\array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
                         if ($entityConfig[ConfigUtil::EXCLUDE]) {
                             $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
                         } else {
@@ -148,7 +148,7 @@ class ApiConfiguration implements ConfigurationInterface
                     }
                     if (!empty($entityConfig[ConfigUtil::FIELDS])) {
                         foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                            if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
+                            if (\array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
                                 && !$fieldConfig[ConfigUtil::EXCLUDE]
                             ) {
                                 $config[self::INCLUSIONS_SECTION][] = [

@@ -14,7 +14,7 @@ class EntityAliasesConfiguration
      *
      * @param NodeBuilder $node
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $node
             ->scalarNode('alias')
@@ -24,7 +24,7 @@ class EntityAliasesConfiguration
                 ->validate()
                     ->ifTrue(
                         function ($v) {
-                            return !preg_match('/^[a-z][a-z0-9_]*$/D', $v);
+                            return !\preg_match('/^[a-z][a-z0-9_]*$/D', $v);
                         }
                     )
                     ->thenInvalid(
@@ -42,7 +42,7 @@ class EntityAliasesConfiguration
                 ->validate()
                     ->ifTrue(
                         function ($v) {
-                            return !preg_match('/^[a-z][a-z0-9_]*$/D', $v);
+                            return !\preg_match('/^[a-z][a-z0-9_]*$/D', $v);
                         }
                     )
                     ->thenInvalid(
