@@ -5,7 +5,6 @@ namespace Oro\Bundle\AsseticBundle\Command\Proxy;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\DependencyInjection\ScopeInterface;
 
 class ContainerProxy implements ContainerInterface
 {
@@ -52,10 +51,9 @@ class ContainerProxy implements ContainerInterface
     }
 
     /**
-     * @TODO: remove $scope parameter in scope of BAP-15236
      * {@inheritdoc}
      */
-    public function set($id, $service, $scope = ContainerInterface::SCOPE_CONTAINER)
+    public function set($id, $service)
     {
         $this->container->set($id, $service);
     }
@@ -100,46 +98,5 @@ class ContainerProxy implements ContainerInterface
     public function setParameter($name, $value)
     {
         $this->container->setParameter($name, $value);
-    }
-
-    // @TODO: remove code below in scope of BAP-15236
-    /**
-     * {@inheritdoc}
-     */
-    public function enterScope($name)
-    {
-        $this->container->enterScope($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function leaveScope($name)
-    {
-        $this->container->leaveScope($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addScope(ScopeInterface $scope)
-    {
-        $this->container->addScope($scope);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasScope($name)
-    {
-        return $this->container->hasScope($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isScopeActive($name)
-    {
-        return $this->container->isScopeActive($name);
     }
 }

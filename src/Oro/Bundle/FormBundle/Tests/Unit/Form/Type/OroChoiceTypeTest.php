@@ -60,9 +60,7 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
                     'value' => 'c1'
                 ],
                 'options' => [
-                    'choices' => ['c1', 'c2', 'c3'],
-                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                    'choices_as_values' => true,
+                    'choices' => ['c1', 'c2', 'c3']
                 ]
             ],
         ];

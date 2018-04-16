@@ -48,9 +48,7 @@ class ChannelType extends AbstractType
             IntegrationTypeSelectType::class,
             [
                 'required' => true,
-                'label'    => 'oro.integration.integration.type.label',
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'label'    => 'oro.integration.integration.type.label'
             ]
         );
         $builder->add('name', TextType::class, [
@@ -79,9 +77,7 @@ class ChannelType extends AbstractType
                 'label'       => 'oro.integration.integration.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
-                'constraints' => new NotBlank(),
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'constraints' => new NotBlank()
             ]
         );
 
@@ -94,9 +90,7 @@ class ChannelType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
-                'required' => false,
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'required' => false
             ]
         );
 

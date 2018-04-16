@@ -31,6 +31,9 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     const PROPERTY_TYPE = 'bigint';
 
+    /**
+     * @var array
+     */
     private static $entityConfig = [
         'label' => self::SOME_LABEL
     ];
@@ -289,9 +292,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
                     'choices' => [
                         'No' => false,
                         'Yes' => true
-                    ],
-                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                    'choices_as_values' => true
+                    ]
                 ]
             ],
             'string' => [

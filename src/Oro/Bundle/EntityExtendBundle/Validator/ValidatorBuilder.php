@@ -306,14 +306,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory)
     {
-        // @TODO: remove this if statement and throwing an exception in scope of BAP-15236
-        if (null !== $this->propertyAccessor) {
-            throw new ValidatorException(
-                'You cannot set a validator factory after setting a custom property accessor. ' .
-                'Remove the call to setPropertyAccessor() if you want to call setConstraintValidatorFactory().'
-            );
-        }
-
         $this->validatorFactory = $validatorFactory;
 
         return $this;
@@ -335,35 +327,6 @@ class ValidatorBuilder implements ValidatorBuilderInterface
     public function setTranslationDomain($translationDomain)
     {
         $this->translationDomain = $translationDomain;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * TODO: remove this method in scope of BAP-15236
-     * @deprecated since version 2.5, to be removed in 3.0.
-     *             The validator will function without a property accessor.
-     */
-    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
-    {
-        @trigger_error(
-            'The ' .
-            __METHOD__ .
-            ' method is deprecated since version 2.5 and will be removed in 3.0. ' .
-            'The validator will function without a property accessor.',
-            E_USER_DEPRECATED
-        );
-
-        if (null !== $this->validatorFactory) {
-            throw new ValidatorException(
-                'You cannot set a property accessor after setting a custom validator factory. ' .
-                'Configure your validator factory instead.'
-            );
-        }
-
-        $this->propertyAccessor = $propertyAccessor;
 
         return $this;
     }

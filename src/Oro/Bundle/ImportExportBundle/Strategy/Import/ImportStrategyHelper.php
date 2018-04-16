@@ -133,7 +133,7 @@ class ImportStrategyHelper
      * @param array $excludedProperties
      * @throws InvalidArgumentException
      */
-    public function importEntity($basicEntity, $importedEntity, array $excludedProperties = array())
+    public function importEntity($basicEntity, $importedEntity, array $excludedProperties = [])
     {
         $basicEntityClass = ClassUtils::getClass($basicEntity);
         if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
@@ -164,8 +164,7 @@ class ImportStrategyHelper
      */
     public function validateEntity($entity, $groups = null)
     {
-        // TODO: change to $violations = $this->validator->validate($entity, null, $groups); in scope of BAP-15236
-        $violations = $this->validator->validate($entity, $groups);
+        $violations = $this->validator->validate($entity, null, $groups);
         if (count($violations)) {
             $errors = [];
 
@@ -208,9 +207,9 @@ class ImportStrategyHelper
             }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
-                array(
+                [
                     '%number%' => $rowNumber
-                )
+                ]
             );
         }
         foreach ($validationErrors as $validationError) {
