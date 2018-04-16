@@ -56,6 +56,19 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('default_api_adapter')->defaultValue(self::DEFAULT_ADAPTER)->end()
                 ->scalarNode('debug_translator')->defaultFalse()->end()
+                ->arrayNode('locales')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($v) {
+                            return preg_split('/\s*,\s*/', $v);
+                        })
+                    ->end()
+                    ->requiresAtLeastOneElement()
+                    ->prototype('scalar')->end()
+                ->end()
+                ->booleanNode('default_required')->defaultTrue()->end()
+                ->scalarNode('manager_registry')->defaultValue('doctrine')->end()
+                ->scalarNode('templating')->defaultValue("OroTranslationBundle::default.html.twig")->end()
             ->end();
 
         SettingsBuilder::append(
@@ -68,3 +81,4 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 }
+

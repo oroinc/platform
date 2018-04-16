@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -80,7 +81,7 @@ class EmailTemplateTranslationType extends AbstractType
      */
     public function getParent()
     {
-        return 'a2lix_translations_gedmo';
+        return GedmoTranslationsType::class;
     }
 
     /**
