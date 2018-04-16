@@ -16,7 +16,7 @@ define(function(require) {
 
             var first = this.groups.first();
             first.set('active', true);
-            this.trigger(first, true);
+            this.triggerGroupChange(first, true);
 
             this.view = new TabCollectionView({
                 el: options._sourceElement,
@@ -30,11 +30,17 @@ define(function(require) {
 
         onGroupChange: function(model) {
             if (model.get('active') === true) {
-                this.trigger(model);
+                this.triggerGroupChange(model);
             }
         },
 
-        trigger: function(model, initialize) {
+        /**
+         * Triggers global event via mediator and pass params to listeners
+         *
+         * @param {Backbone.Model} model
+         * @param {boolean} initialize
+         */
+        triggerGroupChange: function(model, initialize) {
             mediator.trigger('entity-config:attribute-group:changed', model, initialize);
         }
     });
