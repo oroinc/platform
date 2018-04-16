@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Form\EventListener;
 
 use Oro\Bundle\TranslationBundle\Form\TranslationForm\TranslationFormInterface;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslationsFieldsType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -39,7 +40,7 @@ class GedmoTranslationsListener implements EventSubscriberInterface
 
         foreach ($formOptions['locales'] as $locale) {
             if (isset($childrenOptions[$locale])) {
-                $form->add($locale, 'a2lix_translationsFields', [
+                $form->add($locale, TranslationsFieldsType::class, [
                     'fields' => $childrenOptions[$locale],
                     'translation_class' => $form->getTranslationClass($translatableClass),
                 ]);

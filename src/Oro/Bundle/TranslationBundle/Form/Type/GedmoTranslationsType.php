@@ -70,13 +70,13 @@ class GedmoTranslationsType extends AbstractType
             $childrenOptions = $this->translationForm->getChildrenOptions($options['translatable_class'], $options);
             $defaultLocale = (array) $this->translationForm->getGedmoTranslatableListener()->getDefaultLocale();
 
-            $builder->add('defaultLocale', 'a2lix_translationsLocales_gedmo', [
+            $builder->add('defaultLocale', GedmoTranslationsLocalesType::class, [
                 'locales' => $defaultLocale,
                 'fields_options' => $childrenOptions,
                 'inherit_data' => true,
             ]);
 
-            $builder->add($builder->getName(), 'a2lix_translationsLocales_gedmo', [
+            $builder->add($builder->getName(), GedmoTranslationsLocalesType::class, [
                 'locales' => array_diff($options['locales'], $defaultLocale),
                 'fields_options' => $childrenOptions,
                 'inherit_data' => false,
