@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents a sorter configuration for a field.
+ * Represents the configuration of a field that can be used to sort data.
  */
 class SorterFieldConfig implements FieldConfigInterface
 {
