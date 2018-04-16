@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 
 /**
+ * Adds the description property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait DescriptionTrait

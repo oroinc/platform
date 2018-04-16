@@ -4,14 +4,27 @@ namespace Oro\Bundle\SecurityBundle\Exception;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
+/**
+ * This exception is thrown if the organization is locked.
+ */
 class OrganizationAccessDeniedException extends AuthenticationException
 {
-    /**
-     * @var string
-     */
-    protected $organizationName;
+    /** @var string */
+    private $organizationName;
 
     /**
+     * Gets the organization name.
+     *
+     * @return string
+     */
+    public function getOrganizationName()
+    {
+        return $this->organizationName;
+    }
+
+    /**
+     * Sets the organization name.
+     *
      * @param string $organizationName
      */
     public function setOrganizationName($organizationName)
@@ -35,29 +48,20 @@ class OrganizationAccessDeniedException extends AuthenticationException
         return ['%organization_name%' => $this->organizationName];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function serialize()
     {
-        return serialize([
-            $this->getToken(),
-            $this->code,
-            $this->message,
-            $this->file,
-            $this->line,
-            $this->organizationName,
-        ]);
+        return serialize([parent::serialize(), $this->organizationName]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function unserialize($str)
     {
-        list(
-            $token,
-            $this->code,
-            $this->message,
-            $this->file,
-            $this->line,
-            $this->organizationName
-        ) = unserialize($str);
-
-        $this->setToken($token);
+        list($parentData, $this->organizationName) = unserialize($str);
+        parent::unserialize($parentData);
     }
 }

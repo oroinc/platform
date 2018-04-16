@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\EntityConfig;
 
 /**
- * Represents a configuration of all sorters for an entity.
+ * Represents the configuration of all fields that can be used to sort data.
  */
 class SortersConfig implements EntityConfigInterface
 {

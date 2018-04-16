@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 /**
+ * Adds association related methods to a configuration class.
+ *
  * @property array $items
  */
 trait AssociationTargetTrait

@@ -8,7 +8,7 @@ use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
- * A set of reusable utility methods to get data related to ActivityList entity from the database.
+ * Provides reusable methods that provide the database access for the ActivityList entity.
  */
 class ActivityListRepository extends EntityRepository
 {

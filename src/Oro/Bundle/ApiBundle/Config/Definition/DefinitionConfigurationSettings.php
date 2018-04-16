@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+/**
+ * The implementation of the settings for nested builders for "entities" and "relations" configuration sections.
+ */
 class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
 {
     /** @var ConfigurationSettingsInterface */
-    protected $settings;
+    private $settings;
 
     /** @var array [section path => callback[], ...] */
-    protected $additionalConfigureCallbacks = [];
+    private $additionalConfigureCallbacks = [];
 
     /**
      * @param ConfigurationSettingsInterface $settings
@@ -21,7 +24,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtraSections()
+    public function getExtraSections(): array
     {
         return $this->settings->getExtraSections();
     }
@@ -29,7 +32,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigureCallbacks($section)
+    public function getConfigureCallbacks(string $section): array
     {
         $callbacks = $this->settings->getConfigureCallbacks($section);
         if (isset($this->additionalConfigureCallbacks[$section])) {
@@ -42,7 +45,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /**
      * {@inheritdoc}
      */
-    public function getPreProcessCallbacks($section)
+    public function getPreProcessCallbacks(string $section): array
     {
         return $this->settings->getPreProcessCallbacks($section);
     }
@@ -50,7 +53,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
     /**
      * {@inheritdoc}
      */
-    public function getPostProcessCallbacks($section)
+    public function getPostProcessCallbacks(string $section): array
     {
         return $this->settings->getPostProcessCallbacks($section);
     }
@@ -59,7 +62,7 @@ class DefinitionConfigurationSettings implements ConfigurationSettingsInterface
      * @param string   $section
      * @param callable $callback
      */
-    public function addAdditionalConfigureCallback($section, $callback)
+    public function addAdditionalConfigureCallback(string $section, $callback): void
     {
         $this->additionalConfigureCallbacks[$section][] = $callback;
     }
