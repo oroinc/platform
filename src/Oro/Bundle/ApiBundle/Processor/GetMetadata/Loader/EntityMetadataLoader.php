@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
+/**
+ * The metadata loader for manageable entities.
+ */
 class EntityMetadataLoader
 {
     /** @var DoctrineHelper */

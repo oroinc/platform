@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
+ * Represents the configuration of an entity field.
+ *
  * @method EntityDefinitionConfig|null getTargetEntity()
  * @method EntityDefinitionConfig|null setTargetEntity(EntityDefinitionConfig $targetEntity = null)
  */

@@ -9,8 +9,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class RequestDependedTextProcessor
 {
-    const START_REQUEST_TAG = '{@request:';
-    const END_REQUEST_TAG   = '{@/request}';
+    private const START_REQUEST_TAG = '{@request:';
+    private const END_REQUEST_TAG   = '{@/request}';
 
     /** @var RequestExpressionMatcher */
     private $matcher;
@@ -33,17 +33,17 @@ class RequestDependedTextProcessor
      *
      * @return string
      */
-    public function process($text, RequestType $requestType)
+    public function process(string $text, RequestType $requestType): string
     {
         $offset = 0;
-        $startLength = strlen(self::START_REQUEST_TAG);
-        $endLength = strlen(self::END_REQUEST_TAG);
-        while (false !== ($startOpenPos = strpos($text, self::START_REQUEST_TAG, $offset))) {
-            $startClosePos = strpos($text, '}', $startOpenPos + $startLength);
+        $startLength = \strlen(self::START_REQUEST_TAG);
+        $endLength = \strlen(self::END_REQUEST_TAG);
+        while (false !== ($startOpenPos = \strpos($text, self::START_REQUEST_TAG, $offset))) {
+            $startClosePos = \strpos($text, '}', $startOpenPos + $startLength);
             if (false === $startClosePos) {
                 break;
             }
-            $expression = substr(
+            $expression = \substr(
                 $text,
                 $startOpenPos + $startLength,
                 $startClosePos - $startOpenPos - $startLength
@@ -51,17 +51,17 @@ class RequestDependedTextProcessor
             if (!$expression) {
                 break;
             }
-            $endClosePos = strpos($text, self::END_REQUEST_TAG, $startClosePos + 1);
+            $endClosePos = \strpos($text, self::END_REQUEST_TAG, $startClosePos + 1);
             if (false === $endClosePos) {
                 break;
             }
 
             $body = '';
             if ($this->matcher->matchValue($expression, $requestType)) {
-                $body = substr($text, $startClosePos + 1, $endClosePos - $startClosePos - 1);
+                $body = \substr($text, $startClosePos + 1, $endClosePos - $startClosePos - 1);
             }
 
-            $text = substr_replace($text, $body, $startOpenPos, ($endClosePos + $endLength) - $startOpenPos);
+            $text = \substr_replace($text, $body, $startOpenPos, ($endClosePos + $endLength) - $startOpenPos);
         }
 
         return $text;

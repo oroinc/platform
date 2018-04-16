@@ -170,9 +170,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro.notification.event.notification_send_after, method: logMassNotification}
 
-
     # message queue
-
     oro_notification.async.send_email_message_processor:
         class: 'Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor'
         arguments:
@@ -182,11 +180,21 @@ services:
             - '@oro_email.email_renderer'
             - '@logger'
         tags:
-            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email }
 
+    oro_notification.async.send_mass_email_message_processor:
+        class: 'Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor'
+        arguments:
+            - '@oro_email.direct_mailer'
+            - '@oro_email.mailer.processor'
+            - '@doctrine'
+            - '@oro_email.email_renderer'
+            - '@logger'
+            - '@event_dispatcher'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_mass_notification_email }
 
     # manager
-
     oro_notification.manager.email_notification:
         class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager'
         public: false

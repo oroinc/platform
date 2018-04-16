@@ -87,20 +87,26 @@ If you need to add new form elements can by tagging them in the dependency injec
     acme.form.type.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType
         tags:
-            - { name: form.type, alias: acme_datetime } # Enable usage of the form type on the UI.
-            - { name: oro.api.form.type, alias: acme_datetime } # Enable usage of the form type in the data API.
+            # Enable usage of the form type on the UI.
+            - { name: form.type, alias: acme_datetime }
+            # Enable usage of the form type in the data API.
+            - { name: oro.api.form.type, alias: acme_datetime }
 
     acme.form.extension.datetime:
         class: Acme\Bundle\AcmeBundle\Form\Extension\DateTimeExtension
         tags:
-            - { name: form.type_extension, alias: acme_datetime } # Add the form extension to the UI forms.
-            - { name: oro.api.form.type_extension, alias: acme_datetime } # Add the form extension to the data API forms.
+            # Add the form extension to the UI forms.
+            - { name: form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
+            # Add the form extension to the data API forms.
+            - { name: oro.api.form.type_extension, extended_type: Acme\Bundle\AcmeBundle\Form\Type\DateTimeType }
 
     acme.form.guesser.test:
         class: Acme\Bundle\AcmeBundle\Form\Guesser\TestGuesser
         tags:
-            - { name: form.type_guesser } # Add the form type guesser to the UI forms.
-            - { name: oro.api.form.type_guesser } # Add the form type guesser to the data API forms.
+            # Add the form type guesser to the UI forms.
+            - { name: form.type_guesser }
+            # Add the form type guesser to the data API forms.
+            - { name: oro.api.form.type_guesser }
 ```
 
 To switch between the general and data API forms, use the [Processor\Shared\InitializeApiFormExtension](../../Processor/Shared/InitializeApiFormExtension.php) and [Processor\Shared\RestoreDefaultFormExtension](../../Processor/Shared/RestoreDefaultFormExtension.php) processors.

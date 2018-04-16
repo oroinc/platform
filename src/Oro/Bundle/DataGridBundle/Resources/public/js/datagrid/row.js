@@ -96,6 +96,9 @@ define([
                     cellOptions.model = _this.model;
                     var Cell = column.get('cell');
                     var cell = new Cell(cellOptions);
+                    cell.$el.attr({
+                        'data-column-label': column.get('label')
+                    });
                     if (column.has('align')) {
                         cell.$el.removeClass('align-left align-center align-right');
                         cell.$el.addClass('align-' + column.get('align'));

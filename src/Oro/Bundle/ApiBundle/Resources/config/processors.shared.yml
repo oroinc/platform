@@ -153,9 +153,7 @@ services:
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -60 }
 
     oro_api.rest.set_default_sorting:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetDefaultSorting
-        arguments:
-            - '@oro_api.doctrine_helper'
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: rest&!json_api, priority: -100 }
@@ -170,8 +168,6 @@ services:
 
     oro_api.json_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetDefaultSorting
-        arguments:
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -105 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -105 }

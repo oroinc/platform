@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class CompleteObjectDefinitionHelper
 {
     /** @var CompleteAssociationHelper */
-    protected $associationHelper;
+    private $associationHelper;
 
     /**
      * @param CompleteAssociationHelper $associationHelper
@@ -41,7 +41,7 @@ class CompleteObjectDefinitionHelper
     /**
      * @param EntityDefinitionConfig $definition
      */
-    protected function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
+    private function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
     {
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
@@ -59,7 +59,7 @@ class CompleteObjectDefinitionHelper
      * @param string                 $version
      * @param RequestType            $requestType
      */
-    protected function completeObjectAssociations(
+    private function completeObjectAssociations(
         EntityDefinitionConfig $definition,
         $version,
         RequestType $requestType
@@ -77,7 +77,7 @@ class CompleteObjectDefinitionHelper
      * @param string                      $version
      * @param RequestType                 $requestType
      */
-    protected function completeObjectAssociation(
+    private function completeObjectAssociation(
         EntityDefinitionConfig $definition,
         $fieldName,
         EntityDefinitionFieldConfig $field,

@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
+/**
+ * Adds metadata to all associations.
+ */
 class AssociationMetadataLoader
 {
     /** @var MetadataProvider */

@@ -15,35 +15,27 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Sends single notification message, e.g. email notification rules.
+ */
 class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var DirectMailer
-     */
+    /** @var DirectMailer */
     private $mailer;
 
-    /**
-     * @var Processor
-     */
+    /** @var Processor */
     private $mailerProcessor;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @var EmailRenderer
-     */
+    /** @var EmailRenderer */
     private $emailRenderer;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
-     *
      * @param DirectMailer    $mailer
      * @param Processor       $processor
      * @param ManagerRegistry $managerRegistry
@@ -72,17 +64,18 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $data = JSON::decode($message->getBody());
 
         $data = array_merge([
-            'fromEmail' => null,
-            'fromName' => null,
-            'toEmail' => null,
-            'subject' => null,
-            'body' => null,
+            'fromEmail'   => null,
+            'fromName'    => null,
+            'toEmail'     => null,
+            'subject'     => null,
+            'body'        => null,
             'contentType' => null,
-            'template' => null
+            'template'    => null
         ], $data);
 
-        if (empty($data['body']) || ! isset($data['fromEmail'], $data['toEmail'])
-            || (isset($data['template']) && ! is_array($data['body']))
+        if (empty($data['body'])
+            || !isset($data['fromEmail'], $data['toEmail'])
+            || (isset($data['template']) && !is_array($data['body']))
         ) {
             $this->logger->critical('Got invalid message');
 
@@ -105,8 +98,8 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->mailerProcessor->processEmbeddedImages($emailMessage);
 
         //toDo: can possibly send duplicate replies. See BAP-12503
-
-        if (! $this->mailer->send($emailMessage)) {
+        $result = $this->mailer->send($emailMessage);
+        if (!$result) {
             $this->logger->error('Cannot send message');
 
             return self::REJECT;
@@ -125,32 +118,22 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
     /**
      * @param string $templateName
-     * @param array $data
+     * @param array  $data
      *
-     * @return array - first element is email subject, second - message
+     * @return array [{email subject} => {email message}]
      * @throws \RuntimeException
      */
     protected function renderTemplate($templateName, array $data)
     {
-        $emailTemplate = $this->findEmailTemplateByName($templateName);
+        $emailTemplate = $this->managerRegistry
+            ->getManagerForClass(EmailTemplate::class)
+            ->getRepository(EmailTemplate::class)
+            ->findByName($templateName);
 
         if (! $emailTemplate instanceof EmailTemplateInterface) {
             throw new \RuntimeException(sprintf('EmailTemplate not found by name "%s"', $templateName));
         }
 
         return $this->emailRenderer->compileMessage($emailTemplate, $data);
-    }
-
-    /**
-     * @param string $emailTemplateName
-     *
-     * @return EmailTemplateInterface
-     */
-    protected function findEmailTemplateByName($emailTemplateName)
-    {
-        return $this->managerRegistry
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class)
-            ->findOneBy(['name' => $emailTemplateName]);
     }
 }

@@ -4,6 +4,7 @@ define(function(require) {
     var NumberFilter;
 
     var _ = require('underscore');
+    var $ = require('jquery');
     var ChoiceFilter = require('./choice-filter');
     var NumberFormatter = require('orofilter/js/formatter/number-formatter');
     var __ = require('orotranslation/js/translator');
@@ -17,6 +18,11 @@ define(function(require) {
          * @property {Boolean}
          */
         wrapHintValue: false,
+
+        /**
+         * @property {Number}
+         */
+        precision: null,
 
         /**
          * @inheritDoc
@@ -162,10 +168,9 @@ define(function(require) {
          * @inheritDoc
          */
         _writeDOMValue: function(data) {
-            var value = _.isString(data.value) ? this.formatter.toRaw(data.value) : data.value;
-            this._setInputValue(this.criteriaValueSelectors.value, value);
-            this._setInputValue(this.criteriaValueSelectors.type, data.type);
-            return this;
+            this._initInputWidget();
+
+            return NumberFilter.__super__._writeDOMValue.apply(this, arguments);
         },
 
         /**
@@ -230,6 +235,16 @@ define(function(require) {
                 'warning',
                 __('This value should be {{ limit }} or less.', {limit: 100})
             );
+        },
+
+        _initInputWidget: function() {
+            if (this.precision) {
+                _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
+                    $(field).attr('data-precision', this.precision);
+                }, this);
+            }
+
+            this.$el.inputWidget('seekAndCreate');
         }
     });
 

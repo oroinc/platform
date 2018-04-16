@@ -3,12 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
+/**
+ * This class is responsible for creating an instance of an entity or a model inherited from an entity
+ * via constructor or if it is not possible via reflection.
+ */
 class EntityInstantiator
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -25,13 +30,13 @@ class EntityInstantiator
      *
      * @return object
      */
-    public function instantiate($className)
+    public function instantiate(string $className)
     {
         $reflClass = new \ReflectionClass($className);
 
-        return $this->mustBeInstantiatedWithoutConstructor($reflClass)
-            ? $this->instantiateViaReflection($reflClass)
-            : $this->instantiateViaConstructor($reflClass);
+        return $this->isInstantiableViaConstructor($reflClass)
+            ? $this->instantiateViaConstructor($reflClass)
+            : $this->instantiateViaReflection($reflClass);
     }
 
     /**
@@ -39,15 +44,15 @@ class EntityInstantiator
      *
      * @return bool
      */
-    protected function mustBeInstantiatedWithoutConstructor(\ReflectionClass $reflClass)
+    private function isInstantiableViaConstructor(\ReflectionClass $reflClass): bool
     {
         $constructor = $reflClass->getConstructor();
 
         return
-            null !== $constructor
-            && (
-                !$constructor->isPublic()
-                || 0 !== $constructor->getNumberOfRequiredParameters()
+            null === $constructor
+            || (
+                $constructor->isPublic()
+                && 0 === $constructor->getNumberOfRequiredParameters()
             );
     }
 
@@ -56,7 +61,7 @@ class EntityInstantiator
      *
      * @return object
      */
-    protected function instantiateViaConstructor(\ReflectionClass $reflClass)
+    private function instantiateViaConstructor(\ReflectionClass $reflClass)
     {
         return $reflClass->newInstance();
     }
@@ -66,11 +71,11 @@ class EntityInstantiator
      *
      * @return object
      */
-    protected function instantiateViaReflection(\ReflectionClass $reflClass)
+    private function instantiateViaReflection(\ReflectionClass $reflClass)
     {
         $entity = $reflClass->newInstanceWithoutConstructor();
 
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($reflClass->getName(), false);
+        $metadata = $this->getEntityMetadata($reflClass);
         if (null !== $metadata) {
             $associations = $metadata->getAssociationNames();
             foreach ($associations as $propertyName) {
@@ -90,5 +95,27 @@ class EntityInstantiator
         }
 
         return $entity;
+    }
+
+    /**
+     * @param \ReflectionClass $reflClass
+     *
+     * @return ClassMetadata|null
+     */
+    private function getEntityMetadata(\ReflectionClass $reflClass): ?ClassMetadata
+    {
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($reflClass->getName(), false);
+        if (null === $metadata) {
+            $parentClass = $reflClass->getParentClass();
+            while ($parentClass) {
+                $metadata = $this->doctrineHelper->getEntityMetadataForClass($parentClass->getName(), false);
+                if (null !== $metadata) {
+                    break;
+                }
+                $parentClass = $parentClass->getParentClass();
+            }
+        }
+
+        return $metadata;
     }
 }

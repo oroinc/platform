@@ -5,21 +5,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\AssociationHandler;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler\EntityHandler;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $customizationProcessor;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CustomizeLoadedDataProcessor */
+    private $customizationProcessor;
 
     /** @var SetDataCustomizationHandler */
-    protected $processor;
+    private $processor;
 
     /** @var int */
-    protected $customizationProcessorCallIndex;
+    private $customizationProcessorCallIndex;
 
     protected function setUp()
     {
@@ -27,27 +27,14 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         $this->customizationProcessorCallIndex = 0;
 
-        $this->customizationProcessor = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper         = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->customizationProcessor = $this->createMock(CustomizeLoadedDataProcessor::class);
 
-        $this->processor = new SetDataCustomizationHandler(
-            $this->customizationProcessor,
-            $this->doctrineHelper
-        );
+        $this->processor = new SetDataCustomizationHandler($this->customizationProcessor);
     }
 
     public function testProcessForEmptyConfig()
     {
         $config = [];
-
-        $this->doctrineHelper->expects($this->never())
-            ->method('isManageableEntityClass');
 
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
@@ -66,9 +53,6 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
-            ->method('isManageableEntityClass');
-
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
@@ -84,7 +68,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForEntityWithoutAssociations()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -105,25 +89,21 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(false);
-
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            EntityHandler::class,
             $configObject->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field1')
                 ->getTargetEntity()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -137,7 +117,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntity()
+    public function testProcessForEntityWithAssociations()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -145,10 +125,12 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 'field1' => null,
                 'field2' => [
                     'exclusion_policy' => 'all',
+                    'target_class'     => 'Test\Field2Target',
                     'fields'           => [
                         'field21' => null,
                         'field22' => [
                             'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\Field22Target',
                             'fields'           => [
                                 'field221' => null
                             ]
@@ -158,67 +140,36 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturnMap([['field2', true]]);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('field2')
-            ->willReturn('Test\Field2Target');
-
-        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturnMap([['field22', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('getAssociationTargetClass')
-            ->with('field22')
-            ->willReturn('Test\Field22Target');
-
-        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
-            ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                ]
-            );
-
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            EntityHandler::class,
             $configObject->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field1')
                 ->getTargetEntity()
         );
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
                 ->getField('field21')
                 ->getTargetEntity()
         );
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -226,7 +177,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -236,8 +187,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert    = $this->getRootHandlerAssertion($configObject);
-        $field2Assert  = $this->getChildHandlerAssertion(
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $field2Assert = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
@@ -257,7 +208,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntityAndAssociationsWithPropertyPath()
+    public function testProcessForEntityWithRenamedAssociations()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -265,11 +216,13 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 'field1' => null,
                 'field2' => [
                     'exclusion_policy' => 'all',
+                    'target_class'     => 'Test\Field2Target',
                     'property_path'    => 'realField2',
                     'fields'           => [
                         'field21' => null,
                         'field22' => [
                             'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\Field22Target',
                             'property_path'    => 'realField22',
                             'fields'           => [
                                 'field221' => null
@@ -280,67 +233,36 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturnMap([['realField2', true]]);
-        $rootEntityMetadata->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with('realField2')
-            ->willReturn('Test\Field2Target');
-
-        $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturnMap([['realField22', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
-            ->method('getAssociationTargetClass')
-            ->with('realField22')
-            ->willReturn('Test\Field22Target');
-
-        $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
-            ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                ]
-            );
-
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            EntityHandler::class,
             $configObject->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field1')
                 ->getTargetEntity()
         );
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
                 ->getField('field21')
                 ->getTargetEntity()
         );
-        $this->assertNotNull(
+        self::assertInstanceOf(
+            AssociationHandler::class,
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -348,7 +270,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
                 ->getPostSerializeHandler()
         );
-        $this->assertNull(
+        self::assertNull(
             $configObject
                 ->getField('field2')
                 ->getTargetEntity()
@@ -358,8 +280,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert    = $this->getRootHandlerAssertion($configObject);
-        $field2Assert  = $this->getChildHandlerAssertion(
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $field2Assert = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
@@ -376,75 +298,16 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         }
     }
 
-    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
-    {
-        $config = [
-            'exclusion_policy' => 'all',
-            'fields'           => [
-                'association' => [
-                    'target_class' => 'Test\AssociationTargetClass',
-                    'target_type'  => 'to-one'
-                ]
-            ]
-        ];
-
-        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
-            ->method('hasAssociation')
-            ->willReturn(false);
-
-        $associationTargetEntityMetadata = $this->getClassMetadataMock('Test\AssociationTargetClass');
-
-        $this->doctrineHelper->expects($this->exactly(2))
-            ->method('isManageableEntityClass')
-            ->willReturnMap([
-                [self::TEST_CLASS_NAME, true],
-                ['Test\AssociationTargetClass', true]
-            ]);
-        $this->doctrineHelper->expects($this->exactly(2))
-            ->method('getEntityMetadataForClass')
-            ->willReturnMap([
-                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                ['Test\AssociationTargetClass', true, $associationTargetEntityMetadata],
-            ]);
-
-        /** @var EntityDefinitionConfig $configObject */
-        $configObject = $this->createConfigObject($config);
-        $this->context->setResult($configObject);
-        $this->processor->process($this->context);
-
-        $this->assertNotNull(
-            $configObject->getPostSerializeHandler()
-        );
-        $this->assertNotNull(
-            $configObject
-                ->getField('association')
-                ->getTargetEntity()
-                ->getPostSerializeHandler()
-        );
-
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $associationAssert = $this->getChildHandlerAssertion(
-            $configObject,
-            $configObject->getField('association')->getTargetEntity(),
-            'Test\AssociationTargetClass',
-            'association'
-        );
-        foreach ([$rootAssert, $associationAssert] as $assert) {
-            $assert();
-        }
-    }
-
     /**
      * @param EntityDefinitionConfig $configObject
      *
      * @return callable
      */
-    protected function getRootHandlerAssertion(EntityDefinitionConfig $configObject)
+    private function getRootHandlerAssertion(EntityDefinitionConfig $configObject)
     {
-        $sourceDataItem    = ['source data'];
+        $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
-        $this->customizationProcessor->expects($this->at($this->customizationProcessorCallIndex++))
+        $this->customizationProcessor->expects(self::at($this->customizationProcessorCallIndex++))
             ->method('process')
             ->willReturnCallback(
                 function (CustomizeLoadedDataContext $context) use (
@@ -452,11 +315,11 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                     $processedDataItem,
                     $configObject
                 ) {
-                    $this->assertEquals($this->context->getVersion(), $context->getVersion());
-                    $this->assertEquals($this->context->getRequestType(), $context->getRequestType());
-                    $this->assertEquals($this->context->getClassName(), $context->getClassName());
-                    $this->assertSame($configObject, $context->getConfig());
-                    $this->assertEquals($sourceDataItem, $context->getResult());
+                    self::assertEquals($this->context->getVersion(), $context->getVersion());
+                    self::assertEquals($this->context->getRequestType(), $context->getRequestType());
+                    self::assertEquals($this->context->getClassName(), $context->getClassName());
+                    self::assertSame($configObject, $context->getConfig());
+                    self::assertEquals($sourceDataItem, $context->getResult());
 
                     $context->setResult($processedDataItem);
                 }
@@ -464,7 +327,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         return function () use ($configObject, $processedDataItem, $sourceDataItem) {
             $rootHandler = $configObject->getPostSerializeHandler();
-            $this->assertEquals(
+            self::assertEquals(
                 $processedDataItem,
                 call_user_func($rootHandler, $sourceDataItem)
             );
@@ -479,15 +342,15 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
      *
      * @return callable
      */
-    protected function getChildHandlerAssertion(
+    private function getChildHandlerAssertion(
         EntityDefinitionConfig $configObject,
         EntityDefinitionConfig $childConfigObject,
         $childEntityClass,
         $fieldPath
     ) {
-        $sourceDataItem    = ['source data'];
+        $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
-        $this->customizationProcessor->expects($this->at($this->customizationProcessorCallIndex++))
+        $this->customizationProcessor->expects(self::at($this->customizationProcessorCallIndex++))
             ->method('process')
             ->willReturnCallback(
                 function (CustomizeLoadedDataContext $context) use (
@@ -498,14 +361,14 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                     $configObject,
                     $childConfigObject
                 ) {
-                    $this->assertEquals($this->context->getVersion(), $context->getVersion());
-                    $this->assertEquals($this->context->getRequestType(), $context->getRequestType());
-                    $this->assertEquals($this->context->getClassName(), $context->getRootClassName());
-                    $this->assertEquals($childEntityClass, $context->getClassName());
-                    $this->assertEquals($fieldPath, $context->getPropertyPath());
-                    $this->assertSame($configObject, $context->getRootConfig());
-                    $this->assertSame($childConfigObject, $context->getConfig());
-                    $this->assertEquals($sourceDataItem, $context->getResult());
+                    self::assertEquals($this->context->getVersion(), $context->getVersion());
+                    self::assertEquals($this->context->getRequestType(), $context->getRequestType());
+                    self::assertEquals($this->context->getClassName(), $context->getRootClassName());
+                    self::assertEquals($childEntityClass, $context->getClassName());
+                    self::assertEquals($fieldPath, $context->getPropertyPath());
+                    self::assertSame($configObject, $context->getRootConfig());
+                    self::assertSame($childConfigObject, $context->getConfig());
+                    self::assertEquals($sourceDataItem, $context->getResult());
 
                     $context->setResult($processedDataItem);
                 }
@@ -513,7 +376,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 
         return function () use ($childConfigObject, $processedDataItem, $sourceDataItem) {
             $childHandler = $childConfigObject->getPostSerializeHandler();
-            $this->assertEquals(
+            self::assertEquals(
                 $processedDataItem,
                 call_user_func($childHandler, $sourceDataItem)
             );
