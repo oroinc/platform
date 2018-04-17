@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * @author David ALLIX
+ * Adds locale fields on preSetData event
  */
 class GedmoTranslationsListener implements EventSubscriberInterface
 {

@@ -10,8 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Translations locales (gedmo)
- *
- * @author David ALLIX
  */
 class GedmoTranslationsLocalesType extends AbstractType
 {

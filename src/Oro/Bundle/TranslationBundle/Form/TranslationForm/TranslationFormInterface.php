@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Form\TranslationForm;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 
 /**
- * @author David ALLIX
+ * Handles logic for configuring options for form types
  */
 interface TranslationFormInterface
 {

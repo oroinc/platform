@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Gedmo\Translatable\TranslatableListener;
 
 /**
- * @author David ALLIX
+ * Handles logic for getting translatable fields and config for class
  */
 class GedmoTranslationForm extends AbstractTranslationForm
 {

@@ -42,8 +42,6 @@ services:
             - '@oro_translation.form.gedmo_translation_form'
             - '%oro_translation.locales%'
             - '%oro_translation.default_required%'
-        tags:
-            - { name: form.type, alias: oro_translation_filter_language }
 
     oro_translation.form.gedmo_translation_form:
         class: 'Oro\Bundle\TranslationBundle\Form\TranslationForm\GedmoTranslationForm'

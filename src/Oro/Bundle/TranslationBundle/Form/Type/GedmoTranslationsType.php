@@ -14,9 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Regroup by locales, all translations fields (gedmo)
+ * Regroups by locales, all translations fields (gedmo)
  *
- * @author David ALLIX
  */
 class GedmoTranslationsType extends AbstractType
 {

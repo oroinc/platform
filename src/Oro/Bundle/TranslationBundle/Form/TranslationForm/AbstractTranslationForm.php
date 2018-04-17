@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 
 /**
- * @author David ALLIX
+ * Handles logic for configuring options for form types
  */
 abstract class AbstractTranslationForm implements TranslationFormInterface
 {

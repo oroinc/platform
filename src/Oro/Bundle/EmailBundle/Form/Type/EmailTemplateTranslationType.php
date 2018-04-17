@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for email templates with multilocales option
+ */
 class EmailTemplateTranslationType extends AbstractType
 {
     /** @var ConfigManager */

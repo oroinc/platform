@@ -8,9 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Translations fields
- *
- * @author David ALLIX
+ * Translations fields type
  */
 class TranslationsFieldsType extends AbstractType
 {
