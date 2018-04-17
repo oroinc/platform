@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Component\MessageQueue\Exception\JobNotFoundException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 
 class JobRunner
@@ -101,7 +102,7 @@ class JobRunner
     {
         $job = $this->jobProcessor->findJobById($jobId);
         if (! $job) {
-            throw new \LogicException(sprintf('Job was not found. id: "%s"', $jobId));
+            throw JobNotFoundException::create($jobId);
         }
         $this->throwIfJobIsStale($job);
 
