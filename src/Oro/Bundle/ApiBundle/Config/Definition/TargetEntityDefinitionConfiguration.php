@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The base class for "entities" and "relations" configuration section builders.
+ */
 class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
     /** @var string */
@@ -18,7 +21,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param string $sectionName
      */
-    public function __construct($sectionName = 'entity')
+    public function __construct(string $sectionName = 'entity')
     {
         $this->sectionName = $sectionName;
     }
@@ -28,7 +31,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return string
      */
-    public function getSectionName()
+    public function getSectionName(): string
     {
         return $this->sectionName;
     }
@@ -38,7 +41,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return string|null
      */
-    public function getParentSectionName()
+    public function getParentSectionName(): ?string
     {
         return $this->parentSectionName;
     }
@@ -48,7 +51,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @param string $sectionName
      */
-    public function setParentSectionName($sectionName)
+    public function setParentSectionName(string $sectionName): void
     {
         $this->parentSectionName = $sectionName;
     }
@@ -56,7 +59,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
         if (!empty($this->parentSectionName)) {
@@ -90,7 +93,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessConfig(array $config)
+    protected function postProcessConfig(array $config): array
     {
         if (empty($config[EntityDefinitionConfig::ORDER_BY])) {
             unset($config[EntityDefinitionConfig::ORDER_BY]);
@@ -120,7 +123,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    public function configureEntityNode(NodeBuilder $node)
+    public function configureEntityNode(NodeBuilder $node): void
     {
         $node
             ->enumNode(EntityDefinitionConfig::EXCLUSION_POLICY)
@@ -158,10 +161,10 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
             ->variableNode(EntityDefinitionConfig::FORM_EVENT_SUBSCRIBER)
                 ->validate()
                     ->always(function ($v) {
-                        if (is_string($v)) {
+                        if (\is_string($v)) {
                             return [$v];
                         }
-                        if (is_array($v)) {
+                        if (\is_array($v)) {
                             return $v;
                         }
                         throw new \InvalidArgumentException(
@@ -175,7 +178,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
         if (!empty($this->parentSectionName)) {
@@ -220,7 +223,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessFieldConfig(array $config)
+    protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[EntityDefinitionFieldConfig::FORM_TYPE])) {
             unset($config[EntityDefinitionFieldConfig::FORM_TYPE]);

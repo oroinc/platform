@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+/**
+ * The base implementation of the settings for configuration section builders.
+ */
 class ConfigurationSettings implements ConfigurationSettingsInterface
 {
-    /** @var array [section name => ConfigurationSectionInterface[], ...] */
-    protected $extraSections = [];
+    /** @var ConfigurationSectionInterface[] [section name => ConfigurationSectionInterface, ...] */
+    private $extraSections = [];
 
     /** @var array [section path => callback[], ...] */
-    protected $configureCallbacks = [];
+    private $configureCallbacks = [];
 
     /** @var array [section path => callback[], ...] */
-    protected $preProcessCallbacks = [];
+    private $preProcessCallbacks = [];
 
     /** @var array [section path => callback[], ...] */
-    protected $postProcessCallbacks = [];
+    private $postProcessCallbacks = [];
 
     /**
      * {@inheritdoc}
      */
-    public function getExtraSections()
+    public function getExtraSections(): array
     {
         return $this->extraSections;
     }
@@ -27,38 +30,32 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigureCallbacks($section)
+    public function getConfigureCallbacks(string $section): array
     {
-        return isset($this->configureCallbacks[$section])
-            ? $this->configureCallbacks[$section]
-            : [];
+        return $this->configureCallbacks[$section] ?? [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPreProcessCallbacks($section)
+    public function getPreProcessCallbacks(string $section): array
     {
-        return isset($this->preProcessCallbacks[$section])
-            ? $this->preProcessCallbacks[$section]
-            : [];
+        return $this->preProcessCallbacks[$section] ?? [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPostProcessCallbacks($section)
+    public function getPostProcessCallbacks(string $section): array
     {
-        return isset($this->postProcessCallbacks[$section])
-            ? $this->postProcessCallbacks[$section]
-            : [];
+        return $this->postProcessCallbacks[$section] ?? [];
     }
 
     /**
      * @param string                        $sectionName
      * @param ConfigurationSectionInterface $section
      */
-    public function addExtraSection($sectionName, ConfigurationSectionInterface $section)
+    public function addExtraSection(string $sectionName, ConfigurationSectionInterface $section): void
     {
         $this->extraSections[$sectionName] = $section;
     }
@@ -67,7 +64,7 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
      * @param string   $section
      * @param callable $callback
      */
-    public function addConfigureCallback($section, $callback)
+    public function addConfigureCallback(string $section, $callback): void
     {
         $this->configureCallbacks[$section][] = $callback;
     }
@@ -76,7 +73,7 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
      * @param string   $section
      * @param callable $callback
      */
-    public function addPreProcessCallback($section, $callback)
+    public function addPreProcessCallback(string $section, $callback): void
     {
         $this->preProcessCallbacks[$section][] = $callback;
     }
@@ -85,7 +82,7 @@ class ConfigurationSettings implements ConfigurationSettingsInterface
      * @param string   $section
      * @param callable $callback
      */
-    public function addPostProcessCallback($section, $callback)
+    public function addPostProcessCallback(string $section, $callback): void
     {
         $this->postProcessCallbacks[$section][] = $callback;
     }

@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 
 /**
+ * Adds the action collection related methods to a configuration class.
+ *
  * @property ActionConfig[] $actions [action name => ActionConfig, ...]
  */
 trait ActionsTrait

@@ -3,7 +3,7 @@ define([
     'underscore',
     'backgrid',
     'oro/datagrid/cell/action-cell',
-    '../header-cell/action-header-cell'
+    'orodatagrid/js/datagrid/header-cell/action-header-cell'
 ], function(Backbone, _, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
 

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
 /**
+ * Adds methods for undefined explicitly properties to a configuration class.
+ *
  * @property array $items
  */
 trait ConfigTrait

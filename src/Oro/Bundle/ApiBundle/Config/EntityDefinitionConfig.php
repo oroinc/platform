@@ -7,7 +7,7 @@ use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
- * Represents a configuration of an entity.
+ * Represents the configuration of an entity.
  *
  * @method EntityDefinitionFieldConfig[] getFields()
  * @method EntityDefinitionFieldConfig|null getField($fieldName)
