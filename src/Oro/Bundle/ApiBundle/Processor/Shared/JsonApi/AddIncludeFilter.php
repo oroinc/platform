@@ -50,7 +50,14 @@ class AddIncludeFilter implements ProcessorInterface
             // the "include" filter is disabled
             return;
         }
-        $associations = $context->getMetadata()->getAssociations();
+
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
+        $associations = $metadata->getAssociations();
         if (empty($associations)) {
             // the "include" filter has sense only if an entity has at least one association
             return;

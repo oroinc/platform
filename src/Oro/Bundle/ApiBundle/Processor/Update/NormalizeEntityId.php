@@ -38,9 +38,15 @@ class NormalizeEntityId implements ProcessorInterface
             return;
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         try {
             $context->setId(
-                $this->entityIdTransformer->reverseTransform($entityId, $context->getMetadata())
+                $this->entityIdTransformer->reverseTransform($entityId, $metadata)
             );
         } catch (\Exception $e) {
             $context->addError(

@@ -96,15 +96,25 @@ class RestDocHandler implements HandlerInterface
             return;
         }
 
+        $annotation->setSection($entityType);
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
         $context = $this->getContext($action, $entityClass, $associationName);
-        $config = $context->getConfig();
-        $metadata = $context->getMetadata();
 
-        $annotation->setSection($entityType);
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $this->setDescription($annotation, $config);
         $this->setDocumentation($annotation, $config);
+        $this->setStatusCodes($annotation, $config);
+
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            return;
+        }
+
         if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
             $this->identifierHandler->handle(
                 $annotation,
@@ -112,10 +122,10 @@ class RestDocHandler implements HandlerInterface
                 $associationName ? $context->getParentMetadata() : $metadata
             );
         }
+
+        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
         $this->setInputMetadata($annotation, $action, $config, $metadata);
         $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
-        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-        $this->setStatusCodes($annotation, $config);
     }
 
     /**

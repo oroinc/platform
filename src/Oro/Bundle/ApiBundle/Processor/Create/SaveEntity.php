@@ -48,6 +48,12 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         $em->persist($entity);
         try {
             $em->flush();
@@ -61,7 +67,7 @@ class SaveEntity implements ProcessorInterface
 
         // save entity id into the Context
         if (!$context->hasErrors()) {
-            $id = $context->getMetadata()->getIdentifierValue($entity);
+            $id = $metadata->getIdentifierValue($entity);
             if (null !== $id) {
                 $context->setId($id);
             }
