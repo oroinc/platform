@@ -4,9 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Form\EventListener;
 
 use Oro\Bundle\TranslationBundle\Form\TranslationForm\TranslationFormInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslationsFieldsType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author David ALLIX

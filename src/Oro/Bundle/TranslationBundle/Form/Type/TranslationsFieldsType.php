@@ -29,7 +29,7 @@ class TranslationsFieldsType extends AbstractType
 
     /**
      * BC for SF < 2.7
-     * 
+     *
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)

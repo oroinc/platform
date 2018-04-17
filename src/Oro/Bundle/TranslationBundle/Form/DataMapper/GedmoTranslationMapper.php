@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\DataMapper;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Moved from https://github.com/a2lix/TranslationFormBundle/tree/1.x
@@ -63,7 +63,6 @@ class GedmoTranslationMapper implements DataMapperInterface
                 if ($existingTranslation) {
                     $existingTranslation->setContent($content);
                     $newData->add($existingTranslation);
-
                 } else {
                     $translation = new $translationClass();
                     $translation->setLocale($locale);

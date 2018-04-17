@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\DataMapper\GedmoTranslationMapper;
 use Oro\Bundle\TranslationBundle\Form\EventListener\GedmoTranslationsListener;
 use Oro\Bundle\TranslationBundle\Form\TranslationForm\GedmoTranslationForm;
-use Oro\Bundle\TranslationBundle\Form\DataMapper\GedmoTranslationMapper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
 
 /**
  * Regroup by locales, all translations fields (gedmo)
@@ -60,7 +60,6 @@ class GedmoTranslationsType extends AbstractType
         if (!$options['inherit_data']) {
             $builder->setDataMapper(new GedmoTranslationMapper());
             $builder->addEventSubscriber(new GedmoTranslationsListener());
-
         } else {
             if (!$options['translatable_class']) {
                 throw new \Exception("If you want include the default locale with translations

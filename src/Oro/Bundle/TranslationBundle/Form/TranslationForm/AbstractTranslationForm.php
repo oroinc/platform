@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormTypeGuesserInterface;
  */
 abstract class AbstractTranslationForm implements TranslationFormInterface
 {
-     /**
+    /**
      * @var FormTypeGuesserInterface
      */
     private $typeGuesser;
@@ -67,7 +67,7 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
 
             if (!isset($childOptions['display']) || $childOptions['display']) {
                 $childOptions = $this->guessMissingChildOptions($this->typeGuesser, $class, $child, $childOptions);
-                 $this->fillChildrenOptions($childOptions, $child, $options, $childrenOptions);
+                $this->fillChildrenOptions($childOptions, $child, $options, $childrenOptions);
             }
         }
 
