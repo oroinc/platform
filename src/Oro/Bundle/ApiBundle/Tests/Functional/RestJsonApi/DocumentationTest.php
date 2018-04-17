@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -105,6 +106,20 @@ class DocumentationTest extends RestJsonApiTestCase
         $resourceData = reset($resourceData);
         $expectedData = $this->loadYamlData('simple_data_types.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testSubresourceWithUnknownTargetTypeShouldBeInRigtCategory()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $docs = $this->getSubresourceEntityDocsForAction($entityType, 'search', ApiActions::GET_SUBRESOURCE);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        self::assertEquals($resourceData['section'], $entityType);
     }
 
     /**
@@ -304,6 +319,26 @@ class DocumentationTest extends RestJsonApiTestCase
                 return
                     $route->getDefault('entity') === $entityType
                     && $route->getDefault('_action') === $action;
+            }
+        );
+    }
+
+    /**
+     * @param $entityType
+     * @param $subresiurce
+     * @param $action
+     *
+     * @return array
+     */
+    protected function getSubresourceEntityDocsForAction($entityType, $subresiurce, $action)
+    {
+        return $this->filterDocs(
+            $this->getExtractor()->all(self::VIEW),
+            function (Route $route) use ($entityType, $action, $subresiurce) {
+                return
+                    $route->getDefault('entity') === $entityType
+                    && $route->getDefault('_action') === $action
+                    && $route->getDefault('association') === $subresiurce;
             }
         );
     }

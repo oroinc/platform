@@ -60,7 +60,8 @@ class CreateEntity implements ProcessorInterface
         $entityId = $context->getId();
         if ($entityId && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $metadata = $context->getMetadata();
-            if (!$metadata->hasIdentifierGenerator()
+            if (null !== $metadata
+                && !$metadata->hasIdentifierGenerator()
                 && null !== $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
             ) {
                 $context->addError(
