@@ -67,7 +67,7 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
 
             if (!isset($childOptions['display']) || $childOptions['display']) {
                 $childOptions = $this->guessMissingChildOptions($this->typeGuesser, $class, $child, $childOptions);
-                $childrenOptions = $this->fillChildrenOptions($childOptions, $child, $options);
+                 $this->fillChildrenOptions($childOptions, $child, $options, $childrenOptions);
             }
         }
 
@@ -78,12 +78,11 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
      * @param array $childOptions
      * @param string $child
      * @param array $options
+     * @param array $childrenOptions
      * @return array
      */
-    private function fillChildrenOptions(array $childOptions, $child, array $options)
+    private function fillChildrenOptions(array $childOptions, $child, array $options, array &$childrenOptions)
     {
-        $childrenOptions = [];
-
         // Custom options by locale
         if (isset($childOptions['locale_options'])) {
             $localesChildOptions = $childOptions['locale_options'];
