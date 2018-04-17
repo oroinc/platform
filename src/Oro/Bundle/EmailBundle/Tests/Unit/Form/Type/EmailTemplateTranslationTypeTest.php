@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
+use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\FormView;
 
 class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
@@ -56,6 +57,6 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('a2lix_translations_gedmo', $this->type->getParent());
+        $this->assertEquals(GedmoTranslationsType::class, $this->type->getParent());
     }
 }

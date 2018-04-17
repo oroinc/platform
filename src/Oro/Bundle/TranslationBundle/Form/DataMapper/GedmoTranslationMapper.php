@@ -22,9 +22,7 @@ class GedmoTranslationMapper implements DataMapperInterface
             return;
         }
 
-        if (!is_array($data) && !is_object($data)) {
-            throw new UnexpectedTypeException($data, 'object, array or empty');
-        }
+        $this->checkDataSupported($data);
 
         foreach ($forms as $translationsFieldsForm) {
             $locale = $translationsFieldsForm->getConfig()->getName();
