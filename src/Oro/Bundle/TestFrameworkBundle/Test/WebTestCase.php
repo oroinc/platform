@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Yaml\Yaml;
@@ -653,7 +654,9 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getUrl($name, $parameters = [], $absolute = false)
     {
-        return self::getContainer()->get('router')->generate($name, $parameters, $absolute);
+        $referenceType = $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+        return self::getContainer()->get('router')->generate($name, $parameters, $referenceType);
     }
 
     /**
