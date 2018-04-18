@@ -200,7 +200,7 @@ Data may be created by the steps of the scenario or as [fixtures](#fixtures).
 Install application without demo data in production mode using the following command:
 
 ```bash
-app/console oro:install  --drop-database --user-name=admin --user-email=admin@example.com \
+app/console oro:install  --drop-database --user-name=admin --user-email=admin@example.com --application-url=http://dev-crm.local/ \
   --user-firstname=John --user-lastname=Doe --user-password=admin \
   --organization-name=ORO --env=prod --sample-data=n --timeout=3000
 ```
