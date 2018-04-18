@@ -10,6 +10,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
+ * Serializer Implementation.
+ *
  * @todo: This is draft implementation of the entity serializer.
  *       It is expected that the full implementation will be done when new API component is implemented.
  * What need to do:
@@ -527,13 +529,21 @@ class EntitySerializer
                 continue;
             }
 
+            $allowedIds = $entityIds;
+            if (null !== $this->fieldFilter) {
+                $allowedIds = $this->getAccessibleIds($entityIds, $entityClass, $propertyPath);
+            }
+            if (empty($allowedIds)) {
+                continue;
+            }
+
             $mapping = $entityMetadata->getAssociationMapping($propertyPath);
             $targetConfig = $this->getTargetEntity($config, $field);
 
             if ($this->isSingleStepLoading($mapping['targetEntity'], $targetConfig)) {
-                $value = $this->loadRelatedItemsForSimpleEntity($entityIds, $mapping, $targetConfig, $context);
+                $value = $this->loadRelatedItemsForSimpleEntity($allowedIds, $mapping, $targetConfig, $context);
             } else {
-                $value = $this->loadRelatedItems($entityIds, $mapping, $targetConfig, $context);
+                $value = $this->loadRelatedItems($allowedIds, $mapping, $targetConfig, $context);
             }
             $relatedData[$field] = $value;
         }
@@ -923,5 +933,34 @@ class EntitySerializer
         }
 
         return $targetClass;
+    }
+
+    /**
+     * Check access to a specified field for each entity object from the given $entityIds list
+     * and returns ids only for entities for which this access is granted.
+     *
+     * @param array $entityIds
+     * @param string $entityClass
+     * @param string $field
+     *
+     * @return array
+     */
+    private function getAccessibleIds(array $entityIds, $entityClass, $field)
+    {
+        $allowedIds = [];
+        foreach ($entityIds as $entityId) {
+            $isFieldAllowed = $this->fieldFilter->checkField(
+                ['entityId' => $entityId],
+                $entityClass,
+                $field
+            );
+            if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
+                continue;
+            }
+
+            $allowedIds[] = $entityId;
+        }
+
+        return $allowedIds;
     }
 }
