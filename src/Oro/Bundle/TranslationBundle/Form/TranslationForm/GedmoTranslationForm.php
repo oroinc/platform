@@ -21,7 +21,6 @@ class GedmoTranslationForm extends AbstractTranslationForm
     private $gedmoConfig;
 
     /**
-     *
      * @return TranslatableListener
      */
     public function getGedmoTranslatableListener()
@@ -30,7 +29,6 @@ class GedmoTranslationForm extends AbstractTranslationForm
     }
 
     /**
-     *
      * @param TranslatableListener $gedmoTranslatableListener
      */
     public function setGedmoTranslatableListener(TranslatableListener $gedmoTranslatableListener)
@@ -39,7 +37,6 @@ class GedmoTranslationForm extends AbstractTranslationForm
     }
 
     /**
-     *
      * @param string $translatableClass
      * @return string
      */
@@ -68,7 +65,6 @@ class GedmoTranslationForm extends AbstractTranslationForm
     }
 
     /**
-     *
      * @param string $translatableClass
      * @return array
      */

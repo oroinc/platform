@@ -5,7 +5,6 @@ namespace Oro\Bundle\TranslationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Translations fields type
@@ -26,23 +25,13 @@ class TranslationsFieldsType extends AbstractType
     }
 
     /**
-     * BC for SF < 2.7
-     *
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $this->configureOptions($resolver);
-    }
-
-    /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'fields' => array(),
+        $resolver->setDefaults([
+            'fields' => [],
             'translation_class' => null
-        ));
+        ]);
     }
 }

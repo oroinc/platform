@@ -28,7 +28,6 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
     abstract protected function getTranslatableFields($class);
 
     /**
-     *
      * @param FormRegistry $formRegistry
      * @param ManagerRegistry $managerRegistry
      */
@@ -39,7 +38,6 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
     }
 
     /**
-     *
      * @return ManagerRegistry
      */
     public function getManagerRegistry()
@@ -54,7 +52,6 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
     {
         $childrenOptions = [];
 
-        // Clean some options
         unset($options['inherit_data']);
         unset($options['translatable_class']);
 
