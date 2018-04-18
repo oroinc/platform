@@ -64,11 +64,17 @@ class BuildSingleItemQuery implements ProcessorInterface
             }
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
         $this->entityIdHelper->applyEntityIdentifierRestriction(
             $query,
             $context->getId(),
-            $context->getMetadata()
+            $metadata
         );
 
         $criteria = $context->getCriteria();

@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Exception\JobNotFoundException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
@@ -464,7 +465,7 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobExtension->expects($this->never())
             ->method('onPostCreateDelayed');
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(JobNotFoundException::class);
         $this->expectExceptionMessage('Job was not found. id: "job-id"');
 
         $jobRunner = new JobRunner($jobProcessor, $jobExtension);
