@@ -6,10 +6,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserWithBU;
+use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserWithBUAndOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
  * @dbIsolationPerTest
@@ -22,24 +21,25 @@ class DictionaryFilterTest extends WebTestCase
     public function setUp()
     {
         $this->initClient();
-        $this->loadFixtures([LoadUserWithBU::class]);
+        $this->loadFixtures([LoadUserWithBUAndOrganization::class]);
         $this->filter = $this->getContainer()->get('oro_filter.dictionary_filter');
     }
 
     /**
      * @dataProvider filterProvider
      *
-     * @param string   $dataName
+     * @param string $join
+     * @param string $dataName
      * @param callable $filterFormData
-     * @param array    $expectedResult
+     * @param array $expectedResult
      */
-    public function testFilter($dataName, callable $filterFormData, array $expectedResult)
+    public function testFilter($join, $dataName, callable $filterFormData, array $expectedResult)
     {
         $qb = $this->createQueryBuilder('u');
         $qb
             ->select('u.username')
             ->orderBy('u.username')
-            ->leftJoin('u.businessUnits', 'businessUnits')
+            ->leftJoin('u.' . $join, $join)
             ->andWhere(
                 $qb->expr()->in(
                     'u.username',
@@ -54,7 +54,7 @@ class DictionaryFilterTest extends WebTestCase
 
         $this->assertTrue($filterForm->isValid());
 
-        $this->filter->init($dataName, ['class' => BusinessUnit::class, 'data_name' => $dataName]);
+        $this->filter->init($dataName, ['data_name' => $dataName]);
         $this->filter->apply($ds, $filterForm->getData());
 
         $result = $ds->getQueryBuilder()->getQuery()->getResult();
@@ -68,17 +68,30 @@ class DictionaryFilterTest extends WebTestCase
     public function filterProvider()
     {
         return [
+            'Filter "is any of" for toOne relation' => [
+                'join' => 'organization',
+                'dataName' => 'organization.id',
+                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_IN, 'mainOrganization'),
+                'expectedResult' => [
+                    ['username' => 'u3'],
+                ],
+            ],
             'Filter "is any of"' => [
+                'join' => 'businessUnits',
                 'dataName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_IN),
+                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_IN, 'mainBusinessUnit'),
                 'expectedResult' => [
                     ['username' => 'u1'],
                     ['username' => 'u2'],
                 ],
             ],
             'Filter "is not any of"' => [
-                'filterName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_NOT_IN),
+                'join' => 'businessUnits',
+                'dataName' => 'businessUnits.id',
+                'filterFormData' => $this->getFilterFormDataCallback(
+                    DictionaryFilterType::TYPE_NOT_IN,
+                    'mainBusinessUnit'
+                ),
                 'expectedResult' => [
                     [
                         'username' => 'u3',
@@ -89,16 +102,17 @@ class DictionaryFilterTest extends WebTestCase
     }
 
     /**
-     * @param $type
+     * @param int $type
+     * @param string $reference
      *
      * @return \Closure
      */
-    private function getFilterFormDataCallback($type)
+    private function getFilterFormDataCallback($type, $reference)
     {
-        return function () use ($type) {
+        return function () use ($type, $reference) {
             return [
                 'type' => $type,
-                'value' => $this->getReference('mainBusinessUnit')->getId(),
+                'value' => $this->getReference($reference)->getId(),
             ];
         };
     }
