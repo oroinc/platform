@@ -299,6 +299,9 @@ class RendererTest extends LayoutTestCase
     }
 
     /**
+     * @param string|null $action
+     * @param string|null $method
+     *
      * @return FormInterface
      */
     protected function getTestForm($action = null, $method = null)
@@ -454,10 +457,10 @@ HTML;
         $expected = <<<HTML
 <div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
-        <label class="required">User</label>
+        <label data-ftid="form_for_layout_renderer_test_user" data-name="field__user" class="required">User</label>
         <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user" data-name="field__user">
             <div>
-                <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+                <label data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name" class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
                 <input type="text"
                     id="form_for_layout_renderer_test_user_firstName"
                     name="form_for_layout_renderer_test[user][firstName]"
@@ -465,7 +468,7 @@ HTML;
                     data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name"/>
             </div>
             <div>
-                <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+                <label data-ftid="form_for_layout_renderer_test_user_lastName" data-name="field__last-name" class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
                 <input type="text"
                     id="form_for_layout_renderer_test_user_lastName"
                     name="form_for_layout_renderer_test[user][lastName]"
@@ -475,7 +478,7 @@ HTML;
         </div>
     </div>
     <div>
-        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
+        <label data-ftid="form_for_layout_renderer_test_jobTitle" data-name="field__job-title" for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
             id="form_for_layout_renderer_test_jobTitle"
             name="form_for_layout_renderer_test[jobTitle]"
@@ -489,19 +492,19 @@ HTML;
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
                 value=""  checked="checked"/>
-            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
+            <label data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder" for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_0" data-name="field__0"
                 value="male"/>
-            <label for="form_for_layout_renderer_test_gender_0">Male</label>
+            <label data-ftid="form_for_layout_renderer_test_gender_0" data-name="field__0" for="form_for_layout_renderer_test_gender_0">Male</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_1"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_1" data-name="field__1"
                 value="female"/>
-            <label for="form_for_layout_renderer_test_gender_1">Female</label>
+            <label data-ftid="form_for_layout_renderer_test_gender_1" data-name="field__1" for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
 </div>
