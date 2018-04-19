@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
+use Doctrine\ORM\Proxy\Proxy;
 use Nelmio\Alice\Instances\Collection;
 use Nelmio\Alice\Instances\Processor\Methods\MethodInterface;
 use Nelmio\Alice\Instances\Processor\ProcessableInterface;
@@ -51,7 +52,7 @@ class AliceReferenceProcessor implements MethodInterface
         }
 
         $object = $this->objects->find($reference);
-        $result = $object;
+        $result = $this->actualizeObject($object);
         $propertyAccessor = new PropertyAccessor();
 
         foreach ($refParts as $refPart) {
@@ -82,5 +83,18 @@ class AliceReferenceProcessor implements MethodInterface
         $method = $matches['methodName'];
 
         return call_user_func_array([$object, $method], $parameters);
+    }
+
+    /**
+     * @param object $object
+     * @return object
+     */
+    private function actualizeObject($object)
+    {
+        if ($object instanceof Proxy && !$object->__isInitialized()) {
+            $object->__load();
+        }
+
+        return $object;
     }
 }
