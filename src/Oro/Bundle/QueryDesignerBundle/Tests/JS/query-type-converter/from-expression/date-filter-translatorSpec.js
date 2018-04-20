@@ -36,40 +36,47 @@ define(function(require) {
 
         describe('rejects node structure because', function() {
             var cases = {
-                'improper AST':
-                    new ConstantNode('test'),
-                'unsupported operation':
-                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
-                'improper left operand AST':
-                    new BinaryNode('=', new ConstantNode('test'), new ConstantNode('2018-04-03')),
-                'unsupported function call in left operand (unsupported date part)':
+                'improper AST': [
+                    new ConstantNode('test')
+                ],
+                'unsupported operation': [
+                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03'))
+                ],
+                'improper left operand AST': [
+                    new BinaryNode('=', new ConstantNode('test'), new ConstantNode('2018-04-03'))
+                ],
+                'unsupported function call in left operand (unsupported date part)': [
                     new BinaryNode('=',
                         createFunctionNode('dateISO', [createGetAttrNode('foo.bar')]),
                         new ConstantNode('2018-04-03')
-                    ),
-                'improper right operand AST':
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ArrayNode()),
-                'improper value of right operand':
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('Apr 3, 2018')),
-                'unsupported function call in right operand (unsupported variable)':
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('rightNow')),
-                'different fields in the between operation':
+                    )
+                ],
+                'improper right operand AST': [
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ArrayNode())
+                ],
+                'improper value of right operand': [
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('Apr 3, 2018'))
+                ],
+                'unsupported function call in right operand (unsupported variable)': [
+                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('rightNow'))
+                ],
+                'different fields in the between operation': [
                     new BinaryNode('and',
                         new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
                         new BinaryNode('<=', createGetAttrNode('foo.qux'), new ConstantNode('2018-04-07'))
-                    ),
-                'invalid pair operators in the not between operation':
+                    )
+                ],
+                'invalid pair operators in the not between operation': [
                     new BinaryNode('and',
                         new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
                         new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-07'))
                     )
+                ]
             };
 
-            _.each(cases, function(ast, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(ast)).toBe(null);
-                    expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
-                });
+            jasmine.itEachCase(cases, function(ast) {
+                expect(translator.tryToTranslate(ast)).toBe(null);
+                expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
             });
         });
 
