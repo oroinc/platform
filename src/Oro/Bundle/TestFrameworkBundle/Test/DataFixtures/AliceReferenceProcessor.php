@@ -6,6 +6,7 @@ use Doctrine\ORM\Proxy\Proxy;
 use Nelmio\Alice\Instances\Collection;
 use Nelmio\Alice\Instances\Processor\Methods\MethodInterface;
 use Nelmio\Alice\Instances\Processor\ProcessableInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class AliceReferenceProcessor implements MethodInterface
@@ -13,9 +14,22 @@ class AliceReferenceProcessor implements MethodInterface
     private static $regex = '/^@(?P<ref>[^<*]*)$/';
 
     /**
+     * @var RegistryInterface
+     */
+    protected $registry;
+
+    /**
      * @var Collection
      */
     protected $objects;
+
+    /**
+     * @param RegistryInterface $registry
+     */
+    public function __construct(RegistryInterface $registry)
+    {
+        $this->registry = $registry;
+    }
 
     /**
      * Sets the object collection to handle referential calls.
@@ -86,13 +100,19 @@ class AliceReferenceProcessor implements MethodInterface
     }
 
     /**
+     * Reload the object, because it can be detached from doctrine by previous moves
+     *
      * @param object $object
      * @return object
      */
     private function actualizeObject($object)
     {
-        if ($object instanceof Proxy && !$object->__isInitialized()) {
-            $object->__load();
+        $class = get_class($object);
+        $manager = $this->registry->getManagerForClass($class);
+
+        if ($object instanceof Proxy && !$object->__isInitialized() && !$manager->contains($object)) {
+            $identifier = $manager->getClassMetadata($class)->getIdentifierValues($object);
+            $object = $manager->find($class, $identifier);
         }
 
         return $object;
