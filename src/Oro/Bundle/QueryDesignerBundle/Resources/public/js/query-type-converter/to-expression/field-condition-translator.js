@@ -9,14 +9,14 @@ define(function(require) {
      *
      * @param {FieldIdTranslatorToExpression} fieldIdTranslator
      * @param {FilterConfigProvider} filterConfigProvider
-     * @param {Object.<string, FilterTranslatorToExpression>} filterTranslators
+     * @param {TranslatorProvider} filterTranslatorProvider
      * @constructor
      * @throws TypeError if some required argument is missing
      */
     var FieldConditionTranslator = function FieldConditionTranslatorToExpression(
         fieldIdTranslator,
         filterConfigProvider,
-        filterTranslators
+        filterTranslatorProvider
     ) {
         if (!fieldIdTranslator) {
             throw new TypeError(
@@ -26,14 +26,14 @@ define(function(require) {
             throw new TypeError(
                 'Instance of `FilterConfigProvider` is required for `FieldConditionTranslatorToExpression`');
         }
-        if (!filterTranslators) {
+        if (!filterTranslatorProvider) {
             throw new TypeError(
-                'List of `filterTranslators` is required for `FieldConditionTranslatorToExpression`');
+                'Instance of `TranslatorProvider` is required for `FieldConditionTranslatorToExpression`');
         }
 
         this.fieldIdTranslator = fieldIdTranslator;
         this.filterConfigProvider = filterConfigProvider;
-        this.filterTranslators = filterTranslators;
+        this.filterTranslatorProvider = filterTranslatorProvider;
 
         FieldConditionTranslator.__super__.constructor.apply(this, arguments);
     };
@@ -43,6 +43,7 @@ define(function(require) {
 
     Object.assign(FieldConditionTranslator.prototype, {
         constructor: FieldConditionTranslator,
+
         /**
          * @inheritDoc
          */
@@ -93,14 +94,18 @@ define(function(require) {
          * Finds filter translate by its name
          *
          * @param {string} filterName
-         * @return {AbstractFilterTranslator|null}
+         * @return {AbstractFilterTranslatorToExpression|null}
          * @protected
          */
         resolveFilterTranslator: function(filterName) {
+            var FilterTranslator;
             var filterTranslator;
             var filterConfig = this.filterConfigProvider.getFilterConfigByName(filterName);
-            if (filterConfig && this.filterTranslators[filterConfig.type]) {
-                filterTranslator = new this.filterTranslators[filterConfig.type](filterConfig);
+            if (
+                filterConfig &&
+                (FilterTranslator = this.filterTranslatorProvider.getTranslator(filterConfig.type))
+            ) {
+                filterTranslator = new FilterTranslator(filterConfig);
             }
             return filterTranslator || null;
         }

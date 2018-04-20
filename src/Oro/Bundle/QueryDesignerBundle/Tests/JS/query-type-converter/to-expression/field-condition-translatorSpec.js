@@ -52,16 +52,21 @@ define(function(require) {
                 )
             ]);
 
-            var filterTranslators = {
-                string: function() {
-                    return stringFilterTranslatorMock;
-                }
-            };
+            var filterTranslatorProviderMock = jasmine.combineSpyObj('filterTranslatorProvider', [
+                jasmine.createSpy('getTranslator').and.callFake(function(name) {
+                    var filterTranslators = {
+                        string: function() {
+                            return stringFilterTranslatorMock;
+                        }
+                    };
+                    return filterTranslators[name] || null;
+                })
+            ]);
 
             translator = new FieldConditionTranslator(
                 fieldIdTranslatorMock,
                 filterConfigProviderMock,
-                filterTranslators
+                filterTranslatorProviderMock
             );
         });
 

@@ -1,72 +1,80 @@
-define(function(require) {
+define(function() {
     'use strict';
 
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
+    /**
+     * TranslatorProvider allows to collect and fetch translator's constructors
+     * (that are extends of specific base translator)
+     *
+     * @param {Function} BaseTranslator
+     * @constructor
+     * @throws TypeError if BaseTranslator is not a function
+     */
+    function TranslatorProvider(BaseTranslator) {
+        if (!(BaseTranslator instanceof Function)) {
+            throw new TypeError('`BaseTranslator` is not a function');
+        }
+        this.translators = {};
+        this.BaseTranslator = BaseTranslator;
+    }
 
-    var FilterTranslatorsManager = {
-        /**
-         */
-        fromExpression: {},
-
-        /**
-         */
-        toExpression: {},
-
-        /**
-         * @param modules
-         */
-        loadTranslatorsFromExpression: function(modules) {
-            this._loadTranslators(modules, this.fromExpression);
-        },
-
-        /**
-         * @param modules
-         */
-        loadTranslatorsToExpression: function(modules) {
-            this._loadTranslators(modules, this.toExpression);
-        },
+    Object.assign(TranslatorProvider.prototype, {
+        constructor: TranslatorProvider,
 
         /**
-         * @param {Array} modules
-         * @param {Object} space
-         * @private
+         * Map type of translator to its constructor
+         * @type {Object.<string, Function>}
          */
-        _loadTranslators: function(modules, space) {
-            tools.loadModules(modules, function() {
-                _.each(arguments, function(module) {
-                    this.addTranslator(module, space);
-                }, this);
-            }, this);
-        },
+        translators: null,
 
         /**
-         * @param {Constructor} Translator
-         * @param {Object} space
+         * Register passed translator constructor in the provider
+         *
+         * @param {string} type of translator
+         * @param {Function} Translator constructor
+         * @throws {Error} if passed translator is not instance of BaseTranslator
          */
-        addTranslator: function(Translator, space) {
-            var translator = new Translator();
-            var type = translator.filterType;
-
-            if (type) {
-                space[type] = translator;
+        registerTranslator: function(type, Translator) {
+            var prototype = Translator.prototype;
+            if (prototype instanceof this.BaseTranslator) {
+                this.translators[type] = Translator;
+            } else {
+                throw new Error('Translator has to be instance of `' + this.BaseTranslator.name + '`');
             }
         },
 
         /**
-         * @returns {*}
+         * Fetches Translator constructor by its type
+         *
+         * @param {string} type
+         * @return {Function|null}
          */
-        getTranslatorsFromExpression: function() {
-            return _.clone(this.fromExpression);
-        },
-
-        /**
-         * @returns {*}
-         */
-        getTranslatorsToExpression: function() {
-            return _.clone(this.toExpression);
+        getTranslator: function(type) {
+            return this.translators[type] || null;
         }
+    });
+
+    /**
+     * Registered providers
+     * @type {Object}
+     * @static
+     */
+    TranslatorProvider.providers = {};
+
+    /**
+     *
+     * @param BaseTranslator
+     * @return {TranslatorProvider}
+     * @static
+     */
+    TranslatorProvider.getProviderFor = function(BaseTranslator) {
+        var providers = TranslatorProvider.providers;
+        var name = BaseTranslator.name;
+        if (!providers[name]) {
+            providers[name] = new TranslatorProvider(BaseTranslator);
+        }
+        return providers[name];
     };
 
-    return FilterTranslatorsManager;
+
+    return TranslatorProvider;
 });
