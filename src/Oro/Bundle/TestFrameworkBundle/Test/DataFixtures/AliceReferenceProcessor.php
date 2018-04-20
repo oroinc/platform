@@ -9,6 +9,9 @@ use Nelmio\Alice\Instances\Processor\ProcessableInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * AliceReferenceProcessor parse reference path to return the appropriate value
+ */
 class AliceReferenceProcessor implements MethodInterface
 {
     private static $regex = '/^@(?P<ref>[^<*]*)$/';
