@@ -20,6 +20,7 @@ config:
 
         'oroquerydesigner/js/app/modules/validator-constraints-module': 'bundles/oroquerydesigner/js/app/modules/validator-constraints-module.js'
         'oroquerydesigner/js/app/modules/entity-filter-preset-module': 'bundles/oroquerydesigner/js/app/modules/entity-filter-preset-module.js'
+        'oroquerydesigner/js/app/modules/query-type-converter-module': 'bundles/oroquerydesigner/js/app/modules/query-type-converter-module.js'
         'oroquerydesigner/js/validator/not-blank-filters': 'bundles/oroquerydesigner/js/validator/not-blank-filters.js'
 
         'oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator.js'
@@ -41,9 +42,9 @@ config:
         'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator': 'bundles/oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator.js'
         'oroquerydesigner/js/query-type-converter/expression-functions-provider': 'bundles/oroquerydesigner/js/query-type-converter/expression-functions-provider.js'
         'oroquerydesigner/js/query-type-converter/filter-config-provider': 'bundles/oroquerydesigner/js/query-type-converter/filter-config-provider.js'
-        'oroquerydesigner/js/query-type-converter/filter-translators-manager': 'bundles/oroquerydesigner/js/query-type-converter/filter-translators-manager.js'
+        'oroquerydesigner/js/query-type-converter/translator-provider': 'bundles/oroquerydesigner/js/query-type-converter/translator-provider.js'
 
     appmodules:
         - oroquerydesigner/js/app/modules/validator-constraints-module
         - oroquerydesigner/js/app/modules/entity-filter-preset-module
-        - oroquerydesigner/js/app/modules/filter-translators-module
+        - oroquerydesigner/js/app/modules/query-type-converter-module
