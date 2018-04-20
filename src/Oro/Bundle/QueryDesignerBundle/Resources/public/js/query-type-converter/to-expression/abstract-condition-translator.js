@@ -5,11 +5,53 @@ define(function(require) {
 
     /**
      * Defines interface and implements base functionality of ConditionTranslatorToExpression
+     *
+     * @param {FieldIdTranslatorToExpression} fieldIdTranslator
+     * @param {FilterConfigProvider} filterConfigProvider
+     * @param {TranslatorProvider} filterTranslatorProvider
+     * @constructor
+     * @throws TypeError if some required argument is missing
      */
-    var AbstractConditionTranslator = function AbstractConditionTranslatorToExpression() {};
+    var AbstractConditionTranslator = function AbstractConditionTranslatorToExpression(
+        fieldIdTranslator,
+        filterConfigProvider,
+        filterTranslatorProvider
+    ) {
+        if (!fieldIdTranslator) {
+            throw new TypeError(
+                'Instance of `FieldIdTranslator` is required for `AbstractConditionTranslatorToExpression`');
+        }
+        if (!filterConfigProvider) {
+            throw new TypeError(
+                'Instance of `FilterConfigProvider` is required for `AbstractConditionTranslatorToExpression`');
+        }
+        if (!filterTranslatorProvider) {
+            throw new TypeError(
+                'Instance of `TranslatorProvider` is required for `AbstractConditionTranslatorToExpression`');
+        }
+
+        this.fieldIdTranslator = fieldIdTranslator;
+        this.filterConfigProvider = filterConfigProvider;
+        this.filterTranslatorProvider = filterTranslatorProvider;
+    };
 
     Object.assign(AbstractConditionTranslator.prototype, {
         constructor: AbstractConditionTranslator,
+
+        /**
+         * @type {FieldIdTranslatorToExpression}
+         */
+        fieldIdTranslator: null,
+
+        /**
+         * @type {FilterConfigProvider}
+         */
+        filterConfigProvider: null,
+
+        /**
+         * @type {TranslatorProvider}
+         */
+        filterTranslatorProvider: null,
 
         /**
          * Builds JSON validation schema
@@ -60,6 +102,26 @@ define(function(require) {
          */
         translate: function(condition) {
             throw new Error('Method `translate` has to be defined in descendant FilterTranslatorToExpression');
+        },
+
+        /**
+         * Finds filter translate by its name
+         *
+         * @param {string} filterName
+         * @return {AbstractFilterTranslatorToExpression|null}
+         * @protected
+         */
+        resolveFilterTranslator: function(filterName) {
+            var FilterTranslator;
+            var filterTranslator;
+            var filterConfig = this.filterConfigProvider.getFilterConfigByName(filterName);
+            if (
+                filterConfig &&
+                (FilterTranslator = this.filterTranslatorProvider.getTranslator(filterConfig.type))
+            ) {
+                filterTranslator = new FilterTranslator(filterConfig);
+            }
+            return filterTranslator || null;
         }
     });
 

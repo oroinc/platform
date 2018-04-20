@@ -5,36 +5,9 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator');
 
     /**
-     * Defines interface and implements base functionality of ConditionTranslatorToExpression
-     *
-     * @param {FieldIdTranslatorToExpression} fieldIdTranslator
-     * @param {FilterConfigProvider} filterConfigProvider
-     * @param {TranslatorProvider} filterTranslatorProvider
-     * @constructor
-     * @throws TypeError if some required argument is missing
+     * @inheritDoc
      */
-    var FieldConditionTranslator = function FieldConditionTranslatorToExpression(
-        fieldIdTranslator,
-        filterConfigProvider,
-        filterTranslatorProvider
-    ) {
-        if (!fieldIdTranslator) {
-            throw new TypeError(
-                'Instance of `FieldIdTranslatorToExpression` is required for `FieldConditionTranslatorToExpression`');
-        }
-        if (!filterConfigProvider) {
-            throw new TypeError(
-                'Instance of `FilterConfigProvider` is required for `FieldConditionTranslatorToExpression`');
-        }
-        if (!filterTranslatorProvider) {
-            throw new TypeError(
-                'Instance of `TranslatorProvider` is required for `FieldConditionTranslatorToExpression`');
-        }
-
-        this.fieldIdTranslator = fieldIdTranslator;
-        this.filterConfigProvider = filterConfigProvider;
-        this.filterTranslatorProvider = filterTranslatorProvider;
-
+    var FieldConditionTranslator = function FieldConditionTranslatorToExpression() {
         FieldConditionTranslator.__super__.constructor.apply(this, arguments);
     };
 
@@ -88,26 +61,6 @@ define(function(require) {
             var leftOperand = this.fieldIdTranslator.translate(condition.columnName);
 
             return filterTranslator.translate(leftOperand, condition.criterion.data);
-        },
-
-        /**
-         * Finds filter translate by its name
-         *
-         * @param {string} filterName
-         * @return {AbstractFilterTranslatorToExpression|null}
-         * @protected
-         */
-        resolveFilterTranslator: function(filterName) {
-            var FilterTranslator;
-            var filterTranslator;
-            var filterConfig = this.filterConfigProvider.getFilterConfigByName(filterName);
-            if (
-                filterConfig &&
-                (FilterTranslator = this.filterTranslatorProvider.getTranslator(filterConfig.type))
-            ) {
-                filterTranslator = new FilterTranslator(filterConfig);
-            }
-            return filterTranslator || null;
         }
     });
 
