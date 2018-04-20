@@ -581,7 +581,7 @@ define(function(require) {
                 this.expressionEditorComponent.setEntity(entityClassName);
             });
 
-            this.expressionEditorComponent.view.setValue(this.load('expression'));
+            this.expressionEditorComponent.view.setValue(this.load('expression') || '');
             this.listenTo(this.expressionEditorComponent.view, 'change', function(value) {
                 this.save(value, 'expression');
             });
@@ -606,7 +606,7 @@ define(function(require) {
                 this.conditionBuilderComponent.setEntity(entityClassName);
             });
 
-            this.conditionBuilderComponent.view.setValue(this.load('filters'));
+            this.conditionBuilderComponent.view.setValue(this.load('filters') || []);
             this.listenTo(this.conditionBuilderComponent.view, 'change', function(value) {
                 this.save(value, 'filters');
             });
@@ -629,6 +629,11 @@ define(function(require) {
                 // there're no all required components
                 return;
             }
+
+            this.queryTypeConverterComponent.setEntity(this.entityClassName);
+            this.on('entityChange', function(entityClassName) {
+                this.queryTypeConverterComponent.setEntity(entityClassName);
+            });
 
             var expressionEditorValue = this.expressionEditorComponent.view.getValue();
             var conditionBuilderValue = this.conditionBuilderComponent.view.getValue();

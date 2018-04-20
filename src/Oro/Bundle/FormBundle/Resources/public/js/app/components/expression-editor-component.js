@@ -20,6 +20,7 @@ define(function(require) {
         /**
          * @param {Object} options
          * @param {Object} options.dataProviderConfig
+         * @param {Array<string>} options.expressionFunctionProviderModules
          */
         initialize: function(options) {
             this._deferredInit();
@@ -77,7 +78,7 @@ define(function(require) {
                 el: options._sourceElement,
                 autoRender: true,
                 entityDataProvider: entityStructureDataProvider,
-                expressionFunctionProviders: expressionFunctionProviders,
+                expressionFunctionProviders: expressionFunctionProviders
             }, _.omit(options, '_sourceElement', '_subPromises', 'dataProviderConfig'));
 
             this.view = new ExpressionEditorView(viewOptions);

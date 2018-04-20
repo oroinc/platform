@@ -2,11 +2,22 @@ define(function(require) {
     'use strict';
 
     var QueryTypeConverterComponent;
+    var $ = require('jquery');
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseModel = require('oroui/js/app/models/base/model');
     var QueryTypeSwitcherView = require('oroquerydesigner/js/app/views/query-type-switcher-view');
-    var FilterConfigProvider =require('oroquerydesigner/js/query-type-converter/filter-config-provider');
+    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    var FilterConfigProvider = require('oroquerydesigner/js/query-type-converter/filter-config-provider');
+    var TranslatorProvider = require('oroquerydesigner/js/query-type-converter/translator-provider');
+    var QueryConditionConverterToExpression =
+        require('oroquerydesigner/js/query-type-converter/to-expression/query-condition-converter');
+    var FieldIdTranslatorToExpression =
+        require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
+    var AbstractFilterTranslatorToExpression =
+        require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
+    var AbstractConditionTranslatorToExpression =
+        require('oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator');
 
     QueryTypeConverterComponent = BaseComponent.extend({
         relatedSiblingComponents: {
@@ -15,8 +26,21 @@ define(function(require) {
         },
 
         defaultOptions: {
+            entityStructureDataProviderConfig: {
+                filterPreset: 'querydesigner'
+            },
             defaultMode: 'simple'
         },
+
+        /**
+         * @type {EntityStructureDataProvider}
+         */
+        entityStructureDataProvider: null,
+
+        /**
+         * @type {FilterConfigProvider}
+         */
+        filterConfigProvider: null,
 
         /**
          * @inheritDoc
@@ -33,24 +57,113 @@ define(function(require) {
                 // To converting both of switched components are required
                 return;
             }
+            options = _.defaults(options, this.defaultOptions);
 
             this._deferredInit();
-            var fieldConditionOptions = this.conditionBuilderComponent
-                .view.getCriteriaOrigin('condition-item').data('options');
-            var filterConfigProvider = new FilterConfigProvider(_.pick(fieldConditionOptions, 'filters', 'hierarchy'));
-            filterConfigProvider.loadInitModules()
-                .always(this._resolveDeferredInit.bind(this));
+            $.when(
+                this.initEntityStructureDataProvider(options),
+                this.initFilterConfigProvider()
+            )
+                .then(this._init.bind(this, options))
+                .then(this._resolveDeferredInit.bind(this));
 
-            options = _.defaults(options || {}, this.defaultOptions);
+            QueryTypeConverterComponent.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Continue initialization once all promises are resolved
+         *
+         * @param {Object} options
+         * @param {EntityStructureDataProvider} entityStructureDataProvider
+         * @param {FilterConfigProvider} filterConfigProvider
+         * @protected
+         */
+        _init: function(options, entityStructureDataProvider, filterConfigProvider) {
+            if (this.disposed) {
+                return;
+            }
+            this.entityStructureDataProvider = entityStructureDataProvider;
+            this.filterConfigProvider = filterConfigProvider;
+
+            // init translators
+            this.initTranslatorsToExpression();
+            this.initTranslatorsFromExpression();
+
+            // init state model
             this.queryTypeStateModel = new BaseModel();
             this.listenTo(this.queryTypeStateModel, 'change:mode', this.onModeChange);
+
+            // init type switcher view
             this.view = new QueryTypeSwitcherView({
                 el: options._sourceElement,
                 model: this.queryTypeStateModel
             });
             this.listenTo(this.view, 'switch', this.onModeSwitch);
+
             this.setMode(options.defaultMode);
-            QueryTypeConverterComponent.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * Initializes entity structure data provider
+         *
+         * @param {Object} options
+         * @return {Promise<EntityStructureDataProvider>}
+         */
+        initEntityStructureDataProvider: function(options) {
+            return EntityStructureDataProvider
+                .createDataProvider(options.entityStructureDataProviderConfig, this);
+        },
+
+        /**
+         * Initializes filter config provider
+         *
+         * @return {Promise<FilterConfigProvider>}
+         */
+        initFilterConfigProvider: function() {
+            var fieldConditionOptions = this.conditionBuilderComponent
+                .view.getCriteriaOrigin('condition-item').data('options');
+
+            var data = _.pick(fieldConditionOptions, 'filters', 'hierarchy');
+            var filterConfigProvider = new FilterConfigProvider(data);
+            return filterConfigProvider.loadInitModules()
+                .then(function() {
+                    return filterConfigProvider;
+                });
+        },
+
+        /**
+         * Initializes translator for conversion condition to expression
+         */
+        initTranslatorsToExpression: function() {
+            var filterIdTranslator = new FieldIdTranslatorToExpression(this.entityStructureDataProvider);
+            var filterConfigProvider = this.filterConfigProvider;
+            var filterTranslatorProvider = TranslatorProvider.getProviderOf(AbstractFilterTranslatorToExpression);
+            var conditionTranslators = TranslatorProvider.getProviderOf(AbstractConditionTranslatorToExpression)
+                .getTranslatorConstructors()
+                .map(function(ConditionTranslator) {
+                    return new ConditionTranslator(
+                        filterIdTranslator,
+                        filterConfigProvider,
+                        filterTranslatorProvider
+                    );
+                });
+            this.toExpression = new QueryConditionConverterToExpression(conditionTranslators);
+        },
+
+        /**
+         * Initializes translator for conversion expression to condition
+         */
+        initTranslatorsFromExpression: function() {
+            // this.fromExpression = new QueryConditionTranslatorFromExpression();
+        },
+
+        /**
+         * Sets root entity in instance EntityStructureDataProvider
+         *
+         * @param {string} entityClassName
+         */
+        setEntity: function(entityClassName) {
+            this.entityStructureDataProvider.setRootEntityClassName(entityClassName);
         },
 
         /**
@@ -144,57 +257,53 @@ define(function(require) {
         },
 
         /**
-         * Checks if convertion is posibility
+         * Checks if conversion condition to expression is possible
          *
-         * @param {Array} value - JSON with condition builder value
+         * @param {Array} condition - JSON with condition builder value
          * @returns {boolean}
          * @protected
          */
-        _isConvertibleToAdvanced: function(value) {
-            // TODO: use real converter to check convert possibility
-            var wrongCondition = _.find(value, function(item) {
-                if (item === 'AND' || item === 'OR') {
-                    return false;
+        _isConvertibleToAdvanced: function(condition) {
+            var notEmpty = function(item) {
+                if (_.isArray(item)) {
+                    return _.all(item, notEmpty);
                 }
-                if (!_.isObject(item) || !item.hasOwnProperty('columnName')) {
-                    return true;
-                }
-            });
-            return wrongCondition === void 0;
+                return item === 'AND' || item === 'OR' || _.isObject(item) && !_.isEmpty(item);
+            };
+            return _.all(condition, notEmpty) && this._convertToExpression(condition) !== void 0;
         },
 
         /**
          * Converts condition builder value to expression
          *
-         * @param {Array} value - JSON with condition builder value
-         * @returns {string}
+         * @param {Array} condition - JSON with condition builder value
+         * @returns {string|undefined}
          * @protected
          */
-        _convertToExpression: function(value) {
-            // TODO: use real converter
-            return '';
+        _convertToExpression: function(condition) {
+            return this.toExpression.convert(condition) || '';
         },
 
         /**
-         * Checks if convertion is posibility
+         * Checks if conversion expression to condition is possible
          *
-         * @param {string} value - expression editor value
+         * @param {string} expression - expression editor value
          * @returns {boolean}
          * @protected
          */
-        _isConvertibleToSimple: function(value) {
+        _isConvertibleToSimple: function(expression) {
             // TODO: use real converter to check convert possibility
-            return value.indexOf('+') === -1;
+            return expression.indexOf('+') === -1;
         },
 
         /**
          * Converts expression to condition builder value
          *
-         * @param {string} value - expression editor value
+         * @param {string} expression - expression editor value
          * @returns {Array}
          * @protected
          */
-        _convertToConditions: function(value) {
+        _convertToConditions: function(expression) {
             // TODO: use real converter
             return [];
         }
