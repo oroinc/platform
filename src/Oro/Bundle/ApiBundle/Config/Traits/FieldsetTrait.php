@@ -12,6 +12,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait FieldsetTrait
 {
     /**
+     * Indicates whether the "disable_fieldset" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableFieldset()
+    {
+        return array_key_exists(EntityDefinitionConfig::DISABLE_FIELDSET, $this->items);
+    }
+
+    /**
      * Indicates whether indicates whether a requesting of a restricted set of fields is enabled.
      *
      * @return bool
@@ -30,7 +40,7 @@ trait FieldsetTrait
      */
     public function enableFieldset()
     {
-        unset($this->items[EntityDefinitionConfig::DISABLE_FIELDSET]);
+        $this->items[EntityDefinitionConfig::DISABLE_FIELDSET] = false;
     }
 
     /**

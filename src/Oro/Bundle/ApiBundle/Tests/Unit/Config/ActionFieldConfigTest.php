@@ -95,6 +95,51 @@ class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testDirection()
+    {
+        $config = new ActionFieldConfig();
+        self::assertFalse($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+
+        $config->setDirection('input-only');
+        self::assertTrue($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertFalse($config->isOutput());
+        self::assertEquals(['direction' => 'input-only'], $config->toArray());
+
+        $config->setDirection('output-only');
+        self::assertTrue($config->hasDirection());
+        self::assertFalse($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals(['direction' => 'output-only'], $config->toArray());
+
+        $config->setDirection('bidirectional');
+        self::assertTrue($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals(['direction' => 'bidirectional'], $config->toArray());
+
+        $config->setDirection(null);
+        self::assertFalse($config->hasDirection());
+        self::assertTrue($config->isInput());
+        self::assertTrue($config->isOutput());
+        self::assertEquals([], $config->toArray());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The possible values for the direction are "input-only", "output-only" or "bidirectional".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSetInvalidDirection()
+    {
+        $config = new ActionFieldConfig();
+
+        $config->setDirection('another');
+    }
+
     public function testFormType()
     {
         $config = new ActionFieldConfig();

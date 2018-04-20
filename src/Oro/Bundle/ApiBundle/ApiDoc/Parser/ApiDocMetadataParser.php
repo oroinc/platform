@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -17,15 +18,15 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Parse fields definition by given ApiDocMetadata information
+ * Builds definitions of fields from ApiDocMetadata.
  */
 class ApiDocMetadataParser implements ParserInterface
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var ApiDocDataTypeConverter */
-    protected $dataTypeConverter;
+    private $dataTypeConverter;
 
     /**
      * @param ValueNormalizer         $valueNormalizer
@@ -45,7 +46,7 @@ class ApiDocMetadataParser implements ParserInterface
     public function supports(array $item)
     {
         return
-            isset($item['options']['metadata'])
+            isset($item['options']['direction'], $item['options']['metadata'])
             && $item['options']['metadata'] instanceof ApiDocMetadata;
     }
 
@@ -61,7 +62,8 @@ class ApiDocMetadataParser implements ParserInterface
             $data->getMetadata(),
             $data->getConfig(),
             $data->getAction(),
-            $data->getRequestType()
+            $data->getRequestType(),
+            'output' === $item['options']['direction']
         );
     }
 
@@ -70,14 +72,16 @@ class ApiDocMetadataParser implements ParserInterface
      * @param EntityDefinitionConfig $config
      * @param string                 $action
      * @param RequestType            $requestType
+     * @param bool                   $isOutput
      *
      * @return array [field name => [key => value, ...], ...]
      */
-    protected function getApiDocFieldsDefinition(
+    private function getApiDocFieldsDefinition(
         EntityMetadata $metadata,
         EntityDefinitionConfig $config,
         $action,
-        RequestType $requestType
+        RequestType $requestType,
+        $isOutput
     ) {
         $identifiersData = [];
         $fieldsData = [];
@@ -88,38 +92,42 @@ class ApiDocMetadataParser implements ParserInterface
 
         $fields = $metadata->getFields();
         foreach ($fields as $fieldName => $fieldMetadata) {
-            $fieldData = $this->getFieldData(
-                $fieldMetadata,
-                $config->getField($fieldName)
-            );
-            if ($isReadOnlyIdentifier && in_array($fieldName, $identifiers, true)) {
-                $fieldData['readonly'] = true;
-            }
-
-            if (in_array($fieldName, $identifiers, true)) {
-                $identifiersData[$fieldName] = $fieldData;
-            } else {
-                $fieldsData[$fieldName] = $fieldData;
+            if ($this->isPropertyApplicable($fieldMetadata, $isOutput)) {
+                $fieldData = $this->getFieldData(
+                    $fieldMetadata,
+                    $config->getField($fieldName)
+                );
+                $isIdentifier = in_array($fieldName, $identifiers, true);
+                if ($isIdentifier && $isReadOnlyIdentifier) {
+                    $fieldData['readonly'] = true;
+                }
+                if ($isIdentifier) {
+                    $identifiersData[$fieldName] = $fieldData;
+                } else {
+                    $fieldsData[$fieldName] = $fieldData;
+                }
             }
         }
 
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $associationMetadata) {
-            $associationData = $this->getAssociationData(
-                $associationMetadata,
-                $config->getField($associationName),
-                $requestType
-            );
-            if ($isReadOnlyIdentifier && in_array($associationName, $identifiers, true)) {
-                $associationData['readonly'] = true;
-            }
-
-            if (in_array($associationName, $identifiers, true)) {
-                $identifiersData[$associationName] = $associationData;
-            } elseif (isset($associationData['subType'])) {
-                $associationsData[$associationName] = $associationData;
-            } else {
-                $fieldsData[$associationName] = $associationData;
+            if ($this->isPropertyApplicable($associationMetadata, $isOutput)) {
+                $associationData = $this->getAssociationData(
+                    $associationMetadata,
+                    $config->getField($associationName),
+                    $requestType
+                );
+                $isIdentifier = in_array($associationName, $identifiers, true);
+                if ($isIdentifier && $isReadOnlyIdentifier) {
+                    $associationData['readonly'] = true;
+                }
+                if ($isIdentifier) {
+                    $identifiersData[$associationName] = $associationData;
+                } elseif (isset($associationData['subType'])) {
+                    $associationsData[$associationName] = $associationData;
+                } else {
+                    $fieldsData[$associationName] = $associationData;
+                }
             }
         }
 
@@ -131,15 +139,26 @@ class ApiDocMetadataParser implements ParserInterface
     }
 
     /**
+     * @param PropertyMetadata $propertyMetadata
+     * @param bool             $isOutput
+     *
+     * @return bool
+     */
+    private function isPropertyApplicable(PropertyMetadata $propertyMetadata, $isOutput)
+    {
+        return $isOutput
+            ? $propertyMetadata->isOutput()
+            : $propertyMetadata->isInput();
+    }
+
+    /**
      * @param FieldMetadata               $metadata
      * @param EntityDefinitionFieldConfig $config
      *
      * @return array
      */
-    protected function getFieldData(
-        FieldMetadata $metadata,
-        EntityDefinitionFieldConfig $config
-    ) {
+    private function getFieldData(FieldMetadata $metadata, EntityDefinitionFieldConfig $config)
+    {
         return [
             'description' => $config->getDescription(),
             'required'    => !$metadata->isNullable(),
@@ -154,24 +173,19 @@ class ApiDocMetadataParser implements ParserInterface
      *
      * @return array
      */
-    protected function getAssociationData(
+    private function getAssociationData(
         AssociationMetadata $metadata,
         EntityDefinitionFieldConfig $config,
         RequestType $requestType
     ) {
         $result = [
             'description' => $config->getDescription(),
-            'required'    => !$metadata->isNullable()
+            'required'    => !$metadata->isNullable(),
+            'dataType'    => $this->dataTypeConverter->convertDataType($metadata->getDataType())
         ];
-        $dataType = $metadata->getDataType();
-        $result['dataType'] = $this->dataTypeConverter->convertDataType($dataType);
-        if (!DataType::isAssociationAsField($dataType)) {
+        if (!DataType::isAssociationAsField($metadata->getDataType())) {
             $result['subType'] = $this->getEntityType($metadata->getTargetClassName(), $requestType);
-            $actualType = null;
-            if ($metadata->isCollection()) {
-                $actualType = ApiDocDataTypes::COLLECTION;
-            }
-            $result['actualType'] = $actualType;
+            $result['actualType'] = $metadata->isCollection() ? ApiDocDataTypes::COLLECTION : null;
         }
 
         return $result;
@@ -183,7 +197,7 @@ class ApiDocMetadataParser implements ParserInterface
      *
      * @return string|null
      */
-    protected function getEntityType($entityClass, RequestType $requestType)
+    private function getEntityType($entityClass, RequestType $requestType)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

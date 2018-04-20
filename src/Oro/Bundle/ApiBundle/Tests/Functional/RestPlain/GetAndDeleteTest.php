@@ -33,7 +33,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         );
         self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
-        $id = $this->getGetEntityId($entityClass, self::jsonToArray($response->getContent()));
+        $id = $this->getFirstEntityId($entityClass, self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
@@ -129,7 +129,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
      *
      * @return mixed
      */
-    protected function getGetEntityId($entityClass, $content)
+    protected function getFirstEntityId($entityClass, $content)
     {
         if (count($content) !== 1) {
             return null;

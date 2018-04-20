@@ -55,6 +55,36 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testToArrayInputOnlyField()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDirection(true, false);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'input-only'
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
+    public function testToArrayOutputOnlyField()
+    {
+        $fieldMetadata = new FieldMetadata();
+        $fieldMetadata->setName('testName');
+        $fieldMetadata->setDirection(false, true);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'output-only'
+            ],
+            $fieldMetadata->toArray()
+        );
+    }
+
     public function testNameInConstructor()
     {
         $fieldMetadata = new FieldMetadata('fieldName');
@@ -92,6 +122,29 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($fieldMetadata->getDataType());
         $fieldMetadata->setDataType('fieldType');
         $this->assertEquals('fieldType', $fieldMetadata->getDataType());
+    }
+
+    public function testDirection()
+    {
+        $fieldMetadata = new FieldMetadata();
+
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, false);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(false, true);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, false);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(false, false);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertFalse($fieldMetadata->isOutput());
+        $fieldMetadata->setDirection(true, true);
+        self::assertTrue($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
     }
 
     public function testNullable()
