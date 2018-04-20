@@ -102,7 +102,10 @@ define(function(require) {
             }
             _.extend(this, _.pick(options, 'entityDataProvider', 'dataSourceNames'));
             this.options = _.defaults(_.pick(options, _.keys(this.defaultOptions)), this.defaultOptions);
-            this.expressionLanguage = new ExpressionLanguage();
+            this.expressionLanguage = new ExpressionLanguage(
+                options.expressionParserCache || void 0,
+                options.expressionFunctionProviders || []
+            );
             this._prepareOperationsItems();
             this._createValidator();
             this.listenTo(this.entityDataProvider, 'root-entity-change', this.onRootEntityChanged);

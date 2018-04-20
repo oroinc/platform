@@ -154,7 +154,10 @@
         options: {
             dataProviderConfig: {
                 filterPreset: 'querydesigner'
-            }
+            },
+            expressionFunctionProviderModules: [
+                'oroquerydesigner/js/query-type-converter/expression-functions-provider'
+            ]
         }
     }|merge_recursive(params|default({})) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
