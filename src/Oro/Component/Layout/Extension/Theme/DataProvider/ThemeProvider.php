@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Extension\Theme\DataProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
+/**
+ * Provides theme icon and path to css files in theme by passed styles entry point
+ */
 class ThemeProvider
 {
     /** @var ThemeManager */
@@ -46,7 +49,7 @@ class ThemeProvider
 
         $parentTheme = $this->getTheme($themeName)->getParentTheme();
         if ($parentTheme) {
-            return $this->getStylesOutput($parentTheme);
+            return $this->getStylesOutput($parentTheme, $sectionName);
         }
 
         return null;
