@@ -48,8 +48,17 @@ define(function() {
          * @param {string} type
          * @return {Function|null}
          */
-        getTranslator: function(type) {
+        getTranslatorConstructor: function(type) {
             return this.translators[type] || null;
+        },
+
+        /**
+         * Returns all registered translator constructors
+         *
+         * @return {Array<Function>}
+         */
+        getTranslatorConstructors: function() {
+            return Object.values(this.translators);
         }
     });
 
@@ -66,7 +75,7 @@ define(function() {
      * @return {TranslatorProvider}
      * @static
      */
-    TranslatorProvider.getProviderFor = function(BaseTranslator) {
+    TranslatorProvider.getProviderOf = function(BaseTranslator) {
         var providers = TranslatorProvider.providers;
         var name = BaseTranslator.name;
         if (!providers[name]) {

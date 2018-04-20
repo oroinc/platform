@@ -53,7 +53,7 @@ define(function(require) {
             ]);
 
             var filterTranslatorProviderMock = jasmine.combineSpyObj('filterTranslatorProvider', [
-                jasmine.createSpy('getTranslator').and.callFake(function(name) {
+                jasmine.createSpy('getTranslatorConstructor').and.callFake(function(name) {
                     var filterTranslators = {
                         string: function() {
                             return stringFilterTranslatorMock;

@@ -117,7 +117,7 @@ define(function(require) {
             var filterConfig = this.filterConfigProvider.getFilterConfigByName(filterName);
             if (
                 filterConfig &&
-                (FilterTranslator = this.filterTranslatorProvider.getTranslator(filterConfig.type))
+                (FilterTranslator = this.filterTranslatorProvider.getTranslatorConstructor(filterConfig.type))
             ) {
                 filterTranslator = new FilterTranslator(filterConfig);
             }

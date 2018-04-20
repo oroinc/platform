@@ -14,7 +14,7 @@ define(function(require) {
         // 'oroquerydesigner/js/query-type-converter/from-expression/number-filter-translator',
         'oroquerydesigner/js/query-type-converter/from-expression/string-filter-translator'
     ], function(AbstractFilterTranslatorFromExpression) {
-        var provider = TranslatorProvider.getProviderFor(AbstractFilterTranslatorFromExpression);
+        var provider = TranslatorProvider.getProviderOf(AbstractFilterTranslatorFromExpression);
         Array.prototype.slice.call(arguments, 1).forEach(function(Translator) {
             provider.registerTranslator(Translator.prototype.filterType, Translator);
         });
@@ -30,7 +30,7 @@ define(function(require) {
         'oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator',
         'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator'
     ], function(AbstractFilterTranslatorToExpression) {
-        var provider = TranslatorProvider.getProviderFor(AbstractFilterTranslatorToExpression);
+        var provider = TranslatorProvider.getProviderOf(AbstractFilterTranslatorToExpression);
         Array.prototype.slice.call(arguments, 1).forEach(function(Translator) {
             provider.registerTranslator(Translator.prototype.filterType, Translator);
         });
@@ -41,7 +41,7 @@ define(function(require) {
         'oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator',
         'oroquerydesigner/js/query-type-converter/to-expression/field-condition-translator'
     ], function(AbstractConditionTranslator) {
-        var provider = TranslatorProvider.getProviderFor(AbstractConditionTranslator);
+        var provider = TranslatorProvider.getProviderOf(AbstractConditionTranslator);
         Array.prototype.slice.call(arguments, 1).forEach(function(Translator) {
             provider.registerTranslator(Translator.name, Translator);
         });
