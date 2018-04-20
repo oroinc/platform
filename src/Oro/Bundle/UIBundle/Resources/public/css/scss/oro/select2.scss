@@ -40,7 +40,7 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
             color: #666;
         }
 
-        img{
+        img {
             max-width: 16px;
             margin-top: -2px;
             display: block;
@@ -726,5 +726,15 @@ disabled look for disabled choices in the results dropdown
             margin-right: 5px;
             margin-left: 2px;
         }
+    }
+}
+
+.select-values-autocomplete {
+    &[type="text"] {
+        font-size: $baseFontSize;
+    }
+
+    &::placeholder {
+        color: $btnTextColor;
     }
 }

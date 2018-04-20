@@ -16,6 +16,10 @@ $sidebarContentMinWidth: 288px;
         background: #fff;
         flex-shrink: 0;
 
+        &:not(.ui-resizable-resizing) {
+            transition: width .3s;
+        }
+
         &.content-sidebar-minimized {
             padding-left: 0;
             width: $sidebarMinimizedWidth;
