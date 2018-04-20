@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Test\DataFixtures;
 
 use Nelmio\Alice\Instances\Processor\Processable;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class AliceReferenceProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +16,9 @@ class AliceReferenceProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCanProcess($expectedMatch, $value)
     {
         $processable = new Processable($value);
-        $aliceReferenceProcessor = new AliceReferenceProcessor();
+        /** @var RegistryInterface $registry */
+        $registry = $this->createMock(RegistryInterface::class);
+        $aliceReferenceProcessor = new AliceReferenceProcessor($registry);
 
         self::assertSame($expectedMatch, $aliceReferenceProcessor->canProcess($processable));
     }
