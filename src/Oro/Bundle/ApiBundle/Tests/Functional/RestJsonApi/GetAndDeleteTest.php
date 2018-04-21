@@ -28,7 +28,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         // test "get list" request
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1]);
 
-        $id = $this->getGetEntityId(self::jsonToArray($response->getContent()));
+        $id = $this->getFirstEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
@@ -108,7 +108,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
      *
      * @return mixed
      */
-    protected function getGetEntityId($content)
+    protected function getFirstEntityId($content)
     {
         return array_key_exists('data', $content) && count($content['data']) === 1
             ? $content['data'][0]['id']

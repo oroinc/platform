@@ -85,6 +85,118 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         self::assertEquals(1, $response->headers->get('X-Include-Total-Count'));
     }
 
+    public function testMetaTitles()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee1->id)>',
+                        'meta'       => [
+                            'title' => 'TestEmployee1 developer'
+                        ],
+                        'attributes' => [
+                            'name' => 'TestEmployee1'
+                        ]
+                    ],
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee2->id)>',
+                        'meta'       => [
+                            'title' => 'TestEmployee2 developer'
+                        ],
+                        'attributes' => [
+                            'name' => 'TestEmployee2'
+                        ]
+                    ],
+                    [
+                        'type'       => $entityType,
+                        'id'         => '<toString(@TestEmployee3->id)>',
+                        'meta'       => [
+                            'title' => 'TestEmployee, with comma in name developer'
+                        ],
+                        'attributes' => [
+                            'name' => 'TestEmployee, with comma in name'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testMetaTitlesWhenOnlyIdentifierFieldIsRequested()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title', 'fields[' . $entityType . ']' => 'id']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee1->id)>',
+                        'meta' => [
+                            'title' => 'TestEmployee1 developer'
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee2->id)>',
+                        'meta' => [
+                            'title' => 'TestEmployee2 developer'
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id'   => '<toString(@TestEmployee3->id)>',
+                        'meta' => [
+                            'title' => 'TestEmployee, with comma in name developer'
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testMetaTitlesWhenMetaFilterIsDisabled()
+    {
+        $this->appendEntityConfig(
+            TestEmployee::class,
+            [
+                'disable_meta_properties' => true
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['meta' => 'title'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testFilterByField()
     {
         $entityType = $this->getEntityType(TestEmployee::class);
@@ -256,6 +368,124 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         self::assertResponseCount(10, $response);
     }
 
+    public function testCustomDefaultPagination()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'page_size' => 3
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(3, $response);
+    }
+
+    public function testUnlimitedDefaultPagination()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'page_size' => -1
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment11->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment12->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment13->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment14->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment15->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment16->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment17->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment18->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment19->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment20->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment21->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(21, $response);
+    }
+
+    public function testDisabledPagination()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'page_size' => -1
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['number' => 2, 'size' => 2]],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title'  => 'filter constraint',
+                    'detail' => 'The filter is not supported.',
+                    'source' => ['parameter' => 'page[number]']
+                ],
+                [
+                    'title'  => 'filter constraint',
+                    'detail' => 'The filter is not supported.',
+                    'source' => ['parameter' => 'page[size]']
+                ]
+            ],
+            $response
+        );
+    }
+
     public function testDefaultPaginationWithSpecifiedPageNumber()
     {
         $entityType = $this->getEntityType(TestDepartment::class);
@@ -344,19 +574,90 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    [
-                        'type' => $entityType,
-                        'id'   => '<toString(@TestEmployee3->id)>'
-                    ],
-                    [
-                        'type' => $entityType,
-                        'id'   => '<toString(@TestEmployee2->id)>'
-                    ],
-                    [
-                        'type' => $entityType,
-                        'id'   => '<toString(@TestEmployee1->id)>'
-                    ],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee1->id)>']
                 ]
+            ],
+            $response
+        );
+    }
+
+    public function testDefaultSorting()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee3->id)>']
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testCustomDefaultSorting()
+    {
+        $this->appendEntityConfig(
+            TestEmployee::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'order_by' => ['id' => 'DESC']
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee1->id)>']
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testDisabledSorting()
+    {
+        $this->appendEntityConfig(
+            TestEmployee::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'disable_sorting' => true
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['sort' => '-id'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'sort']
             ],
             $response
         );

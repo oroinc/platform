@@ -238,3 +238,21 @@ field_form:
                     form_type: integer
                     form_options:
                         option1: value1
+
+field_direction:
+    config:
+        create:
+            fields:
+                field1:
+                    direction: input-only
+                field2:
+                    direction: ~
+                field3:
+                    direction: ""
+    expected:
+        create:
+            fields:
+                field1:
+                    direction: input-only
+                field2: ~
+                field3: ~

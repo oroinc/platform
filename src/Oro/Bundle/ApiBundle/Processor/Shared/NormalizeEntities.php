@@ -1,13 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class NormalizeData implements ProcessorInterface
+/**
+ * Converts the list of entities to an array using the ObjectNormalizer.
+ */
+class NormalizeEntities implements ProcessorInterface
 {
     /** @var ObjectNormalizer */
     protected $objectNormalizer;
@@ -25,7 +28,7 @@ class NormalizeData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if (!$context->hasResult()) {
             // no result
