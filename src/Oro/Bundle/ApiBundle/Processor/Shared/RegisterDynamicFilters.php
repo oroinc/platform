@@ -89,12 +89,6 @@ class RegisterDynamicFilters extends RegisterFilters
                             $renameMap[$filterKey] = null;
                         } else {
                             foreach ($actualFilterKeys as $actualFilterKey) {
-                                if ($this->filterGroup) {
-                                    $actualFilterKey = $filterCollection->getGroupedFilterKey(
-                                        $this->filterGroup,
-                                        $actualFilterKey
-                                    );
-                                }
                                 $knownFilterKeys[$actualFilterKey] = true;
                                 $renameMap[$filterKey][] = $actualFilterKey;
                             }
