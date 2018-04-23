@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
     require('bootstrap');
     var BaseView = require('oroui/js/app/views/base/view');
-    var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
     var Typeahead = $.fn.typeahead.Constructor;
 
     ExpressionEditorView = BaseView.extend({
@@ -75,16 +74,15 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var utilOptions = _.pick(options,
-                'itemLevelLimit', 'allowedOperations', 'operations', 'supportedNames',
-                'entityDataProvider', 'expressionFunctionProviders'
-            );
-            utilOptions.dataSourceNames = _.keys(options.dataSource);
-            this.util = new ExpressionEditorUtil(utilOptions);
+            if (!options.util) {
+                throw new Error('Option `util` is required for `ExpressionEditorView`');
+            }
 
-            this.autocompleteData = this.autocompleteData || {};
+            _.extend(this, _.pick(options, 'util'));
+
+            this.autocompleteData = {};
             this.dataSource = this.dataSource || {};
-            this.dataSourceInstances = this.dataSourceInstances || {};
+            this.dataSourceInstances = {};
 
             return ExpressionEditorView.__super__.initialize.apply(this, arguments);
         },

@@ -7,6 +7,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
     var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
     var BaseComponent = require('oroui/js/app/components/base/component');
 
     ExpressionEditorComponent = BaseComponent.extend({
@@ -72,15 +73,20 @@ define(function(require) {
                 return;
             }
 
-            this.provider = entityStructureDataProvider;
+            this.entityStructureDataProvider = entityStructureDataProvider;
+
+            var utilOptions = _.extend({
+                dataSourceNames: _.keys(options.dataSource),
+                entityDataProvider: entityStructureDataProvider,
+                expressionFunctionProviders: expressionFunctionProviders
+            }, _.pick(options, 'itemLevelLimit', 'allowedOperations', 'operations', 'supportedNames'));
+            this.expressionEditorUtil = new ExpressionEditorUtil(utilOptions);
 
             var viewOptions = _.extend({
                 el: options._sourceElement,
                 autoRender: true,
-                entityDataProvider: entityStructureDataProvider,
-                expressionFunctionProviders: expressionFunctionProviders
-            }, _.omit(options, '_sourceElement', '_subPromises', 'dataProviderConfig'));
-
+                util: this.expressionEditorUtil
+            }, _.pick(options, 'dataSource'));
             this.view = new ExpressionEditorView(viewOptions);
         },
 
@@ -90,7 +96,7 @@ define(function(require) {
          * @param {string} entityClassName
          */
         setEntity: function(entityClassName) {
-            this.provider.setRootEntityClassName(entityClassName);
+            this.entityStructureDataProvider.setRootEntityClassName(entityClassName);
         }
     });
 

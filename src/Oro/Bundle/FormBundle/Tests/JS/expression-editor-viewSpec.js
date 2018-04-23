@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
+    var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
     var DataProviderMock = require('./Fixture/entity-structure-data-provider-mock.js');
 
     // fixtures
@@ -18,50 +19,61 @@ define(function(require) {
     require('jasmine-jquery');
 
     function createEditorOptions(customOptions) {
-        return _.defaults(customOptions, {
+        var utilOptions = _.result(customOptions, 'util');
+        var viewOptions = _.omit(customOptions, 'util');
+        _.defaults(viewOptions, {
             autoRender: true,
             el: '#expression-editor',
-            entityDataProvider: new DataProviderMock(entitiesData),
             dataSource: {
                 pricelist: dataSource
-            },
-            supportedNames: ['pricelist', 'product']
+            }
         });
+        if (utilOptions !== null) {
+            viewOptions.util = new ExpressionEditorUtil(_.defaults(utilOptions || {}, {
+                entityDataProvider: new DataProviderMock(entitiesData),
+                dataSourceNames: ['pricelist'],
+                supportedNames: ['pricelist', 'product'],
+                itemLevelLimit: 3
+            }));
+        }
+        return viewOptions;
     }
 
     describe('oroform/js/app/views/expression-editor-view', function() {
         beforeEach(function() {
             window.setFixtures(html);
-            var options = createEditorOptions({itemLevelLimit: 3});
-            expressionEditorView = new ExpressionEditorView(options);
-            typeahead = expressionEditorView.typeahead;
         });
 
         afterEach(function() {
             expressionEditorView.dispose();
-            expressionEditorView = null;
-            typeahead = null;
         });
 
         describe('check initialization', function() {
+            beforeEach(function() {
+                var options = createEditorOptions();
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
             it('view is defined and instance of BaseView', function() {
                 expect(expressionEditorView).toEqual(jasmine.any(BaseView));
             });
-            it('util throw an exeption when required options is missed', function() {
+
+            it('view throw an exception when util options is missed', function() {
                 expect(function() {
-                    var options = createEditorOptions({entityDataProvider: null});
-                    expressionEditorView = new ExpressionEditorView(options);
-                }).toThrowError();
-            });
-            it('util throw an exeption when "itemLevelLimit" option is too small', function() {
-                expect(function() {
-                    var options = createEditorOptions({itemLevelLimit: 1});
+                    var options = createEditorOptions({util: null});
                     expressionEditorView = new ExpressionEditorView(options);
                 }).toThrowError();
             });
         });
 
         describe('check autocomplete logic', function() {
+            beforeEach(function() {
+                var options = createEditorOptions();
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
             it('chain select', function() {
                 expressionEditorView.el.value = 'pro';
                 typeahead.lookup();
@@ -118,6 +130,12 @@ define(function(require) {
         });
 
         describe('check value update after inserting selected value', function() {
+            beforeEach(function() {
+                var options = createEditorOptions();
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
             it('inserting in the field start', function() {
                 expressionEditorView.el.value = 'pro';
                 expressionEditorView.el.selectionStart = 2;
@@ -140,6 +158,12 @@ define(function(require) {
         });
 
         describe('check data source render', function() {
+            beforeEach(function() {
+                var options = createEditorOptions();
+                expressionEditorView = new ExpressionEditorView(options);
+                typeahead = expressionEditorView.typeahead;
+            });
+
             it('shown if type pricel', function() {
                 expressionEditorView.el.value = 'pricel';
                 typeahead.lookup();
@@ -155,107 +179,14 @@ define(function(require) {
                 expect($dataSource.is(':visible')).toBeFalsy();
             });
         });
-    });
 
-    describe('oroform/js/app/views/expression-editor-view', function() {
-        describe('when limit is `2`', function() {
-            beforeEach(function() {
-                window.setFixtures(html);
-                var options = createEditorOptions({itemLevelLimit: 2});
-                expressionEditorView = new ExpressionEditorView(options);
-                typeahead = expressionEditorView.typeahead;
-            });
-
-            afterEach(function() {
-                expressionEditorView.dispose();
-                expressionEditorView = null;
-                typeahead = null;
-            });
-            it('second level is present', function() {
-                expressionEditorView.el.value = 'pro';
-                typeahead.lookup();
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.');
-                expect(typeahead.source()).toEqual([
-                    'id',
-                    'status'
-                ]);
-            });
-
-            it('third level is missed', function() {
-                expressionEditorView.el.value = 'pro';
-                typeahead.lookup();
-                expect(typeahead.source()).toContain('product');
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.');
-                expect(typeahead.source()).toContain('id');
-                typeahead.select();
-                expect(typeahead.source()).toContain('!=');
-            });
-        });
-
-        describe('when limit is `4`', function() {
-            beforeEach(function() {
-                window.setFixtures(html);
-                var options = createEditorOptions({itemLevelLimit: 4});
-                expressionEditorView = new ExpressionEditorView(options);
-                typeahead = expressionEditorView.typeahead;
-            });
-
-            afterEach(function() {
-                expressionEditorView.dispose();
-                expressionEditorView = null;
-                typeahead = null;
-            });
-            it('fourth level is present', function() {
-                expressionEditorView.el.value = 'pro';
-                typeahead.lookup();
-                expect(typeahead.source()).toContain('product');
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.');
-                expressionEditorView.el.value += 'cat';
-                typeahead.lookup();
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.category.');
-                expressionEditorView.el.value += 'par';
-                typeahead.lookup();
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.');
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.id ');
-            });
-
-            it('fifth level is missed', function() {
-                expressionEditorView.el.value = 'pro';
-                typeahead.lookup();
-                expect(typeahead.source()).toContain('product');
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.');
-                expressionEditorView.el.value += 'cat';
-                typeahead.lookup();
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.category.');
-                expressionEditorView.el.value += 'par';
-                typeahead.lookup();
-                typeahead.select();
-                expect(expressionEditorView.el.value).toEqual('product.category.parentCategory.');
-                expect(typeahead.source()).not.toContain('parentCategory');
-            });
-        });
         describe('when allowed operations configured', function() {
-            beforeEach(function() {
-                window.setFixtures(html);
-            });
-
-            afterEach(function() {
-                expressionEditorView.dispose();
-                expressionEditorView = null;
-                typeahead = null;
-            });
             it('only math operations is accessible', function() {
                 var options = createEditorOptions({
-                    allowedOperations: ['math'],
-                    itemLevelLimit: 2
+                    util: {
+                        allowedOperations: ['math'],
+                        itemLevelLimit: 2
+                    }
                 });
                 expressionEditorView = new ExpressionEditorView(options);
                 typeahead = expressionEditorView.typeahead;
@@ -270,10 +201,13 @@ define(function(require) {
                 expect(typeahead.source()).not.toContain('and');
                 expect(typeahead.source()).not.toContain('match');
             });
+
             it('only equality and compare operations are accessible', function() {
                 var options = createEditorOptions({
-                    allowedOperations: ['equality', 'compare'],
-                    itemLevelLimit: 2
+                    util: {
+                        allowedOperations: ['equality', 'compare'],
+                        itemLevelLimit: 2
+                    }
                 });
                 expressionEditorView = new ExpressionEditorView(options);
                 typeahead = expressionEditorView.typeahead;

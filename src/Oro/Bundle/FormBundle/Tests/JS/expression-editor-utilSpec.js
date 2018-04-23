@@ -20,14 +20,17 @@ define(function(require) {
     describe('oroform/js/expression-editor-util', function() {
         var expressionEditorUtil = null;
 
+        it('util throw an exception when "itemLevelLimit" option is too small', function() {
+            expect(function() {
+                var options = createUtilOptions({itemLevelLimit: 1});
+                expressionEditorUtil = new ExpressionEditorUtil(options);
+            }).toThrowError();
+        });
+
         describe('with default field level limit', function() {
             beforeEach(function() {
                 var options = createUtilOptions({itemLevelLimit: 3});
                 expressionEditorUtil = new ExpressionEditorUtil(options);
-            });
-
-            afterEach(function() {
-                expressionEditorUtil = null;
             });
 
             describe('has to make correct validation', function() {
@@ -300,10 +303,6 @@ define(function(require) {
                 expressionEditorUtil = new ExpressionEditorUtil(options);
             });
 
-            afterEach(function() {
-                expressionEditorUtil = null;
-            });
-
             it('second level is present', function() {
                 var data = expressionEditorUtil.getAutocompleteData('product.', 8);
                 expect(data.itemsType).toBe('entities');
@@ -326,10 +325,6 @@ define(function(require) {
             beforeEach(function() {
                 var options = createUtilOptions({itemLevelLimit: 4});
                 expressionEditorUtil = new ExpressionEditorUtil(options);
-            });
-
-            afterEach(function() {
-                expressionEditorUtil = null;
             });
 
             it('fourth level is present', function() {
