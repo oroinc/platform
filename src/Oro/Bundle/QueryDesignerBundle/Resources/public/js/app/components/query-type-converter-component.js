@@ -7,7 +7,6 @@ define(function(require) {
     var BaseComponent = require('oroui/js/app/components/base/component');
     var BaseModel = require('oroui/js/app/models/base/model');
     var QueryTypeSwitcherView = require('oroquerydesigner/js/app/views/query-type-switcher-view');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
     var FilterConfigProvider = require('oroquerydesigner/js/query-type-converter/filter-config-provider');
     var TranslatorProvider = require('oroquerydesigner/js/query-type-converter/translator-provider');
     var QueryConditionConverterToExpression =
@@ -33,11 +32,6 @@ define(function(require) {
         },
 
         /**
-         * @type {EntityStructureDataProvider}
-         */
-        entityStructureDataProvider: null,
-
-        /**
          * @type {FilterConfigProvider}
          */
         filterConfigProvider: null,
@@ -61,7 +55,6 @@ define(function(require) {
 
             this._deferredInit();
             $.when(
-                this.initEntityStructureDataProvider(options),
                 this.initFilterConfigProvider()
             )
                 .then(this._init.bind(this, options))
@@ -74,15 +67,13 @@ define(function(require) {
          * Continue initialization once all promises are resolved
          *
          * @param {Object} options
-         * @param {EntityStructureDataProvider} entityStructureDataProvider
          * @param {FilterConfigProvider} filterConfigProvider
          * @protected
          */
-        _init: function(options, entityStructureDataProvider, filterConfigProvider) {
+        _init: function(options, filterConfigProvider) {
             if (this.disposed) {
                 return;
             }
-            this.entityStructureDataProvider = entityStructureDataProvider;
             this.filterConfigProvider = filterConfigProvider;
 
             // init translators
@@ -101,17 +92,6 @@ define(function(require) {
             this.listenTo(this.view, 'switch', this.onModeSwitch);
 
             this.setMode(options.defaultMode);
-        },
-
-        /**
-         * Initializes entity structure data provider
-         *
-         * @param {Object} options
-         * @return {Promise<EntityStructureDataProvider>}
-         */
-        initEntityStructureDataProvider: function(options) {
-            return EntityStructureDataProvider
-                .createDataProvider(options.entityStructureDataProviderConfig, this);
         },
 
         /**
@@ -135,7 +115,8 @@ define(function(require) {
          * Initializes translator for conversion condition to expression
          */
         initTranslatorsToExpression: function() {
-            var filterIdTranslator = new FieldIdTranslatorToExpression(this.entityStructureDataProvider);
+            var entityStructureDataProvider = this.expressionEditorComponent.entityStructureDataProvider;
+            var filterIdTranslator = new FieldIdTranslatorToExpression(entityStructureDataProvider);
             var filterConfigProvider = this.filterConfigProvider;
             var filterTranslatorProvider = TranslatorProvider.getProviderOf(AbstractFilterTranslatorToExpression);
             var conditionTranslators = TranslatorProvider.getProviderOf(AbstractConditionTranslatorToExpression)
@@ -155,15 +136,6 @@ define(function(require) {
          */
         initTranslatorsFromExpression: function() {
             // this.fromExpression = new QueryConditionTranslatorFromExpression();
-        },
-
-        /**
-         * Sets root entity in instance EntityStructureDataProvider
-         *
-         * @param {string} entityClassName
-         */
-        setEntity: function(entityClassName) {
-            this.entityStructureDataProvider.setRootEntityClassName(entityClassName);
         },
 
         /**

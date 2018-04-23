@@ -630,11 +630,6 @@ define(function(require) {
                 return;
             }
 
-            this.queryTypeConverterComponent.setEntity(this.entityClassName);
-            this.on('entityChange', function(entityClassName) {
-                this.queryTypeConverterComponent.setEntity(entityClassName);
-            });
-
             var expressionEditorValue = this.expressionEditorComponent.view.getValue();
             var conditionBuilderValue = this.conditionBuilderComponent.view.getValue();
 

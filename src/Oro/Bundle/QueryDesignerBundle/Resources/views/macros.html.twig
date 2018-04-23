@@ -294,15 +294,8 @@
 #}
 {% macro query_type_converter(params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set params = {
-        options: {
-            entityStructureDataProviderConfig: {
-                filterPreset: 'querydesigner'
-            }
-        }
-    }|merge_recursive(params|default({})) %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroquerydesigner/js/app/components/query-type-converter-component',
         name: 'query-type-converter'
-    }|merge(params)) }}></div>
+    }|merge(params|default({}))) }}></div>
 {% endmacro %}
