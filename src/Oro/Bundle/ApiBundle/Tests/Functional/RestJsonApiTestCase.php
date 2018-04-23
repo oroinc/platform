@@ -217,6 +217,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
+        $this->getEntityManager()->clear();
+
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
             self::assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
