@@ -13,9 +13,10 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
+ * The base class for REST API that conforms JSON.API specification functional tests.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class RestJsonApiTestCase extends ApiTestCase
+class RestJsonApiTestCase extends RestApiTestCase
 {
     const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
@@ -24,14 +25,7 @@ class RestJsonApiTestCase extends ApiTestCase
      */
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]
-            )
-        );
-
+        $this->initClient();
         parent::setUp();
     }
 
@@ -73,6 +67,10 @@ class RestJsonApiTestCase extends ApiTestCase
             }
         }
 
+        if (!isset($server['HTTP_X-WSSE'])) {
+            $server = array_replace($server, $this->getWsseAuthHeader());
+        }
+
         $this->client->request(
             $method,
             $uri,
@@ -104,7 +102,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get', $routeParameters),
+            $this->getUrl($this->getGetRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -138,7 +136,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get_relationship', $routeParameters),
+            $this->getUrl($this->getGetRelationshipRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -172,7 +170,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_get_subresource', $routeParameters),
+            $this->getUrl($this->getGetSubresourceRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -206,7 +204,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_cget', $routeParameters),
+            $this->getUrl($this->getGetListRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -242,7 +240,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_post', $routeParameters),
+            $this->getUrl($this->getPostRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -278,7 +276,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_post_relationship', $routeParameters),
+            $this->getUrl($this->getPostRelationshipRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -318,10 +316,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'PATCH',
-            $this->getUrl(
-                'oro_rest_api_patch',
-                $routeParameters
-            ),
+            $this->getUrl($this->getPatchRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -357,7 +352,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_patch_relationship', $routeParameters),
+            $this->getUrl($this->getPatchRelationshipRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -397,7 +392,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_delete', $routeParameters),
+            $this->getUrl($this->getDeleteRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -432,7 +427,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_cdelete', $routeParameters),
+            $this->getUrl($this->getDeleteListRouteName(), $routeParameters),
             $parameters,
             $server
         );
@@ -467,7 +462,7 @@ class RestJsonApiTestCase extends ApiTestCase
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_delete_relationship', $routeParameters),
+            $this->getUrl($this->getDeleteRelationshipRouteName(), $routeParameters),
             $parameters,
             $server
         );

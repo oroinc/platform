@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
@@ -25,6 +26,8 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class RegisterDynamicFilters extends RegisterFilters
 {
+    private const FILTER_GROUP = 'filter';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -53,8 +56,9 @@ class RegisterDynamicFilters extends RegisterFilters
     {
         /** @var Context $context */
 
+        $filterGroup = $this->getFilterGroup();
         $allFilterValues = $context->getFilterValues();
-        $filterValues = $allFilterValues->getGroup('filter');
+        $filterValues = $this->getFilterValues($allFilterValues, $filterGroup);
         if (!empty($filterValues)) {
             $filters = $context->getFilters();
             $knownFilterKeys = [];
@@ -80,11 +84,42 @@ class RegisterDynamicFilters extends RegisterFilters
                     }
                 } elseif ($allFilterValues->has($filterKey)) {
                     $knownFilterKeys[$filterKey] = true;
+                } elseif ($filterGroup) {
+                    $groupedFilterKey = \sprintf('%s[%s]', $filterGroup, $filterKey);
+                    if ($allFilterValues->has($groupedFilterKey)) {
+                        $knownFilterKeys[$groupedFilterKey] = true;
+                        $renameMap[$filterKey][] = $groupedFilterKey;
+                    } else {
+                        $renameMap[$filterKey] = null;
+                    }
                 }
             }
             $this->renameFilters($filters, $renameMap);
             $this->addDynamicFilters($filters, $filterValues, $knownFilterKeys, $context);
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFilterGroup()
+    {
+        return self::FILTER_GROUP;
+    }
+
+    /**
+     * @param FilterValueAccessorInterface $allFilterValues
+     * @param string|null                  $filterGroup
+     *
+     * @return FilterValue[]
+     */
+    protected function getFilterValues(FilterValueAccessorInterface $allFilterValues, $filterGroup)
+    {
+        if ($filterGroup) {
+            return $allFilterValues->getGroup($filterGroup);
+        }
+
+        return $allFilterValues->getAll();
     }
 
     /**

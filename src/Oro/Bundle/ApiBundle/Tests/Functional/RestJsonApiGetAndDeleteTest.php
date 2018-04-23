@@ -31,7 +31,7 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
         );
         self::assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
 
-        $id = $this->getGetEntityId(self::jsonToArray($response->getContent()));
+        $id = $this->getFirstEntityId(self::jsonToArray($response->getContent()));
         if (null !== $id) {
             // test "get" request
             if (!in_array('get', $excludedActions, true)) {
@@ -121,7 +121,7 @@ class RestJsonApiGetAndDeleteTest extends RestJsonApiTestCase
      *
      * @return mixed
      */
-    protected function getGetEntityId($content)
+    protected function getFirstEntityId($content)
     {
         return array_key_exists('data', $content) && count($content['data']) === 1
             ? $content['data'][0]['id']

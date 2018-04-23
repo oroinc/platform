@@ -5,12 +5,13 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Security\UserApiKeyInterface;
 
 /**
  * @ORM\Table(name="oro_user_api")
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository")
  */
-class UserApi
+class UserApi implements UserApiKeyInterface
 {
     /**
      * @ORM\Id
@@ -50,6 +51,16 @@ class UserApi
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Indicates whether this API key is enabled.
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->getUser()->getOrganizations()->contains($this->getOrganization());
     }
 
     /**

@@ -42,19 +42,13 @@ class NormalizeFilterKeys implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
         $filterCollection = $context->getFilters();
-        $idFieldName = $this->getIdFieldName($context->getClassName());
+        $idFieldName = $this->getIdentifierFieldName($context);
 
         $filters = $filterCollection->all();
         foreach ($filters as $filterKey => $filter) {
             $filterCollection->remove($filterKey);
-            if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
+            if ($filter instanceof ComparisonFilter && $idFieldName && $filter->getField() === $idFieldName) {
                 $filterKey = JsonApiDoc::ID;
                 $filter->setDescription(self::ID_FILTER_DESCRIPTION);
             }
@@ -79,5 +73,36 @@ class NormalizeFilterKeys implements ProcessorInterface
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
 
         return reset($idFieldNames);
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return string|null
+     */
+    private function getIdentifierFieldName(Context $context)
+    {
+        $idFieldName = null;
+        $config = $context->getConfig();
+        if (null !== $config) {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (count($idFieldNames) === 1) {
+                $idFieldName = reset($idFieldNames);
+                $idField = $config->getField($idFieldName);
+                if (null !== $idField && $idField->hasPropertyPath()) {
+                    $idFieldName = $idField->getPropertyPath($idFieldName);
+                }
+            }
+        } else {
+            $entityClass = $context->getClassName();
+            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+                $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+                if (count($idFieldNames) === 1) {
+                    $idFieldName = reset($idFieldNames);
+                }
+            }
+        }
+
+        return $idFieldName;
     }
 }
