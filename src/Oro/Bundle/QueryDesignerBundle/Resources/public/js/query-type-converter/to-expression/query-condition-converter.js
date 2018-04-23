@@ -50,10 +50,10 @@ define(function(require) {
                     var isOdd = index % 2 === 1;
                     // every element with odd index has to be string 'AND' or 'OR'
                     return isOdd && (item === 'AND' || item === 'OR') ||
-                        // every element with even index has to be:
-                        !isOdd && (
-                        // not empty array with valid structure
-                        _.isArray(item) && item.length > 0 && this.test(item) ||
+                        // every element with even index has to be not empty
+                        !isOdd && !_.isEmpty(item) && (
+                        // array with valid structure
+                        _.isArray(item) && this.test(item) ||
                         // or plain object
                         _.isObject(item) && !_.isArray(item)
                     );
