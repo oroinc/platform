@@ -175,7 +175,7 @@ define(function(require) {
 
                 // check if it's transition from opposite mode and not setting initial state
                 if (model.previous('mode') === 'simple' && !_.isEmpty(conditionsValue)) {
-                    expressionView.setValue(this._convertToExpression(conditionsValue));
+                    expressionView.setValue(this._convertToExpression(conditionsValue) || '');
                 }
                 expressionView.$el.show();
                 this.listenTo(expressionView, 'change', this.onExpressionEditorChange);
@@ -238,7 +238,8 @@ define(function(require) {
                 }
                 return item === 'AND' || item === 'OR' || _.isObject(item) && !_.isEmpty(item);
             };
-            return _.all(condition, notEmpty) && this._convertToExpression(condition) !== void 0;
+            return _.isEmpty(condition) ||
+                _.all(condition, notEmpty) && this._convertToExpression(condition) !== void 0;
         },
 
         /**
@@ -249,7 +250,7 @@ define(function(require) {
          * @protected
          */
         _convertToExpression: function(condition) {
-            return this.toExpression.convert(condition) || '';
+            return this.toExpression.convert(condition);
         },
 
         /**

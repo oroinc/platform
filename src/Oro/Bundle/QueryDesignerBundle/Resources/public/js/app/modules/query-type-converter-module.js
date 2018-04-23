@@ -31,7 +31,8 @@ define(function(require) {
         'oroquerydesigner/js/query-type-converter/to-expression/number-filter-translator',
         'oroquerydesigner/js/query-type-converter/to-expression/string-filter-translator'
     ], function(AbstractFilterTranslatorToExpression) {
-        var provider = TranslatorProvider.createProvider('filterToExpression', AbstractFilterTranslatorToExpression);
+        var provider = TranslatorProvider
+            .createProvider('filterToExpression', AbstractFilterTranslatorToExpression);
         Array.prototype.slice.call(arguments, 1).forEach(function(Translator) {
             provider.registerTranslator(Translator.prototype.filterType, Translator);
         });

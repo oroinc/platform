@@ -18,6 +18,10 @@ define(function(require) {
     Object.assign(Parser.prototype, {
         constructor: Parser,
 
+        binaryOperators: Object.assign({
+            '=': OriginalParser.prototype.binaryOperators['===']
+        }, OriginalParser.prototype.binaryOperators),
+
         /**
          * @inheritdoc
          */
