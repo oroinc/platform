@@ -399,4 +399,22 @@
     }
 }
 
+// Mixin for add styles to block with background and paddings
+@mixin block-substrate($offset-inner, $bg, $border-radius: null) {
+    padding: $offset-inner;
+
+    background: $bg;
+    border-radius: $border-radius;
+}
+
+@mixin keyframe($animation-name) {
+    @-webkit-keyframes $animation-name {
+        @content;
+    }
+
+    @keyframes $animation-name {
+        @content;
+    }
+}
+
 @import 'mixins-for-components';

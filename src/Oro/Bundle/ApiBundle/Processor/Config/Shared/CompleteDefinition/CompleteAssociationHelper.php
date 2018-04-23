@@ -20,7 +20,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class CompleteAssociationHelper
 {
     /** @var ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /**
      * @param ConfigProvider $configProvider
@@ -191,7 +191,7 @@ class CompleteAssociationHelper
     /**
      * @param EntityDefinitionFieldConfig $field
      */
-    protected function completeDependsOn(EntityDefinitionFieldConfig $field)
+    private function completeDependsOn(EntityDefinitionFieldConfig $field)
     {
         $dependsOn = $field->getDependsOn();
         if (null === $dependsOn) {

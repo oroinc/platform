@@ -5,10 +5,8 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
-use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
-use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
-use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListIdProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
@@ -40,7 +38,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $activityListFilterHelper;
+    protected $activityListIdProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -50,12 +48,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $inheritanceHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
@@ -73,11 +65,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->config = $this->createMock(ConfigManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->provider = $this->createMock(ActivityListChainProvider::class);
-        $this->activityListFilterHelper = $this->createMock(ActivityListFilterHelper::class);
+        $this->activityListIdProvider = $this->createMock(ActivityListIdProvider::class);
         $this->em = $this->createMock(EntityManager::class);
         $this->commentManager = $this->createMock(CommentApiManager::class);
-        $this->aclHelper = $this->createMock(ActivityListAclCriteriaHelper::class);
-        $this->inheritanceHelper = $this->createMock(ActivityInheritanceTargetsHelper::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
@@ -96,11 +86,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->entityNameResolver,
             $this->config,
             $this->provider,
-            $this->activityListFilterHelper,
+            $this->activityListIdProvider,
             $this->commentManager,
             $this->doctrineHelper,
-            $this->aclHelper,
-            $this->inheritanceHelper,
             $this->eventDispatcher,
             $this->workflowHelper,
             $this->htmlTagHelper
@@ -195,15 +183,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ],
             $this->activityListManager->getItem(105)
         );
-    }
-
-    public function testGetGroupedEntitiesEmpty()
-    {
-        $this->provider
-            ->expects($this->once())
-            ->method('getProviderForEntity')
-            ->willReturn($this->returnValue(new TestActivityProvider()));
-        $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), '', '', 0, []));
     }
 
     protected function mockEmailActivityListProvider()

@@ -65,7 +65,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
                 }
                 $response = $this->cdelete(
                     ['entity' => $entityType],
-                    ['filter[id]' => implode(',', $id)],
+                    ['filter' => ['id' => implode(',', $id)]],
                     [],
                     false
                 );

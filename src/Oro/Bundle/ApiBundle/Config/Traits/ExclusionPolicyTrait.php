@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Component\EntitySerializer\EntityConfig;
 
 /**
+ * Adds the exclusion policy property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait ExclusionPolicyTrait

@@ -10,28 +10,25 @@ use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
+/**
+ * Sends maintenance notification email to all recipients defined in system configuration
+ * or to all active users if such configuration is not defined.
+ */
 class MassNotificationSender
 {
-    const MAINTENANCE_VARIABLE = 'maintenance_message';
-
+    const MAINTENANCE_VARIABLE  = 'maintenance_message';
     const NOTIFICATION_LOG_TYPE = 'mass';
 
-    /**
-     * @var EmailNotificationManager
-     */
+    /** @var EmailNotificationManager */
     protected $emailNotificationManager;
 
     /** @var ConfigManager */
     protected $cm;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var EntityPool
-     */
+    /** @var EntityPool */
     protected $entityPool;
 
     /** @var DQLNameFormatter */
@@ -39,10 +36,10 @@ class MassNotificationSender
 
     /**
      * @param EmailNotificationManager $emailNotificationManager
-     * @param ConfigManager $cm
-     * @param EntityManager $em
-     * @param EntityPool $entityPool
-     * @param DQLNameFormatter $dqlNameFormatter
+     * @param ConfigManager            $cm
+     * @param EntityManager            $em
+     * @param EntityPool               $entityPool
+     * @param DQLNameFormatter         $dqlNameFormatter
      */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
@@ -59,10 +56,11 @@ class MassNotificationSender
     }
 
     /**
-     * @param string $body
+     * @param string      $body
      * @param string|null $subject
      * @param string|null $senderEmail
      * @param string|null $senderName
+     *
      * @return int
      */
     public function send(
@@ -97,6 +95,7 @@ class MassNotificationSender
      * Get template to use for notification
      *
      * @param string $subject
+     *
      * @return EmailTemplate
      */
     protected function getTemplate($subject)
@@ -148,11 +147,8 @@ class MassNotificationSender
         );
         $qb->andWhere('u.enabled = :enabled')->setParameter('enabled', true);
         $users = $qb->getQuery()->getResult();
-        $users = array_map(function ($user) {
-            return [$user['email'] => $user['name']];
-        }, $users);
 
-        return $users;
+        return array_column($users, 'email');
     }
 
     /**

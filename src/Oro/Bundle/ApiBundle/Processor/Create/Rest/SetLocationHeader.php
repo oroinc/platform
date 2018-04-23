@@ -60,12 +60,20 @@ class SetLocationHeader implements ProcessorInterface
             return;
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         $entityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $context->getClassName(),
             $context->getRequestType()
         );
-        $entityId = $this->entityIdTransformer->transform($entityId, $context->getMetadata());
+
+        $entityId = $this->entityIdTransformer->transform($entityId, $metadata);
+
         $location = $this->router->generate(
             'oro_rest_api_item',
             ['entity' => $entityType, 'id' => $entityId],

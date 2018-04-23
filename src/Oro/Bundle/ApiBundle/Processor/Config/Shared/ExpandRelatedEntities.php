@@ -23,10 +23,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ExpandRelatedEntities implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -84,7 +84,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeEntityAssociations(
+    private function completeEntityAssociations(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
         $expandedEntities,
@@ -151,7 +151,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeObjectAssociations(
+    private function completeObjectAssociations(
         EntityDefinitionConfig $definition,
         $expandedEntities,
         $version,
@@ -187,7 +187,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeAssociation(
+    private function completeAssociation(
         EntityDefinitionConfig $definition,
         $fieldName,
         $targetClass,
@@ -222,7 +222,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      *
      * @return array
      */
-    protected function splitExpandedEntities($expandedEntities)
+    private function splitExpandedEntities($expandedEntities)
     {
         $result = [];
         foreach ($expandedEntities as $expandedEntity) {
@@ -243,7 +243,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      *
      * @return string
      */
-    protected function getAssociationTargetType($isCollection)
+    private function getAssociationTargetType($isCollection)
     {
         return $isCollection ? 'to-many' : 'to-one';
     }
@@ -254,7 +254,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      *
      * @return string
      */
-    protected function getPropertyPath($fieldName, EntityDefinitionConfig $definition)
+    private function getPropertyPath($fieldName, EntityDefinitionConfig $definition)
     {
         if (!$definition->hasField($fieldName)) {
             return $fieldName;

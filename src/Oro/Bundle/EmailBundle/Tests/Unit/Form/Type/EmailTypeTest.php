@@ -32,6 +32,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -199,7 +200,8 @@ class EmailTypeTest extends TypeTestCase
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
-        $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
+        $context = $this->createMock(ContextInterface::class);
+        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context);
         $resizableRichTextType = new OroResizeableRichTextType($configManager, $htmlTagProvider);
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

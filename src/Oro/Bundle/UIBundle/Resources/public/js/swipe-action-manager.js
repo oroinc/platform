@@ -57,6 +57,7 @@ define(function(require) {
          */
         _bindEvents: function() {
             this.$el.on('touchstart', _.bind(this._swipeStart, this));
+            this.$el.on('touchmove', _.bind(this._swipeMove, this));
             this.$el.on('touchend', _.bind(this._swipeEnd, this));
         },
 
@@ -75,6 +76,25 @@ define(function(require) {
             };
 
             this.startTime = new Date().getTime();
+
+            mediator.trigger('swipe-action-start', {}, event.target);
+        },
+
+        /**
+         * Handler for start move
+         *
+         * @param {jQuery.Event} event
+         * @private
+         */
+        _swipeMove: function(event) {
+            event = ('changedTouches' in event) ? event.changedTouches[0] : event;
+
+            var touchEndCoords = {
+                x: event.pageX - this.touchStartCoords.x,
+                y: event.pageY - this.touchStartCoords.y
+            };
+
+            mediator.trigger('swipe-action-move', this._collectOptions(touchEndCoords), event.target);
         },
 
         /**
@@ -97,10 +117,22 @@ define(function(require) {
                     Math.abs(this.touchEndCoords.x) >= this.minDistanceXAxis &&
                     Math.abs(this.touchEndCoords.y) <= this.maxDistanceYAxis
                 ) {
-                    this.direction = (this.touchEndCoords.x < 0) ? 'left' : 'right';
-                    mediator.trigger('swipe-action-' + this.direction);
+                    this.direction = this._getDirection(this.touchEndCoords.x);
+                    mediator.trigger('swipe-action-' + this.direction, this.touchEndCoords, event.target);
                 }
             }
+
+            mediator.trigger('swipe-action-end', this._collectOptions(this.touchEndCoords), event.target);
+        },
+
+        _getDirection: function(coords) {
+            return (coords < 0) ? 'left' : 'right';
+        },
+
+        _collectOptions: function(options) {
+            return _.extend({}, options, {
+                direction: this._getDirection(options.x)
+            });
         }
     };
 

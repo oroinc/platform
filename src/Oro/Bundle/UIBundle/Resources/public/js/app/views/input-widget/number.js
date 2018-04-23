@@ -7,7 +7,9 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
 
-    var decimalSeparator = localeSettings.getNumberFormats('decimal').decimal_separator_symbol;
+    var decimalSettings = localeSettings.getNumberFormats('decimal');
+    var decimalSeparator = decimalSettings.decimal_separator_symbol;
+    var groupingSeparator = decimalSettings.grouping_separator_symbol;
 
     NumberInputWidgetView = AbstractInputWidgetView.extend({
         events: {
@@ -128,7 +130,8 @@ define(function(require) {
                 field.value = field.value.replace(/^0*/g, '');
             }
 
-            field.value = field.value.replace(/(?!\.)[?:\D+]/g, '');// clear not allowed symbols
+            // clear not allowed symbols
+            field.value = field.value.replace(new RegExp('(?!\\' + decimalSeparator + ')[?:\\D+]', 'g'), '');
 
             if (field.value[0] === decimalSeparator && this.precision > 0) {
                 field.value = '0' + field.value;
@@ -136,7 +139,7 @@ define(function(require) {
             // filter value end
 
             // validate value start
-            var regExpString = '^([0-9]*)';
+            var regExpString = '^([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
             if (this.precision > 0) {
                 regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
             }

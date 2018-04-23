@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ActivityListBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_1\OroActivityListBundle as OroActivityListBundle11;
-use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_2\AddActivityDescription as AddActivityDescription12;
-use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_3\AddActivityOwner as AddActivityOwner13;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * Creates all tables and indexes for the ActivityList bundle.
+ */
 class OroActivityListBundleInstaller implements Installation
 {
     /**
@@ -16,7 +16,7 @@ class OroActivityListBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -26,14 +26,11 @@ class OroActivityListBundleInstaller implements Installation
     {
         /** Tables generation **/
         $this->createOroActivityListTable($schema);
+        $this->createOroActivityOwnerTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroActivityListForeignKeys($schema);
-
-        OroActivityListBundle11::addColumns($schema);
-        AddActivityDescription12::addColumns($schema);
-
-        AddActivityOwner13::addActivityOwner($schema);
+        $this->addOroActivityOwnerForeignKeys($schema);
     }
 
     /**
@@ -54,11 +51,33 @@ class OroActivityListBundleInstaller implements Installation
         $table->addColumn('related_activity_id', 'integer', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('description', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['organization_id'], 'IDX_B1F9F0132C8A3DE', []);
         $table->addIndex(['updated_at'], 'oro_activity_list_updated_idx', []);
         $table->addIndex(['user_owner_id'], 'IDX_B1F9F019EB185F9', []);
         $table->addIndex(['user_editor_id'], 'IDX_B1F9F01697521A8', []);
+        $table->addIndex(['related_activity_class'], 'al_related_activity_class');
+        $table->addIndex(['related_activity_id'], 'al_related_activity_id');
+    }
+
+    /**
+     * Create oro_activity_owner table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroActivityOwnerTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_activity_owner');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('activity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['activity_id', 'user_id'], 'UNQ_activity_owner');
+        $table->addIndex(['activity_id']);
+        $table->addIndex(['organization_id']);
+        $table->addIndex(['user_id'], 'idx_oro_activity_owner_user_id', []);
     }
 
     /**
@@ -86,6 +105,34 @@ class OroActivityListBundleInstaller implements Installation
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * Add oro_activity_owner foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroActivityOwnerForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_activity_owner');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_activity_list'),
+            ['activity_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }

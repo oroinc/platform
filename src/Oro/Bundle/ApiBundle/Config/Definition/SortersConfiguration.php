@@ -7,12 +7,15 @@ use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "sorters" section.
+ */
 class SortersConfiguration extends AbstractConfigurationSection
 {
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $sectionName = 'sorters';
 
@@ -47,7 +50,7 @@ class SortersConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'sorters.field';
 
