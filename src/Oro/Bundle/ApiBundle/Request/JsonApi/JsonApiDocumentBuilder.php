@@ -162,6 +162,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            if (!$property->isOutput()) {
+                continue;
+            }
             $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
                 $result[self::META][$resultName] = $data[$name];
@@ -179,6 +182,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
             if (!in_array($name, $idFieldNames, true)) {
                 $result[self::ATTRIBUTES][$name] = $data[$name] ?? null;
             }
@@ -199,6 +205,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
             $value = $this->getRelationshipValue($data, $requestType, $name, $association);
             if (DataType::isAssociationAsField($association->getDataType())) {
                 $result[self::ATTRIBUTES][$name] = $value;
@@ -217,6 +226,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
             $result[self::META][$name] = $data[$name] ?? null;
         }
     }
@@ -235,6 +247,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
             $result[self::META][$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }

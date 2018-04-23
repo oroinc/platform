@@ -130,6 +130,7 @@ services:
     oro_api.create.rest.set_location_header:
         class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
         arguments:
+            - 'oro_rest_api_item'
             - '@router'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.entity_id_transformer'

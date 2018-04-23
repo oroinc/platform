@@ -43,7 +43,7 @@ class ExtractEntityId implements ProcessorInterface
             $context->setId($data[JsonApiDoc::ID]);
         } else {
             $metadata = $context->getMetadata();
-            if (!$metadata->hasIdentifierGenerator()) {
+            if (null !== $metadata && !$metadata->hasIdentifierGenerator()) {
                 $context->addError($this->createRequiredEntityIdError());
             }
         }

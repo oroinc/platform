@@ -163,6 +163,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
+            - '@assets.context'
             - '%kernel.cache_dir%'
         calls:
             - [setAssetHelper, ['@assets.packages']]

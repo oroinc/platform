@@ -20,13 +20,13 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 class CompleteCustomAssociationHelper
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var CompleteAssociationHelper */
-    protected $associationHelper;
+    private $associationHelper;
 
     /** @var AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
     /**
      * @param DoctrineHelper            $doctrineHelper
@@ -69,7 +69,7 @@ class CompleteCustomAssociationHelper
      * @param string                      $version
      * @param RequestType                 $requestType
      */
-    protected function completeCustomAssociation(
+    private function completeCustomAssociation(
         $entityClass,
         EntityDefinitionConfig $definition,
         $fieldName,
@@ -96,7 +96,7 @@ class CompleteCustomAssociationHelper
      * @param string                      $version
      * @param RequestType                 $requestType
      */
-    protected function completeExtendedAssociation(
+    private function completeExtendedAssociation(
         $entityClass,
         $fieldName,
         EntityDefinitionFieldConfig $field,
@@ -146,7 +146,7 @@ class CompleteCustomAssociationHelper
      *
      * @return string
      */
-    protected function getExtendedAssociationTargetType($associationType)
+    private function getExtendedAssociationTargetType($associationType)
     {
         $isCollection =
             in_array($associationType, RelationType::$toManyRelations, true)
@@ -162,7 +162,7 @@ class CompleteCustomAssociationHelper
      *
      * @return array [target entity class => field name, ...]
      */
-    protected function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
+    private function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
     {
         return $this->associationManager->getAssociationTargets(
             $entityClass,
@@ -176,7 +176,7 @@ class CompleteCustomAssociationHelper
      * @param EntityDefinitionFieldConfig $field
      * @param string[]                    $targets
      */
-    protected function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
+    private function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
     {
         $targetEntity = $field->getTargetEntity();
         if (null === $targetEntity) {

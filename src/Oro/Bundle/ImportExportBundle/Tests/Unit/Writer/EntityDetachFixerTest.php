@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Writer\Stub\EntityStub;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -26,21 +27,14 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManager = $this->createMock('Doctrine\ORM\EntityManager');
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityManager')
             ->will($this->returnValue($this->entityManager));
 
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldHelper = $this->createMock('Oro\Bundle\EntityBundle\Helper\FieldHelper');
 
         $this->fixer = new EntityDetachFixer(
             $this->doctrineHelper,
@@ -64,8 +58,8 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
      */
     public function testFixEntityAssociationFieldsEntity($fieldValue)
     {
-        $entity = new \stdClass();
-        $entity->field = $fieldValue;
+        $entity = new EntityStub();
+        $entity->setReadable($fieldValue);
 
         if ($fieldValue instanceof ArrayCollection) {
             $linkedEntity = $fieldValue->getIterator()->offsetGet(0);
@@ -76,11 +70,14 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $this->fieldHelper->expects($this->once())
             ->method('getRelations')
             ->with(get_class($entity))
-            ->will($this->returnValue([['name' => 'field']]));
+            ->willReturn(
+                [
+                    ['name' => 'readable'],
+                    ['name' => 'notReadable']
+                ]
+            );
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
         $metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($linkedEntity)
@@ -88,8 +85,8 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
-            ->with(get_class($entity))
-            ->will($this->returnValue($metadata));
+            ->with(\stdClass::class)
+            ->willReturn($metadata);
 
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
@@ -97,7 +94,7 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $uow->expects($this->once())
             ->method('getEntityState')
             ->with($linkedEntity)
-            ->will($this->returnValue(UnitOfWork::STATE_DETACHED));
+            ->willReturn(UnitOfWork::STATE_DETACHED);
 
         $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
@@ -105,20 +102,18 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->once())
             ->method('getReference')
-            ->with(get_class($entity), 'id')
-            ->will(
-                $this->returnCallback(
-                    function () use ($entity) {
-                        $entity->reloaded = true;
-                        return $entity;
-                    }
-                )
+            ->with('stdClass', 'id')
+            ->willReturnCallback(
+                function () use ($entity) {
+                    $entity->reloaded = true;
+                    return $entity;
+                }
             );
         $this->fixer->fixEntityAssociationFields($entity, 0);
         if ($fieldValue instanceof ArrayCollection) {
-            $this->assertTrue($entity->field->getIterator()->offsetGet(0)->reloaded);
+            $this->assertTrue($entity->getReadable()->getIterator()->offsetGet(0)->reloaded);
         } else {
-            $this->assertTrue($entity->field->reloaded);
+            $this->assertTrue($entity->getReadable()->reloaded);
         }
     }
 

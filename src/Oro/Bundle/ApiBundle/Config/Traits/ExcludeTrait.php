@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * Adds the exclude property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait ExcludeTrait

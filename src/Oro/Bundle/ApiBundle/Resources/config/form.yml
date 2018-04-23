@@ -25,6 +25,11 @@ services:
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_api.form.extension.datetime:
+        class: Oro\Bundle\ApiBundle\Form\Extension\DateTimeExtension
+        tags:
+            - { name: oro.api.form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
+
     oro_api.form.extension.customize_form_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
         arguments:
@@ -60,7 +65,7 @@ services:
     oro_api.form.type.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityType
         arguments:
-            - '@doctrine'
+            - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
             - { name: oro.api.form.type, alias: oro_api_entity }
@@ -69,7 +74,7 @@ services:
         class: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType
         arguments:
             - '@property_accessor'
-            - '@doctrine'
+            - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
             - { name: oro.api.form.type, alias: oro_api_nested_association }

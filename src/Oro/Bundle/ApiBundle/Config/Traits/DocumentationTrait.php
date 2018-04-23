@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
+ * Adds the documentation property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait DocumentationTrait

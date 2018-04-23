@@ -9,6 +9,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * A set of utility methods to operate with inheritance of activity lists.
+ * The inheritance of activity lists is a logical relation between different types of entities.
+ * Using this logical relation it is possible to get activities related to all linked entities.
+ */
 class ActivityInheritanceTargetsHelper
 {
     /** @var ConfigManager */
@@ -54,9 +59,8 @@ class ActivityInheritanceTargetsHelper
      * @param array        $inheritanceTarget
      * @param string       $aliasSuffix
      * @param string       $entityIdExpr
-     * @param bool         $head Head activity only
      */
-    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr, $head)
+    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr)
     {
         QueryBuilderUtil::checkIdentifier($aliasSuffix);
         $alias = 'ta_' . $aliasSuffix;
@@ -70,9 +74,6 @@ class ActivityInheritanceTargetsHelper
                 $aliasSuffix
             )->getDQL()
         ));
-        if ($head) {
-            $qb->andWhere($qb->expr()->andX('activity.head = true'));
-        }
     }
 
     /**

@@ -397,8 +397,6 @@ class Form extends Element
             )
         ), $errorSpans);
 
-        self::assertNotEmpty($errorSpans, "Field $fieldName has no validation errors");
-
         return array_map(function (NodeElement $error) {
             return $error->getText();
         }, $errorSpans);

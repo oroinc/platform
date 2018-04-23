@@ -60,6 +60,7 @@
     $(function() {
         var userName = {{ userName|json_encode|raw }},
             apiKey = {{ apiKey|json_encode|raw }},
+            apiKeyGenerationHint = {{ apiKeyGenerationHint|default('')|json_encode|raw }},
             loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
             logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
             sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
@@ -73,6 +74,9 @@
             apiPrefix = '',
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
+            },
+            escapeHtmlAttribute = function (val) {
+                return val.replace(/"/g,'&quot;');
             },
             addHeader = function ($headers, headerKey, headerValue) {
                 var needsHeader = true,
@@ -158,10 +162,8 @@
          * Add the authentication type selector
          */
         $('#sandbox_configuration').prepend(
-            (wsseAllowed ? '' : '<span class="authentication-warning"' +
-            ' title="To use WSSE authentication you need to generate API key for the current logged-in user.' +
-            ' To do this, go to the My User page and click Generate Key near to API Key.' +
-            ' After that reload this page."' +
+            (wsseAllowed || !apiKeyGenerationHint ? '' : '<span class="authentication-warning"' +
+            ' title="' + escapeHtmlAttribute(apiKeyGenerationHint) + '"' +
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +

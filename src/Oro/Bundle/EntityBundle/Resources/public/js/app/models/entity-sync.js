@@ -24,8 +24,6 @@ define(function(require) {
             urlParams.include = options.include.join();
         }
 
-        urlParams.meta = _.union(options.meta, ['title']).join();
-
         // @todo add filter by fields
 
         if (!options.url) {

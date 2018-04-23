@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
+ * Validates and prepares email template for sending
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class SendEmailTemplate extends AbstractSendEmail
@@ -108,8 +109,10 @@ class SendEmailTemplate extends AbstractSendEmail
         foreach ($this->options['to'] as $email) {
             if ($email) {
                 $address = $this->getEmailAddress($context, $email);
-                $this->validateAddress($address);
-                $to[] = $this->getEmailAddress($context, $address);
+                if ($address) {
+                    $this->validateAddress($address);
+                    $to[] = $this->getEmailAddress($context, $address);
+                }
             }
         }
         $emailModel->setTo($to);

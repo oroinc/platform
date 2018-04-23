@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
+/**
+ * The metadata factory for manageable entities.
+ */
 class EntityMetadataFactory
 {
     /** @var MetadataHelper */

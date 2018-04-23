@@ -18,25 +18,31 @@ class SetLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Location';
 
+    /** @var string */
+    private $itemRouteName;
+
     /** @var RouterInterface */
-    protected $router;
+    private $router;
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    private $entityIdTransformer;
 
     /**
+     * @param string                       $itemRouteName
      * @param RouterInterface              $router
      * @param ValueNormalizer              $valueNormalizer
      * @param EntityIdTransformerInterface $entityIdTransformer
      */
     public function __construct(
+        string $itemRouteName,
         RouterInterface $router,
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
+        $this->itemRouteName = $itemRouteName;
         $this->router = $router;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformer = $entityIdTransformer;
@@ -60,14 +66,22 @@ class SetLocationHeader implements ProcessorInterface
             return;
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         $entityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $context->getClassName(),
             $context->getRequestType()
         );
-        $entityId = $this->entityIdTransformer->transform($entityId, $context->getMetadata());
+
+        $entityId = $this->entityIdTransformer->transform($entityId, $metadata);
+
         $location = $this->router->generate(
-            'oro_rest_api_item',
+            $this->itemRouteName,
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

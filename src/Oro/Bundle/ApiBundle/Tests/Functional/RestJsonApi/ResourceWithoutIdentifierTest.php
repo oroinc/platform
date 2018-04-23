@@ -43,7 +43,16 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
+        $this->assertResponseContains(
+            [
+                'meta' => [
+                    'name'        => 'test',
+                    'description' => null
+                ]
+            ],
+            $response
+        );
     }
 
     public function testPatch()
@@ -61,7 +70,16 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        $this->assertResponseContains(
+            [
+                'meta' => [
+                    'name'        => 'test',
+                    'description' => null
+                ]
+            ],
+            $response
+        );
     }
 
     public function testDelete()
