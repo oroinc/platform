@@ -70,18 +70,31 @@ define(function() {
     TranslatorProvider.providers = {};
 
     /**
+     * Creates an instance of translator provider
      *
-     * @param BaseTranslator
+     * @param {string} groupName
+     * @param {function} BaseTranslator
      * @return {TranslatorProvider}
      * @static
      */
-    TranslatorProvider.getProviderOf = function(BaseTranslator) {
+    TranslatorProvider.createProvider = function(groupName, BaseTranslator) {
         var providers = TranslatorProvider.providers;
-        var name = BaseTranslator.name;
-        if (!providers[name]) {
-            providers[name] = new TranslatorProvider(BaseTranslator);
+        if (providers[groupName]) {
+            throw new Error('Provider with group name "' + groupName + '" already created');
         }
-        return providers[name];
+        providers[groupName] = new TranslatorProvider(BaseTranslator);
+        return providers[groupName];
+    };
+
+    /**
+     * Returns instance of translator provider by group name
+     *
+     * @param {string} groupName
+     * @return {TranslatorProvider|null}
+     * @static
+     */
+    TranslatorProvider.getProvider = function(groupName) {
+        return TranslatorProvider.providers[groupName] || null;
     };
 
 

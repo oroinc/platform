@@ -13,10 +13,6 @@ define(function(require) {
         require('oroquerydesigner/js/query-type-converter/to-expression/query-condition-converter');
     var FieldIdTranslatorToExpression =
         require('oroquerydesigner/js/query-type-converter/to-expression/field-id-translator');
-    var AbstractFilterTranslatorToExpression =
-        require('oroquerydesigner/js/query-type-converter/to-expression/abstract-filter-translator');
-    var AbstractConditionTranslatorToExpression =
-        require('oroquerydesigner/js/query-type-converter/to-expression/abstract-condition-translator');
 
     QueryTypeConverterComponent = BaseComponent.extend({
         relatedSiblingComponents: {
@@ -118,8 +114,8 @@ define(function(require) {
             var entityStructureDataProvider = this.expressionEditorComponent.entityStructureDataProvider;
             var filterIdTranslator = new FieldIdTranslatorToExpression(entityStructureDataProvider);
             var filterConfigProvider = this.filterConfigProvider;
-            var filterTranslatorProvider = TranslatorProvider.getProviderOf(AbstractFilterTranslatorToExpression);
-            var conditionTranslators = TranslatorProvider.getProviderOf(AbstractConditionTranslatorToExpression)
+            var filterTranslatorProvider = TranslatorProvider.getProvider('filterToExpression');
+            var conditionTranslators = TranslatorProvider.getProvider('conditionToExpression')
                 .getTranslatorConstructors()
                 .map(function(ConditionTranslator) {
                     return new ConditionTranslator(
