@@ -92,6 +92,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             // remove custom handler
             $(document).unbind('keydown.dialog', this._onBackspacePress);
             $(window).unbind('resize.dialog', this._windowResizeHandler);
+
+            // @TODO: Remove this fix when Apple fix caret placement bug
+            this.iOScaretFixer(false);
         },
 
         _makeDraggable: function() {

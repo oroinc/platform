@@ -44,7 +44,7 @@ class LocalizationSelectTypeTest extends \PHPUnit_Framework_TestCase
                     $this->assertArrayHasKey('autocomplete_alias', $options);
                     $this->assertArrayHasKey('create_form_route', $options);
                     $this->assertArrayHasKey('configs', $options);
-                    $this->assertEquals(LocalizationType::class, $options['autocomplete_alias']);
+                    $this->assertEquals('oro_localization', $options['autocomplete_alias']);
                     $this->assertEquals('oro_locale_localization_create', $options['create_form_route']);
                     $this->assertEquals(
                         ['placeholder' => 'oro.locale.localization.form.placeholder.choose'],

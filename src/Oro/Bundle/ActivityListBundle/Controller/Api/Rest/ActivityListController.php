@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * The REST API resources for the activity lists.
+ *
  * @RouteResource("activitylist")
  * @NamePrefix("oro_api_")
  */
@@ -47,7 +49,7 @@ class ActivityListController extends RestController
     {
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $request->get('filter');
-        $pageFilter  = $request->get('pageFilter');
+        $pageFilter  = $request->get('pageFilter', []);
 
         $results = $this->getManager()->getListData(
             $entityClass,

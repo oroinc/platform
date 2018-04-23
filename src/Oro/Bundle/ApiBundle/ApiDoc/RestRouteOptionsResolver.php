@@ -82,12 +82,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        $group = $route->getOption(self::GROUP_OPTION);
-        if ($group === 'rest_api_deprecated') {
-            $routes->remove($routes->getName($route));
-            return;
-        }
-        if ($group !== $this->routeGroup
+        if ($route->getOption(self::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;

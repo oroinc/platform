@@ -28,7 +28,7 @@ define([
          * @inheritDoc
          */
         render: function() {
-            if (this.column.get('editable')) {
+            if (this.isEditableColumn()) {
                 // render a checkbox for editable cell
                 BooleanCell.__super__.render.apply(this, arguments);
             } else {
@@ -51,7 +51,7 @@ define([
          */
         enterEditMode: function(e) {
             BooleanCell.__super__.enterEditMode.apply(this, arguments);
-            if (this.column.get('editable')) {
+            if (this.isEditableColumn()) {
                 var $editor = this.currentEditor.$el;
                 $editor.prop('checked', !$editor.prop('checked')).change();
                 e.stopPropagation();

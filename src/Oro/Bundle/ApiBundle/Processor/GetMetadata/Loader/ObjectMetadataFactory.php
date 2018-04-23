@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * The metadata factory for non manageable entities.
+ */
 class ObjectMetadataFactory
 {
     /** @var MetadataHelper */
@@ -225,14 +228,12 @@ class ObjectMetadataFactory
      */
     protected function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
     {
-        $targets = $this->associationManager->getAssociationTargets(
+        return $this->associationManager->getAssociationTargets(
             $entityClass,
             null,
             $associationType,
             $associationKind
         );
-
-        return $targets;
     }
 
     /**

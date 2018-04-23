@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class RegisterConfiguredFilters extends RegisterFilters
 {
-    const ASSOCIATION_ALLOWED_OPERATORS = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
+    private const ASSOCIATION_ALLOWED_OPERATORS = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -78,7 +78,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                         $filter->setSupportedOperators([StandaloneFilter::EQ]);
                     }
                     // only EQ and NEQ operators should be available for association filters
-                    if (in_array($propertyPath, $associationNames, true) &&
+                    if (\in_array($propertyPath, $associationNames, true) &&
                         [] !== array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
                     ) {
                         $filter->setSupportedOperators(self::ASSOCIATION_ALLOWED_OPERATORS);
@@ -98,7 +98,7 @@ class RegisterConfiguredFilters extends RegisterFilters
     protected function getAssociationNames(ClassMetadata $metadata = null)
     {
         return null !== $metadata
-            ? array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
+            ? \array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
             : [];
     }
 
@@ -111,7 +111,7 @@ class RegisterConfiguredFilters extends RegisterFilters
     protected function isCollection(ClassMetadata $metadata, $propertyPath)
     {
         $isCollection = false;
-        $path = explode('.', $propertyPath);
+        $path = \explode('.', $propertyPath);
         foreach ($path as $fieldName) {
             if ($metadata->isCollectionValuedAssociation($fieldName)) {
                 $isCollection = true;

@@ -153,6 +153,9 @@ api:
                     form_options:
                         constraints:
                             - NotBlank: ~
+                description:
+                    data_type: string
+                    description: The description of a resource
             actions:
                 get:
                     description: Get Resource Without Identifier
@@ -166,3 +169,8 @@ api:
                 update:
                     description: Update Resource Without Identifier
                     documentation: Update resource without identifier
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct:
+            subresources:
+                search:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestEntityIdentifier
+                    target_type: collection

@@ -1,0 +1,3 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct:
+    test_product1:
+        name: test_product

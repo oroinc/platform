@@ -7,12 +7,15 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "filters" section.
+ */
 class FiltersConfiguration extends AbstractConfigurationSection
 {
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $sectionName = 'filters';
 
@@ -47,7 +50,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'filters.field';
 
@@ -86,7 +89,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessFieldConfig(array $config)
+    protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[FilterFieldConfig::OPTIONS])) {
             unset($config[FilterFieldConfig::OPTIONS]);

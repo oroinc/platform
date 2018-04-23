@@ -14,8 +14,8 @@ class NumberTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertSame($expected, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertSame($expected, $form->getData());
     }
 
     public function validValuesDataProvider()
@@ -35,7 +35,7 @@ class NumberTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
-        $this->assertFalse($form->isSynchronized());
+        self::assertFalse($form->isSynchronized());
     }
 
     public function invalidValuesDataProvider()
@@ -51,6 +51,6 @@ class NumberTypeTest extends TypeTestCase
     public function testGetName()
     {
         $type = new NumberType();
-        $this->assertEquals('oro_api_number', $type->getName());
+        self::assertEquals('oro_api_number', $type->getName());
     }
 }

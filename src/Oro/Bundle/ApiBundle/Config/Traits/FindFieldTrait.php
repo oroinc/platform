@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
+ * Adds methods to find a field to a configuration class.
+ *
  * @property FieldConfigInterface[] $fields
  */
 trait FindFieldTrait

@@ -464,8 +464,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
         self::assertEquals(
             [
-                    'id'       => 123,
-                    'category' => $expected
+                'id'       => 123,
+                'category' => $expected
             ],
             $this->documentBuilder->getDocument()
         );
@@ -781,6 +781,120 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'category'   => 456,
                 'categories' => [456, 457]
             ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyMetaProperty()
+    {
+        $object = [
+            'id'    => 123,
+            'meta1' => 'Meta1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id' => 123
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyField()
+    {
+        $object = [
+            'id'     => 123,
+            'field1' => 'value1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addField($this->createFieldMetadata('field1'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id' => 123
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyAssociation()
+    {
+        $object = [
+            'id'           => 123,
+            'association1' => 456
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $metadata->addAssociation($this->createAssociationMetadata('association1', 'Test\Category'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id' => 123
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyMetaPropertyForEntityWithoutIdentifier()
+    {
+        $object = [
+            'meta1' => 'Meta1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', []);
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('meta1'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyFieldForEntityWithoutIdentifier()
+    {
+        $object = [
+            'field1' => 'value1'
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', []);
+        $metadata->addField($this->createFieldMetadata('field1'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testInputOnlyAssociationForEntityWithoutIdentifier()
+    {
+        $object = [
+            'association1' => 456
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', []);
+        $metadata->addAssociation($this->createAssociationMetadata('association1', 'Test\Category'))
+            ->setDirection(true, false);
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [],
             $this->documentBuilder->getDocument()
         );
     }

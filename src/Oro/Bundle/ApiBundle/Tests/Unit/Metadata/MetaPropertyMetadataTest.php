@@ -49,6 +49,36 @@ class MetaPropertyMetadataTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testToArrayInputOnlyProperty()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+        $propertyMetadata->setName('testName');
+        $propertyMetadata->setDirection(true, false);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'input-only'
+            ],
+            $propertyMetadata->toArray()
+        );
+    }
+
+    public function testToArrayOutputOnlyProperty()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+        $propertyMetadata->setName('testName');
+        $propertyMetadata->setDirection(false, true);
+
+        self::assertEquals(
+            [
+                'name'      => 'testName',
+                'direction' => 'output-only'
+            ],
+            $propertyMetadata->toArray()
+        );
+    }
+
     public function testNameInConstructor()
     {
         $propertyMetadata = new MetaPropertyMetadata('name');
@@ -86,6 +116,29 @@ class MetaPropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($propertyMetadata->getDataType());
         $propertyMetadata->setDataType('dataType');
         $this->assertEquals('dataType', $propertyMetadata->getDataType());
+    }
+
+    public function testDirection()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+
+        self::assertTrue($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
+        $propertyMetadata->setDirection(true, false);
+        self::assertTrue($propertyMetadata->isInput());
+        self::assertFalse($propertyMetadata->isOutput());
+        $propertyMetadata->setDirection(false, true);
+        self::assertFalse($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
+        $propertyMetadata->setDirection(true, false);
+        self::assertTrue($propertyMetadata->isInput());
+        self::assertFalse($propertyMetadata->isOutput());
+        $propertyMetadata->setDirection(false, false);
+        self::assertFalse($propertyMetadata->isInput());
+        self::assertFalse($propertyMetadata->isOutput());
+        $propertyMetadata->setDirection(true, true);
+        self::assertTrue($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
     }
 
     public function testResultName()

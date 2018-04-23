@@ -44,6 +44,11 @@ class SetEntityId implements ProcessorInterface
         }
 
         $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         if ($metadata->hasIdentifierGenerator()) {
             // ignore entities with an identity generator
             return;

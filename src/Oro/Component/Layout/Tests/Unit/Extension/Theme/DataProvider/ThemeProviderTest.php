@@ -99,5 +99,6 @@ class ThemeProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturnOnConsecutiveCalls($theme, $parentTheme, $grandParentTheme);
 
         $this->assertSame('grand/parent/theme/path/to/output/css', $this->provider->getStylesOutput($themeName));
+        $this->assertNull($this->provider->getStylesOutput($themeName, 'undefined'));
     }
 }
