@@ -117,11 +117,10 @@ class TranslatableEntityType extends AbstractType
 
             return new TranslationChoiceLoader(
                 $options['class'],
-                $options['query_builder'],
                 $this->registry,
-                $this->factory
+                $this->factory,
+                $options['query_builder']
             );
         });
     }
 }
-

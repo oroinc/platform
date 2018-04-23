@@ -4,7 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Form\ChoiceList;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
@@ -12,6 +11,10 @@ use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 
+/**
+ * Implementation of ChoiceLoaderInterface for TranslatableEntityType.
+ * It loads all entities of a given class name or entities restricted by query builder to use for choices.
+ */
 class TranslationChoiceLoader implements ChoiceLoaderInterface
 {
     /**
@@ -43,12 +46,13 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
      * @param string $className
      * @param ManagerRegistry $registry
      * @param ChoiceListFactoryInterface $factory
+     * @param QueryBuilder|null $queryBuilder
      */
     public function __construct(
         string $className,
-        $queryBuilder,
         ManagerRegistry $registry,
-        ChoiceListFactoryInterface $factory
+        ChoiceListFactoryInterface $factory,
+        $queryBuilder
     ) {
         $this->className = $className;
         $this->queryBuilder = $queryBuilder;
@@ -68,18 +72,6 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         /** @var $entityManager EntityManager */
         $entityManager = $this->registry->getManager();
 
-        // get query builder
-        if (!empty($this->queryBuilder)) {
-            $queryBuilder = $this->queryBuilder;
-            if ($queryBuilder instanceof \Closure) {
-                $queryBuilder = $queryBuilder($this->registry->getRepository($this->className));
-            }
-        } else {
-            /** @var $repository EntityRepository */
-            $repository = $this->registry->getRepository($this->className);
-            $queryBuilder = $repository->createQueryBuilder('e');
-        }
-
         // translation must not be selected separately for each entity
         $entityManager->getConfiguration()->addCustomHydrationMode(
             TranslationWalker::HYDRATE_OBJECT_TRANSLATION,
@@ -87,8 +79,7 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
         );
 
         // make entity translatable
-        /** @var $queryBuilder QueryBuilder */
-        $query = $queryBuilder->getQuery();
+        $query = $this->resolveQueryBuilder()->getQuery();
         $query->setHint(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
@@ -121,5 +112,21 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
     {
         return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
-}
 
+    /**
+     * @return QueryBuilder
+     */
+    private function resolveQueryBuilder()
+    {
+        if ($this->queryBuilder === null) {
+            $repository = $this->registry->getRepository($this->className);
+            return $repository->createQueryBuilder('e');
+        }
+
+        if ($this->queryBuilder instanceof \Closure) {
+            return \call_user_func($this->queryBuilder, $this->registry->getRepository($this->className));
+        }
+
+        return $this->queryBuilder;
+    }
+}
