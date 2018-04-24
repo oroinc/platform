@@ -5,6 +5,7 @@ namespace Oro\Bundle\AddressBundle\Form\EventListener;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -74,7 +75,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 $formType = $regionTypeConfig->getType()->getName();
             } else {
                 $config = array();
-                $formType = 'oro_region';
+                $formType = RegionType::class;
             }
 
             $config['country'] = $country;
