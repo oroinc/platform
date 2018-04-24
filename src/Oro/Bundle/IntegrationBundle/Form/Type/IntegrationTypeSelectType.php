@@ -36,7 +36,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $choices = $options['choice_list']->getChoices();
+        $choices = $options['choices'];
 
         if (empty($choices)) {
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
