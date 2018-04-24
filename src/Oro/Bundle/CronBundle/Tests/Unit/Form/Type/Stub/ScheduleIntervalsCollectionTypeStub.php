@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Form\Type\Stub;
 
 use Oro\Bundle\CronBundle\Form\Type\ScheduleIntervalsCollectionType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class ScheduleIntervalsCollectionTypeStub extends ScheduleIntervalsCollectionType
 {
@@ -19,6 +20,6 @@ class ScheduleIntervalsCollectionTypeStub extends ScheduleIntervalsCollectionTyp
      */
     public function getParent()
     {
-        return 'collection';
+        return CollectionType::class;
     }
 }

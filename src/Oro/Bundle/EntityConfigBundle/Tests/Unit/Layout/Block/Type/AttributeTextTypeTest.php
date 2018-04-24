@@ -67,13 +67,6 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetName()
-    {
-        $type = $this->getBlockType(AttributeTextType::NAME);
-
-        $this->assertSame(AttributeTextType::NAME, $type->getName());
-    }
-
     public function testGetParent()
     {
         $type = $this->getBlockType(AttributeTextType::NAME);

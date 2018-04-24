@@ -125,12 +125,12 @@ class EmailTemplateType extends AbstractType
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('name', 'text', null, $options));
+                    $form->add($factory->createNamed('name', TextType::class, null, $options));
                     if (!$data->getIsEditable()) {
                         // name field
                         $options = $form->get('type')->getConfig()->getOptions();
                         $setDisabled($options);
-                        $form->add($factory->createNamed('type', 'choice', null, $options));
+                        $form->add($factory->createNamed('type', ChoiceType::class, null, $options));
                     }
                 }
             }

@@ -72,7 +72,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 $config = $regionTypeConfig->getOptions();
                 unset($config['choice_list']);
                 unset($config['choices']);
-                $formType = $regionTypeConfig->getType()->getName();
+                $formType = get_class($regionTypeConfig->getType()->getInnerType());
             } else {
                 $config = array();
                 $formType = RegionType::class;
@@ -135,7 +135,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form->add(
                 $this->factory->createNamed(
                     'region',
-                    $form->get('region')->getConfig()->getType()->getName(),
+                    get_class($form->get('region')->getConfig()->getType()->getInnerType()),
                     null,
                     $config
                 )

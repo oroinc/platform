@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
@@ -36,7 +37,7 @@ class ChoiceAssociationPropertyTypeTest extends AssociationTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'choice',
+            ChoiceType::class,
             $this->getFormType()->getParent()
         );
     }

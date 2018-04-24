@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -44,7 +45,7 @@ class UserApiSubscriber implements EventSubscriberInterface
         }
 
         if (!$data->getId()) {
-            $form->add('plainPassword', 'password');
+            $form->add('plainPassword', PasswordType::class);
         }
     }
 }

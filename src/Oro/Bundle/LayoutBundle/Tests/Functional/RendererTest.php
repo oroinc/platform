@@ -7,7 +7,9 @@ use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -320,13 +322,14 @@ class RendererTest extends LayoutTestCase
             $options
         )
             ->add('user', UserNameType::class)
-            ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
+            ->add('jobTitle', TextType::class, ['label' => 'Job Title', 'required' => false])
             ->add(
                 'gender',
-                'choice',
+                ChoiceType::class,
                 [
                     'label'    => 'Gender',
                     'required' => false,
+                    //TODO flip choices in scope BAP-16689
                     'choices'  => ['male' => 'Male', 'female' => 'Female'],
                     'expanded' => true
                 ]

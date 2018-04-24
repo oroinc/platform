@@ -267,13 +267,4 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
         return $userEmailOrigin;
     }
-
-    /**
-     * Test name of type
-     */
-    public function testGetName()
-    {
-        $type = new ChoiceAccountType($this->translator);
-        $this->assertEquals(ChoiceAccountType::NAME, $type->getName());
-    }
 }

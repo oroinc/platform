@@ -126,9 +126,4 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('region_route', $view->vars);
         $this->assertEquals('test', $view->vars['region_route']);
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_address', $this->type->getName());
-    }
 }

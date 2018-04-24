@@ -134,7 +134,7 @@ class DictionaryTest extends OrmTestCase
 
         $this->formFactory->expects($this->once())
             ->method('create')
-            ->with(DictionaryFilterType::NAME)
+            ->with(DictionaryFilterType::class)
             ->will($this->returnValue($form));
 
         $this->assertSame(

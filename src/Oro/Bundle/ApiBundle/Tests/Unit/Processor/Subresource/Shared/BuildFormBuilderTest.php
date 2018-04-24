@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -78,7 +79,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
@@ -121,7 +122,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => $parentBaseEntityClass,
@@ -165,7 +166,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => $parentEntityClass,
@@ -210,7 +211,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
@@ -251,7 +252,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
@@ -295,7 +296,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
@@ -342,7 +343,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
@@ -383,7 +384,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,

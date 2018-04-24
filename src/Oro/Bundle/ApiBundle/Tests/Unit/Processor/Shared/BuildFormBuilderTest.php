@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -156,7 +157,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -236,7 +237,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $parentEntityClass,
@@ -281,7 +282,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -326,7 +327,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -370,7 +371,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -415,7 +416,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -459,7 +460,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -502,7 +503,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -545,7 +546,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -586,7 +587,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -626,7 +627,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,

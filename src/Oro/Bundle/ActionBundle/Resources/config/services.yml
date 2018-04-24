@@ -132,12 +132,12 @@ services:
         parent: oro_action.abstract_guesser
         calls:
             # mapping from attribute type to form parameters
-            - [addFormTypeMapping, ["string", "text"]]
-            - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["integer", "integer", { precision: 0 }]]
-            - [addFormTypeMapping, ["bool", "checkbox"]]
-            - [addFormTypeMapping, ["boolean", "checkbox"]]
-            - [addFormTypeMapping, ["float", "number"]]
+            - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+            - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', { precision: 0 }]]
+            - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', { precision: 0 }]]
+            - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
 
     oro_action.options_assembler:
         class: '%oro_action.options_assembler.class%'

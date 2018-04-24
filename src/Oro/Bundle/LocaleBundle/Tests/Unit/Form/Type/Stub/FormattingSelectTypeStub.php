@@ -13,7 +13,7 @@ class FormattingSelectTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return FormattingSelectType::NAME;
     }

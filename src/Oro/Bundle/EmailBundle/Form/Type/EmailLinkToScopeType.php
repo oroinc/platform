@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class EmailLinkToScopeType extends AbstractType
 {
     const NAME = 'oro_email_link_to_scope';
+
     /**
      * {@inheritdoc}
      */

@@ -24,7 +24,7 @@ class TagType extends AbstractType
         )
             ->add(
                 'taxonomy',
-                'oro_taxonomy_select',
+                TaxonomySelectType::class,
                 [
                     'required' => false,
                     'label'    => 'oro.taxonomy.entity_label',

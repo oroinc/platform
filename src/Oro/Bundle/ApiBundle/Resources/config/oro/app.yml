@@ -120,35 +120,35 @@ oro_api:
 
     form_type_guesses:
         boolean:
-            form_type: oro_api_boolean
+            form_type: Oro\Bundle\ApiBundle\Form\Type\BooleanType
         integer:
-            form_type: integer
+            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         smallint:
-            form_type: integer
+            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         bigint:
-            form_type: oro_api_number
+            form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
             options:
                 scale: 0
         decimal:
-            form_type: oro_api_number
+            form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
         float:
-            form_type: number
+            form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
         date:
-            form_type: date
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateType
             options:
                 model_timezone: UTC
                 view_timezone: UTC
                 widget: single_text
                 format: "yyyy-MM-dd" # HTML5
         time:
-            form_type: time
+            form_type: Symfony\Component\Form\Extension\Core\Type\TimeType
             options:
                 model_timezone: UTC
                 view_timezone: UTC
                 with_seconds: true
                 widget: single_text
         datetime:
-            form_type: datetime
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType
             options:
                 model_timezone: UTC
                 view_timezone: UTC
@@ -156,7 +156,7 @@ oro_api:
                 widget: single_text
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
         datetimetz:
-            form_type: datetime
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType
             options:
                 model_timezone: UTC
                 view_timezone: UTC
@@ -164,19 +164,19 @@ oro_api:
                 widget: single_text
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
         text:
-            form_type: textarea
+            form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
         percent:
-            form_type: number
+            form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
         money:
-            form_type: oro_api_number
+            form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
             options:
                 scale: 4
         money_value:
-            form_type: oro_api_number
+            form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
             options:
                 scale: 4
         duration:
-            form_type: oro_duration
+            form_type: Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
     actions:
         get_list:

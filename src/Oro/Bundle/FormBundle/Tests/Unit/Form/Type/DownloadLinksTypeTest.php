@@ -27,12 +27,6 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->type, $this->assetHelper);
     }
 
-    public function testGetName()
-    {
-        $this->assertInternalType('string', $this->type->getName());
-        $this->assertEquals('oro_download_links_type', $this->type->getName());
-    }
-
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @expectedExceptionMessage The required option "source" is missing.
