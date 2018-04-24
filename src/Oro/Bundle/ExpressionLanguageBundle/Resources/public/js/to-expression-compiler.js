@@ -43,10 +43,12 @@ define(function(require) {
          */
         _compile: function(node) {
             var constructor = node.origin().constructor;
-
-            if (constructor && ExpressionLanguageLibrary[constructor.name] === constructor) {
-                var methodName = '_compile' + constructor.name;
-
+            // retrieves original name of the Node constructor (workaround for broken after minification names)
+            var name = constructor && _.findKey(ExpressionLanguageLibrary, function(item) {
+                return item === constructor;
+            });
+            if (name) {
+                var methodName = '_compile' + name;
                 if (_.isFunction(this[methodName])) {
                     return this[methodName](node);
                 }

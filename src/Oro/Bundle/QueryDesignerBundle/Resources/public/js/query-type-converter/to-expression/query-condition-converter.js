@@ -52,11 +52,11 @@ define(function(require) {
                     return isOdd && (item === 'AND' || item === 'OR') ||
                         // every element with even index has to be not empty
                         !isOdd && !_.isEmpty(item) && (
-                        // array with valid structure
-                        _.isArray(item) && this.test(item) ||
-                        // or plain object
-                        _.isObject(item) && !_.isArray(item)
-                    );
+                            // array with valid structure
+                            _.isArray(item) && this.test(item) ||
+                            // or plain object
+                            _.isObject(item) && !_.isArray(item)
+                        );
                 }, this);
         },
 
