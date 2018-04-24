@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -32,7 +33,7 @@ class AddExtendDescription implements Migration, ExtendExtensionAwareInterface
                     'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                     'merge'     => ['display' => true],
                     'dataaudit' => ['auditable' => true],
-                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'form'      => ['type' => OroResizeableRichTextType::class],
                     'view'      => ['type' => 'html'],
                 ]
             ]

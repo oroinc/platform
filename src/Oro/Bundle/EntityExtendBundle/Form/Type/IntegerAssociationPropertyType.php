@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+
 /**
  * This form type represents a 'integer' association property.
  * Can be used bor both single and multiple associations.
@@ -29,6 +31,6 @@ class IntegerAssociationPropertyType extends AbstractAssociationType
      */
     public function getParent()
     {
-        return 'integer';
+        return IntegerType::class;
     }
 }

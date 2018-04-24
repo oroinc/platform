@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * The trait for form related methods.
+ * Adds form related methods to a configuration class.
  *
  * @property array $items
  */

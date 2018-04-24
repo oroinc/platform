@@ -5,6 +5,10 @@ namespace Oro\Bundle\SegmentBundle\Form\Type;
 use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,7 +20,7 @@ class SegmentType extends AbstractQueryDesignerType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name', 'text', ['required' => true])
+            ->add('name', TextType::class, ['required' => true])
             ->add('entity', SegmentEntityChoiceType::class, ['required' => true])
             ->add(
                 'type',
@@ -29,8 +33,8 @@ class SegmentType extends AbstractQueryDesignerType
                     'tooltip'     => 'oro.segment.type.tooltip_text'
                 ]
             )
-            ->add('recordsLimit', 'integer', ['required' => false])
-            ->add('description', 'textarea', ['required' => false]);
+            ->add('recordsLimit', IntegerType::class, ['required' => false])
+            ->add('description', TextareaType::class, ['required' => false]);
 
         parent::buildForm($builder, $options);
     }
@@ -46,7 +50,7 @@ class SegmentType extends AbstractQueryDesignerType
             'column_column_field_choice_options' => [
                 'exclude_fields' => ['relation_type'],
             ],
-            'column_column_choice_type' => 'hidden',
+            'column_column_choice_type' => HiddenType::class,
             'filter_column_choice_type' => EntityFieldSelectType::class
         ];
     }

@@ -10,13 +10,13 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 class ExtendedAssociationFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
-    protected $associationManager;
+    private $associationManager;
 
     /** @var ExtendedAssociationFilterFactory */
-    protected $factory;
+    private $factory;
 
     protected function setUp()
     {

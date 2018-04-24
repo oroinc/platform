@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DateTransformer;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;

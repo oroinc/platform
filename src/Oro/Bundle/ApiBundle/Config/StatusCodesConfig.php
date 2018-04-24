@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents a configuration of all possible response status codes.
+ * Represents a configuration of all possible response status codes for Data API resource or sub-resource.
  */
 class StatusCodesConfig
 {

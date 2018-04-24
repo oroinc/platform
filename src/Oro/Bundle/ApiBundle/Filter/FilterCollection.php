@@ -7,11 +7,50 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 {
+    private const GROUPED_FILTER_KEY_TEMPLATE = '%s[%s]';
+
     /** @var FilterInterface[] */
     private $filters = [];
 
+    /** @var string|null */
+    private $defaultGroupName;
+
+    /**
+     * Builds the filter key for in the given group.
+     *
+     * @param string $group The name of a filter's group
+     * @param string $key   The filter key
+     *
+     * @return string The filter key in the given group
+     */
+    public function getGroupedFilterKey($group, $key)
+    {
+        return \sprintf(self::GROUPED_FILTER_KEY_TEMPLATE, $group, $key);
+    }
+
+    /**
+     * Gets the name of default filter's group.
+     *
+     * @return string|null
+     */
+    public function getDefaultGroupName()
+    {
+        return $this->defaultGroupName;
+    }
+
+    /**
+     * Sets the name of default filter's group.
+     *
+     * @param string|null $group The name of a filter's group
+     */
+    public function setDefaultGroupName($group)
+    {
+        $this->defaultGroupName = $group;
+    }
+
     /**
      * Checks whether the collection contains a filter with the specified key.
+     * In additional finds the filter in the default filter's group if it is set.
      *
      * @param string $key
      *
@@ -19,11 +58,19 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function has($key)
     {
-        return isset($this->filters[$key]);
+        if (isset($this->filters[$key])) {
+            return true;
+        }
+        if ($this->defaultGroupName) {
+            return isset($this->filters[$this->getGroupedFilterKey($this->defaultGroupName, $key)]);
+        }
+
+        return false;
     }
 
     /**
-     * Gets a filter by key.
+     * Gets a filter by its key.
+     * In additional finds the filter in the default filter's group if it is set.
      *
      * @param string $key
      *
@@ -31,9 +78,17 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function get($key)
     {
-        return isset($this->filters[$key])
-            ? $this->filters[$key]
-            : null;
+        if (isset($this->filters[$key])) {
+            return $this->filters[$key];
+        }
+        if ($this->defaultGroupName) {
+            $groupedKey = $this->getGroupedFilterKey($this->defaultGroupName, $key);
+            if (isset($this->filters[$groupedKey])) {
+                return $this->filters[$groupedKey];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -125,7 +180,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      */
     public function count()
     {
-        return count($this->filters);
+        return \count($this->filters);
     }
 
     /**

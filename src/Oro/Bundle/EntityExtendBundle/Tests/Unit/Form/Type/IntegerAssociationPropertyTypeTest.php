@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
@@ -36,7 +37,7 @@ class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'integer',
+            IntegerType::class,
             $this->getFormType()->getParent()
         );
     }

@@ -20,5 +20,15 @@ Feature: My emails 
     When I filter "Date/Time" as between "2010-10-30" and "2010-11-01"
     Then I should not see alert
       And I should see following grid:
-        | Subject           | Date        |
-        | There is no spoon | 2010-10-31 |
+        | Subject               | Date        |
+        | There is no spoon     | 2010-10-31 |
+      And I should see "Total Of 1 Records"
+
+  Scenario: Filter emails by From field
+    Given I login as administrator
+    And I click My Emails in user menu
+    When I filter From as contains "Charlie"
+      And I should see following grid:
+        | Subject               | Date        |
+        | There is no spoon     | 2010-10-31 |
+      And I should see "Total Of 1 Records"

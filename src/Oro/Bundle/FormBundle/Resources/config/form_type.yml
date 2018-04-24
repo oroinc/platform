@@ -64,7 +64,7 @@ services:
         class: '%oro_form.type.duration.class%'
         tags:
             - { name: form.type, alias: oro_duration }
-            - { name: oro.api.form.type, alias: oro_duration }
+            - { name: oro.api.form.type, alias: Oro\Bundle\FormBundle\Form\Type\OroDurationType }
 
     oro_form.type.money:
         class: '%oro_form.type.money.class%'
@@ -163,6 +163,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
+            - '@assets.context'
             - '%kernel.cache_dir%'
         calls:
             - [setAssetHelper, ['@assets.packages']]
@@ -253,7 +254,7 @@ services:
     oro_form.extension.js_validation.repeated:
         class: '%oro_form.extension.js_validation.repeated.class%'
         tags:
-            - { name: form.type_extension, alias: repeated }
+            - { name: form.type_extension, alias: repeated, extended_type: Symfony\Component\Form\Extension\Core\Type\RepeatedType }
 
     oro_form.extension.additional_attr:
         class: '%oro_form.extension.additional_attr.class%'

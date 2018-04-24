@@ -16,7 +16,7 @@ class RelatedEntityCollectionApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'          => true,
-                'type'               => RelatedEntityApiType::class
+                'entry_type'         => RelatedEntityApiType::class
             ]
         );
     }

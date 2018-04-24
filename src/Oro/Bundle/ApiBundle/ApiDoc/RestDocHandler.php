@@ -85,15 +85,25 @@ class RestDocHandler implements HandlerInterface
             return;
         }
 
+        $annotation->setSection($entityType);
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
         $context = $this->getContext($action, $entityClass, $associationName);
-        $config = $this->getConfig($context);
-        $metadata = $this->getMetadata($context);
 
-        $annotation->setSection($entityType);
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $this->setDescription($annotation, $config);
         $this->setDocumentation($annotation, $config);
+        $this->setStatusCodes($annotation, $config);
+
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            return;
+        }
+
         if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
             $this->identifierHandler->handle(
                 $annotation,
@@ -101,10 +111,10 @@ class RestDocHandler implements HandlerInterface
                 $associationName ? $context->getParentMetadata() : $metadata
             );
         }
+
+        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
         $this->setInputMetadata($annotation, $action, $config, $metadata);
         $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
-        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-        $this->setStatusCodes($annotation, $config);
     }
 
     /**
@@ -249,7 +259,11 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata
     ) {
         if ($this->isActionWithInput($action)) {
-            $this->setDirectionValue($annotation, 'input', $this->getDirectionValue($action, $config, $metadata));
+            $this->setDirectionValue(
+                $annotation,
+                'input',
+                $this->getDirectionValue($action, 'input', $config, $metadata)
+            );
         }
     }
 
@@ -270,32 +284,40 @@ class RestDocHandler implements HandlerInterface
         $associationName = null
     ) {
         if ($this->isActionWithOutput($action)) {
-            // check if output format should be taken from another action type. In this case
-            // entity metadata and config will be taken for the action, those format should be used
-            $substituteAction = $this->getOutputAction($action);
-            if ($action !== $substituteAction) {
-                $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
-                $config = $this->getConfig($substituteContext);
-                $metadata = $this->getMetadata($substituteContext);
+            if ($metadata->hasIdentifierFields()) {
+                // check if output format should be taken from another action type. In this case
+                // entity metadata and config will be taken for the action, those format should be used
+                $substituteAction = $this->getOutputAction($action);
+                if ($action !== $substituteAction) {
+                    $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
+                    $config = $this->getConfig($substituteContext);
+                    $metadata = $this->getMetadata($substituteContext);
+                }
             }
 
-            $this->setDirectionValue($annotation, 'output', $this->getDirectionValue($action, $config, $metadata));
+            $this->setDirectionValue(
+                $annotation,
+                'output',
+                $this->getDirectionValue($action, 'output', $config, $metadata)
+            );
         }
     }
 
     /**
      * @param string                 $action
+     * @param string                 $direction
      * @param EntityDefinitionConfig $config
      * @param EntityMetadata         $metadata
      *
      * @return array
      */
-    private function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
+    private function getDirectionValue($action, $direction, EntityDefinitionConfig $config, EntityMetadata $metadata)
     {
         return [
             'class'   => null,
             'options' => [
-                'metadata' => new ApiDocMetadata(
+                'direction' => $direction,
+                'metadata'  => new ApiDocMetadata(
                     $action,
                     $metadata,
                     $config,

@@ -9,14 +9,13 @@ namespace Oro\Bundle\ApiBundle\Filter;
 interface SelfIdentifiableFilterInterface
 {
     /**
-     * Tries to find a value that is matched by this filter.
+     * Tries to find values that are matched by this filter.
      *
      * @param FilterValue[] $filterValues [filter key => FilterValue, ...]
      *
-     * @return string|null The key of found filter value
-     *                     or NULL if the collection does not contain a value for this filter
+     * @return string[] The keys of found filter values
      *
      * @throws InvalidFilterValueKeyException if a filter value was found, but its key is not valid by some reasons
      */
-    public function searchFilterKey(array $filterValues);
+    public function searchFilterKeys(array $filterValues): array;
 }

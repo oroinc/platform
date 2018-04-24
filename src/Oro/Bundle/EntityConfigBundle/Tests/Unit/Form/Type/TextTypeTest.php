@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextType as BaseTextType;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
@@ -29,18 +30,10 @@ class TextTypeTest extends AbstractConfigTypeTestCase
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_config_text',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(
-            'text',
+            BaseTextType::class,
             $this->type->getParent()
         );
     }

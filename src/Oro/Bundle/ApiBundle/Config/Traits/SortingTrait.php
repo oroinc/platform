@@ -5,10 +5,22 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
+ * Adds the enable/disable sorting property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait SortingTrait
 {
+    /**
+     * Indicates whether the "disable_sorting" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableSorting()
+    {
+        return array_key_exists(EntityDefinitionConfig::DISABLE_SORTING, $this->items);
+    }
+
     /**
      * Indicates whether a sorting is enabled.
      *
@@ -28,7 +40,7 @@ trait SortingTrait
      */
     public function enableSorting()
     {
-        unset($this->items[EntityDefinitionConfig::DISABLE_SORTING]);
+        $this->items[EntityDefinitionConfig::DISABLE_SORTING] = false;
     }
 
     /**

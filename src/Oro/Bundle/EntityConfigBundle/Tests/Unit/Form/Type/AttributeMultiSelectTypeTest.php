@@ -107,11 +107,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals(['locked' => 'locked'], $locked);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(AttributeMultiSelectType::NAME, $this->formType->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());

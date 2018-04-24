@@ -58,7 +58,10 @@ class LoadNormalizedEntity implements ProcessorInterface
             $this->processGetResult($getContext, $context);
             $context->setProcessed(self::OPERATION_NAME);
         } elseif (!$context->hasIdentifierFields()) {
-            $context->removeResult();
+            // remove the result if it was not normalized yet
+            if ($context->hasResult() && \is_object($context->getResult())) {
+                $context->removeResult();
+            }
             $context->setProcessed(self::OPERATION_NAME);
         }
     }

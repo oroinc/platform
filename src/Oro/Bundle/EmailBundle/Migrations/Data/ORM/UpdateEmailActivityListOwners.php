@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -13,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Adds the activity owners to email activity list entities.
+ */
 class UpdateEmailActivityListOwners extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;

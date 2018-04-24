@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType as SymfonyIntegerType;
+
 /**
  * This form type is just a wrapper around standard 'integer' form type, but
  * this form type can handle 'immutable' behaviour. It means that you can use it
@@ -31,6 +33,6 @@ class IntegerType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'integer';
+        return SymfonyIntegerType::class;
     }
 }

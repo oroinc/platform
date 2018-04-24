@@ -67,13 +67,6 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         );
     }
 
-    public function testGetName()
-    {
-        $type = $this->getBlockType(EmbedFormEndType::NAME);
-
-        $this->assertSame(EmbedFormEndType::NAME, $type->getName());
-    }
-
     public function testGetParent()
     {
         $type = $this->getBlockType(EmbedFormEndType::NAME);

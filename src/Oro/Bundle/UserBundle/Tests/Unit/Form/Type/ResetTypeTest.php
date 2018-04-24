@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\ResetType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -46,7 +47,7 @@ class ResetTypeTest extends FormIntegrationTestCase
         $builder->expects($this->exactly(1))
             ->method('add')
             ->with('plainPassword', RepeatedType::class, [
-                'type'            => 'password',
+                'type'            => PasswordType::class,
                 'required'        => true,
                 'invalid_message' => 'oro.user.message.password_mismatch',
                 'first_options' => [

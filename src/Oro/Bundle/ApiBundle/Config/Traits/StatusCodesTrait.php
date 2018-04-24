@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 
 /**
+ * Adds the status code collection related methods to a configuration class.
+ *
  * @property array $items
  */
 trait StatusCodesTrait

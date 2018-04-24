@@ -15,7 +15,6 @@ oro:
         related_activity_id.label:    Related activity id
         created_at.label:    Created at
         updated_at.label:    Updated at
-        head.label:          Is Head
         description.label:   Description
 
         no_activities_exist: No activities found

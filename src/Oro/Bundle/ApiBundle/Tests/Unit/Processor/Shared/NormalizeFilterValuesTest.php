@@ -6,25 +6,25 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
-    /** @var NormalizeFilterValues */
-    protected $processor;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var NormalizeFilterValues */
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->processor = new NormalizeFilterValues($this->valueNormalizer);
     }
@@ -34,7 +34,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
         $this->processor->process($this->context);
-        $this->assertEquals($context, $this->context);
+        self::assertEquals($context, $this->context);
     }
 
     public function testProcess()
@@ -45,32 +45,30 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
             ->method('getQueryString')
             ->willReturn('id=1&label=test');
         $filterValues = new RestFilterValueAccessor($request);
 
-        $this->valueNormalizer->expects($this->exactly(2))
+        $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
             ->willReturnMap(
                 [
                     ['1', 'integer', $this->context->getRequestType(), false, false, 1],
-                    ['test', 'string', $this->context->getRequestType(), false, false, 'test'],
+                    ['test', 'string', $this->context->getRequestType(), false, false, 'test']
                 ]
             );
 
         $this->context->setFilterValues($filterValues);
         $this->processor->process($this->context);
 
-        $this->assertTrue(is_int($filterValues->get('id')->getValue()));
-        $this->assertEquals(1, $filterValues->get('id')->getValue());
-        $this->assertTrue(is_string($filterValues->get('label')->getValue()));
-        $this->assertEquals('test', $filterValues->get('label')->getValue());
+        self::assertTrue(is_int($filterValues->get('id')->getValue()));
+        self::assertEquals(1, $filterValues->get('id')->getValue());
+        self::assertTrue(is_string($filterValues->get('label')->getValue()));
+        self::assertEquals('test', $filterValues->get('label')->getValue());
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForInvalidDataType()
@@ -81,15 +79,13 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $exception = new \UnexpectedValueException('invalid data type');
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
             ->method('getQueryString')
             ->willReturn('id=invalid');
         $filterValues = new RestFilterValueAccessor($request);
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('invalid', 'integer', $this->context->getRequestType(), false, false)
             ->willThrowException($exception);
@@ -97,12 +93,41 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->context->setFilterValues($filterValues);
         $this->processor->process($this->context);
 
-        $this->assertEquals('invalid', $filterValues->get('id')->getValue());
+        self::assertEquals('invalid', $filterValues->get('id')->getValue());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                Error::createByException($exception)
-                    ->setStatusCode(Response::HTTP_BAD_REQUEST)
+                Error::createValidationError(Constraint::FILTER)
+                    ->setInnerException($exception)
+                    ->setSource(ErrorSource::createByParameter('id'))
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessForNotSupportedFilter()
+    {
+        $filters = $this->context->getFilters();
+        $integerFilter = new ComparisonFilter('string');
+        $filters->add('label', $integerFilter);
+
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
+            ->method('getQueryString')
+            ->willReturn('id=1&label=test');
+        $filterValues = new RestFilterValueAccessor($request);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('test', 'string', $this->context->getRequestType(), false, false)
+            ->willReturn('test');
+
+        $this->context->setFilterValues($filterValues);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
                     ->setSource(ErrorSource::createByParameter('id'))
             ],
             $this->context->getErrors()
