@@ -107,11 +107,6 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
         );
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(SearchEntityFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(SearchEntityFilterType::NAME, $this->type->getBlockPrefix());

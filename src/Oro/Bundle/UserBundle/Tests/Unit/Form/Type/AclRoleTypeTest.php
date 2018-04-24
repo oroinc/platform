@@ -32,11 +32,6 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($builder, array());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_user_role_form', $this->formType->getName());
-    }
-
     public function testConfigureOptions()
     {
         $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')

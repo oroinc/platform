@@ -3,6 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\Form\Type\SetupType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
@@ -10,7 +11,7 @@ class SetupStep extends AbstractStep
 {
     public function displayAction(ProcessContextInterface $context)
     {
-        $form = $this->createForm('oro_installer_setup');
+        $form = $this->createForm(SetupType::class);
 
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_config.global');
@@ -30,7 +31,7 @@ class SetupStep extends AbstractStep
     {
         $adminUser = $this->getAdminUser();
 
-        $form = $this->createForm('oro_installer_setup');
+        $form = $this->createForm(SetupType::class);
         $form->setData($adminUser);
 
         $form->handleRequest($this->get('request_stack')->getCurrentRequest());
