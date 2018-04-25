@@ -31,7 +31,7 @@
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => 'oro_workflow_transition',
+                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

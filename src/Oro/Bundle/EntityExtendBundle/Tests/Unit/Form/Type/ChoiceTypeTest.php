@@ -62,6 +62,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
 
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyChoiceType::class,
             $this->getFormType()->getParent()

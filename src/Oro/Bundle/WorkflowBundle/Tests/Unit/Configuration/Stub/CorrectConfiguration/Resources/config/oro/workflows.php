@@ -187,7 +187,7 @@ return [
                     'is_unavailable_hidden' => false,
                     'acl_message' => null,
                     'frontend_options' => [],
-                    'form_type' => 'oro_workflow_transition',
+                    'form_type' => WorkflowTransitionType::class,
                     'display_type' => 'dialog',
                     'form_options' => [
                         WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
@@ -216,7 +216,7 @@ return [
                     'is_unavailable_hidden' => false,
                     'acl_message' => null,
                     'frontend_options' => [],
-                    'form_type' => 'oro_workflow_transition',
+                    'form_type' => WorkflowTransitionType::class,
                     'display_type' => 'dialog',
                     'form_options' => [
                         WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
@@ -307,7 +307,7 @@ return [
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

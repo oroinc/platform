@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -242,6 +243,13 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(ActionFieldConfig::EXCLUDE)->end()
+            ->enumNode(ActionFieldConfig::DIRECTION)
+                ->values([
+                    EntityDefinitionFieldConfig::DIRECTION_INPUT_ONLY,
+                    EntityDefinitionFieldConfig::DIRECTION_OUTPUT_ONLY,
+                    EntityDefinitionFieldConfig::DIRECTION_BIDIRECTIONAL
+                ])
+            ->end()
             ->scalarNode(ActionFieldConfig::FORM_TYPE)->end()
             ->arrayNode(ActionFieldConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')

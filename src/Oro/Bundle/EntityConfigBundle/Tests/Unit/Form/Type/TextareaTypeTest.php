@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType as BaseTextareaType;
 
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
@@ -29,18 +30,10 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_config_textarea',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(
-            'textarea',
+            BaseTextareaType::class,
             $this->type->getParent()
         );
     }

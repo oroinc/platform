@@ -56,7 +56,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    OroMoneyType::class => $this->formType
+                    $this->formType
                 ],
                 []
             ),

@@ -42,10 +42,28 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
             'options' => []
         ];
 
-        $this->assertFalse($this->parser->supports($item));
+        self::assertFalse($this->parser->supports($item));
     }
 
-    public function testSupportsWithMetadata()
+    public function testSupportsWithDirectionAndMetadata()
+    {
+        $item = [
+            'class'   => null,
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata(
+                    'test',
+                    $this->createMock(EntityMetadata::class),
+                    $this->createMock(EntityDefinitionConfig::class),
+                    new RequestType([])
+                )
+            ]
+        ];
+
+        self::assertTrue($this->parser->supports($item));
+    }
+
+    public function testSupportsWithMetadataButWithoutDirection()
     {
         $item = [
             'class'   => null,
@@ -59,7 +77,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->assertTrue($this->parser->supports($item));
+        self::assertFalse($this->parser->supports($item));
     }
 
     public function testSupportsWithUnknownMetadata()
@@ -67,11 +85,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $item = [
             'class'   => null,
             'options' => [
-                'metadata' => new \stdClass()
+                'direction' => 'input',
+                'metadata'  => new \stdClass()
             ]
         ];
 
-        $this->assertFalse($this->parser->supports($item));
+        self::assertFalse($this->parser->supports($item));
     }
 
     public function testParseIdentifierFieldWithGeneratorForCreateAction()
@@ -88,11 +107,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id' => [
                     'required'    => true,
@@ -118,11 +138,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id' => [
                     'required'    => true,
@@ -148,11 +169,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('update', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('update', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'id' => [
                     'required'    => true,
@@ -180,11 +202,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'field1' => [
                     'required'    => false,
@@ -211,11 +234,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'field1' => [
                     'required'    => true,
@@ -239,7 +263,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $association->setTargetClassName('Test\TargetClass');
         $association->setIsNullable(true);
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
             ->willReturn('targets');
@@ -249,11 +273,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'association1' => [
                     'required'    => false,
@@ -278,7 +303,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
             ->willReturn('targets');
@@ -288,11 +313,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'association1' => [
                     'required'    => true,
@@ -318,7 +344,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $association->setTargetClassName('Test\TargetClass');
         $association->setIsCollection(true);
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
             ->willReturn('targets');
@@ -328,11 +354,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'association1' => [
                     'required'    => true,
@@ -357,7 +384,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $association->setDataType('object');
         $association->setTargetClassName('Test\TargetClass');
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
             ->willReturn('targets');
@@ -367,11 +394,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'association1' => [
                     'required'    => true,
@@ -395,7 +423,7 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');
 
-        $this->valueNormalizer->expects($this->any())
+        $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
             ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
             ->willReturn('targets');
@@ -405,11 +433,12 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->parser->parse([
             'options' => [
-                'metadata' => new ApiDocMetadata('create', $metadata, $config, $requestType)
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
             ]
         ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'association1' => [
                     'required'    => true,
@@ -422,5 +451,241 @@ class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
             ],
             $result
         );
+    }
+
+    public function testParseInputOnlyFieldForInputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+        $field->setDirection(true, false);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'field1' => [
+                    'required'    => true,
+                    'dataType'    => 'string',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseInputOnlyFieldForOutputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+        $field->setDirection(true, false);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'output',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals([], $result);
+    }
+
+    public function testParseOutputOnlyFieldForOutputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+        $field->setDirection(false, true);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'output',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'field1' => [
+                    'required'    => true,
+                    'dataType'    => 'string',
+                    'description' => 'Field Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseOutputOnlyFieldForInputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $field = $metadata->addField(new FieldMetadata('field1'));
+        $field->setDataType('string');
+        $field->setDirection(false, true);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDescription('Field Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals([], $result);
+    }
+
+    public function testParseInputOnlyAssociationForInputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setDirection(true, false);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'actualType'  => null,
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseInputOnlyAssociationForOutputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setDirection(true, false);
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'output',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals([], $result);
+    }
+
+    public function testParseOutputOnlyAssociationForOutputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setDirection(false, true);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('Test\TargetClass', 'entityType', self::identicalTo($requestType), false)
+            ->willReturn('targets');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'output',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'association1' => [
+                    'required'    => true,
+                    'dataType'    => 'integer',
+                    'description' => 'Association Description',
+                    'actualType'  => null,
+                    'subType'     => 'targets'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseOutputOnlyAssociationForInputDefinition()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $association = $metadata->addAssociation(new AssociationMetadata('association1'));
+        $association->setDataType('integer');
+        $association->setTargetClassName('Test\TargetClass');
+        $association->setDirection(false, true);
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')->setDescription('Association Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals([], $result);
     }
 }

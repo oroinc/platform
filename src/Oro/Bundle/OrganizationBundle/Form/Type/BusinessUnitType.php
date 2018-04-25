@@ -53,7 +53,7 @@ class BusinessUnitType extends AbstractType
             )
             ->add(
                 'parentBusinessUnit',
-                'oro_type_business_unit_select_autocomplete',
+                BusinessUnitSelectAutocomplete::class,
                 [
                     'required' => false,
                     'label' => 'oro.organization.businessunit.parent.label',
@@ -139,7 +139,7 @@ class BusinessUnitType extends AbstractType
             $form->remove('parentBusinessUnit');
             $form->add(
                 'parentBusinessUnit',
-                'oro_type_business_unit_select_autocomplete',
+                BusinessUnitSelectAutocomplete::class,
                 [
                     'required' => false,
                     'label' => 'oro.organization.businessunit.parent.label',
@@ -174,7 +174,7 @@ class BusinessUnitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return self::FORM_NAME;
     }

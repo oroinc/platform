@@ -36,9 +36,4 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 
         $this->emailFolderTreeType->configureOptions($resolver);
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_email_email_folder_tree', $this->emailFolderTreeType->getName());
-    }
 }

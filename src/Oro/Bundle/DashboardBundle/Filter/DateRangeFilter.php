@@ -7,8 +7,11 @@ use Oro\Bundle\FilterBundle\Filter\AbstractDateFilter;
 
 class DateRangeFilter extends AbstractDateFilter
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function getFormType()
     {
-        return WidgetDateRangeType::NAME;
+        return WidgetDateRangeType::class;
     }
 }

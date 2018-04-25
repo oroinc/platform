@@ -23,12 +23,12 @@ class WorkflowDatagridLabelListener
         WorkflowStep::class => [
             'pk' => 'id',
             'defaultLabel' => 'oro.workflow.workflowstep.grid.label',
-            'form' => WorkflowStepSelectType::NAME
+            'form' => WorkflowStepSelectType::class
         ],
         WorkflowDefinition::class => [
             'pk' => 'name',
             'defaultLabel' => 'oro.workflow.workflowdefinition.grid.column.label',
-            'form' => WorkflowDefinitionSelectType::NAME
+            'form' => WorkflowDefinitionSelectType::class
         ]
     ];
 

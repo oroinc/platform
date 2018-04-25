@@ -27,11 +27,6 @@ class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($options, $optionsResolver->getDefinedOptions());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(UserApiKeyGenKeyType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(UserApiKeyGenKeyType::NAME, $this->type->getBlockPrefix());
