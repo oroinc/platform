@@ -3,6 +3,7 @@
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 return [
     'first_workflow' => [
@@ -123,7 +124,7 @@ return [
                 'form_options' => [
                     'attribute_fields' => [
                         'first_attribute' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'First Attribute',
                             'options' => [
                                 'required' => 1

@@ -56,7 +56,7 @@ class LanguageFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formFactory->expects($this->once())
             ->method('create')
-            ->with(LanguageFilterType::NAME);
+            ->with(LanguageFilterType::class);
 
         $this->filter->getForm();
     }

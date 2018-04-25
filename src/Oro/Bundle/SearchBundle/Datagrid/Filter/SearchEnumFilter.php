@@ -53,6 +53,6 @@ class SearchEnumFilter extends EnumFilter
      */
     protected function getFormType()
     {
-        return SearchEnumFilterType::NAME;
+        return SearchEnumFilterType::class;
     }
 }

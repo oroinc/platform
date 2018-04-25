@@ -233,7 +233,7 @@ class WorkflowStepColumnListener
                     'type' => 'entity',
                     'data_name' => self::WORKFLOW_STEP_COLUMN,
                     'options' => [
-                        'field_type' => WorkflowDefinitionSelectType::NAME,
+                        'field_type' => WorkflowDefinitionSelectType::class,
                         'field_options' => [
                             'workflow_entity_class' => $rootEntity,
                             'multiple' => true
@@ -247,7 +247,7 @@ class WorkflowStepColumnListener
                 'type' => 'entity',
                 'data_name' => self::WORKFLOW_STEP_COLUMN . '.id',
                 'options' => [
-                    'field_type' => WorkflowStepSelectType::NAME,
+                    'field_type' => WorkflowStepSelectType::class,
                     'field_options' => [
                         'workflow_entity_class' => $rootEntity,
                         'multiple' => true,

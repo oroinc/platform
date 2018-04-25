@@ -7,7 +7,7 @@ entity_config:
                         priority:           250
                         default_value:      true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.workflow.entity_config.show_step_in_grid.label
                             required:       false

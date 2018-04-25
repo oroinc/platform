@@ -6,7 +6,7 @@ system_configuration:
     fields:
         oro_activity_list.sorting_field:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_field.label
@@ -17,7 +17,7 @@ system_configuration:
                     - NotBlank: ~
         oro_activity_list.sorting_direction:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_direction.label
@@ -28,7 +28,7 @@ system_configuration:
                     - NotBlank: ~
         oro_activity_list.per_page:
             data_type: integer
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.per_page.label
@@ -41,7 +41,7 @@ system_configuration:
                     - NotBlank: ~
         oro_activity_list.grouping:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label

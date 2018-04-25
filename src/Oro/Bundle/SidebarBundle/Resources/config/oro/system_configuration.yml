@@ -5,7 +5,7 @@ system_configuration:
     fields:
         oro_sidebar.sidebar_left_active:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
@@ -14,7 +14,7 @@ system_configuration:
                     - Yes
         oro_sidebar.sidebar_right_active:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_right_active.label

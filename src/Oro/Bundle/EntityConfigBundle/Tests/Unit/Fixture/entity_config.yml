@@ -18,7 +18,7 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -57,7 +57,7 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -76,7 +76,7 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -95,7 +95,7 @@ entity_config:
                         filterable:         true
                         show_filter:        true
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false

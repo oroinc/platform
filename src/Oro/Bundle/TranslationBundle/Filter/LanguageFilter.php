@@ -25,6 +25,6 @@ class LanguageFilter extends EntityFilter
      */
     protected function getFormType()
     {
-        return LanguageFilterType::NAME;
+        return LanguageFilterType::class;
     }
 }

@@ -18,7 +18,7 @@ class SearchStringFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return SearchStringFilterType::NAME;
+        return SearchStringFilterType::class;
     }
 
     /**

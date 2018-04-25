@@ -18,7 +18,7 @@ entity_config:
                     options:
                         priority:           10
                     form:
-                        type:               oro_icon_select
+                        type:               Oro\Bundle\FormBundle\Form\Type\OroIconType # TODO: BAP-16690 add migration
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.icon
                             block:          general
@@ -38,7 +38,7 @@ entity_config:
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
-                        type:               text
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.label
                             block:          general
@@ -55,7 +55,7 @@ entity_config:
                             min:            2
                             max:            50
                     form:
-                        type:               text
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.plural_label
                             block:          general
@@ -70,7 +70,7 @@ entity_config:
                         - Length:
                             max:            500
                     form:
-                        type:               textarea
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextareaType
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.description
                             block:          general
@@ -103,7 +103,7 @@ entity_config:
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                         sortable:           true
                     form:
-                        type:               text
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             label:          oro.entity.entity_config.entity.field.items.label
                             tooltip:        oro.entity.entity_config.entity.field.items.label.tooltip
@@ -119,7 +119,7 @@ entity_config:
                         - Length:
                             max:            500
                     form:
-                        type:               textarea
+                        type:               Symfony\Component\Form\Extension\Core\Type\TextareaType
                         options:
                             label:          oro.entity.entity_config.entity.field.items.description
                             tooltip:        oro.entity.entity_config.entity.field.items.description.tooltip
@@ -142,7 +142,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               oro_entity_extend_choice
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 0: 'No'
@@ -164,7 +164,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -179,7 +179,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.order
@@ -216,7 +216,7 @@ entity_config:
                             value:          Custom
 
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -237,7 +237,7 @@ entity_config:
                             value:          Custom
 
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:        ['No', 'Yes']
                             placeholder:    false
@@ -252,7 +252,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.priority
