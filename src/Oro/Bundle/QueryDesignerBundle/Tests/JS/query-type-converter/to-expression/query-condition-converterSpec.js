@@ -6,7 +6,7 @@ define(function(require) {
     var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
     var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
 
-    fdescribe('oroquerydesigner/js/query-type-converter/to-expression/query-condition-converter', function() {
+    describe('oroquerydesigner/js/query-type-converter/to-expression/query-condition-converter', function() {
         var converterToExpression;
 
         beforeEach(function() {
