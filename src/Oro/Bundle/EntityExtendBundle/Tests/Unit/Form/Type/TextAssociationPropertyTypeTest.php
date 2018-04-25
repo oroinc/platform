@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
 {
@@ -35,9 +36,8 @@ class TextAssociationPropertyTypeTest extends AssociationTypeTestCase
 
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
-            'text',
+            TextType::class,
             $this->getFormType()->getParent()
         );
     }

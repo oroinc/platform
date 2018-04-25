@@ -34,6 +34,43 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
 
     public function testProcessWhenSortFilterIsNotAddedYet()
     {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['name']);
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setClassName(Category::class);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+    }
+
+    public function testProcessWhenConfigHasOrderByOption()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['name']);
+        $config->setOrderBy(['label' => 'DESC']);
+
+        $this->context->getRequestType()->add(RequestType::JSON_API);
+        $this->context->setClassName(Category::class);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['label' => 'DESC'], $sortFilter->getDefaultValue());
+    }
+
+    public function testProcessForEntityWithoutIdentifier()
+    {
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName(Category::class);
         $this->context->setConfig(new EntityDefinitionConfig());
@@ -44,7 +81,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         self::assertEquals('orderBy', $sortFilter->getDataType());
-        self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        self::assertEquals([], $sortFilter->getDefaultValue());
     }
 
     public function testProcessWhenSortFilterIsAlreadyAdded()

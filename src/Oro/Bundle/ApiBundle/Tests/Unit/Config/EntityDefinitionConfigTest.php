@@ -386,13 +386,16 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
     public function testSortingFlag()
     {
         $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDisableSorting());
         $this->assertTrue($config->isSortingEnabled());
 
         $config->disableSorting();
+        $this->assertTrue($config->hasDisableSorting());
         $this->assertFalse($config->isSortingEnabled());
         $this->assertEquals(['disable_sorting' => true], $config->toArray());
 
         $config->enableSorting();
+        $this->assertTrue($config->hasDisableSorting());
         $this->assertTrue($config->isSortingEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -400,13 +403,16 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
     public function testInclusionFlag()
     {
         $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDisableInclusion());
         $this->assertTrue($config->isInclusionEnabled());
 
         $config->disableInclusion();
+        $this->assertTrue($config->hasDisableInclusion());
         $this->assertFalse($config->isInclusionEnabled());
         $this->assertEquals(['disable_inclusion' => true], $config->toArray());
 
         $config->enableInclusion();
+        $this->assertTrue($config->hasDisableInclusion());
         $this->assertTrue($config->isInclusionEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -414,13 +420,16 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
     public function testFieldsetFlag()
     {
         $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDisableFieldset());
         $this->assertTrue($config->isFieldsetEnabled());
 
         $config->disableFieldset();
+        $this->assertTrue($config->hasDisableFieldset());
         $this->assertFalse($config->isFieldsetEnabled());
         $this->assertEquals(['disable_fieldset' => true], $config->toArray());
 
         $config->enableFieldset();
+        $this->assertTrue($config->hasDisableFieldset());
         $this->assertTrue($config->isFieldsetEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -428,13 +437,16 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
     public function testMetaPropertiesFlag()
     {
         $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasDisableMetaProperties());
         $this->assertTrue($config->isMetaPropertiesEnabled());
 
         $config->disableMetaProperties();
+        $this->assertTrue($config->hasDisableMetaProperties());
         $this->assertFalse($config->isMetaPropertiesEnabled());
         $this->assertEquals(['disable_meta_properties' => true], $config->toArray());
 
         $config->enableMetaProperties();
+        $this->assertTrue($config->hasDisableMetaProperties());
         $this->assertTrue($config->isMetaPropertiesEnabled());
         $this->assertEquals([], $config->toArray());
     }

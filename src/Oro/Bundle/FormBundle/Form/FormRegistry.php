@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Form;
 
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
+ * @TODO this registry should be removed in scope BAP-15236
  * The central registry of the Form component.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -132,7 +134,13 @@ class FormRegistry implements FormRegistryInterface
     {
         $typeExtensions = array();
         $parentType = $type->getParent();
-        $fqcn = get_class($type);
+
+        if ($type instanceof EntityType) {
+            $fqcn = $type->getName();
+        } else {
+            $fqcn = get_class($type);
+        }
+
         $name = $type->getName();
         $hasCustomName = $name !== $fqcn;
 

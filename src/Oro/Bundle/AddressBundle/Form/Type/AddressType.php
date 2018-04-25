@@ -3,6 +3,8 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
+use Oro\Bundle\AddressBundle\Form\Type\CountryType;
+use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;

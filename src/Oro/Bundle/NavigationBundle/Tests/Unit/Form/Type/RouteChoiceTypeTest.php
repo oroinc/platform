@@ -61,12 +61,6 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_route_choice', $this->formType->getName());
-        $this->assertEquals('oro_route_choice', $this->formType->getBlockPrefix());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());

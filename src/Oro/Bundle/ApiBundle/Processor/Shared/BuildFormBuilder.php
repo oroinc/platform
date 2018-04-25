@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -55,7 +56,7 @@ class BuildFormBuilder implements ProcessorInterface
     protected function getFormBuilder(FormContext $context)
     {
         $config = $context->getConfig();
-        $formType = $config->getFormType() ?: 'form';
+        $formType = $config->getFormType() ?: FormType::class;
 
         $formBuilder = $this->formHelper->createFormBuilder(
             $formType,
@@ -64,8 +65,11 @@ class BuildFormBuilder implements ProcessorInterface
             $config->getFormEventSubscribers()
         );
 
-        if ('form' === $formType) {
-            $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
+        if (FormType::class === $formType) {
+            $metadata = $context->getMetadata();
+            if (null !== $metadata) {
+                $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
+            }
         }
 
         return $formBuilder;

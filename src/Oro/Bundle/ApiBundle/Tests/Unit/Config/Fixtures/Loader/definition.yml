@@ -54,8 +54,7 @@ disable_sorting:
 enable_sorting:
     config:
         disable_sorting: false
-    expected:
-        disable_sorting: false
+    expected: []
 
 disable_inclusion:
     config:
@@ -66,8 +65,7 @@ disable_inclusion:
 enable_inclusion:
     config:
         disable_inclusion: false
-    expected:
-        disable_inclusion: false
+    expected: []
 
 disable_fieldset:
     config:
@@ -78,8 +76,7 @@ disable_fieldset:
 enable_fieldset:
     config:
         disable_fieldset: false
-    expected:
-        disable_fieldset: false
+    expected: []
 
 disable_meta_properties:
     config:
@@ -90,8 +87,7 @@ disable_meta_properties:
 enable_meta_properties:
     config:
         disable_meta_properties: false
-    expected:
-        disable_meta_properties: false
+    expected: []
 
 empty_identifier_field_names:
     config:

@@ -10,13 +10,17 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
-class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
+class TranslatableEntityTypeTest extends FormIntegrationTestCase
 {
     const TEST_CLASS      = 'TestClass';
     const TEST_IDENTIFIER = 'testId';
@@ -114,7 +118,9 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->getEntityRepository()));
 
-        $this->type = new TranslatableEntityType($this->registry);
+        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory());
+
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -126,6 +132,16 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
         unset($this->entityRepository);
         unset($this->queryBuilder);
         unset($this->type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensions()
+    {
+        return [
+            new PreloadedExtension([$this->type], [])
+        ];
     }
 
     public function testGetName()
@@ -212,6 +228,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildForm($options, array $expectedCalls = array())
     {
+        /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $formBuilder */
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->setMethods(array('addEventSubscriber', 'addViewTransformer'))
@@ -268,125 +285,104 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @param array $choiceListOptions
-     * @param array $expectedChoices
-     *
-     * @dataProvider configureOptionsDataProvider
-     */
-    public function testConfigureOptions(array $choiceListOptions, array $expectedChoices)
+    public function testBuildViewWhenChoicesGiven()
     {
-        // prepare query builder option
-        if (isset($choiceListOptions['query_builder'])) {
-            $choiceListOptions['query_builder'] = $this->getQueryBuilderOption($choiceListOptions);
-            $configuration = $this->ormConfiguration;
-            $configuration->expects($this->once())
-                ->method('addCustomHydrationMode')
-                ->with(
-                    TranslationWalker::HYDRATE_OBJECT_TRANSLATION,
-                    'Gedmo\\Translatable\\Hydrator\\ORM\\ObjectHydrator'
-                );
+        $customChoice = new TestEntity('0', 'someValue');
+        $form = $this->factory->create(TranslatableEntityType::class, null, [
+            'class' => self::TEST_CLASS,
+            'choice_label' => self::TEST_PROPERTY,
+            'choices' => [$customChoice]
+        ]);
 
-            /** @var $query \PHPUnit_Framework_MockObject_MockObject */
-            $this->query->expects($this->at(0))
-                ->method('setHint')
-                ->with(
-                    Query::HINT_CUSTOM_OUTPUT_WALKER,
-                    'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
-                );
+        $formView = $form->createView();
 
-            /** @var $query \PHPUnit_Framework_MockObject_MockObject */
-            $this->query->expects($this->at(1))
-                ->method('setHint')
-                ->with(
-                    Query::HINT_INCLUDE_META_COLUMNS,
-                    true
-                );
-        }
-
-
-
-        $resolver = new OptionsResolver();
-        $this->type->configureOptions($resolver);
-        $result = $resolver->resolve($choiceListOptions);
-
-        $this->assertInstanceOf(
-            'Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList',
-            $result['choice_list']
+        $this->assertEquals(
+            [new ChoiceView($customChoice, '0', 'someValue')],
+            $formView->vars['choices']
         );
-        $this->assertEquals($expectedChoices, $result['choice_list']->getChoices());
     }
 
-    /**
-     * @param  array                 $options
-     * @return callable|QueryBuilder
-     */
-    protected function getQueryBuilderOption(array $options)
+    public function testBuildViewWhenNoChoicesGiven()
     {
-        if (empty($options['query_builder'])) {
-            return null;
-        }
+        $form = $this->factory->create(TranslatableEntityType::class, null, [
+            'class' => self::TEST_CLASS,
+            'choice_label' => self::TEST_PROPERTY,
+        ]);
 
-        $test = $this;
+        $formView = $form->createView();
 
-        switch ($options['query_builder']) {
-            case 'closure':
-                return function (EntityRepository $entityRepository) use ($test) {
-                    $test->assertEquals($test->getEntityRepository(), $entityRepository);
+        $this->assertEquals(
+            [
+                new ChoiceView(new TestEntity('0', 'one'), '0', 'one'),
+                new ChoiceView(new TestEntity('1', 'two'), '1', 'two'),
+                new ChoiceView(new TestEntity('2', 'three'), '2', 'three')
+            ],
+            $formView->vars['choices']
+        );
+    }
 
-                    return $test->getQueryBuilder();
-                };
-            case 'object':
-            default:
+    public function testBuildViewWhenQueryBuilderGiven()
+    {
+        $form = $this->factory->create(TranslatableEntityType::class, null, [
+            'class' => self::TEST_CLASS,
+            'choice_label' => self::TEST_PROPERTY,
+            'query_builder' => $this->getQueryBuilder()
+        ]);
+
+        $formView = $form->createView();
+
+        $this->assertEquals(
+            [
+                new ChoiceView(new TestEntity('0', 'one'), '0', 'one'),
+                new ChoiceView(new TestEntity('1', 'two'), '1', 'two'),
+                new ChoiceView(new TestEntity('2', 'three'), '2', 'three')
+            ],
+            $formView->vars['choices']
+        );
+    }
+
+    public function testBuildViewWhenQueryBuilderCallbackGiven()
+    {
+        $form = $this->factory->create(TranslatableEntityType::class, null, [
+            'class' => self::TEST_CLASS,
+            'choice_label' => self::TEST_PROPERTY,
+            'query_builder' => function (EntityRepository $entityRepository) {
+                $this->assertEquals($this->getEntityRepository(), $entityRepository);
+
                 return $this->getQueryBuilder();
-        }
+            }
+        ]);
+
+        $formView = $form->createView();
+
+        $this->assertEquals(
+            [
+                new ChoiceView(new TestEntity('0', 'one'), '0', 'one'),
+                new ChoiceView(new TestEntity('1', 'two'), '1', 'two'),
+                new ChoiceView(new TestEntity('2', 'three'), '2', 'three')
+            ],
+            $formView->vars['choices']
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function configureOptionsDataProvider()
+    public function testConfigureOptionsWhenClassOptionIsNotSet()
     {
-        $testChoiceEntities = $this->getTestChoiceEntities($this->testChoices);
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "class" is missing.');
 
-        return array(
-            'predefined_choices' => array(
-                'choiceListOptions' => array(
-                    'class'    => self::TEST_CLASS,
-                    'choice_label' => self::TEST_PROPERTY,
-                    'choices'  => $testChoiceEntities
-                 ),
-                'expectedChoices' => $testChoiceEntities
-            ),
-            'all_choices' => array(
-                'choiceListOptions' => array(
-                    'class'    => self::TEST_CLASS,
-                    'choice_label' => self::TEST_PROPERTY,
-                    'choices'  => null
-                ),
-                'expectedChoices' => $testChoiceEntities,
-                'expectTranslation' => true,
-            ),
-            'query_builder' => array(
-               'choiceListOptions' => array(
-                   'class'    => self::TEST_CLASS,
-                   'choice_label' => self::TEST_PROPERTY,
-                   'choices'  => null,
-                   'query_builder' => 'object'
-                ),
-                'expectedChoices' => $testChoiceEntities,
-                'expectTranslation' => true,
-            ),
-            'query_builder_callback' => array(
-                'choiceListOptions' => array(
-                    'class'    => self::TEST_CLASS,
-                    'choice_label' => self::TEST_PROPERTY,
-                    'choices'  => null,
-                    'query_builder' => 'closure'
-                ),
-                'expectedChoices' => $testChoiceEntities,
-                'expectTranslation' => true,
-            ),
+        $this->factory->create(TranslatableEntityType::class, null, []);
+    }
+
+    public function testConfigureOptions()
+    {
+        $form = $this->factory->create(TranslatableEntityType::class, null, ['class' => self::TEST_CLASS]);
+
+        $this->assertArraySubset(
+            [
+                'class' => self::TEST_CLASS,
+                'choice_value' => 'testId'
+            ],
+            $form->getConfig()->getOptions()
         );
     }
 }

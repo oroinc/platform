@@ -13,6 +13,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
 {
+    private const ITEM_ROUTE_NAME = 'item_route';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
     private $router;
 
@@ -34,6 +36,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new SetLocationHeader(
+            self::ITEM_ROUTE_NAME,
             $this->router,
             $this->valueNormalizer,
             $this->entityIdTransformer
@@ -81,7 +84,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->router->expects(self::once())
             ->method('generate')
             ->with(
-                'oro_rest_api_item',
+                self::ITEM_ROUTE_NAME,
                 ['entity' => $entityType, 'id' => $transformedEntityId],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

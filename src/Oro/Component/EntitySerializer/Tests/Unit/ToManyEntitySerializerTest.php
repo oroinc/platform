@@ -2,6 +2,11 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Filter\TestFilter;
+
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ToManyEntitySerializerTest extends EntitySerializerTestCase
 {
     /**
@@ -944,6 +949,178 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                             'groups' => [200, 201],
                         ],
                     ]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSerializeWithFieldsFilterAndEnabledToManyAssociation()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->leftJoin('e.owner', 'user')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
+            . ' u1_.category_name AS category_name_5'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                    'category_name_5' => 'owner_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT p0_.id AS id_0, g1_.id AS id_1'
+                . ' FROM group_table g1_ INNER JOIN product_table p0_ ON'
+                . ' (EXISTS (SELECT 1 FROM rel_product_to_group_table r2_'
+                . ' INNER JOIN group_table g3_ ON r2_.product_group_id = g3_.id'
+                . ' WHERE r2_.product_id = p0_.id AND g3_.id IN (g1_.id))) WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'id_1'            => 1,
+                ],
+                [
+                    'id_0'            => 1,
+                    'id_1'            => 2,
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $filter = new TestFilter();
+        $filter->setCheckRules(
+            [
+                'name' => TestFilter::FILTER_VALUE,
+                'owner' => TestFilter::FILTER_ALL,
+            ]
+        );
+        $this->serializer->setFieldsFilter($filter);
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'fields' => 'id',
+                    ],
+                    'groups' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'groups' => [
+                        ['id' => 1],
+                        ['id' => 2],
+                    ],
+                    'id'    => 1,
+                    'name'  => null,
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSerializeWithFieldsFilterAndDisabledToManyAssociation()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->leftJoin('e.owner', 'user')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectation(
+            $conn,
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' u1_.id AS id_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4,'
+            . ' u1_.category_name AS category_name_5'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN user_table u1_ ON p0_.owner_id = u1_.id'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'id_2'            => 10,
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                    'category_name_5' => 'owner_category_name',
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $filter = new TestFilter();
+        $filter->setCheckRules(
+            [
+                'name' => TestFilter::FILTER_VALUE,
+                'groups' => TestFilter::FILTER_VALUE,
+                'owner' => TestFilter::FILTER_ALL,
+            ]
+        );
+        $this->serializer->setFieldsFilter($filter);
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'    => null,
+                    'name'  => null,
+                    'owner' => [
+                        'fields' => 'id',
+                    ],
+                    'groups' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'    => 1,
+                    'name'  => null,
                 ]
             ],
             $result

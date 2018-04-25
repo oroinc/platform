@@ -16,11 +16,6 @@ class WidgetTitleTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new WidgetTitleType();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_type_widget_title', $this->formType->getName());
-    }
-
     public function testBuildForm()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

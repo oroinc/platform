@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType as BaseIntegerType;
 
 class IntegerTypeTest extends AbstractConfigTypeTestCase
 {
@@ -29,18 +30,10 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
         $this->doTestConfigureOptions($this->type, $configId, $immutable, $options, $expectedOptions);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_entity_config_integer',
-            $this->type->getName()
-        );
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(
-            'integer',
+            BaseIntegerType::class,
             $this->type->getParent()
         );
     }

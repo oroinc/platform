@@ -142,7 +142,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
-            ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
+            ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::class))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)

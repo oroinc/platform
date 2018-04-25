@@ -106,6 +106,7 @@ class EmailNotificationType extends AbstractType
             [
                 'label' => 'oro.notification.emailnotification.template.label',
                 'class' => 'OroEmailBundle:EmailTemplate',
+                'choice_label' => 'name',
                 'configs' => [
                     'allowClear' => true,
                     'placeholder' => 'oro.email.form.choose_template',
