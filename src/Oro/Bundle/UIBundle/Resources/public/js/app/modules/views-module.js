@@ -22,7 +22,7 @@ define([
         regions: {
             mainContainer: '#container',
             mainMenu: '#main-menu',
-            userMenu: '#top-page .user-menu',
+            userMenu: '#central-panel .user-menu',
             breadcrumb: '#breadcrumb',
             leftPanel: '#left-panel',
             beforeContentAddition: '#before-content-addition',

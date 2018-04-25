@@ -88,8 +88,9 @@ class LoginFormTest extends Selenium2TestCase
         $this->waitForAjax();
         $this->assertEquals('Dashboard', $this->title());
 
-        $this->byXPath("//*[@id='top-page']//ul[@class='nav pull-right user-menu']/li[@class='dropdown']/a")->click();
-        $this->byXPath("//*[@id='top-page']//ul[@class='nav pull-right user-menu']//li/a[contains(.,'Logout')]")
+        $this->byXPath("//*[@id='central-panel']//ul[@class='nav pull-right user-menu']/li[@class='dropdown']/a")
+            ->click();
+        $this->byXPath("//*[@id='central-panel']//ul[@class='nav pull-right user-menu']//li/a[contains(.,'Logout')]")
             ->click();
         $this->assertEquals('Login', $this->title());
     }
@@ -146,7 +147,7 @@ class LoginFormTest extends Selenium2TestCase
         $this->url('user/login');
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $this->byXPath("//*[@id='top-page']//fieldset//a[contains(.,'Forgot your password?')]")->click();
+        $this->byXPath("//*[@id='central-panel']//fieldset//a[contains(.,'Forgot your password?')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->assertEquals('Forgot Password', $this->title());
@@ -155,7 +156,7 @@ class LoginFormTest extends Selenium2TestCase
         $this->byXPath("//button[contains(.,'Request')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $messageActual = $this->byXPath("//*[@id='top-page']//div[contains(@class,'alert-error')]")->text();
+        $messageActual = $this->byXPath("//*[@id='central-panel']//div[contains(@class,'alert-error')]")->text();
         $messageExpect = "There is no active user with username or email address \"123test123\".";
         $this->assertEquals($messageExpect, $messageActual);
 
@@ -163,7 +164,7 @@ class LoginFormTest extends Selenium2TestCase
         $this->byXPath("//button[contains(.,'Request')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $messageActual = $this->byXPath("//*[@id='top-page']//div[contains(@class,'alert-success')]")->text();
+        $messageActual = $this->byXPath("//*[@id='central-panel']//div[contains(@class,'alert-success')]")->text();
 
         $this->assertEquals(
             'An email has been sent to ...@example.com. It contains a link you must click to reset your password.',

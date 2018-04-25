@@ -13,7 +13,7 @@
 </head>
 <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
     <div id="page">
-        <div id="top-page">
+        <div id="central-panel">
             {% set messagesContent %}
             {% if app.session.flashbag.peekAll|length > 0 %}
                 {% for type, messages in app.session.flashbag.all %}
