@@ -20,7 +20,7 @@ class UpdateLocalizationFormType implements Migration
             new UpdateEntityConfigEntityValueQuery(
                 Localization::class,
                 'form',
-                'type',
+                'form_type',
                 LocalizationSelectType::class
             )
         );

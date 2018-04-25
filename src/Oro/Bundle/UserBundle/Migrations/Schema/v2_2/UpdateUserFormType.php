@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_10;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v2_2;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\TagBundle\Entity\Taxonomy;
-use Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
 
-class UpdateTaxonomyFormType implements Migration
+class UpdateUserFormType implements Migration
 {
     /**
      * {@inheritdoc}
@@ -18,10 +18,10 @@ class UpdateTaxonomyFormType implements Migration
     {
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
-                Taxonomy::class,
+                User::class,
                 'form',
                 'form_type',
-                TaxonomySelectType::class
+                UserSelectType::class
             )
         );
     }

@@ -1,27 +1,27 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_10;
+namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_7;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigEntityValueQuery;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\TagBundle\Entity\Taxonomy;
-use Oro\Bundle\TagBundle\Form\Type\TaxonomySelectType;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
 
-class UpdateTaxonomyFormType implements Migration
+class UpdateOrganizationFormType implements Migration
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(
             new UpdateEntityConfigEntityValueQuery(
-                Taxonomy::class,
+                Organization::class,
                 'form',
                 'form_type',
-                TaxonomySelectType::class
+                OrganizationSelectType::class
             )
         );
     }
