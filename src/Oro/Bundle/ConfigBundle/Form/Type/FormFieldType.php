@@ -25,7 +25,8 @@ class FormFieldType extends AbstractType
             [
                 'target_field_options' => [],
                 'use_parent_field_options' => [],
-                'target_field_type'    => TextType::class,
+                'target_field_type' => TextType::class,
+                'target_field_alias' => 'text',
                 'resettable'           => true,
                 'parent_checkbox_label' => ''
             ]
@@ -41,7 +42,7 @@ class FormFieldType extends AbstractType
                 $attr['class'] = '';
             }
 
-            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_type']);
+            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_alias']);
 
             return $attr;
         });

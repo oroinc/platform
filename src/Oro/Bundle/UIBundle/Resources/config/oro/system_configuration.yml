@@ -24,7 +24,7 @@ system_configuration:
                     - NotBlank: ~
         oro_ui.navbar_position:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.ui.system_configuration.fields.navbar_position.label

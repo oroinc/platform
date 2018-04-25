@@ -9,10 +9,10 @@ system_configuration:
     fields:
         oro_layout.development_settings_feature_enabled:
             data_type: boolean
-            type: hidden
+            type: Symfony\Component\Form\Extension\Core\Type\HiddenType
         oro_layout.debug_block_info:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.layout.system_configuration.fields.debug_block_info.label
@@ -22,7 +22,7 @@ system_configuration:
             priority: 20
         oro_layout.debug_developer_toolbar:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.layout.system_configuration.fields.debug_developer_toolbar.label

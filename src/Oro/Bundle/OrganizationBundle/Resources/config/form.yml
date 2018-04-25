@@ -198,5 +198,4 @@ services:
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_business_unit_select' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType }
