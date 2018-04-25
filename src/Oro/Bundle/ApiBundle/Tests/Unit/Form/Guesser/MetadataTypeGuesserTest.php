@@ -6,11 +6,19 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
+use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityType;
+use Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType;
+use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
@@ -149,7 +157,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     public function testGuessTypeWithoutMetadataAccessor()
     {
         $this->assertEquals(
-            new TypeGuess('text', [], TypeGuess::LOW_CONFIDENCE),
+            new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -158,7 +166,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     {
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor(null));
         $this->assertEquals(
-            new TypeGuess('text', [], TypeGuess::LOW_CONFIDENCE),
+            new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -170,7 +178,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
-            new TypeGuess('text', [], TypeGuess::LOW_CONFIDENCE),
+            new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -220,7 +228,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity',
+                EntityType::class,
                 ['metadata' => $associationMetadata, 'included_entities' => null],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -245,7 +253,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setIncludedEntities($includedEntities);
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity',
+                EntityType::class,
                 ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -268,7 +276,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity',
+                EntityType::class,
                 ['metadata' => $associationMetadata, 'included_entities' => null],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -293,7 +301,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setIncludedEntities($includedEntities);
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity',
+                EntityType::class,
                 ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -374,10 +382,10 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_collection',
+                CollectionType::class,
                 [
                     'entry_data_class' => 'Test\TargetEntity',
-                    'entry_type'       => 'oro_api_compound_object',
+                    'entry_type'       => CompoundObjectType::class,
                     'entry_options'    => [
                         'metadata' => $targetMetadata,
                         'config'   => $associationConfig
@@ -418,10 +426,10 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity_collection',
+                EntityCollectionType::class,
                 [
                     'entry_data_class' => 'Test\TargetEntity',
-                    'entry_type'       => 'oro_api_compound_object',
+                    'entry_type'       => CompoundObjectType::class,
                     'entry_options'    => [
                         'metadata' => $targetMetadata,
                         'config'   => $associationConfig
@@ -501,7 +509,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_scalar_collection',
+                ScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'name'],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -535,7 +543,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity_scalar_collection',
+                EntityScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'name'],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -571,7 +579,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_entity_scalar_collection',
+                EntityScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'association1'],
                 TypeGuess::HIGH_CONFIDENCE
             ),
@@ -607,7 +615,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_compound_object',
+                CompoundObjectType::class,
                 [
                     'data_class' => 'Test\TargetEntity',
                     'metadata'   => $targetMetadata,
@@ -646,7 +654,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_nested_association',
+                NestedAssociationType::class,
                 [
                     'metadata' => $associationMetadata,
                     'config'   => $associationConfig

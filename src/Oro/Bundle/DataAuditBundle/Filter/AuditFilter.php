@@ -229,6 +229,6 @@ class AuditFilter extends EntityFilter
      */
     protected function getFormType()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 }

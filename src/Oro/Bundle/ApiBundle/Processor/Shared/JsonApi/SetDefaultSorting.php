@@ -18,6 +18,14 @@ class SetDefaultSorting extends BaseSetDefaultSorting
      */
     protected function getDefaultValue(EntityDefinitionConfig $config): array
     {
-        return [JsonApiDoc::ID => Criteria::ASC];
+        $orderBy = $config->getOrderBy();
+        if (empty($orderBy)) {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (!empty($idFieldNames)) {
+                $orderBy = [JsonApiDoc::ID => Criteria::ASC];
+            }
+        }
+
+        return $orderBy;
     }
 }

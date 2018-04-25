@@ -40,7 +40,7 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $fields       = [];
+        $fields = [];
         $filterValues = $context->getFilterValues()->getGroup(AddFieldsFilter::FILTER_KEY);
         foreach ($filterValues as $filterValue) {
             $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
@@ -50,8 +50,11 @@ class HandleFieldsFilter implements ProcessorInterface
                 true
             );
         }
-        if (!empty($fields)) {
-            $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
+        if (empty($fields)) {
+            // filtering of fields was not requested
+            return;
         }
+
+        $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
     }
 }

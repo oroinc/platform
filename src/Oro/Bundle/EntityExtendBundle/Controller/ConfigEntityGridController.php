@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -136,7 +137,7 @@ class ConfigEntityGridController extends Controller
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
-            'oro_entity_extend_entity_type',
+            EntityType::class,
             array(
                 'data' => $cloneEntityModel,
             )

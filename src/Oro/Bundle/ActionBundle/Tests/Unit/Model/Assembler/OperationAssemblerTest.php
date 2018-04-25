@@ -71,7 +71,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setActions(OperationDefinition::PREACTIONS, [])
             ->setActions(OperationDefinition::ACTIONS, [])
             ->setActions(OperationDefinition::FORM_INIT, [])
-            ->setFormType(OperationType::NAME)
+            ->setFormType(OperationType::class)
             ->setConditions(
                 OperationDefinition::PRECONDITIONS,
                 [
@@ -103,7 +103,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
-            ->setFormType(OperationType::NAME);
+            ->setFormType(OperationType::class);
 
         $definition3 = clone $definition2;
         $definition3
@@ -136,7 +136,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
-            ->setFormType(OperationType::NAME);
+            ->setFormType(OperationType::class);
 
         return [
             'minimum data' => [

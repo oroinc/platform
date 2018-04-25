@@ -130,8 +130,8 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -50 }
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, priority: -50 }
 
-    oro_api.json_api.normalize_filter_keys:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys
+    oro_api.json_api.normalize_id_filter_key:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIdFilterKey
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
@@ -140,12 +140,25 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: json_api, priority: -55 }
             - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: json_api, priority: -55 }
 
+    oro_api.rest.register_dynamic_filters:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
+        arguments:
+            - '@oro_api.filter_factory'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -59 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: rest&!json_api, priority: -59 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, requestType: rest&!json_api, priority: -59 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, collection: true, requestType: rest&!json_api, priority: -59 }
+
     oro_api.register_dynamic_filters:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters
         arguments:
             - '@oro_api.filter_factory'
             - '@oro_api.doctrine_helper'
             - '@oro_api.config_provider'
+            - 'filter'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -60 }
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
@@ -646,7 +659,7 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: true, priority: 10 }
 
     oro_api.normalize_entity:
-        class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntity
         arguments:
             - '@oro_api.object_normalizer'
         tags:
@@ -654,7 +667,7 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: normalize_data, collection: false, priority: -10 }
 
     oro_api.normalize_entities:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeData
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntities
         arguments:
             - '@oro_api.object_normalizer'
         tags:

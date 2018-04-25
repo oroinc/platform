@@ -319,7 +319,8 @@ services:
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
-            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_user_select' }
+            #@TODO Change to FQCN in scope BAP-16688
+            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_user_select' }
 
     oro_user.widget_config_value.widget_role_multiselect.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
@@ -330,7 +331,8 @@ services:
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\Role'
         tags:
-            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_role_select' }
+            #@TODO Change to FQCN in scope BAP-16688
+            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_role_select' }
 
     oro_user.widget_config_value.widget_owners.converter:
         class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetDefaultOwnersConverter
@@ -341,7 +343,8 @@ services:
             - [ setConverter, ['@oro_user.widget_config_value.widget_role_multiselect.converter', 'roles', 'oro.user.dashboard.role'] ]
             - [ setConverter, ['@oro_user.widget_config_value.widget_user_multiselect.converter', 'users', 'oro.user.dashboard.owner'] ]
         tags:
-            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_owners' }
+            #@TODO Change to FQCN in scope BAP-16688
+            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_owners' }
 
     oro_user.form.type.apikey_gen:
         class: Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType

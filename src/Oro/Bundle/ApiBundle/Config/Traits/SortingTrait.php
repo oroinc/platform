@@ -12,6 +12,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait SortingTrait
 {
     /**
+     * Indicates whether the "disable_sorting" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableSorting()
+    {
+        return array_key_exists(EntityDefinitionConfig::DISABLE_SORTING, $this->items);
+    }
+
+    /**
      * Indicates whether a sorting is enabled.
      *
      * @return bool
@@ -30,7 +40,7 @@ trait SortingTrait
      */
     public function enableSorting()
     {
-        unset($this->items[EntityDefinitionConfig::DISABLE_SORTING]);
+        $this->items[EntityDefinitionConfig::DISABLE_SORTING] = false;
     }
 
     /**

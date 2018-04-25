@@ -5,7 +5,9 @@ parameters:
 services:
     oro_translation.form.type.translatable_entity:
         class: '%oro_translation.form.type.translatable_entity.class%'
-        arguments: ["@doctrine"]
+        arguments:
+          - "@doctrine"
+          - "@form.choice_list_factory.default"
         tags:
             - { name: form.type, alias: translatable_entity }
 

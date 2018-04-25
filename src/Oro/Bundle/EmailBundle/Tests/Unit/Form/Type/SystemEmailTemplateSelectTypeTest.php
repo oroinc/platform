@@ -68,7 +68,8 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'query_builder' => $this->queryBuilder,
                 'class'         => 'OroEmailBundle:EmailTemplate',
-                'choice_value'  => 'name'
+                'choice_value'  => 'name',
+                'choice_label'  => 'name'
             ]);
         $this->type->configureOptions($resolver);
     }

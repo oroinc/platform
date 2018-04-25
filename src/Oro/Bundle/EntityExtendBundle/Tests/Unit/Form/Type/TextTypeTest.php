@@ -62,6 +62,7 @@ class TextTypeTest extends AbstractConfigTypeTestCase
 
     public function testGetParent()
     {
+        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyTextType::class,
             $this->getFormType()->getParent()

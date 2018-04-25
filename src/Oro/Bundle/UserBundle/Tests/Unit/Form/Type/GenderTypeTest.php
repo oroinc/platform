@@ -81,11 +81,6 @@ class GenderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($this->genderChoices, $actualChoices);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(GenderType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->type->getParent());

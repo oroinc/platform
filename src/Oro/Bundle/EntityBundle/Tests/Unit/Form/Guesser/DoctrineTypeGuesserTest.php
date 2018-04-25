@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
@@ -118,7 +120,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertGuess(
             $this->guesser->guessType($class, $property),
-            'entity',
+            EntityType::class,
             array('class' => $associationClass, 'multiple' => false),
             TypeGuess::HIGH_CONFIDENCE
         );
@@ -147,7 +149,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertGuess(
             $this->guesser->guessType($class, $property),
-            'entity',
+            EntityType::class,
             array('class' => $associationClass, 'multiple' => true),
             TypeGuess::HIGH_CONFIDENCE
         );
@@ -190,6 +192,6 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertDefaultGuess($guess)
     {
-        $this->assertGuess($guess, 'text', array(), TypeGuess::LOW_CONFIDENCE);
+        $this->assertGuess($guess, TextType::class, array(), TypeGuess::LOW_CONFIDENCE);
     }
 }

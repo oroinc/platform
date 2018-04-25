@@ -2,22 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Converts values of all requested filters according to the type of a filter.
+ * Validated that all requested filters are supported.
  */
 class NormalizeFilterValues implements ProcessorInterface
 {
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
      * @param ValueNormalizer $valueNormalizer
@@ -55,13 +57,28 @@ class NormalizeFilterValues implements ProcessorInterface
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {
-                        $error = Error::createByException($e)
-                            ->setStatusCode(Response::HTTP_BAD_REQUEST)
-                            ->setSource(ErrorSource::createByParameter($filterKey));
-                        $context->addError($error);
+                        $context->addError(
+                            $this->createFilterError($filterKey, $filterValue)->setInnerException($e)
+                        );
                     }
                 }
+            } else {
+                $context->addError(
+                    $this->createFilterError($filterKey, $filterValue)->setDetail('The filter is not supported.')
+                );
             }
         }
+    }
+
+    /**
+     * @param string      $filterKey
+     * @param FilterValue $filterValue
+     *
+     * @return Error
+     */
+    private function createFilterError(string $filterKey, FilterValue $filterValue): Error
+    {
+        return Error::createValidationError(Constraint::FILTER)
+            ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey() ?: $filterKey));
     }
 }

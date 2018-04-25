@@ -338,7 +338,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $configuration = array_merge(
             [
                 'is_start' => false,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'form_options' => [],
                 'frontend_options' => [],
             ],
@@ -652,13 +652,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEmpty($actualTransition->getFrontendOptions());
         $this->assertFalse($actualTransition->isStart());
-        $this->assertEquals('oro_workflow_transition', $actualTransition->getFormType());
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType());
         $this->assertEmpty($actualTransition->getFormOptions());
 
         $configuration = array_merge(
             [
                 'is_start' => false,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'form_options' => [],
                 'frontend_options' => [],
             ],
@@ -757,7 +757,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($actualTransition->getFrontendOptions());
         $this->assertFalse($actualTransition->isStart());
-        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType());
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType());
         $this->assertEquals([], $actualTransition->getFormOptions());
 
         $this->assertTemplate('page', $configuration, $actualTransition);
@@ -897,7 +897,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $actualTransition->getFrontendOptions(), 'Incorrect frontend_options');
         $this->assertTrue($actualTransition->isStart(), 'Incorrect is_start');
 
-        $this->assertEquals(WorkflowTransitionType::NAME, $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType(), 'Incorrect form_type');
         $this->assertEmpty($actualTransition->getFormOptions(), 'Incorrect form_options');
 
         $this->assertTemplate('page', $configuration, $actualTransition);
