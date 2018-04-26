@@ -16,7 +16,7 @@ class ScopeCollectionTypeStub extends ScopeCollectionType
     {
         $resolver->setDefaults(
             [
-                'type' => ScopeType::NAME,
+                'entry_type' => ScopeType::NAME,
             ]
         );
     }

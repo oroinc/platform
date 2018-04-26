@@ -504,7 +504,7 @@ operations:
         form_options:
             attribute_fields:
                 demo_attr:
-                    form_type: text
+                    form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             required: true
                             constraints:

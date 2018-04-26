@@ -284,7 +284,7 @@ api:
 
                 # A form type and form options for a field
                 field6:
-                    form_type: text
+                    form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                     form_options:
                         trim: false
                         constraints:
@@ -399,6 +399,7 @@ The `actions` configuration section serves to specify action-specific options. T
     * **description** (*string*) - A human-readable description of the status code. Used in the auto-generated documentation only.
 * **fields** - This section describes entity field configuration specific to the particular action.
     * **exclude** (*boolean*) - Indicates whether to exclude the field for the particular action. See the [Exclude" option](#exclude-option) section for the description.
+    * **direction** (*string*) - Indicates whether the field is `input-only`, `output-only` or `bidirectional`. The `input-only` means that the request data can contain this field, but the response data cannot. The `output-only` means that the response data can contain this field, but the request data cannot. The `bidirectional` is the default behaviour and means that both the request data and the response data can contain this field.
     * **form_type** (*string*) - The form type to use for the field.
     * **form_options** (*array*) - The form options to use for the field.
 

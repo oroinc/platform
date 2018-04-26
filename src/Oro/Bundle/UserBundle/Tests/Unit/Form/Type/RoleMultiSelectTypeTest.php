@@ -143,7 +143,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
                 [
                     $this->formType,
                     Select2HiddenType::class => new Select2Type('hidden', 'oro_select2_hidden'),
-                    'oro_jqueryselect2_hidden' => new OroJquerySelect2HiddenType(
+                    OroJquerySelect2HiddenType::class => new OroJquerySelect2HiddenType(
                         $this->em,
                         $searchRegistry,
                         $configProvider

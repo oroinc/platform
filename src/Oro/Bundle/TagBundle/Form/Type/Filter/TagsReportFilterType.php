@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class TagsReportFilterType extends DictionaryFilterType
@@ -15,7 +16,7 @@ class TagsReportFilterType extends DictionaryFilterType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
-        $builder->add('entity_class', 'text', ['required' => true]);
+        $builder->add('entity_class', TextType::class, ['required' => true]);
     }
 
     /**

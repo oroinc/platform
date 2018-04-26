@@ -31,11 +31,6 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->configureOptions($optionResolver);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(OwnershipType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->type->getParent());

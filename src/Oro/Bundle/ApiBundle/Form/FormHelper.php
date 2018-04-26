@@ -10,6 +10,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Provides a set of reusable utility methods to simplify
+ * creation and configuration of FormBuilder for forms used in Data API actions,
+ * such as "create", "update", "update_relationship", "add_relationship" and "delete_relationship".
+ */
 class FormHelper
 {
     const EXTRA_FIELDS_MESSAGE = 'oro.api.form.extra_fields';
@@ -74,10 +79,16 @@ class FormHelper
     ) {
         $fields = $entityMetadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isInput()) {
+                continue;
+            }
             $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $field);
         }
         $associations = $entityMetadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isInput()) {
+                continue;
+            }
             $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $association);
         }
     }

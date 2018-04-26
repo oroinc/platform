@@ -16,11 +16,6 @@ class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new WidgetDateType();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_type_widget_date', $this->formType->getName());
-    }
-
     public function testBuildFormWithDate()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

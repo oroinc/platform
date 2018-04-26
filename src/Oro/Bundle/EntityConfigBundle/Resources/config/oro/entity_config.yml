@@ -66,7 +66,7 @@ entity_config:
                         value_type: boolean
                         default_value: false
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices: ['No', 'Yes']
                             placeholder: false
@@ -77,7 +77,7 @@ entity_config:
                         value_type: boolean
                         default_value: false
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices: ['No', 'Yes']
                             placeholder: false
@@ -88,7 +88,7 @@ entity_config:
                         value_type: string
                         default_value: 'exact_value'
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
                                 exact_value: 'oro.entity_config.field_config.filter_by.exact_value.label'
@@ -102,7 +102,7 @@ entity_config:
                         value_type: boolean
                         default_value: false
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices: ['No', 'Yes']
                             placeholder: false
@@ -113,7 +113,7 @@ entity_config:
                         value_type: boolean
                         default_value: false
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices: ['No', 'Yes']
                             placeholder: false
@@ -129,7 +129,7 @@ entity_config:
                         label: oro.entity_config.entity_config.attribute.field.items.visible
                         renderable: true
                     form:
-                        type: choice
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices: ['No', 'Yes']
                             placeholder: false

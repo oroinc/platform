@@ -9,7 +9,7 @@ entity_config:
                         priority:              250
                         default_value:         false
                     form:
-                        type:               oro_tag_config_choice
+                        type:               Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
                         options:
                             block:          other
                             required:       true

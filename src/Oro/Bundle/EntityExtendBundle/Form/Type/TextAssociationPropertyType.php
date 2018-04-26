@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 /**
  * This form type represents a 'text' association property.
  * Can be used bor both single and multiple associations.
@@ -29,6 +31,6 @@ class TextAssociationPropertyType extends AbstractAssociationType
      */
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 }

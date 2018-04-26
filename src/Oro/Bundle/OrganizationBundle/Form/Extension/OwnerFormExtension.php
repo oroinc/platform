@@ -11,6 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -21,6 +22,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -346,7 +348,7 @@ class OwnerFormExtension extends AbstractTypeExtension
 
             $builder->add(
                 $this->fieldName,
-                'oro_user_acl_select',
+                UserAclSelectType::class,
                 $options
             );
         }
@@ -401,7 +403,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             if ($this->authorizationChecker->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
                 $builder->add(
                     $this->fieldName,
-                    'oro_type_business_unit_select_autocomplete',
+                    BusinessUnitSelectAutocomplete::class,
                     [
                         'required' => false,
                         'label' => $this->fieldLabel,
@@ -439,7 +441,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                     array_merge(
                         [
                             'class'                => 'OroOrganizationBundle:BusinessUnit',
-                            'property'             => 'name',
+                            'choice_label'         => 'name',
                             'choices'              => $businessUnits,
                             'mapped'               => true,
                             'label'                => $this->fieldLabel,

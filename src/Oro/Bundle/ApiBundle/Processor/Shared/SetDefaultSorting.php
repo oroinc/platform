@@ -84,18 +84,18 @@ class SetDefaultSorting implements ProcessorInterface
      */
     protected function getDefaultValue(EntityDefinitionConfig $config): array
     {
-        $idFieldNames = $config->getIdentifierFieldNames();
-        if (empty($idFieldNames)) {
-            return [];
-        }
-
-        $orderBy = [];
-        foreach ($idFieldNames as $fieldName) {
-            $field = $config->getField($fieldName);
-            if (null !== $field) {
-                $fieldName = $field->getPropertyPath($fieldName);
+        $orderBy = $config->getOrderBy();
+        if (empty($orderBy)) {
+            $idFieldNames = $config->getIdentifierFieldNames();
+            if (!empty($idFieldNames)) {
+                foreach ($idFieldNames as $fieldName) {
+                    $field = $config->getField($fieldName);
+                    if (null !== $field) {
+                        $fieldName = $field->getPropertyPath($fieldName);
+                    }
+                    $orderBy[$fieldName] = Criteria::ASC;
+                }
             }
-            $orderBy[$fieldName] = Criteria::ASC;
         }
 
         return $orderBy;

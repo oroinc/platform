@@ -104,7 +104,7 @@ Select it according to what you need to achieve.
  *      defaultValues={
             ...
  *          "form"={
- *              "form_type"="oro_user_select",
+ *              "form_type"="Oro\Bundle\UserBundle\Form\Type\UserSelectType",
  *              "form_option"="{option1: ..., ...}"
  *          }
  *      }

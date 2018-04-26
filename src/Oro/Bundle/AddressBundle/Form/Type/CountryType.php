@@ -22,6 +22,7 @@ class CountryType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
+                'choice_label' => 'name',
                 'configs' => array(
                     'allowClear' => true,
                     'placeholder'   => 'oro.address.form.choose_country'

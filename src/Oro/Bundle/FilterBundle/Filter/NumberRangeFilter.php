@@ -12,7 +12,7 @@ class NumberRangeFilter extends NumberFilter
      */
     protected function getFormType()
     {
-        return NumberRangeFilterType::NAME;
+        return NumberRangeFilterType::class;
     }
 
     /**

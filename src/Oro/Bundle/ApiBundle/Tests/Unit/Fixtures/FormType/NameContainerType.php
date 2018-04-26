@@ -29,7 +29,7 @@ class NameContainerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'test_name_container';
     }

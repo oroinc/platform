@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
+use A2lix\TranslationFormBundle\Form\Type\GedmoTranslationsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\FormView;
@@ -19,7 +20,7 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new EmailTemplateTranslationType($this->configManager);
+        $this->type = new EmailTemplateTranslationType($this->configManager, GedmoTranslationsType::class);
     }
 
     protected function tearDown()
@@ -48,11 +49,6 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->buildView($view, $form, $options);
         $this->assertEquals($options['labels'], $view->vars['labels']);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_email_emailtemplate_translatation', $this->type->getName());
     }
 
     public function testGetParent()
