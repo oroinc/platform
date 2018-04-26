@@ -94,7 +94,9 @@ class ConfigurationType extends AbstractType
             ])
             ->add('imapEncryption', ChoiceType::class, [
                 'label'       => 'oro.imap.configuration.imap_encryption.label',
-                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices'     => ['SSL' => 'ssl', 'TLS' => 'tls'],
                 'attr'        => ['class' => 'imap-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'placeholder' => '',
@@ -120,7 +122,9 @@ class ConfigurationType extends AbstractType
             ])
             ->add('smtpEncryption', ChoiceType::class, [
                 'label'       => 'oro.imap.configuration.smtp_encryption.label',
-                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices'     => ['SSL' => 'ssl', 'TLS' => 'tls'],
                 'attr'        => ['class' => 'smtp-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'placeholder' => '',

@@ -14,6 +14,6 @@ integrations:
                     tooltip:  oro.integration.integration.sync_priority.tooltip
                     required: true
                     choices:
-                        remote: oro.integration.integration.remote_wins.label
-                        local:  oro.integration.integration.local_wins.label
+                        oro.integration.integration.remote_wins.label: remote
+                        oro.integration.integration.local_wins.label: local
                 applicable: "@oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)"

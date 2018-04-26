@@ -236,7 +236,12 @@ class RelationType extends AbstractType
 
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
-                'choices' => ['No', 'Yes'],
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices' => [
+                    'No' => 0,
+                    'Yes' => 1,
+                ],
                 'placeholder' => false,
                 'block' => 'general',
                 'subblock' => 'properties',

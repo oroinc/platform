@@ -71,6 +71,14 @@ class EmbeddedFormManager
     }
 
     /**
+     * @return array
+     */
+    public function getAllChoices()
+    {
+        return array_flip($this->formTypes);
+    }
+
+    /**
      * @param string $type
      *
      * @return string|null

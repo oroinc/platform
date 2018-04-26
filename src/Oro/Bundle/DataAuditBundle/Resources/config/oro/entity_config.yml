@@ -18,7 +18,11 @@ entity_config:
                     form:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.entity.items.auditable
@@ -45,7 +49,11 @@ entity_config:
                     form:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable

@@ -171,7 +171,7 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
                 )
             );
         $form = $this->factory->create(FallbackParentStubType::class, $parentObject, $this->getDefaultOptions());
-        $this->assertArrayHasKey(
+        $this->assertContains(
             'testFallback2',
             $this->getChildForm($form)->get('fallback')->getConfig()->getOption('choices')
         );

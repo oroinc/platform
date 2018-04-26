@@ -56,7 +56,7 @@ class EnumValueProvider
 
             /** @var AbstractEnumValue[] $values */
             foreach ($values as $enum) {
-                $result[$enum->getId()] = $enum->getName();
+                $result[$enum->getName()] = $enum->getId();
             }
             $this->enumTranslationCache->save($enumClass, $result);
         } else {

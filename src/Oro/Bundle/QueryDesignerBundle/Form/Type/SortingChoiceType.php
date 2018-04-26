@@ -17,10 +17,12 @@ class SortingChoiceType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices'     => array(
-                    'ASC'  => 'oro.query_designer.form.sorting_asc',
-                    'DESC' => 'oro.query_designer.form.sorting_desc'
-                ),
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices'     => [
+                    'oro.query_designer.form.sorting_asc' => 'ASC',
+                    'oro.query_designer.form.sorting_desc' => 'DESC',
+                ],
                 'placeholder' => 'oro.query_designer.form.choose_sorting',
                 'empty_data'  => ''
             )

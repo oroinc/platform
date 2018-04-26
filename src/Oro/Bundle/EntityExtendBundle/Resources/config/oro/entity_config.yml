@@ -487,7 +487,11 @@ entity_config:
                     #        block:          general
                     #        subblock:       properties
                     #        required:       false
-                    #        choices:        ['No', 'Yes']
+                    #        TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    #        choices_as_values: true
+                    #        choices:
+                    #            No:         0
+                    #            Yes:        1
                     #        placeholder:    false
                     #        label:          oro.entity_extend.enum_public
                     #        tooltip:        oro.entity_extend.enum_public.tooltip
@@ -524,7 +528,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -544,7 +552,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -562,7 +574,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field

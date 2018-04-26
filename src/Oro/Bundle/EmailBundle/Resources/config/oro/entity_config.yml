@@ -10,7 +10,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
@@ -26,7 +30,11 @@ entity_config:
                         type:                   Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
                         options:
                             block:              attachments
-                            choices:            ['oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label', 'oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label: 0
+                                oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label: 1
                             placeholder:        false
                             required:           true
                             label:              oro.email.system_configuration.attachment_configuration.link_to_scope.label

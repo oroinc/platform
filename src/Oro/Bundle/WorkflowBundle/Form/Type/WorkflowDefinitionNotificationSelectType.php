@@ -31,7 +31,7 @@ class WorkflowDefinitionNotificationSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-           'class' => WorkflowDefinition::class,
+            'class' => WorkflowDefinition::class,
             'translation_domain' => WorkflowTranslationHelper::TRANSLATION_DOMAIN,
         ]);
         $resolver->setDefined('entityClass');
