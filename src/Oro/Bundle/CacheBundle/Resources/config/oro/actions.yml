@@ -37,8 +37,8 @@ operations:
                     options:
                         placeholder: false
                         choices:
-                            scheduled: oro.cache.invalidate.type.scheduled
-                            immediate: oro.cache.invalidate.type.immediate
+                            oro.cache.invalidate.type.scheduled: scheduled
+                            oro.cache.invalidate.type.immediate: immediate
                 invalidateCacheAt:
                     form_type: Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
                 invalidateNow:

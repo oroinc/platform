@@ -100,7 +100,7 @@ class ChoiceFieldHelper
         $result = $query->getResult();
         $choices = [];
         foreach ($result as $item) {
-            $choices[$item[$keyField]] = $item[$labelField];
+            $choices[$item[$labelField]] = $item[$keyField];
         }
 
         return $choices;

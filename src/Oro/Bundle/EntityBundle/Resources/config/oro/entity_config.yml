@@ -144,11 +144,13 @@ entity_config:
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType
                         options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                0: 'No'
-                                1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
-                                3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
-                                2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
+                                No: 0
+                                oro.entity.entity_config.datagrid.field.items.is_visible.shown: 1
+                                oro.entity.entity_config.datagrid.field.items.is_visible.hidden: 3
+                                oro.entity.entity_config.datagrid.field.items.is_visible.mandatory: 2
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
@@ -166,7 +168,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.show_filter
@@ -218,7 +224,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.form.field.items.is_enabled
@@ -239,7 +249,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.is_displayable

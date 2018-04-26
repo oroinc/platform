@@ -62,7 +62,7 @@ abstract class AbstractEnumType extends AbstractType
                 'query_builder' => function (EnumValueRepository $repo) {
                     return $repo->getValuesQueryBuilder();
                 },
-                'property'      => 'name',
+                'choice_label'  => 'name',
                 'multiple'      => null
             ]
         );

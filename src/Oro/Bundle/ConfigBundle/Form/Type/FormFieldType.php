@@ -62,6 +62,15 @@ class FormFieldType extends AbstractType
         $useParentOptions['label'] = $options['parent_checkbox_label'];
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
+
+        // TODO: remove 'if' statement below in scope of BAP-15236
+        if (isset($options['target_field_options']['choices'])) {
+            $options['target_field_options'] = array_merge(
+                ['choices_as_values' => true],
+                $options['target_field_options']
+            );
+        }
+
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
 
         if ($options['resettable']) {

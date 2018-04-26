@@ -68,7 +68,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices: ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No: 0
+                                Yes: 1
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.searchable
@@ -79,7 +83,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices: ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No: 0
+                                Yes: 1
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filterable
@@ -90,9 +98,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                exact_value: 'oro.entity_config.field_config.filter_by.exact_value.label'
-                                fuzzy_search: 'oro.entity_config.field_config.filter_by.fuzzy_search.label'
+                                oro.entity_config.field_config.filter_by.exact_value.label: exact_value
+                                oro.entity_config.field_config.filter_by.fuzzy_search.label: fuzzy_search
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filter_by.label
@@ -104,7 +114,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices: ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No: 0
+                                Yes: 1
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
@@ -115,7 +129,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices: ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No: 0
+                                Yes: 1
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.enabled
@@ -131,7 +149,11 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices: ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No: 0
+                                Yes: 1
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.visible

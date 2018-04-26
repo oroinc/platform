@@ -44,10 +44,10 @@ class ChoiceOriginFolderFilterType extends AbstractChoiceType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = array(
-            self::TYPE_CONTAINS     => $this->translator->trans('oro.filter.form.label_type_contains'),
-            self::TYPE_NOT_CONTAINS => $this->translator->trans('oro.filter.form.label_type_not_contains')
-        );
+        $choices = [
+            $this->translator->trans('oro.filter.form.label_type_contains') => self::TYPE_CONTAINS,
+            $this->translator->trans('oro.filter.form.label_type_not_contains') => self::TYPE_NOT_CONTAINS
+        ];
 
         $resolver->setDefaults(
             array(

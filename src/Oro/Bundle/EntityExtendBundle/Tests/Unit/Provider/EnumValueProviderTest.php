@@ -35,7 +35,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEnumChoices()
     {
         $enumClass = '\stdClass';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->assertEnumChoices($enumClass);
         $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
@@ -44,7 +44,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEnumChoicesWithEmptyCache()
     {
         $enumClass = 'FooBar';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->cache->expects($this->once())
             ->method('contains')
@@ -87,7 +87,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     {
         $code = 'test_enum';
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $expected = ['id' => 'Name'];
+        $expected = ['Name' => 'id'];
 
         $this->assertEnumChoices($enumClass);
         $this->assertEquals($expected, $this->provider->getEnumChoicesByCode($code));

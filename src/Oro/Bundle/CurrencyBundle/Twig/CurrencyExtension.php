@@ -136,7 +136,7 @@ class CurrencyExtension extends \Twig_Extension
             function ($symbol) {
                 return ['symbol' => $symbol];
             },
-            $currencySymbolCollection
+            array_keys($currencySymbolCollection)
         );
 
         return json_encode($currencySymbolCollection);

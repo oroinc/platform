@@ -9,18 +9,22 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - No
-                    - Yes
+                    No: 0
+                    Yes: 1
         oro_sidebar.sidebar_right_active:
             data_type: boolean
             type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - No
-                    - Yes
+                    No: 0
+                    Yes: 1
     tree:
         system_configuration:
             platform:

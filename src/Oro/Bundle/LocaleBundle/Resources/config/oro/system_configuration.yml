@@ -119,9 +119,11 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    fahrenheit: oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit
-                    celsius: oro.locale.system_configuration.fields.temperature_unit.choices.celsius
+                    oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit: fahrenheit
+                    oro.locale.system_configuration.fields.temperature_unit.choices.celsius: celsius
 
         oro_locale.wind_speed_unit:
             data_type: string
@@ -134,10 +136,12 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    miles_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour
-                    kilometers_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour
-                    meters_per_second: oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour: miles_per_hour
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour: kilometers_per_hour
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second: meters_per_second
 
         oro_locale.enabled_localizations:
             data_type: array

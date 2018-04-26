@@ -27,7 +27,10 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 
         $optionResolver->expects($this->once())
             ->method('setDefaults')
-            ->with(array('choices' => $this->type->getOwnershipsArray()));
+            ->with([
+                'choices_as_values' => true,
+                'choices' => array_flip($this->type->getOwnershipsArray()),
+            ]);
         $this->type->configureOptions($optionResolver);
     }
 

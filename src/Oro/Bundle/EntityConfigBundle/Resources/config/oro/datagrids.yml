@@ -165,6 +165,7 @@ datagrids:
                     data_name: cf.type
                     options:
                         field_options:
+                            choices_as_values: true
                             choices: "@oro_entity_extend.type.field->getTranslatedTypeChoices"
                             multiple: true
 

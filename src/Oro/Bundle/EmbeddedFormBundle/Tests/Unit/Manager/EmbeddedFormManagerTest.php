@@ -207,6 +207,19 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetAllChoices()
+    {
+        $type1 = 'type1';
+        $typeLabel1 = 'Type 1';
+        $type2 = 'type2';
+        $typeLabel2 = 'Type 2';
+        $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+        $manager->addFormType($type1, $typeLabel1);
+        $manager->addFormType($type2, $typeLabel2);
+
+        $this->assertEquals([$typeLabel1 => $type1, $typeLabel2 => $type2], $manager->getAllChoices());
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

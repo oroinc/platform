@@ -69,7 +69,11 @@ class EnumFilterTypeTest extends TypeTestCase
 
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValue('None'));
+            ->willReturnMap([
+                ['oro.filter.form.label_type_in', [], null, null, 'is any of'],
+                ['oro.filter.form.label_type_not_in', [], null, null, 'is not any of'],
+                ['oro.entity_extend.datagrid.enum.filter.empty', [], null, null, 'None'],
+            ]);
 
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -103,21 +107,23 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => 'test_enum',
                 'class'           => null,
                 'nullValue'       => null,
-                'values'          => ['val1' => 'Value1'],
+                'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
                     'operator_choices' => [
-                        1 => 'None',
-                        2 =>  'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'class'         => ExtendHelper::buildEnumValueClassName('test_enum'),
                     'null_value'    => null,
                     'field_options' => [
                         'multiple' => true,
                         'choices'  => [
-                            'val1' => 'Value1'
-                        ]
+                            'Value1' => 'val1'
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ],
                 ]
             ],
@@ -125,22 +131,24 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => 'test_enum',
                 'class'           => null,
                 'nullValue'       => ':empty:',
-                'values'          => ['val1' => 'Value1'],
+                'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
                     'operator_choices' => [
-                        1 => 'None',
-                        2 =>  'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'class'         => ExtendHelper::buildEnumValueClassName('test_enum'),
                     'null_value'    => ':empty:',
                     'field_options' => [
                         'multiple' => true,
                         'choices'  => [
-                            ':empty:' => 'None',
-                            'val1'    => 'Value1'
-                        ]
+                            'None' => ':empty:',
+                            'Value1' => 'val1'
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -148,12 +156,12 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => null,
-                'values'          => ['val1' => 'Value1'],
+                'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'operator_choices' => [
-                        1 => 'None',
-                        2 =>  'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'enum_code'     => null,
                     'class'         => 'Extend\Entity\EV_Test_Enum',
@@ -161,8 +169,10 @@ class EnumFilterTypeTest extends TypeTestCase
                     'field_options' => [
                         'multiple' => true,
                         'choices'  => [
-                            'val1' => 'Value1'
-                        ]
+                            'Value1' => 'val1'
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -170,22 +180,24 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => ':empty:',
-                'values'          => ['val1' => 'Value1'],
+                'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => null,
                     'operator_choices' => [
-                        1 => 'None',
-                        2 =>  'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => ':empty:',
                     'field_options' => [
                         'multiple' => true,
                         'choices'  => [
-                            ':empty:' => 'None',
-                            'val1'    => 'Value1'
-                        ]
+                            'None' => ':empty:',
+                            'Value1' => 'val1'
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -193,23 +205,25 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => null,
-                'values'          => ['val1' => 'Value1'],
+                'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => [
                     'multiple' => false
                 ],
                 'expectedOptions' => [
                     'enum_code'     => null,
                     'operator_choices' => [
-                        1 => 'None',
-                        2 => 'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => null,
                     'field_options' => [
                         'multiple' => false,
                         'choices'  => [
-                            'val1' => 'Value1'
-                        ]
+                            'Value1' => 'val1'
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -217,24 +231,26 @@ class EnumFilterTypeTest extends TypeTestCase
                 'enumCode'        => null,
                 'class'           => 'Extend\Entity\EV_Test_Enum',
                 'nullValue'       => ':empty:',
-                'values'          => [1 => 'Value1'],
+                'values'          => ['Value1' => 1],
                 'fieldOptions'    => [
                     'multiple' => false
                 ],
                 'expectedOptions' => [
                     'enum_code'     => null,
                     'operator_choices' => [
-                        1 => 'None',
-                        2 => 'None'
+                        'is any of' => 1,
+                        'is not any of' => 2,
                     ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => ':empty:',
                     'field_options' => [
                         'multiple' => false,
                         'choices'  => [
-                            ':empty:' => 'None',
-                            1 => 'Value1'
-                        ]
+                            'None' => ':empty:',
+                            'Value1' => 1
+                        ],
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                     ]
                 ]
             ]

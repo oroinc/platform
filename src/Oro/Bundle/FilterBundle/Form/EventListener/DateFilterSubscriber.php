@@ -108,7 +108,15 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $children = array_keys($form->all());
 
         foreach ($children as $child) {
-            $form->add($child, ChoiceType::class, ['choices' => $choices]);
+            $form->add(
+                $child,
+                ChoiceType::class,
+                [
+                    // TODO: remove 'choices_as_values' option and array_flip function below in scope of BAP-15236
+                    'choices_as_values' => true,
+                    'choices' => array_flip($choices),
+                ]
+            );
         }
     }
 }

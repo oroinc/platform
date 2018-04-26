@@ -50,7 +50,7 @@ class WidgetConfigurationLoadListener
         $choices = $metadata->offsetGetByPath('[gridViews][choices]', []);
         $viewChoices = [];
         foreach ($choices as $choice) {
-            $viewChoices[$choice['value']] = $choice['label'];
+            $viewChoices[$choice['label']] = $choice['value'];
         }
         if (!isset($configuration['fields'])) {
             $configuration['fields'] = [];
@@ -63,6 +63,8 @@ class WidgetConfigurationLoadListener
                     'type' => 'choice',
                     'options' => [
                         'label' => 'oro.dashboard.grid.fields.grid_view.label',
+                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                        'choices_as_values' => true,
                         'choices' => $viewChoices,
                     ],
                     'show_on_widget' => false,

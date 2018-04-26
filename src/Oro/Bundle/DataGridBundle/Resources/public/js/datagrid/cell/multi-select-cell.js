@@ -71,7 +71,9 @@ define([
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +
                     value
                         .map(function(item) {
-                            return choices[item];
+                            return _.findKey(choices, function(value) {
+                                return value === item;
+                            });
                         })
                         .filter(function(item) {
                             return item;
