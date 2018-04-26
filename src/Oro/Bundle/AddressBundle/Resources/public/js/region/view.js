@@ -33,7 +33,7 @@ define(function(require) {
             this.target = $(options.target);
             this.$simpleEl = $(options.simpleEl);
 
-            this.target.closest('.controls').append(this.$simpleEl);
+            this.target.after(this.$simpleEl);
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
@@ -96,7 +96,15 @@ define(function(require) {
         },
 
         getInputLabel: function(el) {
-            return el.parent().parent().find('label');
+            var label;
+            var input = _.result(el.data('select2'), 'focusser') || el;
+            var id = input.attr('id');
+
+            if (id) {
+                label = $('label[for="' + id + '"]');
+            }
+
+            return label && label.length ? label : el.parent().parent().find('label');
         },
 
         /**
@@ -136,7 +144,7 @@ define(function(require) {
                 this.$simpleEl.val('');
             } else {
                 this.target.hide();
-                this.target.val('');
+                this.target.inputWidget('val', '');
                 this.displaySelect2(false);
                 this.$simpleEl.show();
             }
