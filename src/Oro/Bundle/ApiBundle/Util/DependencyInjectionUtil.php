@@ -159,4 +159,30 @@ class DependencyInjectionUtil
         $container->setDefinition($serviceId . '.debug', $debugDefinition);
         $container->setAlias($serviceId, new Alias($serviceId . '.debug', $isPublic));
     }
+
+    /**
+     * Disables the specific API processor for the given request type.
+     *
+     * @param ContainerBuilder $container
+     * @param string           $processorServiceId
+     * @param string           $requestType
+     */
+    public static function disableApiProcessor(
+        ContainerBuilder $container,
+        string $processorServiceId,
+        string $requestType
+    ) {
+        $processorDef = $container->getDefinition($processorServiceId);
+        $tags = $processorDef->getTag('oro.api.processor');
+        $processorDef->clearTag('oro.api.processor');
+
+        foreach ($tags as $tag) {
+            if (empty($tag['requestType'])) {
+                $tag['requestType'] = '!' . $requestType;
+            } else {
+                $tag['requestType'] .= '&!' . $requestType;
+            }
+            $processorDef->addTag('oro.api.processor', $tag);
+        }
+    }
 }
