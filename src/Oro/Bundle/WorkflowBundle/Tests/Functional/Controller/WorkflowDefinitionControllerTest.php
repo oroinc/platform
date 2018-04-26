@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -26,8 +27,20 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     public function testIndexAction()
     {
-        $response = $this->client->requestGrid(['gridName' => 'workflow-definitions-grid'], [], true);
-        $this->getJsonResponseContent($response, 200);
+        $response = $this->client->requestGrid(
+            ['gridName' => 'workflow-definitions-grid'],
+            ['workflow-definitions-grid[_sort_by][createdAt]' => OrmSorterExtension::DIRECTION_DESC],
+            true
+        );
+        $result = $this->getJsonResponseContent($response, 200);
+        $workflowList = [];
+
+        foreach ($result['data'] as $item) {
+            $workflowList[] = $item['name'];
+        }
+
+        $this->assertTrue(in_array(LoadWorkflowDefinitions::MULTISTEP, $workflowList));
+        $this->assertTrue(in_array(LoadWorkflowDefinitions::WITH_START_STEP, $workflowList));
 
         $crawler = $this->client->request(
             'GET',
@@ -41,8 +54,6 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains('workflow-definitions-grid', $crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::MULTISTEP, $crawler->html());
-        $this->assertContains(LoadWorkflowDefinitions::WITH_START_STEP, $crawler->html());
         $this->assertContainGroups($crawler->html());
     }
 
