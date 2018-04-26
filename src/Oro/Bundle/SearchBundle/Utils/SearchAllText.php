@@ -23,8 +23,8 @@ class SearchAllText
     public function getOperatorChoices()
     {
         return [
-            TextFilterType::TYPE_CONTAINS => $this->translator->trans('oro.filter.form.label_type_contains'),
-            TextFilterType::TYPE_NOT_CONTAINS => $this->translator->trans('oro.filter.form.label_type_not_contains')
+            $this->translator->trans('oro.filter.form.label_type_contains') => TextFilterType::TYPE_CONTAINS ,
+            $this->translator->trans('oro.filter.form.label_type_not_contains') => TextFilterType::TYPE_NOT_CONTAINS,
         ];
     }
 }

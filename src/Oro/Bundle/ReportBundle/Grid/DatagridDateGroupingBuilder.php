@@ -157,11 +157,13 @@ class DatagridDateGroupingBuilder
             'joined_table' => $dateFieldTableAlias,
             'options' => [
                 'field_options' => [
+                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices' => [
-                        'day' => 'Day',
-                        'month' => 'Month',
-                        'quarter' => 'Quarter',
-                        'year' => 'Year',
+                        'Day' => 'day',
+                        'Month' => 'month',
+                        'Quarter' => 'quarter',
+                        'Year' => 'year',
                     ]
                 ],
                 'default_value' => 'Day'
@@ -205,9 +207,11 @@ class DatagridDateGroupingBuilder
             'label' => 'oro.report.filter.skip_empty_periods.label',
             'options' => [
                 'field_options' => [
+                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices' => [
-                        'No',
-                        'Yes'
+                        'No' => 0,
+                        'Yes' => 1,
                     ]
                 ],
                 'default_value' => 'Yes'

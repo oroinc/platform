@@ -62,19 +62,21 @@ class MergeFieldType extends AbstractType
             $builder->add(
                 'mode',
                 ChoiceType::class,
-                array(
+                [
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices'  => $this->getMergeValues($mergeModes),
                     'multiple' => false,
                     'expanded' => false,
                     'label'    => 'oro.entity_merge.form.strategy',
                     'tooltip'  => 'oro.entity_merge.form.strategy.tooltip'
-                )
+                ]
             );
         } else {
             $builder->add(
                 'mode',
                 HiddenType::class,
-                array('data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes))
+                ['data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes)]
             );
         }
 
@@ -98,7 +100,7 @@ class MergeFieldType extends AbstractType
         $result = array();
 
         foreach ($modes as $mode) {
-            $result[$mode] = $this->translator->trans('oro.entity_merge.merge_modes.' . $mode);
+            $result[$this->translator->trans('oro.entity_merge.merge_modes.' . $mode)] = $mode;
         }
 
         return $result;

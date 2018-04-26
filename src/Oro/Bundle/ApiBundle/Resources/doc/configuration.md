@@ -284,7 +284,7 @@ api:
 
                 # A form type and form options for a field
                 field6:
-                    form_type: text
+                    form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                     form_options:
                         trim: false
                         constraints:

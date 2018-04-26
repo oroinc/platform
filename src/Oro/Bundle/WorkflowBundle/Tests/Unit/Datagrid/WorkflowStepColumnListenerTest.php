@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -351,7 +350,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN,
                                 'options' => [
-                                    'field_type' => WorkflowDefinitionSelectType::NAME,
+                                    'field_type' => WorkflowDefinitionSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true
@@ -363,7 +362,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
-                                    'field_type' => WorkflowStepSelectType::NAME,
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true,
@@ -458,7 +457,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN . '.id',
                                 'options' => [
-                                    'field_type' => WorkflowStepSelectType::NAME,
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
                                         'multiple' => true,
@@ -537,7 +536,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'entity',
                                 'data_name' => self::ALIAS . '.' . 'workflowStep',
                                 'options' => [
-                                    'field_type' => 'oro_workflow_step_select',
+                                    'field_type' => WorkflowStepSelectType::class,
                                     'field_options' => ['workflow_entity_class' => self::ENTITY_FULL_NAME]
                                 ]
                             ],

@@ -266,7 +266,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                                 'field_type' => EntityType::class,
                                 'field_options' => [
                                     'class' => $extendFieldConfig->get('target_entity'),
-                                    'property' => $extendFieldConfig->get('target_field'),
+                                    'choice_label' => $extendFieldConfig->get('target_field'),
                                     'multiple' => true,
                                 ],
                             ],

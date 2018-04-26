@@ -89,7 +89,7 @@ datagrids:
                     options:
                         field_options:
                             class: OroTagBundle:Taxonomy
-                            property: name
+                            choice_label: name
                             translatable_options: false
         actions:
             search:

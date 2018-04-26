@@ -21,13 +21,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
+    /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $choicesProvider;
+
     /** @var WorkflowDefinitionType */
     protected $formType;
 
     protected function setUp()
     {
-        $choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
-        $this->formType = new WorkflowDefinitionType($choicesProvider);
+        $this->choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
+        $this->formType = new WorkflowDefinitionType($this->choicesProvider);
         parent::setUp();
     }
 
@@ -47,6 +50,13 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {
+        $this->choicesProvider->expects($this->any())
+            ->method('getActiveGroupsChoices')
+            ->willReturn([]);
+        $this->choicesProvider->expects($this->any())
+            ->method('getRecordGroupsChoices')
+            ->willReturn([]);
+
         $form = $this->factory->create(WorkflowDefinitionType::class);
 
         foreach ($fields as $field => $options) {

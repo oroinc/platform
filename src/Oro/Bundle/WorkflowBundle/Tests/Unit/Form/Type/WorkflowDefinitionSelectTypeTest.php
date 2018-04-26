@@ -153,7 +153,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             [
                 [
                     'class' => 'OroWorkflowBundle:WorkflowStep',
-                    'property' => 'label'
+                    'choice_label' => 'label'
                 ]
             ]
         ];

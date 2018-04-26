@@ -20,7 +20,7 @@ operations:
         form_options:
             attribute_fields:
                 language_code:
-                    form_type: oro_translation_add_language
+                    form_type: Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType
                     options:
                         required: true
                         constraints:
@@ -184,7 +184,7 @@ operations:
         form_options:
             attribute_fields:
                 language_code:
-                    form_type: hidden
+                    form_type: Symfony\Component\Form\Extension\Core\Type\HiddenType
                     options:
                         required: true
             attribute_default_values:
