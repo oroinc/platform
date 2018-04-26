@@ -104,7 +104,7 @@ class OrganizationsSelectType extends AbstractType
         $this->addOrganizationsField($builder);
         $builder->add(
             'businessUnits',
-            'oro_type_business_unit_select_autocomplete',
+            BusinessUnitSelectAutocomplete::class,
             [
                 'required' => false,
                 'label' => 'oro.user.form.business_units.label',

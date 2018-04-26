@@ -173,12 +173,12 @@ action_form_type:
         testSubresource:
             actions:
                 create:
-                    form_type: integer
+                    form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
     expected:
         testSubresource:
             actions:
                 create:
-                    form_type: integer
+                    form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
 
 action_null_form_options:
     config:
@@ -201,14 +201,14 @@ action_form:
         testSubresource:
             actions:
                 create:
-                    form_type: integer
+                    form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                     form_options:
                         option1: value1
     expected:
         testSubresource:
             actions:
                 create:
-                    form_type: integer
+                    form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                     form_options:
                         option1: value1
 
@@ -242,15 +242,15 @@ action_field_form:
                         field2:
                             form_type: ""
                         field3:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                         field4:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             form_options: ~
                         field5:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             form_options: []
                         field6:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             form_options:
                                 option1: value1
     expected:
@@ -261,12 +261,12 @@ action_field_form:
                         field1: ~
                         field2: ~
                         field3:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                         field4:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                         field5:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                         field6:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             form_options:
                                 option1: value1

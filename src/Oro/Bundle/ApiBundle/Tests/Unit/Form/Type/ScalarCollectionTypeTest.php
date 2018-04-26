@@ -58,7 +58,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ->method('removeGroup');
 
         $form->submit(['groups' => ['group1', 'group2']]);
-        self::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testShouldUseRemover()
@@ -236,11 +236,5 @@ class ScalarCollectionTypeTest extends TypeTestCase
         );
         $form->submit('test');
         self::assertFalse($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new ScalarCollectionType();
-        self::assertEquals('oro_api_scalar_collection', $type->getName());
     }
 }

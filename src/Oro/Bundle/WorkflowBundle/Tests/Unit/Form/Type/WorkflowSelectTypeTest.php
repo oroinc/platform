@@ -121,7 +121,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'entity_class' => self::TEST_ENTITY_CLASS,
-                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                    'choices' => [self::TEST_WORKFLOW_LABEL => self::TEST_WORKFLOW_NAME],
                 ]
             ],
             'parent configuration id' => [
@@ -129,7 +129,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                     'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
                 ],
                 'expectedOptions' => [
-                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                    'choices' => [self::TEST_WORKFLOW_LABEL => self::TEST_WORKFLOW_NAME],
                 ]
             ],
         ];

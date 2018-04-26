@@ -50,7 +50,10 @@ class EntityTypeProvider
         $result = [];
         $classNames = $this->configProvider->getAllAuditableEntities();
         foreach ($classNames as $className) {
-            $result[$className] = $this->entityClassNameProvider->getEntityClassName($className);
+            $label = $this->entityClassNameProvider->getEntityClassName($className);
+            if ($label) {
+                $result[$label] = $className;
+            }
         }
         asort($result, SORT_STRING | SORT_FLAG_CASE);
 

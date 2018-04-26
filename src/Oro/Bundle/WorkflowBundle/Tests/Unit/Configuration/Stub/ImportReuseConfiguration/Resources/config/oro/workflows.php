@@ -47,7 +47,7 @@ return [
                     'icon' => 'foo',
                     'message' => 'hello'
                 ],
-                'form_type' => 'oro_workflow_transition',
+                'form_type' => 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType',
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

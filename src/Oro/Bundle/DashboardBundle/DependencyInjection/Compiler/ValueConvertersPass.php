@@ -24,7 +24,7 @@ class ValueConvertersPass implements CompilerPassInterface
         // find converters
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $serviceDef->addMethodCall('addConverter', [$attributes[0]['alias'], new Reference($id)]);
+            $serviceDef->addMethodCall('addConverter', [$attributes[0]['form_type'], new Reference($id)]);
         }
     }
 }

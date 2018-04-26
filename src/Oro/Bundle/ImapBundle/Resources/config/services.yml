@@ -1,8 +1,8 @@
 parameters:
     oro_imap.user_form_name:                         oro_user_emailsettings
-    oro_imap.user_form_type:                         oro_user_emailsettings
+    oro_imap.user_form_type:                         Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
     oro_imap.email_mailbox_form_name:                oro_email_mailbox
-    oro_imap.email_mailbox_form_type:                oro_email_mailbox
+    oro_imap.email_mailbox_form_type:                Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
     oro_imap.connector.class:                        Oro\Bundle\ImapBundle\Connector\ImapConnector
     oro_imap.services.factory.class:                 Oro\Bundle\ImapBundle\Connector\ImapServicesFactory

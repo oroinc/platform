@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
@@ -46,7 +47,7 @@ class AttributeGuesser extends AbstractGuesser
             $formOptions = $formConfig->get('form_options', false, array());
         }
         if (!$formType) {
-            $formType = 'entity';
+            $formType = EntityType::class;
             $formOptions = array(
                 'class' => $entityClass,
                 'multiple' => false,

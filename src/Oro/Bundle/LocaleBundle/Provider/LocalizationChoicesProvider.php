@@ -51,7 +51,7 @@ class LocalizationChoicesProvider
         $result = [];
 
         foreach ($this->languageProvider->getLanguages($onlyEnabled) as $language) {
-            $result[$language->getId()] = $this->languageFormatter->formatLocale($language->getCode());
+            $result[$this->languageFormatter->formatLocale($language->getCode())] = $language->getId();
         }
 
         return $result;
@@ -62,7 +62,7 @@ class LocalizationChoicesProvider
      */
     public function getFormattingChoices()
     {
-        return Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage());
+        return array_flip(Intl::getLocaleBundle()->getLocaleNames($this->getSystemLanguage()));
     }
 
     /**
@@ -75,7 +75,7 @@ class LocalizationChoicesProvider
         $data = [];
 
         foreach ($choices as $choice) {
-            $data[$choice->getId()] = $choice->getName();
+            $data[$choice->getName()] = $choice->getId();
         }
 
         return $data;

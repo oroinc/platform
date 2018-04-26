@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Oro\Bundle\InstallerBundle\Form\Type\ConfigurationType;
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
 class ConfigureStep extends AbstractStep
@@ -54,6 +55,6 @@ class ConfigureStep extends AbstractStep
     {
         $data = $this->get('oro_installer.yaml_persister')->parse();
 
-        return $this->createForm('oro_installer_configuration', empty($data) ? null : $data);
+        return $this->createForm(ConfigurationType::class, empty($data) ? null : $data);
     }
 }

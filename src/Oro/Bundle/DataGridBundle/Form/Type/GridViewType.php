@@ -61,8 +61,8 @@ class GridViewType extends AbstractType
                 'error_bubbling' => false,
                 'allow_add'      => true,
                 'allow_delete'   => true,
-                'entry_type'           => 'choice',
-                'entry_options'        => [
+                'entry_type'     => ChoiceType::class,
+                'entry_options'  => [
                     'choices' => [
                         1  => 1,
                         -1 => -1

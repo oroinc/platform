@@ -58,14 +58,14 @@ system_configuration:
     fields:
         oro_email.feature_enabled:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 110
             options:
                 label: oro.email.system_configuration.feature_enabled.label
 
         oro_email.minimum_input_length:
             data_type: integer
-            type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
             search_type: text
             options:
                 label: oro.email.system_configuration.email_autocomplete_configuration.minimum_input_length.label
@@ -75,7 +75,7 @@ system_configuration:
 
         oro_email.signature:
             data_type: string
-            type: oro_rich_text
+            type: Oro\Bundle\FormBundle\Form\Type\OroRichTextType
             search_type: text
             options:
                 label: oro.email.system_configuration.signature_configuration.signature.label
@@ -83,27 +83,31 @@ system_configuration:
 
         oro_email.append_signature:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.email.system_configuration.signature_configuration.append_signature.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
-                    0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
+                    oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label: 1
+                    oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label: 0
 
         oro_email.default_button_reply:
             data_type: integer
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.email.system_configuration.reply_configuration.default_button.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    1: oro.email.reply
-                    2: oro.email.reply_all
+                    oro.email.reply: 1
+                    oro.email.reply_all: 2
                 required: false
 
         oro_email.mailbox_grid:
-            type: oro_email_mailbox_grid
+            type: Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
             ui_only: true
             options:
                 label: false
@@ -112,7 +116,7 @@ system_configuration:
 
         oro_email.smtp_settings_host:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 attr: {data-class: smtp_settings}
@@ -125,7 +129,7 @@ system_configuration:
 
         oro_email.smtp_settings_port:
             data_type: number
-            type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
             search_type: text
             options:
                 attr: {data-class: smtp_settings}
@@ -138,15 +142,17 @@ system_configuration:
 
         oro_email.smtp_settings_encryption:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.encryption.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    ~: oro.email.system_configuration.smtp_settings.encryption.none.label
-                    ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
-                    tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
+                    oro.email.system_configuration.smtp_settings.encryption.none.label: ~
+                    oro.email.system_configuration.smtp_settings.encryption.ssl.label: ssl
+                    oro.email.system_configuration.smtp_settings.encryption.tls.label: tls
                 constraints:
                     - Choice:
                         choices: [~, ssl, tls]
@@ -154,7 +160,7 @@ system_configuration:
 
         oro_email.smtp_settings_username:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 attr: {data-class: smtp_settings}
@@ -163,7 +169,7 @@ system_configuration:
 
         oro_email.smtp_settings_password:
             data_type: string
-            type: password
+            type: Symfony\Component\Form\Extension\Core\Type\PasswordType
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.password.label
@@ -171,7 +177,7 @@ system_configuration:
 
         oro_email.show_recent_emails_in_user_bar:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 100
             options:
                 label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
@@ -179,7 +185,7 @@ system_configuration:
 
         oro_email.attachment_sync_enable:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 50
             options:
                 label: oro.email.system_configuration.attachment_sync.enable.label
@@ -188,7 +194,7 @@ system_configuration:
 
         oro_email.attachment_sync_max_size:
             data_type: number
-            type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
             search_type: text
             priority: 50
             options:
@@ -198,7 +204,7 @@ system_configuration:
 
         oro_email.attachment_preview_limit:
             data_type: number
-            type: number
+            type: Symfony\Component\Form\Extension\Core\Type\NumberType
             search_type: text
             priority: 40
             options:
@@ -207,7 +213,7 @@ system_configuration:
                 required: true
 
         oro_email.user_mailbox:
-            type: oro_user_emailsettings
+            type: Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
             ui_only: true
             priority: 10
             options:
@@ -217,7 +223,7 @@ system_configuration:
 
         oro_email.sanitize_html:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             options:
                 label: oro.email.system_configuration.sanitize_html.label
                 tooltip: oro.email.system_configuration.sanitize_html.tooltip
@@ -225,13 +231,15 @@ system_configuration:
 
         oro_email.threads_grouping:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.email.system_configuration.email_threads.use_threads.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label
-                    - oro.email.system_configuration.email_threads.use_threads.choices.threaded.label
+                    oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label: 0
+                    oro.email.system_configuration.email_threads.use_threads.choices.threaded.label: 1
 
     tree:
         system_configuration:

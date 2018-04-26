@@ -38,8 +38,14 @@ class StatusGridHelper
             $type = $params->get('integrationType');
 
             $connectorChoices = $this->typesRegistry->getAvailableConnectorsTypesChoiceList($type);
-            $event->getDatagrid()->getConfig()
-                ->offsetSetByPath('[filters][columns][connector][options][field_options][choices]', $connectorChoices);
+            $config = $event->getDatagrid()->getConfig();
+
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            $config->offsetSetByPath('[filters][columns][connector][options][field_options][choices_as_values]', true);
+            $config->offsetSetByPath(
+                '[filters][columns][connector][options][field_options][choices]',
+                array_flip($connectorChoices)
+            );
         }
     }
 

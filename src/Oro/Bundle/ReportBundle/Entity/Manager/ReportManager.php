@@ -31,7 +31,7 @@ class ReportManager
         $result = [];
         $types = $this->em->getRepository('OroReportBundle:ReportType')->findAll();
         foreach ($types as $type) {
-            $result[$type->getName()] = $type->getLabel();
+            $result[$type->getLabel()] = $type->getName();
         }
 
         return $result;

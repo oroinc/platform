@@ -66,6 +66,6 @@ class ManyToManyFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return ManyToManyFilterType::NAME;
+        return ManyToManyFilterType::class;
     }
 }

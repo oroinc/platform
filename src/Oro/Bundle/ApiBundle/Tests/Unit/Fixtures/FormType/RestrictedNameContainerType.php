@@ -32,7 +32,7 @@ class RestrictedNameContainerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'test_restricted_name_container';
     }

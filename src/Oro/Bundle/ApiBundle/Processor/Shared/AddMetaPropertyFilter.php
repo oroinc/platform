@@ -9,14 +9,14 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds "meta" filter.
- * This filter can be used to specify which entity meta properties should be returned.
+ * Adds "meta" filter that can be used to specify which entity meta properties should be returned.
+ * As this filter has influence on the entity configuration, it is handled by a separate processor.
+ * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
  */
 class AddMetaPropertyFilter implements ProcessorInterface
 {
-    const FILTER_KEY = 'meta';
-
-    const FILTER_DESCRIPTION = 'A list of meta properties to be returned. Comma-separated names.';
+    public const FILTER_KEY         = 'meta';
+    public const FILTER_DESCRIPTION = 'A list of meta properties to be returned. Comma-separated names.';
 
     /**
      * {@inheritdoc}
@@ -31,24 +31,12 @@ class AddMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
-        /**
-         * TODO: BAP-9470 - Refactoring of filters in API to add possibility to add dependency between filters
-         *
-         * this filter has descriptive nature and it should be added to the list of filters
-         * only if descriptions are requested
-         * actually a filtering by this filter is performed by
-         * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
-         */
-        /*
-        if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {
-            return;
-        }
-        */
-
-        if (!$context->getConfig()->isMetaPropertiesEnabled()) {
+        $config = $context->getConfig();
+        if (null === $config || !$config->isMetaPropertiesEnabled()) {
             // the "meta" filter is disabled
             return;
         }
+
         $filter = new MetaPropertyFilter(DataType::STRING, self::FILTER_DESCRIPTION);
         $filter->setArrayAllowed(true);
         $filters->add(self::FILTER_KEY, $filter);

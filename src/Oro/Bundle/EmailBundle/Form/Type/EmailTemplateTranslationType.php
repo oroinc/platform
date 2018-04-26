@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -14,12 +15,17 @@ class EmailTemplateTranslationType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var string */
+    protected $parentClass;
+
     /**
      * @param ConfigManager $configManager
+     * @param string $parentClass
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, string $parentClass)
     {
         $this->configManager = $configManager;
+        $this->parentClass = $parentClass;
     }
 
     /**
@@ -52,7 +58,7 @@ class EmailTemplateTranslationType extends AbstractType
                     return [
                         'subject' => array_merge_recursive(
                             [
-                                'field_type' => 'text'
+                                'field_type' => TextType::class
                             ],
                             $options['subject_options']
                         ),
@@ -80,7 +86,7 @@ class EmailTemplateTranslationType extends AbstractType
      */
     public function getParent()
     {
-        return 'a2lix_translations_gedmo';
+        return $this->parentClass;
     }
 
     /**

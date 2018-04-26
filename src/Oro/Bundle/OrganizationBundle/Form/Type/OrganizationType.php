@@ -40,7 +40,9 @@ class OrganizationType extends AbstractType
                 [
                     'required' => true,
                     'label'    => 'oro.organization.enabled.label',
-                    'choices'  => [1 => 'Active', 0 => 'Inactive']
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
+                    'choices'  => ['Active' => 1, 'Inactive' => 0]
                 ]
             )
             ->add(

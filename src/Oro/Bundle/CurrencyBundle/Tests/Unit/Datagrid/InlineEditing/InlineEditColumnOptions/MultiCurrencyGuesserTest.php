@@ -179,8 +179,8 @@ class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
                 ],
                 true,
                 [
-                    'USD' => 'US Dollar',
-                    'UAH' => 'Ukrainian grivna'
+                    'US Dollar' => 'USD',
+                    'Ukrainian grivna' => 'UAH',
                 ]
             ],
             'Without inline edit options' => [

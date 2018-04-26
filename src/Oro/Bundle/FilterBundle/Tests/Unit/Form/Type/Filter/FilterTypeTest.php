@@ -31,11 +31,6 @@ class FilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(FilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -98,7 +93,7 @@ class FilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'operator_choices' => array(
-                        1 => 'Choice 1'
+                        'Choice 1' => 1,
                     )
                 ),
             ),
@@ -110,7 +105,7 @@ class FilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'operator_choices' => array(
-                        1 => 'Choice 1'
+                        'Choice 1' => 1
                     )
                 ),
             ),

@@ -50,7 +50,7 @@ class WidgetItemsChoiceTypeConverter extends ConfigValueConverterAbstract
         if ($config['converter_attributes']['default_selected'] === self::ALL_ITEMS) {
             $values = [];
             foreach ($config['options']['choices'] as $option) {
-                $values = array_merge($values, array_keys($option));
+                $values = array_merge($values, array_values($option));
             }
         } else {
             $values = $config['converter_attributes']['default_selected'];
