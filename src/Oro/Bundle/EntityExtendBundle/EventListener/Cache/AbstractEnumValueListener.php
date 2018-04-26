@@ -3,19 +3,17 @@
 namespace Oro\Bundle\EntityExtendBundle\EventListener\Cache;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation;
 
 /**
- * Listen to updates of EnumValueTranslation and invalidate a cache
+ * Abstract class for listeners which will invalidate a enum translations cache
  */
-class EnumValueTranslationListener
+abstract class AbstractEnumValueListener
 {
     /**
      * @var EnumTranslationCache
      */
-    private $enumTranslationCache;
+    protected $enumTranslationCache;
 
     /**
      * @param EnumTranslationCache $enumTranslationCache
@@ -26,37 +24,34 @@ class EnumValueTranslationListener
     }
 
     /**
-     * @param EnumValueTranslation $entity
+     * @param object $entity
      * @param LifecycleEventArgs $args
      */
-    public function postPersist(EnumValueTranslation $entity, LifecycleEventArgs $args)
+    public function postPersist($entity, LifecycleEventArgs $args)
     {
         $this->invalidateCache($entity);
     }
 
     /**
-     * @param EnumValueTranslation $entity
+     * @param object $entity
      * @param LifecycleEventArgs $args
      */
-    public function postUpdate(EnumValueTranslation $entity, LifecycleEventArgs $args)
+    public function postUpdate($entity, LifecycleEventArgs $args)
     {
         $this->invalidateCache($entity);
     }
 
     /**
-     * @param EnumValueTranslation $entity
+     * @param object $entity
      * @param LifecycleEventArgs $args
      */
-    public function postRemove(EnumValueTranslation $entity, LifecycleEventArgs $args)
+    public function postRemove($entity, LifecycleEventArgs $args)
     {
         $this->invalidateCache($entity);
     }
 
     /**
-     * @param EnumValueTranslation $entity
+     * @param object $entity
      */
-    protected function invalidateCache(EnumValueTranslation $entity)
-    {
-        $this->enumTranslationCache->invalidate($entity->getObjectClass());
-    }
+    abstract protected function invalidateCache($entity);
 }
