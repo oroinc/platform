@@ -3,8 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -18,6 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * The base class for Data API functional tests.
+ */
 abstract class ApiTestCase extends WebTestCase
 {
     /** @var DoctrineHelper */
@@ -35,7 +36,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function setUp()
     {
         /** @var ContainerInterface $container */
-        $container = $this->getContainer();
+        $container = self::getContainer();
 
         $this->valueNormalizer = $container->get('oro_api.value_normalizer');
         $this->doctrineHelper  = $container->get('oro_api.doctrine_helper');
@@ -86,8 +87,8 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
-        $doctrineHelper = $this->getContainer()->get('oro_api.doctrine_helper');
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $doctrineHelper = self::getContainer()->get('oro_api.doctrine_helper');
+        $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
@@ -108,8 +109,8 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
+        $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
+        $subresourcesProvider = self::getContainer()->get('oro_api.subresources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
@@ -136,7 +137,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function findEntityId($entityClass)
     {
         /** @var EntityManager|null $em */
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
+        $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
         if (!$em) {
             return null;
         }
@@ -168,35 +169,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return string|null
-     */
-    protected function getRestApiEntityId($entityClass, $entityId)
-    {
-        if (null === $entityId) {
-            return null;
-        }
-
-        $config = $this->getContainer()->get('oro_api.config_provider')->getConfig(
-            $entityClass,
-            Version::LATEST,
-            $this->getRequestType(),
-            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
-        );
-        $metadata = $this->getContainer()->get('oro_api.metadata_provider')->getMetadata(
-            $entityClass,
-            Version::LATEST,
-            $this->getRequestType(),
-            $config->getDefinition()
-        );
-
-        return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
-            ->transform($entityId, $metadata);
-    }
-
-    /**
      * Loads the response content.
      *
      * @param string $fileName
@@ -209,7 +181,7 @@ abstract class ApiTestCase extends WebTestCase
         if ($this->isRelativePath($fileName)) {
             $fileName = $this->getTestResourcePath($folderName, $fileName);
         }
-        $file = $this->getContainer()->get('file_locator')->locate($fileName);
+        $file = self::getContainer()->get('file_locator')->locate($fileName);
         self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
 
         return Yaml::parse(file_get_contents($file));
@@ -371,7 +343,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return self::getContainer()->get('doctrine')->getManager();
     }
 
     /**
@@ -379,7 +351,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function getConfigRegistry()
     {
-        return $this->getContainer()->get('oro_api.tests.config_registry');
+        return self::getContainer()->get('oro_api.tests.config_registry');
     }
 
     /**

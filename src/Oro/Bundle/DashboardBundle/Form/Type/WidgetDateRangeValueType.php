@@ -72,7 +72,7 @@ class WidgetDateRangeValueType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'field_type'          => 'text',
+                'field_type'          => TextType::class,
                 'field_options'       => [],
                 'start_field_options' => [],
                 'end_field_options'   => []

@@ -26,15 +26,15 @@ class GridHelper
      * Gets names of all configurable entities
      *
      * @return array
-     *      key   => full class name of an entity
-     *      value => translated entity name
+     *      key   => translated entity name
+     *      value => full class name of an entity
      */
     public function getEntityNames()
     {
         if (!$this->entityNames) {
             $this->entityNames = [];
             foreach ($this->entityProvider->getEntities() as $entity) {
-                $this->entityNames[$entity['name']] = $entity['label'];
+                $this->entityNames[$entity['label']] = $entity['name'];
             }
         }
 

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -61,7 +62,7 @@ class BuildFormBuilder implements ProcessorInterface
             $formEventSubscribers = $parentConfig->getFormEventSubscribers();
         }
         $formBuilder = $this->formHelper->createFormBuilder(
-            'form',
+            FormType::class,
             $context->getParentEntity(),
             ['data_class' => $this->getFormDataClass($context, $parentConfig)],
             $formEventSubscribers

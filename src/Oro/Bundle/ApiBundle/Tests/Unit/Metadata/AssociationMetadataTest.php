@@ -95,7 +95,45 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
                 'nullable'         => false,
                 'collapsed'        => false,
                 'association_type' => null,
-                'collection'       => false,
+                'collection'       => false
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayInputOnlyAssociation()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setDirection(true, false);
+
+        self::assertEquals(
+            [
+                'name'             => 'testName',
+                'direction'        => 'input-only',
+                'nullable'         => false,
+                'collapsed'        => false,
+                'association_type' => null,
+                'collection'       => false
+            ],
+            $associationMetadata->toArray()
+        );
+    }
+
+    public function testToArrayOutputOnlyAssociation()
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setName('testName');
+        $associationMetadata->setDirection(false, true);
+
+        self::assertEquals(
+            [
+                'name'             => 'testName',
+                'direction'        => 'output-only',
+                'nullable'         => false,
+                'collapsed'        => false,
+                'association_type' => null,
+                'collection'       => false
             ],
             $associationMetadata->toArray()
         );
@@ -161,8 +199,8 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testNameInConstructor()
     {
-        $fieldMetadata = new AssociationMetadata('associationName');
-        $this->assertEquals('associationName', $fieldMetadata->getName());
+        $associationMetadata = new AssociationMetadata('associationName');
+        $this->assertEquals('associationName', $associationMetadata->getName());
     }
 
     public function testName()
@@ -196,6 +234,29 @@ class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($associationMetadata->getDataType());
         $associationMetadata->setDataType('associationType');
         $this->assertEquals('associationType', $associationMetadata->getDataType());
+    }
+
+    public function testDirection()
+    {
+        $associationMetadata = new AssociationMetadata();
+
+        self::assertTrue($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+        $associationMetadata->setDirection(true, false);
+        self::assertTrue($associationMetadata->isInput());
+        self::assertFalse($associationMetadata->isOutput());
+        $associationMetadata->setDirection(false, true);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+        $associationMetadata->setDirection(true, false);
+        self::assertTrue($associationMetadata->isInput());
+        self::assertFalse($associationMetadata->isOutput());
+        $associationMetadata->setDirection(false, false);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertFalse($associationMetadata->isOutput());
+        $associationMetadata->setDirection(true, true);
+        self::assertTrue($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
     }
 
     public function testTargetClassName()

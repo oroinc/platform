@@ -87,10 +87,11 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
+                'choices_as_values' => true,
                 'choices' => function () {
                 },
                 'compact' => false,
-                'full_localization_list' => null,
+                'full_localization_list' => false,
                 'placeholder' => '',
                 'translatable_options' => false,
                 'configs' => [
@@ -123,9 +124,9 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
         ]);
 
         $this->localizationChoicesProvider->method('getLocalizationChoices')->willReturn([
-            1 => 'Localization 1',
-            2 => 'Localization 2',
-            3 => 'Localization 3',
+            'Localization 1' => 1,
+            'Localization 2' => 2,
+            'Localization 3' => 3,
         ]);
 
         $form = $this->factory->create(LocalizationSelectionType::class);

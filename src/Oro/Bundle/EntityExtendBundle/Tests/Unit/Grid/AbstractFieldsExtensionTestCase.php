@@ -474,7 +474,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                                     'field_type' => EntityType::class,
                                     'field_options' => [
                                         'class' => null,
-                                        'property' => 'name',
+                                        'choice_label' => 'name',
                                         'multiple' => true,
                                     ],
                                 ],

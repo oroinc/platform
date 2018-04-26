@@ -12,6 +12,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait MetaPropertyTrait
 {
     /**
+     * Indicates whether the "disable_meta_properties" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableMetaProperties()
+    {
+        return array_key_exists(EntityDefinitionConfig::DISABLE_META_PROPERTIES, $this->items);
+    }
+
+    /**
      * Indicates whether a requesting of additional meta properties is enabled.
      *
      * @return bool
@@ -30,7 +40,7 @@ trait MetaPropertyTrait
      */
     public function enableMetaProperties()
     {
-        unset($this->items[EntityDefinitionConfig::DISABLE_META_PROPERTIES]);
+        $this->items[EntityDefinitionConfig::DISABLE_META_PROPERTIES] = false;
     }
 
     /**

@@ -19,7 +19,7 @@ class ConfigType extends AbstractType
             ->add(
                 'repositories',
                 CollectionType::class,
-                ['type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
+                ['entry_type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
             );
     }
 

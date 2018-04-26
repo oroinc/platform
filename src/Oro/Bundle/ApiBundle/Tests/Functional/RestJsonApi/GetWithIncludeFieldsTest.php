@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -18,6 +19,32 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         );
 
         $response = $this->cget(['entity' => 'users'], ['include' => 'owner'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'include']
+            ],
+            $response
+        );
+    }
+
+    public function testIncludeFilterWhenItIsDisabledBecauseEntityDoesNotHaveAssociations()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'fields' => [
+                    'staff'        => ['exclude' => true],
+                    'owner'        => ['exclude' => true],
+                    'organization' => ['exclude' => true]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(['entity' => $entityType], ['include' => 'owner'], [], false);
 
         $this->assertResponseValidationError(
             [
@@ -85,15 +112,19 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
     {
         $response = $this->cget(
             ['entity' => 'users'],
-            ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]],
-            [],
-            false
+            ['fields' => ['unknown' => 'name'], 'page' => ['size' => 1]]
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
-                    ['type' => 'users', 'id' => '1']
+                    [
+                        'type'       => 'users',
+                        'id'         => '1',
+                        'attributes' => [
+                            'username' => 'admin'
+                        ]
+                    ]
                 ]
             ],
             $response
@@ -173,10 +204,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
     public function testIncludeFilterWithWrongFieldName()
     {
         $params = [
-            'page'   => ['size' => 1],
-            'fields' => [
-                'include' => 'wrongField',
-                'users'   => 'username,owner'
+            'page'    => ['size' => 1],
+            'include' => 'wrongField',
+            'fields'  => [
+                'users' => 'username,owner'
             ]
         ];
         $extectedResponse = [

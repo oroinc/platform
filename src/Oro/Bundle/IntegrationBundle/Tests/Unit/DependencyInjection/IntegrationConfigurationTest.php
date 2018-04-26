@@ -21,7 +21,7 @@ class IntegrationConfigurationTest extends \PHPUnit_Framework_TestCase
                     ],
                     'enabled'      => [
                         'type'       => 'choice',
-                        'options'    => ['choices' => ['Enabled', 'Disabled']],
+                        'options'    => ['choices' => ['Enabled' => 0, 'Disabled' => 1]],
                         'priority'   => -200,
                         'applicable' => [],
                     ],

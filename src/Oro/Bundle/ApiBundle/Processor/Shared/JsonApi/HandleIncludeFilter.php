@@ -51,8 +51,11 @@ class HandleIncludeFilter implements ProcessorInterface
             $context->getRequestType(),
             true
         );
-        if (!empty($includes)) {
-            $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
+        if (empty($includes)) {
+            // expanding of related entities was not requested
+            return;
         }
+
+        $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
     }
 }

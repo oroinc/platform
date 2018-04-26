@@ -5,7 +5,7 @@ system_configuration:
     fields:
         oro_logger.email_notification_recipients:
             data_type: string
-            type: textarea
+            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
             search_type: text
             priority: 10
             options:

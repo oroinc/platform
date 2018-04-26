@@ -57,10 +57,12 @@ class EmailTemplateType extends AbstractType
                 'label'    => 'oro.email.emailtemplate.type.label',
                 'multiple' => false,
                 'expanded' => true,
-                'choices'  => array(
-                    'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
-                    'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
-                ),
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices'  => [
+                    'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
+                    'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',
+                ],
                 'required' => true
             )
         );
@@ -125,12 +127,12 @@ class EmailTemplateType extends AbstractType
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('name', 'text', null, $options));
+                    $form->add($factory->createNamed('name', TextType::class, null, $options));
                     if (!$data->getIsEditable()) {
                         // name field
                         $options = $form->get('type')->getConfig()->getOptions();
                         $setDisabled($options);
-                        $form->add($factory->createNamed('type', 'choice', null, $options));
+                        $form->add($factory->createNamed('type', ChoiceType::class, null, $options));
                     }
                 }
             }

@@ -40,11 +40,6 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(SearchStringFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(SearchStringFilterType::NAME, $this->type->getBlockPrefix());
@@ -64,9 +59,9 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
             [
                 'defaultOptions' => [
                     'operator_choices' => [
-                        TextFilterType::TYPE_CONTAINS     => 'oro.filter.form.label_type_contains',
-                        TextFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
-                        TextFilterType::TYPE_EQUAL        => 'oro.filter.form.label_type_equals',
+                        'oro.filter.form.label_type_contains'=> TextFilterType::TYPE_CONTAINS,
+                        'oro.filter.form.label_type_not_contains' => TextFilterType::TYPE_NOT_CONTAINS,
+                        'oro.filter.form.label_type_equals' => TextFilterType::TYPE_EQUAL,
                     ]
                 ]
             ]

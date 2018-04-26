@@ -42,11 +42,12 @@ class UniqueKeyCollectionType extends AbstractType
             }
 
             $fieldName = $fieldConfigId->getFieldName();
-
-            $fields[$fieldName] = $this
+            $fieldLabel = $this
                 ->entityProvider
                 ->getConfig($className, $fieldName)
                 ->get('label', false, ucfirst($fieldName));
+
+            $fields[$fieldLabel] =  $fieldName;
         }
 
         $builder->add(

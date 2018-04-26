@@ -84,6 +84,7 @@ services:
             - '@form.factory'
             - '@security.authorization_checker'
             - '@oro_config.configuration_search_provider.chain'
+            - '@form.registry'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
         tags:

@@ -16,11 +16,6 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
         $this->attachmentType = new AttachmentType();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_attachment', $this->attachmentType->getName());
-    }
-
     public function testConfigureOptions()
     {
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');

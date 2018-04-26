@@ -57,7 +57,7 @@ class MultiCurrencyGuesser implements GuesserInterface
             if (empty($column[Configuration::CHOICES_KEY])) {
                 $choices = $this->currencyHelper->getCurrencyChoices();
                 $result[Configuration::CHOICES_KEY] = !empty($choices) ?
-                    array_keys($choices) :
+                    array_values($choices) :
                     [];
             }
 

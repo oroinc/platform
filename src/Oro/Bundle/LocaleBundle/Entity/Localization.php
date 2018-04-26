@@ -30,7 +30,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
  *              "category"="account_management"
  *          },
  *          "form"={
- *              "form_type"="oro_locale_localization_select",
+ *              "form_type"="Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType",
  *              "grid_name"="oro-locale-localizations-select-grid",
  *          },
  *      }

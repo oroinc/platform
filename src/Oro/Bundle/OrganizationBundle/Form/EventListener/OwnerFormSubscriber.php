@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -111,7 +112,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         $form->remove($this->fieldName);
         $form->add(
             $this->fieldName,
-            'text',
+            TextType::class,
             array(
                 'disabled' => true,
                 'data' => $ownerData ?: '',

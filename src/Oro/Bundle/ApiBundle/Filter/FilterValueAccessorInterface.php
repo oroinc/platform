@@ -9,6 +9,7 @@ interface FilterValueAccessorInterface
 {
     /**
      * Checks whether a filter value with the given key exists.
+     * In additional finds the filter value in the default filter's group if it is set.
      *
      * @param string $key The key of a filter value
      *
@@ -17,7 +18,8 @@ interface FilterValueAccessorInterface
     public function has($key);
 
     /**
-     * Gets a filter value.
+     * Gets a filter value by its key.
+     * In additional finds the filter value in the default filter's group if it is set.
      *
      * @param string $key The key of a filter value
      *
@@ -35,7 +37,21 @@ interface FilterValueAccessorInterface
     public function getGroup($group);
 
     /**
-     * Gets all filters.
+     * Gets the name of default filter's group.
+     *
+     * @return string|null
+     */
+    public function getDefaultGroupName();
+
+    /**
+     * Sets the name of default filter's group.
+     *
+     * @param string|null $group The name of a filter's group
+     */
+    public function setDefaultGroupName($group);
+
+    /**
+     * Gets all filter values.
      *
      * @return FilterValue[] [filter key => FilterValue, ...]
      */

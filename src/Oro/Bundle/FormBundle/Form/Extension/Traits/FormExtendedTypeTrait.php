@@ -13,8 +13,6 @@ trait FormExtendedTypeTrait
      */
     public function getExtendedType()
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-            : 'form';
+        return FormType::class;
     }
 }

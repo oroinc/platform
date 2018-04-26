@@ -13,19 +13,20 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds "fields[]" filters.
- * These filters can be used to specify which fields of primary
+ * Adds "fields[]" filters that can be used to specify which fields of primary
  * or related entities should be returned.
+ * As this filter has influence on the entity configuration, it is handled by a separate processor.
+ * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
  */
 class AddFieldsFilter implements ProcessorInterface
 {
-    const FILTER_KEY          = 'fields';
-    const FILTER_KEY_TEMPLATE = 'fields[%s]';
-
-    const FILTER_DESCRIPTION_TEMPLATE = 'A list of fields of \'%s\' entity that will be returned in the response.';
+    public const FILTER_KEY                  = 'fields';
+    public const FILTER_KEY_TEMPLATE         = 'fields[%s]';
+    public const FILTER_DESCRIPTION_TEMPLATE =
+        'A list of fields of \'%s\' entity that will be returned in the response.';
 
     /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /**
      * @param ValueNormalizer $valueNormalizer
@@ -48,37 +49,44 @@ class AddFieldsFilter implements ProcessorInterface
             return;
         }
 
-        /**
-         * TODO: BAP-9470 - Refactoring of filters in API to add possibility to add dependency between filters
-         *
-         * this filter has descriptive nature and it should be added to the list of filters
-         * only if descriptions are requested
-         * actually a filtering by this filter is performed by
-         * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
-         */
-        /*
-        if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {
-            return;
-        }
-        */
-
         $config = $context->getConfig();
-        if (!$config->isFieldsetEnabled()) {
+        if (null === $config || !$config->isFieldsetEnabled()) {
             // the "fields" filter is disabled
             return;
         }
 
+        if ('initialize' === $context->getLastGroup()) {
+            // add "fields" filters for the primary entity and all associated entities
+            // this is required to display them on the API Sandbox
+            $this->addFiltersForDocumentation($context);
+        } else {
+            // add all requested "fields" filters
+            $filterValues = $context->getFilterValues()->getGroup(self::FILTER_KEY);
+            foreach ($filterValues as $filterValue) {
+                $this->addFilter($filters, $filterValue->getPath());
+            }
+        }
+    }
+
+    /**
+     * @param Context $context
+     */
+    private function addFiltersForDocumentation(Context $context): void
+    {
         $metadata = $context->getMetadata();
         if (null === $metadata) {
             // the metadata does not exist
             return;
         }
 
-        if (count($config->getFields()) > 1) {
-            // the "fields" filter for the primary entity has sense only if it has more than one field
-            $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
-        }
+        $filters = $context->getFilters();
+        $requestType = $context->getRequestType();
 
+        // the "fields" filter for the primary entity
+        $this->addFilterForEntityClass($filters, $context->getClassName(), $requestType);
+
+        // the "fields" filters for associated entities
+        $config = $context->getConfig();
         $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {
             $fieldConfig = $config->getField($associationName);
@@ -87,7 +95,7 @@ class AddFieldsFilter implements ProcessorInterface
             }
             $targetClasses = $association->getAcceptableTargetClassNames();
             foreach ($targetClasses as $targetClass) {
-                $this->addFilter($filters, $targetClass, $context->getRequestType());
+                $this->addFilterForEntityClass($filters, $targetClass, $requestType);
             }
         }
     }
@@ -97,21 +105,33 @@ class AddFieldsFilter implements ProcessorInterface
      * @param string           $entityClass
      * @param RequestType      $requestType
      */
-    protected function addFilter(FilterCollection $filters, $entityClass, RequestType $requestType)
-    {
+    private function addFilterForEntityClass(
+        FilterCollection $filters,
+        string $entityClass,
+        RequestType $requestType
+    ): void {
         $entityType = $this->convertToEntityType($entityClass, $requestType);
         if ($entityType) {
-            $filter = new FieldsFilter(
-                DataType::STRING,
-                sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
-            );
-            $filter->setArrayAllowed(true);
-
-            $filters->add(
-                sprintf(self::FILTER_KEY_TEMPLATE, $entityType),
-                $filter
-            );
+            $this->addFilter($filters, $entityType);
         }
+    }
+
+    /**
+     * @param FilterCollection $filters
+     * @param string           $entityType
+     */
+    private function addFilter(FilterCollection $filters, string $entityType): void
+    {
+        $filter = new FieldsFilter(
+            DataType::STRING,
+            sprintf(self::FILTER_DESCRIPTION_TEMPLATE, $entityType)
+        );
+        $filter->setArrayAllowed(true);
+
+        $filters->add(
+            sprintf(self::FILTER_KEY_TEMPLATE, $entityType),
+            $filter
+        );
     }
 
     /**
@@ -120,7 +140,7 @@ class AddFieldsFilter implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function convertToEntityType($entityClass, RequestType $requestType)
+    private function convertToEntityType(string $entityClass, RequestType $requestType): ?string
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

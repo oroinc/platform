@@ -70,9 +70,4 @@ class TagSelectTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->buildForm($builder, array());
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_tag_select', $this->type->getName());
-    }
 }

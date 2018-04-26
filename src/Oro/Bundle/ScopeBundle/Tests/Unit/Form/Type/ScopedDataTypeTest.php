@@ -152,9 +152,4 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
             ],
         ];
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals(ScopedDataType::NAME, $this->formType->getName());
-    }
 }

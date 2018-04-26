@@ -48,6 +48,6 @@ class SearchNumberRangeFilter extends SearchNumberFilter
      */
     protected function getFormType()
     {
-        return NumberRangeFilterType::NAME;
+        return NumberRangeFilterType::class;
     }
 }

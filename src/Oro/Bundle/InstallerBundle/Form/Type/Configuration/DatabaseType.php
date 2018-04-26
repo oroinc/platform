@@ -32,10 +32,12 @@ class DatabaseType extends AbstractType
                 'oro_installer_database_driver',
                 ChoiceType::class,
                 array(
-                    'label'       => 'form.configuration.database.driver',
-                    'choices'       => array(
-                        DatabaseDriverInterface::DRIVER_MYSQL      => 'MySQL',
-                        DatabaseDriverInterface::DRIVER_POSTGRESQL => 'PostgreSQL',
+                    'label' => 'form.configuration.database.driver',
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
+                    'choices' => array(
+                        'MySQL' => DatabaseDriverInterface::DRIVER_MYSQL,
+                        'PostgreSQL' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                     ),
                     'constraints' => array(
                         new Assert\NotBlank(),
@@ -103,10 +105,12 @@ class DatabaseType extends AbstractType
                 array(
                     'label'         => 'form.configuration.database.drop',
                     'data'          => 'none',
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices'       => array(
-                        'none' => 'form.configuration.database.drop_none',
-                        'app'  => 'form.configuration.database.drop_app',
-                        'full' => 'form.configuration.database.drop_full'
+                        'form.configuration.database.drop_none' => 'none',
+                        'form.configuration.database.drop_app' => 'app',
+                        'form.configuration.database.drop_full' => 'full',
                     ),
                     'constraints'   => array(
                         new Assert\NotBlank()
