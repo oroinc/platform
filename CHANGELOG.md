@@ -8,6 +8,10 @@
 #### ApiBundle
 * Removed deprecated routes contain `_format` placeholder.
 
+### Changed
+#### ApiBundle
+* The service `oro_api.get_config.add_owner_validator` was renamed to `oro_organization.api.config.add_owner_validator`
+
 ## 3.0.0-beta (2018-03-30)
 [Show detailed list of changes](incompatibilities-3-0-beta.md)
 
