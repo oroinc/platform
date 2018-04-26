@@ -401,7 +401,7 @@ define(function(require) {
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            var $el = $(element);
+            var $el = getErrorTarget(element);
             $el.removeClass('error')
                 .closest('.controls')
                 .removeClass('validation-error')
