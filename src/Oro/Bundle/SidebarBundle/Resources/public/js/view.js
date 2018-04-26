@@ -118,14 +118,11 @@ define(function(require) {
         render: function() {
             var view = this;
             var model = view.model;
-            var $main = view.options.$main;
             var maximized = model.get('state') === constants.SIDEBAR_MAXIMIZED;
             var minimized = model.get('state') === constants.SIDEBAR_MINIMIZED;
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.toggleClass('sidebar-maximized', maximized);
-            $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MAXIMIZED), maximized);
-            $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MINIMIZED), minimized);
 
             this.onWidgetsReset();
             if (minimized) {

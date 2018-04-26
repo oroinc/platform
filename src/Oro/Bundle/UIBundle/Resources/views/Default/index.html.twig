@@ -54,6 +54,13 @@
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">
+        {% if isDesktopVersion() %}
+            {% block left_panel %}
+                <div id="left-panel" class="app-page__left-panel" data-layout="separate">
+                    {% placeholder left_panel with {placement: 'left'} %}
+                </div>
+            {% endblock left_panel %}
+        {% endif %}
         <div id="central-panel" class="app-page__central-panel">
             {% block header %}
                 <header class="navbar" id="oroplatform-header">
@@ -74,13 +81,6 @@
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
-            {% if isDesktopVersion() %}
-                {% block left_panel %}
-                    <div id="left-panel" class="app-page__left-panel" data-layout="separate">
-                        {% placeholder left_panel with {placement: 'left'} %}
-                    </div>
-                {% endblock left_panel %}
-            {% endif %}
             {% block main %}
                 <div id="main" class="app-page__main">
                     {% block before_content %}
@@ -176,13 +176,6 @@
                     </div>
                 </div>
             {% endblock main %}
-            {% if isDesktopVersion() %}
-                {% block right_panel %}
-                    <div id="right-panel" class="app-page__right-panel">
-                        {% placeholder right_panel with {placement: 'right'} %}
-                    </div>
-                {% endblock right_panel %}
-            {% endif %}
             {% block footer %}
                 <div id="dialog-extend-fixed-container" class="ui-dialog-minimize-container"></div>
                 <footer id="footer" class="footer">
@@ -190,6 +183,13 @@
                 </footer>
             {% endblock footer %}
         </div>
+        {% if isDesktopVersion() %}
+            {% block right_panel %}
+                <div id="right-panel" class="app-page__right-panel">
+                    {% placeholder right_panel with {placement: 'right'} %}
+                </div>
+            {% endblock right_panel %}
+        {% endif %}
     </div>
     {% placeholder before_body_end %}
     </body>

@@ -17,14 +17,14 @@
 }
 
 .app-page {
+  display: flex;
   &__left-panel,
   &__right-panel {
+    display: flex;
     overflow: visible;
   }
-  &__left-panel,
-  &__right-panel,
-  &__main {
-    float: left;
+  &__central-panel {
+    flex-grow: 1;
   }
 }
 

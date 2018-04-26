@@ -265,15 +265,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     }
                 }
             };
-            var $main = $('#main');
-            var $centralPanel = $('#central-panel');
-            var $leftPanel = $('#left-panel');
-            var $rightPanel = $('#right-panel');
             adjustHeight = function() {
                 initializeContent();
 
-                // set width for #main container
-                $main.width(realWidth($centralPanel) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
                 var sfToolbar = $('.sf-toolbarreset');
@@ -286,9 +280,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     el = $(el);
                     el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
                 });
-
-                // set height for #left-panel and #right-panel
-                $leftPanel.add($rightPanel).height($main.height());
 
                 scrollspy.adjust();
 

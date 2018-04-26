@@ -19,7 +19,6 @@ define(['../side-menu', '../mediator', 'oroui/js/persistent-storage'], function(
         _update: function() {
             var isMinimized = persistentStorage.getItem(STATE_STORAGE_KEY) !== MAXIMIZED_STATE;
             this.element.toggleClass('minimized', isMinimized);
-            $('#main').toggleClass('main-menu-maximized', isMinimized);
             if (isMinimized) {
                 this._convertToDropdown();
             } else {

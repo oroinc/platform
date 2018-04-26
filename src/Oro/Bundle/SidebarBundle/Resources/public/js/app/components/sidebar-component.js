@@ -40,8 +40,7 @@ define(function(require) {
                 model: this.sidebarModel,
                 availableWidgets: options.availableWidgets,
                 widgets: this.widgetsCollection,
-                el: options._sourceElement,
-                $main: $('#main')
+                el: options._sourceElement
             });
 
             this.view.render();
