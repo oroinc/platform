@@ -61,7 +61,7 @@ class EnumExtension extends \Twig_Extension
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
         $result = [];
-        foreach ($values as $id => $name) {
+        foreach ($values as $name => $id) {
             if (isset($ids[$id])) {
                 $result[] = $id;
             }
@@ -81,8 +81,9 @@ class EnumExtension extends \Twig_Extension
     public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
+        $label = array_search($enumValueId, $values);
 
-        return $values[$enumValueId] ?? $enumValueId;
+        return $label !== false ? $label : $enumValueId;
     }
 
     /**

@@ -16,11 +16,6 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new LinkType();
     }
 
-    public function testGetName()
-    {
-        $this->assertInternalType('string', $this->type->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertInternalType('string', $this->type->getParent());

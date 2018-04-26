@@ -46,11 +46,6 @@ class EntityChangesetTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(EntityChangesetType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(DataChangesetType::class, $this->type->getParent());

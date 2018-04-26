@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * A base processor to validate that the request data contains valid JSON.API object.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class ValidateRequestData implements ProcessorInterface
 {

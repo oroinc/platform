@@ -1,5 +1,4 @@
 parameters:
-    test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
@@ -52,12 +51,10 @@ services:
     oro_test.alice_reference_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
         arguments:
-            - '@kernel'
+            - '@doctrine'
 
     oro_test.alice_to_string_processor:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
-        arguments:
-            - '@kernel'
 
     oro_test.alice_fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader

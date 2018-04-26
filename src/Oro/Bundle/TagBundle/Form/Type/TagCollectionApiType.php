@@ -16,7 +16,7 @@ class TagCollectionApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
-                'type'                 => TagEntityApiType::class,
+                'entry_type'           => TagEntityApiType::class,
             ]
         );
     }

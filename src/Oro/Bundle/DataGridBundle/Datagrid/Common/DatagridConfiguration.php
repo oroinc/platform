@@ -380,13 +380,13 @@ class DatagridConfiguration extends ConfigObject
                 'data_name' => $dataName,
                 'options'   => [
                     'field_options' => [
-                        'class'         => ExtendHelper::buildEnumValueClassName($enumCode),
-                        'property'      => 'name',
+                        'class' => ExtendHelper::buildEnumValueClassName($enumCode),
+                        'choice_label' => 'name',
                         'query_builder' => function (EntityRepository $entityRepository) {
                             return $entityRepository->createQueryBuilder('c')
                                 ->orderBy('c.name', 'ASC');
                         },
-                        'multiple'      => $isMultiple,
+                        'multiple' => $isMultiple,
                     ],
                 ],
             ]

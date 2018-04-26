@@ -45,7 +45,7 @@ class EmailTemplateSelectType extends AbstractType
             array(
                 'label'                   => null,
                 'class'                   => 'OroEmailBundle:EmailTemplate',
-                'property'                => 'name',
+                'choice_label'            => 'name',
                 'query_builder'           => null,
                 'depends_on_parent_field' => 'entityName',
                 'target_field'            => null,

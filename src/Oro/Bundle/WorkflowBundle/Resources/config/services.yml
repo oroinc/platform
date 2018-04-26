@@ -537,20 +537,20 @@ services:
             - '@oro_workflow.transition_data.provider'
 
     oro_workflow.variable_guesser:
-            class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
-            parent: oro_action.abstract_guesser
-            arguments:
-                - '@translator'
-            calls:
-                # mapping from variable type to form parameters
-                # an additional array with form options can be added
-                - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
-                - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
-                - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
-                - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
-                - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
-                - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
-                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
+        class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
+        parent: oro_action.abstract_guesser
+        arguments:
+            - '@translator'
+        calls:
+            # mapping from variable type to form parameters
+            # an additional array with form options can be added
+            - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+            - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+            - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+            - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+            - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
+            - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
 
     oro_workflow.transition_form.data_provider.transition_page_form:
         class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider'

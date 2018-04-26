@@ -28,7 +28,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *              "category"="account_management"
  *          },
  *          "form"={
- *              "form_type"="oro_organization_select"
+ *              "form_type"="Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType"
  *          },
  *          "dataaudit"={
  *              "auditable"=true

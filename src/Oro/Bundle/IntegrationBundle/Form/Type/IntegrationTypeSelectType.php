@@ -36,7 +36,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $choices = $options['choice_list']->getChoices();
+        $choices = $options['choices'];
 
         if (empty($choices)) {
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
@@ -52,6 +52,8 @@ class IntegrationTypeSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices'     => $this->getChoices(),
                 'choice_attr' => function ($choice) {
                     return $this->getChoiceAttributes($choice);

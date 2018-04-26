@@ -57,6 +57,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($string) {
+                return $string . '.trans';
+            });
 
         $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -266,14 +271,5 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         $userEmailOrigin->setOwner($this->getUser());
 
         return $userEmailOrigin;
-    }
-
-    /**
-     * Test name of type
-     */
-    public function testGetName()
-    {
-        $type = new ChoiceAccountType($this->translator);
-        $this->assertEquals(ChoiceAccountType::NAME, $type->getName());
     }
 }

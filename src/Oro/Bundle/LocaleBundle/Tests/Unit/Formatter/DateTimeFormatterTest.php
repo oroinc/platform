@@ -511,6 +511,43 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getDateTimeNotModifiedDataProvider
+     */
+    public function testGetDateTimeReturnsNotModified($date)
+    {
+        $this->assertSame($date, $this->formatter->getDateTime($date));
+    }
+
+    /**
+     * @return array
+     */
+    public function getDateTimeNotModifiedDataProvider()
+    {
+        return [
+            'DateTime' => [
+                'date' => new \DateTime,
+            ],
+            'DateTimeImmutable' => [
+                'date' => new \DateTimeImmutable(),
+            ],
+        ];
+    }
+
+    public function testGetDateTimeFromString()
+    {
+        $actual = $this->formatter->getDateTime('10 September 2000');
+        $this->assertInstanceOf(\DateTime::class, $actual);
+        $this->assertEquals('UTC', $actual->getTimezone()->getName());
+    }
+
+    public function testGetDateTimeFromInteger()
+    {
+        $actual = $this->formatter->getDateTime(1523028070);
+        $this->assertInstanceOf(\DateTime::class, $actual);
+        $this->assertEquals('UTC', $actual->getTimezone()->getName());
+    }
+
+    /**
      * @param string $lang
      * @param string $timeZone
      * @param string $pattern

@@ -25,7 +25,8 @@ class FormFieldType extends AbstractType
             [
                 'target_field_options' => [],
                 'use_parent_field_options' => [],
-                'target_field_type'    => TextType::class,
+                'target_field_type' => TextType::class,
+                'target_field_alias' => 'text',
                 'resettable'           => true,
                 'parent_checkbox_label' => ''
             ]
@@ -41,7 +42,7 @@ class FormFieldType extends AbstractType
                 $attr['class'] = '';
             }
 
-            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_type']);
+            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_alias']);
 
             return $attr;
         });
@@ -61,6 +62,15 @@ class FormFieldType extends AbstractType
         $useParentOptions['label'] = $options['parent_checkbox_label'];
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
+
+        // TODO: remove 'if' statement below in scope of BAP-15236
+        if (isset($options['target_field_options']['choices'])) {
+            $options['target_field_options'] = array_merge(
+                ['choices_as_values' => true],
+                $options['target_field_options']
+            );
+        }
+
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
 
         if ($options['resettable']) {

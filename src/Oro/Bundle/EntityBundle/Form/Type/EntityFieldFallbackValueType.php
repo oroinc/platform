@@ -237,8 +237,10 @@ class EntityFieldFallbackValueType extends AbstractType
                 continue;
             }
 
-            $choices[$fallbackId] = $this->fallbackResolver->getFallbackLabel($fallbackId);
+            $choices[$this->fallbackResolver->getFallbackLabel($fallbackId)] = $fallbackId;
         }
+        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+        $fallbackOptions['choices_as_values'] = true;
         $fallbackOptions['choices'] = $choices;
 
         return $fallbackOptions;

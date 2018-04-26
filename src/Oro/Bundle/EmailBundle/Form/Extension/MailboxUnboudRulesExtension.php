@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -31,7 +32,7 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $unboundRules = $builder->create('unboundRules', 'hidden', [
+        $unboundRules = $builder->create('unboundRules', HiddenType::class, [
             'mapped' => false,
         ]);
 

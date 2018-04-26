@@ -20,7 +20,7 @@ entity_config:
                                code:      field_acl_supported
                                value:     true
                     form:
-                        type:               checkbox
+                        type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
                             block:          other
                             required:       false
@@ -36,7 +36,7 @@ entity_config:
                                code:      field_acl_supported
                                value:     true
                     form:
-                        type:               checkbox
+                        type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
                             block:          other
                             required:       false

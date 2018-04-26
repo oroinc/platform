@@ -635,7 +635,7 @@ General methods:
 - **setSoftErrorsHandling(softErrorsHandling)** - Sets a value that indicates whether to stop the further processing or thrown an exception in case of error.
 - **setProcessed(operationName)** - Marks a work as already done. In the most cases this method is useless because it is easy to determine when a work is already done by checking a state of a context. However, a processor performs a complex work, it might be required to mark a work as already done directly.
 - **clearProcessed(operationName)** - Marks a work as not yet done.
-- **isProcessed(operationName)** - Checks whether any error happened during the processing of an action.
+- **isProcessed(operationName)** - Checks whether a work is already done.
 
 Entity configuration related methods:
 

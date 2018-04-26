@@ -5,7 +5,7 @@ system_configuration:
     fields:
         oro_report.display_sql_query:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             options:
                 label: oro.report.system_configuration.fields.display_sql_query.label
                 tooltip: oro.report.system_configuration.fields.display_sql_query.tooltip

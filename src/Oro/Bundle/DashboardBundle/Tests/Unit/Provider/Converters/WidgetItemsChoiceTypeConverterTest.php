@@ -24,8 +24,8 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit_Framework_TestCase
     public function testGetDefaultValue()
     {
         $choises = [
-            [1 => 'first'],
-            [2 => 'second']
+            ['first' => 1],
+            ['second' => 2],
         ];
 
         $config = [

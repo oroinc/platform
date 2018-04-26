@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -156,7 +157,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -236,7 +237,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $parentEntityClass,
@@ -281,7 +282,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -326,7 +327,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -370,7 +371,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -415,7 +416,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -459,7 +460,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -502,7 +503,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -545,7 +546,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,
@@ -563,6 +564,86 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata(new EntityMetadata());
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForOutputOnlyField()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')
+            ->setDirection('output-only');
+
+        $metadata = new EntityMetadata();
+        $metadata->addField($this->createFieldMetadata('field1'))
+            ->setDirection(false, true);
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::never())
+            ->method('add');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForOutputOnlyAssociation()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('association1')
+            ->setDirection('output-only');
+
+        $metadata = new EntityMetadata();
+        $metadata->addAssociation($this->createAssociationMetadata('association1'))
+            ->setDirection(false, true);
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::never())
+            ->method('add');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
         $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());

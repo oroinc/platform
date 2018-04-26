@@ -17,9 +17,9 @@ class UniqueKeyTypeTest extends TypeTestCase
      * @var array
      */
     private $fields = [
-        'firstName' => 'First Name',
-        'lastName'  => 'Last Name',
-        'email'     => 'Email',
+        'First Name' => 'firstName',
+        'Last Name' => 'lastName',
+        'Email' => 'email',
     ];
 
     protected function setUp()

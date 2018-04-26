@@ -128,6 +128,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            if (!$property->isOutput()) {
+                continue;
+            }
             $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
                 $result[$resultName] = $data[$name];
@@ -144,6 +147,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     {
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
             $result[$name] = array_key_exists($name, $data)
                 ? $data[$name]
                 : null;
@@ -164,6 +170,9 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
             $result[$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }

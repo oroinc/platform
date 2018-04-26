@@ -7,6 +7,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -79,7 +80,7 @@ class MenuUpdateType extends AbstractType
             [
                 'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
-                'entry_type' => 'textarea',
+                'entry_type' => TextareaType::class,
                 'field' => 'text',
             ]
         );

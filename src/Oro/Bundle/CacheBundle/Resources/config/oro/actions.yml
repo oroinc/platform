@@ -33,16 +33,16 @@ operations:
         form_options:
             attribute_fields:
                 invalidateType:
-                    form_type: choice
+                    form_type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                     options:
                         placeholder: false
                         choices:
-                            scheduled: oro.cache.invalidate.type.scheduled
-                            immediate: oro.cache.invalidate.type.immediate
+                            oro.cache.invalidate.type.scheduled: scheduled
+                            oro.cache.invalidate.type.immediate: immediate
                 invalidateCacheAt:
                     form_type: Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
                 invalidateNow:
-                    form_type: hidden
+                    form_type: Symfony\Component\Form\Extension\Core\Type\HiddenType
             attribute_default_values:
                 invalidateCacheAt: $.invalidateCacheAt
         form_init:

@@ -55,7 +55,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
      */
     protected function getFormType()
     {
-        return DictionaryFilterType::NAME;
+        return DictionaryFilterType::class;
     }
 
     /**
