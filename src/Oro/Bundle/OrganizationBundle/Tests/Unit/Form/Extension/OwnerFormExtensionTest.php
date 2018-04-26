@@ -334,16 +334,17 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
             EntityType::class,
-            array(
-                'class' => 'OroOrganizationBundle:BusinessUnit',
-                'choice_label' => 'name',
-                'choices' => $this->businessUnits,
+            [
+                'class' => BusinessUnit::class,
+                'property' => 'name',
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'oro.user.owner.label',
-                'translatable_options' => false
-            )
+                'translatable_options' => false,
+                'query_builder' => function () {
+                },
+            ]
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }

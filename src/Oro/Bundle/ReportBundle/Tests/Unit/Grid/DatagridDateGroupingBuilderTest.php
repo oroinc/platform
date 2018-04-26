@@ -287,11 +287,12 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                         'joined_table' => 't1',
                         'options' => [
                             'field_options' => [
+                                'choices_as_values' => true,
                                 'choices' => [
-                                    'day' => 'Day',
-                                    'month' => 'Month',
-                                    'quarter' => 'Quarter',
-                                    'year' => 'Year',
+                                    'Day' => 'day',
+                                    'Month' => 'month',
+                                    'Quarter' => 'quarter',
+                                    'Year' => 'year',
                                 ]
                             ],
                             'default_value' => 'Day'
@@ -347,9 +348,10 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                             'label' => 'oro.report.filter.skip_empty_periods.label',
                             'options' => [
                                 'field_options' => [
+                                    'choices_as_values' => true,
                                     'choices' => [
-                                        'No',
-                                        'Yes'
+                                        'No' => 0,
+                                        'Yes' => 1,
                                     ]
                                 ],
                                 'default_value' => 'Yes'

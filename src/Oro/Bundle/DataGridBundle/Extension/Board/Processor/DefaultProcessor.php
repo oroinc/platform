@@ -181,7 +181,7 @@ class DefaultProcessor implements BoardProcessorInterface
     protected function prepareOptions($options, $default)
     {
         $result = [];
-        foreach ($options as $id => $label) {
+        foreach ($options as $label => $id) {
             $ids = [$id];
             if ($id === $default) {
                 $ids[] = null; //entities with empty values go to the default column
@@ -210,7 +210,7 @@ class DefaultProcessor implements BoardProcessorInterface
         if (isset($boardConfig[Configuration::DEFAULT_COLUMN_KEY])) {
             $default = $boardConfig[Configuration::DEFAULT_COLUMN_KEY];
         }
-        $ids = array_keys($options);
+        $ids = array_values($options);
         if (!in_array($default, $ids, true)) {
             $default = reset($ids);
         }

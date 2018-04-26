@@ -47,27 +47,27 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
-                    'field_type'        => NumberType::class,
-                    'operator_choices'  => array(
-                        NumberFilterType::TYPE_EQUAL         => 'oro.filter.form.label_type_equal',
-                        NumberFilterType::TYPE_NOT_EQUAL     => 'oro.filter.form.label_type_not_equal',
-                        NumberFilterType::TYPE_GREATER_EQUAL => 'oro.filter.form.label_type_greater_equal',
-                        NumberFilterType::TYPE_GREATER_THAN  => 'oro.filter.form.label_type_greater_than',
-                        NumberFilterType::TYPE_LESS_EQUAL    => 'oro.filter.form.label_type_less_equal',
-                        NumberFilterType::TYPE_LESS_THAN     => 'oro.filter.form.label_type_less_than',
-                        NumberFilterType::TYPE_IN            => 'oro.filter.form.label_type_in',
-                        NumberFilterType::TYPE_NOT_IN        => 'oro.filter.form.label_type_not_in',
-                        FilterUtility::TYPE_EMPTY            => 'oro.filter.form.label_type_empty',
-                        FilterUtility::TYPE_NOT_EMPTY        => 'oro.filter.form.label_type_not_empty',
-                    ),
-                    'data_type'         => NumberFilterType::DATA_INTEGER,
-                    'formatter_options' => array()
-                )
-            )
-        );
+        return [
+            [
+                'defaultOptions' => [
+                    'field_type' => NumberType::class,
+                    'operator_choices'  => [
+                        'oro.filter.form.label_type_equal' => NumberFilterType::TYPE_EQUAL,
+                        'oro.filter.form.label_type_not_equal' => NumberFilterType::TYPE_NOT_EQUAL,
+                        'oro.filter.form.label_type_greater_equal' => NumberFilterType::TYPE_GREATER_EQUAL,
+                        'oro.filter.form.label_type_greater_than' => NumberFilterType::TYPE_GREATER_THAN,
+                        'oro.filter.form.label_type_less_equal' => NumberFilterType::TYPE_LESS_EQUAL,
+                        'oro.filter.form.label_type_less_than' => NumberFilterType::TYPE_LESS_THAN,
+                        'oro.filter.form.label_type_in' => NumberFilterType::TYPE_IN,
+                        'oro.filter.form.label_type_not_in' => NumberFilterType::TYPE_NOT_IN,
+                        'oro.filter.form.label_type_empty' => FilterUtility::TYPE_EMPTY,
+                        'oro.filter.form.label_type_not_empty' => FilterUtility::TYPE_NOT_EMPTY,
+                    ],
+                    'data_type' => NumberFilterType::DATA_INTEGER,
+                    'formatter_options' => []
+                ]
+            ]
+        ];
     }
 
     /**

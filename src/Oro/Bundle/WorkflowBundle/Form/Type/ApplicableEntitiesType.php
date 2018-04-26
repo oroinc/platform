@@ -57,9 +57,9 @@ class ApplicableEntitiesType extends AbstractType
         $resolver->setNormalizer(
             'choices',
             function (Options $options, $choices) {
-                foreach ($choices as $class => $item) {
+                foreach ($choices as $item => $class) {
                     if (!$this->entityConnector->isApplicableEntity($class)) {
-                        unset($choices[$class]);
+                        unset($choices[$item]);
                     }
                 }
 

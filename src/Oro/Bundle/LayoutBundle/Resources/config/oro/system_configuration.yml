@@ -16,9 +16,11 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.layout.system_configuration.fields.debug_block_info.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - oro.layout.system_configuration.fields.debug_block_info.choices.no
-                    - oro.layout.system_configuration.fields.debug_block_info.choices.yes
+                    oro.layout.system_configuration.fields.debug_block_info.choices.no: 0
+                    oro.layout.system_configuration.fields.debug_block_info.choices.yes: 1
             priority: 20
         oro_layout.debug_developer_toolbar:
             data_type: boolean
@@ -27,9 +29,11 @@ system_configuration:
             options:
                 label: oro.layout.system_configuration.fields.debug_developer_toolbar.label
                 tooltip: oro.layout.system_configuration.fields.debug_developer_toolbar.tooltip
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.no
-                    - oro.layout.system_configuration.fields.debug_developer_toolbar.choices.yes
+                    oro.layout.system_configuration.fields.debug_developer_toolbar.choices.no: 0
+                    oro.layout.system_configuration.fields.debug_developer_toolbar.choices.yes: 1
             priority: 10
 
     tree:

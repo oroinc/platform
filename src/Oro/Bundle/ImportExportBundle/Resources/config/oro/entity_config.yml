@@ -40,10 +40,12 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.identity.label
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                false:      'No'
-                                -1:         oro.importexport.entity_config.identity.only_when_not_empty
-                                true:       oro.importexport.entity_config.identity.always
+                                No:         0
+                                oro.importexport.entity_config.identity.only_when_not_empty: -1
+                                oro.importexport.entity_config.identity.always: 1
                             placeholder:    false
                             required:       false
                             block:          import_export
@@ -56,9 +58,11 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.excluded.label
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                false:      'No'
-                                true:       'Yes'
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             required:       false
                             block:          import_export
@@ -70,9 +74,11 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.full.label
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                false:      'Identity only'
-                                true:       'All'
+                                Identity only: 0
+                                All:        1
                             placeholder:    false
                             required:       false
                             block:          import_export

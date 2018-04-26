@@ -93,7 +93,7 @@ class FilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'operator_choices' => array(
-                        1 => 'Choice 1'
+                        'Choice 1' => 1,
                     )
                 ),
             ),
@@ -105,7 +105,7 @@ class FilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'operator_choices' => array(
-                        1 => 'Choice 1'
+                        'Choice 1' => 1
                     )
                 ),
             ),

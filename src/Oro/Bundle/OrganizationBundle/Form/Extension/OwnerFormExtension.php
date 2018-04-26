@@ -10,6 +10,7 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
@@ -440,9 +441,15 @@ class OwnerFormExtension extends AbstractTypeExtension
                     EntityType::class,
                     array_merge(
                         [
-                            'class'                => 'OroOrganizationBundle:BusinessUnit',
-                            'choice_label'         => 'name',
-                            'choices'              => $businessUnits,
+                            'class'                => BusinessUnit::class,
+                            'property'             => 'name',
+                            'query_builder'        => function (BusinessUnitRepository $repository) use ($user) {
+                                $qb = $repository->createQueryBuilder('bu');
+                                $qb->andWhere($qb->expr()->isMemberOf(':user', 'bu.users'));
+                                $qb->setParameter('user', $user);
+
+                                return $qb;
+                            },
                             'mapped'               => true,
                             'label'                => $this->fieldLabel,
                             'translatable_options' => false

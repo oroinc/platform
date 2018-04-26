@@ -39,6 +39,8 @@ class EntityChoiceType extends AbstractType
 
         $resolver->setDefaults(
             [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values'    => true,
                 'choices'              => function (Options $options) {
                     return $this->getChoices($options['show_plural'], $options['apply_exclusions']);
                 },
@@ -112,7 +114,8 @@ class EntityChoiceType extends AbstractType
     {
         $choices = [];
         foreach ($this->getEntities($showPlural, $applyExclusions) as $entityClass => $entity) {
-            $choices[$entityClass] = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $key = $showPlural ? $entity['plural_label'] : $entity['label'];
+            $choices[$key] = $entityClass;
         }
 
         return $choices;

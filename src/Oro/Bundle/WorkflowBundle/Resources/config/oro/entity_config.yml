@@ -11,8 +11,10 @@ entity_config:
                         options:
                             label:          oro.workflow.entity_config.show_step_in_grid.label
                             required:       false
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                false:      oro.workflow.entity_config.show_step_in_grid.choice.hide
-                                true:       oro.workflow.entity_config.show_step_in_grid.choice.show
+                                oro.workflow.entity_config.show_step_in_grid.choice.hide: 0
+                                oro.workflow.entity_config.show_step_in_grid.choice.show: 1
                             placeholder:    false
                             block:          other

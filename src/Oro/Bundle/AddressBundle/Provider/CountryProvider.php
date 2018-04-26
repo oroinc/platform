@@ -24,7 +24,7 @@ class CountryProvider
     {
         $countries = [];
         foreach ($this->repository->getCountries() as $country) {
-            $countries[$country->getIso2Code()] = $country->getName();
+            $countries[$country->getName()] = $country->getIso2Code();
         }
 
         return $countries;

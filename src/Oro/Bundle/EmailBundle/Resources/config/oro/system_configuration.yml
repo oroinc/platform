@@ -87,9 +87,11 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.email.system_configuration.signature_configuration.append_signature.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
-                    0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
+                    oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label: 1
+                    oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label: 0
 
         oro_email.default_button_reply:
             data_type: integer
@@ -97,9 +99,11 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.email.system_configuration.reply_configuration.default_button.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    1: oro.email.reply
-                    2: oro.email.reply_all
+                    oro.email.reply: 1
+                    oro.email.reply_all: 2
                 required: false
 
         oro_email.mailbox_grid:
@@ -143,10 +147,12 @@ system_configuration:
             options:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.encryption.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    ~: oro.email.system_configuration.smtp_settings.encryption.none.label
-                    ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
-                    tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
+                    oro.email.system_configuration.smtp_settings.encryption.none.label: ~
+                    oro.email.system_configuration.smtp_settings.encryption.ssl.label: ssl
+                    oro.email.system_configuration.smtp_settings.encryption.tls.label: tls
                 constraints:
                     - Choice:
                         choices: [~, ssl, tls]
@@ -229,9 +235,11 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.email.system_configuration.email_threads.use_threads.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label
-                    - oro.email.system_configuration.email_threads.use_threads.choices.threaded.label
+                    oro.email.system_configuration.email_threads.use_threads.choices.non_threaded.label: 0
+                    oro.email.system_configuration.email_threads.use_threads.choices.threaded.label: 1
 
     tree:
         system_configuration:

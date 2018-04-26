@@ -20,7 +20,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -59,7 +63,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Show in Datagrid"
@@ -78,7 +86,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid search"
@@ -97,7 +109,11 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          datagrid
                             label:          "Datagrid filter"
