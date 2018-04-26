@@ -33,6 +33,7 @@ class SystemEmailTemplateSelectType extends AbstractType
         $resolver->setDefaults([
             'query_builder' => $this->getRepository()->getSystemTemplatesQueryBuilder(),
             'class' => 'OroEmailBundle:EmailTemplate',
+            'choice_label' => 'name',
             'choice_value' => 'name',
         ]);
     }

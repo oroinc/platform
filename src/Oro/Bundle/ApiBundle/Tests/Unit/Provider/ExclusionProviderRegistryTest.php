@@ -46,7 +46,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find a exclusion provider for the request "rest,another".
+     * @expectedExceptionMessage Cannot find an exclusion provider for the request "rest,another".
      */
     public function testGetExclusionProviderForUnsupportedRequestType()
     {

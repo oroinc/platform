@@ -29,6 +29,13 @@ interface SecurityContextInterface
     public function getApiKey(): ?string;
 
     /**
+     * Gets a hint with instructions how to generate API key.
+     *
+     * @return string|null
+     */
+    public function getApiKeyGenerationHint(): ?string;
+
+    /**
      * Gets the route name to the sign in form.
      *
      * @return string|null

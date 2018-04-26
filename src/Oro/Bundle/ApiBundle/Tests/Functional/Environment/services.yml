@@ -25,6 +25,11 @@ services:
         tags:
             - { name: routing.options_resolver }
 
+    oro_api.tests.test_session_listener:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestSessionListener
+        tags:
+            - { name: kernel.event_subscriber }
+
     oro_api.tests.check_request_type:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\CheckRequestType
         tags:
@@ -74,3 +79,11 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DeleteTestResourceWithoutIdentifierEntity
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+
+    oro_api.tests.normalize_test_resource_without_identifier_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntity
+        arguments:
+            - '@oro_api.object_normalizer'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+            - { name: oro.api.processor, action: update, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }

@@ -2,29 +2,32 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
+/**
+ * Transforms class name and identifier of an entity to an entity object.
+ */
 class EntityToIdTransformer extends AbstractEntityAssociationTransformer
 {
     /** @var IncludedEntityCollection|null */
     protected $includedEntities;
 
     /**
-     * @param ManagerRegistry               $doctrine
+     * @param DoctrineHelper                $doctrineHelper
      * @param EntityLoader                  $entityLoader
      * @param AssociationMetadata           $metadata
      * @param IncludedEntityCollection|null $includedEntities
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,
         AssociationMetadata $metadata,
         IncludedEntityCollection $includedEntities = null
     ) {
-        parent::__construct($doctrine, $entityLoader, $metadata);
+        parent::__construct($doctrineHelper, $entityLoader, $metadata);
         $this->includedEntities = $includedEntities;
     }
 

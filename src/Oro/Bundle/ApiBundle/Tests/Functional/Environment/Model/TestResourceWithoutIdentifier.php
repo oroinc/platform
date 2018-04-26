@@ -10,6 +10,9 @@ class TestResourceWithoutIdentifier
     /** @var string|null */
     private $name;
 
+    /** @var string|null */
+    private $description;
+
     /**
      * @return string|null
      */
@@ -24,5 +27,21 @@ class TestResourceWithoutIdentifier
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string|null $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 }

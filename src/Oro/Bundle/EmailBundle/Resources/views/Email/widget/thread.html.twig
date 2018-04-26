@@ -2,7 +2,7 @@
 
 <div class="widget-content">
     {# Display contexts targets in the activity list item view #}
-    {% if renderContexts is defined and renderContexts %}
+    {% if renderContexts is defined and renderContexts and thread|length > 0 %}
     <div class="activity-context-activity-list">
         {% set checkTarget = target ? true : false %}
         {{ AC.activity_contexts(thread|first, target, checkTarget) }}

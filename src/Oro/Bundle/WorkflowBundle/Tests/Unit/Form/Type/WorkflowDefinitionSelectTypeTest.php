@@ -123,11 +123,6 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowDefinitionSelectType::NAME, $this->type->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(EntityType::class, $this->type->getParent());
@@ -158,7 +153,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
             [
                 [
                     'class' => 'OroWorkflowBundle:WorkflowStep',
-                    'property' => 'label'
+                    'choice_label' => 'label'
                 ]
             ]
         ];

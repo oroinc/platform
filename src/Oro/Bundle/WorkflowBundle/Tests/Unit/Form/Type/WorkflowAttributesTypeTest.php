@@ -94,6 +94,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 []
             ),
         ];
+        parent::setUp();
     }
 
     /**

@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -55,7 +56,7 @@ class FileSubscriber implements EventSubscriberInterface
         ) {
             $form->add(
                 'emptyFile',
-                'hidden',
+                HiddenType::class,
                 [
                     'required' => false,
                 ]

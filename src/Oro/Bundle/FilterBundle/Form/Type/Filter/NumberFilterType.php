@@ -83,18 +83,18 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $operatorChoices = array(
-            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equal'),
-            self::TYPE_NOT_EQUAL          => $this->translator->trans('oro.filter.form.label_type_not_equal'),
-            self::TYPE_GREATER_EQUAL      => $this->translator->trans('oro.filter.form.label_type_greater_equal'),
-            self::TYPE_GREATER_THAN       => $this->translator->trans('oro.filter.form.label_type_greater_than'),
-            self::TYPE_LESS_EQUAL         => $this->translator->trans('oro.filter.form.label_type_less_equal'),
-            self::TYPE_LESS_THAN          => $this->translator->trans('oro.filter.form.label_type_less_than'),
-            self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
-            self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
-            FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
-            FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
-        );
+        $operatorChoices = [
+            $this->translator->trans('oro.filter.form.label_type_equal') => self::TYPE_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_not_equal') => self::TYPE_NOT_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_equal') => self::TYPE_GREATER_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_than') => self::TYPE_GREATER_THAN,
+            $this->translator->trans('oro.filter.form.label_type_less_equal') => self::TYPE_LESS_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_less_than') => self::TYPE_LESS_THAN,
+            $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
+            $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
+            $this->translator->trans('oro.filter.form.label_type_empty') => FilterUtility::TYPE_EMPTY,
+            $this->translator->trans('oro.filter.form.label_type_not_empty') => FilterUtility::TYPE_NOT_EMPTY,
+        ];
 
         $resolver->setDefaults(
             array(

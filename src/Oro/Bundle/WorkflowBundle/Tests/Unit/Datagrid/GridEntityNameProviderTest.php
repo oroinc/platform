@@ -77,7 +77,7 @@ class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
             ->with('untranslated.label')
             ->will($this->returnValue($label));
 
-        $expected = array($entity => $label);
+        $expected = array($label => $entity);
         $this->assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
     }
 

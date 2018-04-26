@@ -96,10 +96,12 @@ datagrids:
                     data_name: a.action
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                create: oro.dataaudit.action.create
-                                update: oro.dataaudit.action.update
-                                remove: oro.dataaudit.action.remove
+                                oro.dataaudit.action.create: create
+                                oro.dataaudit.action.update: update
+                                oro.dataaudit.action.remove: remove
                 version:
                     type: number-range
                     data_name: a.version
@@ -109,6 +111,7 @@ datagrids:
                     data_name: a.objectClass
                     options:
                           field_options:
+                              choices_as_values: true
                               choices: "@oro_dataaudit.datagrid.entity_type_provider->getEntityTypes"
                 objectName:
                     type: string

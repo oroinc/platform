@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Component\EntitySerializer\FieldConfig;
 
 /**
+ * Adds the property path amd the exclude properties related methods to a configuration class.
+ *
  * @property array $items
  */
 trait FieldConfigTrait

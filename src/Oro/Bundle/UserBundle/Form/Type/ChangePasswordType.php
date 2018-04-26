@@ -55,7 +55,7 @@ class ChangePasswordType extends AbstractType
                 RepeatedType::class,
                 [
                     'required' => false,
-                    'type' => 'password',
+                    'type' => PasswordType::class,
                     'invalid_message' => $options['plain_password_invalid_message'],
                     'options' => [
                         'attr' => [

@@ -100,7 +100,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ->with($this->identicalTo($group2));
 
         $form->submit(['groups' => ['group1']]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldUpdateExistingEntity()
@@ -137,9 +137,9 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ->method('removeGroup');
 
         $form->submit(['groups' => ['group2']]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
 
-        $this->assertEquals('group2', $group1->getName());
+        self::assertEquals('group2', $group1->getName());
     }
 
     public function testShouldUseRemoverWhenRemoveAllItems()
@@ -177,7 +177,7 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ->with($this->identicalTo($group1));
 
         $form->submit(['groups' => []]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldValidateEntryEntity()
@@ -217,11 +217,11 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ->method('removeGroup');
 
         $form->submit(['groups' => ['']]);
-        $this->assertTrue($form->isSynchronized());
-        $this->assertFalse($form->isValid());
-        $this->assertCount(0, $form->getErrors());
-        $this->assertCount(0, $form->get('groups')->getErrors());
-        $this->assertCount(1, $form->get('groups')->get(0)->getErrors());
+        self::assertTrue($form->isSynchronized());
+        self::assertFalse($form->isValid());
+        self::assertCount(0, $form->getErrors());
+        self::assertCount(0, $form->get('groups')->getErrors());
+        self::assertCount(1, $form->get('groups')->get(0)->getErrors());
     }
 
     public function testWithInvalidValue()
@@ -235,12 +235,6 @@ class ScalarCollectionTypeTest extends TypeTestCase
             ]
         );
         $form->submit('test');
-        $this->assertFalse($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new ScalarCollectionType();
-        $this->assertEquals('oro_api_scalar_collection', $type->getName());
+        self::assertFalse($form->isSynchronized());
     }
 }

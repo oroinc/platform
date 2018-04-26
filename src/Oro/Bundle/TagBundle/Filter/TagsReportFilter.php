@@ -11,7 +11,7 @@ class TagsReportFilter extends TagsDictionaryFilter
      */
     protected function getFormType()
     {
-        return TagsReportFilterType::NAME;
+        return TagsReportFilterType::class;
     }
 
     /**

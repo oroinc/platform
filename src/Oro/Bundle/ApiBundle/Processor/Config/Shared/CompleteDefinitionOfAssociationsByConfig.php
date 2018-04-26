@@ -20,10 +20,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var RelationConfigProvider */
-    protected $relationConfigProvider;
+    private $relationConfigProvider;
 
     /**
      * @param DoctrineHelper         $doctrineHelper
@@ -33,7 +33,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
         DoctrineHelper $doctrineHelper,
         RelationConfigProvider $relationConfigProvider
     ) {
-        $this->doctrineHelper         = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->relationConfigProvider = $relationConfigProvider;
     }
 
@@ -76,7 +76,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeEntityAssociations(
+    private function completeEntityAssociations(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
         $version,
@@ -116,7 +116,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeObjectAssociations(
+    private function completeObjectAssociations(
         EntityDefinitionConfig $definition,
         $version,
         RequestType $requestType,
@@ -151,7 +151,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
      * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function completeAssociation(
+    private function completeAssociation(
         EntityDefinitionConfig $definition,
         $fieldName,
         $targetClass,
@@ -191,7 +191,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
      *
      * @return string
      */
-    protected function getAssociationTargetType($isCollection)
+    private function getAssociationTargetType($isCollection)
     {
         return $isCollection ? 'to-many' : 'to-one';
     }

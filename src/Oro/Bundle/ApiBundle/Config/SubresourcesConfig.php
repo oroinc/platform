@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Represents the configuration of Data API sub-resources.
+ */
 class SubresourcesConfig
 {
     /** @var SubresourceConfig[] [association name => SubresourceConfig, ...] */

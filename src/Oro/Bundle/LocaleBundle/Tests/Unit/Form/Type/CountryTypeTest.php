@@ -29,6 +29,7 @@ class CountryTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
+                'choices_as_values' => true,
                 'choices' => array_flip(Intl::getRegionBundle()->getCountryNames('en')),
             ]);
 

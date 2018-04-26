@@ -17,7 +17,7 @@ class BooleanFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return BooleanFilterType::NAME;
+        return BooleanFilterType::class;
     }
 
     /**

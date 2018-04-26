@@ -235,7 +235,7 @@ class BusinessUnitManager
         $choices = [];
         $blanks  = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
         foreach ($options as $option) {
-            $choices += [$option['id'] => $blanks . htmlspecialchars($option['name'])];
+            $choices += [$blanks . htmlspecialchars($option['name']) => $option['id']];
             if (isset($option['children'])) {
                 $choices += $this->getTreeOptions($option['children'], $level + 1);
             }

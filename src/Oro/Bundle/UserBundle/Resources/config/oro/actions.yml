@@ -81,7 +81,7 @@ operations:
         form_options:
             attribute_fields:
                 entity:
-                    form_type: form
+                    form_type: Symfony\Component\Form\Extension\Core\Type\FormType
 
     oro_user_edit_role:
         label: oro.user.role.actions.edit

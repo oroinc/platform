@@ -77,7 +77,7 @@ operations:
         form_options:
             attribute_fields:
                 entity:
-                    form_type: form
+                    form_type: Symfony\Component\Form\Extension\Core\Type\FormType
         form_init:
             - '@assign_value': [$.entityFields, []]
             - '@call_service_method':

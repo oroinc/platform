@@ -52,11 +52,6 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(DateRangeFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -72,12 +67,12 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
                         'showTimepicker'    => false,
                     ),
                     'operator_choices' => array(
-                        DateRangeFilterType::TYPE_BETWEEN => 'oro.filter.form.label_date_type_between',
-                        DateRangeFilterType::TYPE_NOT_BETWEEN => 'oro.filter.form.label_date_type_not_between',
-                        DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
-                        DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
-                        DateRangeFilterType::TYPE_EQUAL => 'oro.filter.form.label_date_type_equals',
-                        DateRangeFilterType::TYPE_NOT_EQUAL => 'oro.filter.form.label_date_type_not_equals'
+                        'oro.filter.form.label_date_type_between' => DateRangeFilterType::TYPE_BETWEEN,
+                        'oro.filter.form.label_date_type_not_between' => DateRangeFilterType::TYPE_NOT_BETWEEN,
+                        'oro.filter.form.label_date_type_more_than' => DateRangeFilterType::TYPE_MORE_THAN ,
+                        'oro.filter.form.label_date_type_less_than' => DateRangeFilterType::TYPE_LESS_THAN,
+                        'oro.filter.form.label_date_type_equals' => DateRangeFilterType::TYPE_EQUAL,
+                        'oro.filter.form.label_date_type_not_equals' => DateRangeFilterType::TYPE_NOT_EQUAL
                     ),
                     'type_values' => array(
                         'between'    => DateRangeFilterType::TYPE_BETWEEN,

@@ -116,6 +116,8 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices' => $choices,
                 'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
             ]
@@ -138,7 +140,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
                 $fieldLabelPath =
                     ($currentLabelPath ? implode(self::LABEL_GLUE, $currentLabelPath).self::LABEL_GLUE : '').
                     $fieldLabel;
-                $choices[$fieldPath] = $fieldLabelPath;
+                $choices[$fieldLabelPath] = $fieldPath;
             }
 
             if (count($currentPath) < self::MAX_NESTING_LEVEL - 1) {

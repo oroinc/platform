@@ -49,9 +49,11 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      */
     public function getDefaultValue()
     {
-        return is_callable($this->defaultValue)
-            ? call_user_func($this->defaultValue)
-            : $this->defaultValue;
+        if (\is_callable($this->defaultValue)) {
+            return \call_user_func($this->defaultValue);
+        }
+
+        return $this->defaultValue;
     }
 
     /**
@@ -71,15 +73,12 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      */
     public function getDefaultValueString()
     {
+        $value = $this->getDefaultValue();
         if (null !== $this->defaultValueToStringConverter) {
-            return call_user_func($this->defaultValueToStringConverter, $this->getDefaultValue());
+            return \call_user_func($this->defaultValueToStringConverter, $value);
         }
 
-        $value = $this->getDefaultValue();
-
-        return null !== $value
-            ? $value
-            : (string)$value;
+        return $value ?? (string)$value;
     }
 
     /**

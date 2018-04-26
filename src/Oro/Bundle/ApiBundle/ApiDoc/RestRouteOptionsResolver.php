@@ -15,6 +15,8 @@ use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Adds all REST API routes to API sandbox based on the current API view and Data API configuration.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -82,12 +84,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        $group = $route->getOption(self::GROUP_OPTION);
-        if ($group === 'rest_api_deprecated') {
-            $routes->remove($routes->getName($route));
-            return;
-        }
-        if ($group !== $this->routeGroup
+        if ($route->getOption(self::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
         ) {
             return;

@@ -33,7 +33,7 @@ class WidgetItemsType extends AbstractType
         $builder->addEventSubscriber($this->itemsSubscriber);
 
         $builder->add('items', CollectionType::class, [
-            'type' => WidgetItemType::class,
+            'entry_type' => WidgetItemType::class,
         ]);
     }
 

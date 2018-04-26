@@ -60,7 +60,7 @@ class SendProcessorRegistry
     {
         $result = array();
         foreach ($this->processors as $name => $processor) {
-            $result[$name] = $processor->getLabel();
+            $result[$processor->getLabel()] = $name;
         }
         return $result;
     }

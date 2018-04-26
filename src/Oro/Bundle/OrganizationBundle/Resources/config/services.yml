@@ -53,7 +53,7 @@ services:
     oro_organization.organization_manager:
         class: '%oro_organization.organization.manager.class%'
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     #
     # Organization API

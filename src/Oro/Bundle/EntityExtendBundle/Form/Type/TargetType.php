@@ -62,6 +62,8 @@ class TargetType extends AbstractType
                     'class' => 'extend-rel-target-name',
                 ),
                 'label'       => 'oro.entity_extend.form.target_entity',
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choice_attr' => function ($choice) {
                     return $this->getChoiceAttributes($choice);
                 },
@@ -127,7 +129,7 @@ class TargetType extends AbstractType
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
             $entityConfig = $this->configManager->getProvider('entity')->getConfig($className);
-            $choices[$className] = $entityConfig->get('label');
+            $choices[$entityConfig->get('label')] = $className;
         }
 
         return $choices;
