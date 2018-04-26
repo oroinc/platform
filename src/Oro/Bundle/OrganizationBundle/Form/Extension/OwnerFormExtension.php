@@ -441,7 +441,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                     array_merge(
                         [
                             'class'                => 'OroOrganizationBundle:BusinessUnit',
-                            'property'             => 'name',
+                            'choice_label'         => 'name',
                             'choices'              => $businessUnits,
                             'mapped'               => true,
                             'label'                => $this->fieldLabel,

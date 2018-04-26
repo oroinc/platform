@@ -63,9 +63,9 @@ class NoteSubscriber implements EventSubscriberInterface
                     EntityType::class,
                     [
                         'required' => false,
-                        'class'    => $fieldExtendConfig->get('target_entity'),
-                        'property' => $fieldExtendConfig->get('target_field'),
-                        'label'    => $fieldEntityConfig->get('label')
+                        'class' => $fieldExtendConfig->get('target_entity'),
+                        'choice_label' => $fieldExtendConfig->get('target_field'),
+                        'label' => $fieldEntityConfig->get('label')
                     ]
                 );
             }

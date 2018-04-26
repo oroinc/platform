@@ -63,7 +63,7 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
                 TranslatableEntityType::class,
                 array(
                     'class'    => 'OroAddressBundle:AddressType',
-                    'property' => 'label',
+                    'choice_label' => 'label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,

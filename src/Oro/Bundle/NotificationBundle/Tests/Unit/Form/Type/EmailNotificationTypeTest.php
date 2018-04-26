@@ -225,7 +225,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    EmailNotificationType::class => $this->formType,
+                    $this->formType,
                     EmailNotificationEntityChoiceType::class => new EntityTypeStub(
                         ['user' => User::class, 'stdClass' => \stdClass::class],
                         EmailNotificationEntityChoiceType::NAME,
