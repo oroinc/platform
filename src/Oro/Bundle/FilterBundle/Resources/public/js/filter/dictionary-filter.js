@@ -168,7 +168,8 @@ define(function(require) {
                 var value = this.value.value;
                 var result = {
                     results: _.filter(select2ConfigData, function(item) {
-                        return _.indexOf(value, item.id) !== -1;
+                        var id = item.id.toString();
+                        return _.indexOf(value, id) !== -1;
                     })
                 };
                 self.trigger(successEventName, result);
