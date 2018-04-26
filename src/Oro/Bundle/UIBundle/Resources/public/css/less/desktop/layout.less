@@ -1,3 +1,13 @@
+&,
+.app-page,
+.app-page__central-panel {
+  height: 100%;
+  overflow: hidden; // prevents scroll bar appearance
+}
+& {
+  overflow-x: auto;
+}
+
 .responsive-block{
   min-width: 340px;
   padding-right: 5px;
@@ -6,12 +16,16 @@
   }
 }
 
-#left-panel,
-#right-panel {
-  overflow: visible;
-}
-#left-panel, #right-panel, #main {
-  float: left;
+.app-page {
+  &__left-panel,
+  &__right-panel {
+    overflow: visible;
+  }
+  &__left-panel,
+  &__right-panel,
+  &__main {
+    float: left;
+  }
 }
 
 .oro-page {

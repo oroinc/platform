@@ -1,10 +1,15 @@
-html, body, #page, #central-panel {
-  height: auto;
+html,
+body,
+.app-page,
+.app-page__central-panel {
+  height: auto !important;
 }
-#left-panel,
-#right-panel {
-  display: none;
-}
-#main {
-  width: 100% !important;
+.app-page {
+  &__left-panel,
+  &__right-panel {
+    display: none;
+  }
+  &__main {
+    width: 100% !important;
+  }
 }

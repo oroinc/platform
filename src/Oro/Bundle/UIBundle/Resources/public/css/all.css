@@ -1,9 +1,7 @@
-#page{
-/*    display: table; need fix when create fotter at bottom
-    height: 100%; */
+.app-page {
     width: 100%;
 }
-#central-panel{
+.app-page__central-panel {
     width: 100%;
 }
 .footer,footer,

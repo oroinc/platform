@@ -53,8 +53,8 @@
             <div class="bar" style="width: 90%;"></div>
         </div>
     </div>
-    <div id="page" style="display:none;">
-        <div id="central-panel">
+    <div id="page" style="display:none;" class="app-page">
+        <div id="central-panel" class="app-page__central-panel">
             {% block header %}
                 <header class="navbar" id="oroplatform-header">
                     {% placeholder before_navigation %}
@@ -76,13 +76,13 @@
             {% endblock header %}
             {% if isDesktopVersion() %}
                 {% block left_panel %}
-                    <div id="left-panel" data-layout="separate">
+                    <div id="left-panel" class="app-page__left-panel" data-layout="separate">
                         {% placeholder left_panel with {placement: 'left'} %}
                     </div>
                 {% endblock left_panel %}
             {% endif %}
             {% block main %}
-                <div id="main">
+                <div id="main" class="app-page__main">
                     {% block before_content %}
                     <div id="flash-messages">
                         {% block messages %}
@@ -178,7 +178,7 @@
             {% endblock main %}
             {% if isDesktopVersion() %}
                 {% block right_panel %}
-                    <div id="right-panel">
+                    <div id="right-panel" class="app-page__right-panel">
                         {% placeholder right_panel with {placement: 'right'} %}
                     </div>
                 {% endblock right_panel %}

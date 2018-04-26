@@ -295,6 +295,6 @@ table.table {
     padding-left: 10px;
 }
 
-#page {
+.app-page {
     overflow: auto;
 }

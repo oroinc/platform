@@ -1,3 +1,11 @@
+& {
+  min-height: 100%;
+}
+.app-page {
+  &__central-panel {
+    padding-top: @headerHeight;
+  }
+}
 .mobile-hide{
   display:none;
   width: 0;
@@ -6,20 +14,6 @@
   position: absolute;
   top: -9999px;
   left: -9999px;
-}
-&, #page, #central-panel {
-  height: auto;
-  min-height: 100%;
-  overflow: visible;
-}
-
-#main {
-  float: none;
-  height: 100%;
-}
-
-#central-panel {
-  padding-top: @headerHeight;
 }
 #oroplatform-header {
   position: fixed;
