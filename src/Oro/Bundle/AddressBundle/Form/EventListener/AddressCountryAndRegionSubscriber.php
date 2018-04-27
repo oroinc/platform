@@ -70,7 +70,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if ($form->has('region')) {
                 $regionTypeConfig = $form->get('region')->getConfig();
                 $config = $regionTypeConfig->getOptions();
-                unset($config['choice_list']);
                 unset($config['choices']);
                 $formType = get_class($regionTypeConfig->getType()->getInnerType());
             } else {
@@ -116,7 +115,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form = $event->getForm();
 
             $config = $form->get('region')->getConfig()->getOptions();
-            unset($config['choice_list']);
             unset($config['choices']);
 
             //@TODO Remove in scope BAP-16504

@@ -53,7 +53,6 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
 
         $options = $existingEntityForm->getConfig()->getOptions();
         unset($options['choices']);
-        unset($options['choice_list']);
 
         $templateForm->add('existing_entity', AutoResponseTemplateChoiceType::class, array_merge(
             $options,

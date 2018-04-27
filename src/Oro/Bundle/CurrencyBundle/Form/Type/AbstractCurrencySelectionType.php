@@ -141,7 +141,7 @@ abstract class AbstractCurrencySelectionType extends AbstractType
                     $event->getForm()->getParent(),
                     $event->getForm()->getName(),
                     ['additional_currencies' => [$formData]],
-                    ['choice_list', 'choices']
+                    ['choices']
                 );
             }
         });
