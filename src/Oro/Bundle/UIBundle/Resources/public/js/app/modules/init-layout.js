@@ -19,15 +19,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     /* ============================================================
      * from layout.js
      * ============================================================ */
-
-    var realWidth = function($selector) {
-        if ($selector instanceof $ && $selector.length > 0) {
-            return $selector[0].getBoundingClientRect().width;
-        } else {
-            return 0;
-        }
-    };
-
     $(function() {
         var $pageTitle = $('#page-title');
         if ($pageTitle.length) {

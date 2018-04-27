@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var SidebarComponent;
-    var $ = require('jquery');
     var _ = require('underscore');
     var SidebarModel = require('orosidebar/js/model');
     var SidebarView = require('orosidebar/js/view');

@@ -23,10 +23,6 @@ define(function(require) {
 
     var WIDGET_SORT_DELAY = 100;
 
-    function stateToClass(position, state) {
-        return position.toLowerCase().replace('_', '-') + '-' + state.slice(8).toLowerCase();
-    }
-
     /**
      * @export  orosidebar/js/view
      * @class   orosidebar.View
