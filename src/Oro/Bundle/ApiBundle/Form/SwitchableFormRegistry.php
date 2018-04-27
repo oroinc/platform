@@ -9,9 +9,9 @@ use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 
 /**
  * Unfortunately we have to use inheritance instead of aggregation because there are
- * 3-rd party bundles that use FormRegistry instead of FormRegistryInterface.
+ * bundles that use FormRegistry instead of FormRegistryInterface.
  * For example:
- * @see \A2lix\TranslationFormBundle\TranslationForm\TranslationForm
+ * @see \Oro\Bundle\TranslationBundle\Form\TranslationForm\AbstractTranslationForm
  */
 class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitcherInterface
 {
