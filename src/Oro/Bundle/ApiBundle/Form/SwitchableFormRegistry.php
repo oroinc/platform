@@ -3,20 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 
 /**
- * Unfortunately we have to use inheritance instead of aggregation because there are
- * 3-rd party bundles that use FormRegistry instead of FormRegistryInterface.
- * For example:
- * @see \A2lix\TranslationFormBundle\TranslationForm\TranslationForm
+ * The form registry is used to switch between default forms that are used on UI and Data API forms.
+ * Unfortunately we have to use inheritance instead of aggregation because
+ * some 3-rd party bundles can use FormRegistry instead of FormRegistryInterface.
+ * An example of such usages is A2lix\TranslationFormBundle\TranslationForm\TranslationForm.
  */
 class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitcherInterface
 {
-    const DEFAULT_EXTENSION = 'default';
-    const API_EXTENSION     = 'api';
+    public const DEFAULT_EXTENSION = 'default';
+    public const API_EXTENSION     = 'api';
 
     /** @var SwitchableDependencyInjectionExtension */
     protected $extension;
@@ -39,18 +40,16 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     ) {
         parent::__construct($extensions, $resolvedTypeFactory);
 
-        if (count($extensions) !== 1) {
+        if (\count($extensions) !== 1) {
             throw new \InvalidArgumentException('Expected only one form extension.');
         }
-        $this->extension = reset($extensions);
+        $this->extension = \reset($extensions);
         if (!$this->extension instanceof SwitchableDependencyInjectionExtension) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected type of form extension is "%s", "%s" given.',
-                    'Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension',
-                    get_class($this->extension)
-                )
-            );
+            throw new \InvalidArgumentException(\sprintf(
+                'Expected type of form extension is "%s", "%s" given.',
+                SwitchableDependencyInjectionExtension::class,
+                \get_class($this->extension)
+            ));
         }
         $this->extensionState = $extensionState;
     }
@@ -95,14 +94,40 @@ class SwitchableFormRegistry extends FormRegistry implements FormExtensionSwitch
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getType($name)
+    {
+        // prevent using of not registered in API form types
+        if ($this->extensionState->isApiFormExtensionActivated()) {
+            $isKnownType = false;
+            $extensions = $this->getExtensions();
+            foreach ($extensions as $extension) {
+                if ($extension->hasType($name)) {
+                    $isKnownType = true;
+                    break;
+                }
+            }
+            if (!$isKnownType) {
+                throw new InvalidArgumentException(\sprintf(
+                    'The form type "%s" is not configured to be used in Data API.',
+                    $name
+                ));
+            }
+        }
+
+        return parent::getType($name);
+    }
+
+    /**
      * @param string $propertyName
      * @param mixed  $value
      */
-    protected function setPrivatePropertyValue($propertyName, $value)
+    private function setPrivatePropertyValue($propertyName, $value)
     {
-        $r = new \ReflectionClass('Symfony\Component\Form\FormRegistry');
+        $r = new \ReflectionClass(FormRegistry::class);
         if (!$r->hasProperty($propertyName)) {
-            throw new \RuntimeException(sprintf('The "%s" property does not exist.', $propertyName));
+            throw new \RuntimeException(\sprintf('The "%s" property does not exist.', $propertyName));
         }
         $p = $r->getProperty($propertyName);
         $p->setAccessible(true);

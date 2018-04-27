@@ -21,11 +21,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor';
     private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE     = 'oro_api.rest.request_type_provider';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.chain_routing_options_resolver';
-    private const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro_api.routing_options_resolver';
+    private const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro.api.routing_options_resolver';
     private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
-    private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro_api.api_doc_annotation_handler';
+    private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro_api.request_type_provider';
+    private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
     private const EXPECTED_API_DOC_HTML_FORMATTER_CLASS     = 'Nelmio\ApiDocBundle\Formatter\HtmlFormatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';

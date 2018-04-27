@@ -90,7 +90,7 @@ services:
         class: '%oro_email.form.type.emailtemplate_translation.class%'
         arguments:
             - '@oro_config.user'
-            - '%a2lix_translation_form.gedmo.type.translations.class%'
+            - 'Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType'
         tags:
             - { name: form.type, alias: oro_email_emailtemplate_translatation }
 
