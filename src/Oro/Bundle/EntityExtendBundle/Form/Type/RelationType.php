@@ -234,6 +234,12 @@ class RelationType extends AbstractType
             $data['bidirectional'] = true;
         }
 
+        $attr = [];
+
+        if ($readOnly) {
+            $attr['readonly'] = true;
+        }
+
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
                 // TODO: remove 'choices_as_values' option below in scope of BAP-15236
@@ -247,9 +253,7 @@ class RelationType extends AbstractType
                 'subblock' => 'properties',
                 'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
                 'data' => $this->getArrayValue($data, 'bidirectional'),
-                'attr' => [
-                    'readonly' => $readOnly
-                ]
+                'attr' => $attr
             ];
 
             $form->add('bidirectional', Select2ChoiceType::class, $options);
