@@ -34,10 +34,11 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit_Framework_TestCase
      */
     public function removeNonPrintableCharactersDataProvider()
     {
+        $lineFeedCode = 10;
         $simpleSpaceCode = 32;
         $spaceCharactersCodes = [
             9, // HT
-            10, // LF
+            $lineFeedCode,
             11, // VT
             12, // FF
             13, // CR
@@ -60,11 +61,15 @@ class NonPrintableCharsStringSanitizerTest extends \PHPUnit_Framework_TestCase
             ],
             'spaces' => [
                 'string' => implode('', array_map('chr', $spaceCharactersCodes)),
-                'expectedString' => chr($simpleSpaceCode),
+                'expectedString' => chr($lineFeedCode) . chr($simpleSpaceCode),
             ],
             'graph ignored characters' => [
                 'string' => implode('', $graphIgnoredCharacters),
                 'expectedString' => '',
+            ],
+            'text with new line' => [
+                'string' => 'First string' . chr($lineFeedCode) . 'Second string',
+                'expectedString' => "First string\nSecond string",
             ],
         ];
     }

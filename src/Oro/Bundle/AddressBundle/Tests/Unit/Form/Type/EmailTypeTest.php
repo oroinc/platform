@@ -42,9 +42,4 @@ class EmailTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->buildForm($builder, array());
     }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_email', $this->type->getName());
-    }
 }

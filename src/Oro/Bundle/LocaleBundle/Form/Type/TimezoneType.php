@@ -43,7 +43,9 @@ class TimezoneType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'choices' => self::$timezones,
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices' => self::$timezones ? array_flip(self::$timezones) : null,
             )
         );
     }

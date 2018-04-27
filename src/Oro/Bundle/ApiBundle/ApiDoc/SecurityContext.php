@@ -74,6 +74,17 @@ class SecurityContext implements SecurityContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getApiKeyGenerationHint(): ?string
+    {
+        return
+            'To use WSSE authentication you need to generate API key for the current logged-in user.'
+            . ' To do this, go to the My User page and click Generate Key near to API Key.'
+            . ' After that reload this page.';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLoginRoute(): ?string
     {
         return 'oro_user_security_login';

@@ -33,8 +33,8 @@ datagrids:
                 label: oro.notification.massnotification.status.label
                 frontend_type: select
                 choices:
-                   - oro.notification.massnotification.status.failed
-                   - oro.notification.massnotification.status.success
+                   oro.notification.massnotification.status.failed: 0
+                   oro.notification.massnotification.status.success: 1
 
         properties:
             id: ~
@@ -79,9 +79,11 @@ datagrids:
                     data_name: e.status
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                0: oro.notification.massnotification.status.failed
-                                1: oro.notification.massnotification.status.success
+                                oro.notification.massnotification.status.failed: 0
+                                oro.notification.massnotification.status.success: 1
 
     email-notification-grid:
         options:
@@ -187,6 +189,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            choices_as_values: true
                             choices: "@oro_entity.datagrid_helper->getEntityNames"
                             translatable_options: false
 
@@ -197,6 +200,8 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices: "@oro_notification.event_listener.email_notification_service->getEventNameChoices"
 
                 templateName:
@@ -209,6 +214,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            choices_as_values: true
                             choices: "@oro_notification.event_listener.email_notification_service->getRecipientUsersChoices"
 
                 recipientGroupsList:
@@ -217,6 +223,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            choices_as_values: true
                             choices: "@oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices"
 
                 emailRecipient:

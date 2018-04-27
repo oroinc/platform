@@ -44,8 +44,8 @@ class SegmentManagerTest extends WebTestCase
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
 
         $this->assertEquals([
-            $dynamicSegment->getType()->getName() => $dynamicSegment->getType()->getLabel(),
-            $staticSegment->getType()->getName() => $staticSegment->getType()->getLabel(),
+            $dynamicSegment->getType()->getLabel() => $dynamicSegment->getType()->getName(),
+            $staticSegment->getType()->getLabel() => $staticSegment->getType()->getName(),
         ], $this->manager->getSegmentTypeChoices());
     }
 

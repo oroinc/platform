@@ -58,9 +58,9 @@ class EmailNotificationGridHelper
                 $id = $entityItem['id'];
                 unset($entityItem['id']);
 
-                $options[$id] = implode(' ', $entityItem);
+                $options[implode(' ', $entityItem)] = $id;
             } else {
-                $options[$entityItem['id']] = $entityItem[$mainField];
+                $options[$entityItem[$mainField]] = $entityItem['id'];
             }
         }
 

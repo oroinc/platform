@@ -75,8 +75,8 @@ abstract class AbstractQueryDesignerType extends AbstractType
     {
         return
             array(
-                'grouping_column_choice_type'        => 'hidden',
-                'column_column_choice_type'          => 'hidden',
+                'grouping_column_choice_type'        => HiddenType::class,
+                'column_column_choice_type'          => HiddenType::class,
                 'filter_column_choice_type'          => EntityFieldSelectType::class,
                 'date_grouping_choice_type'          => EntityFieldSelectType::class,
                 'column_column_field_choice_options' => [],

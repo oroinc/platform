@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents a filter configuration for a field.
+ * Represents the configuration of a field that can be used to filter data.
  */
 class FilterFieldConfig implements FieldConfigInterface
 {

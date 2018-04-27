@@ -48,7 +48,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return ChoiceTreeFilterType::NAME;
+        return ChoiceTreeFilterType::class;
     }
 
     /**

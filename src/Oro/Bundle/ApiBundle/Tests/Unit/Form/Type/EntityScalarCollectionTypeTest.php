@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -59,18 +60,12 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         $form = $formBuilder->getForm();
 
         $form->submit(['groups' => []]);
-        $this->assertTrue($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new EntityScalarCollectionType();
-        $this->assertEquals('oro_api_entity_scalar_collection', $type->getName());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testGetParent()
     {
         $type = new EntityScalarCollectionType();
-        $this->assertEquals(ScalarCollectionType::class, $type->getParent());
+        self::assertEquals(ScalarCollectionType::class, $type->getParent());
     }
 }

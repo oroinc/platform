@@ -15,6 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType as SymfonyEmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -125,7 +126,7 @@ class UserType extends AbstractType
                 CollectionType::class,
                 [
                     'label'          => 'oro.user.emails.label',
-                    'type'           => EmailType::class,
+                    'entry_type'     => EmailType::class,
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'by_reference'   => false,
@@ -156,7 +157,7 @@ class UserType extends AbstractType
 
         $passwordOptions = [
             'invalid_message' => 'oro.user.message.password_mismatch',
-            'type' => 'password',
+            'type' => PasswordType::class,
             'required' => false,
             'first_options' => [
                 'label' => 'oro.user.password.label',

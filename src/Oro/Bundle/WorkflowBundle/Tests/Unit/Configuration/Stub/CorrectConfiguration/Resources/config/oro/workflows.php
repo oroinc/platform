@@ -3,6 +3,7 @@
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 return [
     'first_workflow' => [
@@ -123,7 +124,7 @@ return [
                 'form_options' => [
                     'attribute_fields' => [
                         'first_attribute' => [
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'First Attribute',
                             'options' => [
                                 'required' => 1
@@ -187,7 +188,7 @@ return [
                     'is_unavailable_hidden' => false,
                     'acl_message' => null,
                     'frontend_options' => [],
-                    'form_type' => 'oro_workflow_transition',
+                    'form_type' => WorkflowTransitionType::class,
                     'display_type' => 'dialog',
                     'form_options' => [
                         WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
@@ -216,7 +217,7 @@ return [
                     'is_unavailable_hidden' => false,
                     'acl_message' => null,
                     'frontend_options' => [],
-                    'form_type' => 'oro_workflow_transition',
+                    'form_type' => WorkflowTransitionType::class,
                     'display_type' => 'dialog',
                     'form_options' => [
                         WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
@@ -307,7 +308,7 @@ return [
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
-                'form_type' => WorkflowTransitionType::NAME,
+                'form_type' => WorkflowTransitionType::class,
                 'display_type' => 'dialog',
                 'destination_page' => '',
                 'form_options' => [],

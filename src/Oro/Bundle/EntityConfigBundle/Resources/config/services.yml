@@ -281,7 +281,6 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 /**
+ * Adds the data type property related methods to a configuration class.
+ *
  * @property array $items
  */
 trait DataTypeTrait

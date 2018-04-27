@@ -8,7 +8,7 @@ entity_config:
                         require_schema_update: true
                         priority:           250
                     form:
-                        type:               oro_activity_multiple_association_choice
+                        type:               Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType
                         options:
                             block:          associations
                             required:       false

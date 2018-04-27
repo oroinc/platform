@@ -9,6 +9,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
+/**
+ * Provides a set of methods to simplify manage of the User entity.
+ */
 class UserManager extends BaseUserManager
 {
     const AUTH_STATUS_ENUM_CODE = 'auth_status';
@@ -107,20 +110,21 @@ class UserManager extends BaseUserManager
     protected function assertRoles(UserInterface $user)
     {
         if (count($user->getRoles()) === 0) {
-            $metadata = $this->getStorageManager()->getClassMetadata(ClassUtils::getClass($user));
-            $roleClassName = $metadata->getAssociationTargetClass('roles');
+            $storageManager = $this->getStorageManager();
 
-            if (!is_a($roleClassName, 'Symfony\Component\Security\Core\Role\RoleInterface', true)) {
+            $roleClassName = $storageManager
+                ->getClassMetadata(ClassUtils::getClass($user))
+                ->getAssociationTargetClass('roles');
+            if (!is_a($roleClassName, RoleInterface::class, true)) {
                 throw new \RuntimeException(
-                    sprintf('Expected Symfony\Component\Security\Core\Role\RoleInterface, %s given', $roleClassName)
+                    sprintf('Expected %s, %s given', RoleInterface::class, $roleClassName)
                 );
             }
 
-            /** @var RoleInterface $role */
-            $role = $this->getStorageManager()
+            /** @var RoleInterface|null $role */
+            $role = $storageManager
                 ->getRepository($roleClassName)
                 ->findOneBy(['role' => User::ROLE_DEFAULT]);
-
             if (!$role) {
                 throw new \RuntimeException('Default user role not found');
             }

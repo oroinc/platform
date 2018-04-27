@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Represents the configuration of Data API resource action.
+ */
 class ActionConfig implements ConfigBagInterface
 {
     use Traits\ConfigTrait;
@@ -84,6 +87,11 @@ class ActionConfig implements ConfigBagInterface
     public function toArray()
     {
         $result = $this->convertItemsToArray();
+        $this->removeItemWithDefaultValue($result, self::DISABLE_META_PROPERTIES);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_INCLUSION);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_FIELDSET);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_SORTING);
+
         $fields = ConfigUtil::convertObjectsToArray($this->fields, true);
         if (!empty($fields)) {
             $result[self::FIELDS] = $fields;

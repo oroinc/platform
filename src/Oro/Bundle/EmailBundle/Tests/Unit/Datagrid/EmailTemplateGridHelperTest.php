@@ -50,9 +50,9 @@ class EmailTemplateGridHelperTest extends \PHPUnit_Framework_TestCase
         $result = $this->helper->getEntityNames();
         $this->assertSame(
             [
-                '_empty_'     => 'oro.email.datagrid.emailtemplate.filter.entityName.empty',
-                'TestEntity1' => 'entity1_label',
-                'TestEntity2' => 'entity2_label',
+                'oro.email.datagrid.emailtemplate.filter.entityName.empty' => '_empty_',
+                'entity1_label' => 'TestEntity1',
+                'entity2_label' => 'TestEntity2',
             ],
             $result
         );

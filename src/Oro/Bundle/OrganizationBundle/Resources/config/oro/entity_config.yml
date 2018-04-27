@@ -17,7 +17,7 @@ entity_config:
                         show_filter:        true
                         choices:            "@oro_organization.form.type.ownership_type->getOwnershipsArray"
                     form:
-                        type:               oro_type_choice_ownership_type
+                        type:               Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
                         options:
                             block:          other
                             required:       true

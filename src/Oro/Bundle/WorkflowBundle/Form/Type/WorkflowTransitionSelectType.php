@@ -38,6 +38,10 @@ class WorkflowTransitionSelectType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefaults([
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            'choices_as_values' => true,
+        ]);
         $resolver->setDefined('workflowName');
         $resolver->setAllowedTypes('workflowName', ['string', 'null']);
         $resolver->setRequired('workflowName');
@@ -54,7 +58,7 @@ class WorkflowTransitionSelectType extends AbstractType
 
                 $choices = [];
                 foreach ($transitions as $transition) {
-                    $choices[$transition->getName()] = $transition->getLabel();
+                    $choices[$transition->getLabel()] = $transition->getName();
                 }
 
                 return $choices;

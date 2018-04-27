@@ -72,6 +72,6 @@ class ContactInformationEmailsProviderTest extends \PHPUnit_Framework_TestCase
 
         $recipients = $this->provider->getRecipients($entity);
 
-        $this->assertEquals(['email' => 'Translated label'], $recipients);
+        $this->assertEquals(['Translated label' => 'email'], $recipients);
     }
 }

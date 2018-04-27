@@ -80,11 +80,6 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
         return $this->searchHandler;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_autocomplete', $this->formType->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(TextType::class, $this->formType->getParent());

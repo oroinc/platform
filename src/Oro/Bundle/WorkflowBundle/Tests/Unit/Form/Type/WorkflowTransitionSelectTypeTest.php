@@ -59,18 +59,13 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 
         $form = $this->factory->create(WorkflowTransitionSelectType::class, null, ['workflowName' => 'test_workflow']);
 
-        $this->assertFormOptionEqual([$transition->getName() => $transition->getLabel()], 'choices', $form);
+        $this->assertFormOptionEqual([$transition->getLabel() => $transition->getName()], 'choices', $form);
         $this->assertNull($form->getData());
 
         $form->submit($transition->getName());
 
         $this->assertFormIsValid($form);
         $this->assertEquals($transition->getName(), $form->getData());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowTransitionSelectType::NAME, $this->type->getName());
     }
 
     public function testConfigureOptions()

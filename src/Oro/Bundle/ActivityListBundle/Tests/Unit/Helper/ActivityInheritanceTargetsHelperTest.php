@@ -124,8 +124,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             0,
-            ':entityId',
-            false
+            ':entityId'
         );
 
         $expectedDQL = 'SELECT activity.id, activity.updatedAt '
@@ -134,34 +133,6 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit_Framework_TestCase
             . 'WHERE ta_0.id IN(SELECT inherit_0.id'
             . ' FROM Acme\Bundle\AcmeBundle\Entity\Contact inherit_0'
             . ' INNER JOIN inherit_0.accounts t_0_0 WHERE t_0_0.id = :entityId)';
-
-        $this->assertSame($expectedDQL, $mainQb->getDQL());
-    }
-
-    public function testApplyInheritanceActivityHeadOnly()
-    {
-        $mainQb = $this->prepareMock();
-
-        $this->activityInheritanceTargetsHelper->applyInheritanceActivity(
-            $mainQb,
-            [
-                'targetClass' => 'Acme\Bundle\AcmeBundle\Entity\Contact',
-                'targetClassAlias' => 'contact_e8d5b2ba',
-                'path' => [
-                    'accounts'
-                ]
-            ],
-            0,
-            ':entityId',
-            true
-        );
-
-        $expectedDQL = 'SELECT activity.id, activity.updatedAt '
-            . 'FROM ActivityList activity '
-            . 'LEFT JOIN activity.contact_e8d5b2ba ta_0 '
-            . 'WHERE ta_0.id IN(SELECT inherit_0.id'
-            . ' FROM Acme\Bundle\AcmeBundle\Entity\Contact inherit_0'
-            . ' INNER JOIN inherit_0.accounts t_0_0 WHERE t_0_0.id = :entityId) AND activity.head = true';
 
         $this->assertSame($expectedDQL, $mainQb->getDQL());
     }

@@ -13,25 +13,23 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
 class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_CLASS_NAME        = 'Test\Class';
-    const TEST_VERSION           = '1.1';
-    const TEST_REQUEST_TYPE      = RequestType::REST;
-    const TEST_TARGET_CLASS_NAME = 'Test\TargetClass';
+    private const TEST_CLASS_NAME        = 'Test\Class';
+    private const TEST_VERSION           = '1.1';
+    private const TEST_REQUEST_TYPE      = RequestType::REST;
+    private const TEST_TARGET_CLASS_NAME = 'Test\TargetClass';
 
     /** @var MetadataContext */
-    protected $context;
+    private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var AssociationMetadataLoader */
     protected $associationMetadataLoader;
 
     protected function setUp()
     {
-        $this->metadataProvider = $this->getMockBuilder(MetadataProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->associationMetadataLoader = new AssociationMetadataLoader($this->metadataProvider);
 
@@ -47,6 +45,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
+        $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $fieldConfig->createAndSetTargetEntity();
 
         $entityMetadata = new EntityMetadata();
@@ -105,6 +104,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
+        $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
         $entityMetadata = new EntityMetadata();
@@ -136,6 +136,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
+        $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
         $entityMetadata = new EntityMetadata();

@@ -74,6 +74,8 @@ datagrids:
                     data_name: j.status
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
                                 oro.message_queue_job.status.new: oro.message_queue_job.status.new
                                 oro.message_queue_job.status.running: oro.message_queue_job.status.running
@@ -177,6 +179,8 @@ datagrids:
                     data_name: j.status
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
                                 oro.message_queue_job.status.new: oro.message_queue_job.status.new
                                 oro.message_queue_job.status.running: oro.message_queue_job.status.running
