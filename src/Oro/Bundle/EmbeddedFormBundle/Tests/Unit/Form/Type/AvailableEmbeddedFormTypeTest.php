@@ -28,7 +28,10 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['choices' => $availableForms]);
+            ->with([
+                'choices_as_values' => true,
+                'choices' => array_flip($availableForms),
+            ]);
 
         $formType = new AvailableEmbeddedFormType($manager);
         $formType->configureOptions($resolver);

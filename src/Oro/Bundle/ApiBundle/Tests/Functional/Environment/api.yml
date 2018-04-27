@@ -153,6 +153,9 @@ api:
                     form_options:
                         constraints:
                             - NotBlank: ~
+                description:
+                    data_type: string
+                    description: The description of a resource
             actions:
                 get:
                     description: Get Resource Without Identifier

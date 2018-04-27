@@ -525,7 +525,7 @@ workflows:
                 form_options:
                     attribute_fields:                       # fields of form that will be shown when transition button is clicked
                         call_timeout:
-                            form_type: integer
+                            form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                             options:
                                 required: false
                 display_type: page

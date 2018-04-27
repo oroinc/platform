@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -88,6 +89,8 @@ class MailboxType extends AbstractType
 
         $builder->add('processType', ChoiceType::class, [
             'label'       => 'oro.email.mailbox.process.type.label',
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            'choices_as_values' => true,
             'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
             'mapped'      => false,

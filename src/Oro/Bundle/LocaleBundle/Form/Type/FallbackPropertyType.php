@@ -59,6 +59,8 @@ class FallbackPropertyType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values'  => true,
                 'required'           => false,
                 'placeholder'        => false,
                 'enabled_fallbacks'  => [],
@@ -96,7 +98,7 @@ class FallbackPropertyType extends AbstractType
                     );
                 }
 
-                return $choices;
+                return array_flip($choices);
             }
         );
 

@@ -8,19 +8,19 @@ system_configuration:
     fields:
         oro_notification.email_notification_sender_email:
             data_type: string
-            type: email
+            type: Symfony\Component\Form\Extension\Core\Type\EmailType
             search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_email
         oro_notification.email_notification_sender_name:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 label: oro.notification.system_configuration.email_notification_sender_name
         oro_notification.mass_notification_template:
             data_type: string
-            type: oro_email_system_template_list
+            type: Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType
             priority: 20
             options:
                 required: false
@@ -28,7 +28,7 @@ system_configuration:
                 tooltip: oro.notification.system_configuration.mass_notification.template.tooltip
         oro_notification.mass_notification_recipients:
             data_type: string
-            type: textarea
+            type: Symfony\Component\Form\Extension\Core\Type\TextareaType
             search_type: text
             priority: 10
             options:

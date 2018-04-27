@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Guesser;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesser extends AbstractFormGuesser
@@ -70,7 +71,7 @@ class DoctrineTypeGuesser extends AbstractFormGuesser
      */
     protected function getTypeGuessByEntity($class, $multiple)
     {
-        $formType = 'entity';
+        $formType = EntityType::class;
         $formOptions = array(
             'class' => $class,
             'multiple' => $multiple

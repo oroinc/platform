@@ -5,8 +5,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
+use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -120,7 +122,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 $this->equalTo('defaultUserOwner'),
-                $this->equalTo('oro_user_organization_acl_select'),
+                $this->equalTo(OrganizationUserAclSelectType::class),
                 $this->equalTo(
                     [
                         'required' => true,
@@ -164,7 +166,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 $this->equalTo('defaultBusinessUnitOwner'),
-                $this->equalTo('oro_business_unit_select'),
+                $this->equalTo(BusinessUnitSelectType::class),
                 $this->equalTo(
                     [
                         'required'    => true,
@@ -213,7 +215,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 $this->equalTo('defaultUserOwner'),
-                $this->equalTo('oro_user_organization_acl_select'),
+                $this->equalTo(OrganizationUserAclSelectType::class),
                 $this->equalTo(
                     [
                         'required' => true,
@@ -261,7 +263,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 $this->equalTo('defaultBusinessUnitOwner'),
-                $this->equalTo('oro_business_unit_select'),
+                $this->equalTo(BusinessUnitSelectType::class),
                 $this->equalTo(
                     [
                         'required'    => true,

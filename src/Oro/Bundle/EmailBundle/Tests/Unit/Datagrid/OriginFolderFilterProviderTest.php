@@ -159,7 +159,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($origin2->isActive(), $result[$origin2MailboxName]['active']);
         $this->assertCount(2, $result[$origin1MailboxName]['folder']);
         $this->assertCount(1, $result[$origin2MailboxName]['folder']);
-        $this->assertEquals($folder2->getFullName(), $result[$origin1MailboxName]['folder'][$folder2->getId()]);
+        $this->assertEquals($folder2->getId(), $result[$origin1MailboxName]['folder'][$folder2->getFullName()]);
     }
 
     public function testMailboxOrigins()
@@ -214,6 +214,6 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($origin2->isActive(), $result[$mailbox2->getLabel()]['active']);
         $this->assertCount(2, $result[$mailbox1->getLabel()]['folder']);
         $this->assertCount(1, $result[$mailbox2->getLabel()]['folder']);
-        $this->assertEquals($folder2->getFullName(), $result[$mailbox1->getLabel()]['folder'][$folder2->getId()]);
+        $this->assertEquals($folder2->getId(), $result[$mailbox1->getLabel()]['folder'][$folder2->getFullName()]);
     }
 }

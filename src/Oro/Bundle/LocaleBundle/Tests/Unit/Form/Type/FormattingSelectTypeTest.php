@@ -43,8 +43,8 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
     public function testBuildForm()
     {
         $data =  [
-            'en' => 'English',
-            'es' => 'Spain'
+            'English' => 'en',
+            'Spain' => 'es',
         ];
 
         $this->provider->expects($this->once())->method('getFormattingChoices')->willReturn($data);

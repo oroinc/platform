@@ -61,12 +61,6 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_route_choice', $this->formType->getName());
-        $this->assertEquals('oro_route_choice', $this->formType->getBlockPrefix());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(Select2ChoiceType::class, $this->formType->getParent());
@@ -185,11 +179,11 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $resolvedOptions = $resolver->resolve($options);
 
         $expectedChoices = [
-            'oro_route_get_simple' => 'Oro Route Get Simple',
-            'oro_route_get' => 'Oro Route Get',
-            'oro_route_get_post' => 'Oro Route Get Post',
-            'oro_route_with_option' => 'Oro Route With Option',
-            'oro_route_get_simple_no_title' => 'Oro Route Get Simple No Title'
+            'Oro Route Get Simple' => 'oro_route_get_simple',
+            'Oro Route Get' => 'oro_route_get',
+            'Oro Route Get Post' => 'oro_route_get_post',
+            'Oro Route With Option' => 'oro_route_with_option',
+            'Oro Route Get Simple No Title' => 'oro_route_get_simple_no_title',
         ];
 
         $this->assertArrayHasKey('choices', $resolvedOptions);

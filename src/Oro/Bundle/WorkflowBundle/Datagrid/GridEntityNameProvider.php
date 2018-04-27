@@ -76,7 +76,7 @@ class GridEntityNameProvider
                     $label = $this->translator->trans($config->get('label'));
                 }
 
-                $this->relatedEntities[$className] = $label;
+                $this->relatedEntities[$label] = $className;
             }
         }
 

@@ -114,7 +114,7 @@ class OriginFolderFilterProvider
                         $results[$mailbox]['folder'][$i]['fullName'] = str_replace('@', '\@', $folder->getFullName());
                         $i++;
                     } else {
-                        $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
+                        $results[$mailbox]['folder'][str_replace('@', '\@', $folder->getFullName())] = $folder->getId();
                     }
                 }
             }
@@ -152,7 +152,7 @@ class OriginFolderFilterProvider
                         $results[$mailbox]['folder'][$i]['fullName'] = str_replace('@', '\@', $folder->getFullName());
                         $i++;
                     } else {
-                        $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
+                        $results[$mailbox]['folder'][str_replace('@', '\@', $folder->getFullName())] = $folder->getId();
                     }
                 }
             }

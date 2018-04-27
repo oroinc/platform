@@ -32,7 +32,7 @@ class PageTemplatesManager
                 $routeName = $pageTemplate->getRouteName();
                 $routeTitle = isset($titles[$routeName]) ? $titles[$routeName] : $routeName;
                 $routes[$routeName]['label'] = $routeTitle;
-                $routes[$routeName]['choices'][$pageTemplate->getKey()] = $pageTemplate->getLabel();
+                $routes[$routeName]['choices'][$pageTemplate->getLabel()] = $pageTemplate->getKey();
             }
         }
 

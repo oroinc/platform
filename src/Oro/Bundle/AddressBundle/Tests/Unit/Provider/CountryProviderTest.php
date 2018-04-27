@@ -34,8 +34,8 @@ class CountryProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'iso2Code1' => 'name1',
-                'iso2Code2' => 'name2',
+                'name1' => 'iso2Code1',
+                'name2' => 'iso2Code2',
             ],
             $this->provider->getCountriesNames()
         );

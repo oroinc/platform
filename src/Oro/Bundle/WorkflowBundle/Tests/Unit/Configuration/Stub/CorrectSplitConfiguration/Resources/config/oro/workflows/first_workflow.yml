@@ -62,7 +62,7 @@ workflows:
                 form_options:
                     attribute_fields:
                         first_attribute:
-                            form_type: text
+                            form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                             label: 'First Attribute'
                             options:
                                 required: true

@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -16,7 +15,6 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -49,14 +47,9 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -73,15 +66,10 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $sortersConfig = $this->getSortersConfig(['id']);
         $sortersConfig->getField('id')->setExcluded(true);
 
-        $sorterFilter = new SortFilter('integer');
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $this->prepareFilters();
         $this->context->getFilterValues()->get('sort')->setSourceKey('sortFilterSourceKey');
 
         $this->context->setConfigOfSorters($sortersConfig);
-        $this->context->set('filters', $filters);
         $this->processor->process($this->context);
 
         self::assertEquals(
@@ -394,10 +382,6 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      */
     private function prepareFilters($sortBy = '-id')
     {
-        $sorterFilter = new SortFilter(DataType::ORDER_BY);
-        $filters      = new FilterCollection();
-        $filters->add('sort', $sorterFilter);
-
         $request = $this->createMock(Request::class);
         $request->expects(self::once())
             ->method('getQueryString')
@@ -417,8 +401,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         }
         $filterValues->get('sort')->setValue($orderBy);
 
-        $this->context->set('filters', $filters);
         $this->context->setFilterValues($filterValues);
+        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
     }
 
     /**

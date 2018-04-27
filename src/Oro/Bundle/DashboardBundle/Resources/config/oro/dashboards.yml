@@ -1,7 +1,7 @@
 dashboards:
     widgets_configuration:
         title:
-            type: oro_type_widget_title
+            type: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
             options:
                label: oro.dashboard.title.label
                required: false

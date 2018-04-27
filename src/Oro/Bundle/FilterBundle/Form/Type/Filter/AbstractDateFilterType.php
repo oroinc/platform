@@ -90,12 +90,12 @@ abstract class AbstractDateFilterType extends AbstractType
     public function getOperatorChoices()
     {
         return [
-            self::TYPE_BETWEEN     => $this->translator->trans('oro.filter.form.label_date_type_between'),
-            self::TYPE_NOT_BETWEEN => $this->translator->trans('oro.filter.form.label_date_type_not_between'),
-            self::TYPE_MORE_THAN   => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-            self::TYPE_LESS_THAN   => $this->translator->trans('oro.filter.form.label_date_type_less_than'),
-            self::TYPE_EQUAL       => $this->translator->trans('oro.filter.form.label_date_type_equals'),
-            self::TYPE_NOT_EQUAL   => $this->translator->trans('oro.filter.form.label_date_type_not_equals')
+            $this->translator->trans('oro.filter.form.label_date_type_between') => self::TYPE_BETWEEN,
+            $this->translator->trans('oro.filter.form.label_date_type_not_between') => self::TYPE_NOT_BETWEEN,
+            $this->translator->trans('oro.filter.form.label_date_type_more_than') => self::TYPE_MORE_THAN,
+            $this->translator->trans('oro.filter.form.label_date_type_less_than') => self::TYPE_LESS_THAN,
+            $this->translator->trans('oro.filter.form.label_date_type_equals') => self::TYPE_EQUAL,
+            $this->translator->trans('oro.filter.form.label_date_type_not_equals') => self::TYPE_NOT_EQUAL
         ];
     }
 
@@ -176,7 +176,16 @@ abstract class AbstractDateFilterType extends AbstractType
             $options['date_parts'] = [];
         }
 
-        $builder->add('part', ChoiceType::class, ['choices' => $options['date_parts']]);
+        $builder->add(
+            'part',
+            ChoiceType::class,
+            [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices' => array_flip($options['date_parts']),
+            ]
+        );
+
         if ($options['compile_date']) {
             $builder->addEventSubscriber($this->subscriber);
         }

@@ -6,7 +6,7 @@ system_configuration:
     fields:
         oro_sso.enable_google_sso:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             options:
                 label: oro.sso.system_configuration.fields.enable_google_sso.label
                 required: false
@@ -14,7 +14,7 @@ system_configuration:
             priority: 10
         oro_sso.domains:
             data_type: array
-            type: oro_textlist
+            type: Oro\Bundle\FormBundle\Form\Type\OroTextListType
             search_type: text
             options:
                 label:      oro.sso.system_configuration.fields.domains.label

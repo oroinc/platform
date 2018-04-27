@@ -57,8 +57,9 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
+                    'choices_as_values' => true,
                     'choices' => $emailFields,
-                    'tooltip'     => 'oro.notification.emailnotification.additional_emails.tooltip',
+                    'tooltip' => 'oro.notification.emailnotification.additional_emails.tooltip',
                 ]
             );
 
@@ -110,8 +111,9 @@ class ContactInformationEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true,
+                    'choices_as_values' => true,
                     'choices' => $emailFields,
-                    'tooltip'     => 'oro.notification.emailnotification.additional_emails.tooltip',
+                    'tooltip' => 'oro.notification.emailnotification.additional_emails.tooltip',
                 ]
             );
 

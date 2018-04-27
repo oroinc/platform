@@ -72,7 +72,8 @@ class ActivityListFilterHelperTest extends \PHPUnit_Framework_TestCase
                     'options'   => [
                         'field_options' => [
                             'multiple' => true,
-                            'choices'  => ['Acme\TestBundle\Entity\TestEntity' => 0]
+                            'choices_as_values' => true,
+                            'choices'  => ['Acme\TestBundle\Entity\TestEntity']
                         ]
                     ]
                 ]
