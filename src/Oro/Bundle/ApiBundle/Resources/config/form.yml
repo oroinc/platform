@@ -13,8 +13,7 @@ services:
         public: false
         class: Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - '@service_container'
-            - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - '@service_container' # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass with service locator
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
 
