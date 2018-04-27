@@ -184,7 +184,7 @@ The `entities` section describes a configuration of entities.
 * **hints** (*array*) - Sets thr [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with the `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **identifier_field_names** (*string[]*) - The names of identifier fields of the entity. Use this option to override names set in a configuration file (for the data API resource that are not based on ORM entity) or retrieved from an entity metadata (for ORM entities). This option is helpful when you do not want to use the primary key as an entity identifier in the data API.
 * **delete_handler** (*string*) - The identifier of a service that should be used to delete the entity via the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default, the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
-* **form_type** (*string*) - The form type to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default, the `form` form type is used.
+* **form_type** (*string*) - The form type to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default, the `Symfony\Component\Form\Extension\Core\Type\FormType` form type is used.
 * **form_options** (*array*) - The form options to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
 * **form_event_subscriber** - The form event subscribers that to use for the entity in the [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. When the `form_type` option is not specified, this event subscriber is also used for the [update_relationship](./actions.md#update_relationship-action), [add_relationship](./actions.md#add_relationship-action), and [delete_relationship](./actions.md#delete_relationship-action) actions. For custom form types, this event subscriber is not used. Can be specified as service name or array of service names. An event subscriber service should implement the `Symfony\Component\EventDispatcher\EventSubscriberInterface` interface.
 
@@ -215,7 +215,7 @@ api:
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: 'Acme\Bundle\AcmeBundle\AST_Walker_Class'}
             delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
-            form_type: acme_entity.api_form
+            form_type: Acme\Bundle\AcmeBundle\Api\Form\Type\AcmeEntityType
             form_options:
                 validation_groups: ['Default', 'api', 'my_group']
             form_event_subscriber: acme.api.form_listener.test_entity
