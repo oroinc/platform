@@ -224,7 +224,7 @@ class EmailType extends AbstractType
                         );
                     },
             ],
-            ['choice_list', 'choices']
+            ['choices']
         );
     }
 
