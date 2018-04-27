@@ -44,7 +44,6 @@ class EntityType extends AbstractType
             'query_builder' => null,
             'create_enabled' => false,
             'class' => null,
-            'choice_label' => null
         ];
 
         if ($this->options) {
