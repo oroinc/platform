@@ -7,7 +7,7 @@ use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Moved from https://github.com/a2lix/TranslationFormBundle/tree/1.x
+ * Inspired by https://github.com/a2lix/TranslationFormBundle/tree/1.x
  * Converts form data and vise versa to supported format
  */
 class GedmoTranslationMapper implements DataMapperInterface

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use A2lix\TranslationFormBundle\Form\Type\GedmoTranslationsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\FormView;
