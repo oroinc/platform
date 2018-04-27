@@ -7,7 +7,6 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\AbstractConfigControllerTest;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UIBundle\Route\Router;
 
 /**
@@ -109,7 +108,6 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     {
         $form = $this->processFirstStep('file', 'file');
 
-        $form['oro_entity_config_type[attachment][attachment][owner]'] = $this->getCurrentUser()->getId();
         $form['oro_entity_config_type[attachment][maxsize]'] = 1000000;
 
         $this->finishAttributeCreation($form);
@@ -119,7 +117,6 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     {
         $form = $this->processFirstStep('image', 'image');
 
-        $form['oro_entity_config_type[attachment][attachment][owner]'] = $this->getCurrentUser()->getId();
         $form['oro_entity_config_type[attachment][maxsize]'] = 1000000;
         $form['oro_entity_config_type[attachment][width]'] = 100;
         $form['oro_entity_config_type[attachment][height]'] = 100;
@@ -317,13 +314,5 @@ class AttributeControllerTest extends AbstractConfigControllerTest
             );
             $this->assertEquals(1, $crawler->filterXPath($filter)->count(), $requiredProperty['code']);
         }
-    }
-
-    /**
-     * @return User
-     */
-    private function getCurrentUser()
-    {
-        return $this->getContainer()->get('oro_security.token_accessor')->getUser();
     }
 }
