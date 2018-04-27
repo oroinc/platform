@@ -35,7 +35,7 @@ class EnumValueCollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'handle_primary' => false,
-                'type'           => EnumValueType::class
+                'entry_type'     => EnumValueType::class
             ]
         );
 
@@ -46,7 +46,7 @@ class EnumValueCollectionType extends AbstractType
             }
         )
         ->setNormalizer(
-            'options',
+            'entry_options',
             function (Options $options, $value) {
                 return array_replace(
                     ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],

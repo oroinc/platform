@@ -24,7 +24,6 @@ class OroDurationTypeTest extends FormIntegrationTestCase
     {
         $expectedOptions = [
             'tooltip' => 'oro.form.oro_duration.tooltip',
-            'type' => 'text',
         ];
 
         $form = $this->factory->create(OroDurationType::class);

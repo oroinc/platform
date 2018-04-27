@@ -15,10 +15,10 @@ class GenderProvider
     /**
      * @var array
      */
-    protected $choices = array(
-        Gender::MALE   => 'oro.user.gender.male',
-        Gender::FEMALE => 'oro.user.gender.female',
-    );
+    protected $choices = [
+        'oro.user.gender.male' => Gender::MALE,
+        'oro.user.gender.female' => Gender::FEMALE,
+    ];
 
     /**
      * @var array
@@ -40,8 +40,8 @@ class GenderProvider
     {
         if (null === $this->translatedChoices) {
             $this->translatedChoices = array();
-            foreach ($this->choices as $name => $label) {
-                $this->translatedChoices[$name] = $this->translator->trans($label);
+            foreach ($this->choices as $label => $name) {
+                $this->translatedChoices[$this->translator->trans($label)] = $name;
             }
         }
 
@@ -56,10 +56,11 @@ class GenderProvider
     public function getLabelByName($name)
     {
         $choices = $this->getChoices();
-        if (!isset($choices[$name])) {
+        $label = array_search($name, $choices, true);
+        if ($label === false) {
             throw new \LogicException(sprintf('Unknown gender with name "%s"', $name));
         }
 
-        return $choices[$name];
+        return $label;
     }
 }

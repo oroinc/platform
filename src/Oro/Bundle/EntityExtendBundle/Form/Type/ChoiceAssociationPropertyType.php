@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 /**
  * This form type represents a 'choice' association property.
  * Can be used bor both single and multiple associations.
@@ -29,6 +31,6 @@ class ChoiceAssociationPropertyType extends AbstractAssociationType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

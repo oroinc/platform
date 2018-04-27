@@ -17,7 +17,12 @@ class AssociationChoiceType extends AbstractAssociationType
         $resolver->setDefaults(
             [
                 'placeholder' => false,
-                'choices'     => ['No', 'Yes'],
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
+                'choices' => [
+                    'No' => 0,
+                    'Yes' => 1,
+                ],
                 'schema_update_required' => function ($newVal, $oldVal) {
                     return true == $newVal && false == $oldVal;
                 },

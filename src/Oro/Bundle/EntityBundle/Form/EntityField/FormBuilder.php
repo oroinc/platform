@@ -7,10 +7,14 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
+use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
+use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
@@ -18,6 +22,7 @@ use Symfony\Component\Form\FormInterface;
 
 class FormBuilder
 {
+    /** @var array */
     protected $fieldTypeMap = [
         'string' => TextType::class,
         'datetime' => OroDateTimeType::class,
@@ -26,7 +31,11 @@ class FormBuilder
         'float' => NumberType::class,
         'decimal' => NumberType::class,
         'money_value' => NumberType::class,
-        'entity' => EntityType::class
+        'entity' => EntityType::class,
+        'integer' => IntegerType::class,
+        'text' => TextType::class,
+        'percent' => OroPercentType::class,
+        'currency' => CurrencyType::class
     ];
 
     /** @var FormFactory */
@@ -73,7 +82,7 @@ class FormBuilder
     {
         $form = $this->formFactory
             ->createBuilder(
-                'form',
+                FormType::class,
                 $entity,
                 [
                     'csrf_protection' => false,

@@ -34,11 +34,6 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ChoiceFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -50,8 +45,8 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                     'field_type' => ChoiceType::class,
                     'field_options' => array(),
                     'operator_choices' => array(
-                        ChoiceFilterType::TYPE_CONTAINS => 'oro.filter.form.label_type_contains',
-                        ChoiceFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
+                        'oro.filter.form.label_type_contains' => ChoiceFilterType::TYPE_CONTAINS,
+                        'oro.filter.form.label_type_not_contains' => ChoiceFilterType::TYPE_NOT_CONTAINS,
                     ),
                     'populate_default' => false,
                     'default_value' => null,

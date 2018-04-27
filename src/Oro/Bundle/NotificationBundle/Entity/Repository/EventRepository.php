@@ -23,7 +23,7 @@ class EventRepository extends EntityRepository
         $eventNames = $this->getEventNamesQuery()->getArrayResult();
 
         foreach ((array) $eventNames as $value) {
-            $options[$value['id']] = $value['name'];
+            $options[$value['name']] = $value['id'];
         }
 
         return $options;

@@ -12,7 +12,13 @@
     &__input,
     &__control,
     input[type='radio'] {
-        display: none;
+        position: absolute;
+        height: 0;
+        width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0 none;
+        opacity: 0;
     }
 
     &__input,

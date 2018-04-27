@@ -25,7 +25,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -47,6 +49,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var ChainSearchProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $searchProvider;
 
+    /** @var  FormRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formRegistry;
+
     /**
      * Get parent checkbox label for test
      *
@@ -60,6 +65,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
      * @param FormFactoryInterface $formFactory
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param ChainSearchProvider $searchProvider
+     * @param FormRegistryInterface $formRegistry
      *
      * @return AbstractProvider
      */
@@ -68,7 +74,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
         AuthorizationCheckerInterface $authorizationChecker,
-        ChainSearchProvider $searchProvider
+        ChainSearchProvider $searchProvider,
+        FormRegistryInterface $formRegistry
     );
 
     /**
@@ -90,6 +97,14 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                 new DataBlockExtension()
             )
             ->getFormFactory();
+
+        $this->formRegistry = $this->createMock(FormRegistryInterface::class);
+
+        $formTYpe = $this->createMock(ResolvedFormType::class);
+
+        $this->formRegistry->expects($this->any())
+            ->method('getType')
+            ->willReturn($formTYpe);
 
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
@@ -381,7 +396,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             $this->translator,
             $this->factory,
             $this->authorizationChecker,
-            $this->searchProvider
+            $this->searchProvider,
+            $this->formRegistry
         );
 
         return $provider;

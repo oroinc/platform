@@ -13,14 +13,6 @@ class LocalizedFallbackValueCollectionTypeStub extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return LocalizedFallbackValueCollectionType::NAME;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return LocalizedFallbackValueCollectionType::NAME;

@@ -53,7 +53,7 @@ class ConfigTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'repositories',
                 CollectionType::class,
-                ['type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
+                ['entry_type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
             );
 
         $type->buildForm($builder, []);

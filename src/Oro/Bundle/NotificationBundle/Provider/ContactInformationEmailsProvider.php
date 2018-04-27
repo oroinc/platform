@@ -46,7 +46,7 @@ class ContactInformationEmailsProvider
 
                 if ('Active' === $extendFieldConfig->get('state')
                     && 'email' === $fieldConfig->get('contact_information')) {
-                    $emailFields[$fieldId->getFieldName()] = $fieldConfig->get('label');
+                    $emailFields[$fieldConfig->get('label')] = $fieldId->getFieldName();
                 }
             }
         }

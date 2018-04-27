@@ -1,8 +1,19 @@
 ## 3.0.0-rc
 
+### Added
+#### ApiBundle
+* Added `direction` option for fields in `actions` section to be able to specify if the request data and the the response data can contain a field. Possible values are `input-only`, `output-only` or `bidirectional`. The `bidirectional` is the default value.
+
 ### Removed
 #### ApiBundle
-* Removed deprecated routes contain `_format` placeholder
+* Removed deprecated routes contain `_format` placeholder.
+
+### Changed
+#### ApiBundle
+* The service `oro_api.get_config.add_owner_validator` was renamed to `oro_organization.api.config.add_owner_validator`
+* The DIC tag `oro_api.request_type_provider` was renamed to `oro.api.request_type_provider`
+* The DIC tag `oro_api.routing_options_resolver` was renamed to `oro.api.routing_options_resolver`
+* The DIC tag `oro_api.api_doc_annotation_handler` was renamed to `oro.api.api_doc_annotation_handler`
 
 ## 3.0.0-beta (2018-03-30)
 [Show detailed list of changes](incompatibilities-3-0-beta.md)

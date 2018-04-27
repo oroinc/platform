@@ -110,7 +110,7 @@ class FieldSearchProviderTest extends \PHPUnit_Framework_TestCase
         $field = [
             'search_type' => 'choice',
             'options' => [
-                'choices' => ['choice.1.key', 'choice.2.key']
+                'choices' => ['choice.1.key' => 0, 'choice.2.key' => 1]
             ]
         ];
 

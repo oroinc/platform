@@ -30,15 +30,19 @@ class WidgetSortByType extends AbstractType
         $builder
             ->add('property', ChoiceType::class, [
                 'label' => false,
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices' => $this->createPropertyChoices($options['class_name']),
                 'required' => false,
                 'placeholder' => 'oro.dashboard.widget.sort_by.property.placeholder',
             ])
             ->add('order', ChoiceType::class, [
                 'label' => false,
+                // TODO: remove 'choices_as_values' option and 'array_flip' function below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices' => [
-                    'ASC' => 'oro.dashboard.widget.sort_by.order.asc.label',
-                    'DESC' => 'oro.dashboard.widget.sort_by.order.desc.label',
+                    'oro.dashboard.widget.sort_by.order.asc.label' => 'ASC',
+                    'oro.dashboard.widget.sort_by.order.desc.label' => 'DESC',
                 ],
             ])
             ->add('className', HiddenType::class, ['data' => $options['class_name']]);
@@ -87,7 +91,7 @@ class WidgetSortByType extends AbstractType
         //@TODO change logic of grabbing choices. They should grab from datagrid config
         $fields = $this->fieldProvider->getFields($className);
         foreach ($fields as $field) {
-            $choices[$field['name']] = $field['label'];
+            $choices[$field['label']] = $field['name'];
         }
 
         return $choices;

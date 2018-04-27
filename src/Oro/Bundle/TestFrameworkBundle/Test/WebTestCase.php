@@ -654,10 +654,9 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function getUrl($name, $parameters = [], $absolute = false)
     {
+        $referenceType = $absolute;
         if (is_bool($absolute)) {
             $referenceType = $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
-        } else {
-            $referenceType = $absolute;
         }
 
         return self::getContainer()->get('router')->generate($name, $parameters, $referenceType);

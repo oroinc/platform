@@ -11,11 +11,13 @@ system_configuration:
     fields:
         oro_data_grid.default_per_page:
             data_type: integer
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             priority: 200
             options:
                 label: oro.grid.system_configuration.fields.default_per_page.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
                     10:     10
                     25:     25
@@ -25,7 +27,7 @@ system_configuration:
                     - NotBlank: ~
         oro_data_grid.full_screen_layout_enabled:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 150
             options:
                 label: oro.grid.system_configuration.fields.full_screen_layout_enabled.label

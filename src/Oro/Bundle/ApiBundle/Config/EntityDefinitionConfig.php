@@ -147,6 +147,10 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     {
         $result = parent::toArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_META_PROPERTIES);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_INCLUSION);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_FIELDSET);
+        $this->removeItemWithDefaultValue($result, self::DISABLE_SORTING);
         $this->removeItemWithDefaultValue($result, FieldConfig::COLLAPSE);
 
         $keys = array_keys($result);

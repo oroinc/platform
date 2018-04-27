@@ -84,7 +84,7 @@ class FieldSearchProvider implements SearchProviderInterface
             }
 
             $data = [];
-            foreach ($field['options']['choices'] as $choiceLabel) {
+            foreach ($field['options']['choices'] as $choiceLabel => $choiceValue) {
                 $data[] = $this->translator->trans($choiceLabel);
             }
 

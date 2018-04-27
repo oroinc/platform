@@ -9,14 +9,14 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds "include" filter.
- * This filter can be used to specify which related entities should be returned.
+ * Adds "include" filter that can be used to specify which related entities should be returned.
+ * As this filter has influence on the entity configuration, it is handled by a separate processor.
+ * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
  */
 class AddIncludeFilter implements ProcessorInterface
 {
-    const FILTER_KEY = 'include';
-
-    const FILTER_DESCRIPTION =
+    public const FILTER_KEY         = 'include';
+    public const FILTER_DESCRIPTION =
         'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.';
 
     /**
@@ -32,34 +32,9 @@ class AddIncludeFilter implements ProcessorInterface
             return;
         }
 
-        /**
-         * TODO: BAP-9470 - Refactoring of filters in API to add possibility to add dependency between filters
-         *
-         * this filter has descriptive nature and it should be added to the list of filters
-         * only if descriptions are requested
-         * actually a filtering by this filter is performed by
-         * @see \Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
-         */
-        /*
-        if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {
-            return;
-        }
-        */
-
-        if (!$context->getConfig()->isInclusionEnabled()) {
+        $config = $context->getConfig();
+        if (null === $config || !$config->isInclusionEnabled()) {
             // the "include" filter is disabled
-            return;
-        }
-
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
-            // the metadata does not exist
-            return;
-        }
-
-        $associations = $metadata->getAssociations();
-        if (empty($associations)) {
-            // the "include" filter has sense only if an entity has at least one association
             return;
         }
 

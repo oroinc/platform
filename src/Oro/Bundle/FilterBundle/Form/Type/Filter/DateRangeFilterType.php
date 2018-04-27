@@ -43,7 +43,7 @@ class DateRangeFilterType extends AbstractDateFilterType
         parent::configureOptions($resolver);
 
         $resolver->setDefaults(
-            array(
+            [
                 'field_type'       => DateRangeType::class,
                 'widget_options'   => [
                     'showDatevariables' => true,
@@ -52,7 +52,7 @@ class DateRangeFilterType extends AbstractDateFilterType
                 ],
                 'operator_choices' => $this->getOperatorChoices(),
                 'type_values'      => $this->getTypeValues(),
-            )
+            ]
         );
     }
 

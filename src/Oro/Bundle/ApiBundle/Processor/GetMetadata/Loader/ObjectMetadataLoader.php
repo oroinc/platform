@@ -58,7 +58,7 @@ class ObjectMetadataLoader
             }
             $dataType = $field->getDataType();
             if (DataType::isNestedObject($dataType)) {
-                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
+                $metadata = $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                     $entityMetadata,
                     $config,
                     $entityClass,
@@ -68,7 +68,7 @@ class ObjectMetadataLoader
                     $targetAction
                 );
             } elseif (DataType::isNestedAssociation($dataType)) {
-                $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
+                $metadata = $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
@@ -77,7 +77,7 @@ class ObjectMetadataLoader
                     $targetAction
                 );
             } elseif ($field->isMetaProperty()) {
-                $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
+                $metadata = $this->objectMetadataFactory->createAndAddMetaPropertyMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
@@ -88,7 +88,7 @@ class ObjectMetadataLoader
                     $entityMetadata->setInheritedType(true);
                 }
             } elseif ($field->getTargetClass()) {
-                $this->objectMetadataFactory->createAndAddAssociationMetadata(
+                $metadata = $this->objectMetadataFactory->createAndAddAssociationMetadata(
                     $entityMetadata,
                     $entityClass,
                     $config,
@@ -97,13 +97,16 @@ class ObjectMetadataLoader
                     $targetAction
                 );
             } else {
-                $this->objectMetadataFactory->createAndAddFieldMetadata(
+                $metadata = $this->objectMetadataFactory->createAndAddFieldMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
                     $field,
                     $targetAction
                 );
+            }
+            if ($field->hasDirection()) {
+                $metadata->setDirection($field->isInput(), $field->isOutput());
             }
         }
 

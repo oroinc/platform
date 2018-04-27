@@ -36,6 +36,8 @@ class TargetFieldType extends AbstractType
                 'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
                 'placeholder'     => 'oro.entity.form.choose_entity_field',
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'auto_initialize' => false
             ]
         );
@@ -76,8 +78,9 @@ class TargetFieldType extends AbstractType
             $fieldLabel = $entityConfigProvider
                 ->getConfig($fieldId->getClassName(), $fieldId->getFieldName())
                 ->get('label');
+            $fieldName = $fieldId->getFieldName();
 
-            $choices[$fieldId->getFieldName()] = $fieldLabel ?: $fieldId->getFieldName();
+            $choices[$fieldLabel ?: $fieldName] = $fieldName;
         }
 
         return $choices;

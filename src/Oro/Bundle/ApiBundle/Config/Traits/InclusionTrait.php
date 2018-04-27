@@ -12,6 +12,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait InclusionTrait
 {
     /**
+     * Indicates whether the "disable_inclusion" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableInclusion()
+    {
+        return array_key_exists(EntityDefinitionConfig::DISABLE_INCLUSION, $this->items);
+    }
+
+    /**
      * Indicates whether an inclusion of related entities is enabled.
      *
      * @return bool
@@ -30,7 +40,7 @@ trait InclusionTrait
      */
     public function enableInclusion()
     {
-        unset($this->items[EntityDefinitionConfig::DISABLE_INCLUSION]);
+        $this->items[EntityDefinitionConfig::DISABLE_INCLUSION] = false;
     }
 
     /**

@@ -74,8 +74,7 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
-        // TODO: change to $this->getValidator()->validate($entityData, null, ['validateCount']) in scope of BAP-15236
-        $constraintViolations = $this->getValidator()->validate($entityData, ['validateCount']);
+        $constraintViolations = $this->getValidator()->validate($entityData, null, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {
                 /* @var ConstraintViolation $violation */

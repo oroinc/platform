@@ -16,6 +16,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     use Traits\ExcludeTrait;
     use Traits\DescriptionTrait;
     use Traits\DataTypeTrait;
+    use Traits\DirectionTrait;
     use Traits\AssociationTargetTrait;
     use Traits\FormTrait;
 
@@ -24,6 +25,18 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /** the data type of the field value */
     const DATA_TYPE = 'data_type';
+
+    /** a value that indicates whether the field is input-only, output-only or bidirectional */
+    const DIRECTION = 'direction';
+
+    /** a value for the direction option that indicates whether the field is input-only */
+    const DIRECTION_INPUT_ONLY = 'input-only';
+
+    /** a value for the direction option that indicates whether the field is output-only */
+    const DIRECTION_OUTPUT_ONLY = 'output-only';
+
+    /** a value for the direction option that indicates whether the field is bidirectional */
+    const DIRECTION_BIDIRECTIONAL = 'bidirectional';
 
     /** a flag indicates whether the field represents a meta information */
     const META_PROPERTY = 'meta_property';
