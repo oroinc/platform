@@ -35,7 +35,11 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
             'js_translation' => array(
                 'domains' => array('validators'),
                 'debug' => false,
-            )
+            ),
+            'locales' => ['en'],
+            'default_required' => true,
+            'manager_registry' => 'doctrine',
+            'templating' => 'foo.html.twig'
         )
     );
 

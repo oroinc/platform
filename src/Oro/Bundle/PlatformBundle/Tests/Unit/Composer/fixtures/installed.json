@@ -15,7 +15,6 @@
             "shasum": ""
         },
         "require": {
-            "a2lix/translation-form-bundle": "1.2",
             "akeneo/batch-bundle": "0.1.2",
             "ass/xmlsecurity": "1.0.0",
             "composer/composer": "1.0.0-alpha8",

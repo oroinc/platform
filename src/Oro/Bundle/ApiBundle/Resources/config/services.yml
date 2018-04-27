@@ -510,8 +510,8 @@ services:
             - '@oro_api.subresources_provider'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro_api.routing_options_resolver, view: rest_json_api }
-            - { name: oro_api.routing_options_resolver, view: rest_plain }
+            - { name: oro.api.routing_options_resolver, view: rest_json_api }
+            - { name: oro.api.routing_options_resolver, view: rest_plain }
 
     oro_api.rest.doc_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler
@@ -621,7 +621,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider
         public: false
         tags:
-            - { name: oro_api.request_type_provider }
+            - { name: oro.api.request_type_provider }
 
     oro_api.api_doc.validate_view_listener:
         class: Oro\Bundle\ApiBundle\EventListener\ValidateApiDocViewListener
