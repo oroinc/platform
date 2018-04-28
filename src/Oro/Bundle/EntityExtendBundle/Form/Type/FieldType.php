@@ -83,6 +83,8 @@ class FieldType extends AbstractType
             'type',
             Select2ChoiceType::class,
             [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {
                     $parts = explode('||', $choiceKey);
@@ -172,7 +174,7 @@ class FieldType extends AbstractType
 
         uasort($fieldTypes, 'strcasecmp');
 
-        return $fieldTypes;
+        return array_flip($fieldTypes);
     }
 
     /**
@@ -187,7 +189,7 @@ class FieldType extends AbstractType
 
         uasort($relationTypes, 'strcasecmp');
 
-        return $relationTypes;
+        return array_flip($relationTypes);
     }
 
     /**
@@ -231,14 +233,15 @@ class FieldType extends AbstractType
                 $fieldName                         = $cutFieldName;
             }
 
-            $key          = $relationKey . '||' . $fieldName;
-            $result[$key] = $this->translator->trans(
+            $value = $relationKey . '||' . $fieldName;
+            $label = $this->translator->trans(
                 self::TYPE_LABEL_PREFIX . 'inverse_relation',
                 [
                     '%entity_name%' => $this->translator->trans($entityLabel),
                     '%field_name%'  => $this->translator->trans($fieldLabel)
                 ]
             );
+            $result[$label] = $value;
         }
 
         return $result;

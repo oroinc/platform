@@ -86,13 +86,11 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->getFormType();
-        $this->assertEquals('oro_activity_multiple_association_choice', $type->getName());
+        $this->assertEquals('oro_activity_multiple_association_choice', $this->getFormType()->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->getFormType();
-        $this->assertEquals(BaseMultipleAssociationChoiceType::class, $type->getParent());
+        $this->assertEquals(BaseMultipleAssociationChoiceType::class, $this->getFormType()->getParent());
     }
 }

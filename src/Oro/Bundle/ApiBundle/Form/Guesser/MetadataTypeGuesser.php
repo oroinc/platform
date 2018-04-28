@@ -6,11 +6,19 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
+use Oro\Bundle\ApiBundle\Form\Type\EntityType;
+use Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType;
+use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
@@ -219,7 +227,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      */
     protected function createDefaultTypeGuess()
     {
-        return $this->createTypeGuess('text', [], TypeGuess::LOW_CONFIDENCE);
+        return $this->createTypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
 
     /**
@@ -246,7 +254,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     protected function getTypeGuessForAssociation(AssociationMetadata $metadata)
     {
         return $this->createTypeGuess(
-            'oro_api_entity',
+            EntityType::class,
             ['metadata' => $metadata, 'included_entities' => $this->includedEntities],
             TypeGuess::HIGH_CONFIDENCE
         );
@@ -268,14 +276,14 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         }
 
         $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
-            ? 'oro_api_entity_collection'
-            : 'oro_api_collection';
+            ? EntityCollectionType::class
+            : CollectionType::class;
 
         return $this->createTypeGuess(
             $formType,
             [
                 'entry_data_class' => $targetMetadata->getClassName(),
-                'entry_type'       => 'oro_api_compound_object',
+                'entry_type'       => CompoundObjectType::class,
                 'entry_options'    => [
                     'metadata' => $targetMetadata,
                     'config'   => $config->getTargetEntity()
@@ -296,7 +304,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         EntityDefinitionFieldConfig $config
     ) {
         return $this->createTypeGuess(
-            'oro_api_compound_object',
+            CompoundObjectType::class,
             array_merge(
                 $config->getFormOptions(),
                 [
@@ -332,8 +340,8 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         }
 
         $formType = $this->doctrineHelper->isManageableEntityClass($targetMetadata->getClassName())
-            ? 'oro_api_entity_scalar_collection'
-            : 'oro_api_scalar_collection';
+            ? EntityScalarCollectionType::class
+            : ScalarCollectionType::class;
 
         return $this->createTypeGuess(
             $formType,
@@ -356,7 +364,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         EntityDefinitionFieldConfig $config
     ) {
         return $this->createTypeGuess(
-            'oro_api_nested_association',
+            NestedAssociationType::class,
             ['metadata' => $metadata, 'config' => $config],
             TypeGuess::HIGH_CONFIDENCE
         );

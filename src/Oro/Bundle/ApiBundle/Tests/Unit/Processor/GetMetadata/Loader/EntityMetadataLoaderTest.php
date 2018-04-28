@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedAssociationMetadataFactory;
@@ -19,22 +22,22 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataFactory */
     protected $metadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectMetadataFactory */
     protected $objectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityMetadataFactory */
     protected $entityMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNestedObjectMetadataFactory */
     protected $nestedObjectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNestedAssociationMetadataFactory */
     protected $nestedAssociationMetadataFactory;
 
     /** @var EntityMetadataLoader */
@@ -42,24 +45,12 @@ class EntityMetadataLoaderTest extends LoaderTestCase
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataFactory = $this->getMockBuilder(MetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityMetadataFactory = $this->getMockBuilder(EntityMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->nestedObjectMetadataFactory = $this->getMockBuilder(EntityNestedObjectMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->nestedAssociationMetadataFactory = $this->getMockBuilder(EntityNestedAssociationMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->metadataFactory = $this->createMock(MetadataFactory::class);
+        $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
+        $this->entityMetadataFactory = $this->createMock(EntityMetadataFactory::class);
+        $this->nestedObjectMetadataFactory = $this->createMock(EntityNestedObjectMetadataFactory::class);
+        $this->nestedAssociationMetadataFactory = $this->createMock(EntityNestedAssociationMetadataFactory::class);
 
         $this->entityMetadataLoader = new EntityMetadataLoader(
             $this->doctrineHelper,
@@ -1501,5 +1492,458 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
+    }
+
+    public function testForFieldWithConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $fieldMetadata = new FieldMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([$fieldName]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                $fieldName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($fieldMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+    }
+
+    public function testForMetaPropertyWithConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setMetaProperty(true);
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $propertyMetadata = new MetaPropertyMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([$fieldName]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::once())
+            ->method('createAndAddMetaPropertyMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                $fieldName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($propertyMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
+    }
+
+    public function testForAssociationWithConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $associationName = 'testAssociation';
+        $field = $config->addField($associationName);
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $associationMetadata = new AssociationMetadata($associationName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([$associationName]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::once())
+            ->method('createAndAddAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                $associationName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($associationMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+    }
+
+    public function testForFieldDoesNotExistInEntityAndConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setDataType('string');
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $fieldMetadata = new FieldMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddFieldMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                $entityClass,
+                $fieldName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($fieldMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($fieldMetadata->isInput());
+        self::assertTrue($fieldMetadata->isOutput());
+    }
+
+    public function testForMetaPropertyDoesNotExistInEntityAndConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setMetaProperty(true);
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $propertyMetadata = new MetaPropertyMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddMetaPropertyMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                $entityClass,
+                $fieldName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($propertyMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($propertyMetadata->isInput());
+        self::assertTrue($propertyMetadata->isOutput());
+    }
+
+    public function testForAssociationDoesNotExistInEntityAndConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $associationName = 'testAssociation';
+        $field = $config->addField($associationName);
+        $field->setTargetClass('Test\AssociationTargetClass');
+        $field->setTargetType('to-one');
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $associationMetadata = new AssociationMetadata($associationName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                $entityClass,
+                self::identicalTo($config),
+                $associationName,
+                self::identicalTo($field),
+                $targetAction
+            )
+            ->willReturn($associationMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+    }
+
+    public function testForNestedObjectPropertyWithConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setDataType('nestedObject');
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $associationMetadata = new AssociationMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->nestedObjectMetadataFactory->expects(self::once())
+            ->method('createAndAddNestedObjectMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                self::identicalTo($config),
+                $entityClass,
+                $fieldName,
+                self::identicalTo($field),
+                $withExcludedProperties,
+                $targetAction
+            )
+            ->willReturn($associationMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
+    }
+
+    public function testForNestedAssociationPropertyWithConfiguredDirection()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setDataType('nestedAssociation');
+        $field->setDirection('output-only');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+        $associationMetadata = new AssociationMetadata($fieldName);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->nestedAssociationMetadataFactory->expects(self::once())
+            ->method('createAndAddNestedAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                self::identicalTo($classMetadata),
+                $entityClass,
+                $fieldName,
+                self::identicalTo($field),
+                $withExcludedProperties,
+                $targetAction
+            )
+            ->willReturn($associationMetadata);
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+        self::assertFalse($associationMetadata->isInput());
+        self::assertTrue($associationMetadata->isOutput());
     }
 }

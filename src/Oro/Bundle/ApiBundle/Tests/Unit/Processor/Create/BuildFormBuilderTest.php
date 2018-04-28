@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
@@ -46,7 +47,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->method('createNamedBuilder')
             ->with(
                 null,
-                'form',
+                FormType::class,
                 $data,
                 [
                     'data_class'           => $entityClass,

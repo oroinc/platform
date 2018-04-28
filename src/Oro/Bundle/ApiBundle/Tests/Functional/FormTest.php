@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
 
 class FormTest extends WebTestCase
@@ -204,9 +207,9 @@ class FormTest extends WebTestCase
     protected function getForm(array $options = [])
     {
         $form = $this->getRootForm($options);
-        $form->add('id', 'integer');
-        $form->add('title', 'text');
-        $form->add('description', 'text');
+        $form->add('id', IntegerType::class);
+        $form->add('title', TextType::class);
+        $form->add('description', TextType::class);
 
         return $form;
     }
@@ -236,7 +239,7 @@ class FormTest extends WebTestCase
             $options['data_class'] = self::TEST_CLASS;
         }
         $options['extra_fields_message'] = FormHelper::EXTRA_FIELDS_MESSAGE;
-        $form = $this->getContainer()->get('form.factory')->create($this->getType(), null, $options);
+        $form = $this->getContainer()->get('form.factory')->create(FormType::class, null, $options);
 
         return $form;
     }
@@ -261,17 +264,5 @@ class FormTest extends WebTestCase
         $metadata->addField($titleField);
 
         return $metadata;
-    }
-
-    /**
-     * Provide backward compatibility between Symfony versions < 2.8 and 2.8+
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-            : 'form';
     }
 }

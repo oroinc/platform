@@ -10,6 +10,10 @@ use Oro\Component\ChainProcessor\ParameterBag;
  */
 abstract class PropertyMetadata extends ParameterBag
 {
+    private const MASK_DIRECTION_INPUT         = 1;
+    private const MASK_DIRECTION_OUTPUT        = 2;
+    private const MASK_DIRECTION_BIDIRECTIONAL = 3;
+
     /** @var string */
     private $name;
 
@@ -19,6 +23,9 @@ abstract class PropertyMetadata extends ParameterBag
     /** @var string */
     private $dataType;
 
+    /** @var integer */
+    private $flags;
+
     /**
      * PropertyMetadata constructor.
      *
@@ -27,6 +34,7 @@ abstract class PropertyMetadata extends ParameterBag
     public function __construct($name = null)
     {
         $this->name = $name;
+        $this->flags = self::MASK_DIRECTION_BIDIRECTIONAL;
     }
 
     /**
@@ -42,6 +50,11 @@ abstract class PropertyMetadata extends ParameterBag
         }
         if ($this->dataType) {
             $result['data_type'] = $this->dataType;
+        }
+        if ($this->isInput() && !$this->isOutput()) {
+            $result['direction'] = 'input-only';
+        } elseif ($this->isOutput() && !$this->isInput()) {
+            $result['direction'] = 'output-only';
         }
 
         return $result;
@@ -113,5 +126,60 @@ abstract class PropertyMetadata extends ParameterBag
     public function setDataType($dataType)
     {
         $this->dataType = $dataType;
+    }
+
+    /**
+     * Indicates whetner the request data can contain this property.
+     *
+     * @return bool
+     */
+    public function isInput()
+    {
+        return $this->hasFlag(self::MASK_DIRECTION_INPUT);
+    }
+
+    /**
+     * Indicates whetner the response data can contain this property.
+     *
+     * @return bool
+     */
+    public function isOutput()
+    {
+        return $this->hasFlag(self::MASK_DIRECTION_OUTPUT);
+    }
+
+    /**
+     * Sets a value indicates whetner the request data and the response data can contain this property.
+     *
+     * @param bool $input
+     * @param bool $output
+     */
+    public function setDirection($input, $output)
+    {
+        $this->setFlag($input, self::MASK_DIRECTION_INPUT);
+        $this->setFlag($output, self::MASK_DIRECTION_OUTPUT);
+    }
+
+    /**
+     * @param int $valueMask
+     *
+     * @return bool
+     */
+    protected function hasFlag($valueMask)
+    {
+        return $valueMask === ($this->flags & $valueMask);
+    }
+
+    /**
+     * @param bool $value
+     * @param int  $valueMask
+     */
+    protected function setFlag($value, $valueMask)
+    {
+        if ($value) {
+            $this->flags |= $valueMask;
+        } else {
+            $this->flags &= ~$valueMask;
+        }
     }
 }

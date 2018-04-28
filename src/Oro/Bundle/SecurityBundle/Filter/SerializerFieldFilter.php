@@ -11,6 +11,9 @@ use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Filters field from being shown/returned to the user depending on the VIEW permission to the field.
+ */
 class SerializerFieldFilter implements EntityAwareFilterInterface
 {
     /** @var AuthorizationCheckerInterface */
@@ -25,6 +28,10 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
     /** @var array|ConfigInterface[] */
     protected $securityConfigs = [];
 
+    /**
+     * @var bool if true, entity ID field will be checked for access. */
+    private $isIdFieldProtected = true;
+
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigProvider $securityConfigProvider,
@@ -36,6 +43,16 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
     }
 
     /**
+     * Sets the flag if access to entity id field should be checked.
+     *
+     * @param $isIdFieldProtected
+     */
+    public function setIsIdFieldProtected($isIdFieldProtected)
+    {
+        $this->isIdFieldProtected = $isIdFieldProtected;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function checkField($entity, $entityClass, $field)
@@ -44,7 +61,13 @@ class SerializerFieldFilter implements EntityAwareFilterInterface
             $entity = $this->getEntityReference($entityClass, $entity['entityId']);
         }
 
-        $isFieldAllowed = $this->authChecker->isGranted('VIEW', new FieldVote($entity, $field));
+        $isFieldAllowed = true;
+        if ($this->isIdFieldProtected
+            || $this->doctrineHelper->getEntityIdFieldName($entityClass) !== $field
+        ) {
+            $isFieldAllowed = $this->authChecker->isGranted('VIEW', new FieldVote($entity, $field));
+        }
+
         $shouldShowRestricted = $this->shouldShowRestricted($entityClass);
 
         if (!$shouldShowRestricted && !$isFieldAllowed) {

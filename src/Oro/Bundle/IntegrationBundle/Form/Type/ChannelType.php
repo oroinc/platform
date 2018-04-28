@@ -60,9 +60,11 @@ class ChannelType extends AbstractType
             'enabled',
             ChoiceType::class,
             [
+                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                'choices_as_values' => true,
                 'choices'  => [
-                    true    => 'oro.integration.integration.enabled.active.label',
-                    false   => 'oro.integration.integration.enabled.inactive.label'
+                    'oro.integration.integration.enabled.active.label' => true,
+                    'oro.integration.integration.enabled.inactive.label' => false,
                 ],
                 'required' => true,
                 'label'    => 'oro.integration.integration.enabled.label',

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -105,6 +106,20 @@ class DocumentationTest extends RestJsonApiTestCase
         $resourceData = reset($resourceData);
         $expectedData = $this->loadYamlData('simple_data_types.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testSubresourceWithUnknownTargetTypeShouldBeInRigtCategory()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $docs = $this->getSubresourceEntityDocsForAction($entityType, 'search', ApiActions::GET_SUBRESOURCE);
+
+        $data = $this->getSimpleFormatter()->format($docs);
+        $resourceData = reset($data);
+        $resourceData = reset($resourceData);
+        self::assertEquals($resourceData['section'], $entityType);
     }
 
     /**
@@ -228,6 +243,8 @@ class DocumentationTest extends RestJsonApiTestCase
                 'Missing documentation. Default value is used: "%s"',
                 $definition['documentation']
             );
+        } elseif ($this->hasDuplates($definition['documentation'])) {
+            $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
         if (!empty($definition['parameters'])) {
             foreach ($definition['parameters'] as $name => $item) {
@@ -309,6 +326,26 @@ class DocumentationTest extends RestJsonApiTestCase
     }
 
     /**
+     * @param $entityType
+     * @param $subresiurce
+     * @param $action
+     *
+     * @return array
+     */
+    protected function getSubresourceEntityDocsForAction($entityType, $subresiurce, $action)
+    {
+        return $this->filterDocs(
+            $this->getExtractor()->all(self::VIEW),
+            function (Route $route) use ($entityType, $action, $subresiurce) {
+                return
+                    $route->getDefault('entity') === $entityType
+                    && $route->getDefault('_action') === $action
+                    && $route->getDefault('association') === $subresiurce;
+            }
+        );
+    }
+
+    /**
      * @param array    $docs
      * @param callable $filter function (Route $route) : bool
      *
@@ -342,5 +379,24 @@ class DocumentationTest extends RestJsonApiTestCase
     protected function getSimpleFormatter()
     {
         return self::getContainer()->get('nelmio_api_doc.formatter.simple_formatter');
+    }
+
+    /**
+     * @param string $documentation
+     *
+     * @return bool
+     */
+    protected function hasDuplates($documentation)
+    {
+        $delimiter = strpos($documentation, '.');
+        if (false === $delimiter) {
+            return false;
+        }
+
+        $firstSentence = substr($documentation, 0, $delimiter + 1);
+
+        return
+            str_word_count($firstSentence) >= 5
+            && false !== strpos($documentation, $firstSentence, $delimiter);
     }
 }

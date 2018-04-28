@@ -13,8 +13,7 @@ services:
         public: false
         class: Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - '@service_container'
-            - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - '@service_container' # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass with service locator
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
 
@@ -55,12 +54,12 @@ services:
     oro_api.form.type.boolean:
         class: Oro\Bundle\ApiBundle\Form\Type\BooleanType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_boolean }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\BooleanType }
 
     oro_api.form.type.number:
         class: Oro\Bundle\ApiBundle\Form\Type\NumberType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_number }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\NumberType }
 
     oro_api.form.type.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityType
@@ -68,7 +67,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_entity }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityType }
 
     oro_api.form.type.nested_association:
         class: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType
@@ -77,34 +76,34 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_nested_association }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType }
 
     oro_api.form.type.compound_entity:
         class: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType
         arguments:
             - '@oro_api.form_helper'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_compound_object }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType }
 
     oro_api.form.type.collection:
         class: Oro\Bundle\ApiBundle\Form\Type\CollectionType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_collection }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CollectionType }
 
     oro_api.form.type.collection.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_entity_collection }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType }
 
     oro_api.form.type.scalar_collection:
         class: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_scalar_collection }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType }
 
     oro_api.form.type.scalar_collection.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
         tags:
-            - { name: oro.api.form.type, alias: oro_api_entity_scalar_collection }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType }
 
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator

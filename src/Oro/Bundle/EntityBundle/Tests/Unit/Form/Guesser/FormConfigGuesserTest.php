@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
@@ -318,7 +319,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertDefaultTypeGuess($guess)
     {
-        $this->assertTypeGuess($guess, 'text', [], TypeGuess::LOW_CONFIDENCE);
+        $this->assertTypeGuess($guess, TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }
 
     /**

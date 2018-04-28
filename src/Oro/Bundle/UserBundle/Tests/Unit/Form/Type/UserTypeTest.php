@@ -94,6 +94,12 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 ->with('roles', EntityType::class)
                 ->will($this->returnValue($builder));
         }
+        $attr = [];
+
+        if ($isMyProfile) {
+            $attr['readonly'] = true;
+        }
+
         if ($permissions[self::RULE_GROUP]) {
             $arr = array(
                 'label'     => 'oro.user.groups.label',
@@ -102,9 +108,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'multiple'  => true,
                 'expanded'  => true,
                 'required'  => false,
-                'attr'      => [
-                    'readonly' => $isMyProfile,
-                ],
+                'attr'      => $attr,
                 'disabled'  => $isMyProfile,
                 'translatable_options' => false
             );

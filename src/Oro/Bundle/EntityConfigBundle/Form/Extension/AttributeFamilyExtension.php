@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -24,18 +24,11 @@ class AttributeFamilyExtension extends AbstractTypeExtension
     protected $attributeConfigProvider;
 
     /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
      * @param ConfigProvider $attributeConfigProvider
-     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ConfigProvider $attributeConfigProvider, DoctrineHelper $doctrineHelper)
+    public function __construct(ConfigProvider $attributeConfigProvider)
     {
         $this->attributeConfigProvider = $attributeConfigProvider;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -57,14 +50,18 @@ class AttributeFamilyExtension extends AbstractTypeExtension
     {
         $class = $event->getForm()->getConfig()->getOptions()['data_class'];
 
-        $repository = $this->doctrineHelper->getEntityRepositoryForClass(AttributeFamily::class);
-        $families = $repository->findBy(['entityClass' => $class]);
         $event->getForm()->add(
             'attributeFamily',
             EntityType::class,
             [
                 'class' => AttributeFamily::class,
-                'choices' => $families,
+                'query_builder' => function (AttributeFamilyRepository $repository) use ($class) {
+                    $qb = $repository->createQueryBuilder('af');
+                    $qb->andWhere($qb->expr()->eq('af.entityClass', ':entityClass'));
+                    $qb->setParameter('entityClass', $class);
+
+                    return $qb;
+                },
                 'label' => 'oro.entity_config.attribute_family.entity_label',
                 'required' => true,
                 'constraints' => [

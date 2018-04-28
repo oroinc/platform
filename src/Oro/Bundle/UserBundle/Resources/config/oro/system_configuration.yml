@@ -10,7 +10,7 @@ system_configuration:
     fields:
         oro_user.password_min_length:
             data_type: integer
-            type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             search_type: text
             priority: 40
             options:
@@ -21,7 +21,7 @@ system_configuration:
 
         oro_user.password_numbers:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 30
             options:
                 label: oro.user.system_configuration.fields.password_numbers.label
@@ -29,7 +29,7 @@ system_configuration:
 
         oro_user.password_lower_case:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 25
             options:
                 label: oro.user.system_configuration.fields.password_lower_case.label
@@ -37,7 +37,7 @@ system_configuration:
 
         oro_user.password_upper_case:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 20
             options:
                 label: oro.user.system_configuration.fields.password_upper_case.label
@@ -45,7 +45,7 @@ system_configuration:
 
         oro_user.password_special_chars:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 10
             options:
                 label: oro.user.system_configuration.fields.password_special_chars.label
@@ -54,7 +54,7 @@ system_configuration:
 
         oro_user.send_password_in_invitation_email:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 10
             options:
                 label: oro.user.system_configuration.fields.send_password_in_invitation_email.label

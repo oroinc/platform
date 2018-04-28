@@ -106,12 +106,12 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         ];
         $result = $this->businessUnitManager->getTreeOptions($inputData);
         $expectedResult = [
-            '3'  => 'First BU',
-            '5'  => '&nbsp;&nbsp;&nbsp;Sub First BU',
-            '4'  => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sub Sub First BU',
-            '10' => 'Second BU',
-            '11' => '&nbsp;&nbsp;&nbsp;Sub Second BU',
-            '15' => 'BU wo children'
+            'First BU' => '3',
+            '&nbsp;&nbsp;&nbsp;Sub First BU' => '5',
+            '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sub Sub First BU' => '4',
+            'Second BU' => '10',
+            '&nbsp;&nbsp;&nbsp;Sub Second BU' => '11',
+            'BU wo children' => '15',
         ];
         $this->assertEquals($expectedResult, $result);
     }

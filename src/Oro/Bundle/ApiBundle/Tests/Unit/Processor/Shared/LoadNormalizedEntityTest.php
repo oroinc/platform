@@ -32,7 +32,23 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor = new LoadNormalizedEntity($this->processorBag);
     }
 
-    public function testProcessWhenEntityIdDoesNotExistInContextAndEntityDoesNotHaveIdentifierFields()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizadResult()
+    {
+        $metadata = new EntityMetadata();
+        $normalizadResult = ['key' => 'value'];
+
+        $this->processorBag->expects(self::never())
+            ->method('getProcessor');
+
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($normalizadResult);
+        $this->processor->process($this->context);
+
+        self::assertEquals($normalizadResult, $this->context->getResult());
+        self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
+    }
+
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizadResult()
     {
         $metadata = new EntityMetadata();
 
@@ -40,7 +56,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
             ->method('getProcessor');
 
         $this->context->setMetadata($metadata);
-        $this->context->setResult(['key' => 'value']);
+        $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasResult());

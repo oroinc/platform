@@ -105,6 +105,24 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
     }
 
+    public function testProcessWhenConfigHasOrderByOption()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->setOrderBy(['name' => 'DESC']);
+
+        $this->context->setClassName(User::class);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $filters = $this->context->getFilters();
+        self::assertCount(1, $filters);
+        /** @var SortFilter $sortFilter */
+        $sortFilter = $filters->get('sort');
+        self::assertEquals('orderBy', $sortFilter->getDataType());
+        self::assertEquals(['name' => 'DESC'], $sortFilter->getDefaultValue());
+    }
+
     public function testProcessForEntityWithoutIdentifier()
     {
         $config = new EntityDefinitionConfig();

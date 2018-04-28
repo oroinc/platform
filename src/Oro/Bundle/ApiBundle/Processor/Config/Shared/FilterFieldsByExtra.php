@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Excludes fields according to requested fieldset.
- * For example, in JSON.API the "fields[TYPE]" parameter can be used to request only specific fields.
+ * For example, in JSON.API the "fields[TYPE]" filter can be used to request only specific fields.
  */
 class FilterFieldsByExtra implements ProcessorInterface
 {

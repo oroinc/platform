@@ -18,11 +18,6 @@ class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType = new ObjectLabelType(new EntityClassNameHelper($entityAliasResolver));
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_acl_label', $this->formType->getName());
-    }
-
     public function testGetParent()
     {
         $this->assertEquals(HiddenType::class, $this->formType->getParent());

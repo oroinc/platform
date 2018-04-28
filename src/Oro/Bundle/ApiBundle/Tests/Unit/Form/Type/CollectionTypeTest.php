@@ -21,7 +21,7 @@ class CollectionTypeTest extends TypeTestCase
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension(
-                [new CollectionEntryType()],
+                [CollectionEntryType::class => new CollectionEntryType()],
                 []
             )
         ];
@@ -64,7 +64,7 @@ class CollectionTypeTest extends TypeTestCase
             ->method('removeGroup');
 
         $form->submit(['groups' => [['name' => 'group1'], ['name' => 'group2']]]);
-        self::assertTrue($form->isSynchronized());
+        $this->assertTrue($form->isSynchronized());
     }
 
     public function testShouldUseRemover()
@@ -239,11 +239,5 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form->submit('test');
         self::assertFalse($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new CollectionType();
-        self::assertEquals('oro_api_collection', $type->getName());
     }
 }

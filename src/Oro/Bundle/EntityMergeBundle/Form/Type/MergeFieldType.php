@@ -96,7 +96,7 @@ class MergeFieldType extends AbstractType
         $result = [];
 
         foreach ($modes as $mode) {
-            $result[$mode] = $this->translator->trans('oro.entity_merge.merge_modes.' . $mode);
+            $result[$this->translator->trans('oro.entity_merge.merge_modes.' . $mode)] = $mode;
         }
 
         return $result;

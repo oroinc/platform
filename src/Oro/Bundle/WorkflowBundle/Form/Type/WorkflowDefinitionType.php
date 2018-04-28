@@ -74,6 +74,8 @@ class WorkflowDefinitionType extends AbstractType
                 'exclusive_active_groups',
                 OroChoiceType::class,
                 [
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices' => $this->provider->getActiveGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_active_groups.label',
                     'required' => false,
@@ -85,6 +87,8 @@ class WorkflowDefinitionType extends AbstractType
                 'exclusive_record_groups',
                 OroChoiceType::class,
                 [
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices' => $this->provider->getRecordGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_record_groups.label',
                     'required' => false,

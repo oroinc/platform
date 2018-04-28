@@ -105,8 +105,8 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->callback(
                     function ($options) {
                         $expectedChoices = [
-                            'groups.owner' => 'Groups > Owner',
-                            'users' => 'Users',
+                            'Groups > Owner' => 'groups.owner',
+                            'Users' => 'users',
                         ];
                         return $options['choices'] == $expectedChoices;
                     }
@@ -192,8 +192,8 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit_Framework_TestCase
                 $this->callback(
                     function ($options) {
                         $expectedChoices = [
-                            'groups.owner' => 'Groups > Owner',
-                            'users' => 'Users',
+                            'Groups > Owner' => 'groups.owner',
+                            'Users' => 'users',
                         ];
                         return $options['choices'] == $expectedChoices;
                     }

@@ -108,6 +108,6 @@ class SearchNumberFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return NumberFilterType::NAME;
+        return NumberFilterType::class;
     }
 }
