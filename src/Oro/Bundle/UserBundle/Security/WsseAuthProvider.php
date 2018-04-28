@@ -109,7 +109,7 @@ class WsseAuthProvider extends Provider
             $isSecretValid = false;
             if ($secret) {
                 $isSecretValid = $this->validateDigest(
-                    $token->getAttribute('digest'),
+                    $token->getCredentials(),
                     $nonce,
                     $token->getAttribute('created'),
                     $secret,

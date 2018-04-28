@@ -2,11 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenSerializerTrait;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-class WsseToken extends Token implements OrganizationContextTokenInterface
+class WsseToken extends AbstractToken implements OrganizationContextTokenInterface
 {
     use OrganizationContextTokenSerializerTrait;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCredentials()
+    {
+        return '';
+    }
 }
