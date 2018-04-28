@@ -10,7 +10,6 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -258,7 +257,7 @@ class DirectMailer extends \Swift_Mailer
         $realTransport = null;
         $mailers       = array_keys($this->container->getParameter('swiftmailer.mailers'));
         foreach ($mailers as $name) {
-            if ($this->container instanceof IntrospectableContainerInterface
+            if ($this->container instanceof ContainerInterface
                 && !$this->container->initialized(sprintf('swiftmailer.mailer.%s', $name))
             ) {
                 continue;

@@ -4,7 +4,6 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 
 /**
@@ -16,7 +15,7 @@ class ContainerClearer implements ClearerInterface, ChainExtensionAwareInterface
     /** @var string[] */
     private $persistentServices = [];
 
-    /** @var ResettableContainerInterface|IntrospectableContainerInterface */
+    /** @var ResettableContainerInterface */
     private $container;
 
     /** @var ExtensionInterface|null */

@@ -13,14 +13,13 @@ use Oro\Component\PhpUtils\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 /**
  * Removes unnecessary ORM metadata factory to avoid keeping unnecessary objects in the memory.
  */
 class OrmMetadataFactoryClearer implements ClearerInterface
 {
-    /** @var ContainerInterface|IntrospectableContainerInterface */
+    /** @var ContainerInterface */
     private $container;
 
     /** @var string */

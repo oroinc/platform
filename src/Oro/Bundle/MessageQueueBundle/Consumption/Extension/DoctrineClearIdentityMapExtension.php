@@ -6,11 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 class DoctrineClearIdentityMapExtension extends AbstractExtension implements ResettableExtensionInterface
 {
-    /** @var ContainerInterface|IntrospectableContainerInterface */
+    /** @var ContainerInterface */
     private $container;
 
     /** @var ManagerRegistry|null */
