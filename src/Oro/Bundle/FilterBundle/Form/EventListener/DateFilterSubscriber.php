@@ -112,8 +112,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
                 $child,
                 ChoiceType::class,
                 [
-                    // TODO: remove 'choices_as_values' option and array_flip function below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => array_flip($choices),
                 ]
             );

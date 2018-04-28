@@ -33,8 +33,6 @@ class DatabaseType extends AbstractType
                 ChoiceType::class,
                 array(
                     'label' => 'form.configuration.database.driver',
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => array(
                         'MySQL' => DatabaseDriverInterface::DRIVER_MYSQL,
                         'PostgreSQL' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
@@ -105,8 +103,6 @@ class DatabaseType extends AbstractType
                 array(
                     'label'         => 'form.configuration.database.drop',
                     'data'          => 'none',
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices'       => array(
                         'form.configuration.database.drop_none' => 'none',
                         'form.configuration.database.drop_app' => 'app',

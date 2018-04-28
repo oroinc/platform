@@ -25,8 +25,6 @@ class MailerType extends AbstractType
                 ChoiceType::class,
                 array(
                     'label'         => 'form.configuration.mailer.transport',
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices'       => array(
                         'PHP mail' => 'mail',
                         'SMTP' => 'smtp',
@@ -64,8 +62,6 @@ class MailerType extends AbstractType
                 array(
                     'label'         => 'form.configuration.mailer.encryption',
                     'required'      => false,
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices'       => array(
                         'SSL' => 'ssl',
                         'TLS' => 'tls',

@@ -132,8 +132,6 @@ class EmailType extends AbstractType
                     'label'      => 'oro.email.type.label',
                     'required'   => true,
                     'data'       => 'html',
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices'  => [
                         'oro.email.datagrid.emailtemplate.filter.type.html' => 'html',
                         'oro.email.datagrid.emailtemplate.filter.type.txt' => 'txt',

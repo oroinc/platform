@@ -62,8 +62,6 @@ class FilterType extends AbstractType
     {
         $result = array('required' => false);
         if ($options['operator_choices']) {
-            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-            $result['choices_as_values'] = true;
             $result['choices'] = $options['operator_choices'];
         }
         $result = array_merge($result, $options['operator_options']);

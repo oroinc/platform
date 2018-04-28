@@ -212,8 +212,6 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 oro.email.folder_type.inbox: inbox
                                 oro.email.folder_type.sent: sent
@@ -225,15 +223,12 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices_as_values: true
                             choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices()"
                 is_new:
                     label: oro.email.status.label
                     type: boolean
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 # in boolean filter type, 1 = yes, 2 = false
                                 oro.email.status.unread.label: 2
@@ -246,7 +241,6 @@ datagrids:
                     options:
                         field_options:
                             required: false
-                            choices_as_values: true
                             choices: "@oro_email.mailbox_choice_list->getChoiceList"
         views_list : "@oro_email.emailfolder.datagrid_view_list"
 
@@ -556,7 +550,6 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices_as_values: true
                             choices: "@oro_email.emailtemplate.datagrid_helper->getEntityNames"
                             translatable_options: false
                 name:
@@ -567,7 +560,6 @@ datagrids:
                     data_name:       t.type
                     options:
                         field_options:
-                            choices_as_values: true
                             choices: "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
 
                 isSystem:

@@ -165,11 +165,6 @@ class OperationType extends AbstractType
 
             $attributeOptions = $this->prepareAttributeOptions($attribute, $attributeOptions, $options);
 
-            // TODO: remove 'if' statement below in scope of BAP-15236
-            if (isset($attributeOptions['options']['choices'])) {
-                $attributeOptions['options']['choices_as_values'] = true;
-            }
-
             $builder->add($attribute->getName(), $attributeOptions['form_type'], $attributeOptions['options']);
         }
     }
