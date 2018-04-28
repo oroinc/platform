@@ -1,22 +1,5 @@
 query_designer:
     aggregates:
-        identifier_distinct:
-            applicable: [{identifier: true}]
-            functions:
-                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
-            query_type: [report]
-        number_distinct:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
-            functions:
-                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
-                - { name: Sum Distinct,   expr: SUM(DISTINCT $column) }
-                - { name: Avg Distinct,   expr: AVG(DISTINCT $column) }
-            query_type: [report]
-        other_distinct:
-            applicable: [{type: string}, {type: text}, {type: date}, {type: datetime}]
-            functions:
-                - { name: Count Distinct, expr: COUNT(DISTINCT $column), return_type: integer }
-            query_type: [report]
         identifier:
             applicable: [{identifier: true}]
             functions:
@@ -39,11 +22,14 @@ query_designer:
         date:
             applicable: [{type: date}, {type: datetime}]
             functions:
-                - { name: Count, expr: COUNT($column), return_type: integer }
-                - { name: Min,   expr: MIN($column) }
-                - { name: Max,   expr: MAX($column) }
+                - { name: Count,       expr: COUNT($column), return_type: integer }
+                - { name: Min,         expr: MIN($column) }
+                - { name: Max,         expr: MAX($column) }
+                - { name: Month,       expr: MONTH($column), return_type: integer }
+                - { name: Year,        expr: YEAR($column), return_type: integer }
+                - { name: Day,         expr: DAY($column), return_type: integer }
+                - { name: Day of year, expr: DAYOFYEAR($column), return_type: integer }
             query_type: [report]
-
     filters:
         boolean:
             placeholder: oro.query_designer.filter.boolean.select_value.label
