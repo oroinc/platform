@@ -332,8 +332,7 @@ class RendererTest extends LayoutTestCase
                 [
                     'label'    => 'Gender',
                     'required' => false,
-                    //TODO flip choices in scope BAP-16689
-                    'choices'  => ['male' => 'Male', 'female' => 'Female'],
+                    'choices'  => ['Male' => 'male', 'Female' => 'female'],
                     'expanded' => true
                 ]
             )
