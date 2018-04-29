@@ -8,16 +8,19 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Helps to apply criteria stored in Criteria object to the QueryBuilder.
+ */
 class CriteriaConnector
 {
     /** @var CriteriaNormalizer */
-    protected $criteriaNormalizer;
+    private $criteriaNormalizer;
 
     /** @var CriteriaPlaceholdersResolver */
-    protected $placeholdersResolver;
+    private $placeholdersResolver;
 
     /** @var QueryExpressionVisitorFactory */
-    protected $expressionVisitorFactory;
+    private $expressionVisitorFactory;
 
     /**
      * @param CriteriaNormalizer            $criteriaNormalizer
@@ -40,7 +43,7 @@ class CriteriaConnector
      * @param QueryBuilder $qb
      * @param Criteria     $criteria
      */
-    public function applyCriteria(QueryBuilder $qb, Criteria $criteria)
+    public function applyCriteria(QueryBuilder $qb, Criteria $criteria): void
     {
         $this->criteriaNormalizer->normalizeCriteria($criteria);
         $this->placeholdersResolver->resolvePlaceholders($criteria, QueryBuilderUtil::getSingleRootAlias($qb));
@@ -48,7 +51,7 @@ class CriteriaConnector
         $joins = $criteria->getJoins();
         if (!empty($joins)) {
             foreach ($joins as $join) {
-                $method = strtolower($join->getJoinType()) . 'Join';
+                $method = \strtolower($join->getJoinType()) . 'Join';
                 $qb->{$method}(
                     $join->getJoin(),
                     $join->getAlias(),
@@ -72,7 +75,7 @@ class CriteriaConnector
      *
      * @throws QueryException
      */
-    protected function addCriteria(QueryBuilder $qb, Criteria $criteria)
+    private function addCriteria(QueryBuilder $qb, Criteria $criteria): void
     {
         $allAliases = $qb->getAllAliases();
         if (!isset($allAliases[0])) {
@@ -95,7 +98,7 @@ class CriteriaConnector
         foreach ($orderings as $sort => $order) {
             $hasValidAlias = false;
             foreach ($allAliases as $alias) {
-                if (0 === strpos($sort . '.', $alias . '.')) {
+                if (0 === \strpos($sort . '.', $alias . '.')) {
                     $hasValidAlias = true;
                     break;
                 }
