@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -225,6 +227,22 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
             array('loader' => array('loader')),
             array_merge(['resource_files' => []], $options)
         );
+
+        $strategy = $this->createMock(TranslationStrategyInterface::class);
+        $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
+        $strategyProviderLink = new ServiceLink($strategyProvider);
+        $strategyProvider->expects($this->any())
+            ->method('getStrategy')
+            ->willReturn($strategy);
+        $strategyProvider->expects($this->any())
+            ->method('getFallbackLocales')
+            ->willReturn([]);
+
+        $translator->setStrategyProviderLink($strategyProviderLink);
+
+        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
+        $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
+        $translator->setTranslationDomainProvider($translationDomainProvider);
 
         $translator->addResource('loader', 'foo', 'fr');
         $translator->addResource('loader', 'foo', 'en');

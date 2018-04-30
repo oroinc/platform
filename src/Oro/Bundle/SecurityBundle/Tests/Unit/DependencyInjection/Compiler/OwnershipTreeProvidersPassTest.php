@@ -67,8 +67,8 @@ class OwnershipTreeProvidersPassTest extends \PHPUnit_Framework_TestCase
             ->with(OwnershipTreeProvidersPass::TAG_NAME)
             ->willReturn(
                 [
-                    'treeProvider1' => [['class' => 'Test\Class1']],
-                    'treeProvider2' => [['class' => 'Test\Class2']],
+                    'treeprovider1' => [['class' => 'Test\Class1']],
+                    'treeprovider2' => [['class' => 'Test\Class2']],
                 ]
             );
 

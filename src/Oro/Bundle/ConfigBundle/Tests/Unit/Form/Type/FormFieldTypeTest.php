@@ -3,8 +3,6 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
-use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,19 +12,6 @@ use Symfony\Component\Form\Test\TypeTestCase;
 class FormFieldTypeTest extends TypeTestCase
 {
     const TEST_LABEL = 'label';
-
-    protected function getExtensions()
-    {
-        $useParentScope = new ParentScopeCheckbox();
-        return [
-            new PreloadedExtension(
-                array(
-                    $useParentScope->getName() => $useParentScope
-                ),
-                array()
-            )
-        ];
-    }
 
     /**
      * @dataProvider buildFormOptionsProvider

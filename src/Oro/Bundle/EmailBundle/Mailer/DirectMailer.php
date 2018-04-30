@@ -257,8 +257,7 @@ class DirectMailer extends \Swift_Mailer
         $realTransport = null;
         $mailers       = array_keys($this->container->getParameter('swiftmailer.mailers'));
         foreach ($mailers as $name) {
-            if ($this->container instanceof ContainerInterface
-                && !$this->container->initialized(sprintf('swiftmailer.mailer.%s', $name))
+            if (!$this->container->initialized(sprintf('swiftmailer.mailer.%s', $name))
             ) {
                 continue;
             }

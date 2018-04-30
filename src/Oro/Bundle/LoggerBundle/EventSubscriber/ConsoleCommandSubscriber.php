@@ -54,7 +54,6 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
         $input = $event->getInput();
-
         $this->logger->error(
             sprintf(
                 'An error occurred while running command "%s". %s',

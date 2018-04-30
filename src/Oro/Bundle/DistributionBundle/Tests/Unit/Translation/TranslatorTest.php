@@ -48,7 +48,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         /** @var MessageSelector|\PHPUnit_Framework_MockObject_MockObject $selector */
         $selector = $this->createMock(MessageSelector::class);
 
-        $this->translator = new Translator($container, $selector);
+        $this->translator = new Translator($container, $selector, []);
     }
 
     public function testAddResource()

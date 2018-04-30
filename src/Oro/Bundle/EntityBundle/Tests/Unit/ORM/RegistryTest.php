@@ -46,7 +46,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->atLeastOnce())
             ->method('get')
             ->with('service.default')
-            ->will($this->onConsecutiveCalls($manager1, $manager2));
+            ->will($this->onConsecutiveCalls($manager1, $manager1, $manager2));
         $this->container->expects($this->atLeastOnce())
             ->method('getParameter')
             ->with('oro_entity.default_query_cache_lifetime')
@@ -54,6 +54,11 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->atLeastOnce())
             ->method('set')
             ->with('service.default', null);
+
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([['service.default', true]]);
 
         $this->assertSame($manager1, $this->registry->getManager('default'));
         // test that a manager service cached
@@ -81,7 +86,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->atLeastOnce())
             ->method('get')
             ->with('service.default')
-            ->will($this->onConsecutiveCalls($manager1, $manager2));
+            ->will($this->onConsecutiveCalls($manager1, $manager1, $manager2));
         $this->container->expects($this->atLeastOnce())
             ->method('getParameter')
             ->with('oro_entity.default_query_cache_lifetime')
@@ -89,6 +94,11 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->atLeastOnce())
             ->method('set')
             ->with('service.default', null);
+
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([['service.default', true]]);
 
         $this->assertSame($manager1, $this->registry->getManagerForClass(self::TEST_ENTITY_CLASS));
         // test that a manager cached
@@ -103,13 +113,19 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testManagerCacheWhenEntityManagerDoesNotExist()
     {
-        $this->container->expects($this->at(0))
+        $this->container->expects($this->atLeastOnce())
             ->method('set')
             ->with('service.default', null);
+
         $this->container->expects($this->at(1))
             ->method('get')
             ->with('service.default')
             ->willReturn(null);
+
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([['service.default', true]]);
 
         $this->assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
         // test that a manager cached

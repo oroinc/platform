@@ -41,8 +41,8 @@ class Select2ChoiceTypeTest extends TypeTestCase
             null,
             [
                 'choices' => [
-                    'foo' => 'Foo',
-                    'bar' => 'Bar'
+                    'Foo' => 'foo',
+                    'Bar' => 'bar'
                 ]
             ]
         );
@@ -59,8 +59,8 @@ class Select2ChoiceTypeTest extends TypeTestCase
             null,
             [
                 'choices' => [
-                    'foo' => 'Foo',
-                    'bar' => 'Bar'
+                    'Foo' => 'foo',
+                    'Bar' => 'bar'
                 ],
                 'multiple' => true
             ]
