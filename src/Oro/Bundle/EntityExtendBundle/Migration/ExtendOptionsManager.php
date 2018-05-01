@@ -107,6 +107,18 @@ class ExtendOptionsManager
     }
 
     /**
+     * @param string $tableName
+     * @param string $columnName
+     * @return bool
+     */
+    public function hasColumnOptions(string $tableName, string $columnName): bool
+    {
+        $objectKey = sprintf(static::COLUMN_OPTION_FORMAT, $tableName, $columnName);
+
+        return isset($this->options[$objectKey]);
+    }
+
+    /**
      * Sets column type
      *
      * @param string $tableName

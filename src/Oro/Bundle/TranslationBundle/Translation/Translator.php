@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Psr\Container\ContainerInterface;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
