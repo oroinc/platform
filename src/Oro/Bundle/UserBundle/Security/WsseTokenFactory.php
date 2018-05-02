@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+/**
+ * Creates WsseToken with needed data
+ */
 class WsseTokenFactory implements WsseTokenFactoryInterface
 {
     /**

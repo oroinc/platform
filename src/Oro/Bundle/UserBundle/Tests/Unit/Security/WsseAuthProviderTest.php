@@ -28,23 +28,19 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     const PROVIDER_KEY = 'someProviderKey';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|UserProviderInterface */
-    private $userProvider;
+    protected $userProvider;
 
     /** @var MessageDigestPasswordEncoder */
-    private $encoder;
+    protected $encoder;
 
     /** @var WsseAuthProvider */
-    private $provider;
+    protected $provider;
 
-    /**
-     * @var UserCheckerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $userChecker;
+    /** @var UserCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $userChecker;
 
-    /**
-     * @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $token;
+    /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $token;
 
     protected function setUp()
     {
