@@ -15,7 +15,7 @@
 
         &:hover {
             ~ .custom-checkbox__icon {
-                border: $checkbox-icon-border-hover-state
+                border: $checkbox-icon-border-hover-state;
             }
         }
 

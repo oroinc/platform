@@ -76,8 +76,13 @@
 }
 
 .form-signin .input-prepend{
-    margin-bottom: 10px;
+    margin-bottom: 13px;
 }
+
+.form-signin .input-prepend--last {
+    margin-bottom: 0;
+}
+
 .wb{
     background-color: #FFF;
 }

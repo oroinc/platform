@@ -31,6 +31,18 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Additional Information": "Additional Information"
 
 oro:
+    auth:
+        description:
+            commerce:
+                logo: OroCommerce
+                main: B2B eCommerce Platform
+                text: OroCommerce reduces the complexity for custom eCommerce projects
+            crm:
+                logo: OroCRM
+                main: The CRM for Marketing and Sales
+                text: All the Features Required to Boost Sales, Optimize Marketing, and Increase Customer Satisfaction
+        copy: © 2018 Oro, Inc. All Rights Reserved
+
     ui:
         actions:          "%entityName% Actions"
         actions.activity: More actions
