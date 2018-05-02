@@ -63,12 +63,12 @@
             color: get-color('additional', 'middle');
         }
 
-        @include hover-focus {
+        /* @include hover-focus {
             [class^="fa-"],
             [class*=" fa-"] {
                 color: get-color('additional', 'dark');
             }
-        }
+        } */
     }
 
     &__subtitle {
@@ -92,9 +92,9 @@
 
         cursor: pointer;
 
-        @include hover-focus {
+        /* @include hover-focus {
             color: get-color('additional', 'dark');
-        }
+        } */
     }
 
     &__list {
@@ -168,7 +168,7 @@
             overflow: auto;
 
             border-width: 1px;
-            box-shadow: $dropdown-box-shadow;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.175); /* $dropdown-box-shadow */
         }
     }
 }

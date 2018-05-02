@@ -81,9 +81,9 @@
 
         @include fa-icon($fa-var-remove);
 
-        @include hover-focus {
+        /* @include hover-focus {
             text-decoration: none;
-        }
+        } */
     }
 
     &.select2-container-disabled {

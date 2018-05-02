@@ -52,7 +52,7 @@
     .filter-container {
         margin: auto;
         position: relative;
-        max-width: $site-width;
+        max-width: 1100px; /* $site-width; */
     }
 
     .filter-items-hint {
