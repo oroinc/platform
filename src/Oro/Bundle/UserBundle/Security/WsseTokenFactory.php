@@ -7,8 +7,8 @@ class WsseTokenFactory implements WsseTokenFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(array $roles = [])
+    public function create($user, $credentials, $providerKey, array $roles = [])
     {
-        return new WsseToken($roles);
+        return new WsseToken($user, $credentials, $providerKey, $roles);
     }
 }
