@@ -11,7 +11,7 @@ For more details on how to use [MonologBundle](https://github.com/symfony/monolo
 To enable error logs email notification run console command `oro:logger:email-notification` with semicolons separated 
 recipients, for example:  
 
-    php app/console oro:logger:email-notification --recipients="admin@example.com;support@example.com"
+    php bin/console oro:logger:email-notification --recipients="admin@example.com;support@example.com"
 
 To disable the notifications run command with `--disable` flag.
   
@@ -27,7 +27,7 @@ and equals to `error`, you can update it at application configuration.
 To find problems you allowed to change this value for a specific time for a specific user, to do this 
 run command:  
 
-    php app/console oro:logger:level debug "1 hour" --user=admin@example.com
+    php bin/console oro:logger:level debug "1 hour" --user=admin@example.com
 
 Where `debug` is log level and `1 hour` is time interval when the level will be used instead of default, 
 `--user` option contains email of user whose log will be affected.

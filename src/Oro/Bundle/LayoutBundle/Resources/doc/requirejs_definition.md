@@ -43,7 +43,7 @@ config:
 When you execute the following command in the console,
 
 ```
-php app/console oro:requirejs:build
+php bin/console oro:requirejs:build
 ```
 
 it produces `web/js/layout/base/scripts.min.js` as the result.

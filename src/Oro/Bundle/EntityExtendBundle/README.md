@@ -305,7 +305,7 @@ class AcmeTestBundle implements Migration, ExtendExtensionAwareInterface
 The following command prepares extended entities configuration:
 
 ```bash
-php app/console oro:entity-extend:update-config
+php bin/console oro:entity-extend:update-config
 ```
 
 ## Updating database schema for extended entities
@@ -313,7 +313,7 @@ php app/console oro:entity-extend:update-config
 The following command updates a database schema for extended entities:
 
 ```bash
-php app/console oro:entity-extend:update-schema
+php bin/console oro:entity-extend:update-schema
 ```
 
 ## Warming up the cache
@@ -321,7 +321,7 @@ php app/console oro:entity-extend:update-schema
 To save entity extend configuration stored in the database to the application cache, the following command can be used:
 
 ```bash
-php app/console oro:entity-extend:cache:warmup
+php bin/console oro:entity-extend:cache:warmup
 ```
 
 ## Clearing up the cache
@@ -329,7 +329,7 @@ php app/console oro:entity-extend:cache:warmup
 The following command removes all data related to entity extend functionality from the application cache:
 
 ```bash
-php app/console oro:entity-extend:cache:clear --no-warmup
+php bin/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
 

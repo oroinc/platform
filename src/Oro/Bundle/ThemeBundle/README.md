@@ -95,9 +95,9 @@ oro_theme:
 After this change was made next commends should be executed:
 
 ```
-app/console cache:clear
-app/console assets:install
-app/console assetic:dump
+bin/console cache:clear
+bin/console assets:install
+bin/console assetic:dump
 ```
 
 
@@ -115,9 +115,9 @@ oro_assetic:
 When you are making changes to theme's CSS don't forget to run next commands:
 
 ```
-app/console cache:clear # if you have changed some theme's setting, including adding/removing CSS/LESS styles files.
-app/console assets:install # if you have changed themes files, you can use --symlink parameter, in this case you should install it only once
-app/console assetic:dump # if you are not using oro_assetic.css_debug: [theme] or oro_assetic.css_debug_all: true options
+bin/console cache:clear # if you have changed some theme's setting, including adding/removing CSS/LESS styles files.
+bin/console assets:install # if you have changed themes files, you can use --symlink parameter, in this case you should install it only once
+bin/console assetic:dump # if you are not using oro_assetic.css_debug: [theme] or oro_assetic.css_debug_all: true options
 ```
 
 ## Getting list of all available themes

@@ -61,7 +61,7 @@ bundles, validate and merge. Merged configuration is stored in app cache.
 Eexecute a command to validate configuration manually:
 
 ```
-php app/console oro:action:configuration:validate
+php bin/console oro:action:configuration:validate
 ```
 
 ## Configuration Merging

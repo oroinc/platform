@@ -30,7 +30,7 @@ class ImapTest extends Selenium2TestCase
         $login = $this->login();
         /** @var UserEmailSettings $login */
         $login->openUserEmailSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
-        exec("app/console oro:cron:imap-sync --env prod");
+        exec("bin/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->assertElementNotPresent(

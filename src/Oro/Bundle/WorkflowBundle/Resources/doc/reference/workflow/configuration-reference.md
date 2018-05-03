@@ -146,7 +146,7 @@ Configuration Loading
 To load configuration execute a command:
 
 ```
-php app/console oro:workflow:definitions:load
+php bin/console oro:workflow:definitions:load
 ```
 Command has two options: "directories" that allows user to specify which directories will be used to find definitions,
 and "workflows" that define names of definitions required to load.
