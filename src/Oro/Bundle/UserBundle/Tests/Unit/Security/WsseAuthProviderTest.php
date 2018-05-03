@@ -4,16 +4,19 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
 use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
@@ -22,6 +25,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     const TEST_PASSWORD = 'somePassword';
     const TEST_NONCE = 'someNonce';
     const TEST_API_KEY = 'someApiKey';
+    const PROVIDER_KEY = 'someProviderKey';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|UserProviderInterface */
     protected $userProvider;
@@ -32,14 +36,28 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /** @var WsseAuthProvider */
     protected $provider;
 
+    /** @var UserCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $userChecker;
+
+    /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $token;
+
     protected function setUp()
     {
-        $this->markTestSkipped('Should be fixed in scope of BAP-16798');
         $this->userProvider = $this->createMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $cache = new ArrayCache();
+        $this->userChecker = $this->createMock(UserCheckerInterface::class);
 
-        $this->provider = new WsseAuthProvider($this->userProvider, $this->encoder, $cache);
+        $this->provider = new WsseAuthProvider(
+            $this->userChecker,
+            $this->userProvider,
+            self::PROVIDER_KEY,
+            $this->encoder,
+            $cache
+        );
+
+        $this->token = $this->createMock(TokenInterface::class);
         $this->provider->setTokenFactory(new WsseTokenFactory());
     }
 
@@ -54,21 +72,26 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
-        $provider = new WsseAuthProvider($this->userProvider, $this->encoder, new ArrayCache());
-        $provider->authenticate(new Token());
+        $provider = new WsseAuthProvider(
+            $this->userChecker,
+            $this->userProvider,
+            self::PROVIDER_KEY,
+            $this->encoder,
+            new ArrayCache()
+        );
+        $provider->authenticate($this->token);
     }
 
     /**
      * @dataProvider userProvider
      *
-     * @param object $user
+     * @param User $user
      * @param string $secret
      * @param string $salt
      */
     public function testAuthenticateOnCorrectData($user, $secret, $salt = '')
     {
         $token = $this->prepareTestInstance($user, $secret, $salt);
-        $this->assertFalse($token->isAuthenticated());
 
         $token = $this->provider->authenticate($token);
         $this->assertTrue($token->isAuthenticated());
@@ -83,7 +106,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $regularUser = new RegularUser();
         $regularUser->setPassword(self::TEST_PASSWORD);
         $regularUser->setSalt(self::TEST_SALT);
-        $regularUser->setRoles([]);
+        $regularUser->setRoles(['admin']);
 
         $organization = new Organization();
         $organization->setEnabled(true);
@@ -96,6 +119,8 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $advancedUser->addOrganization($organization);
         $advancedUser->addApiKey($userApiKey);
         $advancedUser->setEnabled(true);
+        $role = $this->createMock(RoleInterface::class);
+        $advancedUser->setRoles([$role]);
         $userApiKey->setUser($advancedUser);
 
         return [
@@ -186,7 +211,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
      */
-    public function testGetSecret()
+    public function testGetSecretException()
     {
         $noApiKeyUser = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $noApiKeyUser
@@ -212,7 +237,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
             ''
         );
 
-        $token = new Token();
+        $token = new Token(new User(), 'asd', 'wrongKey');
         $token->setAttribute('digest', $digest);
         $token->setAttribute('nonce', $nonce);
         $token->setAttribute('created', $time);
@@ -221,9 +246,9 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $user
-     * @param $secret
-     * @param $salt
+     * @param User $user
+     * @param string $secret
+     * @param string $salt
      *
      * @return Token
      */
@@ -247,7 +272,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
             $salt
         );
 
-        $token = new Token();
+        $token = new Token($user, $digest, self::PROVIDER_KEY, $user->getRoles());
         $token->setAttribute('digest', $digest);
         $token->setAttribute('nonce', $nonce);
         $token->setAttribute('created', $time);
