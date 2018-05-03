@@ -112,7 +112,6 @@ class WsseAuthProvider extends Provider
                         $this->providerKey,
                         $user->getRoles()
                     );
-                    $authenticatedToken->setUser($user);
                     $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
 
                     return $authenticatedToken;
