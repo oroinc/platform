@@ -3,6 +3,8 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\QueryBuilder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -14,6 +16,7 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity\Tagging;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\ORM\Query\AST\Functions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
@@ -38,6 +41,8 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                 'Test' => 'Oro\Bundle\BatchBundle\Tests\Unit\Fixtures\Entity'
             ]
         );
+        $this->em->getConfiguration()->addCustomDatetimeFunction('date', Functions\SimpleFunction::class);
+        $this->em->getConfiguration()->addCustomDatetimeFunction('convert_tz', Functions\DateTime\ConvertTz::class);
 
         $this->relationHelper = $this->createMock(RelationHelper::class);
         $this->relationHelper->expects($this->any())
@@ -58,11 +63,16 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     /**
      * @dataProvider getCountQueryBuilderDataProvider
      *
-     * @param callback $queryBuilder
-     * @param string   $expectedDql
+     * @param callback    $queryBuilder
+     * @param string      $expectedDql
+     * @param string|null $platformClass
      */
-    public function testGetCountQueryBuilder($queryBuilder, $expectedDql)
+    public function testGetCountQueryBuilder($queryBuilder, $expectedDql, $platformClass = null)
     {
+        if (null !== $platformClass) {
+            $this->em->getConnection()->setDatabasePlatform(new $platformClass());
+        }
+
         $optimizer = new CountQueryBuilderOptimizer();
         $optimizer->setRelationHelper($this->relationHelper);
         $countQb   = $optimizer->getCountQueryBuilder(call_user_func($queryBuilder, $this->em));
@@ -407,6 +417,68 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                         ->having('login LIKE :test');
                 },
                 'expectedDQL' => 'SELECT u.id FROM Test:User u WHERE u.username LIKE :test'
+            ],
+            'having_by_expr_with_function_mysql' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->select(['DATE(u.createdAt) as createdDate', 'COUNT(u.id) as count'])
+                        ->groupBy('createdDate')
+                        ->having('createdDate > :date');
+                },
+                'expectedDQL' => 'SELECT DATE(u.createdAt) as _groupByPart0 '
+                    . 'FROM Test:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING _groupByPart0 > :date',
+                'platformClass' => MySqlPlatform::class
+            ],
+            'having_by_expr_with_function_postgresql' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->select(['DATE(u.createdAt) as createdDate', 'COUNT(u.id) as count'])
+                        ->groupBy('createdDate')
+                        ->having('createdDate > :date');
+                },
+                'expectedDQL' => 'SELECT DATE(u.createdAt) as _groupByPart0 '
+                    . 'FROM Test:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING DATE(u.createdAt) > :date',
+                'platformClass' => PostgreSqlPlatform::class
+            ],
+            'having_by_expr_with_nested_functions_mysql' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->select([
+                            'DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as createdDate',
+                            'COUNT(u.id) as count'
+                        ])
+                        ->groupBy('createdDate')
+                        ->having('createdDate > :date');
+                },
+                'expectedDQL' => 'SELECT DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as _groupByPart0 '
+                    . 'FROM Test:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING _groupByPart0 > :date',
+                'platformClass' => MySqlPlatform::class
+            ],
+            'having_by_expr_with_nested_functions_postgresql' => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->select([
+                            'DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as createdDate',
+                            'COUNT(u.id) as count'
+                        ])
+                        ->groupBy('createdDate')
+                        ->having('createdDate > :date');
+                },
+                'expectedDQL' => 'SELECT DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) as _groupByPart0 '
+                    . 'FROM Test:User u '
+                    . 'GROUP BY _groupByPart0 '
+                    . 'HAVING DATE(CONVERT_TZ(u.createdAt, \'+00:00\', \'+03:00\')) > :date',
+                'platformClass' => PostgreSqlPlatform::class
             ],
             'join_on_table_that_has_with_join_condition' => [
                 'queryBuilder' => function ($em) {
