@@ -4,6 +4,8 @@ namespace Oro\Bundle\MessageQueueBundle\Log\Formatter;
 
 use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter as BaseConsoleFormatter;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 /**
  * Formats message queue consumer related log records for the console output
@@ -22,15 +24,44 @@ class ConsoleFormatter extends BaseConsoleFormatter
     protected $dataMap;
 
     /**
+     * @var CliDumper
+     */
+    protected $dumper;
+
+    /**
+     * @var bool|resource
+     */
+    protected $outputBuffer;
+
+    /**
+     * @var array
+     */
+    protected $options;
+
+    /**
+     * @var VarCloner
+     */
+    protected $cloner;
+
+    /**
      * @param array|null  $dataMap    The variable map for "%data%" placeholder
      *                                [variable name => the path to the variable value, ...]
      * @param string|null $format     The format of the message
      * @param string|null $dateFormat The format of the timestamp: one supported by DateTime::format
      */
-    public function __construct(array $dataMap = null, $format = null, $dateFormat = null)
+    public function __construct(array $options = [])
     {
-        parent::__construct($format, $dateFormat, true);
-        $this->dataMap = $dataMap;
+        $this->options = array_replace([
+            'format' => self::SIMPLE_FORMAT,
+            'multiline' => false,
+            'colors' => false
+        ], $options);
+
+        $this->options['format'] = $this->prepareFormat($this->options['format']);
+
+        parent::__construct($this->options);
+
+        $this->dataMap = $this->options['data_map'] ?? null;
         if (null === $this->dataMap) {
             $this->dataMap = [
                 'processor' => ['extra', 'processor'],
@@ -39,6 +70,15 @@ class ConsoleFormatter extends BaseConsoleFormatter
                 'message'   => ['extra', 'message_body'],
             ];
         }
+
+        $this->outputBuffer = fopen('php://memory', 'r+b');
+        $this->cloner = new VarCloner();
+
+        $this->dumper = new CliDumper(
+            [$this, 'echoLineToBuffer'],
+            null,
+            CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_COMMA_SEPARATOR
+        );
     }
 
     /**
@@ -53,9 +93,32 @@ class ConsoleFormatter extends BaseConsoleFormatter
                 $data[$key] = $value;
             }
         }
-        $record['data'] = $data;
 
-        return parent::format($record);
+        $formatted = parent::format($record);
+
+        return strtr($formatted, [
+            '%data%' => $data ? $this->dumpData($data) : '',
+            '%custom_context%' => $record['context'] ? $this->dumpData($record['context']) : ''
+        ]);
+    }
+
+    /**
+     * @param mixed $data
+     * @return string
+     */
+    protected function dumpData($data)
+    {
+        $this->dumper->setColors($this->options['colors']);
+
+        $data = $this->cloner->cloneVar($data);
+        $data = $data->withRefHandles(false);
+        $this->dumper->dump($data);
+
+        $dump = stream_get_contents($this->outputBuffer, -1, 0);
+        rewind($this->outputBuffer);
+        ftruncate($this->outputBuffer, 0);
+
+        return rtrim($dump);
     }
 
     /**
@@ -84,43 +147,25 @@ class ConsoleFormatter extends BaseConsoleFormatter
     }
 
     /**
-     * {@inheritdoc}
+     * @internal
+     * @param string $line
+     * @param int $depth
+     * @param int $indentPad
      */
-    protected function toJson($data, $ignoreErrors = false)
+    public function echoLineToBuffer($line, $depth, $indentPad)
     {
-        $result = parent::toJson($data, $ignoreErrors);
-        if (is_array($data)) {
-            $result = $this->formatJsonArrayString($result);
+        if (-1 !== $depth) {
+            fwrite($this->outputBuffer, $line);
         }
-
-        return $result;
     }
 
     /**
-     * Makes JSON string more pretty for console output.
-     *
-     * @param string $value
-     *
+     * @param string $format
      * @return string
      */
-    protected function formatJsonArrayString($value)
+    private function prepareFormat(string $format): string
     {
-        if ('[]' === $value) {
-            // do not show empty array
-            $value = '';
-        } else {
-            // replace {"key":"{\"anotherKey\":123}"}} with {"key":{"anotherKey":123}}
-            $value = preg_replace_callback(
-                '/"{(?P<val>.+?)}"/',
-                function ($matches) {
-                    return '{' . str_replace('\"', '"', $matches['val']) . '}';
-                },
-                $value
-            );
-            // remove extra back slashes
-            $value = preg_replace('/\\\\{2,}/', '\\', $value);
-        }
-
-        return $value;
+        return strtr($format, ['%context%' => '%custom_context%']);
     }
+
 }
