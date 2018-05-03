@@ -2,29 +2,26 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener\Cache;
 
-use Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation;
-use Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueTranslationListener;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueListener;
+use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 
-class EnumValueTranslationListenerTest extends EnumValueListenerTestCase
+class EnumValueListenerTest extends EnumValueListenerTestCase
 {
-    use EntityTrait;
-
-    /** @var EnumValueTranslationListener */
+    /** @var EnumValueListener */
     private $listener;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->listener = new EnumValueTranslationListener($this->cache);
+        $this->listener = new EnumValueListener($this->cache);
     }
 
     public function testPostPersist()
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postPersist($this->getEntityInstance());
+        $this->listener->postPersist(new StubEnumValue(1, 'test'));
     }
 
     public function testPostPersistNotSupportedClass()
@@ -38,7 +35,7 @@ class EnumValueTranslationListenerTest extends EnumValueListenerTestCase
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postUpdate($this->getEntityInstance());
+        $this->listener->postUpdate(new StubEnumValue(1, 'test'));
     }
 
     public function testPostUpdateNotSupportedClass()
@@ -52,7 +49,7 @@ class EnumValueTranslationListenerTest extends EnumValueListenerTestCase
     {
         $this->assertClearCacheCalled();
 
-        $this->listener->postRemove($this->getEntityInstance());
+        $this->listener->postRemove(new StubEnumValue(1, 'test'));
     }
 
     public function testPostRemoveNotSupportedClass()
@@ -60,13 +57,5 @@ class EnumValueTranslationListenerTest extends EnumValueListenerTestCase
         $this->assertClearCacheNotCalled();
 
         $this->listener->postRemove(new \stdClass());
-    }
-
-    /**
-     * @return EnumValueTranslation|object
-     */
-    private function getEntityInstance()
-    {
-        return $this->getEntity(EnumValueTranslation::class, ['id' => 42, 'objectClass' => self::ENUM_VALUE_CLASS]);
     }
 }

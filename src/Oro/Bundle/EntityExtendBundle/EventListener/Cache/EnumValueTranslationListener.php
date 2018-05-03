@@ -2,52 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener\Cache;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation;
 
 /**
  * Listen to updates of EnumValueTranslation and invalidate a cache
  */
-class EnumValueTranslationListener
+class EnumValueTranslationListener extends AbstractEnumValueListener
 {
     /**
-     * @var EnumTranslationCache
+     * {@inheritdoc}
      */
-    private $enumTranslationCache;
-
-    /**
-     * @param EnumTranslationCache $enumTranslationCache
-     */
-    public function __construct(EnumTranslationCache $enumTranslationCache)
+    protected function invalidateCache($entity)
     {
-        $this->enumTranslationCache = $enumTranslationCache;
-    }
-
-    /**
-     * @param EnumValueTranslation $entity
-     * @param LifecycleEventArgs $args
-     */
-    public function postPersist(EnumValueTranslation $entity, LifecycleEventArgs $args)
-    {
-        $this->enumTranslationCache->invalidate($entity->getObjectClass());
-    }
-
-    /**
-     * @param EnumValueTranslation $entity
-     * @param LifecycleEventArgs $args
-     */
-    public function postUpdate(EnumValueTranslation $entity, LifecycleEventArgs $args)
-    {
-        $this->enumTranslationCache->invalidate($entity->getObjectClass());
-    }
-
-    /**
-     * @param EnumValueTranslation $entity
-     * @param LifecycleEventArgs $args
-     */
-    public function postRemove(EnumValueTranslation $entity, LifecycleEventArgs $args)
-    {
-        $this->enumTranslationCache->invalidate($entity->getObjectClass());
+        if ($entity instanceof EnumValueTranslation) {
+            $this->enumTranslationCache->invalidate($entity->getObjectClass());
+        }
     }
 }
