@@ -18,7 +18,7 @@ entity_config:
                     options:
                         priority:           10
                     form:
-                        type:               Oro\Bundle\FormBundle\Form\Type\OroIconType # TODO: BAP-16690 add migration
+                        type:               Oro\Bundle\FormBundle\Form\Type\OroIconType
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.icon
                             block:          general
