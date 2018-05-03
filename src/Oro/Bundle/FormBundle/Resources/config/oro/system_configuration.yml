@@ -6,7 +6,7 @@ system_configuration:
     fields:
         oro_form.wysiwyg_enabled:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 50
             options:
                 label: oro.form.system_configuration.fields.wysiwyg_enabled.label

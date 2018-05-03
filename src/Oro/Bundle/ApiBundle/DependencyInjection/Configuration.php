@@ -332,7 +332,10 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_types')
                 ->info('The form types that can be reused in Data API')
-                ->example(['form.type.form', 'form.type.integer', 'form.type.text'])
+                ->example([
+                    'Symfony\Component\Form\Extension\Core\Type\FormType',
+                    'oro_api.form.type.entity'
+                ])
                 ->prototype('scalar')
                 ->end()
             ->end();

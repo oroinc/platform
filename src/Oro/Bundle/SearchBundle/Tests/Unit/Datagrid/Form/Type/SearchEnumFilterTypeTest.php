@@ -27,8 +27,8 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
             [
                 'field_options' => [
                     'choices' => [
-                        'value1',
-                        'value2'
+                        'value1' => 0,
+                        'value2' => 1,
                     ]
                 ],
                 'operator_choices' => null
@@ -39,13 +39,13 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
             [
                 'field_options' => [
                     'choices' => [
-                        'value1',
-                        'value2'
+                        'value1' => 0,
+                        'value2' => 1
                     ]
                 ],
                 'operator_choices' => [
-                    'value1',
-                    'value2'
+                    'value1' => 0,
+                    'value2' => 1
                 ]
             ],
             $resolvedOptions

@@ -51,7 +51,7 @@ class CurrencyNameHelper
         $currencyChoiceList = [];
 
         foreach ($this->currencyProvider->getCurrencyList() as $currencyIsoCode) {
-            $currencyChoiceList[$currencyIsoCode] = $this->getCurrencyName($currencyIsoCode, $nameViewStyle);
+            $currencyChoiceList[$this->getCurrencyName($currencyIsoCode, $nameViewStyle)] = $currencyIsoCode;
         }
 
         return $currencyChoiceList;

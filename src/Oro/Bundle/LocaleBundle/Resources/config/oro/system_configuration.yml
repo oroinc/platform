@@ -20,7 +20,7 @@ system_configuration:
     fields:
         oro_locale.locale:
             data_type: string
-            type: oro_locale
+            type: Oro\Bundle\LocaleBundle\Form\Type\LocaleType
             priority: 70
             options:
                 label: oro.locale.system_configuration.fields.locale.label
@@ -31,7 +31,7 @@ system_configuration:
 
         oro_locale.country:
             data_type: string
-            type: oro_locale_country
+            type: Oro\Bundle\LocaleBundle\Form\Type\CountryType
             priority: 60
             options:
                 label: oro.locale.system_configuration.fields.country.label
@@ -42,7 +42,7 @@ system_configuration:
 
         oro_locale.format_address_by_address_country:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 50
             options:
                 label: oro.locale.system_configuration.fields.format_address_by_address_country.label
@@ -51,7 +51,7 @@ system_configuration:
 
         oro_locale.language:
             data_type: string
-            type: oro_language
+            type: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
             priority: 40
             options:
                 label: oro.locale.system_configuration.fields.language.label
@@ -63,7 +63,7 @@ system_configuration:
 
         oro_locale.languages:
             data_type: array
-            type: oro_language
+            type: Oro\Bundle\LocaleBundle\Form\Type\LanguageType
             priority: 35
             options:
                 label: oro.locale.system_configuration.fields.languages.label
@@ -77,7 +77,7 @@ system_configuration:
 
         oro_locale.timezone:
             data_type: string
-            type: oro_locale_timezone
+            type: Oro\Bundle\LocaleBundle\Form\Type\TimezoneType
             priority: 30
             options:
                 label: oro.locale.system_configuration.fields.timezone.label
@@ -88,7 +88,7 @@ system_configuration:
 
         oro_locale.currency:
             data_type: string
-            type: oro_currency
+            type: Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType
             priority: 20
             options:
                 label: oro.locale.system_configuration.fields.currency.label
@@ -99,7 +99,7 @@ system_configuration:
 
         oro_locale.quarter_start:
             data_type: array
-            type: oro_quarter
+            type: Oro\Bundle\LocaleBundle\Form\Type\QuarterType
             priority: 30
             options:
                 label: oro.locale.system_configuration.fields.quarter_start.label
@@ -110,7 +110,7 @@ system_configuration:
 
         oro_locale.temperature_unit:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             priority: 20
             options:
@@ -119,13 +119,15 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    fahrenheit: oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit
-                    celsius: oro.locale.system_configuration.fields.temperature_unit.choices.celsius
+                    oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit: fahrenheit
+                    oro.locale.system_configuration.fields.temperature_unit.choices.celsius: celsius
 
         oro_locale.wind_speed_unit:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             priority: 10
             options:
@@ -134,14 +136,16 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    miles_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour
-                    kilometers_per_hour: oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour
-                    meters_per_second: oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour: miles_per_hour
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour: kilometers_per_hour
+                    oro.locale.system_configuration.fields.wind_speed_unit.choices.meters_per_second: meters_per_second
 
         oro_locale.enabled_localizations:
             data_type: array
-            type: oro_locale_localization_selection
+            type: Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType
             priority: 10
             options:
                 label: oro.locale.system_configuration.fields.enabled_localizations.label
@@ -153,7 +157,7 @@ system_configuration:
 
         oro_locale.default_localization:
             data_type: string
-            type: oro_locale_localization_selection
+            type: Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectionType
             priority: 20
             options:
                 label: oro.locale.system_configuration.fields.default_localization.label

@@ -6,32 +6,38 @@ system_configuration:
     fields:
         oro_activity_list.sorting_field:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_field.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    createdAt: oro.activitylist.system_configuration.fields.sorting_field.choices.createdAt
-                    updatedAt: oro.activitylist.system_configuration.fields.sorting_field.choices.updatedAt
+                    oro.activitylist.system_configuration.fields.sorting_field.choices.createdAt: createdAt
+                    oro.activitylist.system_configuration.fields.sorting_field.choices.updatedAt: updatedAt
                 constraints:
                     - NotBlank: ~
         oro_activity_list.sorting_direction:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.sorting_direction.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    DESC: oro.activitylist.system_configuration.fields.sorting_direction.choices.DESC
-                    ASC: oro.activitylist.system_configuration.fields.sorting_direction.choices.ASC
+                    oro.activitylist.system_configuration.fields.sorting_direction.choices.DESC: DESC
+                    oro.activitylist.system_configuration.fields.sorting_direction.choices.ASC: ASC
                 constraints:
                     - NotBlank: ~
         oro_activity_list.per_page:
             data_type: integer
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.fields.per_page.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
                     10:     10
                     25:     25
@@ -41,13 +47,15 @@ system_configuration:
                     - NotBlank: ~
         oro_activity_list.grouping:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label
+                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                choices_as_values: true
                 choices:
-                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.non_threaded.label
-                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.threaded.label
+                    oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.non_threaded.label: 0
+                    oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.threaded.label: 1
 
     tree:
         system_configuration:

@@ -36,13 +36,15 @@ class ImportType extends AbstractType
         $builder->add('file', FileType::class);
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
-        $processorNames = array_keys($processorChoices);
+        $processorNames = array_values($processorChoices);
 
         $builder->add(
             'processorAlias',
             ChoiceType::class,
             array_merge(
                 [
+                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                    'choices_as_values' => true,
                     'choices' => $processorChoices,
                     'required' => true,
                     'empty_data' => reset($processorNames)
@@ -66,7 +68,7 @@ class ImportType extends AbstractType
 
         $result = [];
         foreach ($aliases as $alias) {
-            $result[$alias] = $this->generateProcessorLabel($alias);
+            $result[$this->generateProcessorLabel($alias)] = $alias;
         }
 
         return $result;

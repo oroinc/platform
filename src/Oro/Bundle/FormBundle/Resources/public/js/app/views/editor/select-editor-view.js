@@ -124,19 +124,19 @@ define(function(require) {
             var fieldRestrictions = _.result(this.options, 'fieldRestrictions');
             if (fieldRestrictions) {
                 restrictionExpectation = _.result(fieldRestrictions, 'mode') === 'disallow';
-                results = _.map(choices, function(text, id) {
-                    var presentInRestriction = _.indexOf(fieldRestrictions.values, id) !== -1;
+                results = _.map(choices, function(value, label) {
+                    var presentInRestriction = _.indexOf(fieldRestrictions.values, value) !== -1;
                     return {
-                        id: id,
-                        text: text,
+                        id: value,
+                        text: label,
                         disabled: presentInRestriction === restrictionExpectation
                     };
                 });
             } else {
-                results = _.map(choices, function(text, id) {
+                results = _.map(choices, function(value, label) {
                     return {
-                        id: id,
-                        text: text
+                        id: value,
+                        text: label
                     };
                 });
             }

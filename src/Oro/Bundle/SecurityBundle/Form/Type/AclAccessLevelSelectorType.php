@@ -44,9 +44,11 @@ class AclAccessLevelSelectorType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices' => AccessLevel::getAccessLevelNames(),
-        ));
+        $resolver->setDefaults([
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            'choices_as_values' => true,
+            'choices' => array_flip(AccessLevel::getAccessLevelNames()),
+        ]);
     }
 
     /**

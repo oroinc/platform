@@ -51,10 +51,10 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetProcessorLabels()
     {
         $this->assertEquals(
-            array(
-                self::FOO_METHOD => self::FOO_LABEL,
-                self::BAR_METHOD => self::BAR_LABEL,
-            ),
+            [
+                self::FOO_LABEL => self::FOO_METHOD,
+                self::BAR_LABEL => self::BAR_METHOD,
+            ],
             $this->registry->getProcessorLabels()
         );
     }

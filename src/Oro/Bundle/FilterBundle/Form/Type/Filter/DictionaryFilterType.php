@@ -50,6 +50,8 @@ class DictionaryFilterType extends AbstractType
     {
         $result = ['required' => false];
         if ($options['operator_choices']) {
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            $result['choices_as_values'] = true;
             $result['choices'] = $options['operator_choices'];
         }
         $result = array_merge($result, $options['operator_options']);
@@ -111,8 +113,8 @@ class DictionaryFilterType extends AbstractType
                 'null_value' => null,
                 'class' => '',
                 'operator_choices' => [
-                    self::TYPE_IN => $this->translator->trans('oro.filter.form.label_type_in'),
-                    self::TYPE_NOT_IN => $this->translator->trans('oro.filter.form.label_type_not_in'),
+                    $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
+                    $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
                 ],
             ]
         )->setRequired(

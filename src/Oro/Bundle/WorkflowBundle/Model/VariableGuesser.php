@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -140,7 +141,7 @@ class VariableGuesser extends AbstractGuesser
 
                 $formOptions = array_merge($formConfig->get('form_options', false, []), $formOptions);
             } else {
-                $formType = 'entity';
+                $formType = EntityType::class;
                 $formOptions = array_merge($formOptions, [
                     'class' => $entityClass,
                     'multiple' => false

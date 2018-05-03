@@ -113,8 +113,8 @@ There are next filters form types:
 
 **Default Options**
 
-* field_type = "text"
-* operator_type = "choice"
+* field_type = TextType::class
+* operator_type = ChoiceType::class
 * show_filter = False
 
 **Class**

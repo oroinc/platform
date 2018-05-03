@@ -31,8 +31,8 @@ class TypedAddressType extends AbstractType
                 'types',
                 TranslatableEntityType::class,
                 array(
-                    'class'    => 'OroAddressBundle:AddressType',
-                    'property' => 'label',
+                    'class' => 'OroAddressBundle:AddressType',
+                    'choice_label' => 'label',
                     'required' => false,
                     'multiple' => true,
                     'expanded' => true

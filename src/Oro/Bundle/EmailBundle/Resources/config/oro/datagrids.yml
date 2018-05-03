@@ -212,9 +212,11 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                inbox: oro.email.folder_type.inbox
-                                sent: oro.email.folder_type.sent
+                                oro.email.folder_type.inbox: inbox
+                                oro.email.folder_type.sent: sent
                     data_name: f.type
                 folders:
                     type: multiselect-originfolder
@@ -223,16 +225,19 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
+                            choices_as_values: true
                             choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices()"
                 is_new:
                     label: oro.email.status.label
                     type: boolean
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
                                 # in boolean filter type, 1 = yes, 2 = false
-                                2: oro.email.status.unread.label
-                                1: oro.email.status.read.label
+                                oro.email.status.unread.label: 2
+                                oro.email.status.read.label: 1
                     data_name: eu.seen
                 mailbox:
                     label: oro.email.mailbox.entity_label
@@ -241,6 +246,7 @@ datagrids:
                     options:
                         field_options:
                             required: false
+                            choices_as_values: true
                             choices: "@oro_email.mailbox_choice_list->getChoiceList"
         views_list : "@oro_email.emailfolder.datagrid_view_list"
 
@@ -549,8 +555,9 @@ datagrids:
                     null_value: _empty_
                     options:
                         field_options:
-                            multiple:       true
-                            choices:        "@oro_email.emailtemplate.datagrid_helper->getEntityNames"
+                            multiple: true
+                            choices_as_values: true
+                            choices: "@oro_email.emailtemplate.datagrid_helper->getEntityNames"
                             translatable_options: false
                 name:
                     type:      string
@@ -560,6 +567,7 @@ datagrids:
                     data_name:       t.type
                     options:
                         field_options:
+                            choices_as_values: true
                             choices: "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
 
                 isSystem:

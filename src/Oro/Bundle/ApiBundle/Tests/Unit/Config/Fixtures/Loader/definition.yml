@@ -432,9 +432,9 @@ entity_empty_form_type:
 
 entity_form_type:
     config:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
     expected:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
 
 entity_null_form_options:
     config:
@@ -459,11 +459,11 @@ entity_form_event_subscriber:
 
 entity_form:
     config:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         form_options:
             option1: value1
     expected:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         form_options:
             option1: value1
 
@@ -475,15 +475,15 @@ field_form:
             field2:
                 form_type: ""
             field3:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field4:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options: ~
             field5:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options: []
             field6:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1
     expected:
@@ -491,12 +491,12 @@ field_form:
             field1: ~
             field2: ~
             field3:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field4:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field5:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field6:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1

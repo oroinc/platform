@@ -7,6 +7,7 @@ use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Provider\AbstractProviderTest;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -30,14 +31,16 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
         AuthorizationCheckerInterface $authorizationChecker,
-        ChainSearchProvider $searchProvider
+        ChainSearchProvider $searchProvider,
+        FormRegistryInterface $formRegistry
     ) {
         return new UserConfigurationFormProvider(
             $configBag,
             $translator,
             $formFactory,
             $authorizationChecker,
-            $searchProvider
+            $searchProvider,
+            $formRegistry
         );
     }
 

@@ -87,14 +87,14 @@ class TypesRegistry
     {
         /** @var ArrayCollection $types */
         $types  = $this->getAvailableIntegrationTypes();
-        $keys   = $types->getKeys();
-        $values = $types->map(
+        $values = $types->getKeys();
+        $labels = $types->map(
             function (IntegrationInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();
 
-        return array_combine($keys, $values);
+        return array_combine($labels, $values);
     }
 
     /**

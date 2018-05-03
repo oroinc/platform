@@ -55,14 +55,15 @@ To register a new form elements using the application configuration file, add `R
 ```yaml
 api:
     form_types:
-        - form.type.date # service id of "date" form type
+        - Symfony\Component\Form\Extension\Core\Type\DateType # the class name of a form type
+        - form.type.date # the service id of a form type
     form_type_extensions:
         - form.type_extension.form.validator # service id of Symfony form validation extension
     form_type_guessers:
-        - form.type_guesser.validator # service id of Symfony form type guesser based on validation constraints
+        - acme.form.type_guesser # service id of a form type guesser
     form_type_guesses:
         datetime: # data type
-            form_type: datetime # the name of guessed form type
+            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType # the guessed form type
             options: # guessed form type options
                 model_timezone: UTC
                 view_timezone: UTC
@@ -70,6 +71,9 @@ api:
                 widget: single_text
                 format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
 ```
+
+**Please note** that the `form_types` section can contain either the class name or the service id of a form type.
+Usually the service id is used if a form type depends on other services in the dependency injection container.
 
 You can find the already registered data API form elements in [Resources/config/oro/app.yml](../config/oro/app.yml).
 

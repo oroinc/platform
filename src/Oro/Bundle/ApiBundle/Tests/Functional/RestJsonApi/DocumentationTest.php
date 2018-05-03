@@ -243,6 +243,8 @@ class DocumentationTest extends RestJsonApiTestCase
                 'Missing documentation. Default value is used: "%s"',
                 $definition['documentation']
             );
+        } elseif ($this->hasDuplates($definition['documentation'])) {
+            $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
         if (!empty($definition['parameters'])) {
             foreach ($definition['parameters'] as $name => $item) {
@@ -377,5 +379,24 @@ class DocumentationTest extends RestJsonApiTestCase
     protected function getSimpleFormatter()
     {
         return self::getContainer()->get('nelmio_api_doc.formatter.simple_formatter');
+    }
+
+    /**
+     * @param string $documentation
+     *
+     * @return bool
+     */
+    protected function hasDuplates($documentation)
+    {
+        $delimiter = strpos($documentation, '.');
+        if (false === $delimiter) {
+            return false;
+        }
+
+        $firstSentence = substr($documentation, 0, $delimiter + 1);
+
+        return
+            str_word_count($firstSentence) >= 5
+            && false !== strpos($documentation, $firstSentence, $delimiter);
     }
 }

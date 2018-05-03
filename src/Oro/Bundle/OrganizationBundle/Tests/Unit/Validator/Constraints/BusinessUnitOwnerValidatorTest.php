@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
