@@ -51,7 +51,6 @@
             "sensio/framework-extra-bundle": "2.3.4",
             "sensio/generator-bundle": "2.3.4",
             "stof/doctrine-extensions-bundle": "1.1.0",
-            "sylius/flow-bundle": "0.6.*",
             "symfony/assetic-bundle": "2.3.0",
             "symfony/icu": "1.1.*",
             "symfony/monolog-bundle": "2.3.0",

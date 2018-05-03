@@ -1,8 +1,6 @@
 # OroInstallerBundle
 
-OroInstallerBundle enables developers to install Oro applications in a prepared environment using the CLI or web UI wizard and to define activities for the installation process on a bundle level.
-
-Inspired by [Sylius](https://github.com/Sylius/SyliusInstallerBundle).
+OroInstallerBundle enables developers to install Oro applications in a prepared environment using the CLI and to define activities for the installation process on a bundle level.
 
 ## Forewords
 To run the installer on existing setup, you need to update parameters.yml file:
@@ -92,7 +90,7 @@ To provide demo fixtures for your bundle just place them in "YourBundle\Data\Dem
 To add additional install scripts during install process you can use install.php files in your bundles and packages.
 This install files will be run before last clear cache during installation.
 
-This file must be started with `@OroScript` annotation with script label which will be shown during web install process.
+This file must be started with `@OroScript` annotation with script label.
 
 Example:
 ``` php

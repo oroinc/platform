@@ -23,10 +23,6 @@ class ScriptHandler extends SensioScriptHandler
 
         $config = [
             [
-                'from' => __DIR__.'/../Resources/public',
-                'to' => $webDir.'/bundles/oroinstaller',
-            ],
-            [
                 'from' => $vendorDir.'/bower-asset',
                 'to' => $webDir.'/bundles/bowerassets',
             ],
