@@ -108,7 +108,7 @@ Each console command have additional option `disabled_listeners`. Using this opt
 As value, this option takes `all` string or array of optional listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
 
 ```
- app/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
+ bin/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
 ```
 
 In this case, command will be run with disabled listeners: first_listener and second_listener.

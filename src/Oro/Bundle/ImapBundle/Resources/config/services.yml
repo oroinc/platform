@@ -225,8 +225,6 @@ services:
 
     oro_imap.validator.email_folders:
         class: 'Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator'
-        arguments:
-            - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_imap.validator.email_folders }
 

@@ -68,12 +68,13 @@ services:
             - '@oro_api.criteria_normalizer'
             - '@oro_api.criteria_placeholders_resolver'
             - '@oro_api.query.expression_visitor_factory'
+            - '@oro_entity.orm.entity_class_resolver'
 
     oro_api.criteria_normalizer:
         class: Oro\Bundle\ApiBundle\Util\CriteriaNormalizer
         public: false
         arguments:
-            - '@oro_api.criteria_placeholders_resolver'
+            - '@oro_api.doctrine_helper'
 
     oro_api.criteria_placeholders_resolver:
         class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver

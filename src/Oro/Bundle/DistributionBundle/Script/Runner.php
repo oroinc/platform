@@ -134,7 +134,7 @@ class Runner
 
     /**
      * Removes dependency container an bundles definitions from the main application cache.
-     * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
+     * Needed to be executed after package has been uninstalled so that main application (bin/console) could be built
      */
     public function removeCachedFiles()
     {
@@ -203,10 +203,16 @@ class Runner
     {
         $phpPath = $this->getPhpExecutablePath();
 
+        $path = $this->applicationRootDir;
+
+        if ($application == 'console') {
+            $path = $this->applicationRootDir . '/../bin';
+        }
+
         $command = sprintf(
             '"%s" "%s/%s" %s --env=%s',
             $phpPath,
-            $this->applicationRootDir,
+            $path,
             $application,
             $command,
             $this->environment

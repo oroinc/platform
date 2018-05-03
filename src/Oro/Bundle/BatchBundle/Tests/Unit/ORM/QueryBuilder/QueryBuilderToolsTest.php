@@ -323,6 +323,36 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetFieldsWithoutAggregateFunctionsForSeveralNestedFunctions()
+    {
+        $tools = new QueryBuilderTools();
+
+        $condition = 'DATE(CONVERT_TZ(l.createdAt, \'+00:00\', \'+03:00\')) >= :param1 ' .
+            'AND MIN(l.updatedAt) <= :param2';
+
+        $this->assertEquals(
+            [
+                'DATE(CONVERT_TZ(l.createdAt, \'+00:00\', \'+03:00\'))'
+            ],
+            array_values($tools->getFieldsWithoutAggregateFunctions($condition))
+        );
+    }
+
+    public function testGetFieldsWithoutAggregateFunctionsForFunctionInMiddleOfMatchedExpression()
+    {
+        $tools = new QueryBuilderTools();
+
+        $condition = 'DATE_ADD(CURRENT_TIME(), INTERVAL 4 MONTH) >= :param1 ' .
+            'AND MIN(l.updatedAt) <= :param2';
+
+        $this->assertEquals(
+            [
+                'DATE_ADD(CURRENT_TIME(), INTERVAL 4 MONTH)'
+            ],
+            array_values($tools->getFieldsWithoutAggregateFunctions($condition))
+        );
+    }
+
     /**
      * @dataProvider fieldsDataProvider
      * @param string $condition

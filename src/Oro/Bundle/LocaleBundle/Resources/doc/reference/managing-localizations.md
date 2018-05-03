@@ -74,7 +74,7 @@ $defaultLocalization = $localizationManager->clearCache();
 _NOTICE:_ Keep in mind that cache is also cleared when you run
 
 ```text
-php app/console cache:clear
+php bin/console cache:clear
 ```
 
 **Oro\Bundle\LocaleBundle\Manager::warmUpCache**
@@ -90,5 +90,5 @@ $defaultLocalization = $localizationManager->warmUpCache();
 _NOTICE:_ Keep in mind that cache is also warmed up when you run
 
 ```text
-php app/console cache:clear
+php bin/console cache:clear
 ```

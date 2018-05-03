@@ -18,13 +18,25 @@ class CriteriaNormalizer
     private const PARENT_PATH_OPTION   = 'parentPath';
     private const NESTING_LEVEL_OPTION = 'nestingLevel';
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     /**
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      */
-    public function normalizeCriteria(Criteria $criteria): void
+    public function normalizeCriteria(Criteria $criteria, string $rootEntityClass): void
     {
         $this->ensureJoinAliasesSet($criteria);
-        $this->completeJoins($criteria);
+        $this->completeJoins($criteria, $rootEntityClass);
         $this->optimizeJoins($criteria);
     }
 
@@ -49,10 +61,11 @@ class CriteriaNormalizer
      * Makes sure that this criteria object contains all required joins and aliases are set for all joins.
      *
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      */
-    private function completeJoins(Criteria $criteria): void
+    private function completeJoins(Criteria $criteria, string $rootEntityClass): void
     {
-        $pathMap = $this->getJoinPathMap($criteria);
+        $pathMap = $this->getJoinPathMap($criteria, $rootEntityClass);
         if (!empty($pathMap)) {
             $aliases = [];
             $joins = $criteria->getJoins();
@@ -92,6 +105,10 @@ class CriteriaNormalizer
     {
         $fields = $this->getWhereFields($criteria);
         foreach ($fields as $field) {
+            $join = $criteria->getJoin($field);
+            if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
+                $join->setJoinType(Join::INNER_JOIN);
+            }
             $lastDelimiter = \strrpos($field, '.');
             while (false !== $lastDelimiter) {
                 $field = \substr($field, 0, $lastDelimiter);
@@ -107,6 +124,7 @@ class CriteriaNormalizer
 
     /**
      * @param Criteria $criteria
+     * @param string   $rootEntityClass
      *
      * @return array
      *  [
@@ -118,7 +136,7 @@ class CriteriaNormalizer
      *      ...
      *  ]
      */
-    private function getJoinPathMap(Criteria $criteria): array
+    private function getJoinPathMap(Criteria $criteria, string $rootEntityClass): array
     {
         $pathMap = [];
 
@@ -127,16 +145,25 @@ class CriteriaNormalizer
             $pathMap[$path] = $this->buildJoinPathMapValue($path);
         }
 
+        $rootMetadata = $this->doctrineHelper->getEntityMetadataForClass($rootEntityClass);
         $rootPath = \substr(Criteria::ROOT_ALIAS_PLACEHOLDER, 1, -1);
         $fields = $this->getFields($criteria);
         foreach ($fields as $field) {
-            while ($field) {
-                $path = $this->getPath($field, $rootPath);
-                $field = null;
-                if ($path && Criteria::ROOT_ALIAS_PLACEHOLDER !== $path && !isset($pathMap[$path])) {
-                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
-                    $field = $path;
+            $path = $this->getPath($field, $rootPath);
+            if (!isset($pathMap[$field])) {
+                if ($path) {
+                    if (null !== $this->doctrineHelper->findEntityMetadataByPath($rootEntityClass, $field)) {
+                        $pathMap[$field] = $this->buildJoinPathMapValue($field);
+                    }
+                } elseif ($rootMetadata->hasAssociation($field)) {
+                    $pathMap[$field] = $this->buildJoinPathMapValue($field);
                 }
+            }
+            while ($path) {
+                if (Criteria::ROOT_ALIAS_PLACEHOLDER !== $path && !isset($pathMap[$path])) {
+                    $pathMap[$path] = $this->buildJoinPathMapValue($path);
+                }
+                $path = $this->getPath($path, $rootPath);
             }
         }
 

@@ -63,7 +63,7 @@ During the synchronization, Oro application loads emails from the user's inbox a
 By default the synchronization is executed by a CRON job every 30 minutes. Outside that schedule, launch synchronization manually using the following command:
 
 ```bash
-php app/console oro:cron:imap-sync
+php bin/console oro:cron:imap-sync
 ```
 
 Email synchronization functionality is implemented in the following classes:

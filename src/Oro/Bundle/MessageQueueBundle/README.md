@@ -107,7 +107,7 @@ oro_channel.async.change_integration_status_processor:
 Now you can start consuming messages:
 
 ```bash
-./app/console oro:message-queue:consume
+./bin/console oro:message-queue:consume
 ```
 
 _**Note**: Add -vvv to find out what is going while you are consuming messages. There is a lot of valuable debug info there._
@@ -123,7 +123,7 @@ the used memory amount after each message processing and terminates if it is exc
 was run:
 
 ```bash
-./app/console oro:message-queue:consume --memory-limit=700
+./bin/console oro:message-queue:consume --memory-limit=700
 ``` 
 
 then:
@@ -166,7 +166,7 @@ has dead by any reason. Pay attention that the [program name](http://supervisord
 
 ```ini
 [program:oro_message_consumer]
-command=/path/to/app/console --env=prod --no-debug oro:message-queue:consume
+command=/path/to/bin/console --env=prod --no-debug oro:message-queue:consume
 process_name=%(program_name)s_%(process_num)02d
 numprocs=4
 autostart=true

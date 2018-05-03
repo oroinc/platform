@@ -138,7 +138,7 @@ operations:
 Execute a command to validate all operations configuration:
 
 ```
-php app/console oro:action:configuration:validate
+php bin/console oro:action:configuration:validate
 ```
 
 **Note:** All configurations apply automatically after their changes made in developer environment.
