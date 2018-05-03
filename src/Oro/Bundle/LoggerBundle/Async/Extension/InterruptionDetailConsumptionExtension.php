@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Writes info about the processor executed before consumption was interrupted to the log.
  * This info might be helpful to find time consuming processors.
  * The typical use case is
- * * Run 'php app/console oro:logger:level info "X minutes" --env=prod' (this will cause to restart all consumers;
+ * * Run 'php bin/console oro:logger:level info "X minutes" --env=prod' (this will cause to restart all consumers;
  *   all new instances of consumers will use new log level)
  * * If some consumers was not stopped after this command, wait till they stop and find in the log which
  *   processors work before they stopped.

@@ -17,7 +17,7 @@ entity_config:
 This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with `@Config` annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
 To apply this changes execute **oro:entity-config:update** command:
 ```bash
-php app/console oro:entity-config:update
+php bin/console oro:entity-config:update
 ```
 An example how to get a value of a configuration attribute:
 ``` php
@@ -147,7 +147,7 @@ This class is the central access point to entity configuration functionality. It
 
 The following command can be used to update configurable entities:
 ```bash
-php app/console oro:entity-config:update
+php bin/console oro:entity-config:update
 ```
 Usually you need to execute this command only in 'dev' mode when new new configuration attribute or whole configuration scope is added.
 
@@ -155,14 +155,14 @@ Usually you need to execute this command only in 'dev' mode when new new configu
 
 The following command removes all data related to configurable entities from the application cache:
 ```bash
-php app/console oro:entity-config:cache:clear --no-warmup
+php bin/console oro:entity-config:cache:clear --no-warmup
 ```
 
 ## Debugging configuration data
 
 You can use `oro:entity-config:debug` command to get a different kind of configuration data as well as add/remove/update configuration of entities. To see all available options run this command with `--help` option. As an example the following command shows all configuration data for User entity:
 ```bash
-php app/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
+php bin/console oro:entity-config:debug "Oro\Bundle\UserBundle\Entity\User"
 ```
 
 ## Special case

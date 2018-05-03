@@ -82,7 +82,7 @@ class SendEmailTest extends Selenium2TestCase
             ->submit();
         /** @var UserEmailSettings $login */
         $login->openUserEmailSettings('Oro\Bundle\ConfigBundle')->setImap($imapSetting);
-        exec("app/console oro:cron:imap-sync --env prod");
+        exec("bin/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->assertElementNotPresent(
@@ -115,7 +115,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setUsername($username)
             ->setPassword('123123q')
             ->submit();
-        exec("app/console oro:cron:imap-sync --env prod");
+        exec("bin/console oro:cron:imap-sync --env prod");
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->filterBy('Subject', $subject)

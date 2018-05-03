@@ -134,7 +134,7 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
         if (!$this->processes) {
             $command = sprintf(
                 'php %s/console oro:message-queue:consume -vv --env=%s %s >> %s/mq.log',
-                realpath($this->kernel->getRootDir()),
+                realpath($this->kernel->getRootDir()) . '/../bin/',
                 $this->kernel->getEnvironment(),
                 $this->kernel->isDebug() ? '' : '--no-debug',
                 realpath($this->kernel->getLogDir())
@@ -179,11 +179,11 @@ abstract class AbstractMessageQueueIsolator extends AbstractOsRelatedIsolator im
     public function stopMessageQueue()
     {
         if (self::WINDOWS_OS === $this->getOs()) {
-            $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()));
+            $killCommand = sprintf('TASKKILL /IM %s/console /T /F', realpath($this->kernel->getRootDir()) . '/../bin/');
         } else {
             $killCommand = sprintf(
                 "pkill -15 -f '%s/[c]onsole oro:message-queue:consume'",
-                realpath($this->kernel->getRootDir())
+                realpath($this->kernel->getRootDir()) . '/../bin/'
             );
         }
 

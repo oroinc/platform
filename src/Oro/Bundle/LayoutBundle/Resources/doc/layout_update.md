@@ -8,7 +8,7 @@ customize the page look depending on our needs. The **layout update** may be per
 
 ## Loaders
 
-A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *Oro Platform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`app/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `app/console cache:warmup --env=prod` shell command.
+A loader is responsible for reading, preparing and caching the content of the update file. Out of the box, *Oro Platform* supports *PHP* and *YAML* loaders that load layout updates matched by the file extension. Each of these loaders generates *PHP* classes in the cache directory (`var/cache/{env}/layouts`). For the production mode, validation and generation of cache files is performed by the *optional cache warmer* and could be enforced by running the `bin/console cache:warmup --env=prod` shell command.
 
 ## Yaml Syntax
 

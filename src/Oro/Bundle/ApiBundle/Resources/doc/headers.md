@@ -23,7 +23,7 @@ The corresponding response:
 ...
 ```
 
-**Hint:** To generate a WSSE header, run: `php app/console oro:wsse:generate-header YOUR_API_KEY`.
+**Hint:** To generate a WSSE header, run: `php bin/console oro:wsse:generate-header YOUR_API_KEY`.
 
 ## Existing X-Include Keys
 
