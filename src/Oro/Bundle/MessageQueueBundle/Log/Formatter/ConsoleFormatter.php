@@ -44,10 +44,15 @@ class ConsoleFormatter extends BaseConsoleFormatter
     protected $cloner;
 
     /**
-     * @param array|null  $dataMap    The variable map for "%data%" placeholder
-     *                                [variable name => the path to the variable value, ...]
-     * @param string|null $format     The format of the message
-     * @param string|null $dateFormat The format of the timestamp: one supported by DateTime::format
+     * Available options:
+     *   * format: The format of the outputted log string.
+     *   * date_format: The format of the outputted date string;
+     *   * colors: If true, the log string contains ANSI code to add color;
+     *   * multiline: If false, "context" and "extra" are dumped on one line.
+     *   * data_map: The variable map for "%data%" placeholder
+     *               [variable name => the path to the variable value, ...]
+     *
+     * @param array $options
      */
     public function __construct(array $options = [])
     {
