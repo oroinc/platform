@@ -64,7 +64,6 @@ class ConfigurablePermissionLoadCommandTest extends WebTestCase
         $result = $this->runCommand(LoadConfigurablePermissionCommand::NAME, ['--no-ansi']);
         $this->assertContains('In AbstractPermissionsConfigurationProvider.php', $result);
         $this->assertContains('Can\'t parse permission configuration', $result);
-
     }
 
     /**

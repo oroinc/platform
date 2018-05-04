@@ -172,5 +172,4 @@ class ConsoleFormatter extends BaseConsoleFormatter
     {
         return strtr($format, ['%context%' => '%custom_context%']);
     }
-
 }

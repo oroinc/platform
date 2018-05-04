@@ -38,12 +38,12 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
 
         $this->type = new DateTimeRangeType($localeSettings);
         $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
-        $this->formExtensions[] = new PreloadedExtension([$this->type],
+        $this->formExtensions[] = new PreloadedExtension(
+            [$this->type],
             [
-                DateTimeType::class => [
-                    new DateTimeExtension()
-                ]
-            ]);
+                DateTimeType::class => [new DateTimeExtension()]
+            ]
+        );
 
         parent::setUp();
     }
