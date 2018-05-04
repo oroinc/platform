@@ -60,11 +60,11 @@ class SearchHandler extends BaseSearchHandler
         return [
             'id'     => json_encode(
                 [
-                    'id'   => $this->propertyAccessor->getValue($item, 'id'),
-                    'name' => $this->propertyAccessor->getValue($item, 'name'),
+                    'id'   => $this->getPropertyValue('id', $item),
+                    'name' => $this->getPropertyValue('name', $item),
                 ]
             ),
-            'name'   => $this->propertyAccessor->getValue($item, 'name')
+            'name'   => $this->getPropertyValue('name', $item)
         ];
     }
 }
