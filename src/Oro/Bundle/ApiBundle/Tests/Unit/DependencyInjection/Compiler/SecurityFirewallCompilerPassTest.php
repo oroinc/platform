@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -98,7 +99,11 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $contextFirewallContext = new Definition(
             FirewallContext::class,
             [
-                [new Reference('security.access_listener')],
+                new IteratorArgument(
+                    [
+                        new Reference('security.access_listener'),
+                    ]
+                ),
                 $exceptionListener
             ]
         );

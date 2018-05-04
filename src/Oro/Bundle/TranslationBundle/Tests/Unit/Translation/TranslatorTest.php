@@ -9,9 +9,9 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -226,7 +226,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
                 $container,
-                new MessageSelector(),
+                new MessageFormatter(),
                 'en',
                 [],
                 ['resource_files' => []]
@@ -269,7 +269,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
                 $container,
-                new MessageSelector(),
+                new MessageFormatter(),
                 'en',
                 [],
                 ['resource_files' => []]
@@ -399,7 +399,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator = new Translator(
             $this->getContainer($loader),
-            new MessageSelector(),
+            new MessageFormatter(),
             'en',
             ['loader' => ['loader']],
             array_merge(['resource_files' => []], $options)

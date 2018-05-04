@@ -4,6 +4,8 @@ namespace Oro\Bundle\DistributionBundle;
 
 use OroRequirements;
 
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
@@ -230,6 +232,7 @@ abstract class OroKernel extends Kernel
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -240,17 +243,42 @@ abstract class OroKernel extends Kernel
             && class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')
         ) {
-            $dumper->setProxyDumper(new ProxyDumper(md5($cache->getPath())));
+            $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));
-        $cache->write($content, $container->getResources());
+        $content = $dumper->dump(array(
+            'class' => $class,
+            'base_class' => $baseClass,
+            'file' => $cache->getPath(),
+            'as_files' => true,
+            'debug' => $this->debug,
+            'inline_class_loader_parameter' => \PHP_VERSION_ID >= 70000 && !$this->loadClassCache
+                && !class_exists(ClassCollectionLoader::class, false)
+                ? 'container.dumper.inline_class_loader'
+                : null,
+            'build_time' => $container->hasParameter('kernel.container_build_time')
+                ? $container->getParameter('kernel.container_build_time')
+                : time(),
+        ));
+
+        $rootCode = array_pop($content);
+        $dir = dirname($cache->getPath()).'/';
+        $fs = new Filesystem();
+
+        foreach ($content as $file => $code) {
+            $fs->dumpFile($dir.$file, $code);
+            @chmod($dir.$file, 0666 & ~umask());
+        }
+        @unlink(dirname($dir.$file).'.legacy');
+
+        $cache->write($rootCode, $container->getResources());
 
         // we should not use parent::stripComments method to cleanup source code from the comments to avoid
         // memory leaks what generate token_get_all function.
-        if (!$this->debug) {
-            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
-        }
+        //@TODO investigate actuality memory leaks what generate token_get_all function in scope BAP-15236.
+//        if (!$this->debug) {
+//            $cache->write(php_strip_whitespace($cache->getPath()), $container->getResources());
+//        }
     }
 
     /**

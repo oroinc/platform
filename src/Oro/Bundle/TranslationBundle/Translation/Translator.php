@@ -10,9 +10,9 @@ use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -53,8 +53,8 @@ class Translator extends BaseTranslator
     /** @var string|null */
     protected $strategyName;
 
-    /** @var MessageSelector */
-    protected $messageSelector;
+    /** @var MessageFormatter */
+    protected $formatter;
 
     /** @var array */
     protected $originalOptions;
@@ -70,19 +70,19 @@ class Translator extends BaseTranslator
 
     /**
      * @param ContainerInterface $container
-     * @param MessageSelector $messageSelector
+     * @param MessageFormatter $formatter
      * @param null $defaultLocale
      * @param array $loaderIds
      * @param array $options
      */
     public function __construct(
         ContainerInterface $container,
-        MessageSelector $messageSelector,
+        MessageFormatter $formatter,
         $defaultLocale = null,
         $loaderIds = [],
         array $options = []
     ) {
-        parent::__construct($container, $messageSelector, $defaultLocale, $loaderIds, $options);
+        parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
 
         // BC 3.x, to be removed in 4.0 along with the $defaultLocale default value
         if (is_array($defaultLocale) || 3 > func_num_args()) {
@@ -93,7 +93,7 @@ class Translator extends BaseTranslator
             $options = $loaderIds;
         }
 
-        $this->messageSelector = $messageSelector;
+        $this->formatter = $formatter;
         $this->originalOptions = $options;
         $this->resourceFiles = $options['resource_files'];
     }
@@ -299,7 +299,7 @@ class Translator extends BaseTranslator
             /* @var $translator Translator */
             $translator = new static(
                 $this->container,
-                $this->messageSelector,
+                $this->formatter,
                 $this->getLocale(),
                 $this->loaderIds,
                 $options
@@ -422,8 +422,7 @@ class Translator extends BaseTranslator
 
         // check if any dynamic resource is changed and update translation catalogue if needed
         if (!empty($this->dynamicResources[$locale])) {
-            $catalogueFile = $this->options['cache_dir']
-                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
+            $catalogueFile = $this->getCatalogueCachePath($locale);
             if (is_file($catalogueFile)) {
                 $time = filemtime($catalogueFile);
                 foreach ($this->dynamicResources[$locale] as $item) {
@@ -443,6 +442,19 @@ class Translator extends BaseTranslator
                 }
             }
         }
+    }
+
+    /**
+     * @param string $locale
+     * @return string
+     */
+    private function getCatalogueCachePath(string $locale): string
+    {
+        return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(
+            substr(base64_encode(hash('sha256', serialize($this->getFallbackLocales()), true)), 0, 7),
+            '/',
+            '_'
+        ).'.php';
     }
 
     /**

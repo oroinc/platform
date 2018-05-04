@@ -25,10 +25,10 @@ services:
     # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
     # is used by ClankSessionHandlerConfigurationPass to add it to a list of periodic services
     # in case if PdoSessionHandler is configured as a session storage handler
-    oro_wamp.ping.pdo:
-        class: Oro\Bundle\SyncBundle\Wamp\DbPing
-        arguments:
-            - "@?doctrine.dbal.session_connection.wrapped"
+#    oro_wamp.ping.pdo:
+#        class: Oro\Bundle\SyncBundle\Wamp\DbPing
+#        arguments:
+#            - "@?doctrine.dbal.session_connection.wrapped"
 
     # this service is used to broadcast messages to clients to prevent connection loose
     # by default, the connection could be closed if no data were transmitted between client and server

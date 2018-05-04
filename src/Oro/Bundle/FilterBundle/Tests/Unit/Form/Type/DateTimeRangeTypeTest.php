@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
@@ -37,7 +38,12 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
 
         $this->type = new DateTimeRangeType($localeSettings);
         $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
-        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+        $this->formExtensions[] = new PreloadedExtension([$this->type],
+            [
+                DateTimeType::class => [
+                    new DateTimeExtension()
+                ]
+            ]);
 
         parent::setUp();
     }

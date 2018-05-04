@@ -46,22 +46,31 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $srcPass    = new CompilerPass1();
         $targetPass = new CompilerPass2();
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
-
         $this->builder->addCompilerPass($targetPass);
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeForNonDefaultPassType()
     {
-        $srcPass    = new CompilerPass1();
+        $srcPass = new CompilerPass1();
         $targetPass = new CompilerPass2();
+
+        [$resolvePrivatesPass] = $this->builder->getCompilerPassConfig()->getBeforeRemovingPasses();
+
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->builder->addCompilerPass($srcPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->builder->moveCompilerPassBefore(
@@ -70,16 +79,15 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $this->assertSame(
-            [$srcPass, $targetPass],
+            [$srcPass, $targetPass, $resolvePrivatesPass],
             $this->builder->getCompilerPassConfig()->getBeforeRemovingPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsBeforeTargetPass()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
-
         $srcPass     = new CompilerPass1();
         $targetPass  = new CompilerPass2();
         $anotherPass = new CompilerPass3();
@@ -88,14 +96,22 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $anotherPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $anotherPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeWhenThereIsAnotherPassExistsAfterSrcPass()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass     = new CompilerPass1();
@@ -106,14 +122,22 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($anotherPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass, $anotherPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $anotherPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeWhenSrcPassIsAlreadyBeforeTargetPass()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass    = new CompilerPass1();
@@ -122,14 +146,21 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($targetPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeWhenDoubleTargetPasses()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass     = new CompilerPass1();
@@ -140,7 +171,15 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($srcPass);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($target1Pass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $target1Pass, $target2Pass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $target1Pass,
+                $target2Pass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
@@ -176,7 +215,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testMoveCompilerPassBeforeWhenTargetPassHasLowerPriority()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass    = new CompilerPass1();
@@ -185,14 +224,21 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 5);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testMoveCompilerPassBeforeWhenTargetPassHasHigherPriority()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass    = new CompilerPass1();
@@ -201,14 +247,21 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($targetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
         $this->builder->moveCompilerPassBefore(get_class($srcPass), get_class($targetPass));
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testAddCompilerPassAfterTargetPass()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass    = new CompilerPass1();
@@ -221,14 +274,22 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($beforeTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 17);
 
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $beforeTargetPass, $srcPass, $targetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $beforeTargetPass,
+                $srcPass,
+                $targetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }
 
     public function testAddCompilerPassBeforeTargetPass()
     {
-        [$resolveClassPass, $resolveInstanceOfConditionalsPass] =
+        [$resolveClassPass, $resolveInstanceOfConditionalsPass, $registerEnvVarsProcessorsPass, $xtensionCompilerPass] =
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
         $srcPass    = new CompilerPass1();
@@ -241,7 +302,15 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->builder->addCompilerPass($afterTargetPass, PassConfig::TYPE_BEFORE_OPTIMIZATION, 7);
 
         $this->assertSame(
-            [$resolveClassPass, $resolveInstanceOfConditionalsPass, $srcPass, $targetPass, $afterTargetPass],
+            [
+                $resolveClassPass,
+                $resolveInstanceOfConditionalsPass,
+                $registerEnvVarsProcessorsPass,
+                $srcPass,
+                $targetPass,
+                $afterTargetPass,
+                $xtensionCompilerPass,
+            ],
             $this->builder->getCompilerPassConfig()->getBeforeOptimizationPasses()
         );
     }

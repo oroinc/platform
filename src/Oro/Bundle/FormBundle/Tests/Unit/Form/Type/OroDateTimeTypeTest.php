@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -26,7 +27,7 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
         $expectedOptions = array(
             'model_timezone'   => 'UTC',
             'view_timezone'    => 'UTC',
-            'format'           => DateTimeType::HTML5_FORMAT,
+            'format'           => DateTimeExtension::HTML5_FORMAT_WITH_TIMEZONE,
             'widget'           => 'single_text',
             'placeholder'      => 'oro.form.click_here_to_select',
             'years'            => [],
@@ -91,7 +92,7 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
     {
         $form = $this->factory->create(OroDateTimeType::class);
         $form->submit($value);
-        $this->assertDateTimeEquals($expectedValue, $form->getData());
+        $this->assertEquals($expectedValue->format('U'), $form->getData()->format('U'));
     }
 
     public function valuesDataProvider()
@@ -105,10 +106,6 @@ class OroDateTimeTypeTest extends FormIntegrationTestCase
                 '2002-10-02T15:00:00Z',
                 new \DateTime('2002-10-02T15:00:00Z')
             ),
-            array(
-                '2002-10-02T15:00:00.05Z',
-                new \DateTime('2002-10-02T15:00:00.05Z')
-            )
         );
     }
 }
