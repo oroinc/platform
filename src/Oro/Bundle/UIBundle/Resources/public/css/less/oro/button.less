@@ -246,6 +246,49 @@
 .btn.process{
   .process();
 }
+
+.btn-brand {
+  &-google {
+    background: #dc4e41;
+    border-color: #dc4e41;
+    position: relative;
+    padding-left: 40px;
+
+    &:before {
+      content: '\f0d5';
+      font-family: 'FontAwesome';
+      font-size: 16px;
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translate(0, -50%);
+    }
+
+    &:hover,
+    &:focus {
+      background: darken(#dc4e41, 5%);
+      border-color: darken(#dc4e41, 5%);
+    }
+
+    &:active {
+      background: lighten(#dc4e41, 25%);
+      border-color: darken(#dc4e41, 5%);
+      color: darken(#dc4e41, 5%);
+    }
+
+    &[disabled] {
+      &,
+      &:hover,
+      &:active,
+      &:focus {
+        background-color: #f1a393;
+        border-color: #f1a393;
+        color: #fdf0ee;
+      }
+    }
+  }
+}
+
 /* button inside dropdown-menu */
 .title-buttons-container {
   .dropdown-menu {
