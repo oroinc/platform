@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Represents NOT EQUAL TO comparison expression.
@@ -16,23 +14,17 @@ class NeqComparisonExpression implements ComparisonExpressionInterface
      */
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
-        Comparison $comparison,
-        $fieldName,
-        $parameterName
+        string $expression,
+        string $parameterName,
+        $value
     ) {
-        QueryBuilderUtil::checkIdentifier($parameterName);
-        QueryBuilderUtil::checkField($fieldName);
-
-        $value = $visitor->walkValue($comparison->getValue());
         if (null === $value) {
-            return $visitor->getExpressionBuilder()->isNotNull($fieldName);
+            return $visitor->getExpressionBuilder()->isNotNull($expression);
         }
 
-        // set parameter
         $visitor->addParameter($parameterName, $value);
 
-        // generate expression
         return $visitor->getExpressionBuilder()
-            ->neq($fieldName, $visitor->buildPlaceholder($parameterName));
+            ->neq($expression, $visitor->buildPlaceholder($parameterName));
     }
 }

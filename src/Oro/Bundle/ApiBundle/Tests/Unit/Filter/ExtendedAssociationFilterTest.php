@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -189,14 +190,14 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->apply($criteria, $filterValue);
 
         self::assertEquals(
-            new Comparison('userField', 'MEMBER OF', '123'),
+            new Comparison('userField', 'MEMBER_OF', '123'),
             $criteria->getWhereExpression()
         );
     }
 
     public function testApplyFilterWithManyToManyAssociationAndNotOperator()
     {
-        $filterValue = new FilterValue('target.users', '123', '!=');
+        $filterValue = new FilterValue('target.users', '123', ComparisonFilter::NEQ);
         $requestType = new RequestType([RequestType::REST]);
         $associationOwnerClass = 'Test\OwnerClass';
         $associationType = 'manyToMany';
@@ -207,7 +208,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->setAssociationOwnerClass($associationOwnerClass);
         $this->filter->setAssociationType($associationType);
         $this->filter->setAssociationKind($associationKind);
-        $this->filter->setSupportedOperators(['=', '!=']);
+        $this->filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -222,7 +223,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->apply($criteria, $filterValue);
 
         self::assertEquals(
-            new CompositeExpression('NOT', [new Comparison('userField', 'MEMBER OF', '123')]),
+            new CompositeExpression('NOT', [new Comparison('userField', 'MEMBER_OF', '123')]),
             $criteria->getWhereExpression()
         );
     }

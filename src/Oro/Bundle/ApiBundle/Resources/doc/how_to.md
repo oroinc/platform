@@ -2,6 +2,8 @@
 
  - [Turn on API for an Entity](#overview)
  - [Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"](#turn-on-api-for-an-entity-disabled-in-resourcesconfigoroentityyml)
+ - [Enable Advanced Operators for String Filter](#enable-advanced-operators-for-string-filter)
+ - [Enable Case-insensitive String Filter](#enable-case-insensitive-string-filter)
  - [Change an ACL Resource for an Action](#change-an-acl-resource-for-an-action)
  - [Disable Access Checks for an Action](#disable-access-checks-for-an-action)
  - [Disable an Entity Action](#disable-an-entity-action)
@@ -54,6 +56,65 @@ api:
             fields:
                 field1:
                     exclude: false # override exclude rule from entity.yml
+```
+
+## Enable Advanced Operators for String Filter
+
+By performance reasons the following operators are disabled out of the box:
+
+- `~` (`contains`) - uses `LIKE %text%` to check that a field value contains the text
+- `!~` (`not_contains`) - uses `NOT LIKE %text%` to check that a field value does not contain the text
+- `^` (`starts_with`) - uses `LIKE text%` to check that a field value starts with the text
+- `!^` (`not_starts_with`) - uses `NOT LIKE text%` to check that a field value does not start with the text
+- `$` (`ends_with`) - uses `LIKE %text` to check that a field value ends with the text
+- `!$` (`not_ends_with`) - uses `NOT LIKE %text` to check that a field value does not end with the text
+
+To enable these operators use `operators` option for filters in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        operators: ['=', '!=', '*', '!*', '~', '!~', '^', '!^', '$', '!$']
+```
+
+## Enable Case-insensitive String Filter
+
+Depending on the [collattion](https://en.wikipedia.org/wiki/Collation) settings of your database the case-insensitive
+filtering may be already enforced to be used on the database level. For example, if you are using MySQL database with
+`utf8_unicode_ci` collation you do not need to do anything to enable the case-insensitive filtering. But if the
+collation of your database or a particular field is not case-insensitive and you need to enable the case-insensitive
+filtering for this field, you can use `case_insensitive` option for a filter in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            case_insensitive: true
+```
+
+**Please note** that the `LOWER` function will be used in this case and it can impact performace
+if there is no [proper index](https://use-the-index-luke.com/sql/where-clause/functions/case-insensitive-search).
+
+Also sometimes data in the database are already converted to lowercase or uppercase, in this case you can use
+`value_transformer` option to convert the filter value to before it will be passed to the database query, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            value_transformer: strtoupper # convert the filter value to uppercase
 ```
 
 ## Change an ACL Resource for an Action

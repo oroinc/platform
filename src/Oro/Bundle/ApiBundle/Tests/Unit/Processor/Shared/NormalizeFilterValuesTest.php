@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
@@ -45,11 +45,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $request = $this->createMock(Request::class);
-        $request->expects(self::once())
-            ->method('getQueryString')
-            ->willReturn('id=1&label=test');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', '1'));
+        $filterValues->set('label', new FilterValue('label', 'test'));
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
@@ -79,11 +77,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $exception = new \UnexpectedValueException('invalid data type');
 
-        $request = $this->createMock(Request::class);
-        $request->expects(self::once())
-            ->method('getQueryString')
-            ->willReturn('id=invalid');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', 'invalid'));
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -111,11 +106,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $integerFilter = new ComparisonFilter('string');
         $filters->add('label', $integerFilter);
 
-        $request = $this->createMock(Request::class);
-        $request->expects(self::once())
-            ->method('getQueryString')
-            ->willReturn('id=1&label=test');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', '1'));
+        $filterValues->set('label', new FilterValue('label', 'test'));
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')

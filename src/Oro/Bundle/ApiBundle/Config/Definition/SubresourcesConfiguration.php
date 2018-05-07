@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -13,21 +14,22 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 class SubresourcesConfiguration extends AbstractConfigurationSection
 {
     /** @var ActionsConfiguration */
-    protected $actionsConfiguration;
+    private $actionsConfiguration;
 
     /** @var FiltersConfiguration */
-    protected $filtersConfiguration;
+    private $filtersConfiguration;
 
     /**
-     * @param string[] $permissibleActions
+     * @param string[]               $permissibleActions
+     * @param FilterOperatorRegistry $filterOperatorRegistry
      */
-    public function __construct(array $permissibleActions)
+    public function __construct(array $permissibleActions, FilterOperatorRegistry $filterOperatorRegistry)
     {
         $this->actionsConfiguration = new ActionsConfiguration(
             $permissibleActions,
             'subresources.subresource.action'
         );
-        $this->filtersConfiguration = new FiltersConfiguration();
+        $this->filtersConfiguration = new FiltersConfiguration($filterOperatorRegistry);
     }
 
     /**
