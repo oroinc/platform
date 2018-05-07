@@ -83,7 +83,7 @@ api:
 
 ## Enable Case-insensitive String Filter
 
-Depending on the [collattion](https://en.wikipedia.org/wiki/Collation) settings of your database the case-insensitive
+Depending on the [collation](https://en.wikipedia.org/wiki/Collation) settings of your database the case-insensitive
 filtering may be already enforced to be used on the database level. For example, if you are using MySQL database with
 `utf8_unicode_ci` collation you do not need to do anything to enable the case-insensitive filtering. But if the
 collation of your database or a particular field is not case-insensitive and you need to enable the case-insensitive
