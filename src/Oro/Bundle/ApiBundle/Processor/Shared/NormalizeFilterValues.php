@@ -46,13 +46,17 @@ class NormalizeFilterValues implements ProcessorInterface
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
                 if ($filter instanceof StandaloneFilter) {
+                    $operator = $filterValue->getOperator();
+                    $dataType = $filter->getDataType();
+                    $isArrayAllowed = $filter->isArrayAllowed($operator);
+                    $isRangeAllowed = $filter->isRangeAllowed($operator);
                     try {
                         $value = $this->valueNormalizer->normalizeValue(
                             $filterValue->getValue(),
-                            $filter->getDataType(),
+                            $dataType,
                             $context->getRequestType(),
-                            $filter->isArrayAllowed($filterValue->getOperator()),
-                            $filter->isRangeAllowed($filterValue->getOperator())
+                            $isArrayAllowed,
+                            $isRangeAllowed
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {

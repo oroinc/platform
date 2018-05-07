@@ -11,6 +11,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\View\ViewHandler;
 
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -18,6 +19,16 @@ use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 
 abstract class AbstractRestApiController extends FOSRestController
 {
+    /**
+     * @param Request $request
+     *
+     * @return FilterValueAccessorInterface
+     */
+    protected function getFilterValueAccessor(Request $request)
+    {
+        return $this->container->get('oro_api.rest.filter_value_accessor_factory')->create($request);
+    }
+
     /**
      * @return ActionProcessorBagInterface
      */

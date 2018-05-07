@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionI
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
 
 /**
- * This expression visitor was created to be able to add custom composite and comparison expressions
+ * This expression visitor was created to be able to add custom composite and comparison expressions.
  */
 class QueryExpressionVisitor extends ExpressionVisitor
 {
@@ -145,16 +145,27 @@ class QueryExpressionVisitor extends ExpressionVisitor
             throw new QueryException('No aliases are set before invoking walkComparison().');
         }
 
-        $operator = $comparison->getOperator();
+        list($operator, $modifier) = array_pad(explode('/', $comparison->getOperator(), 2), 2, null);
         if (!isset($this->comparisonExpressions[$operator])) {
-            throw new QueryException('Unknown comparison operator: ' . $comparison->getOperator());
+            throw new QueryException(sprintf('Unknown comparison operator "%s".', $operator));
+        }
+
+        $fieldName = $this->getFieldName($comparison->getField());
+
+        if ('i' === $modifier) {
+            $fieldName = sprintf('LOWER(%s)', $fieldName);
+            $comparison = new Comparison($comparison->getField(), $operator, $comparison->getValue());
+        } elseif ($modifier) {
+            throw new QueryException(
+                sprintf('Unknown modifier "%s" for comparison operator "%s".', $modifier, $operator)
+            );
         }
 
         return $this->comparisonExpressions[$operator]
             ->walkComparisonExpression(
                 $this,
                 $comparison,
-                $this->getFieldName($comparison->getField()),
+                $fieldName,
                 $this->getParameterName($comparison->getField())
             );
     }
@@ -174,15 +185,13 @@ class QueryExpressionVisitor extends ExpressionVisitor
      */
     private function getFieldName($fieldName)
     {
-        $result = $this->queryAliases[0] . '.' . $fieldName;
         foreach ($this->queryAliases as $alias) {
-            if (0 === strpos($fieldName . '.', $alias . '.')) {
-                $result = $fieldName;
-                break;
+            if ($fieldName !== $alias && 0 === strpos($fieldName . '.', $alias . '.')) {
+                return $fieldName;
             }
         }
 
-        return $result;
+        return $this->queryAliases[0] . '.' . $fieldName;
     }
 
     /**

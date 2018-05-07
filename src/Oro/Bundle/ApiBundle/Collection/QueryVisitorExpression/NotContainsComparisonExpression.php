@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * Represents LIKE '%value%' comparison expression.
+ * Represents NOT LIKE '%value%' comparison expression.
  */
-class ContainsComparisonExpression implements ComparisonExpressionInterface
+class NotContainsComparisonExpression implements ComparisonExpressionInterface
 {
     /**
      * {@inheritdoc}
@@ -27,6 +27,6 @@ class ContainsComparisonExpression implements ComparisonExpressionInterface
 
         // generate expression
         return $visitor->getExpressionBuilder()
-            ->like($fieldName, $visitor->buildPlaceholder($parameterName));
+            ->notLike($fieldName, $visitor->buildPlaceholder($parameterName));
     }
 }

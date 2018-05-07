@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
@@ -46,13 +47,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('id=1&label=test');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', '1'));
+        $filterValues->set('label', new FilterValue('label', 'test'));
 
         $this->valueNormalizer->expects($this->exactly(2))
             ->method('normalizeValue')
@@ -82,13 +79,8 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $exception = new \UnexpectedValueException('invalid data type');
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('id=invalid');
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('id', new FilterValue('id', 'invalid'));
 
         $this->valueNormalizer->expects($this->once())
             ->method('normalizeValue')

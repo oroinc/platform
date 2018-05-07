@@ -10,6 +10,35 @@ use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @param Request $request
+     *
+     * @return RestFilterValueAccessor
+     */
+    private function getRestFilterValueAccessor(Request $request)
+    {
+        $filterValueAccessor = new RestFilterValueAccessor($request);
+        $filterValueAccessor->setOperatorPattern(
+            '(!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(~|\^|\$|%7E|%5E|%24)'
+        );
+        $filterValueAccessor->setOperatorNameMap([
+            'eq'              => '=',
+            'neq'             => '!=',
+            'gt'              => '>',
+            'lt'              => '<',
+            'gte'             => '>=',
+            'lte'             => '<=',
+            'contains'        => '~',
+            'not_contains'    => '!~',
+            'starts_with'     => '^',
+            'not_starts_with' => '!^',
+            'ends_with'       => '$',
+            'not_ends_with'   => '!$'
+        ]);
+
+        return $filterValueAccessor;
+    }
+
+    /**
      * @param string $path
      * @param string $value
      * @param string $operator
@@ -94,7 +123,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'http://test.com?' . implode('&', array_keys($queryStringValues))
         );
 
-        $accessor = new RestFilterValueAccessor($request);
+        $accessor = $this->getRestFilterValueAccessor($request);
 
         foreach ($queryStringValues as $itemKey => $itemValue) {
             list($key, $operator, $value, $path, $sourceKey) = $itemValue;
@@ -180,7 +209,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'http://test.com?' . implode('&', array_keys($queryStringValues))
         );
 
-        $accessor = new RestFilterValueAccessor($request);
+        $accessor = $this->getRestFilterValueAccessor($request);
 
         foreach ($queryStringValues as $itemKey => $itemValue) {
             list($key, $operator, $value, $path, $sourceKey) = $itemValue;
@@ -240,7 +269,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             $requestBody
         );
 
-        $accessor = new RestFilterValueAccessor($request);
+        $accessor = $this->getRestFilterValueAccessor($request);
 
         $this->assertEquals(
             $this->getFilterValue('prm1', 'val1', '=', 'prm1'),
@@ -364,7 +393,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             $requestBody
         );
 
-        $accessor = new RestFilterValueAccessor($request);
+        $accessor = $this->getRestFilterValueAccessor($request);
 
         $this->assertEquals(
             $this->getFilterValue('prm1', 'val1', '=', 'prm1'),
@@ -455,7 +484,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             'DELETE',
             ['prm1' => ['!=' => 'val2']]
         );
-        $accessor = new RestFilterValueAccessor($request);
+        $accessor = $this->getRestFilterValueAccessor($request);
 
         $this->assertCount(1, $accessor->getAll());
         $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
@@ -463,7 +492,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testOverrideExistingFilterValue()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
         $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
 
@@ -483,7 +512,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testOverrideExistingGroupedFilterValue()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
         $this->assertEquals($this->getFilterValue('path', 'val1', '=', 'group[path]'), $accessor->get('group[path]'));
 
@@ -503,7 +532,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testAddNewFilterValue()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com'));
 
         $accessor->set('prm1', new FilterValue('prm1', 'val1', '='));
         $this->assertEquals(new FilterValue('prm1', 'val1', '='), $accessor->get('prm1'));
@@ -521,7 +550,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testAddNewGroupedFilterValue()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com'));
 
         $accessor->set('group[path]', new FilterValue('path', 'val1', '='));
         $this->assertEquals(new FilterValue('path', 'val1', '='), $accessor->get('group[path]'));
@@ -539,7 +568,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveExistingFilterValueViaSetMethod()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
         $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
 
@@ -552,7 +581,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveExistingGroupedFilterValueViaSetMethod()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
         $this->assertEquals($this->getFilterValue('path', 'val1', '=', 'group[path]'), $accessor->get('group[path]'));
 
@@ -565,7 +594,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveExistingFilterValueViaRemoveMethod()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
         $this->assertEquals($this->getFilterValue('prm1', 'val1', '=', 'prm1'), $accessor->get('prm1'));
 
@@ -578,7 +607,7 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveExistingGroupedFilterValueViaRemoveMethod()
     {
-        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
+        $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
         $this->assertEquals($this->getFilterValue('path', 'val1', '=', 'group[path]'), $accessor->get('group[path]'));
 

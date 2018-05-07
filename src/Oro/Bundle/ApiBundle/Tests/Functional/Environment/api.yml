@@ -103,6 +103,7 @@ api:
             filters:
                 fields:
                     fieldString: ~
+                    fieldText: ~
                     fieldInt: ~
                     fieldSmallInt: ~
                     fieldBigInt: ~

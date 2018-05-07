@@ -34,6 +34,8 @@ oro_api:
         - oro_api.config_extension.actions
         - oro_api.config_extension.subresources
 
+    # the default value for "class" is "Oro\Bundle\ApiBundle\Filter\ComparisonFilter"
+    # the default value for "supported_operators" is ['=', '!=']
     filters:
         string: ~
         boolean: ~
@@ -56,6 +58,12 @@ oro_api:
         datetime:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         guid: ~
+        text:
+            # by default, only EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) operators
+            # are enabled for text fields,
+            # to enable other operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: ['*']
         percent:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         money:

@@ -55,6 +55,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('data_transformers.yml');
+        $loader->load('filters.yml');
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
