@@ -10,6 +10,11 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Preparing storable index data from entities.
+ *
+ * @package Oro\Bundle\SearchBundle\Engine
+ */
 class ObjectMapper extends AbstractMapper
 {
     /**
@@ -304,6 +309,7 @@ class ObjectMapper extends AbstractMapper
     {
         if (strpos($fieldName, Indexer::TEXT_ALL_DATA_FIELD) === 0) {
             $value = $this->htmlTagHelper->stripTags((string)$value);
+            $value = $this->htmlTagHelper->stripLongWords($value);
         }
 
         return $value;
