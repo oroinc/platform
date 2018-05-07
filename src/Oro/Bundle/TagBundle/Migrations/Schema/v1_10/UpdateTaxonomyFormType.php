@@ -21,7 +21,8 @@ class UpdateTaxonomyFormType implements Migration
                 Taxonomy::class,
                 'form',
                 'form_type',
-                TaxonomySelectType::class
+                TaxonomySelectType::class,
+                'oro_taxonomy_select'
             )
         );
     }
