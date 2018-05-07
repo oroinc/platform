@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
@@ -17,7 +18,16 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class RegisterConfiguredFilters extends RegisterFilters
 {
-    private const ASSOCIATION_ALLOWED_OPERATORS = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
+    private const ASSOCIATION_ALLOWED_OPERATORS = [
+        ComparisonFilter::EQ,
+        ComparisonFilter::NEQ,
+        ComparisonFilter::EXISTS,
+        ComparisonFilter::NEQ_OR_NULL
+    ];
+    private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS = [
+        ComparisonFilter::EXISTS,
+        ComparisonFilter::NEQ_OR_NULL
+    ];
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -61,6 +71,7 @@ class RegisterConfiguredFilters extends RegisterFilters
 
         /** @var ClassMetadata|null $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
+        $idFieldName = $this->getSingleIdentifierFieldName($context->getConfig());
         $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
         $fields = $configOfFilters->getFields();
@@ -72,12 +83,17 @@ class RegisterConfiguredFilters extends RegisterFilters
             $filter = $this->createFilter($field, $propertyPath, $context);
             if (null !== $filter) {
                 if ($filter instanceof FieldAwareFilterInterface) {
+                    if ($idFieldName && $filterKey === $idFieldName) {
+                        $filter->setSupportedOperators(
+                            array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
+                        );
+                    }
                     // @todo BAP-11881. Update this code when NEQ operator for to-many collection
                     // will be implemented in Oro\Bundle\ApiBundle\Filter\ComparisonFilter
                     if (null !== $metadata && $this->isCollection($metadata, $propertyPath)) {
                         $filter->setSupportedOperators([StandaloneFilter::EQ]);
                     }
-                    // only EQ and NEQ operators should be available for association filters
+                    // only EQ, NEQ and EXISTS operators should be available for association filters
                     if (\in_array($propertyPath, $associationNames, true) &&
                         [] !== array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
                     ) {
@@ -88,6 +104,24 @@ class RegisterConfiguredFilters extends RegisterFilters
                 $filters->add($filterKey, $filter);
             }
         }
+    }
+
+    /**
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return string|null
+     */
+    protected function getSingleIdentifierFieldName(EntityDefinitionConfig $config = null)
+    {
+        if (null === $config) {
+            return null;
+        }
+        $idFieldNames = $config->getIdentifierFieldNames();
+        if (count($idFieldNames) !== 1) {
+            return null;
+        }
+
+        return reset($idFieldNames);
     }
 
     /**

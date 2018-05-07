@@ -32,6 +32,9 @@ class TextFilteredObjectMapper extends ObjectMapper
      */
     protected function clearTextValue($fieldName, $value)
     {
-        return $this->htmlTagHelper->stripTags((string)$value);
+        $value = $this->htmlTagHelper->stripTags((string)$value);
+        $value = $this->htmlTagHelper->stripLongWords($value);
+
+        return $value;
     }
 }

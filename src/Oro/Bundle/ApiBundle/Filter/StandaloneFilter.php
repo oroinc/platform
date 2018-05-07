@@ -10,7 +10,8 @@ use Doctrine\Common\Collections\Criteria;
  */
 class StandaloneFilter implements FilterInterface
 {
-    const EQ = '=';
+    /** @var string "equal to" operator */
+    public const EQ = 'eq';
 
     /** @var string */
     protected $dataType;

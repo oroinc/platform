@@ -64,6 +64,17 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $parameters['filter'][$key] = $filter;
             }
         }
+        if (array_key_exists('filters', $parameters)) {
+            $filters = $parameters['filters'];
+            if ($filters) {
+                $separator = '?';
+                if (false !== strpos($uri, '?')) {
+                    $separator = '&';
+                }
+                $uri .= $separator . $filters;
+            }
+            unset($parameters['filters']);
+        }
 
         if (!isset($server['HTTP_X-WSSE'])) {
             $server = array_replace($server, $this->getWsseAuthHeader());

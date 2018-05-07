@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
  * the filter from the query string will override the filter from the request body.
  *
  * Filter syntax for the query string:
- * * key=value, where "=" is an operator; see getOperators() method to find a list of supported operators
- * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see getOperatorNameMap() method
+ * * key=value, where "=" is an operator; see $this->operators to find a list of supported operators
+ * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see $this->operatorNameMap
  *                             to find a map between operators and their names
  * Examples:
  * * /api/users?filter[name]!=John
@@ -43,23 +43,49 @@ use Symfony\Component\HttpFoundation\Request;
 class RestFilterValueAccessor implements FilterValueAccessorInterface
 {
     /** @var Request */
-    protected $request;
+    private $request;
+
+    /** @var string */
+    private $operatorPattern;
+
+    /** @var string[] [operator short name, ...] */
+    private $operators;
+
+    /** @var array [operator name => operator short name or NULL, ...] */
+    private $operatorNameMap;
+
+    /** @var array [operator short name => operator name, ...] */
+    private $operatorShortNameMap;
 
     /** @var FilterValue[] */
-    protected $parameters;
+    private $parameters;
 
     /** @var array */
-    protected $groups;
+    private $groups;
 
     /** @var string|null */
     private $defaultGroupName;
 
     /**
      * @param Request $request
+     * @param string  $operatorPattern
+     * @param array   $operatorNameMap
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, $operatorPattern, array $operatorNameMap)
     {
         $this->request = $request;
+        $this->operatorPattern = $operatorPattern;
+        $this->operatorNameMap = $operatorNameMap;
+        $this->operators = [];
+        $this->operatorShortNameMap = [];
+        foreach ($operatorNameMap as $name => $shortName) {
+            if ($shortName) {
+                $this->operators[] = $shortName;
+                $this->operatorShortNameMap[$shortName] = $name;
+            }
+        }
+        // "<>" is an alias for "!="
+        $this->operators[] = '<>';
     }
 
     /**
@@ -184,7 +210,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * Makes sure the Request parsed
      */
-    protected function ensureRequestParsed()
+    private function ensureRequestParsed()
     {
         if (null === $this->parameters) {
             $this->parseRequest();
@@ -194,7 +220,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * Extracts filters from the Request
      */
-    protected function parseRequest()
+    private function parseRequest()
     {
         $this->parameters = [];
         $this->groups = [];
@@ -212,7 +238,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return FilterValue
      */
-    protected function addParsed($group, $key, $path, $value, $operator)
+    private function addParsed($group, $key, $path, $value, $operator)
     {
         $filterValue = new FilterValue(
             $path,
@@ -225,7 +251,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         return $filterValue;
     }
 
-    protected function parseQueryString()
+    private function parseQueryString()
     {
         $queryString = $this->request->getQueryString();
         if (empty($queryString)) {
@@ -234,7 +260,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
         $matchResult = \preg_match_all(
             '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]*\])|(%5B[\w\d-\.]*%5D))*)))'
-            . '(?P<operator>(' . $this->getOperatorPattern() . ')'
+            . '(?P<operator>' . $this->operatorPattern . ')'
             . '(?P<value>[^&]+)/',
             $queryString,
             $matches,
@@ -242,7 +268,6 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         );
 
         if (false !== $matchResult) {
-            $operatorNameMap = $this->getOperatorNameMap();
             foreach ($matches as $match) {
                 $key = \rawurldecode($match['key']);
                 $group = \rawurldecode($match['group']);
@@ -254,7 +279,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
                     $pos = \strrpos($path, '[');
                     if (false !== $pos) {
                         $lastElement = \substr($path, $pos + 1, -1);
-                        if (isset($operatorNameMap[$lastElement])) {
+                        if (\array_key_exists($lastElement, $this->operatorNameMap)) {
                             $operator = $lastElement;
                             $key = \substr($key, 0, -(\strlen($path) - $pos));
                             $path = \substr($path, 0, $pos);
@@ -276,7 +301,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         }
     }
 
-    protected function parseRequestBody()
+    private function parseRequestBody()
     {
         if (null === $this->request->request) {
             return;
@@ -311,7 +336,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return bool
      */
-    protected function isValueWithOperator(array $value)
+    private function isValueWithOperator(array $value)
     {
         if (1 !== \count($value)) {
             return false;
@@ -322,8 +347,8 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         return
             \is_string($key)
             && (
-                \in_array($key, $this->getOperators(), true)
-                || \array_key_exists($key, $this->getOperatorNameMap())
+                \in_array($key, $this->operators, true)
+                || \array_key_exists($key, $this->operatorNameMap)
             );
     }
 
@@ -332,41 +357,16 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return string
      */
-    protected function normalizeOperator($operator)
+    private function normalizeOperator($operator)
     {
         if ('<>' === $operator) {
-            return '!=';
+            $operator = '!=';
         }
-        $operatorNameMap = $this->getOperatorNameMap();
-        if (isset($operatorNameMap[$operator])) {
-            $operator = $operatorNameMap[$operator];
+        if (isset($this->operatorShortNameMap[$operator])) {
+            $operator = $this->operatorShortNameMap[$operator];
         }
 
         return $operator;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getOperators()
-    {
-        return ['=', '!=', '>', '<', '>=', '<=', '<>'];
-    }
-
-    /**
-     * @return array [operator name => operator, ...]
-     */
-    protected function getOperatorNameMap()
-    {
-        return ['eq' => '=', 'neq' => '!=', 'gt' => '>', 'lt' => '<', 'gte' => '>=', 'lte' => '<='];
-    }
-
-    /**
-     * @return string
-     */
-    protected function getOperatorPattern()
-    {
-        return '!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E)';
     }
 
     /**

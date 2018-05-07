@@ -11,9 +11,10 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\QueryException;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * This expression visitor was created to be able to add custom composite and comparison expressions
+ * This expression visitor was created to be able to add custom composite and comparison expressions.
  */
 class QueryExpressionVisitor extends ExpressionVisitor
 {
@@ -144,17 +145,28 @@ class QueryExpressionVisitor extends ExpressionVisitor
             throw new QueryException('No aliases are set before invoking walkComparison().');
         }
 
-        $operator = $comparison->getOperator();
+        list($operator, $modifier) = \array_pad(\explode('/', $comparison->getOperator(), 2), 2, null);
         if (!isset($this->comparisonExpressions[$operator])) {
-            throw new QueryException('Unknown comparison operator: ' . $comparison->getOperator());
+            throw new QueryException(\sprintf('Unknown comparison operator "%s".', $operator));
+        }
+
+        $fieldName = $this->getFieldName($comparison->getField());
+        QueryBuilderUtil::checkField($fieldName);
+
+        if ('i' === $modifier) {
+            $fieldName = \sprintf('LOWER(%s)', $fieldName);
+        } elseif ($modifier) {
+            throw new QueryException(
+                \sprintf('Unknown modifier "%s" for comparison operator "%s".', $modifier, $operator)
+            );
         }
 
         return $this->comparisonExpressions[$operator]
             ->walkComparisonExpression(
                 $this,
-                $comparison,
-                $this->getFieldName($comparison->getField()),
-                $this->getParameterName($comparison->getField())
+                $fieldName,
+                $this->getParameterName($comparison->getField()),
+                $this->walkValue($comparison->getValue())
             );
     }
 
@@ -173,15 +185,13 @@ class QueryExpressionVisitor extends ExpressionVisitor
      */
     private function getFieldName($fieldName)
     {
-        $result = $this->queryAliases[0] . '.' . $fieldName;
         foreach ($this->queryAliases as $alias) {
-            if (0 === strpos($fieldName . '.', $alias . '.')) {
-                $result = $fieldName;
-                break;
+            if ($fieldName !== $alias && 0 === \strpos($fieldName . '.', $alias . '.')) {
+                return $fieldName;
             }
         }
 
-        return $result;
+        return $this->queryAliases[0] . '.' . $fieldName;
     }
 
     /**
@@ -191,10 +201,10 @@ class QueryExpressionVisitor extends ExpressionVisitor
      */
     private function getParameterName($fieldName)
     {
-        $result = str_replace('.', '_', $fieldName);
+        $result = \str_replace('.', '_', $fieldName);
         foreach ($this->parameters as $parameter) {
             if ($parameter->getName() === $result) {
-                $result .= '_' . count($this->parameters);
+                $result .= '_' . \count($this->parameters);
                 break;
             }
         }
