@@ -1,44 +1,38 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Api\Processor\Config;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\ValidationHelper;
+use Oro\Bundle\OrganizationBundle\Api\Processor\Config\AddOwnerValidator;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class AddOwnerValidatorTest extends ConfigProcessorTestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    private $ownershipMetadataProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ValidationHelper */
+    private $validationHelper;
+
     /** @var AddOwnerValidator */
-    protected $processor;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $ownershipMetadataProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $validationHelper;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->ownershipMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->validationHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\ValidationHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->validationHelper = $this->createMock(ValidationHelper::class);
 
         $this->processor = new AddOwnerValidator(
             $this->doctrineHelper,
@@ -49,60 +43,30 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
-        $this->ownershipMetadataProvider->expects($this->never())
+        $this->ownershipMetadataProvider->expects(self::never())
             ->method('getMetadata');
 
         $this->processor->process($this->context);
     }
 
-    public function testProcessForCreateAction()
+    public function testProcessWithOwnerField()
     {
         $config = [
             'fields' => [
-                'owner' => null,
+                'owner' => null
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
-            ->method('getMetadata')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn($ownershipMetadata);
-
-        /** @var EntityDefinitionConfig $configObject */
-        $configObject = $this->createConfigObject($config);
-        $this->context->setResult($configObject);
-        $this->context->setTargetAction(ApiActions::CREATE);
-        $this->processor->process($this->context);
-
-        $this->assertEquals(
-            ['constraints' => [new Owner()]],
-            $configObject->getFormOptions()
-        );
-    }
-
-    public function testProcess()
-    {
-        $config = [
-            'fields' => [
-                'owner' => null,
-            ]
-        ];
-        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntityClass')
-            ->with(self::TEST_CLASS_NAME)
-            ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
@@ -113,26 +77,53 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->context->setTargetAction(ApiActions::UPDATE);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['constraints' => [new Owner()]],
             $configObject->getFormOptions()
         );
+    }
+
+    public function testProcessForExcludedOwnerField()
+    {
+        $config = [
+            'fields' => [
+                'owner' => ['exclude' => true]
+            ]
+        ];
+        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->ownershipMetadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($ownershipMetadata);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->context->setTargetAction(ApiActions::UPDATE);
+        $this->processor->process($this->context);
+
+        self::assertNull($configObject->getFormOptions());
     }
 
     public function testProcessForRenamedOwnerField()
     {
         $config = [
             'fields' => [
-                'owner1' => ['property_path' => 'owner'],
+                'owner1' => ['property_path' => 'owner']
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
@@ -142,7 +133,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['constraints' => [new Owner()]],
             $configObject->getFormOptions()
         );
@@ -152,16 +143,16 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
     {
         $config = [
             'fields' => [
-                'someField' => null,
+                'someField' => null
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
@@ -171,32 +162,29 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertEmpty($configObject->getFormOptions());
+        self::assertEmpty($configObject->getFormOptions());
     }
 
-    public function testProcessWhenConstraintsAlreadyExist()
+    public function testProcessWhenConstraintAlreadyExists()
     {
         $config = [
             'fields' => [
-                'owner' => null,
+                'owner' => null
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
-        $this->validationHelper->expects($this->once())
+        $this->validationHelper->expects(self::once())
             ->method('hasValidationConstraintForClass')
-            ->with(
-                self::TEST_CLASS_NAME,
-                'Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner'
-            )
+            ->with(self::TEST_CLASS_NAME, Owner::class)
             ->willReturn(true);
 
         /** @var EntityDefinitionConfig $configObject */
@@ -204,33 +192,30 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertNull($configObject->getFormOptions());
-        $this->assertNull($configObject->getField('owner')->getFormOptions());
+        self::assertNull($configObject->getFormOptions());
+        self::assertNull($configObject->getField('owner')->getFormOptions());
     }
 
-    public function testProcessWhenConstraintsAlreadyExistRenamedOwnerField()
+    public function testProcessWhenConstraintAlreadyExistsForRenamedOwnerField()
     {
         $config = [
             'fields' => [
-                'owner1' => ['property_path' => 'owner'],
+                'owner1' => ['property_path' => 'owner']
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
-        $this->validationHelper->expects($this->once())
+        $this->validationHelper->expects(self::once())
             ->method('hasValidationConstraintForClass')
-            ->with(
-                self::TEST_CLASS_NAME,
-                'Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner'
-            )
+            ->with(self::TEST_CLASS_NAME, Owner::class)
             ->willReturn(true);
 
         /** @var EntityDefinitionConfig $configObject */
@@ -238,7 +223,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->context->setResult($configObject);
         $this->processor->process($this->context);
 
-        $this->assertNull($configObject->getFormOptions());
-        $this->assertNull($configObject->getField('owner1')->getFormOptions());
+        self::assertNull($configObject->getFormOptions());
+        self::assertNull($configObject->getField('owner1')->getFormOptions());
     }
 }

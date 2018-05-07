@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
+use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -29,7 +30,9 @@ class FormBuilder
         'decimal' => NumberType::class,
         'money_value' => NumberType::class,
         'entity' => EntityType::class,
-        'integer' => IntegerType::class
+        'integer' => IntegerType::class,
+        'text' => TextType::class,
+        'percent' => OroPercentType::class,
     ];
 
     /** @var FormFactory */

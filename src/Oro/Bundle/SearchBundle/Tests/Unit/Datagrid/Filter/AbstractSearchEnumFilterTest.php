@@ -69,7 +69,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
-                SearchEnumFilterType::NAME,
+                SearchEnumFilterType::class,
                 [],
                 ['csrf_protection' => false, 'class' => \stdClass::class]
             )

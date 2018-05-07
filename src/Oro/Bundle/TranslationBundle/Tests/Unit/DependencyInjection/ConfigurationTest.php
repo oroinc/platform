@@ -49,7 +49,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'default_api_adapter' => Configuration::DEFAULT_ADAPTER,
-            'debug_translator' => false
+            'debug_translator' => false,
+            'locales' => [],
+            'default_required' => true,
+            'manager_registry' => 'doctrine',
+            'templating' => 'OroTranslationBundle::default.html.twig'
         ];
 
         $this->assertEquals(

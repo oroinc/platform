@@ -45,8 +45,8 @@ datagrids:
                 inline_editing:
                     enable: false
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
             auth_status:
                 label:         oro.user.auth_status.label
                 editable:      false
@@ -121,9 +121,11 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
                 auth_status:
                     type:      enum
                     data_name: au.id
@@ -360,8 +362,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         filters:
             columns:
                 firstName:
@@ -381,9 +383,11 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
         sorters:
             multiple_sorting: true
             default:
@@ -424,8 +428,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         filters:
             columns:
                 has_role:
@@ -448,9 +452,11 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
         sorters:
             multiple_sorting: true
             columns:
@@ -539,8 +545,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         filters:
             columns:
                 has_group:
@@ -563,9 +569,11 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
         sorters:
             multiple_sorting: true
             columns:
@@ -613,8 +621,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
 
         properties:
             id: ~
@@ -651,9 +659,11 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1
 
     owner-users-select-grid:
         extended_entity_name: '%oro_user.entity.class%'
@@ -762,8 +772,8 @@ datagrids:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Disabled
-                   - Enabled
+                   Disabled: 0
+                   Enabled: 1
         sorters:
             columns:
                 firstName:
@@ -798,6 +808,8 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
+                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
+                            choices_as_values: true
                             choices:
-                                2: Disabled
-                                1: Enabled
+                                Disabled: 2
+                                Enabled: 1

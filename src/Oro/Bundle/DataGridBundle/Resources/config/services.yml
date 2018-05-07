@@ -346,3 +346,8 @@ services:
     oro_datagrid.multi_grid_provider.link:
         tags:
             - { name: oro_service_link, service: oro_datagrid.multi_grid_provider }
+
+    oro_datagrid.helper.date:
+        class: Oro\Bundle\DataGridBundle\Tools\DateHelper
+        arguments:
+            - '@oro_locale.settings'

@@ -42,14 +42,14 @@ oro_assetic:
 After this configuration change, the cleanup and assets install is required:
 
 ```php
-php app/console cache:clear
-php app/console assets:install
+php bin/console cache:clear
+php bin/console assets:install
 ```
 
 To get the list of all available asset groups, the following command should be used:
 
 ```php
-php app/console oro:assetic:groups
+php bin/console oro:assetic:groups
 ```
 
 The following code must be added to the main template:

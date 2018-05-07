@@ -54,17 +54,17 @@ class MailboxChoiceList
         foreach ($systemMailboxes as $mailbox) {
             $origin = $mailbox->getOrigin();
             if (null !== $origin) {
-                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox->getLabel());
+                $choiceList[str_replace('@', '\@', $mailbox->getLabel())] = $origin->getId();
             }
         }
         foreach ($origins as $origin) {
-            if (!isset($choiceList[$origin->getId()]) && count($origin->getFolders()) > 0) {
+            if (!in_array($origin->getId(), $choiceList, true) && count($origin->getFolders()) > 0) {
                 $mailboxName = $this->mailboxNameHelper->getMailboxName(
                     get_class($origin),
                     $origin->getMailboxName(),
                     null
                 );
-                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailboxName);
+                $choiceList[str_replace('@', '\@', $mailboxName)] = $origin->getId();
             }
         }
 

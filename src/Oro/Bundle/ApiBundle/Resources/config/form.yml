@@ -11,7 +11,7 @@ services:
 
     oro_api.form.extension:
         public: false
-        class: '%form.extension.class%'
+        class: Oro\Bundle\ApiBundle\Form\FormExtension
         arguments:
             - '@service_container'
             - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
@@ -23,7 +23,7 @@ services:
         arguments:
             - '@oro_api.entity_instantiator'
         tags:
-            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_api.form.extension.datetime:
         class: Oro\Bundle\ApiBundle\Form\Extension\DateTimeExtension
@@ -35,7 +35,7 @@ services:
         arguments:
             - '@oro_api.customize_form_data.processor'
         tags:
-            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
 
     oro_api.form_helper:
         class: Oro\Bundle\ApiBundle\Form\FormHelper
@@ -51,16 +51,6 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
-
-    oro_api.form.type.boolean:
-        class: Oro\Bundle\ApiBundle\Form\Type\BooleanType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\BooleanType }
-
-    oro_api.form.type.number:
-        class: Oro\Bundle\ApiBundle\Form\Type\NumberType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\NumberType }
 
     oro_api.form.type.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityType
@@ -85,26 +75,6 @@ services:
             - '@oro_api.form_helper'
         tags:
             - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType }
-
-    oro_api.form.type.collection:
-        class: Oro\Bundle\ApiBundle\Form\Type\CollectionType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CollectionType }
-
-    oro_api.form.type.collection.entity:
-        class: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType }
-
-    oro_api.form.type.scalar_collection:
-        class: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType }
-
-    oro_api.form.type.scalar_collection.entity:
-        class: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType }
 
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator

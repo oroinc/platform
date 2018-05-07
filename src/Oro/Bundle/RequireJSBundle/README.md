@@ -125,7 +125,7 @@ This directive will prevent module from getting concatenated into build file.
 ### Building
 To make a build for JS-resources, just execute a command in console:
 
-    php app/console oro:requirejs:build
+    php bin/console oro:requirejs:build
 
 It will:
 

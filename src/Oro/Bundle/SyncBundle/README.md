@@ -99,7 +99,7 @@ server {
 You should be able to run this from the root of your symfony installation:
 
 ``` bash
-php app/console clank:server
+php bin/console clank:server
 ```
 
 If everything is successful, you will see something similar to the following:

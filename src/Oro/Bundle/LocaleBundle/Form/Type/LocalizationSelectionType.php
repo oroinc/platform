@@ -81,6 +81,8 @@ class LocalizationSelectionType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
+            'choices_as_values' => true,
             'choices' => function (Options $options) {
                 $localizations = $this->getLocalizations();
 
@@ -126,10 +128,10 @@ class LocalizationSelectionType extends AbstractType
      */
     protected function checkLocalizations(array $localizations)
     {
-        foreach ($localizations as $id => $label) {
+        foreach ($localizations as $label => $id) {
             $localization = $this->localizationManager->getLocalization($id);
             if (!($localization instanceof Localization)) {
-                unset($localizations[$id]);
+                unset($localizations[$label]);
             }
         }
 

@@ -96,13 +96,13 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
         $choices = $form->getConfig()->getOption('choices');
 
         foreach ($codesExpected as $value) {
-            $this->assertArrayHasKey($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.intl']);
+            $this->assertContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
         }
 
         foreach ($currentCodes as $value) {
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertArrayNotHasKey($value, $choices['oro.translation.language.form.select.group.intl']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
+            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
         }
     }
 

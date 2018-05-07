@@ -11,7 +11,7 @@ system_configuration:
     fields:
         oro_google_integration.client_id:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.client_id.label
@@ -20,7 +20,7 @@ system_configuration:
             priority: 30
         oro_google_integration.client_secret:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.client_secret.label
@@ -29,7 +29,7 @@ system_configuration:
             priority: 20
         oro_google_integration.google_api_key:
             data_type: string
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             options:
                 label: oro.google_integration.system_configuration.fields.google_api_key.label

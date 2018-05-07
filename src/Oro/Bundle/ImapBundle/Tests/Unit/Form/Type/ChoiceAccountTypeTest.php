@@ -57,6 +57,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($string) {
+                return $string . '.trans';
+            });
 
         $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

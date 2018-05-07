@@ -519,7 +519,8 @@ class EmailController extends Controller
         $attachments = $entity->getAttachments();
         if (count($attachments)) {
             $zip = new \ZipArchive();
-            $zipName = 'attachments-' . time() . '.zip';
+            $fileManager = $this->get('oro_attachment.file_manager');
+            $zipName = $fileManager->getTemporaryFileName('attachments-' . time() . '.zip');
             $zip->open($zipName, \ZipArchive::CREATE);
             foreach ($attachments as $attachment) {
                 $content = ContentDecoder::decode(

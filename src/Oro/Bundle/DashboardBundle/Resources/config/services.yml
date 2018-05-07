@@ -227,8 +227,7 @@ services:
             - '@translator'
             - '@oro_dashboard.datetime.helper'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_date_range' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateRangeType }
 
     oro_dashboard.widget_config_value.datetime_range.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
@@ -237,33 +236,28 @@ services:
             - '@oro_dashboard.config_resolver'
             - '@oro_dashboard.datetime.helper'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_datetime_range' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateTimeRangeType }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: '%oro_dashboard.widget_config_value.previous_date_range.converter.class%'
           parent: oro_dashboard.widget_config_value.date_range.converter
           tags:
-              #@TODO Change to FQCN in scope BAP-16688
-              - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_previous_date_range' }
+              - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType }
 
     oro_dashboard.widget_config_value.widget_title.converter:
         class: '%oro_dashboard.widget_config_value.widget_title.converter.class%'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_title' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType }
 
     oro_dashboard.widget_config_value.widget_items_choice.converter:
         class: '%oro_dashboard.widget_config_value.widget_items_choice.converter.class%'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_items_choice' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType }
 
     oro_dashboard.widget_config_value.widget_choice.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetChoiceTypeConverter
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_choice' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetChoiceType }
 
     oro_dashboard.widget_config_value.widget_sort_by.converter:
         class: '%oro_dashboard.widget_config_value.widget_sort_by.converter.class%'
@@ -271,8 +265,7 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@translator'
         tags:
-            #@TODO Change to FQCN in scope BAP-16688
-            - { name: oro_dashboard.value.converter, form_type: 'oro_type_widget_sort_by' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType }
 
     oro_dashboard.widget_config_value.widget_entity_select.converter:
         class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter

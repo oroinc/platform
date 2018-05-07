@@ -47,6 +47,20 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     }
 
     /**
+     * @param Request $request
+     *
+     * @return RestFilterValueAccessor
+     */
+    private function getRestFilterValueAccessor(Request $request)
+    {
+        return new RestFilterValueAccessor(
+            $request,
+            '!?=',
+            [ComparisonFilter::EQ => '=', ComparisonFilter::NEQ => '!=']
+        );
+    }
+
+    /**
      * @param string $dataType
      *
      * @return ComparisonFilter
@@ -131,7 +145,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         self::assertCount(0, $this->context->getFilters());
@@ -157,7 +171,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($this->getRequest('')));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($this->getRequest('')));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -189,7 +203,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -222,7 +236,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('name', $filter);
         $this->processor->process($this->context);
 
@@ -252,7 +266,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('id', $idFilter);
         $this->context->getFilters()->add('name', $nameFilter);
         $this->processor->process($this->context);
@@ -282,7 +296,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('name', $nameFilter);
         $this->processor->process($this->context);
 
@@ -309,7 +323,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         self::assertCount(0, $this->context->getFilters());
@@ -332,7 +346,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         self::assertCount(0, $this->context->getFilters());
@@ -363,7 +377,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -403,7 +417,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\UserProfile::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -440,7 +454,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -477,7 +491,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -505,7 +519,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         self::assertCount(0, $this->context->getFilters());
@@ -537,7 +551,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -576,7 +590,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -616,7 +630,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
@@ -655,7 +669,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         self::assertSame($this->context->getRequestType(), $filter->getRequestType());
@@ -677,7 +691,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
@@ -703,7 +717,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
@@ -731,7 +745,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
@@ -765,7 +779,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
@@ -802,7 +816,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
     }

@@ -7,16 +7,16 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -382,11 +382,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
      */
     private function prepareFilters($sortBy = '-id')
     {
-        $request = $this->createMock(Request::class);
-        $request->expects(self::once())
-            ->method('getQueryString')
-            ->willReturn('sort=' . $sortBy);
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer
         $orderBy = [];

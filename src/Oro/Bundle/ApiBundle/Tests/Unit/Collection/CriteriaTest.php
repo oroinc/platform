@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -12,10 +13,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  */
 class CriteriaTest extends OrmRelatedTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
-
     /** @var Criteria */
-    protected $criteria;
+    private $criteria;
 
     protected function setUp()
     {
@@ -24,27 +23,17 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->criteria = new Criteria(new EntityClassResolver($this->doctrine));
     }
 
-    /**
-     * @param string $entityShortClass
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityShortClass)
-    {
-        return self::ENTITY_NAMESPACE . $entityShortClass;
-    }
-
     public function joinTypeDataProvider()
     {
         return [
             [Join::INNER_JOIN, 'addInnerJoin'],
-            [Join::LEFT_JOIN, 'addLeftJoin'],
+            [Join::LEFT_JOIN, 'addLeftJoin']
         ];
     }
 
     public function testEmptyJoins()
     {
-        $this->assertCount(0, $this->criteria->getJoins());
+        self::assertCount(0, $this->criteria->getJoins());
     }
 
     /**
@@ -55,9 +44,9 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->criteria->{$addMethodName}('products', '{root}.products');
 
         $expectedJoin = new Join($joinType, '{root}.products');
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 
     /**
@@ -67,7 +56,7 @@ class CriteriaTest extends OrmRelatedTestCase
     {
         $this->criteria->{$addMethodName}(
             'products',
-            $this->getEntityClass('Product'),
+            Entity\Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL',
             'idx_name'
@@ -75,14 +64,14 @@ class CriteriaTest extends OrmRelatedTestCase
 
         $expectedJoin = new Join(
             $joinType,
-            $this->getEntityClass('Product'),
+            Entity\Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL',
             'idx_name'
         );
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 
     /**
@@ -94,13 +83,13 @@ class CriteriaTest extends OrmRelatedTestCase
 
         $expectedJoin = new Join(
             $joinType,
-            $this->getEntityClass('Product'),
+            Entity\Product::class,
             Join::WITH,
             '{entity}.name IS NOT NULL'
         );
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 
     public function testAddSeveralJoins()
@@ -131,7 +120,7 @@ class CriteriaTest extends OrmRelatedTestCase
         $expectedJoins = [
             'roles'          => new Join(
                 Join::LEFT_JOIN,
-                $this->getEntityClass('Role'),
+                Entity\Role::class,
                 Join::WITH,
                 '{root}.id MEMBER OF {entity}.users'
             ),
@@ -141,7 +130,7 @@ class CriteriaTest extends OrmRelatedTestCase
             ),
             'products'       => new Join(
                 Join::LEFT_JOIN,
-                $this->getEntityClass('Product'),
+                Entity\Product::class,
                 Join::WITH,
                 '{entity}.owner = {root}'
             ),
@@ -150,15 +139,15 @@ class CriteriaTest extends OrmRelatedTestCase
                 '{products}.owner',
                 Join::WITH,
                 '{entity}.id = {roles.users}.id'
-            ),
+            )
         ];
-        $this->assertEquals($expectedJoins, $this->criteria->getJoins());
+        self::assertEquals($expectedJoins, $this->criteria->getJoins());
     }
 
     /**
      * @dataProvider joinTypeDataProvider
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $propertyPath must be specified.
+     * @expectedExceptionMessage The property path must be not empty.
      */
     public function testAddJoinWithEmptyPropertyPath($joinType, $addMethodName)
     {
@@ -168,7 +157,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $join must be specified. Join path: "products".
+     * @expectedExceptionMessage The join must be be not empty. Join path: "products".
      */
     public function testAddJoinWithEmptyJoinExpr($joinType, $addMethodName)
     {
@@ -188,7 +177,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $conditionType must be specified if $condition exists. Join path: "products".
+     * @expectedExceptionMessage The condition type must be specified if the condition exists. Join path: "products".
      */
     public function testAddJoinWithConditionButWithoutConditionType($joinType, $addMethodName)
     {
@@ -200,11 +189,11 @@ class CriteriaTest extends OrmRelatedTestCase
      */
     public function testAddJoinConflictsWithExistingJoin($joinType, $addMethodName)
     {
-        $this->expectException('\LogicException');
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'The join definition for "products" conflicts with already added join.'
-            . ' Existing join: "LEFT JOIN ' . $this->getEntityClass('Product') . '".'
-            . ' New join: "' . $joinType . ' JOIN ' . $this->getEntityClass('Category') . '".'
+            . ' Existing join: "LEFT JOIN ' . Entity\Product::class . '".'
+            . ' New join: "' . $joinType . ' JOIN ' . Entity\Category::class . '".'
         );
         $this->criteria->addLeftJoin('products', 'Test:Product');
         $this->criteria->{$addMethodName}('products', 'Test:Category');
@@ -219,9 +208,9 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->criteria->{$addMethodName}('products', '{root}.products');
 
         $expectedJoin = new Join($joinType, '{root}.products');
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 
     public function testAddInnerJoinAndThenLeftJoinForSameJoinStatement()
@@ -230,9 +219,9 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products');
 
         $expectedJoin = new Join(Join::INNER_JOIN, '{root}.products');
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 
     public function testAddLeftJoinAndThenInnerJoinForSameJoinStatement()
@@ -241,8 +230,8 @@ class CriteriaTest extends OrmRelatedTestCase
         $this->criteria->addInnerJoin('products', '{root}.products');
 
         $expectedJoin = new Join(Join::INNER_JOIN, '{root}.products');
-        $this->assertTrue($this->criteria->hasJoin('products'));
-        $this->assertEquals($expectedJoin, $this->criteria->getJoin('products'));
-        $this->assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
+        self::assertTrue($this->criteria->hasJoin('products'));
+        self::assertEquals($expectedJoin, $this->criteria->getJoin('products'));
+        self::assertEquals(['products' => $expectedJoin], $this->criteria->getJoins());
     }
 }

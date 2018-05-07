@@ -15,7 +15,7 @@ class ReminderCollectionType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'type'                 => ReminderType::class,
+                'entry_type'           => ReminderType::class,
                 'required'             => false,
                 'show_form_when_empty' => false,
                 'error_bubbling'       => false,

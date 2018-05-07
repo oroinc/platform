@@ -42,10 +42,10 @@ class ChoiceTreeFilterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = array(
-            self::TYPE_CONTAINS           => 1,
-            self::TYPE_NOT_CONTAINS       => 2,
-        );
+        $choices = [
+            1 => self::TYPE_CONTAINS,
+            2 => self::TYPE_NOT_CONTAINS,
+        ];
 
         $resolver->setDefaults(
             array(

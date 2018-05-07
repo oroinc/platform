@@ -6,8 +6,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class SimpleFilterFactory implements FilterFactoryInterface
 {
+    private const SUPPORTED_OPERATORS_OPTION = 'supported_operators';
+
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
+
+    /** @var FilterOperatorRegistry */
+    protected $filterOperatorRegistry;
 
     /** @var array [filter type => [class name, parameters], ...] */
     protected $filters = [];
@@ -17,10 +22,14 @@ class SimpleFilterFactory implements FilterFactoryInterface
 
     /**
      * @param PropertyAccessorInterface $propertyAccessor
+     * @param FilterOperatorRegistry    $filterOperatorRegistry
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
-    {
+    public function __construct(
+        PropertyAccessorInterface $propertyAccessor,
+        FilterOperatorRegistry $filterOperatorRegistry
+    ) {
         $this->propertyAccessor = $propertyAccessor;
+        $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
     /**
@@ -50,13 +59,11 @@ class SimpleFilterFactory implements FilterFactoryInterface
             || !$refl->getMethod($factoryMethod)->isPublic()
             || 1 !== $refl->getMethod($factoryMethod)->getNumberOfParameters()
         ) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The "%s($dataType)" public method must be declared in the "%s" class.',
-                    $factoryMethod,
-                    get_class($factory)
-                )
-            );
+            throw new \InvalidArgumentException(\sprintf(
+                'The "%s($dataType)" public method must be declared in the "%s" class.',
+                $factoryMethod,
+                get_class($factory)
+            ));
         }
         $this->factories[$filterType] = [$factory, $factoryMethod, $parameters];
     }
@@ -70,12 +77,21 @@ class SimpleFilterFactory implements FilterFactoryInterface
             return null;
         }
 
-        $options = array_replace($this->getFilterParameters($filterType), $options);
+        $options = \array_replace($this->getFilterParameters($filterType), $options);
         $dataType = $filterType;
-        if (array_key_exists(self::DATA_TYPE_OPTION, $options)) {
+        if (\array_key_exists(self::DATA_TYPE_OPTION, $options)) {
             $dataType = $options[self::DATA_TYPE_OPTION];
             unset($options[self::DATA_TYPE_OPTION]);
         }
+
+        if (!empty($options[self::SUPPORTED_OPERATORS_OPTION])) {
+            $operators = [];
+            foreach ($options[self::SUPPORTED_OPERATORS_OPTION] as $operator) {
+                $operators[] = $this->filterOperatorRegistry->resolveOperator($operator);
+            }
+            $options[self::SUPPORTED_OPERATORS_OPTION] = $operators;
+        }
+
         $filter = $this->instantiateFilter($filterType, $dataType);
         foreach ($options as $name => $value) {
             $this->propertyAccessor->setValue($filter, $name, $value);

@@ -228,7 +228,7 @@ api:
                 my_option: value
 ```
 
-To check that your configuration section is added correctly, run `php app/console oro:api:config:dump-reference`. The output should look similar to the following:
+To check that your configuration section is added correctly, run `php bin/console oro:api:config:dump-reference`. The output should look similar to the following:
 
 ```yaml
 # The structure of "Resources/config/oro/api.yml"

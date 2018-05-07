@@ -61,9 +61,9 @@ class ScriptHandler extends SensioScriptHandler
         $parametersFile = self::getParametersFile($options);
 
         $directories = [
-            'app/cache',
-            'app/logs',
-            'app/attachment',
+            'var/cache',
+            'var/logs',
+            'var/attachment',
             $webDir,
             $parametersFile
         ];
