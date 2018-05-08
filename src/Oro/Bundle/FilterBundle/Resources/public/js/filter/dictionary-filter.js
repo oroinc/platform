@@ -86,6 +86,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // Each filter should have own copy,
+            // otherwise 2 filters on same page will show same values
+            this.selectedData = {};
+
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             } else {
