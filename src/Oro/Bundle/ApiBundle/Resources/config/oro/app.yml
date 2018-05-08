@@ -48,37 +48,61 @@ oro_api:
         - oro_api.config_extension.actions
         - oro_api.config_extension.subresources
 
+    filter_operators:
+        eq:  '='  # equal to
+        neq: '!=' # not equal to
+        gt:  '>'  # greater than
+        lt:  '<'  # less than
+        gte: '>=' # greater than or equal to
+        lte: '<=' # less than or equal to
+        exists: '*' # exists (IS NOT NULL) and not exists (IS NULL), value is true = exists, value is false = not exists
+        neq_or_null:     '!*' # not equal to or IS NULL
+        contains:        '~'  # contains (LIKE %value%)
+        not_contains:    '!~' # not contains (NOT LIKE %value%)
+        starts_with:     '^'  # starts with (LIKE value%)
+        not_starts_with: '!^' # not starts with (NOT LIKE value%)
+        ends_with:       '$'  # ends with (LIKE %value)
+        not_ends_with:   '!$' # not ends with (NOT LIKE %value)
+
+    # the default value for "class" is "Oro\Bundle\ApiBundle\Filter\ComparisonFilter"
+    # the default value for "supported_operators" is ['=', '!=', '*', '!*']
     filters:
         string: ~
         boolean: ~
         integer:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         smallint:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         bigint:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         unsignedInteger:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         decimal:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         float:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         date:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         time:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         datetime:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         guid: ~
+        text:
+            # by default, only EXISTS (IS NOT NULL) and NOT EXISTS (IS NULL) operators
+            # are enabled for text fields,
+            # to enable other operators for a particular field the "operators" option should be
+            # specified for this field in api.yml configuration file, in "filters" section
+            supported_operators: ['*']
         percent:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money_value:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         currency: ~
         duration:
-            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         composite_identifier:
             factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
         association:

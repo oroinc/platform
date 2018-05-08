@@ -113,7 +113,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             'SELECT e FROM Test:User e'
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
-            . ' WHERE category = :category OR groups = :groups'
+            . ' WHERE e.category = :category OR e.groups = :groups'
         );
     }
 

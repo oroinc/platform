@@ -103,7 +103,7 @@ class CriteriaNormalizer
      */
     private function optimizeJoins(Criteria $criteria): void
     {
-        $fields = $this->getWhereFields($criteria);
+        $fields = $this->getFieldsToOptimizeJoins($criteria);
         foreach ($fields as $field) {
             $join = $criteria->getJoin($field);
             if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
@@ -235,27 +235,15 @@ class CriteriaNormalizer
      *
      * @return string[]
      */
-    private function getWhereFields(Criteria $criteria): array
-    {
-        $whereExpr = $criteria->getWhereExpression();
-        if (!$whereExpr) {
-            return [];
-        }
-
-        $visitor = new FieldVisitor();
-        $visitor->dispatch($whereExpr);
-
-        return $visitor->getFields();
-    }
-
-    /**
-     * @param Criteria $criteria
-     *
-     * @return string[]
-     */
     private function getFields(Criteria $criteria): array
     {
-        $fields = $this->getWhereFields($criteria);
+        $fields = [];
+        $whereExpr = $criteria->getWhereExpression();
+        if (null !== $whereExpr) {
+            $visitor = new FieldVisitor();
+            $visitor->dispatch($whereExpr);
+            $fields = $visitor->getFields();
+        }
 
         $orderBy = $criteria->getOrderings();
         foreach ($orderBy as $field => $direction) {
@@ -265,6 +253,24 @@ class CriteriaNormalizer
         }
 
         return $fields;
+    }
+
+    /**
+     * @param Criteria $criteria
+     *
+     * @return string[]
+     */
+    private function getFieldsToOptimizeJoins(Criteria $criteria): array
+    {
+        $whereExpr = $criteria->getWhereExpression();
+        if (null === $whereExpr) {
+            return [];
+        }
+
+        $visitor = new OptimizeJoinsFieldVisitor();
+        $visitor->dispatch($whereExpr);
+
+        return $visitor->getFields();
     }
 
     /**

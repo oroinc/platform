@@ -198,7 +198,7 @@ class OroEntityExtendBundle extends Bundle
         return ProcessBuilder::create()
             ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
             ->add($this->getPhpExecutable())
-            ->add($this->kernel->getRootDir() . '/console')
+            ->add($this->kernel->getRootDir() . '/../bin/console')
             ->add($commandName)
             ->add(sprintf('%s=%s', '--env', $this->kernel->getEnvironment()))
             ->add(sprintf('%s=%s', '--cache-dir', $this->cacheDir));

@@ -13,14 +13,14 @@ for queued indexation.
 
 Single entity indexation:
 ```
-> php app/console oro:search:index OroUserBundle:User 1
+> php bin/console oro:search:index OroUserBundle:User 1
 Started index update for entities.
 
 ```
 
 Multiple entities indexation:
 ```
-> php app/console oro:search:index "Oro\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
+> php bin/console oro:search:index "Oro\Bundle\ContactBundle\Entity\Contact" 1 2 3 4 5 6 7 8 9 10
 Started index update for entities.
 
 ```
@@ -36,14 +36,14 @@ Reindexation itself might takes lots of time for big amount of data, so it would
 
 All entities reindexation:
 ```
-> php app/console oro:search:reindex
+> php bin/console oro:search:reindex
 Started reindex task for all mapped entities
 
 ```
 
 One entity reindexation:
 ```
-> app/console oro:search:reindex OroUserBundle:User
+> bin/console oro:search:reindex OroUserBundle:User
 Started reindex task for "OroUserBundle:User" entity
 
 ```
@@ -61,6 +61,6 @@ You will need a configured Message Queue and at least one running consumer worke
 
 Please use the following parameter to enable it:
 ```
-> app/console oro:search:reindex --scheduled
+> bin/console oro:search:reindex --scheduled
 
 ```

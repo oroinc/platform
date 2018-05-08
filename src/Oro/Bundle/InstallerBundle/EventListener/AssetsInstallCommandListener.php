@@ -125,6 +125,17 @@ class AssetsInstallCommandListener
     private function getWebDir(InputInterface $input)
     {
         $dir = rtrim($input->getArgument('target'), '/');
+
+        // deprecated, logic to be removed in 4.0
+        // this allows the commands to work out of the box with web/ and public/
+        if ('public' === $dir) {
+            $dir = $this->kernelRootDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $dir;
+
+            if (!is_dir($dir)) {
+                $dir = 'web';
+            }
+        }
+
         if ('web' === $dir) {
             $dir = $this->kernelRootDir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $dir;
         }

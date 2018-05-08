@@ -72,6 +72,7 @@
             $apiDocLink = $('#header a').first(),
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
+            operatorMap = {'eq': '=', 'neq': '!=', 'gt': '>', 'lt': '<', 'gte': '>=', 'lte': '<='},
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
             },
@@ -314,6 +315,7 @@
                 var $el = $(el),
                     filterId = $el.closest('table').parent().prev().text(),
                     operators = $el.next().text(),
+                    operatorToShow,
                     options = '',
                     $operatorEl = null;
                 if (filterId) {
@@ -321,7 +323,11 @@
                     if ($operatorEl.length && $operatorEl.prop("tagName") == 'SPAN' && $operatorEl.text() == '=') {
                         operators = operators.split(',');
                         for (var i = 0; i < operators.length; i++) {
-                            options += '<option value="' + operators[i] + '">' + operators[i] + '</option>'
+                            operatorToShow = operators[i];
+                            if (operators[i] in operatorMap) {
+                                operatorToShow = operatorMap[operators[i]];
+                            }
+                            options += '<option value="' + operators[i] + '">' + operatorToShow + '</option>'
                         }
                         $operatorEl.replaceWith('<select class="operator">' + options + '</select>');
                     }
@@ -347,7 +353,9 @@
                     value = $('.value', $(this)).val(),
                     data, obj, keyPair;
                 if (value !== '' && operator !== undefined && operator !== '=' && !jQuery.isEmptyObject(options.data)) {
-                    if (options.data.lastIndexOf('{"', 0) === 0) {
+                    if (operator === 'eq') {
+                        operator = '=';
+                    } else if (options.data.lastIndexOf('{"', 0) === 0) {
                         // json
                         data = JSON.parse(options.data);
                         keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
@@ -365,7 +373,7 @@
                     } else {
                         // uri string
                         options.data = options.data.replace(
-                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2" + operator
+                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2[" + operator + ']='
                         );
                     }
                 }

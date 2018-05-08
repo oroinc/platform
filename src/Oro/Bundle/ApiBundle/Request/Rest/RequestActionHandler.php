@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestActionHandler as BaseRequestActionHandler;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessorFactory;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Component\ChainProcessor\AbstractParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,17 +23,23 @@ class RequestActionHandler extends BaseRequestActionHandler
     /** @var ViewHandlerInterface */
     private $viewHandler;
 
+    /** @var RestFilterValueAccessorFactory */
+    private $filterValueAccessorFactory;
+
     /**
-     * @param string[]                    $requestType
-     * @param ActionProcessorBagInterface $actionProcessorBag
-     * @param ViewHandlerInterface        $viewHandler
+     * @param string[]                       $requestType
+     * @param ActionProcessorBagInterface    $actionProcessorBag
+     * @param RestFilterValueAccessorFactory $filterValueAccessorFactory
+     * @param ViewHandlerInterface           $viewHandler
      */
     public function __construct(
         array $requestType,
         ActionProcessorBagInterface $actionProcessorBag,
+        RestFilterValueAccessorFactory $filterValueAccessorFactory,
         ViewHandlerInterface $viewHandler
     ) {
         parent::__construct($requestType, $actionProcessorBag);
+        $this->filterValueAccessorFactory = $filterValueAccessorFactory;
         $this->viewHandler = $viewHandler;
     }
 
@@ -50,7 +56,7 @@ class RequestActionHandler extends BaseRequestActionHandler
      */
     protected function getRequestFilters(Request $request): FilterValueAccessorInterface
     {
-        return new RestFilterValueAccessor($request);
+        return $this->filterValueAccessorFactory->create($request);
     }
 
     /**

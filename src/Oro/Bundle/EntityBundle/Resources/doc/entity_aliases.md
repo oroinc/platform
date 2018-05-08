@@ -93,7 +93,7 @@ Please, note that you can specify the priority for the alias provider. The bigge
 
 **Viewing existing entity aliases**
 
-You can use `php app/console oro:entity-alias:debug` CLI command to see all the aliases.
+You can use `php bin/console oro:entity-alias:debug` CLI command to see all the aliases.
 The output will look something like this:
 
 ```

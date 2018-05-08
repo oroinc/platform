@@ -978,6 +978,7 @@ filters:
                             allow_array: true
                             allow_range: true
                             description: description1
+                            operators: ['=', '!=', 'exists']
                         field4:
                             exclude: false
                         field5:
@@ -999,6 +1000,7 @@ filters:
                             allow_array: true
                             allow_range: true
                             description: description1
+                            operators: ['eq', 'neq', 'exists']
                         field4:
                             exclude: false
                         field5:
