@@ -19,7 +19,7 @@ class DeleteDataByDeleteHandler extends BaseProcessor
         if (!\is_object($data)) {
             throw new \RuntimeException(
                 \sprintf(
-                    'The result property of the Context should be an object, "%s" given.',
+                    'The result property of the context should be an object, "%s" given.',
                     \is_object($data) ? \get_class($data) : \gettype($data)
                 )
             );

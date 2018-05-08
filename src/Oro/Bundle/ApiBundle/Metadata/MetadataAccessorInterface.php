@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 /**
- * An interface for classes that can be used to get the metadata of API resource outside of API processors.
+ * Provides an interface for classes that can be used to get the metadata of Data API resource
+ * outside of API processors.
  */
 interface MetadataAccessorInterface
 {

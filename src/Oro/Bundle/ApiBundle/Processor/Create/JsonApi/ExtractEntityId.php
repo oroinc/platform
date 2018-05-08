@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether entity identifier exists in the request data,
- * and if so, adds it to the Context.
+ * and if so, adds it to the context.
  * If the entity identifier does not exist in the request data
  * and the entity type does not have id generator then a validation error
  * is added to the context.

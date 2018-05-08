@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * The most often used request validation constrains.
+ * Provides request validation constrains that are used the most often.
  */
 final class Constraint
 {

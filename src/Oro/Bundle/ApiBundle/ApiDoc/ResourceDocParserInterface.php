@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 /**
- * An interface for classes responsible to parse documentation for Data API resources.
+ * Provides an interface for classes responsible to parse documentation for Data API resources.
  */
 interface ResourceDocParserInterface
 {

@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Builds the form using the form builder from the Context.
+ * Builds the form using the form builder from the context.
  */
 class BuildForm implements ProcessorInterface
 {
@@ -27,9 +27,9 @@ class BuildForm implements ProcessorInterface
             return;
         }
 
-        // build the form and add it to the Context
+        // build the form and add it to the context
         $context->setForm($context->getFormBuilder()->getForm());
-        // remove the form builder from the Context
+        // remove the form builder from the context
         $context->setFormBuilder();
     }
 }

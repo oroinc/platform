@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Provides an interface for classes that extracts information from an exception object.
+ */
 interface ExceptionTextExtractorInterface
 {
     /**
