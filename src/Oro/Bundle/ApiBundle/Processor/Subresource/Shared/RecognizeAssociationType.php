@@ -10,10 +10,10 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes sure that the association name exists in the Context.
+ * Makes sure that the association name exists in the context.
  * Computes the related entity class name and the relationship type
  * based on the parent class name and the association name
- * and sets them into the "class" and the "collection" attributes of the Context.
+ * and sets them into the "class" and the "collection" attributes of the context.
  */
 class RecognizeAssociationType implements ProcessorInterface
 {

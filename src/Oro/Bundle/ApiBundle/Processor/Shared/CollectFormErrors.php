@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
- * Collects errors occurred during the the form submit and adds them into the Context.
+ * Collects errors occurred during the the form submit and adds them into the context.
  */
 class CollectFormErrors implements ProcessorInterface
 {

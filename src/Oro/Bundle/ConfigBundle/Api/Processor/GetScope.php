@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Gets "scope" filter from a request, validates it and adds to the Context.
+ * Gets "scope" filter from a request, validates it and adds to the context.
  */
 class GetScope implements ProcessorInterface
 {

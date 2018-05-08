@@ -15,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Makes sure that an entity class name exists in the Context.
+ * Makes sure that an entity class name exists in the context.
  * Converts entity type to FQCN of an entity.
  * Checks that this entity is accessible through Data API.
  */

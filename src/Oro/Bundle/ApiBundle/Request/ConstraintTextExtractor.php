@@ -8,6 +8,9 @@ use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator;
 
+/**
+ * The default implementation of extractor that retrieves information from a validation constraint object.
+ */
 class ConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
     /**
@@ -17,7 +20,8 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
     {
         if ($constraint instanceof ConstraintWithStatusCodeInterface) {
             return $constraint->getStatusCode();
-        } elseif ($constraint instanceof FieldAccessGranted) {
+        }
+        if ($constraint instanceof FieldAccessGranted) {
             return Response::HTTP_FORBIDDEN;
         }
 
@@ -37,6 +41,6 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
      */
     public function getConstraintType(Validator\Constraint $constraint)
     {
-        return ValueNormalizerUtil::humanizeClassName(get_class($constraint), 'Constraint');
+        return ValueNormalizerUtil::humanizeClassName(\get_class($constraint), 'Constraint');
     }
 }

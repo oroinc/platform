@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
 /**
- * An interface for normalizers of different kind of objects
+ * Provides an interface for normalizers of different kind of objects.
  */
 interface ObjectNormalizerInterface
 {

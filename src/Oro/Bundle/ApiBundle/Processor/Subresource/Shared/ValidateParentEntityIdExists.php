@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes sure that the identifier of the parent entity exists in the Context.
+ * Makes sure that the identifier of the parent entity exists in the context.
  */
 class ValidateParentEntityIdExists implements ProcessorInterface
 {

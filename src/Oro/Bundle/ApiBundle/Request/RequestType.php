@@ -41,7 +41,7 @@ class RequestType implements ToArrayInterface
      *
      * @return bool
      */
-    public function contains(string $aspect)
+    public function contains(string $aspect): bool
     {
         return \in_array($aspect, $this->aspects, true);
     }
@@ -51,7 +51,7 @@ class RequestType implements ToArrayInterface
      *
      * @param string $aspect
      */
-    public function add(string $aspect)
+    public function add(string $aspect): void
     {
         if (!\in_array($aspect, $this->aspects, true)) {
             $this->aspects[] = $aspect;
@@ -64,7 +64,7 @@ class RequestType implements ToArrayInterface
      *
      * @param string $aspect
      */
-    public function remove(string $aspect)
+    public function remove(string $aspect): void
     {
         $key = \array_search($aspect, $this->aspects, true);
         if (false !== $key) {
@@ -107,7 +107,7 @@ class RequestType implements ToArrayInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->aspects;
     }

@@ -25,7 +25,7 @@ abstract class ApiContext extends BaseContext
     }
 
     /**
-     * Sets default values into the Context.
+     * Sets default values into the context.
      */
     protected function initialize()
     {

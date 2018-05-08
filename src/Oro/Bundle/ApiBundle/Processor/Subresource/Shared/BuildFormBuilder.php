@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Builds the form builder based on the parent entity configuration
- * and sets it to the Context.
+ * and sets it to the context.
  */
 class BuildFormBuilder implements ProcessorInterface
 {

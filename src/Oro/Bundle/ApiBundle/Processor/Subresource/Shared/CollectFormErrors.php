@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Collects errors occurred during the the form submit and adds them into the Context.
+ * Collects errors occurred during the the form submit and adds them into the context.
  */
 class CollectFormErrors extends BaseCollectFormErrors
 {
