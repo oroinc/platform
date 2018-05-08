@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -35,7 +36,7 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
-        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $this->configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
         $this->configExtensionRegistry->addExtension(new SortersConfigExtension());
 
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);

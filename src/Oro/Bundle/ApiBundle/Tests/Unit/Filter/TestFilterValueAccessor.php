@@ -23,9 +23,7 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
      */
     public function get($key)
     {
-        return isset($this->values[$key])
-            ? $this->values[$key]
-            : null;
+        return $this->values[$key] ?? null;
     }
 
     /**
@@ -68,6 +66,7 @@ class TestFilterValueAccessor implements FilterValueAccessorInterface
             unset($this->values[$key]);
         } else {
             $this->values[$key] = $value;
+            $value->setSourceKey($key);
         }
     }
 

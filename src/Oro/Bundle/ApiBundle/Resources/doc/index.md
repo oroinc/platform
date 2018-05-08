@@ -58,6 +58,8 @@
  - [How To](./how_to.md)
    - [Turn on API for entity](./how_to.md#overview)
    - [Turn on API for entity disabled in "Resources/config/oro/entity.yml"](./how_to.md#turn-on-api-for-entity-disabled-in-resourcesconfigoroentityyml)
+   - [Enable Advanced Operators for String Filter](./how_to.md#enable-advanced-operators-for-string-filter)
+   - [Enable Case-insensitive String Filter](./how_to.md#enable-case-insensitive-string-filter)
    - [Change ACL resource for action](./how_to.md#change-acl-resource-for-action)
    - [Disable access checks for action](./how_to.md#disable-access-checks-for-action)
    - [Disable entity action](./how_to.md#disable-entity-action)

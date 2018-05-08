@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Constraint;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -47,13 +49,22 @@ class NormalizeFilterValues implements ProcessorInterface
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
                 if ($filter instanceof StandaloneFilter) {
+                    $operator = $filterValue->getOperator();
+                    $dataType = $filter->getDataType();
+                    $isArrayAllowed = $filter->isArrayAllowed($operator);
+                    $isRangeAllowed = $filter->isRangeAllowed($operator);
+                    if (ComparisonFilter::EXISTS === $operator) {
+                        $dataType = DataType::BOOLEAN;
+                        $isArrayAllowed = false;
+                        $isRangeAllowed = false;
+                    }
                     try {
                         $value = $this->valueNormalizer->normalizeValue(
                             $filterValue->getValue(),
-                            $filter->getDataType(),
+                            $dataType,
                             $context->getRequestType(),
-                            $filter->isArrayAllowed($filterValue->getOperator()),
-                            $filter->isRangeAllowed($filterValue->getOperator())
+                            $isArrayAllowed,
+                            $isRangeAllowed
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {

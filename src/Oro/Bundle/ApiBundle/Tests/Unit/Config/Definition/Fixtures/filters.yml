@@ -282,9 +282,18 @@ field_operators:
         filters:
             fields:
                 field1:
-                    operators: ['=', '!=']
+                    operators: ['=', '!=', 'exists']
     expected:
         filters:
             fields:
                 field1:
-                    operators: ['=', '!=']
+                    operators: ['eq', 'neq', 'exists']
+
+unsupported_field_operators:
+    config:
+        filters:
+            fields:
+                field1:
+                    operators: ['=', 'neq', 'another']
+    expected: []
+    error: 'Invalid configuration for path "entity.filters.fields.field1.operators": The operator "another" is not known.'
