@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model;
 
-class TestEntityIdentifier
+/**
+ * This model is used to test subresources to a model that is not registered in Data API.
+ */
+class TestUnregisteredModel
 {
     /** @var mixed */
     private $id;
