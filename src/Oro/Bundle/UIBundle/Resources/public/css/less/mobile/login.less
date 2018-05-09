@@ -23,6 +23,10 @@
     margin-bottom: 16px;
     padding: 14px 16px;
   }
+
+  &__inner {
+    padding: 0 16px;
+  }
 }
 
 .form-signin {
@@ -34,17 +38,21 @@
     padding-left: 0;
   }
 
-  fieldset {
-    padding-left: 16px;
-    padding-right: 16px;
+  &__roles-item {
+    display: block;
+    margin: 8px 0;
   }
+
   .title-box {
     margin: 0 0 5px;
-    padding: 0 16px;
 
     .title {
       font-size: 20px;
       line-height: 1.5;
+
+      &--crm-demo {
+        text-align: left;
+      }
     }
   }
   .add-on {
@@ -65,10 +73,6 @@
   }
   .oro-remember-me {
     padding-left: 0;
-  }
-  .oro-hint,
-  .alert {
-    width: 278px;
   }
   span.validation-failed {
     font-size: 13px;
