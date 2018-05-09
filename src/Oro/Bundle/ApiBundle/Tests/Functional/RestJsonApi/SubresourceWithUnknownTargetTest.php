@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
 class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 {
@@ -30,10 +30,15 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
+        self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(
             [
                 'code' => 500,
                 // @todo: should be uncommented in scope of BAP-9473.
+                // possible solution can be to create "unhandled_exception" action
+                // and convert an exception to appropriate Error object there,
+                // this action can be executed by RequestActionProcessor in case if
+                // any exception is thrown by handleException method
                 //'message' => 'The result does not exist.'
             ],
             $response
@@ -51,9 +56,10 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
+        self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(
             [
-                'code' => 500,
+                'code'    => 500,
                 // @todo: should be uncommented in scope of BAP-9473.
                 //'message' => 'The result does not exist.'
             ],
@@ -67,20 +73,16 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $response = $this->postRelationship(
             ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            [
-                'data' => [
-                    ['type' => 'search', 'id' => '1']
-                ]
-            ],
+            ['data' => [['type' => 'search', 'id' => '1']]],
             [],
             false
         );
 
+        self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(
             [
                 'errors' => [
                     [
-                        'status' => '500',
                         'title'  => 'runtime exception',
                         'detail' => \sprintf(
                             'The metadata for association "%s::search" does not exist.',
@@ -99,20 +101,16 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $response = $this->patchRelationship(
             ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            [
-                'data' => [
-                    ['type' => 'search', 'id' => '1']
-                ]
-            ],
+            ['data' => [['type' => 'search', 'id' => '1']]],
             [],
             false
         );
 
+        self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(
             [
                 'errors' => [
                     [
-                        'status' => '500',
                         'title'  => 'runtime exception',
                         'detail' => \sprintf(
                             'The metadata for association "%s::search" does not exist.',
@@ -131,20 +129,16 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $response = $this->deleteRelationship(
             ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            [
-                'data' => [
-                    ['type' => 'search', 'id' => '1']
-                ]
-            ],
+            ['data' => [['type' => 'search', 'id' => '1']]],
             [],
             false
         );
 
+        self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(
             [
                 'errors' => [
                     [
-                        'status' => '500',
                         'title'  => 'runtime exception',
                         'detail' => \sprintf(
                             'The metadata for association "%s::search" does not exist.',
