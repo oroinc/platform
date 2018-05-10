@@ -86,6 +86,10 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            // Each filter should have own copy,
+            // otherwise 2 filters on same page will show same values
+            this.selectedData = {};
+
             if (this.filterParams) {
                 this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             } else {
@@ -149,7 +153,8 @@ define(function(require) {
                 var value = this.value.value;
                 var result = {
                     results: _.filter(select2ConfigData, function(item) {
-                        return _.indexOf(value, item.id) !== -1;
+                        var id = item.id.toString();
+                        return _.indexOf(value, id) !== -1;
                     })
                 };
                 self.trigger(successEventName, result);

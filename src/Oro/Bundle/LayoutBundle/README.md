@@ -1,6 +1,6 @@
 # OroLayoutBundle
 
-This bundle integrates the **Oro Layout Component** into Oro Platform and brings the **themes** functionality.
+OroLayoutBundle integrates the **OroLayout Component** into OroPlatform and enables layout themes definition and configuration which supports building layouts based on the configuration of other bundles.
 
 ## Table of contents
 

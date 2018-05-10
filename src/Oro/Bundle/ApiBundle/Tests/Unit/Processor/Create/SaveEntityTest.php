@@ -160,6 +160,8 @@ class SaveEntityTest extends FormProcessorTestCase
         $em = $this->createMock(EntityManager::class);
         $exception = $this->createMock(UniqueConstraintViolationException::class);
 
+        $metadata = $this->createMock(EntityMetadata::class);
+
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with($this->identicalTo($entity), false)
@@ -175,6 +177,7 @@ class SaveEntityTest extends FormProcessorTestCase
             ->willThrowException($exception);
 
         $this->context->setResult($entity);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getId());

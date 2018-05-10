@@ -103,6 +103,7 @@ api:
             filters:
                 fields:
                     fieldString: ~
+                    fieldText: ~
                     fieldInt: ~
                     fieldSmallInt: ~
                     fieldBigInt: ~
@@ -138,3 +139,8 @@ api:
                     fieldCurrency: ~
         Extend\Entity\TestApiE1: ~
         Extend\Entity\TestApiE2: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct:
+            subresources:
+                search:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestEntityIdentifier
+                    target_type: collection

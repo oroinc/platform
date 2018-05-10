@@ -54,6 +54,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
             - CREATE
+        calls:
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
 

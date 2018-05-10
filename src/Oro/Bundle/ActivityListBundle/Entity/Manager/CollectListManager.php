@@ -9,6 +9,9 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 
+/**
+ * Class that process the changes that was done in activity entities and impose them to activity list entities.
+ */
 class CollectListManager
 {
     /** @var ActivityListChainProvider */
@@ -97,6 +100,7 @@ class CollectListManager
                 $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($entity);
                 if ($activityList) {
                     $entityManager->persist($activityList);
+                    $this->fillOwners($this->chainProvider->getProviderForEntity($entity), $entity, $activityList);
                 }
             }
 

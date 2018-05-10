@@ -95,6 +95,7 @@ EOF
                 $io->comment(sprintf('Warming up cache for the <info>%s</info> view...', $view));
                 $apiDocExtractor->warmUp($view);
             }
+            $this->getContainer()->get('oro_api.api_doc.parser')->clear();
         }
 
         $io->success(sprintf(

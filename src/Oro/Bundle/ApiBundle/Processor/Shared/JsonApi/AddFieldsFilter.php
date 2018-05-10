@@ -67,12 +67,19 @@ class AddFieldsFilter implements ProcessorInterface
             // the "fields" filter is disabled
             return;
         }
+
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         if (count($config->getFields()) > 1) {
             // the "fields" filter for the primary entity has sense only if it has more than one field
             $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
         }
 
-        $associations = $context->getMetadata()->getAssociations();
+        $associations = $metadata->getAssociations();
         foreach ($associations as $associationName => $association) {
             $fieldConfig = $config->getField($associationName);
             if (null !== $fieldConfig && DataType::isAssociationAsField($fieldConfig->getDataType())) {

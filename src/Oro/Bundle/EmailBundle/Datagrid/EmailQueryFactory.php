@@ -19,6 +19,9 @@ use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Class that simplify work with email grid query.
+ */
 class EmailQueryFactory
 {
     /** @var EmailOwnerProviderStorage */
@@ -219,7 +222,7 @@ class EmailQueryFactory
             list(
                 $threadedExpressions,
                 $threadedExpressionsParameters
-            ) = $this->prepareSearchFilters($datagrid, $filters, 'mm');
+            ) = $this->prepareSearchFiltersForQueryBuilder($qb, $datagrid, $filters, 'mm');
         }
 
         if ($threadedExpressions) {
@@ -234,7 +237,7 @@ class EmailQueryFactory
             list(
                 $notThreadedExpressions,
                 $notThreadedExpressionsParameters
-            ) = $this->prepareSearchFilters($datagrid, $filters, 'e');
+            ) = $this->prepareSearchFiltersForQueryBuilder($qb, $datagrid, $filters, 'e');
 
             $expression = call_user_func_array(
                 [$qb->expr(), 'andX'],
@@ -311,6 +314,66 @@ class EmailQueryFactory
         }
 
         $qb->addSelect($selectExpression);
+    }
+
+    /**
+     * @deprecated Will be removed at 3.0
+     *
+     * @param QueryBuilder      $qb
+     * @param DatagridInterface $datagrid
+     * @param array             $filters
+     * @param string            $alias
+     *
+     * @return array
+     */
+    protected function prepareSearchFiltersForQueryBuilder($qb, $datagrid, $filters, $alias = '')
+    {
+        $searchExpressions = null;
+        $searchExpressionsParameters = null;
+        $filterColumnsMap = [
+            'subject' => 'subject',
+            'from'    => 'fromName',
+        ];
+        $searchFilters = array_intersect_key(
+            $filters,
+            array_flip(array_keys($filterColumnsMap))
+        );
+
+        if ($searchFilters) {
+            $queryBuilder = clone $qb;
+
+            $parameters = $datagrid->getParameters();
+
+            $datagridConfig = $datagrid->getConfig();
+            $filterTypes = $datagridConfig->offsetGetByPath('[filters][columns]');
+
+            foreach ($searchFilters as $columnName => $filterData) {
+                $filterConfig = $filterTypes[$columnName];
+                $filterConfig['data_name'] = $alias
+                    ? sprintf('%s.%s', $alias, $filterColumnsMap[$columnName])
+                    : $filterConfig['data_name'];
+
+                $datasourceAdapter = new OrmFilterDatasourceAdapter($queryBuilder);
+                $mFilter = new EmailStringFilter($this->formFactory, $this->filterUtil);
+                $mFilter->init($columnName, $filterConfig);
+                $mFilter->apply($datasourceAdapter, $filterData);
+
+                $searchExpressions = $mFilter->getExpression();
+                $searchExpressionsParameters = $mFilter->getParameters();
+
+                unset($filters[$columnName]);
+                $parameters->set('_filter', $filters);
+            }
+        }
+
+        if (null !== $searchExpressions && !is_array($searchExpressions)) {
+            $searchExpressions = [$searchExpressions];
+        }
+
+        return [
+            $searchExpressions,
+            $searchExpressionsParameters
+        ];
     }
 
     /**

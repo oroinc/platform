@@ -16,12 +16,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**
- * Class WsseAuthProvider
  * This override needed to use random generated API key for WSSE auth instead regular user password.
  * In order to prevent usage of user password in third party software.
  * In case if not ORO user is used this provider fallback to native behavior.
- *
- * @package Oro\Bundle\UserBundle\Security
  */
 class WsseAuthProvider extends Provider
 {
@@ -71,7 +68,6 @@ class WsseAuthProvider extends Provider
             throw new AuthenticationException('Token Factory is not set in WsseAuthProvider.');
         }
 
-        /** @var User $user */
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
             if ($user instanceof AdvancedUserInterface && !$user->isEnabled()) {
@@ -79,7 +75,11 @@ class WsseAuthProvider extends Provider
             }
             $secret = $this->getSecret($user);
             if ($secret instanceof Collection) {
-                $validUserApi = $this->getValidUserApi($token, $secret, $user);
+                if ($user instanceof User) {
+                    $validUserApi = $this->getValidUserApi($token, $secret, $user);
+                } else {
+                    $validUserApi = $this->getValidUserApiNew($token, $secret, $user);
+                }
                 if ($validUserApi) {
                     $authenticatedToken = $this->tokenFactory->create($user->getRoles());
                     $authenticatedToken->setUser($user);
@@ -107,11 +107,25 @@ class WsseAuthProvider extends Provider
      */
     protected function getValidUserApi(TokenInterface $token, Collection $secrets, User $user)
     {
+        return $this->getValidUserApiNew($token, $secrets, $user);
+    }
+
+    /**
+     * Get valid UserApi for given token
+     *
+     * @param TokenInterface $token
+     * @param Collection     $secrets
+     * @param UserInterface  $user
+     *
+     * @return bool|UserApiKeyInterface
+     */
+    protected function getValidUserApiNew(TokenInterface $token, Collection $secrets, UserInterface $user)
+    {
         $currentIteration = 0;
         $nonce            = $token->getAttribute('nonce');
         $secretsCount     = $secrets->count();
 
-        /** @var UserApi $userApi */
+        /** @var UserApiKeyInterface $userApi */
         foreach ($secrets as $userApi) {
             $currentIteration++;
             $secret = $userApi->getApiKey();
@@ -125,11 +139,14 @@ class WsseAuthProvider extends Provider
                     $this->getSalt($user)
                 );
             }
-            if ($isSecretValid && !$userApi->getUser()->getOrganizations()->contains($userApi->getOrganization())) {
-                throw new BadCredentialsException('Wrong API key.');
-            }
-            if ($isSecretValid && !$userApi->getOrganization()->isEnabled()) {
-                throw new BadCredentialsException('Organization is not active.');
+
+            if ($isSecretValid) {
+                if (!$userApi->getOrganization()->isEnabled()) {
+                    throw new BadCredentialsException('Organization is not active.');
+                }
+                if (!$userApi->isEnabled()) {
+                    throw new BadCredentialsException('Wrong API key.');
+                }
             }
 
             // delete nonce from cache because user have another api keys

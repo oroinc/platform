@@ -276,6 +276,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                 'label' => $sub->getLabel(),
                 'uri' => $sub->getUri(),
                 'isAllowed' => $sub->getExtra('isAllowed'),
+                'isDisplayed' => $sub->isDisplayed(),
                 'children' => $this->collectResultItemsData($sub)
             ];
         }
@@ -340,29 +341,42 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                         ],
                         '/my-uri'
                     ),
+                    $this->getMenuItem(
+                        'item_7',
+                        true,
+                        [
+                            $this->getMenuItem('item_7_1', false, [], '', true),
+                            $this->getMenuItem('item_7_2', true, [], '', false),
+                        ],
+                        '#'
+                    ),
                 ],
                 [
                     [
                         'label' => 'item_1',
                         'uri' => '',
                         'isAllowed' => true,
+                        'isDisplayed' => true,
                         'children' => []
                     ],
                     [
                         'label' => 'item_2',
                         'uri' => '',
                         'isAllowed' => true,
+                        'isDisplayed' => true,
                         'children' => [
                             [
                                 'label' => 'item_2_1',
                                 'uri' => '',
                                 'isAllowed' => true,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                             [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                         ]
@@ -371,17 +385,20 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                         'label' => 'item_3',
                         'uri' => '',
                         'isAllowed' => true,
+                        'isDisplayed' => true,
                         'children' => [
                             [
                                 'label' => 'item_3_1',
                                 'uri' => '',
                                 'isAllowed' => false,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                             [
                                 'label' => 'item_3_2',
                                 'uri' => '',
                                 'isAllowed' => true,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                         ]
@@ -390,17 +407,20 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                         'label' => 'item_4',
                         'uri' => '',
                         'isAllowed' => false,
+                        'isDisplayed' => true,
                         'children' => [
                             [
                                 'label' => 'item_4_1',
                                 'uri' => '',
                                 'isAllowed' => false,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                             [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                         ]
@@ -409,16 +429,19 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                         'label' => 'item_5',
                         'uri' => '#',
                         'isAllowed' => false,
+                        'isDisplayed' => true,
                         'children' => [
                             [
                                 'label' => 'item_5_1',
                                 'uri' => '',
                                 'isAllowed' => false,
+                                'isDisplayed' => true,
                                 'children' => [
                                     [
                                         'label' => 'item_5_1_1',
                                         'uri' => '',
                                         'isAllowed' => false,
+                                        'isDisplayed' => true,
                                         'children' => []
                                     ],
                                 ]
@@ -429,21 +452,46 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                         'label' => 'item_6',
                         'uri' => '/my-uri',
                         'isAllowed' => true,
+                        'isDisplayed' => true,
                         'children' => [
                             [
                                 'label' => 'item_6_1',
                                 'uri' => '',
                                 'isAllowed' => false,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                             [
                                 'label' => '',
                                 'uri' => '',
                                 'isAllowed' => true,
+                                'isDisplayed' => true,
                                 'children' => []
                             ],
                         ]
                     ],
+                    [
+                        'label' => 'item_7',
+                        'uri' => '#',
+                        'isAllowed' => false,
+                        'isDisplayed' => true,
+                        'children' => [
+                            [
+                                'label' => 'item_7_1',
+                                'uri' => '',
+                                'isAllowed' => false,
+                                'isDisplayed' => true,
+                                'children' => []
+                            ],
+                            [
+                                'label' => 'item_7_2',
+                                'uri' => '',
+                                'isAllowed' => true,
+                                'isDisplayed' => false,
+                                'children' => []
+                            ],
+                        ]
+                    ]
                 ]
             ]
         ];
@@ -454,10 +502,11 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      * @param bool   $isAllowed
      * @param array  $children
      * @param string $uri
+     * @param bool   $isDisplayed
      *
      * @return MenuItem|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getMenuItem($label, $isAllowed = true, $children = [], $uri = '')
+    protected function getMenuItem($label, $isAllowed = true, $children = [], $uri = '', $isDisplayed = true)
     {
         /** @var MenuItem|\PHPUnit_Framework_MockObject_MockObject $menu */
         $menu = $this->getMockBuilder(MenuItem::class)
@@ -474,6 +523,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($uri));
 
         $menu->setExtra('isAllowed', $isAllowed);
+        $menu->setDisplay($isDisplayed);
 
         $childrenCount = count($children);
         $hasChildren = $childrenCount > 0;

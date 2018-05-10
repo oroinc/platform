@@ -123,7 +123,9 @@ class CreateUpdateConfigFieldHandler
             $this->configManager->persist($extendEntityConfig);
             $this->configManager->flush();
 
-            return $this->configHelperHandler->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
+            return $this
+                ->configHelperHandler->showClearCacheMessage()
+                ->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
         }
 
         return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);

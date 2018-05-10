@@ -3,49 +3,36 @@
 namespace Oro\Bundle\NotificationBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Psr\Log\LoggerInterface;
-
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Psr\Log\LoggerInterface;
 
 class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var DirectMailer
-     */
+    /** @var DirectMailer */
     private $mailer;
 
-    /**
-     * @var Processor
-     */
+    /** @var Processor */
     private $mailerProcessor;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @var EmailRenderer
-     */
+    /** @var EmailRenderer */
     private $emailRenderer;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     /**
-     *
      * @param DirectMailer    $mailer
      * @param Processor       $processor
      * @param ManagerRegistry $managerRegistry
@@ -74,17 +61,18 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $data = JSON::decode($message->getBody());
 
         $data = array_merge([
-            'fromEmail' => null,
-            'fromName' => null,
-            'toEmail' => null,
-            'subject' => null,
-            'body' => null,
+            'fromEmail'   => null,
+            'fromName'    => null,
+            'toEmail'     => null,
+            'subject'     => null,
+            'body'        => null,
             'contentType' => null,
-            'template' => null
+            'template'    => null
         ], $data);
 
-        if (empty($data['body']) || ! isset($data['fromEmail'], $data['toEmail'])
-            || (isset($data['template']) && ! is_array($data['body']))
+        if (empty($data['body'])
+            || !isset($data['fromEmail'], $data['toEmail'])
+            || (isset($data['template']) && !is_array($data['body']))
         ) {
             $this->logger->critical('Got invalid message');
 
@@ -100,15 +88,14 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
             $data['body'],
             $data['contentType']
         );
-
         $emailMessage->setFrom($data['fromEmail'], $data['fromName']);
         $emailMessage->setTo($data['toEmail']);
 
         $this->mailerProcessor->processEmbeddedImages($emailMessage);
 
         //toDo: can possibly send duplicate replies. See BAP-12503
-
-        if (! $this->mailer->send($emailMessage)) {
+        $result = $this->mailer->send($emailMessage);
+        if (!$result) {
             $this->logger->error('Cannot send message');
 
             return self::REJECT;
@@ -127,15 +114,14 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
     /**
      * @param string $templateName
-     * @param array $data
+     * @param array  $data
      *
-     * @return array - first element is email subject, second - message
+     * @return array [{email subject} => {email message}]
      * @throws \RuntimeException
      */
     protected function renderTemplate($templateName, array $data)
     {
         $emailTemplate = $this->findEmailTemplateByName($templateName);
-
         if (! $emailTemplate instanceof EmailTemplateInterface) {
             throw new \RuntimeException(sprintf('EmailTemplate not found by name "%s"', $templateName));
         }
@@ -153,6 +139,6 @@ class SendEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $this->managerRegistry
             ->getManagerForClass(EmailTemplate::class)
             ->getRepository(EmailTemplate::class)
-            ->findOneBy(['name' => $emailTemplateName]);
+            ->findByName($emailTemplateName);
     }
 }

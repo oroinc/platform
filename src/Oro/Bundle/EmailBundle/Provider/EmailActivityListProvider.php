@@ -16,6 +16,7 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -26,6 +27,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -271,7 +273,7 @@ class EmailActivityListProvider implements
         $email = $headEmail = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
-        if ($email->isHead() && $email->getThread()) {
+        if (null !== $email->getThread()) {
             $headEmail = $this->emailThreadProvider->getHeadEmail(
                 $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
                 $email
@@ -285,7 +287,7 @@ class EmailActivityListProvider implements
             'headOwnerName' => $headEmail->getFromName(),
             'headSubject'   => $headEmail->getSubject(),
             'headSentAt'    => $headEmail->getSentAt()->format('c'),
-            'isHead'        => $email->isHead() && $email->getThread(),
+            'isHead'        => null !== $email->getThread(),
             'treadId'       => $email->getThread() ? $email->getThread()->getId() : null
         ];
         $data = $this->setReplaedEmailId($email, $data);
@@ -362,12 +364,50 @@ class EmailActivityListProvider implements
         $queryBuilder->innerJoin(
             'OroEmailBundle:Email',
             'e',
-            'INNER',
+            'WITH',
             'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
         )
             ->setParameter('class', self::ACTIVITY_CLASS)
             ->andWhere('e.thread = :thread')
             ->setParameter('thread', $email->getThread());
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * temporary method in old versions to avoid BC break.
+     * in the latest version $targetActivityClass and $targetActivityId will be added to getGroupedEntities
+     * @param object $email
+     * @param string $targetActivityClass
+     * @param int    $targetActivityId
+     *
+     * @return array
+     */
+    public function getGroupedEntitiesNewTmp($email, $targetActivityClass, $targetActivityId)
+    {
+        $targetAssociationName = ExtendHelper::buildAssociationName(
+            $targetActivityClass,
+            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+        );
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->doctrineRegistryLink->getService()
+            ->getRepository('OroActivityListBundle:ActivityList')
+            ->createQueryBuilder('a')
+            ->innerJoin(
+                'OroEmailBundle:Email',
+                'e',
+                'WITH',
+                'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
+            )
+            ->where(sprintf(':targetId MEMBER OF a.%s', $targetAssociationName))
+            ->setParameter('class', self::ACTIVITY_CLASS)
+            ->setParameter('targetId', $targetActivityId);
+        if (null !== $email->getThread()) {
+            $queryBuilder
+                ->andWhere('e.thread = :thread')
+                ->setParameter('thread', $email->getThread());
+        }
 
         return $queryBuilder->getQuery()->getResult();
     }

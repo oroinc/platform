@@ -55,6 +55,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('data_transformers.yml');
+        $loader->load('filters.yml');
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
@@ -93,6 +94,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         try {
             $this->loadApiConfiguration($container);
+            $this->loadFrontendApiConfiguration($container);
         } catch (InvalidConfigurationException $e) {
             // we have to rethrow the configuration exception but without an inner exception,
             // otherwise a message of the root exception is displayed
@@ -276,6 +278,37 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $chainProviderDef = $container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_SERVICE_ID);
         $chainProviderDef->replaceArgument(1, $inclusions);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function loadFrontendApiConfiguration(ContainerBuilder $container)
+    {
+        $configFileLoaders = [new YamlCumulativeFileLoader('Resources/config/oro/api_frontend.yml')];
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $configFileLoaders[] = new YamlCumulativeFileLoader('Tests/Functional/Environment/api_frontend.yml');
+        }
+        $configLoader = new CumulativeConfigLoader('oro_api', $configFileLoaders);
+        $resources = $configLoader->load($container);
+
+        $config = [];
+        foreach ($resources as $resource) {
+            if (array_key_exists(ApiConfiguration::ROOT_NODE, $resource->data)) {
+                $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
+            }
+        }
+        $config = $this->processConfiguration(
+            new ApiConfiguration($container->get(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)),
+            $config
+        );
+
+        unset($config[ApiConfiguration::ENTITY_ALIASES_SECTION]);
+        unset($config[ApiConfiguration::EXCLUSIONS_SECTION]);
+        unset($config[ApiConfiguration::INCLUSIONS_SECTION]);
+
+        $configBagDef = $container->getDefinition(self::CONFIG_BAG_SERVICE_ID);
+        $configBagDef->addMethodCall('setFrontendConfig', [$config]);
     }
 
     /**

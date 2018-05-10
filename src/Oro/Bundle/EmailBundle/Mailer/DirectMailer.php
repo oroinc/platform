@@ -128,7 +128,7 @@ class DirectMailer extends \Swift_Mailer
         $port = $smtpSettings->getPort();
         $encryption = $smtpSettings->getEncryption();
 
-        if ($transport instanceof \Swift_SmtpTransport) {
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
             $transport->setHost($host);
             $transport->setPort($port);
             $transport->setEncryption($encryption);

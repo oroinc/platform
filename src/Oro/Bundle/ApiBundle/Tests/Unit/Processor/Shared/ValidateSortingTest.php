@@ -8,12 +8,13 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
@@ -398,13 +399,8 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         $filters      = new FilterCollection();
         $filters->add('sort', $sorterFilter);
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
-            ->method('getQueryString')
-            ->willReturn('sort=' . $sortBy);
-        $filterValues = new RestFilterValueAccessor($request);
+        $filterValues = new TestFilterValueAccessor();
+        $filterValues->set('sort', new FilterValue('sort', $sortBy));
 
         // emulate sort normalizer
         $orderBy = [];

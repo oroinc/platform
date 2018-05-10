@@ -12,6 +12,9 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 
+/**
+ * Load data grids configuration from Resources/config/oro/datagrids.yml files
+ */
 class ConfigurationProvider implements ConfigurationProviderInterface
 {
     const COMPILER_PASS_NAME = 'oro_datagrid';
@@ -88,7 +91,10 @@ class ConfigurationProvider implements ConfigurationProviderInterface
     protected function ensureConfigurationLoaded($gridName)
     {
         if (!isset($this->rawConfiguration[$gridName])) {
-            if (!$this->cache->contains(self::LOADED_FLAG) || !$this->cache->fetch(self::LOADED_FLAG)) {
+            if (!$this->cache->contains(self::LOADED_FLAG)
+                || !$this->cache->fetch(self::LOADED_FLAG)
+                || !$this->cache->contains($gridName.'_'.self::CACHE_POSTFIX)
+            ) {
                 $this->loadConfiguration();
             }
 

@@ -65,7 +65,10 @@ class BuildFormBuilder implements ProcessorInterface
         );
 
         if ('form' === $formType) {
-            $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
+            $metadata = $context->getMetadata();
+            if (null !== $metadata) {
+                $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
+            }
         }
 
         return $formBuilder;

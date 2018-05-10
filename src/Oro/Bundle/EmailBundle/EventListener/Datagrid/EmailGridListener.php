@@ -19,6 +19,9 @@ use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridResultHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Grid listener that modify email grids.
+ */
 class EmailGridListener
 {
     /** @var EmailQueryFactory */
@@ -94,15 +97,16 @@ class EmailGridListener
         $isThreadGroupingEnabled = $this->configManager->get('oro_email.threads_grouping');
 
         $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
+        $filters = $this->getFilters($parameters);
 
         if ($isThreadGroupingEnabled) {
             $this->factory->applyAclThreadsGrouping(
                 $queryBuilder,
                 $datagrid,
-                $this->getFilters($parameters)
+                $filters
             );
             if ($countQb) {
-                $this->factory->applyAclThreadsGrouping($countQb);
+                $this->factory->applyAclThreadsGrouping($countQb, $datagrid, $filters);
             }
         } else {
             $this->factory->applyAcl($queryBuilder);

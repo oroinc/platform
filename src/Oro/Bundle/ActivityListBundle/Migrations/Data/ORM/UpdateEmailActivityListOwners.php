@@ -15,6 +15,9 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
+/**
+ * Adds the activity owners to email activity list entities.
+ */
 class UpdateEmailActivityListOwners extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
@@ -86,12 +89,19 @@ class UpdateEmailActivityListOwners extends AbstractFixture implements Container
             $email = $manager->getRepository(Email::class)->find($entity->getRelatedActivityId());
 
             if ($email) {
+                $activityOwners = [];
                 foreach ($email->getEmailUsers() as $emailUser) {
-                    $activityOwner = $this->getActivityOwner($manager, $entity, $emailUser);
+                    if ($emailUser->getOwner() && in_array($emailUser->getOwner()->getId(), $activityOwners, true)) {
+                        // skip users already assigned as owner
+                        continue;
+                    }
 
+                    $activityOwner = $this->getActivityOwner($manager, $entity, $emailUser);
                     if (!$activityOwner) {
                         $activityOwner = $this->prepareActivityOwner($entity, $emailUser);
-
+                        if ($emailUser->getOwner()) {
+                            $activityOwners[] = $emailUser->getOwner()->getId();
+                        }
                         $manager->persist($activityOwner);
                     }
                 }

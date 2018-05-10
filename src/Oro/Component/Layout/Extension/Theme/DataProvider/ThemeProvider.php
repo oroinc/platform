@@ -46,7 +46,7 @@ class ThemeProvider
 
         $parentTheme = $this->getTheme($themeName)->getParentTheme();
         if ($parentTheme) {
-            return $this->getStylesOutput($parentTheme);
+            return $this->getStylesOutput($parentTheme, $sectionName);
         }
 
         return null;

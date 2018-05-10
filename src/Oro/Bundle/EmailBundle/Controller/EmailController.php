@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -33,15 +34,11 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 
 /**
- * Class EmailController
- *
- * @package Oro\Bundle\EmailBundle\Controller
+ * Controller that works with email entities.
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -199,6 +196,16 @@ class EmailController extends Controller
                 $this->get('doctrine')->getManager(),
                 $entity
             );
+            $targetActivityClass = $this->getRequest()->get('targetActivityClass');
+            $targetActivityId = $this->getRequest()->get('targetActivityId');
+            if ($targetActivityClass && $targetActivityId) {
+                $emails = $this->get('oro_activity_list.manager')->filterGroupedEntitiesByActivityLists(
+                    $emails,
+                    $entity,
+                    $targetActivityClass,
+                    $targetActivityId
+                );
+            }
         }
 
         $emails = array_filter($emails, function ($email) {
@@ -373,6 +380,9 @@ class EmailController extends Controller
      */
     public function replyAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createReplyEmailModel($email);
         return $this->process($emailModel);
     }
@@ -392,6 +402,9 @@ class EmailController extends Controller
      */
     public function replyAllAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createReplyAllEmailModel($email);
         return $this->process($emailModel);
     }
@@ -408,6 +421,9 @@ class EmailController extends Controller
      */
     public function forwardAction(Email $email)
     {
+        if (!$this->isGranted('VIEW', $email)) {
+            throw new AccessDeniedException();
+        }
         $emailModel = $this->get('oro_email.email.model.builder')->createForwardEmailModel($email);
         return $this->process($emailModel);
     }
@@ -494,7 +510,8 @@ class EmailController extends Controller
         $attachments = $entity->getAttachments();
         if (count($attachments)) {
             $zip = new \ZipArchive();
-            $zipName = 'attachments-' . time() . '.zip';
+            $fileManager = $this->get('oro_attachment.file_manager');
+            $zipName = $fileManager->getTemporaryFileName('attachments-' . time() . '.zip');
             $zip->open($zipName, \ZipArchive::CREATE);
             foreach ($attachments as $attachment) {
                 $content = ContentDecoder::decode(

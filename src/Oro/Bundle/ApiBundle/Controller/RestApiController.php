@@ -35,7 +35,7 @@ class RestApiController extends AbstractRestApiController
         $processor = $this->getProcessor($request);
         /** @var GetListContext $context */
         $context = $this->getContext($processor, $request);
-        $context->setFilterValues(new RestFilterValueAccessor($request));
+        $context->setFilterValues($this->getFilterValueAccessor($request));
 
         $processor->process($context);
 
@@ -61,7 +61,7 @@ class RestApiController extends AbstractRestApiController
         /** @var GetContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
-        $context->setFilterValues(new RestFilterValueAccessor($request));
+        $context->setFilterValues($this->getFilterValueAccessor($request));
 
         $processor->process($context);
 
@@ -111,7 +111,7 @@ class RestApiController extends AbstractRestApiController
         $processor = $this->getProcessor($request);
         /** @var DeleteListContext $context */
         $context = $this->getContext($processor, $request);
-        $context->setFilterValues(new RestFilterValueAccessor($request));
+        $context->setFilterValues($this->getFilterValueAccessor($request));
 
         $processor->process($context);
 

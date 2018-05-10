@@ -39,6 +39,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestProductTable($schema);
     }
 
     /**
@@ -359,6 +360,23 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         // bidirectional one-to-many without default
         $this->addOneToManyRelation($schema, $t1, 'biO2MnD', $t2, $withoutDefault);
         $this->addOneToManyInverseRelation($schema, $t1, 'biO2MnD', $t2, 'biO2MnDOwner');
+    }
+
+    /**
+     * Create test_api_product table
+     *
+     * @param Schema $schema
+     */
+    protected function createTestProductTable(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_product')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_product');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['id']);
     }
 
     /**

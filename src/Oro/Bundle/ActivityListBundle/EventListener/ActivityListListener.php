@@ -9,6 +9,9 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Class that listens the changes at activity entities and processed the changes at appropriate activity list entities.
+ */
 class ActivityListListener
 {
     /** @var array */
@@ -86,10 +89,7 @@ class ActivityListListener
             $this->insertedEntities = [];
             $hasChanges = true;
         }
-        if ($this->activityListManager->processFillOwners($this->insertedOwnerEntities, $entityManager)) {
-            $this->insertedOwnerEntities = [];
-            $hasChanges = true;
-        }
+        $this->insertedOwnerEntities = [];
         if ($hasChanges) {
             $entityManager->flush();
             $entityManager->clear('Oro\Bundle\ActivityListBundle\Entity\ActivityList');

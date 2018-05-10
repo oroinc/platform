@@ -44,6 +44,15 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /** @var Request */
     protected $request;
 
+    /** @var string */
+    protected $operatorPattern;
+
+    /** @var string[] [operator, ...] */
+    protected $operators;
+
+    /** @var array [operator name => operator, ...] */
+    protected $operatorNameMap;
+
     /** @var FilterValue[] */
     protected $parameters;
 
@@ -51,11 +60,37 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     protected $groups;
 
     /**
-     * @param Request $request
+     * @param Request  $request
      */
     public function __construct(Request $request)
     {
         $this->request = $request;
+    }
+
+    /**
+     * @param string $operatorPattern
+     * @deprecated will be removed in 3.0
+     */
+    public function setOperatorPattern($operatorPattern)
+    {
+        $this->operatorPattern = $operatorPattern;
+    }
+
+    /**
+     * @param array $operatorNameMap
+     * @deprecated will be removed in 3.0
+     */
+    public function setOperatorNameMap(array $operatorNameMap)
+    {
+        $this->operatorNameMap = $operatorNameMap;
+        $this->operators = [];
+        foreach ($operatorNameMap as $name => $shortName) {
+            if ($shortName) {
+                $this->operators[] = $shortName;
+            }
+        }
+        // "<>" is an alias for "!="
+        $this->operators[] = '<>';
     }
 
     /**
@@ -194,7 +229,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
         $matchResult = preg_match_all(
             '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]*\])|(%5B[\w\d-\.]*%5D))*)))'
-            . '(?P<operator>(' . $this->getOperatorPattern() . ')'
+            . '(?P<operator>' . $this->getOperatorPattern() . ')'
             . '(?P<value>[^&]+)/',
             $queryString,
             $matches,
@@ -310,7 +345,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      */
     protected function getOperators()
     {
-        return ['=', '!=', '>', '<', '>=', '<=', '<>'];
+        return $this->operators;
     }
 
     /**
@@ -318,7 +353,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      */
     protected function getOperatorNameMap()
     {
-        return ['eq' => '=', 'neq' => '!=', 'gt' => '>', 'lt' => '<', 'gte' => '>=', 'lte' => '<='];
+        return $this->operatorNameMap;
     }
 
     /**
@@ -326,6 +361,6 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      */
     protected function getOperatorPattern()
     {
-        return '!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E)';
+        return $this->operatorPattern;
     }
 }

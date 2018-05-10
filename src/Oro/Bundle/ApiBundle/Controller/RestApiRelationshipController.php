@@ -34,7 +34,7 @@ class RestApiRelationshipController extends AbstractRestApiSubresourceController
         $processor = $this->getProcessor($request);
         /** @var GetRelationshipContext $context */
         $context = $this->getContext($processor, $request);
-        $context->setFilterValues(new RestFilterValueAccessor($request));
+        $context->setFilterValues($this->getFilterValueAccessor($request));
 
         $processor->process($context);
 

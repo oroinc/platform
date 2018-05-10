@@ -38,6 +38,9 @@ class GetScope implements ProcessorInterface
 
         /** @var StandaloneFilterWithDefaultValue $scopeFilter */
         $scopeFilter = $context->getFilters()->get(AddScopeFilter::FILTER_KEY);
+        if (null === $scopeFilter) {
+            $scopeFilter = $context->getFilters()->get(sprintf('filter[%s]', AddScopeFilter::FILTER_KEY));
+        }
         $scopeFilterValue = $context->getFilterValues()->get(AddScopeFilter::FILTER_KEY);
         if ($scopeFilterValue) {
             $scope = $scopeFilterValue->getValue();

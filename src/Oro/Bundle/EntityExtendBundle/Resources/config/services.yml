@@ -370,6 +370,8 @@ services:
             - "@doctrine"
         tags:
             - { name: twig.extension }
+        calls:
+            - [setEnumValueProvider, ["@oro_entity_extend.enum_value_provider"]]
 
     oro_entity_extend.datagrid.column_options_guesser:
         class: %oro_entity_extend.datagrid.column_options_guesser.class%
@@ -494,6 +496,8 @@ services:
         class: %oro_entity_extend.enum_value_provider.class%
         arguments:
             - "@oro_entity.doctrine_helper"
+        calls:
+            - [setEnumTranslationCache, ["@oro_entity_extend.cache.enum_translation_provider"]]
 
     oro_entity_extend.dictionary_value_list_provider.enum:
         class: %oro_entity_extend.dictionary_value_list_provider.enum.class%
@@ -593,3 +597,37 @@ services:
             - 'oro_entity_extend.orm.metadata_factory'
         tags:
             - { name: oro_message_queue.consumption.clearer, priority: -10 }
+
+    oro_entity_extend.cache.enum_translation:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [setNamespace, ['oro_entity_extend_enum_trans']]
+
+    oro_entity_extend.cache.enum_translation_provider:
+        class: Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache
+        public: false
+        arguments:
+            - '@translator'
+            - '@oro_entity_extend.cache.enum_translation'
+
+    oro_entity_extend.listener.cache.enum_value.abstract:
+        abstract: true
+        arguments:
+            - '@oro_entity_extend.cache.enum_translation_provider'
+
+    oro_entity_extend.listener.cache.enum_value_translation:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueTranslationListener
+        parent: oro_entity_extend.listener.cache.enum_value.abstract
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postRemove }
+
+    oro_entity_extend.listener.cache.enum_value:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueListener
+        parent: oro_entity_extend.listener.cache.enum_value.abstract
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postRemove }

@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * Form type with two 'date' fields - start & end
+ */
 class DateRangeType extends AbstractType
 {
     const NAME = 'oro_type_date_range';
@@ -57,7 +60,7 @@ class DateRangeType extends AbstractType
                     'widget'         => 'single_text',
                     'format'         => 'yyyy-MM-dd',
                     'model_timezone' => $this->localeSettings->getTimeZone(),
-                    'view_timezone'  => $this->localeSettings->getTimeZone(),
+                    'view_timezone'  => 'UTC',
                 ),
                 $options['field_options'],
                 $options['start_field_options']
@@ -73,7 +76,7 @@ class DateRangeType extends AbstractType
                     'widget'         => 'single_text',
                     'format'         => 'yyyy-MM-dd',
                     'model_timezone' => $this->localeSettings->getTimeZone(),
-                    'view_timezone'  => $this->localeSettings->getTimeZone(),
+                    'view_timezone'  => 'UTC',
                 ),
                 $options['field_options'],
                 $options['end_field_options']

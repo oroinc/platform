@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 
 class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
 
@@ -16,11 +20,15 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $provider;
 
+    /**
+     * @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $cache;
+
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->cache = $this->createMock(EnumTranslationCache::class);
         $this->provider = new EnumValueProvider($this->doctrineHelper);
     }
 
@@ -28,8 +36,56 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     {
         $enumClass = '\stdClass';
         $expected = ['id' => 'Name'];
+        $this->cache->expects($this->never())
+            ->method('fetch')
+            ->with($enumClass);
 
         $this->assertEnumChoices($enumClass);
+        $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
+    }
+
+    public function testGetEnumChoicesWithEmptyCache()
+    {
+        $enumClass = 'FooBar';
+        $expected = ['id' => 'Name'];
+
+        $this->cache->expects($this->once())
+            ->method('contains')
+            ->with($enumClass)
+            ->willReturn(false);
+        $this->cache->expects($this->never())
+            ->method('fetch');
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with($enumClass, $expected);
+        $this->provider->setEnumTranslationCache($this->cache);
+
+        $this->assertEnumChoices($enumClass);
+        $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
+    }
+
+    public function testGetEnumChoicesFromCache()
+    {
+        $enumClass = 'FooBar';
+        $expected  = [1 => 'Test'];
+
+        $this->cache->expects($this->once())
+            ->method('contains')
+            ->with($enumClass)
+            ->willReturn(true);
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($enumClass)
+            ->willReturn($expected);
+        $this->cache->expects($this->never())
+            ->method('save');
+
+        $this->provider->setEnumTranslationCache($this->cache);
+
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityRepository')
+            ->with($enumClass);
+
         $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
     }
 
@@ -48,9 +104,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertEnumChoices($enumClass)
     {
-        $enum = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $enum = $this->createMock(AbstractEnumValue::class);
         $enum->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('id'));
@@ -59,9 +113,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('Name'));
         $values = [$enum];
 
-        $repo = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects($this->once())
             ->method('getValues')
             ->will($this->returnValue($values));
@@ -99,6 +151,6 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
             ->with($enumClass)
             ->will($this->returnValue([$instance]));
 
-        $this->assertEquals([$instance], $this->provider->getEnumValueByCode($code));
+        $this->assertEquals([$instance], $this->provider->getEnumValueByCode($code, $id));
     }
 }

@@ -28,6 +28,9 @@ class SetLocationHeader implements ProcessorInterface
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
+    /** @var string */
+    private $getRouteName;
+
     /**
      * @param RouterInterface              $router
      * @param ValueNormalizer              $valueNormalizer
@@ -41,6 +44,15 @@ class SetLocationHeader implements ProcessorInterface
         $this->router = $router;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformer = $entityIdTransformer;
+        $this->getRouteName = 'oro_rest_api_get';
+    }
+
+    /**
+     * @param string $routeName
+     */
+    public function setGetRouteName($routeName)
+    {
+        $this->getRouteName = $routeName;
     }
 
     /**
@@ -55,14 +67,20 @@ class SetLocationHeader implements ProcessorInterface
             return;
         }
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         $entityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $context->getClassName(),
             $context->getRequestType()
         );
-        $entityId = $this->entityIdTransformer->transform($context->getId(), $context->getMetadata());
+        $entityId = $this->entityIdTransformer->transform($context->getId(), $metadata);
         $location = $this->router->generate(
-            'oro_rest_api_get',
+            $this->getRouteName,
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

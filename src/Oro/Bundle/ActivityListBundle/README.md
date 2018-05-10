@@ -1,16 +1,15 @@
-OroActivityListBundle
-=====================
-The `OroActivityListBundle` provide ability to show all activities in one widget.
+# OroActivityListBundle
 
-Table of content
-----------------
+OroActivityListBundle adds a widget to the entity view page. The widget displays a list of activities related to the entity record in the chronological order. It also enables widget configuration in the system configuration section.
+
+## Table of contents
+
 - [Fundamentals](#fundamentals)
 - [Add widget into a page](#add-widget-into-a-page)
 - [Register a new entity](#register-a-new-entity)
 - [Configuration](#configuration)
 
-Fundamentals
-------------
+## Fundamentals
 
 Examples of activities that can be added to other entities are:
 - Emails
@@ -26,8 +25,8 @@ The widget currently displayed in "Record activities" placeholder block on an en
 **Example UI within contact page**
 ![An example of widget](./Resources/doc/example.png)
 
-Add widget into a page
-----------------------
+## Add widget into a page
+
 Generally widget will be rendered in placeholder "view_content_data_activities". But in case of extending or using view template different from 'OroUIBundle:actions:view.html.twig' you will have to define placeholder in it, e.g.: 
 
 ```
@@ -43,8 +42,8 @@ Generally widget will be rendered in placeholder "view_content_data_activities".
   }]) %}
 ```
 
-Show widget and it button on specific page (view/edit)
-----------------------------------------
+## Show widget and it button on specific page (view/edit)
+
 To show a widget and it button on specific pages you should set entity annotation.
 Widget can be displayed on `view` and/or `update` pages. Allowed values see in `\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope` e.g.:
 ```
@@ -63,8 +62,8 @@ Widget can be displayed on `view` and/or `update` pages. Allowed values see in `
 class CustomerUserRole extends AbstractRole { ... }
 ```
 
-Register a new entity
-----------------------
+## Register a new entity
+
 To add a new entity to be displayed within widget you need to register a service that implements **ActivityListProviderInterface** and tagged as **oro_activity_list.provider**. Working example can be found in EmailBundle or CalendarBundle:
 ```
     oro_calendar.activity_list.provider:
@@ -93,8 +92,8 @@ public function getTemplate()
 
 ```
 
-Configuration
--------------
+## Configuration
+
 Sorting and limitation could be changed in UI: System -> Configuration -> Display settings -> section "Activity lists".
 
  - Sort by field - sorting available by "Created date" or "Updated date"(default).

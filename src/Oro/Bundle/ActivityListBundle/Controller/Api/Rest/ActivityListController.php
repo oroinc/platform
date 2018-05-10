@@ -49,7 +49,7 @@ class ActivityListController extends RestController
     {
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $this->getRequest()->get('filter');
-        $pageFilter  = $this->getRequest()->get('pageFilter');
+        $pageFilter  = $this->getRequest()->get('pageFilter', []);
 
         $results = $this->getManager()->getListData(
             $entityClass,

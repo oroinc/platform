@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
@@ -24,6 +25,9 @@ class AddExcludedActions implements ProcessorInterface
     /** @var ConfigBag */
     protected $configBag;
 
+    /** @var RequestType */
+    private $requestType;
+
     /**
      * @param ConfigLoaderFactory $configLoaderFactory
      * @param ConfigBag           $configBag
@@ -42,6 +46,8 @@ class AddExcludedActions implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         /** @var CollectResourcesContext $context */
+
+        $this->requestType = $context->getRequestType();
 
         $actionsConfig = [];
         $version = $context->getVersion();
@@ -73,7 +79,9 @@ class AddExcludedActions implements ProcessorInterface
     protected function getActionsConfig($entityClass, $version)
     {
         $actions = null;
-        $config = $this->configBag->getConfig($entityClass, $version);
+        $config = $this->requestType->contains('frontend')
+            ? $this->configBag->getFrontendConfig($entityClass, $version)
+            : $this->configBag->getConfig($entityClass, $version);
         if (null !== $config && !empty($config[ConfigUtil::ACTIONS])) {
             $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
             $actions = $actionsLoader->load($config[ConfigUtil::ACTIONS]);

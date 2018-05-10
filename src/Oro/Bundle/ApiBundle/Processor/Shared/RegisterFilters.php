@@ -11,6 +11,9 @@ use Oro\Bundle\ApiBundle\Filter\RequestAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
+/**
+ * Abstract class for register filters processor.
+ */
 abstract class RegisterFilters implements ProcessorInterface
 {
     /** @var FilterFactoryInterface */
@@ -60,7 +63,15 @@ abstract class RegisterFilters implements ProcessorInterface
                 $filter->setRequestType($context->getRequestType());
             }
             if ($filter instanceof MetadataAwareFilterInterface) {
-                $filter->setMetadata($context->getMetadata());
+                $metadata = $context->getMetadata();
+                if (null === $metadata) {
+                    throw new \LogicException(\sprintf(
+                        'The metadata for class "%s" does not exist, but it required for the filter by "%s"',
+                        $context->getClassName(),
+                        $propertyPath
+                    ));
+                }
+                $filter->setMetadata($metadata);
             }
         }
 

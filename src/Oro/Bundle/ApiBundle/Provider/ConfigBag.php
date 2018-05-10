@@ -9,12 +9,53 @@ class ConfigBag
     /** @var array */
     protected $config;
 
+    /** @var array */
+    private $frontendConfig;
+
     /**
      * @param array $config
      */
     public function __construct(array $config)
     {
         $this->config = $config;
+    }
+
+    /**
+     * @param array $frontendConfig
+     */
+    public function setFrontendConfig(array $frontendConfig)
+    {
+        $this->frontendConfig = $frontendConfig;
+    }
+
+    /**
+     * @internal Will be removed in 3.0
+     * @param string $version The version of a config
+     *
+     * @return array [entity class => config, ...]
+     */
+    public function getFrontendConfigs($version)
+    {
+        if (!isset($this->frontendConfig['entities'])) {
+            return [];
+        }
+
+        return $this->frontendConfig['entities'];
+    }
+
+    /**
+     * @param string $className The FQCN of an entity
+     * @param string $version   The version of a config
+     *
+     * @return array|null
+     */
+    public function getFrontendConfig($className, $version)
+    {
+        if (!isset($this->frontendConfig['entities'][$className])) {
+            return null;
+        }
+
+        return $this->frontendConfig['entities'][$className];
     }
 
     /**

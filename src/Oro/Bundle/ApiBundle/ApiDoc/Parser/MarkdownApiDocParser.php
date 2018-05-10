@@ -147,6 +147,15 @@ class MarkdownApiDocParser
     }
 
     /**
+     * @internal Will be removed in 3.0
+     */
+    public function clear()
+    {
+        $this->loadedData = [];
+        $this->parsedFiles = [];
+    }
+
+    /**
      * @param array $newData
      */
     protected function merge(array $newData)

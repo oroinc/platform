@@ -31,7 +31,9 @@ class LoadFromConfigBag implements ProcessorInterface
         /** @var CollectResourcesContext $context */
 
         $resources = $context->getResult();
-        $configs = $this->configBag->getConfigs($context->getVersion());
+        $configs = $context->getRequestType()->contains('frontend')
+            ? $this->configBag->getFrontendConfigs($context->getVersion())
+            : $this->configBag->getConfigs($context->getVersion());
         foreach ($configs as $entityClass => $config) {
             if (!$resources->has($entityClass)) {
                 $resources->add(new ApiResource($entityClass));

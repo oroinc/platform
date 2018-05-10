@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\FlushableCache;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -20,6 +21,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDum
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 
 /**
+ * Dumper for extended entity configs
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendConfigDumper
@@ -285,11 +288,12 @@ class ExtendConfigDumper
                 $filesystem->remove($aliasesPath);
             }
         } else {
-            $baseCacheDir = ExtendClassLoadingUtils::getEntityBaseCacheDir($this->cacheDir);
+            $baseCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
             if ($filesystem->exists($baseCacheDir)) {
-                $filesystem->remove([$baseCacheDir]);
+                $finder = new Finder();
+                $finder->files()->in($baseCacheDir);
+                $filesystem->remove($finder);
             }
-            $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         }
 
         foreach ($this->entityManagerBag->getEntityManagers() as $em) {

@@ -1,12 +1,11 @@
-OroRequireJSBundle
-====================
-This bundle provides an easy way to:
+# OroRequireJSBundle
 
- -  generate require.js config file for a project;
- -  optimize, minify and merge all JS-file into one resources.
+OroRequireJSBundle uses the [RequireJS](http://requirejs.org/) library to enable a modular structure of JS components in Oro applications.
 
-For details of configuration options see [RequireJS API].<br />
-For details of build options see [example.build.js].
+The bundle enables developers to define RequireJS configuration in YAML files on the bundle level. It also provides a CLI tool to collect RequireJS modules and configuration from bundles, merge and minify them in the production mode.
+
+For details of the RequireJS configuration options, see [RequireJS API].
+For details of the RequireJS build options, see [example.build.js].
 
 ## Require.js config generation
 ### Configuration

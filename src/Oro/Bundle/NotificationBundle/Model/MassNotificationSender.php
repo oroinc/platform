@@ -12,26 +12,19 @@ use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class MassNotificationSender
 {
-    const MAINTENANCE_VARIABLE = 'maintenance_message';
-
+    const MAINTENANCE_VARIABLE  = 'maintenance_message';
     const NOTIFICATION_LOG_TYPE = 'mass';
 
-    /**
-     * @var EmailNotificationManager
-     */
+    /** @var EmailNotificationManager */
     protected $emailNotificationManager;
 
     /** @var ConfigManager */
     protected $cm;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var EntityPool
-     */
+    /** @var EntityPool */
     protected $entityPool;
 
     /** @var DQLNameFormatter */
@@ -39,10 +32,10 @@ class MassNotificationSender
 
     /**
      * @param EmailNotificationManager $emailNotificationManager
-     * @param ConfigManager $cm
-     * @param EntityManager $em
-     * @param EntityPool $entityPool
-     * @param DQLNameFormatter $dqlNameFormatter
+     * @param ConfigManager            $cm
+     * @param EntityManager            $em
+     * @param EntityPool               $entityPool
+     * @param DQLNameFormatter         $dqlNameFormatter
      */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
@@ -59,10 +52,11 @@ class MassNotificationSender
     }
 
     /**
-     * @param string $body
+     * @param string      $body
      * @param string|null $subject
      * @param string|null $senderEmail
      * @param string|null $senderName
+     *
      * @return int
      */
     public function send(
@@ -71,8 +65,10 @@ class MassNotificationSender
         $senderEmail = null,
         $senderName = null
     ) {
-        $senderName  = $senderName ?: $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_name');
-        $senderEmail = $senderEmail ?: $this->cm->get('oro_notification.email_notification_sender_email');
+        $senderName = $senderName
+            ? : $senderEmail
+            ? : $this->cm->get('oro_notification.email_notification_sender_name');
+        $senderEmail = $senderEmail ? : $this->cm->get('oro_notification.email_notification_sender_email');
 
         $recipients = $this->getRecipientEmails();
         $template = $this->getTemplate($subject);
@@ -88,15 +84,14 @@ class MassNotificationSender
         //persist and flush sending job entity
         $this->entityPool->persistAndFlush($this->em);
 
-        $recipientsCount = count($recipients);
-
-        return $recipientsCount;
+        return count($recipients);
     }
 
     /**
      * Get template to use for notification
      *
      * @param string $subject
+     *
      * @return EmailTemplate
      */
     protected function getTemplate($subject)
@@ -148,11 +143,8 @@ class MassNotificationSender
         );
         $qb->andWhere('u.enabled = :enabled')->setParameter('enabled', true);
         $users = $qb->getQuery()->getResult();
-        $users = array_map(function ($user) {
-            return [$user['email'] => $user['name']];
-        }, $users);
 
-        return $users;
+        return array_column($users, 'email');
     }
 
     /**

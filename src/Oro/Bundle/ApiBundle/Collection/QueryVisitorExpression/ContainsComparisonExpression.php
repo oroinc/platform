@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 
 /**
- * Represents LIKE comparison expression.
+ * Represents LIKE '%value%' comparison expression.
  */
 class ContainsComparisonExpression implements ComparisonExpressionInterface
 {

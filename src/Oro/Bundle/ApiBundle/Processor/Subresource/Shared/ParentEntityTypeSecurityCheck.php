@@ -10,6 +10,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
 /**
  * Validates whether an access to the type of entities specified
@@ -23,6 +25,9 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
+
+    /** @var AclGroupProviderInterface */
+    protected $aclGroupProvider;
 
     /** @var string */
     protected $permission;
@@ -46,6 +51,15 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
         $this->authorizationChecker = $authorizationChecker;
         $this->permission = $permission;
         $this->forcePermissionUsage = $forcePermissionUsage;
+    }
+
+    /**
+     * @internal Will be removed in 3.0
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -87,9 +101,19 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
             return true;
         }
 
+        if (null === $this->aclGroupProvider) {
+            return $this->authorizationChecker->isGranted(
+                $this->permission,
+                new ObjectIdentity('entity', $entityClass)
+            );
+        }
+
         return $this->authorizationChecker->isGranted(
             $this->permission,
-            new ObjectIdentity('entity', $entityClass)
+            new ObjectIdentity(
+                'entity',
+                ObjectIdentityHelper::buildType($entityClass, $this->aclGroupProvider->getGroup())
+            )
         );
     }
 }

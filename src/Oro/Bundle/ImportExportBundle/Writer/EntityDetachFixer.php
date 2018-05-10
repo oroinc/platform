@@ -71,6 +71,10 @@ class EntityDetachFixer
 
         foreach ($relations as $associationMapping) {
             $fieldName = $associationMapping['name'];
+            if (!$this->propertyAccessor->isReadable($entity, $fieldName)) {
+                continue;
+            }
+
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
             if ($value && is_object($value)) {

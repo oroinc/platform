@@ -1,10 +1,8 @@
-OroMigrationBundle
-==================
+# OroMigrationBundle
 
-Database structure and data manipulator.
+OroMigrationBundle extends DBAL (database abstraction layer) and provides the ability for developers to manage and deploy changes in the Oro application database schema programmatically in a consistent, structured way using Migrations and Fixtures classes.
 
-Database structure migrations
------------------------------
+## Database structure migrations
 
 Each bundle can have migration files that allow to update database schema.
 
@@ -145,16 +143,15 @@ Next algorithm may be used for new versions of your bundle:
  - Generate fresh installation file with **oro:migration:dump**
  - If required - add migration extensions calls to generated installation.
 
-Examples of database structure migrations
------------------------------------------
+## Examples of database structure migrations
 
  - [Simple migration](../UserBundle/Migrations/Schema/v1_0/OroUserBundle.php)
  - [Installer](../InstallerBundle/Migrations/Schema)
  - [Complex migration](../EntityConfigBundle/Migrations/Schema/v1_2)
 
 
-Extensions for database structure migrations
---------------------------------------------
+## Extensions for database structure migrations
+
 Sometime you cannot use standard Doctrine methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how [RenameExtension][5] can be used:
 ``` php
 <?php
@@ -203,8 +200,8 @@ Also there is some additional useful interfaces you can use in your migration cl
  - [DatabasePlatformAwareInterface][3] - allows to write a database type independent migrations
  - [NameGeneratorAwareInterface][4] - provides an access to [DbIdentifierNameGenerator](./Tools/DbIdentifierNameGenerator.php) class which can be used to generate names of indices, foreign key constraints and others.
 
-Create own extensions for database structure migrations
--------------------------------------------------------
+## Create own extensions for database structure migrations
+
 To create your own extension you need too do the following simple steps:
 
  - Create an extension class in `YourBundle/Migration/Extension` directory. Using `YourBundle/Migration/Extension` directory is not mandatory, but highly recommended. For example:
@@ -266,8 +263,7 @@ services:
 If you need an access to the database platform or the name generator you extension class should implement [DatabasePlatformAwareInterface][3] or [NameGeneratorAwareInterface][4] appropriately.
 Also if you need to use other extension in your extension the extension class should just implement `*AwareInterface` of the extension you need.
 
-Data fixtures
--------------
+## Data fixtures
 
 Symfony allows to load data using data fixtures. But these fixtures are run each time when `doctrine:fixtures:load` command is executed.
 
@@ -279,8 +275,7 @@ Data fixtures for this command should be put in `Migrations/Data/ORM` or in `Mig
 
 Fixtures order can be changed with standard Doctrine ordering or dependency functionality. More information about fixture ordering can be found in [doctrine data fixtures manual][2].
 
-Versioned fixtures
-------------------
+## Versioned fixtures
 
 There are fixtures which need to be executed time after time. An example is a fixture which uploads countries data. Usually, if you add new countries list, you need to create new data fixture which will upload this data. To avoid this you can use versioned data fixtures.
 

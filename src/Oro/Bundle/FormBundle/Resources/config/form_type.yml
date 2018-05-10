@@ -167,6 +167,7 @@ services:
             - %kernel.cache_dir%
         calls:
             - [setAssetHelper, ['@assets.packages']]
+            - [setContext, ['@assets.context']]
         tags:
             - { name: form.type, alias: oro_rich_text }
 
@@ -194,6 +195,11 @@ services:
         class: %oro_form.extension.data_block.class%
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
+    oro_help.form.date_time_extension:
+        class: Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension
+        tags:
+            - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
 
     oro_form.extension.client_validation:
         class: %oro_form.extension.client_validation.class%

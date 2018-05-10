@@ -12,9 +12,8 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 /**
- * For "create" action adds NotNull validation constraint for "owner" field.
- * Adds NotBlank validation constraint for "owner" field.
- * Adds Owner validation constraint for the entity.
+ * Adds the validation constraint that is used to validate that
+ * an owner of the entity can be changed.
  */
 class AddOwnerValidator implements ProcessorInterface
 {
@@ -69,7 +68,7 @@ class AddOwnerValidator implements ProcessorInterface
             return;
         }
         $field = $definition->findField($fieldName, true);
-        if (null === $field) {
+        if (null === $field || $field->isExcluded()) {
             return;
         }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys;
@@ -33,10 +34,12 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessForNotManageableEntity()
     {
         $className = 'Test\Class';
+        $config = new EntityDefinitionConfig();
 
         $this->notManageableClassNames = [$className];
 
         $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->processor->process($this->context);
 
         $this->assertNull($this->context->getQuery());
@@ -56,6 +59,7 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->set('filters', $filtersDefinition);
         $this->context->setClassName($className);
+        $this->context->set('config_definition', null);
         $this->processor->process($this->context);
 
         $filtersDefinition = $this->context->getFilters();

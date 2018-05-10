@@ -196,15 +196,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetGroupedEntitiesEmpty()
-    {
-        $this->provider
-            ->expects($this->once())
-            ->method('getProviderForEntity')
-            ->willReturn($this->returnValue(new TestActivityProvider()));
-        $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), '', '', 0, []));
-    }
-
     protected function mockEmailActivityListProvider()
     {
         $emailActivityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')

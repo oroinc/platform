@@ -56,6 +56,26 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
+     * @param string $group
+     *
+     * @return bool
+     */
+    private function isSupportedGroup($group)
+    {
+        if ($group === self::ROUTE_GROUP
+            && !$this->docViewDetector->getRequestType()->isEmpty()
+            && !$this->docViewDetector->getRequestType()->contains('frontend')
+        ) {
+            return true;
+        }
+        if ($group === 'frontend_rest_api' && $this->docViewDetector->getRequestType()->contains('frontend')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
@@ -65,9 +85,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             $routes->remove($routes->getName($route));
             return;
         }
-        if ($group !== self::ROUTE_GROUP
-            || $this->docViewDetector->getRequestType()->isEmpty()
-        ) {
+        if (!$this->isSupportedGroup($group)) {
             return;
         }
 

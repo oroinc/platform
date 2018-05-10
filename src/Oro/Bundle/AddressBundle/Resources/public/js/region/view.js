@@ -31,10 +31,12 @@ define(function(require) {
          */
         initialize: function(options) {
             this.target = $(options.target);
-            this.$simpleEl = $(options.simpleEl);
+            this.$simpleEl = this.switchState !== 'disable' ? $(options.simpleEl) : null;
 
-            this.target.closest('.controls').append(this.$simpleEl);
-            this.$simpleEl.attr('type', 'text');
+            if (this.$simpleEl) {
+                this.target.after(this.$simpleEl);
+                this.$simpleEl.attr('type', 'text');
+            }
 
             this.showSelect = options.showSelect;
             this.regionRequired = options.regionRequired;
@@ -63,13 +65,13 @@ define(function(require) {
         displaySelect2: function(display) {
             if (display) {
                 if (this.regionRequired) {
-                    this.addRequiredFlag(this.$simpleEl);
+                    this.addRequiredFlag();
                 }
                 this.switchInputWidget(display);
             } else {
                 this.switchInputWidget(display);
                 if (this.regionRequired) {
-                    this.removeRequiredFlag(this.$simpleEl);
+                    this.removeRequiredFlag();
                 }
                 if (this.target.closest('form').data('validator')) {
                     this.target.validate().hideElementErrors(this.target);
@@ -77,7 +79,7 @@ define(function(require) {
             }
         },
 
-        addRequiredFlag: function(el) {
+        addRequiredFlag: function() {
             var label = this.getInputLabel(this.target);
             if (!label.hasClass('required')) {
                 label
@@ -86,7 +88,7 @@ define(function(require) {
             }
         },
 
-        removeRequiredFlag: function(el) {
+        removeRequiredFlag: function() {
             var label = this.getInputLabel(this.target);
             if (label.hasClass('required')) {
                 label
@@ -96,7 +98,15 @@ define(function(require) {
         },
 
         getInputLabel: function(el) {
-            return el.parent().parent().find('label');
+            var label;
+            var input = _.result(el.data('select2'), 'focusser') || el;
+            var id = input.attr('id');
+
+            if (id) {
+                label = $('label[for="' + id + '"]');
+            }
+
+            return label && label.length ? label : el.parent().parent().find('label');
         },
 
         /**
@@ -132,13 +142,17 @@ define(function(require) {
                 this.target.append(this.template({regions: this.collection.models}));
                 this.target.val(this.target.data('selected-data') || '').trigger('change');
 
-                this.$simpleEl.hide();
-                this.$simpleEl.val('');
+                if (this.$simpleEl) {
+                    this.$simpleEl.hide().val('');
+                }
             } else {
                 this.target.hide();
-                this.target.val('');
+                this.target.inputWidget('val', '');
                 this.displaySelect2(false);
-                this.$simpleEl.show();
+
+                if (this.$simpleEl) {
+                    this.$simpleEl.show();
+                }
             }
             this.$el.trigger('value:changed');
         },

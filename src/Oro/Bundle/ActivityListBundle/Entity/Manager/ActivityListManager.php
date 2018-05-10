@@ -20,6 +20,7 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -131,20 +132,25 @@ class ActivityListManager
      */
     public function getListData($entityClass, $entityId, $filter, $pageFilter = [])
     {
-        $qb = $this->getBaseQB($entityClass, $entityId);
-
         $result = [];
 
-        $ids = $this->getListDataIds(clone $qb, $entityClass, $entityId, $filter, $pageFilter);
-        if ($ids) {
-            $qb->setParameters([]);
-            $qb->resetDQLParts(['join', 'where']);
-            $qb->where($qb->expr()->in('activity.id', ':activitiesIds'))->setParameter('activitiesIds', $ids);
-            $qb->orderBy(
-                'activity.' . $this->config->get('oro_activity_list.sorting_field'),
-                $this->config->get('oro_activity_list.sorting_direction')
-            );
-            $qb->setMaxResults($this->config->get('oro_activity_list.per_page'));
+        $event = new ActivityListPreQueryBuildEvent($entityClass, $entityId);
+        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
+            $entityClass,
+            $event->getTargetIds()
+        );
+
+        $ids = $this->getListDataIds($qb, $entityClass, $entityId, $filter, $pageFilter);
+        if (!empty($ids)) {
+            $qb = $this->getRepository()->createQueryBuilder('activity')
+                ->where($qb->expr()->in('activity.id', ':activitiesIds'))
+                ->setParameter('activitiesIds', $ids)
+                ->orderBy(
+                    'activity.' . $this->config->get('oro_activity_list.sorting_field'),
+                    $this->config->get('oro_activity_list.sorting_direction')
+                )
+                ->setMaxResults($this->config->get('oro_activity_list.per_page'));
 
             $result = $qb->getQuery()->getResult();
         }
@@ -175,40 +181,171 @@ class ActivityListManager
     protected function getListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter)
     {
         $pageSize = $this->config->get('oro_activity_list.per_page');
+        $ids = $this->loadListDataIds($qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize);
+        $ids = array_unique(array_column($ids, 'id'));
+        $ids = array_slice($ids, 0, $pageSize);
+
+        return $ids;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param integer      $entityId
+     * @param array        $filter
+     * @param array        $pageFilter
+     * @param int          $pageSize
+     *
+     * @return array
+     */
+    private function loadListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize)
+    {
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
-        $orderDirection = $this->config->get('oro_activity_list.sorting_direction');
+        $grouping = $this->config->get('oro_activity_list.grouping');
 
-        $qb->setMaxResults($pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
-        $qb->resetDQLParts(['select', 'groupBy']);
-        $qb->addSelect('activity.id, activity.' . $orderBy);
+        $getIdsQb = clone $qb;
+        $getIdsQb->setMaxResults($pageSize * self::ACTIVITY_LIST_PAGE_SIZE_MULTIPLIER);
+        $getIdsQb->resetDQLParts(['select']);
+        $getIdsQb->addSelect('activity.id, activity.' . $orderBy);
+        if ($grouping) {
+            $getIdsQb->addSelect('activity.relatedActivityClass, activity.relatedActivityId');
+        }
 
-        $this->applyPageFilter($qb, $pageFilter);
+        $this->applyPageFilter($getIdsQb, $pageFilter);
 
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $this->activityListFilterHelper->addFiltersToQuery($getIdsQb, $filter);
+        $this->activityListAclHelper->applyAclCriteria($getIdsQb, $this->chainProvider->getProviders());
 
         $ids = array_merge(
-            $qb->getQuery()->getArrayResult(),
-            $this->getListDataIdsForInheritances(clone $qb, $entityClass, $entityId, $filter, $pageFilter)
+            $getIdsQb->getQuery()->getArrayResult(),
+            $this->getListDataIdsForInheritances($getIdsQb, $entityClass, $entityId, $filter, $pageFilter)
         );
 
-        if ((!$pageFilter && $orderDirection === 'ASC')
-            || ($orderDirection === 'DESC' && $pageFilter['action'] === 'prev')
-            || ($orderDirection === 'ASC' && $pageFilter['action'] === 'next')
-        ) {
+        $this->sortListDataIds($ids, $pageFilter, $orderBy);
+
+        $numberOfUnfilteredIds = count($ids);
+        if ($grouping) {
+            $ids = $this->filterGroupedIds($ids);
+        }
+
+        // check if the requested number of items is loaded, and if not, load more items
+        $numberOfIds = count($ids);
+        if ($numberOfIds > 0 && $numberOfIds < $pageSize && $numberOfUnfilteredIds > $pageSize) {
+            $lastRow = $ids[$numberOfIds - 1];
+            $offsetDate = $lastRow[$orderBy];
+            if (null === $qb->getParameter('offsetDate')) {
+                $whereComparison = 'gt';
+                if (!$this->isAscendingOrderForListData($pageFilter)) {
+                    $whereComparison = 'lt';
+                }
+                $qb->andWhere($qb->expr()->{$whereComparison}('activity.' . $orderBy, ':offsetDate'));
+            }
+            $qb->setParameter('offsetDate', $offsetDate);
+            $rows = $this->loadListDataIds(
+                $qb,
+                $entityClass,
+                $entityId,
+                $filter,
+                $pageFilter,
+                $pageSize - $numberOfIds
+            );
+            if (!empty($rows)) {
+                $existingIds = array_unique(array_column($ids, 'id'));
+                foreach ($rows as $row) {
+                    if (!in_array($row['id'], $existingIds)) {
+                        $ids[] = $row;
+                    }
+                }
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param array $pageFilter
+     *
+     * @return bool
+     */
+    private function isAscendingOrderForListData($pageFilter)
+    {
+        $orderDirection = $this->config->get('oro_activity_list.sorting_direction');
+
+        if (!array_key_exists('action', $pageFilter)) {
+            return $orderDirection === 'ASC';
+        }
+
+        return
+            ($orderDirection === 'ASC' && $pageFilter['action'] === 'next')
+            || ($orderDirection === 'DESC' && $pageFilter['action'] === 'prev');
+    }
+
+    /**
+     * @param array  $ids
+     * @param array  $pageFilter
+     * @param string $orderBy
+     *
+     * @return array
+     */
+    private function sortListDataIds(array $ids, $pageFilter, $orderBy)
+    {
+        if ($this->isAscendingOrderForListData($pageFilter)) {
             // ASC sorting
             usort($ids, function ($a, $b) use ($orderBy) {
                 return $a[$orderBy]->getTimestamp() - $b[$orderBy]->getTimestamp();
             });
         } else {
-            //DESC sorting
+            // DESC sorting
             usort($ids, function ($a, $b) use ($orderBy) {
                 return $b[$orderBy]->getTimestamp() - $a[$orderBy]->getTimestamp();
             });
         }
 
-        $ids = array_unique(array_column($ids, 'id'));
-        $ids = array_slice($ids, 0, $pageSize);
+        return $ids;
+    }
+
+    /**
+     * @param array $ids
+     *
+     * @return array
+     */
+    private function filterGroupedIds(array $ids)
+    {
+        $emailIds = [];
+        foreach ($ids as $item) {
+            if ($item['relatedActivityClass'] === 'Oro\Bundle\EmailBundle\Entity\Email') {
+                $emailIds[] = $item['relatedActivityId'];
+            }
+        }
+        $emailIds = array_unique($emailIds);
+        if (count($emailIds) > 1) {
+            $qb = $this->doctrineHelper->getEntityRepository('Oro\Bundle\EmailBundle\Entity\Email')
+                ->createQueryBuilder('e')
+                ->select('e.id, IDENTITY(e.thread) AS threadId')
+                ->where('e.id IN (:ids) AND IDENTITY(e.thread) IS NOT NULL')
+                ->setParameter('ids', $emailIds);
+            $rows = $qb->getQuery()->getArrayResult();
+            $emailThreadMap = [];
+            foreach ($rows as $row) {
+                $emailThreadMap[$row['id']] = $row['threadId'];
+            }
+            $filteredIds = [];
+            $processedThreads = [];
+            foreach ($ids as $item) {
+                if ($item['relatedActivityClass'] === 'Oro\Bundle\EmailBundle\Entity\Email') {
+                    $emailId = $item['relatedActivityId'];
+                    if (isset($emailThreadMap[$emailId])) {
+                        $threadId = $emailThreadMap[$emailId];
+                        if (in_array($threadId, $processedThreads)) {
+                            continue;
+                        }
+                        $processedThreads[] = $threadId;
+                    }
+                }
+                $filteredIds[] = $item;
+            }
+            $ids = $filteredIds;
+        }
 
         return $ids;
     }
@@ -220,19 +357,17 @@ class ActivityListManager
     protected function applyPageFilter(QueryBuilder $qb, $pageFilter)
     {
         $orderBy = $this->config->get('oro_activity_list.sorting_field');
-        $orderDirection = $this->config->get('oro_activity_list.sorting_direction');
+
+        $orderDirection = 'ASC';
+        if (!$this->isAscendingOrderForListData($pageFilter)) {
+            $orderDirection = 'DESC';
+        }
 
         if (!empty($pageFilter['date']) && !empty($pageFilter['ids'])) {
             $dateFilter = new \DateTime($pageFilter['date'], new \DateTimeZone('UTC'));
-            $whereComparison = 'lte';
-            if (($pageFilter['action'] === 'next' && $orderDirection === 'ASC')
-                || ($pageFilter['action'] === 'prev' && $orderDirection === 'DESC')
-            ) {
-                $whereComparison = 'gte';
-            }
-
-            if ($pageFilter['action'] === 'prev') {
-                $orderDirection = ($orderDirection === 'DESC') ? 'ASC' : 'DESC';
+            $whereComparison = 'gte';
+            if (!$this->isAscendingOrderForListData($pageFilter)) {
+                $whereComparison = 'lte';
             }
 
             $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
@@ -271,10 +406,42 @@ class ActivityListManager
                 $inheritanceTarget,
                 $key,
                 ':entityId',
-                $this->config->get('oro_activity_list.grouping')
+                false
             );
 
             $this->activityListFilterHelper->addFiltersToQuery($inheritanceQb, $filter);
+            $this->activityListAclHelper->applyAclCriteria($inheritanceQb, $this->chainProvider->getProviders());
+
+            $ids = array_merge($ids, $inheritanceQb->getQuery()->getArrayResult());
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string       $entityClass
+     * @param int          $entityId
+     *
+     * @return array
+     */
+    private function getGroupedActivityListIdsForInheritances(QueryBuilder $qb, $entityClass, $entityId)
+    {
+        $ids = [];
+
+        // due to performance issue - perform separate data request per each inherited entity
+        $inheritanceTargets = $this->activityInheritanceTargetsHelper->getInheritanceTargetsRelations($entityClass);
+        foreach ($inheritanceTargets as $key => $inheritanceTarget) {
+            $inheritanceQb = clone $qb;
+            $inheritanceQb->setParameter(':associatedEntityId', $entityId);
+            $this->activityInheritanceTargetsHelper->applyInheritanceActivity(
+                $inheritanceQb,
+                $inheritanceTarget,
+                $key,
+                ':associatedEntityId',
+                false
+            );
+
             $this->activityListAclHelper->applyAclCriteria($inheritanceQb, $this->chainProvider->getProviders());
 
             $ids = array_merge($ids, $inheritanceQb->getQuery()->getArrayResult());
@@ -355,7 +522,6 @@ class ActivityListManager
             }
         }
 
-        $isHead                  = $this->getHeadStatus($entity, $entityProvider);
         $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
         $numberOfComments        = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
@@ -363,8 +529,10 @@ class ActivityListManager
         );
 
         $data = $entityProvider->getData($entity);
-        if (isset($data['isHead']) && !$data['isHead']) {
-            $isHead = false;
+
+        $isHead = false;
+        if (isset($data['isHead'])) {
+            $isHead = $data['isHead'];
         }
 
         $workflowsData = $this->workflowHelper->getEntityWorkflowsData($activity);
@@ -408,13 +576,23 @@ class ActivityListManager
      */
     public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
-        $results        = [];
-        $entityProvider = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
-        if ($this->isGroupingApplicable($entityProvider)) {
-            /** @var ActivityListGroupProviderInterface $entityProvider */
+        $activityLists = [];
+        $ids = $this->getGroupedActivityListIds($entity, $targetActivityClass, $targetActivityId);
+        if (!empty($ids)) {
+            $qb = $this->getRepository()->createQueryBuilder('activity');
+            $qb = $qb
+                ->where($qb->expr()->in('activity.id', ':activitiesIds'))
+                ->setParameter('activitiesIds', $ids)
+                ->orderBy(
+                    'activity.' . $this->config->get('oro_activity_list.sorting_field'),
+                    $this->config->get('oro_activity_list.sorting_direction')
+                );
+            $activityLists = $qb->getQuery()->getResult();
+        }
 
-            $groupedActivities = $entityProvider->getGroupedEntities($entity);
-            $activityResults   = $this->getEntityViewModels($groupedActivities, [
+        $results = [];
+        if (!empty($activityLists)) {
+            $activityResults = $this->getEntityViewModels($activityLists, [
                 'class' => $targetActivityClass,
                 'id'    => $targetActivityId,
             ]);
@@ -445,10 +623,38 @@ class ActivityListManager
     }
 
     /**
+     * @param object $entity
+     * @param string $targetActivityClass
+     * @param int    $targetActivityId
+     *
+     * @return ActivityList[]
+     */
+    public function getGroupedActivityLists($entity, $targetActivityClass, $targetActivityId)
+    {
+        $results = [];
+        /** @var ActivityListGroupProviderInterface $entityProvider */
+        $entityProvider = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+        if ($this->isGroupingApplicable($entityProvider)) {
+            if ($entityProvider instanceof EmailActivityListProvider) {
+                $results = $entityProvider->getGroupedEntitiesNewTmp(
+                    $entity,
+                    $targetActivityClass,
+                    $targetActivityId
+                );
+            } else {
+                $results = $entityProvider->getGroupedEntities($entity);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
      * @param string $entityClass
      * @param int    $entityId
      *
      * @return QueryBuilder
+     * @deprecated since 2.0. See getListData
      */
     protected function getBaseQB($entityClass, $entityId)
     {
@@ -478,10 +684,106 @@ class ActivityListManager
      * @param object       $entityProvider
      *
      * @return bool
+     * @deprecated since 2.0. See getEntityViewModel
      */
     protected function getHeadStatus(ActivityList $entity, $entityProvider)
     {
         return $this->isGroupingApplicable($entityProvider) && $entity->isHead();
+    }
+
+    /**
+     * @param object[] $entities
+     * @param object   $rootEntity
+     * @param string   $targetActivityClass
+     * @param int      $targetActivityId
+     *
+     * @return ActivityList[]
+     */
+    public function filterGroupedEntitiesByActivityLists(
+        array $entities,
+        $rootEntity,
+        $targetActivityClass,
+        $targetActivityId
+    ) {
+        $entityClass = ClassUtils::getRealClass($rootEntity);
+
+        $activityLists = [];
+        $ids = $this->getGroupedActivityListIds($rootEntity, $targetActivityClass, $targetActivityId);
+        if (!empty($ids)) {
+            $qb = $this->getRepository()->createQueryBuilder('activity');
+            $qb = $qb
+                ->where($qb->expr()->in('activity.id', ':activitiesIds'))
+                ->setParameter('activitiesIds', $ids);
+
+            $activityLists = $qb->getQuery()->getResult();
+        }
+
+        $entityIdsFromActivityLists = [];
+        foreach ($activityLists as $activityList) {
+            if ($activityList->getRelatedActivityClass() === $entityClass) {
+                $entityIdsFromActivityLists[] = $activityList->getRelatedActivityId();
+            }
+        }
+        $filteredEntities = [];
+        foreach ($entities as $entity) {
+            if (in_array($this->doctrineHelper->getSingleEntityIdentifier($entity), $entityIdsFromActivityLists)) {
+                $filteredEntities[] = $entity;
+            }
+        }
+
+        return $filteredEntities;
+    }
+
+    /**
+     * @param object $entity
+     * @param string $targetActivityClass
+     * @param int    $targetActivityId
+     *
+     * @return array
+     */
+    private function getGroupedActivityListIds($entity, $targetActivityClass, $targetActivityId)
+    {
+        $entityClass = ClassUtils::getRealClass($entity);
+        $event = new ActivityListPreQueryBuildEvent(
+            $entityClass,
+            $this->doctrineHelper->getSingleEntityIdentifier($entity)
+        );
+        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $entityIds = $event->getTargetIds();
+        $qb = $this->getRepository()->createQueryBuilder('activity')
+            ->select('activity.id')
+            ->leftJoin('activity.activityOwners', 'ao')
+            ->where('activity.relatedActivityClass = :entityClass')
+            ->setParameter('entityClass', $entityClass);
+        if (count($entityIds) > 1) {
+            $qb
+                ->andWhere('activity.relatedActivityId IN (:entityIds)')
+                ->setParameter('entityIds', $entityIds);
+        } else {
+            $qb
+                ->andWhere('activity.relatedActivityId = :entityId')
+                ->setParameter('entityId', reset($entityIds));
+        }
+
+        $getIdsQb = clone $qb;
+        $getIdsQb
+            ->leftJoin(
+                'activity.' . $this->getActivityListAssociationName($targetActivityClass),
+                'associatedEntity'
+            )
+            ->andWhere('associatedEntity = :associatedEntityId')
+            ->setParameter(':associatedEntityId', $targetActivityId);
+
+        $this->activityListAclHelper->applyAclCriteria($getIdsQb, $this->chainProvider->getProviders());
+
+        $ids = array_merge(
+            $getIdsQb->getQuery()->getArrayResult(),
+            $this->getGroupedActivityListIdsForInheritances($qb, $targetActivityClass, $targetActivityId)
+        );
+
+        $ids = array_unique(array_column($ids, 'id'));
+
+        return $ids;
     }
 
     /**

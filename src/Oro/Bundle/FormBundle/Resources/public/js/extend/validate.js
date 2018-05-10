@@ -308,7 +308,7 @@ define(function(require) {
         collectPristineValues: function() {
             this.pristineValues = {};
             this.elementsOf(this.currentForm).each(_.bind(function(index, element) {
-                if (!this.checkable(element)) {
+                if (!this.checkable(element) && element.name) {
                     this.pristineValues[element.name] = element.value;
                 }
             }, this));
@@ -401,7 +401,7 @@ define(function(require) {
             $el.closest('.control-group').find('.control-label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            var $el = $(element);
+            var $el = getErrorTarget(element);
             $el.removeClass('error')
                 .closest('.controls')
                 .removeClass('validation-error')
