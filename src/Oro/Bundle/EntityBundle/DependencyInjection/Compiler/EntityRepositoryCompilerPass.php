@@ -5,10 +5,13 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Handles entity repository definition
+ */
 class EntityRepositoryCompilerPass implements CompilerPassInterface
 {
     const ABSTRACT_REPOSITORY = 'oro_entity.abstract_repository';
@@ -142,7 +145,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
                 $repositoryClass = $container->getParameter($classParameter);
             }
             return $repositoryClass;
-        } elseif ($definition instanceof DefinitionDecorator
+        } elseif ($definition instanceof ChildDefinition
             && $definition->getParent() !== static::ABSTRACT_REPOSITORY
         ) {
             $parentDefinition = $container->getDefinition($definition->getParent());
@@ -162,7 +165,7 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
         $arguments = $definition->getArguments();
         if (0 !== count($arguments)) {
             return $arguments;
-        } elseif ($definition instanceof DefinitionDecorator) {
+        } elseif ($definition instanceof ChildDefinition) {
             $parentDefinition = $container->getDefinition($definition->getParent());
             return $this->getArguments($container, $parentDefinition);
         } else {
@@ -173,14 +176,14 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      * @param string $parentDefinitionId
-     * @return DefinitionDecorator[]
+     * @return ChildDefinition[]
      */
     private function getChildDefinitions(ContainerBuilder $container, $parentDefinitionId)
     {
         $definitions = [];
 
         foreach ($container->getDefinitions() as $definitionId => $definition) {
-            if ($definition instanceof DefinitionDecorator && $definition->getParent() === $parentDefinitionId) {
+            if ($definition instanceof ChildDefinition && $definition->getParent() === $parentDefinitionId) {
                 if (!$definition->isAbstract()) {
                     $definitions[$definitionId] = $definition;
                 }

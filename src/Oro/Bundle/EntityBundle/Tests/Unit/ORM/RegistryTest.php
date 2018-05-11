@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\LazyOroEntityManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     const TEST_ENTITY_CLASS       = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity';
     const TEST_ENTITY_PROXY_CLASS = 'Doctrine\ORM\Proxy\Proxy';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
     /** @var Registry */
@@ -20,7 +21,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
 
         $this->registry = new Registry(
             $this->container,
@@ -51,10 +52,10 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getParameter')
             ->with('oro_entity.default_query_cache_lifetime')
             ->willReturn(3600);
-        $this->container->expects($this->atLeastOnce())
-            ->method('set')
-            ->with('service.default', null);
 
+        $manager1->expects($this->atLeastOnce())
+            ->method('setProxyInitializer')
+            ->with($this->isInstanceOf(\Closure::class));
         $this->container
             ->expects($this->any())
             ->method('initialized')
@@ -91,9 +92,9 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getParameter')
             ->with('oro_entity.default_query_cache_lifetime')
             ->willReturn(3600);
-        $this->container->expects($this->atLeastOnce())
-            ->method('set')
-            ->with('service.default', null);
+        $manager1->expects($this->atLeastOnce())
+            ->method('setProxyInitializer')
+            ->with($this->isInstanceOf(\Closure::class));
 
         $this->container
             ->expects($this->any())
@@ -113,11 +114,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testManagerCacheWhenEntityManagerDoesNotExist()
     {
-        $this->container->expects($this->atLeastOnce())
-            ->method('set')
-            ->with('service.default', null);
-
-        $this->container->expects($this->at(1))
+        $this->container->expects($this->exactly(1))
             ->method('get')
             ->with('service.default')
             ->willReturn(null);
@@ -125,7 +122,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->container
             ->expects($this->any())
             ->method('initialized')
-            ->willReturnMap([['service.default', true]]);
+            ->willReturnMap([['service.default', false]]);
 
         $this->assertNull($this->registry->getManagerForClass(self::TEST_ENTITY_PROXY_CLASS));
         // test that a manager cached
@@ -187,7 +184,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
             ->method('isTransient')
             ->willReturn(false);
 
-        $manager = $this->createMock(OroEntityManager::class);
+        $manager = $this->createMock(LazyOroEntityManager::class);
         $manager->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($managerConfiguration);

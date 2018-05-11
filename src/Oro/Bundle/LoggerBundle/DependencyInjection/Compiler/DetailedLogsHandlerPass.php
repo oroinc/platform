@@ -5,7 +5,7 @@ namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -45,7 +45,7 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
 
         for ($i = 0; $i < count($handlerIds); $i++) {
             $handler = $container->findDefinition($handlerIds[$i]);
-            if ($handler instanceof DefinitionDecorator &&
+            if ($handler instanceof ChildDefinition &&
                 $handler->getParent() == self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID
             ) {
                 if ($i == 0) {
@@ -86,7 +86,7 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 $handlerId = (string)$call[1][0];
                 $handler = $container->findDefinition($handlerId);
 
-                if (!($handler instanceof DefinitionDecorator) ||
+                if (!($handler instanceof ChildDefinition) ||
                     $handler->getParent() != self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID
                 ) {
                     continue;
@@ -102,7 +102,7 @@ class DetailedLogsHandlerPass implements CompilerPassInterface
                 $handlerName = substr($handlerId, strrpos($handlerId, '.') + 1);
                 $newHandlerId = self::DETAILED_LOGS_HANDLER_SERVICE_PREFIX . $handlerName;
 
-                $newHandler = new DefinitionDecorator(self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
+                $newHandler = new ChildDefinition(self::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                 $newHandler->addMethodCall('setHandler', [new Reference($nestedHandlerId)]);
                 $container->setDefinition($newHandlerId, $newHandler);
 

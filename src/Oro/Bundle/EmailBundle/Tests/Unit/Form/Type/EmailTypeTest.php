@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -331,7 +330,7 @@ class EmailTypeTest extends TypeTestCase
                     ],
                     'subject' => 'Test subject',
                     'type' => 'text',
-                    'attachments' => new ArrayCollection(),
+                    'attachments' => [],
                     'template' => new EmailTemplate(),
                 ],
                 ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],

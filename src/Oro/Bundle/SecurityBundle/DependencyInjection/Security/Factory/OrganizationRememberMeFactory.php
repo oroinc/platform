@@ -4,9 +4,12 @@ namespace Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Handles logic for configuring remember me services
+ */
 class OrganizationRememberMeFactory extends RememberMeFactory
 {
     /**
@@ -24,7 +27,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         $container
             ->setDefinition(
                 $authProviderId,
-                new DefinitionDecorator('oro_security.authentication.provider.organization_rememberme')
+                new ChildDefinition('oro_security.authentication.provider.organization_rememberme')
             )
             ->addArgument($secretKey)
             ->addArgument($id);
@@ -45,7 +48,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
                 ->addMethodCall('addHandler', array(new Reference($rememberMeServicesId)));
         }
 
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
+        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new ChildDefinition($templateId));
         $rememberMeServices->replaceArgument(1, $secretKey);
         $rememberMeServices->replaceArgument(2, $id);
 
@@ -65,7 +68,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         $listenerId = 'security.authentication.listener.rememberme.' . $id;
         $listener   = $container->setDefinition(
             $listenerId,
-            new DefinitionDecorator('security.authentication.listener.rememberme')
+            new ChildDefinition('security.authentication.listener.rememberme')
         );
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
 

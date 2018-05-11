@@ -8,9 +8,9 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatterInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,8 +45,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->any())->method('get')->with('doctrine')->willReturn($registry);
 
-        /** @var MessageSelector|\PHPUnit_Framework_MockObject_MockObject $selector */
-        $selector = $this->createMock(MessageSelector::class);
+        /** @var MessageFormatterInterface|\PHPUnit_Framework_MockObject_MockObject $selector */
+        $selector = $this->createMock(MessageFormatterInterface::class);
 
         $this->translator = new Translator($container, $selector, []);
     }

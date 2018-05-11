@@ -4,11 +4,12 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 class BaseTwigRendererEngineTest extends RendererEngineTest
 {
     /**
-     * @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject
+     * @var Environment|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $environment;
 
@@ -19,10 +20,8 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
 
     protected function setUp()
     {
-        $this->environment = $this->createMock('\Twig_Environment');
-
+        $this->environment = $this->createMock(Environment::class);
         $this->engine = $this->createRendererEngine();
-        $this->engine->setEnvironment($this->environment);
     }
 
     public function testRenderBlock()
@@ -140,6 +139,6 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
      */
     public function createRendererEngine()
     {
-        return new BaseTwigRendererEngine();
+        return new BaseTwigRendererEngine([], $this->environment);
     }
 }
