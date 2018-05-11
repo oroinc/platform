@@ -46,8 +46,8 @@ $info-ultra-dark: darken($info, 20%) !default;
 
 $success: #5aa20f !default;
 $success-light: lighten($success, 4%) !default;
-$success-lighten: #a5c387 !default;
-$success-extra-light: #edf3e7 !default;
+$success-lighten: lighten($success, 10%) !default;
+$success-extra-light: lighten($success, 45%) !default;
 $success-ultra-light: lighten($success, 58%) !default;
 $success-dark: darken($success, 8%) !default;
 $success-darken: desaturate($success, 54%) !default;
