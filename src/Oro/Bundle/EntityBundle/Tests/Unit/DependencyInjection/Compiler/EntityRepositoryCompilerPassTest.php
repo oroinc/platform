@@ -10,7 +10,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntityRepo
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\ThirdEntity;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -256,7 +256,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
             $arguments = array_key_exists('arguments', $config) ? $config['arguments'] : [];
 
             if (array_key_exists('parent', $config)) {
-                $definition = new DefinitionDecorator($config['parent']);
+                $definition = new ChildDefinition($config['parent']);
                 if ($class) {
                     $definition->setClass($class);
                 }

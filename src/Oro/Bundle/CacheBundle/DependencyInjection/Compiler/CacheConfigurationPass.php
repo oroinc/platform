@@ -8,9 +8,12 @@ use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures cache
+ */
 class CacheConfigurationPass implements CompilerPassInterface
 {
     /** this cache should be used to caching data private for each node in a web farm */
@@ -68,7 +71,7 @@ class CacheConfigurationPass implements CompilerPassInterface
         $managerDef  = $container->getDefinition(self::MANAGER_SERVICE_KEY);
         $definitions = $container->getDefinitions();
         foreach ($definitions as $serviceId => $def) {
-            if ($def instanceof DefinitionDecorator
+            if ($def instanceof ChildDefinition
                 && !$def->isAbstract()
                 && in_array($def->getParent(), [self::FILE_CACHE_SERVICE, self::DATA_CACHE_SERVICE])
             ) {

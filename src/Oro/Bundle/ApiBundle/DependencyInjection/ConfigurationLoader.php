@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -350,7 +350,7 @@ class ConfigurationLoader
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $cacheDef = $this->container->setDefinition(
             $cacheServiceId,
-            new DefinitionDecorator('oro.cache.abstract')
+            new ChildDefinition('oro.cache.abstract')
         );
         $cacheDef->setPublic(false);
         $cacheDef->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);

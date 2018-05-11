@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityBundle\ORM\Registry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     const TEST_ENTITY_CLASS       = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity';
     const TEST_ENTITY_PROXY_CLASS = 'Doctrine\ORM\Proxy\Proxy';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
     /** @var Registry */

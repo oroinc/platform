@@ -44,7 +44,7 @@ services:
         arguments:
             - '@oro_translation.uploader.default_adapter'
             - '@oro_translation.js_dumper'
-            - '@translation.loader'
+            - '@translation.reader'
             - '@oro_translation.database_translation.persister'
             - '%kernel.cache_dir%'
         lazy: true
