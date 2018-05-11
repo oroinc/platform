@@ -1,0 +1,60 @@
+// @theme: admin;
+
+// Base Colors
+$primary: #404041 !default;
+$primary-100: lighten($primary, 4%) !default;
+$primary-200: lighten($primary, 8%) !default;
+$primary-300: lighten($primary, 12%) !default;
+$primary-400: lighten($primary, 16%) !default;
+$primary-500: lighten($primary, 24%) !default;
+$primary-600: lighten($primary, 32%) !default;
+$primary-700: lighten($primary, 48%) !default;
+$primary-800: lighten($primary, 64%) !default;
+$primary-900: lighten($primary, 72%) !default;
+
+$secondary: #0c84a3 !default;
+$secondary-100: lighten($secondary, 6%) !default;
+$secondary-200: lighten($secondary, 60%) !default;
+$secondary-300: lighten($secondary, 62%) !default;
+
+$extra: #f9b700 !default;
+$extra-100: lighten($extra, 22%) !default;
+$extra-200: lighten($extra, 22%) !default;
+$extra-300: lighten($extra, 22%) !default;
+$extra-dark: desaturate($extra, 96%) !default;
+
+// UI Colors
+$danger: #e34627 !default;
+$danger-light: lighten($danger, 24%) !default;
+$danger-lighten: lighten($danger, 40%) !default;
+$danger-ultra-light: lighten($danger, 44%) !default;
+$danger-dark: darken($danger, 8%) !default;
+$danger-darken: desaturate($danger, 24%) !default;
+$danger-ultra-dark: desaturate($danger, 28%) !default;
+
+$warning: #f9b700 !default;
+$warning-light: lighten($warning, 48%) !default;
+$warning-dark: desaturate($warning, 24%) !default;
+$warning-darken: desaturate($warning, 28%) !default;
+
+$info: #36acca !default;
+$info-light: lighten($info, 24%) !default;
+$info-lighten: lighten($info, 44%) !default;
+$info-dark: desaturate($info, 24%) !default;
+$info-darken: darken($info, 8%) !default;
+$info-ultra-dark: darken($info, 20%) !default;
+
+$success: #5aa20f !default;
+$success-light: lighten($success, 4%) !default;
+$success-lighten: #a5c387 !default;
+$success-extra-light: #edf3e7 !default;
+$success-ultra-light: lighten($success, 58%) !default;
+$success-dark: darken($success, 8%) !default;
+$success-darken: desaturate($success, 54%) !default;
+
+$default: #5c5c5c !default;
+$default-light: lighten($default, 26%) !default;
+$default-lighten: lighten($default, 38%) !default;
+$default-extra-light: lighten($default, 50%) !default;
+$default-ultra-light: lighten($default, 56%) !default;
+$default-dark: darken($default, 12%) !default;
