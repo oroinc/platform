@@ -30,6 +30,12 @@ final class DataType
     const ENTITY_CLASS     = 'entityClass';
     const ORDER_BY         = 'orderBy';
 
+    private const NESTED_OBJECT                   = 'nestedObject';
+    private const NESTED_ASSOCIATION              = 'nestedAssociation';
+    private const EXTENDED_ASSOCIATION_PREFIX     = 'association';
+    private const EXTENDED_ASSOCIATION_MARKER     = 'association:';
+    private const ASSOCIATION_AS_FIELD_DATA_TYPES = ['array', 'object', 'scalar', 'nestedObject'];
+
     /**
      * Checks whether the field represents a nested object.
      *
@@ -39,7 +45,7 @@ final class DataType
      */
     public static function isNestedObject($dataType)
     {
-        return 'nestedObject' === $dataType;
+        return self::NESTED_OBJECT === $dataType;
     }
 
     /**
@@ -51,7 +57,7 @@ final class DataType
      */
     public static function isNestedAssociation($dataType)
     {
-        return 'nestedAssociation' === $dataType;
+        return self::NESTED_ASSOCIATION === $dataType;
     }
 
     /**
@@ -71,11 +77,7 @@ final class DataType
      */
     public static function isAssociationAsField($dataType)
     {
-        return in_array(
-            $dataType,
-            ['array', 'object', 'scalar', 'nestedObject'],
-            true
-        );
+        return \in_array($dataType, self::ASSOCIATION_AS_FIELD_DATA_TYPES, true);
     }
 
     /**
@@ -88,7 +90,7 @@ final class DataType
      */
     public static function isExtendedAssociation($dataType)
     {
-        return 0 === strpos($dataType, 'association:');
+        return 0 === \strpos($dataType, self::EXTENDED_ASSOCIATION_MARKER);
     }
 
     /**
@@ -103,10 +105,10 @@ final class DataType
      */
     public static function parseExtendedAssociation($dataType)
     {
-        list($prefix, $type, $kind) = array_pad(explode(':', $dataType, 3), 3, null);
-        if ('association' !== $prefix || empty($type) || '' === $kind) {
+        list($prefix, $type, $kind) = \array_pad(\explode(':', $dataType, 3), 3, null);
+        if (self::EXTENDED_ASSOCIATION_PREFIX !== $prefix || empty($type) || '' === $kind) {
             throw new \InvalidArgumentException(
-                sprintf('Expected a string like "association:type[:kind]", "%s" given.', $dataType)
+                \sprintf('Expected a string like "association:type[:kind]", "%s" given.', $dataType)
             );
         }
 

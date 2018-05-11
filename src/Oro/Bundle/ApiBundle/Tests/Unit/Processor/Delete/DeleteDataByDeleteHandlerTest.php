@@ -63,7 +63,7 @@ class DeleteDataByDeleteHandlerTest extends DeleteProcessorTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The result property of the Context should be an object, "string" given.
+     * @expectedExceptionMessage The result property of the context should be an object, "string" given.
      */
     public function testProcessForNotObjectResult()
     {

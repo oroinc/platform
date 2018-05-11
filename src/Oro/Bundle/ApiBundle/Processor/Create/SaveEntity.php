@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Saves new ORM entity to the database and save its identifier into the Context.
+ * Saves new ORM entity to the database and save its identifier into the context.
  */
 class SaveEntity implements ProcessorInterface
 {
@@ -63,7 +63,7 @@ class SaveEntity implements ProcessorInterface
             );
         }
 
-        // save entity id into the Context
+        // save entity id into the context
         if (!$context->hasErrors()) {
             $id = $metadata->getIdentifierValue($entity);
             if (null !== $id) {

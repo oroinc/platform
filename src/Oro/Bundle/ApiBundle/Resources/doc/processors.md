@@ -329,7 +329,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
- * Makes sure that the identifier of an entity exists in the Context.
+ * Makes sure that the identifier of an entity exists in the context.
  */
 class ValidateEntityIdExists implements ProcessorInterface
 {

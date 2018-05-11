@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Transforms and validates the request data via the form from the Context.
+ * Transforms and validates the request data via the form from the context.
  */
 class SubmitForm implements ProcessorInterface
 {

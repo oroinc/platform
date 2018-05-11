@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes sure that the Context does not contain the result.
+ * Makes sure that the context does not contain the result.
  */
 class AssertNotHasResult implements ProcessorInterface
 {

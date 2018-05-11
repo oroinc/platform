@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * All the supported Data API actions which are implemented "out of the box".
+ * Provides the list of all Data API actions that are implemented "out of the box".
  */
-class ApiActions
+final class ApiActions
 {
     const GET                 = 'get';
     const GET_LIST            = 'get_list';
