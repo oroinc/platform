@@ -44,33 +44,33 @@ class DebugAsseticNodeTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'node' => $this->createDebugAsseticNode(
-                    new AssetCollection(array(new FileAsset('first.less.css'), new FileAsset('second.less.css'))),
-                    array('first.less.css', 'second.less.css'),
+                    new AssetCollection(array(new FileAsset('first.scss.css'), new FileAsset('second.scss.css'))),
+                    array('first.scss.css', 'second.scss.css'),
                     'test'
                 ),
                 'compilerCalls' => array(
                     array('addDebugInfo', array($this->isInstanceOf('Oro\Bundle\AsseticBundle\Twig\DebugAsseticNode'))),
-                    // start first.less.css
+                    // start first.scss.css
                     array('write', array("// asset \"test_0\"\n")),
                     array('write', array('$context[')),
                     array('repr', array('asset_url')),
                     array('raw', array('] = ')),
                     array('raw', array('$this->env->getExtension(\'asset\')->getAssetUrl(')),
-                    array('repr', array('first.less.css')),
+                    array('repr', array('first.scss.css')),
                     array('raw', array(')')),
                     array('raw', array(";\n")),
                     array('subcompile', array($this->isInstanceOf('Twig_Node'))),
-                    // start second.less.css
+                    // start second.scss.css
                     array('write', array("// asset \"test_1\"\n")),
                     array('write', array('$context[')),
                     array('repr', array('asset_url')),
                     array('raw', array('] = ')),
                     array('raw', array('$this->env->getExtension(\'asset\')->getAssetUrl(')),
-                    array('repr', array('second.less.css')),
+                    array('repr', array('second.scss.css')),
                     array('raw', array(')')),
                     array('raw', array(";\n")),
                     array('subcompile', array($this->isInstanceOf('Twig_Node'))),
-                    // end second.less.css
+                    // end second.scss.css
                     array('write', array('unset($context[')),
                     array('repr', array('asset_url')),
                     array('raw', array("]);\n")),
