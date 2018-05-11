@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase

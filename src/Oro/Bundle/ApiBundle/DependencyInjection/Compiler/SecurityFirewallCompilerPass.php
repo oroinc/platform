@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallExceptionListener;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**

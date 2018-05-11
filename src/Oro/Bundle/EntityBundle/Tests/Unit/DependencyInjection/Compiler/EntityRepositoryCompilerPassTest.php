@@ -8,9 +8,9 @@ use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepos
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntityRepository;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\ThirdEntity;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 

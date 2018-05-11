@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**

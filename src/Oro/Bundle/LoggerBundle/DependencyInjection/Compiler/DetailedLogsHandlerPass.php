@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**

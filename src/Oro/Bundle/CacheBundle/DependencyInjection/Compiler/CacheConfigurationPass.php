@@ -5,10 +5,10 @@ namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
