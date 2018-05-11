@@ -19,8 +19,8 @@ $secondary-300: lighten($secondary, 62%) !default;
 
 $extra: #f9b700 !default;
 $extra-100: lighten($extra, 22%) !default;
-$extra-200: lighten($extra, 22%) !default;
-$extra-300: lighten($extra, 22%) !default;
+$extra-200: lighten($extra, 40%) !default;
+$extra-300: lighten($extra, 48%) !default;
 $extra-dark: desaturate($extra, 96%) !default;
 
 // UI Colors
