@@ -707,6 +707,59 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see that "Header" contains "Some Text" placeholder
+     * @Then /^(?:|I )should see that "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)" placeholder$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementContainsPlaceholder($locator, $value)
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $field = $this->getPage()->find('named', ['field', $locator]);
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        if (null === $field) {
+            // try to find field among defined elements
+            $field = $this->createElement($locator);
+        }
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|element',
+                $locator
+            );
+        }
+
+        self::assertContains(
+            $value,
+            $field->getAttribute('placeholder'),
+            sprintf('Element %s does not contains placeholder %s', $locator, $value)
+        );
+    }
+
+    /**
+     * Example: Then I should see that "Header" does not contain "Some Text" placeholder
+     * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)" placeholder$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementNotContainsPlaceholder($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertNotContains(
+            $text,
+            $element->getAttribute('placeholder'),
+            sprintf('Element %s does not contains placeholder %s', $elementName, $text)
+        );
+    }
+
+    /**
      * Assert that download link in attachment works properly
      * Example: And download link for "cat.jpg" attachment should work
      * Example: And download link for "note-attachment.jpg" attachment should work
