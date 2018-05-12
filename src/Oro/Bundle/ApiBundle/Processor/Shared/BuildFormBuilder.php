@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -21,12 +22,17 @@ class BuildFormBuilder implements ProcessorInterface
     /** @var FormHelper */
     protected $formHelper;
 
+    /** @var bool */
+    protected $enableFullValidation;
+
     /**
      * @param FormHelper $formHelper
+     * @param bool       $enableFullValidation
      */
-    public function __construct(FormHelper $formHelper)
+    public function __construct(FormHelper $formHelper, bool $enableFullValidation = false)
     {
         $this->formHelper = $formHelper;
+        $this->enableFullValidation = $enableFullValidation;
     }
 
     /**
@@ -64,6 +70,9 @@ class BuildFormBuilder implements ProcessorInterface
             $this->getFormOptions($context, $config),
             $config->getFormEventSubscribers()
         );
+        if ($this->enableFullValidation) {
+            $formBuilder->addEventSubscriber(new EnableFullValidationListener());
+        }
 
         if (FormType::class === $formType) {
             $metadata = $context->getMetadata();
@@ -87,7 +96,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (null === $options) {
             $options = [];
         }
-        if (!array_key_exists('data_class', $options)) {
+        if (!\array_key_exists('data_class', $options)) {
             $options['data_class'] = $this->getFormDataClass($context, $config);
         }
         $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
@@ -105,7 +114,7 @@ class BuildFormBuilder implements ProcessorInterface
     {
         $dataClass = $context->getClassName();
         $entity = $context->getResult();
-        if (is_object($entity)) {
+        if (\is_object($entity)) {
             $parentResourceClass = $config->getParentResourceClass();
             if ($parentResourceClass) {
                 $entityClass = ClassUtils::getClass($entity);
