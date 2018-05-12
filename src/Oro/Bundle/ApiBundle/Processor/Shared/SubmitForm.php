@@ -11,17 +11,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SubmitForm implements ProcessorInterface
 {
-    /** @var bool */
-    protected $clearMissing;
-
-    /**
-     * @param bool $clearMissing Whether to set fields to NULL when they are missing in the submitted data.
-     */
-    public function __construct($clearMissing = false)
-    {
-        $this->clearMissing = $clearMissing;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -40,7 +29,12 @@ class SubmitForm implements ProcessorInterface
             return;
         }
 
-        $form->submit($this->prepareRequestData($context->getRequestData()), $this->clearMissing);
+        /**
+         * always use $clearMissing = false, more details in:
+         * @see \Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder::$enableFullValidation
+         */
+        $form->submit($this->prepareRequestData($context->getRequestData()), false);
     }
 
     /**
@@ -55,7 +49,7 @@ class SubmitForm implements ProcessorInterface
          * @see \Symfony\Component\Form\Form::submit
          * we have to convert false to its string representation here
          */
-        array_walk(
+        \array_walk(
             $requestData,
             function (&$value) {
                 if (false === $value) {
