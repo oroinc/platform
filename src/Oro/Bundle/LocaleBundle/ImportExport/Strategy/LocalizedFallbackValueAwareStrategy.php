@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
@@ -72,6 +71,24 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         }
 
         return parent::afterProcessEntity($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function processEntity(
+        $entity,
+        $isFullData = false,
+        $isPersistNew = false,
+        $itemData = null,
+        array $searchContext = [],
+        $entityIsRelation = false
+    ) {
+        if (ClassUtils::getClass($entity) === $this->localizedFallbackValueClass) {
+            $isFullData = true;
+        }
+
+        return parent::processEntity($entity, $isFullData, $isPersistNew, $itemData, $searchContext, $entityIsRelation);
     }
 
     /**
