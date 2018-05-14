@@ -1,4 +1,4 @@
 assets:
     css:
         orouser:
-            - 'bundles/orouser/css/less/main.less'
+            - 'bundles/orouser/css/scss/main.scss'

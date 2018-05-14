@@ -36,6 +36,18 @@ trait DocumentationTestTrait
             'Get a related entity',
             'Get a list of related entities'
         ],
+        ApiActions::DELETE_SUBRESOURCE  => [
+            'Delete the specified related entity',
+            'Delete the specified related entities'
+        ],
+        ApiActions::ADD_SUBRESOURCE     => [
+            'Add the specified related entity',
+            'Add the specified related entities'
+        ],
+        ApiActions::UPDATE_SUBRESOURCE  => [
+            'Update the specified related entity',
+            'Update the specified related entities'
+        ],
         ApiActions::GET_RELATIONSHIP    => 'Get the relationship data',
         ApiActions::DELETE_RELATIONSHIP => 'Delete the specified members from the relationship',
         ApiActions::ADD_RELATIONSHIP    => 'Add the specified members to the relationship',

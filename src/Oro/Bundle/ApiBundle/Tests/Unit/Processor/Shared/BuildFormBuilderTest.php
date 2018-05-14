@@ -86,9 +86,25 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity object must be added to the context before creation of the form builder.
+     */
+    public function testProcessWhenNoEntity()
+    {
+        $this->formFactory->expects(self::never())
+            ->method('createNamedBuilder');
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setMetadata(new EntityMetadata());
+        $this->processor->process($this->context);
+    }
+
     public function testProcessForCustomForm()
     {
         $entityClass = 'Test\Entity';
+        $data = new \stdClass();
         $formType = 'test_form';
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -101,7 +117,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(
                 null,
                 $formType,
-                null,
+                $data,
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api', 'my_group'],
@@ -115,6 +131,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
+        $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
@@ -49,6 +50,13 @@ class BuildFormBuilder implements ProcessorInterface
         if ($context->hasForm()) {
             // the form is already built
             return;
+        }
+
+        if (!$context->hasResult()) {
+            // the entity is not defined
+            throw new RuntimeException(
+                'The entity object must be added to the context before creation of the form builder.'
+            );
         }
 
         $context->setFormBuilder($this->getFormBuilder($context));

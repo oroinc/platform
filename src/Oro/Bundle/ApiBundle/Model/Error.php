@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Model;
 
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -59,6 +60,19 @@ class Error
     public static function createValidationError($title, $detail = null, $statusCode = Response::HTTP_BAD_REQUEST)
     {
         return self::create($title, $detail)->setStatusCode($statusCode);
+    }
+
+    /**
+     * Creates an instance of Error class represents a violation of 409 Conflict validation constraint.
+     * @link https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10
+     *
+     * @param string|Label|null $detail A human-readable explanation specific to this occurrence of the problem
+     *
+     * @return Error
+     */
+    public static function createConflictValidationError($detail = null)
+    {
+        return self::create(Constraint::CONFLICT, $detail)->setStatusCode(Response::HTTP_CONFLICT);
     }
 
     /**

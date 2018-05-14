@@ -68,7 +68,7 @@ class ReflectionUtil
     {
         if ($form instanceof Form && \count($form->getErrors()) > 0) {
             $clearClosure = \Closure::bind(
-                function (Form $form) {
+                function ($form) {
                     $form->errors = [];
                 },
                 null,
@@ -93,7 +93,7 @@ class ReflectionUtil
         foreach ($form as $child) {
             if ($child instanceof Form && !$child->isSubmitted()) {
                 $markClosure = \Closure::bind(
-                    function (Form $form) {
+                    function ($form) {
                         $form->submitted = true;
                     },
                     null,
