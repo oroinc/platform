@@ -23,6 +23,21 @@ class WsseAuthProvider extends Provider
     protected $tokenFactory;
 
     /**
+     * @var string The security firewall name whose urls should process by this provider
+     */
+    private $firewallName;
+
+    /**
+     * Sets the security firewall name whose urls should process by this provider.
+     *
+     * @param string $firewallName
+     */
+    public function setFirewallName($firewallName)
+    {
+        $this->firewallName = $firewallName;
+    }
+
+    /**
      * @param WsseTokenFactoryInterface $tokenFactory
      */
     public function setTokenFactory(WsseTokenFactoryInterface $tokenFactory)
@@ -137,5 +152,15 @@ class WsseAuthProvider extends Provider
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return parent::supports($token)
+            && $token->hasAttribute('firewallName')
+            && $token->getAttribute('firewallName') === $this->firewallName;
     }
 }
