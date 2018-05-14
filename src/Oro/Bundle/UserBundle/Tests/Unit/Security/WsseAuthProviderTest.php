@@ -126,7 +126,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 
         return [
             'regular user given, should use password and salt' => [$regularUser, self::TEST_PASSWORD, self::TEST_SALT],
-//            'advanced user given, should take API key only' => [$advancedUser, self::TEST_API_KEY]
+            'advanced user given, should take API key only' => [$advancedUser, self::TEST_API_KEY]
         ];
     }
 
