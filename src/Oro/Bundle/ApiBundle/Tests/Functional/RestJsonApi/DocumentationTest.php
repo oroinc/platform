@@ -10,9 +10,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutI
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class DocumentationTest extends RestJsonApiTestCase
 {
     use DocumentationTestTrait;
@@ -67,15 +64,34 @@ class DocumentationTest extends RestJsonApiTestCase
     /**
      * @depends testWarmUpCache
      */
-    public function testSubresourceWithUnknownTargetTypeShouldBeInRightCategory()
+    public function testSubresourceWithEntityIdentifierTargetTypeShouldBeInRightCategory()
     {
         $entityType = $this->getEntityType(TestProduct::class);
-        $docs = $this->getSubresourceEntityDocsForAction($entityType, 'search', ApiActions::GET_SUBRESOURCE);
+        $docs = $this->getSubresourceEntityDocsForAction(
+            $entityType,
+            'entity-identifier-target',
+            ApiActions::GET_SUBRESOURCE
+        );
 
         $data = $this->getSimpleFormatter()->format($docs);
         $resourceData = reset($data);
         $resourceData = reset($resourceData);
         self::assertEquals($resourceData['section'], $entityType);
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testSubresourceWithUnknownTargetTypeShouldBeExcluded()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+        $docs = $this->getSubresourceEntityDocsForAction(
+            $entityType,
+            'unregistered-target',
+            ApiActions::GET_SUBRESOURCE
+        );
+
+        self::assertEmpty($docs);
     }
 
     /**

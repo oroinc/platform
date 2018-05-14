@@ -51,6 +51,8 @@ class LoadEntity implements ProcessorInterface
         }
 
         $entity = $this->entityLoader->findEntity($entityClass, $context->getId(), $context->getMetadata());
-        $context->setResult($entity);
+        if (null !== $entity) {
+            $context->setResult($entity);
+        }
     }
 }

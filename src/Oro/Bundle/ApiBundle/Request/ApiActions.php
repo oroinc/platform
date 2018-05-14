@@ -14,6 +14,9 @@ final class ApiActions
     const DELETE              = 'delete';
     const DELETE_LIST         = 'delete_list';
     const GET_SUBRESOURCE     = 'get_subresource';
+    const UPDATE_SUBRESOURCE  = 'update_subresource';
+    const ADD_SUBRESOURCE     = 'add_subresource';
+    const DELETE_SUBRESOURCE  = 'delete_subresource';
     const GET_RELATIONSHIP    = 'get_relationship';
     const UPDATE_RELATIONSHIP = 'update_relationship';
     const ADD_RELATIONSHIP    = 'add_relationship';

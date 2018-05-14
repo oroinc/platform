@@ -19,9 +19,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
 {
-    const TEST_CLASS_NAME   = 'Test\Class';
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_CLASS_NAME   = 'Test\Class';
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var ConfigContext */
     protected $context;

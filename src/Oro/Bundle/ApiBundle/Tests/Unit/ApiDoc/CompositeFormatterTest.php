@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;

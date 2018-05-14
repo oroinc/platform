@@ -1,0 +1,60 @@
+@import "oroui/css/scss/variables";
+
+[1]:
+    In:
+        UIBundle/Resources/public/blank/scss/variables/page-area-container-config.scss
+        Undefined variable $site-width: line: 4
+
+        DataGridBundle/Resources/public/blank/scss/components/datagrid-toolbar.scss
+        Undefined variable $site-width: line: 14
+
+        FilterBundle/Resources/public/blank/scss/components/filters.scss
+        Undefined variable $site-width: line: 55
+
+    From:
+        FrontendBundle/Resources/public/blank/scss/settings/_sizes.scss
+        FrontendBundle/Resources/public/default/scss/settings/_sizes.scss
+
+[2]:
+    In:
+        UIBundle/Resources/public/blank/scss/components/utilities.scss
+        Undefined mixin img-fluid: line: 54
+
+    From:
+        FrontendBundle/Resources/public/blank/scss/vendors/bootstrap4/scss/mixins/_image.scss
+
+[3]:
+    In:
+        UIBundle/Resources/public/blank/scss/components/page-area-container.scss
+        Undefined mixin make-container: line: 7
+
+    From:
+        FrontendBundle/Resources/public/blank/scss/vendors/bootstrap4/scss/mixins/_grid.scss
+
+[4]:
+    In:
+        DataGridBundle/Resources/public/blank/scss/components/datagrid-massaction.scss
+        Undefined mixin hover-focus: line: 94(90)
+
+        DataGridBundle/Resources/public/blank/scss/components/launcher-item.scss
+        Undefined mixin hover-focus: line: 53(49)
+
+        DataGridBundle/Resources/public/blank/scss/components/grid-views.scss
+        Undefined mixin hover-focus: line: 71(66)
+        Undefined mixin hover-focus: line: 97(95)
+
+        FormBundle/Resources/public/blank/scss/components/select2-container-multi.scss
+        Undefined mixin hover-focus: line: 86(84)
+
+    From:
+        FrontendBundle/Resources/public/blank/scss/vendors/bootstrap4/scss/mixins/_hover.scss
+
+[5]:
+    In:
+        DataGridBundle/Resources/public/blank/scss/components/grid-views.scss
+        Undefined variable $dropdown-box-shadow: line: 171
+
+    From:
+        FrontendBundle/Resources/public/blank/scss/vendors/bootstrap4/scss/_variables.scss
+        FrontendBundle/Resources/public/blank/scss/variables/bootstrap4-variables-config.scss
+

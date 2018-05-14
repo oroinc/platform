@@ -7,10 +7,8 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
-use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Symfony\Component\HttpFoundation\Response;
 
 class SaveEntityTest extends FormProcessorTestCase
 {
@@ -31,7 +29,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenNoEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
@@ -39,7 +37,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
     public function testProcessForNotSupportedEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->context->setResult([]);
@@ -50,9 +48,9 @@ class SaveEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn(null);
 
         $this->context->setResult($entity);
@@ -67,19 +65,19 @@ class SaveEntityTest extends FormProcessorTestCase
         $metadata = $this->createMock(EntityMetadata::class);
         $em = $this->createMock(EntityManager::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getIdentifierValue')
-            ->with($this->identicalTo($entity))
+            ->with(self::identicalTo($entity))
             ->willReturn($entityId);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
-            ->with($this->identicalTo($entity));
-        $em->expects($this->once())
+            ->with(self::identicalTo($entity));
+        $em->expects(self::once())
             ->method('flush')
             ->with(null);
 
@@ -87,7 +85,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertEquals($entityId, $this->context->getId());
+        self::assertEquals($entityId, $this->context->getId());
     }
 
     public function testProcessForManageableEntityWithCompositeId()
@@ -98,19 +96,19 @@ class SaveEntityTest extends FormProcessorTestCase
         $metadata = $this->createMock(EntityMetadata::class);
         $em = $this->createMock(EntityManager::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getIdentifierValue')
-            ->with($this->identicalTo($entity))
+            ->with(self::identicalTo($entity))
             ->willReturn($entityId);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
-            ->with($this->identicalTo($entity));
-        $em->expects($this->once())
+            ->with(self::identicalTo($entity));
+        $em->expects(self::once())
             ->method('flush')
             ->with(null);
 
@@ -118,7 +116,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertEquals($entityId, $this->context->getId());
+        self::assertEquals($entityId, $this->context->getId());
     }
 
     public function testProcessForManageableEntityWhenIdWasNotGenerated()
@@ -128,19 +126,19 @@ class SaveEntityTest extends FormProcessorTestCase
         $metadata = $this->createMock(EntityMetadata::class);
         $em = $this->createMock(EntityManager::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getIdentifierValue')
-            ->with($this->identicalTo($entity))
+            ->with(self::identicalTo($entity))
             ->willReturn(null);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
-            ->with($this->identicalTo($entity));
-        $em->expects($this->once())
+            ->with(self::identicalTo($entity));
+        $em->expects(self::once())
             ->method('flush')
             ->with(null);
 
@@ -148,7 +146,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getId());
+        self::assertNull($this->context->getId());
     }
 
     public function testProcessWhenEntityAlreadyExists()
@@ -160,17 +158,17 @@ class SaveEntityTest extends FormProcessorTestCase
 
         $metadata = $this->createMock(EntityMetadata::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('getClassMetadata');
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
-            ->with($this->identicalTo($entity));
-        $em->expects($this->once())
+            ->with(self::identicalTo($entity));
+        $em->expects(self::once())
             ->method('flush')
             ->willThrowException($exception);
 
@@ -178,11 +176,10 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getId());
+        self::assertNull($this->context->getId());
         self::assertEquals(
             [
-                Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
-                    ->setStatusCode(Response::HTTP_CONFLICT)
+                Error::createConflictValidationError('The entity already exists')
                     ->setInnerException($exception)
             ],
             $this->context->getErrors()

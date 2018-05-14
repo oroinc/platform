@@ -49,7 +49,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     protected function getThemes()
     {
         $asset = [
-            'inputs' => ['sample_data/styles.css', 'styles.scss', 'styles.less'],
+            'inputs' => ['sample_data/styles.css', 'styles.scss'],
             'filters' => ['filters'],
             'output' => 'output.css',
         ];

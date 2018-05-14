@@ -1,4 +1,4 @@
 assets:
     css:
         oroactivitylist:
-            - 'bundles/oroactivitylist/css/less/main.less'
+            - 'bundles/oroactivitylist/css/scss/main.scss'
