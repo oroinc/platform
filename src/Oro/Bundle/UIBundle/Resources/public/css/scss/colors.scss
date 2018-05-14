@@ -52,9 +52,9 @@ $success-ultra-light: lighten($success, 58%) !default;
 $success-dark: darken($success, 8%) !default;
 $success-darken: desaturate($success, 54%) !default;
 
-$default: #5c5c5c !default;
-$default-light: lighten($default, 26%) !default;
-$default-lighten: lighten($default, 38%) !default;
-$default-extra-light: lighten($default, 50%) !default;
-$default-ultra-light: lighten($default, 56%) !default;
-$default-dark: darken($default, 12%) !default;
+$additional: #5c5c5c !default;
+$additional-light: lighten($additional, 26%) !default;
+$additional-lighten: lighten($additional, 38%) !default;
+$additional-extra-light: lighten($additional, 50%) !default;
+$additional-ultra-light: lighten($additional, 56%) !default;
+$additional-dark: darken($additional, 12%) !default;
