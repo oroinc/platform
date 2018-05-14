@@ -7,41 +7,41 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model;
  */
 class TestUnregisteredModel
 {
-    /** @var mixed */
+    /** @var int|null */
     private $id;
 
-    /** @var string */
-    private $class;
+    /** @var string|null */
+    private $name;
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param mixed $id
+     * @param int|null $id
      */
-    public function setId($id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getClass(): string
+    public function getName(): ?string
     {
-        return $this->class;
+        return $this->name;
     }
 
     /**
-     * @param string $class
+     * @param string|null $name
      */
-    public function setClass(string $class): void
+    public function setName(?string $name): void
     {
-        $this->class = $class;
+        $this->name = $name;
     }
 }

@@ -24,24 +24,106 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
 
         $response = $this->getSubresource(
-            ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
             [],
             [],
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
             [
-                'code' => 500,
-                // @todo: should be uncommented in scope of BAP-9473.
-                // possible solution can be to create "unhandled_exception" action
-                // and convert an exception to appropriate Error object there,
-                // this action can be executed by RequestActionProcessor in case if
-                // any exception is thrown by handleException method
-                //'message' => 'The result does not exist.'
+                'errors' => [
+                    [
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
+                    ]
+                ]
             ],
-            $response
+            self::jsonToArray($response->getContent())
+        );
+    }
+
+    public function testPostSubresource()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+
+        $response = $this->postSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
+            [],
+            false
+        );
+
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
+            [
+                'errors' => [
+                    [
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
+                    ]
+                ]
+            ],
+            self::jsonToArray($response->getContent())
+        );
+    }
+
+    public function testPatchSubresource()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
+            [],
+            false
+        );
+
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
+            [
+                'errors' => [
+                    [
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
+                    ]
+                ]
+            ],
+            self::jsonToArray($response->getContent())
+        );
+    }
+
+    public function testDeleteSubresource()
+    {
+        $entityType = $this->getEntityType(TestProduct::class);
+
+        $response = $this->deleteSubresource(
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
+            [],
+            false
+        );
+
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
+            [
+                'errors' => [
+                    [
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
+                    ]
+                ]
+            ],
+            self::jsonToArray($response->getContent())
         );
     }
 
@@ -50,20 +132,25 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
 
         $response = $this->getRelationship(
-            ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
             [],
             [],
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
             [
-                'code'    => 500,
-                // @todo: should be uncommented in scope of BAP-9473.
-                //'message' => 'The result does not exist.'
+                'errors' => [
+                    [
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
+                    ]
+                ]
             ],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 
@@ -72,26 +159,25 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
 
         $response = $this->postRelationship(
-            ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            ['data' => [['type' => 'search', 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
             [],
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
             [
                 'errors' => [
                     [
-                        'title'  => 'runtime exception',
-                        'detail' => \sprintf(
-                            'The metadata for association "%s::search" does not exist.',
-                            TestProduct::class
-                        )
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
                     ]
                 ]
             ],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 
@@ -100,26 +186,25 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
 
         $response = $this->patchRelationship(
-            ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            ['data' => [['type' => 'search', 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
             [],
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
             [
                 'errors' => [
                     [
-                        'title'  => 'runtime exception',
-                        'detail' => \sprintf(
-                            'The metadata for association "%s::search" does not exist.',
-                            TestProduct::class
-                        )
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
                     ]
                 ]
             ],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 
@@ -128,26 +213,25 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestProduct::class);
 
         $response = $this->deleteRelationship(
-            ['entity' => $entityType, 'id' => '@test_product1->id', 'association' => 'search'],
-            ['data' => [['type' => 'search', 'id' => '1']]],
+            ['entity' => $entityType, 'id' => '@test_product->id', 'association' => 'unregistered-target'],
+            [],
             [],
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(
+        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        self::assertEquals(
             [
                 'errors' => [
                     [
-                        'title'  => 'runtime exception',
-                        'detail' => \sprintf(
-                            'The metadata for association "%s::search" does not exist.',
-                            TestProduct::class
-                        )
+                        'status' => '404',
+                        'title'  => 'not found http exception',
+                        'detail' => 'Unsupported subresource.'
                     ]
                 ]
             ],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 }

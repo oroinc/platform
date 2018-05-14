@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeader;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
 /**
@@ -19,21 +16,10 @@ class SetHttpAllowHeaderForSubresource extends SetHttpAllowHeader
     protected function getHttpMethodToActionsMap()
     {
         return [
-            self::METHOD_GET => ApiActions::GET_SUBRESOURCE
+            self::METHOD_GET    => ApiActions::GET_SUBRESOURCE,
+            self::METHOD_PATCH  => ApiActions::UPDATE_SUBRESOURCE,
+            self::METHOD_POST   => ApiActions::ADD_SUBRESOURCE,
+            self::METHOD_DELETE => ApiActions::DELETE_SUBRESOURCE
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getExcludeActions(Context $context)
-    {
-        /** @var SubresourceContext $context */
-
-        return $this->getExcludeActionsForClass(
-            $context->getParentClassName(),
-            $context->getVersion(),
-            $context->getRequestType()
-        );
     }
 }
