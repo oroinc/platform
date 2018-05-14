@@ -27,8 +27,10 @@ define(function(require) {
         },
 
         render: function() {
-            if (this.fieldSelector && this.$(this.checkboxSelector).is(':checked')) {
-                this.$(this.fieldSelector).prop('disabled', true);
+            if (this.$(this.checkboxSelector).is(':checked')) {
+                this.$(this.checkboxSelector).each(_.bind(function(i, e) {
+                    this._setFieldsState($(e), true);
+                }, this))
             }
 
             return DefaultFieldValueView.__super__.render.apply(this, arguments);
@@ -36,9 +38,13 @@ define(function(require) {
 
         onDefaultCheckboxChange: function(e) {
             var $currentTarget = $(e.currentTarget);
-            var $controls = $currentTarget.parents('.controls');
-
             var value = $currentTarget.is(':checked');
+
+            this._setFieldsState($currentTarget, value);
+        },
+
+        _setFieldsState: function($element, value) {
+            var $controls = $element.parents('.controls');
             var valueEls = $controls.find(':input, a.btn, button')
                 .not(this.$(this.checkboxSelector))
                 .not('[readonly]');
