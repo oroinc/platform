@@ -86,20 +86,6 @@ services:
     # transform_data
     #
 
-    oro_api.create.build_form_builder:
-        class: Oro\Bundle\ApiBundle\Processor\Create\BuildFormBuilder
-        arguments:
-            - '@oro_api.form_helper'
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
-
-    oro_api.create.submit_form:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
-        arguments:
-            - true # set missing fields to NULL
-        tags:
-            - { name: oro.api.processor, action: create, group: transform_data, priority: -50 }
-
     #
     # save_data
     #

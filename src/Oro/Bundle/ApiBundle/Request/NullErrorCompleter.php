@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
- * Keeps all all properties of Error objects as is.
+ * The error completer that keeps all properties of Error objects as is.
  */
 class NullErrorCompleter implements ErrorCompleterInterface
 {

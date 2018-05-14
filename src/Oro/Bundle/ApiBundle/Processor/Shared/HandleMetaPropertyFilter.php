@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether the "meta" filter exists and if so,
- * adds the corresponding configuration extra into the Context.
+ * adds the corresponding configuration extra into the context.
  * This filter is used to specify which entity meta properties should be returned.
  */
 class HandleMetaPropertyFilter implements ProcessorInterface

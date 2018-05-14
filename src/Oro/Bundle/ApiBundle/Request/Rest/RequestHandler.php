@@ -80,6 +80,15 @@ class RequestHandler
         if ('GET' === $method) {
             return $this->actionHandler->handleGetSubresource($request);
         }
+        if ('PATCH' === $method) {
+            return $this->actionHandler->handleUpdateSubresource($request);
+        }
+        if ('POST' === $method) {
+            return $this->actionHandler->handleAddSubresource($request);
+        }
+        if ('DELETE' === $method) {
+            return $this->actionHandler->handleDeleteSubresource($request);
+        }
 
         return $this->actionHandler->handleNotAllowedSubresource($request);
     }

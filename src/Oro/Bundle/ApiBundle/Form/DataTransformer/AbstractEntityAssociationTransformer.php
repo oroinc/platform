@@ -10,7 +10,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
- * A base class for transformers for different kind of entity associations.
+ * The base class for transformers for different kind of entity associations.
  */
 abstract class AbstractEntityAssociationTransformer implements DataTransformerInterface
 {

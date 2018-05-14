@@ -26,7 +26,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Loads data from "included" section of the request data to the Context.
+ * Loads data from "included" section of the request data to the context.
  */
 class NormalizeIncludedData implements ProcessorInterface
 {

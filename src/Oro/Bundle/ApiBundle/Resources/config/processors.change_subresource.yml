@@ -1,0 +1,78 @@
+services:
+    oro_api.update_subresource.processor:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - update_subresource
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    oro_api.add_subresource.processor:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - add_subresource
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    oro_api.delete_subresource.processor:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - delete_subresource
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    #
+    # initialize
+    #
+
+    oro_api.update_subresource.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 10 }
+
+    #
+    # resource_check
+    #
+
+    #
+    # normalize_input
+    #
+
+    #
+    # security_check
+    #
+
+    #
+    # load_data
+    #
+
+    #
+    # data_security_check
+    #
+
+    #
+    # transform_data
+    #
+
+    #
+    # save_data
+    #
+
+    #
+    # normalize_data
+    #
+
+    #
+    # finalize
+    #
+
+    #
+    # normalize_result
+    #

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * A base class for filters that can be used independently from other filters
+ * The base class for filters that can be used independently from other filters
  * and can have predefined default value.
  * Also this class can be used for some custom filters.
  */

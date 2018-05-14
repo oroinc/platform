@@ -5,14 +5,12 @@ namespace Oro\Bundle\ApiBundle\Processor\Create;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
-use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Saves new ORM entity to the database and save its identifier into the Context.
+ * Saves new ORM entity to the database and save its identifier into the context.
  */
 class SaveEntity implements ProcessorInterface
 {
@@ -57,13 +55,12 @@ class SaveEntity implements ProcessorInterface
             $em->flush();
         } catch (UniqueConstraintViolationException $e) {
             $context->addError(
-                Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
-                    ->setStatusCode(Response::HTTP_CONFLICT)
+                Error::createConflictValidationError('The entity already exists')
                     ->setInnerException($e)
             );
         }
 
-        // save entity id into the Context
+        // save entity id into the context
         if (!$context->hasErrors()) {
             $id = $metadata->getIdentifierValue($entity);
             if (null !== $id) {

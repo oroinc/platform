@@ -19,12 +19,12 @@ final class Version
      *
      * @return string
      */
-    public static function normalizeVersion($version): string
+    public static function normalizeVersion(?string $version): string
     {
         if (null === $version) {
             $version = self::LATEST;
-        } elseif (0 === strpos($version, 'v')) {
-            $version = substr($version, 1);
+        } elseif (0 === \strpos($version, 'v')) {
+            $version = \substr($version, 1);
         }
 
         return $version;

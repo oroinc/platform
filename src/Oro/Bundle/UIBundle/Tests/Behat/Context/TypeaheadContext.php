@@ -51,6 +51,26 @@ class TypeaheadContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert suggestion in typeahead suggestions after typing in input area
+     * Example: When I focus on "Text" field
+     *          Then I should see "users" in typeahead suggestions for "Text"
+     *
+     * @Given /^I should not see "(?P<suggestion>[^"]+)" in typeahead suggestions for "(?P<field>[^"]+)"$/
+     */
+    public function iShouldNotSeeTypeaheadSuggestion($suggestion, $field)
+    {
+        $suggestions = $this->getSuggestionsElement($field);
+        $link = $suggestions->find(
+            'css',
+            sprintf('li a:contains("%s")', $suggestion)
+        );
+        self::assertTrue(
+            $link === null,
+            sprintf('Suggestion "%s" found in typeahead', $suggestion)
+        );
+    }
+
+    /**
      * Select suggestion from typeahead suggestions after typing in input area
      * Example: When I focus on "Text" field
      *          And I select "users" from typeahead suggestions for "Text"

@@ -134,6 +134,6 @@ demo (active)
  - label: Demo Theme
  - logo: bundles/oroui/themes/demo/images/logo.png
  - icon: bundles/oroui/themes/demo/images/favicon.ico
- - styles: bundles/oroui/themes/demo/css/main.less
+ - styles: bundles/oroui/themes/demo/css/main.scss
 ```
 

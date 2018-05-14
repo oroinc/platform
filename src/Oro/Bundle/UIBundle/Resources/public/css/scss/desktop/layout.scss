@@ -1,0 +1,46 @@
+&,
+.app-page,
+.app-page__central-panel {
+  height: 100%;
+  overflow: hidden; // prevents scroll bar appearance
+}
+& {
+  overflow-x: auto;
+}
+
+.responsive-block{
+  min-width: 340px;
+  padding-right: 5px;
+  &.border-right {
+    border-right: 2px solid #f4f4f4;
+  }
+}
+
+.app-page {
+  display: flex;
+  &__left-panel,
+  &__right-panel {
+    display: flex;
+    overflow: visible;
+  }
+  &__central-panel {
+    flex-grow: 1;
+  }
+}
+
+.oro-page {
+  &.collapsible-sidebar {
+    .oro-page-sidebar {
+      > .dropdown-menu {
+        display: block !important;
+        z-index: inherit;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.container-fluid {
+  padding-right: $contentPadding;
+  padding-left: $contentPadding;
+}

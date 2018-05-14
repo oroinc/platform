@@ -9,7 +9,7 @@ use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A base class for configuration scope managers
+ * The base class for configuration scope managers.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractScopeManager

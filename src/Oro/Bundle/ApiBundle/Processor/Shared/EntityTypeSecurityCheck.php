@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Validates whether an access to the type of entities specified
- * in the "class" property of the Context is granted.
+ * in the "class" property of the context is granted.
  * The permission type is provided in $permission argument of the class constructor.
  */
 class EntityTypeSecurityCheck implements ProcessorInterface

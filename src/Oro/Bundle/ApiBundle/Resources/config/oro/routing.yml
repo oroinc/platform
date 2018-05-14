@@ -27,6 +27,18 @@ oro_rest_api_list:
 # * GET method: returns an entity (for to-one association)
 #   or a list of entities (for to-many association)
 #   connected to the given entity by the given association
+# * PATCH method: updates an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
+# * POST method: adds an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
+# * DELETE method: deletes an entity (or entities, it depends on the association type) connected
+#   to the given entity by the given association.
+#   This type of the request is non-standard and do not have default implementation,
+#   additional processors should be added for each association requires it.
 oro_rest_api_subresource:
     path: /api/{entity}/{id}/{association}
     requirements:

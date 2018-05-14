@@ -12,13 +12,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The default implementation of extractor that retrieves information from an exception object.
+ */
 class ExceptionTextExtractor implements ExceptionTextExtractorInterface
 {
     /** @var bool */
-    protected $debug;
+    private $debug;
 
     /** @var string[] */
-    protected $safeExceptions;
+    private $safeExceptions;
 
     /**
      * @param bool     $debug
@@ -77,7 +80,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     public function getExceptionType(\Exception $exception)
     {
         return ValueNormalizerUtil::humanizeClassName(
-            get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
+            \get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
             'Exception'
         );
     }
@@ -101,7 +104,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             $text = null;
         }
         if (null !== $text) {
-            if (substr($text, -1) !== '.') {
+            if (\substr($text, -1) !== '.') {
                 $text .= '.';
             }
             if ($underlyingException !== $exception && $exception instanceof ExecutionFailedException) {
@@ -123,10 +126,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      *
      * @return bool
      */
-    protected function isSafeException(\Exception $exception)
+    private function isSafeException(\Exception $exception)
     {
         foreach ($this->safeExceptions as $class) {
-            if (is_a($exception, $class)) {
+            if (\is_a($exception, $class)) {
                 return true;
             }
         }
@@ -139,7 +142,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      *
      * @return string
      */
-    protected function getSafeExceptionText(\Exception $exception)
+    private function getSafeExceptionText(\Exception $exception)
     {
         if ($exception instanceof ForbiddenException) {
             return $exception->getReason();

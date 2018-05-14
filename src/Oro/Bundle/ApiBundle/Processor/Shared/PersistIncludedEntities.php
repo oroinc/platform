@@ -38,7 +38,7 @@ class PersistIncludedEntities implements ProcessorInterface
 
         $includedEntities = $context->getIncludedEntities();
         if (null === $includedEntities) {
-            // the Context does not have included entities
+            // the context does not have included entities
             return;
         }
 

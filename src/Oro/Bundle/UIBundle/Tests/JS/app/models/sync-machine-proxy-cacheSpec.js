@@ -19,10 +19,9 @@ define(function(require) {
             instance.SYNC_MACHINE_PROXY_CACHE_STORAGE_KEY = storageKey = 'test';
             instance.SYNC_MACHINE_PROXY_CACHE_EXPIRE_TIME = expireTime = 1000;
             instance.set = jasmine.createSpy('set');
-            instance.fetch = function() {
+            instance.fetch = jasmine.createSpy('fetch').and.callFake(function() {
                 return {then: jasmine.createSpy('then')};
-            };
-            spyOn(instance, 'fetch').and.callThrough();
+            });
             spyOn(instance, 'once').and.callThrough();
             spyOn(instance, 'trigger').and.callThrough();
 
@@ -107,13 +106,14 @@ define(function(require) {
                     expect(storageMock.setItem).toHaveBeenCalledWith(storageKey, jasmine.any(String));
                 });
 
-                it('cached JSON string is well formatted and corresponds to sync data', function() {
-                    var data;
-
+                it('cached JSON string is well formatted', function() {
                     expect(function() {
-                        data = JSON.parse(storageMock.setItem.calls.mostRecent().args[1]);
+                        JSON.parse(storageMock.setItem.calls.mostRecent().args[1]);
                     }).not.toThrowError();
+                });
 
+                it('cached JSON string corresponds to sync data', function() {
+                    var data = JSON.parse(storageMock.setItem.calls.mostRecent().args[1]);
                     expect(data).toEqual({
                         time: jasmine.any(Number),
                         data: {foo: 'bar'}
@@ -121,8 +121,7 @@ define(function(require) {
                 });
 
                 it('no event triggered about stale data in use', function() {
-                    expect(instance.trigger.calls.mostRecent().args)
-                        .not.toEqual(['proxy-cache:stale-data-in-use', instance]);
+                    expect(instance.trigger).not.toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
                 });
             });
         });
@@ -184,14 +183,14 @@ define(function(require) {
                     }, 1);
                 });
 
-                it('time mark of data  is updated in cache', function() {
+                it('time mark of data is updated in cache', function() {
                     var data = JSON.parse(storedData[storageKey]);
+                    expect(storageMock.setItem).toHaveBeenCalledWith(storageKey, jasmine.any(String));
                     expect(data.time).toBeGreaterThan(cacheTimeMark);
                 });
 
                 it('no event triggered about stale data in use', function() {
-                    expect(instance.trigger.calls.mostRecent().args)
-                        .not.toEqual(['proxy-cache:stale-data-in-use', instance]);
+                    expect(instance.trigger).not.toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
                 });
             });
 
@@ -206,8 +205,7 @@ define(function(require) {
                 });
 
                 it('triggered event about stale data in use', function() {
-                    expect(instance.trigger.calls.mostRecent().args)
-                        .toEqual(['proxy-cache:stale-data-in-use', instance]);
+                    expect(instance.trigger).toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
                 });
             });
 
@@ -222,8 +220,7 @@ define(function(require) {
                 });
 
                 it('triggered event about stale data in use', function() {
-                    expect(instance.trigger.calls.mostRecent().args)
-                        .toEqual(['proxy-cache:stale-data-in-use', instance]);
+                    expect(instance.trigger).toHaveBeenCalledWith('proxy-cache:stale-data-in-use', instance);
                 });
             });
         });

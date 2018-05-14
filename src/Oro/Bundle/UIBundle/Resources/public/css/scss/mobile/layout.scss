@@ -1,0 +1,229 @@
+& {
+  min-height: 100%;
+}
+.app-page {
+  &__central-panel {
+    padding-top: $headerHeight;
+  }
+}
+
+.mobile-hide {
+    display: none;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+
+#oroplatform-header {
+    position: fixed;
+    width: 100%;
+    height: $headerHeight;
+    max-height: $headerHeight;
+    top: 0;
+    left: 0;
+}
+
+/**
+ * Fixes issue when header with position fixed loses its place after blur event on some input
+ * $see fixStickyHeader() in oroui/js/mobile/layout.js
+ */
+&.input-focused #oroplatform-header {
+    position: absolute;
+}
+
+.row {
+    margin-left: $contentPadding;
+    margin-right: $contentPadding;
+}
+
+.container-fluid {
+    padding-right: $contentPadding;
+    padding-left: $contentPadding;
+
+    & > .responsive-section {
+        margin: 0 -#{$contentPadding};
+        padding-right: $contentPadding;
+    }
+}
+
+.scrollspy.container-fluid,
+.page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
+.page-title + .product-container {
+    margin-top: -10px;
+
+    .content-with-sidebar--container {
+        padding: 0;
+    }
+
+    > .no-data-visible {
+        padding-top: 1px;
+    }
+}
+
+.page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
+.page-title + .product-container,
+.page-title + .layout-content {
+    @include safe-area-offset(padding, 0);
+}
+
+.layout-content .responsive-section {
+    padding: 0;
+
+    .form-horizontal {
+        padding: $contentPadding 0;
+    }
+}
+
+.container-fluid > .responsive-section {
+    .responsive-cell,
+    .responsive-cell:only-child {
+        padding: 0 $contentPadding;
+    }
+}
+
+.responsive-cell .box-type1 {
+    .filter-box {
+        .btn-group {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.responsive-section {
+    .inner-grid {
+        margin: -#{$contentPadding} 0 $contentPadding;
+    }
+}
+
+.customer-without-border-tabs {
+    min-width: 280px;
+    padding-right: 0;
+    margin-left: -10px;
+    margin-right: -10px;
+    width: calc(100% + 20px);
+}
+
+.tab-content {
+    .oro-tabs {
+        margin: 0;
+        box-sizing: border-box;
+        width: 100%;
+
+        .nav-tabs {
+            & > li {
+                & > a {
+                    border-top-width: 1px;
+                }
+            }
+        }
+    }
+
+    .tab-pane {
+        padding: 0 10px;
+    }
+}
+
+.dashboard-container {
+    .responsive-cell {
+        .box-type1 {
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+    }
+}
+.responsive-cell {
+    margin-bottom: 15px;
+
+    .tab-content {
+        .box-type1 {
+            margin-bottom: 0;
+
+            .container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+    }
+
+    .box-type1 {
+        margin-right: 0;
+        margin-left: 0;
+
+        .filter-box {
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
+            max-width: 100%;
+        }
+
+        .container-fluid,
+        .grid-toolbar {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+
+.oro-page {
+    &.collapsible-sidebar {
+        @media only screen and (min-width: 820px) {
+            .oro-page-sidebar {
+                > .dropdown-menu {
+                    display: block !important;
+                    z-index: inherit;
+                }
+            }
+        }
+
+        @media only screen and (max-width: 820px) {
+            overflow: visible;
+
+            .oro-page-sidebar {
+                overflow: visible;
+                clear: both;
+                width: 100%;
+
+                > .dropdown-toggle:focus {
+                    font-weight: normal;
+                }
+
+                > .dropdown-toggle {
+                    display: block;
+                    background: #fff;
+                    line-height: 30px;
+                    margin: 0 10px;
+                }
+
+                > .dropdown-menu {
+                    z-index: 900;
+                    position: absolute;
+                    padding: 5px 0;
+                    margin: 2px 0 0;
+                    background-color: #fff;
+                    border: 1px solid #ccc;
+                    border: 1px solid rgba(0, 0, 0, .2);
+                    border-radius: 6px;
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+
+                    > li {
+                        width: auto;
+                    }
+                }
+            }
+
+            .oro-page-body {
+                width: 100%;
+                overflow: hidden;
+            }
+        }
+    }
+}
+
+&.loading > .loader-mask {
+    position: fixed;
+    bottom: 0;
+}

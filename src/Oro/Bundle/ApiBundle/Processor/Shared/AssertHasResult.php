@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Makes sure that the result exists in the Context.
+ * Makes sure that the result exists in the context.
  */
 class AssertHasResult implements ProcessorInterface
 {

@@ -46,6 +46,31 @@ class LoadEntityTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessForNotExistingEntity()
+    {
+        $entityClass = 'Test\Entity';
+        $entityId = 123;
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->entityLoader->expects(self::once())
+            ->method('findEntity')
+            ->with($entityClass, $entityId, $metadata)
+            ->willReturn(null);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setId($entityId);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasResult());
+    }
+
     public function testProcessForNotManageableEntity()
     {
         $entityClass = 'Test\Entity';

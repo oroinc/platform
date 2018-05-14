@@ -12,15 +12,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 
 class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
-    const ASSOCIATION_NAME = 'testAssociation';
+    private const ASSOCIATION_NAME = 'testAssociation';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    private $entityIdTransformer;
 
     /** @var NormalizeRequestData */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
      *
      * @return AssociationMetadata
      */
-    protected function createAssociationMetadata($associationName, $targetClass, $isCollection)
+    private function createAssociationMetadata($associationName, $targetClass, $isCollection)
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
@@ -53,7 +53,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
     {
         $parentMetadata = new EntityMetadata();
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->context->setRequestData(['val']);
@@ -66,7 +66,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             self::ASSOCIATION_NAME => 'val'
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testNormalizeDataForToOneAssociation()
@@ -76,7 +76,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->with('val', self::identicalTo($associationMetadata->getTargetMetadata()))
             ->willReturn('normalizedVal');
@@ -94,7 +94,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ]
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testNormalizeEmptyDataForToOneAssociation()
@@ -104,7 +104,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->context->setRequestData([null]);
@@ -117,7 +117,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             self::ASSOCIATION_NAME => null
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testNormalizeDataForToManyAssociation()
@@ -127,12 +127,12 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
 
-        $this->entityIdTransformer->expects($this->exactly(2))
+        $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
             ->willReturnMap(
                 [
                     ['val1', $associationMetadata->getTargetMetadata(), 'normalizedVal1'],
-                    ['val2', $associationMetadata->getTargetMetadata(), 'normalizedVal2'],
+                    ['val2', $associationMetadata->getTargetMetadata(), 'normalizedVal2']
                 ]
             );
 
@@ -155,7 +155,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ]
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testNormalizeEmptyDataForToManyAssociation()
@@ -165,7 +165,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->context->setRequestData([[]]);
@@ -178,7 +178,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             self::ASSOCIATION_NAME => []
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testProcessWithInvalidIdentifierForToOneAssociation()
@@ -188,7 +188,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->willThrowException(new \Exception('cannot normalize id'));
 
@@ -205,8 +205,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ]
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
-        $this->assertEquals(
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals(
             [
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
@@ -223,7 +223,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
 
-        $this->entityIdTransformer->expects($this->exactly(2))
+        $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
             ->willThrowException(new \Exception('cannot normalize id'));
 
@@ -246,15 +246,15 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
             ]
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
-        $this->assertEquals(
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals(
             [
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
                     ->setSource(ErrorSource::createByPropertyPath(self::ASSOCIATION_NAME . '.0')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath(self::ASSOCIATION_NAME . '.1')),
+                    ->setSource(ErrorSource::createByPropertyPath(self::ASSOCIATION_NAME . '.1'))
             ],
             $this->context->getErrors()
         );

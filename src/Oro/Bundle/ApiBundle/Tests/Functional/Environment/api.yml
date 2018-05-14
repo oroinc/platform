@@ -21,6 +21,9 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
             alias: testapiresourcewithoutidentifier
             plural_alias: testapiresourcewithoutidentifier
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel:
+            alias: testapiunaccessiblemodel
+            plural_alias: testapiunaccessiblemodel
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
@@ -76,7 +79,72 @@ api:
             sorters:
                 fields:
                     email: ~
-        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+            subresources:
+                accessible-target:
+                    target_class: Oro\Bundle\TestFrameworkBundle\Entity\TestProductType
+                    target_type: collection
+                accessible-target-custom:
+                    target_class: Oro\Bundle\TestFrameworkBundle\Entity\TestProductType
+                    target_type: collection
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                accessible-target-custom-partial:
+                    target_class: Oro\Bundle\TestFrameworkBundle\Entity\TestProductType
+                    target_type: collection
+                    actions:
+                        get_subresource: false
+                        add_subresource: true
+                entity-identifier-target:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
+                    target_type: collection
+                entity-identifier-target-custom:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
+                    target_type: collection
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                entity-identifier-target-custom-partial:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
+                    target_type: collection
+                    actions:
+                        get_subresource: false
+                        add_subresource: true
+                unaccessible-target:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel
+                    target_type: collection
+                unaccessible-target-custom:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel
+                    target_type: collection
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                unaccessible-target-custom-partial:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel
+                    target_type: collection
+                    actions:
+                        get_subresource: false
+                        add_subresource: true
+                unregistered-target:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnregisteredModel
+                    target_type: collection
+                unregistered-target-custom:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnregisteredModel
+                    target_type: collection
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                unregistered-target-custom-partial:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnregisteredModel
+                    target_type: collection
+                    actions:
+                        get_subresource: false
+                        add_subresource: true
         Oro\Bundle\TestFrameworkBundle\Entity\TestProductType: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestWithoutIdGenerator: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCompositeIdentifier:
@@ -170,8 +238,30 @@ api:
                 update:
                     description: Update Resource Without Identifier
                     documentation: Update resource without identifier
-        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestProduct:
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel:
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: int
+                name:
+                    data_type: string
+            # this entity does not have own Data API resource
+            actions: false
+        Extend\Entity\TestApiE1:
             subresources:
-                search:
-                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestEntityIdentifier
-                    target_type: collection
+                biM2O: # this subresource is used to test "to-one" sub-resource change actions
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                biM2M: # this subresource is used to test "to-many" sub-resource change actions
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true
+                custom: # this subresource is used to test custom sub-resource change actions
+                    target_class: Extend\Entity\TestApiE2
+                    actions:
+                        update_subresource: true
+                        add_subresource: true
+                        delete_subresource: true

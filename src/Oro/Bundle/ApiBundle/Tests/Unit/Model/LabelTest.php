@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class LabelTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
     private $translator;
 
     public function setUp()
@@ -18,36 +18,36 @@ class LabelTest extends \PHPUnit_Framework_TestCase
     public function testName()
     {
         $label = new Label('test');
-        $this->assertEquals('test', $label->getName());
+        self::assertEquals('test', $label->getName());
 
         $label->setName('test1');
-        $this->assertEquals('test1', $label->getName());
+        self::assertEquals('test1', $label->getName());
 
-        $this->assertEquals('Label: test1', (string)$label);
+        self::assertEquals('Label: test1', (string)$label);
     }
 
     public function testTrans()
     {
         $label = new Label('test');
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('test')
             ->willReturn('translated');
 
-        $this->assertEquals('translated', $label->trans($this->translator));
+        self::assertEquals('translated', $label->trans($this->translator));
     }
 
     public function testTransWhenNoTranslation()
     {
         $label = new Label('test');
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('test')
             ->willReturn('test');
 
-        $this->assertEquals('', $label->trans($this->translator));
+        self::assertEquals('', $label->trans($this->translator));
     }
 
     public function testReturnsResultEvenWhenNoTranslationExistIfTranslateDirectlyOptionIsSetToTrue()
@@ -55,11 +55,11 @@ class LabelTest extends \PHPUnit_Framework_TestCase
         $label = new Label('test');
         $label->setTranslateDirectly(true);
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('test')
             ->willReturn('test');
 
-        $this->assertEquals('test', $label->trans($this->translator));
+        self::assertEquals('test', $label->trans($this->translator));
     }
 }

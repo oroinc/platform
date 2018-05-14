@@ -6,6 +6,10 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Provides implementation of FormContext interface.
+ * @see \Oro\Bundle\ApiBundle\Processor\FormContext
+ */
 trait FormContextTrait
 {
     /** @var array */
@@ -34,7 +38,7 @@ trait FormContextTrait
     }
 
     /**
-     * Sets request data to the Context.
+     * Sets request data to the context.
      *
      * @param array $requestData
      */

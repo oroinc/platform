@@ -94,6 +94,10 @@ services:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
 
     #
+    # finalize
+    #
+
+    #
     # normalize_result
     #
 

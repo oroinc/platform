@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether the "fields" filters exist and if so,
- * adds the corresponding configuration extra into the Context.
+ * adds the corresponding configuration extra into the context.
  * These filters are used to specify which fields of primary
  * or related entities should be returned.
  */

@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks if there are any errors in the Context,
+ * Checks if there are any errors in the context,
  * and if so, completes missing properties of all Error objects.
  * E.g. if an error is created due to an exception occurs,
  * such error does not have "statusCode", "title", "details" and other properties,
