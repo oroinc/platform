@@ -2,69 +2,77 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update\JsonApi;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData as BaseProcessor;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
+use Oro\Bundle\ApiBundle\Request\JsonApi\TypedRequestDataValidator;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Validates that the request data contains valid JSON.API object.
  */
-class ValidateRequestData extends BaseProcessor
+class ValidateRequestData implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'validate_request_data';
+
+    /** @var ValueNormalizer */
+    private $valueNormalizer;
+
+    /**
+     * @param ValueNormalizer $valueNormalizer
+     */
+    public function __construct(ValueNormalizer $valueNormalizer)
+    {
+        $this->valueNormalizer = $valueNormalizer;
+    }
+
     /**
      * {@inheritdoc}
      */
-    protected function validatePrimaryDataObject(array $data, $pointer)
+    public function process(ContextInterface $context)
     {
-        if ($this->validateResourceObject($data, $pointer)) {
-            $this->validatePrimaryDataObjectId($data, $pointer);
-            $this->validatePrimaryDataObjectType($data, $pointer);
-            $this->validateAttributesOrRelationshipsExist($data, $pointer);
+        /** @var UpdateContext $context */
+
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the request data were already validated
+            return;
         }
+
+        $errors = $this->validateRequestData($context);
+        foreach ($errors as $error) {
+            $context->addError($error);
+        }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     /**
-     * @param array  $data
-     * @param string $pointer
+     * @param UpdateContext $context
      *
-     * @return bool
+     * @return Error[]
      */
-    protected function validatePrimaryDataObjectId(array $data, $pointer)
+    private function validateRequestData(UpdateContext $context): array
     {
-        // do matching only if the identifier is not normalized yet
-        $id = $this->context->getId();
-        if (is_string($id) && $id !== $data[JsonApiDoc::ID]) {
-            $this->addConflictError(
-                $this->buildPointer($pointer, JsonApiDoc::ID),
-                sprintf(
-                    'The \'%1$s\' property of the primary data object'
-                    . ' should match \'%1$s\' parameter of the query sting',
-                    JsonApiDoc::ID
-                )
+        $requestType = $context->getRequestType();
+        $validator = new TypedRequestDataValidator(function ($entityType) use ($requestType) {
+            return ValueNormalizerUtil::convertToEntityClass(
+                $this->valueNormalizer,
+                $entityType,
+                $requestType,
+                false
             );
+        });
 
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array  $data
-     * @param string $pointer
-     */
-    protected function validateAttributesOrRelationshipsExist(array $data, $pointer)
-    {
-        if (!array_key_exists(JsonApiDoc::ATTRIBUTES, $data)
-            && !array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
-        ) {
-            $this->addError(
-                $pointer,
-                sprintf(
-                    'The primary data object should contain \'%s\' or \'%s\' block',
-                    JsonApiDoc::ATTRIBUTES,
-                    JsonApiDoc::RELATIONSHIPS
-                )
+        if ($context->hasIdentifierFields()) {
+            return $validator->validateResourceObject(
+                $context->getRequestData(),
+                true,
+                $context->getClassName(),
+                $context->getId()
             );
         }
+
+        return $validator->validateMetaObject($context->getRequestData());
     }
 }

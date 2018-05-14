@@ -96,5 +96,9 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
     #
+    # finalize
+    #
+
+    #
     # normalize_result
     #

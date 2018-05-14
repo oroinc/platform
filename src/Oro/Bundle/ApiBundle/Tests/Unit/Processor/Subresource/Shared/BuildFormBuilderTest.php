@@ -64,6 +64,22 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The parent entity object must be added to the context before creation of the form builder.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessWhenNoParentEntity()
+    {
+        $this->formFactory->expects(self::never())
+            ->method('createNamedBuilder');
+
+        $this->context->setParentConfig(new EntityDefinitionConfig());
+        $this->context->setParentMetadata(new EntityMetadata());
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWithDefaultOptions()
     {
         $parentEntity = new \stdClass();

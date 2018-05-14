@@ -14,10 +14,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
     /** @var NormalizeRequestData */
-    protected $processor;
+    private $processor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    private $entityIdTransformer;
 
     public function setUp()
     {
@@ -33,7 +33,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
      *
      * @return FieldMetadata
      */
-    protected function createFieldMetadata($fieldName)
+    private function createFieldMetadata($fieldName)
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -48,7 +48,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
      *
      * @return AssociationMetadata
      */
-    protected function createAssociationMetadata($associationName, $targetClass, $isCollection)
+    private function createAssociationMetadata($associationName, $targetClass, $isCollection)
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
@@ -88,7 +88,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             $this->createAssociationMetadata('emptyToManyRelation', 'Test\Group', true)
         );
 
-        $this->entityIdTransformer->expects($this->any())
+        $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
             ->willReturnCallback(
                 function ($value, EntityMetadata $metadata) {
@@ -125,14 +125,14 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'emptyToManyRelation' => []
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals($expectedData, $this->context->getRequestData());
     }
 
     public function testProcessWithInvalidIdentifiers()
     {
         $inputData = [
             'toOneRelation'  => 'val1',
-            'toManyRelation' => ['val1', 'val2'],
+            'toManyRelation' => ['val1', 'val2']
         ];
 
         $metadata = new EntityMetadata();
@@ -143,7 +143,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             $this->createAssociationMetadata('toManyRelation', 'Test\Group', true)
         );
 
-        $this->entityIdTransformer->expects($this->any())
+        $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
             ->willThrowException(new \Exception('cannot normalize id'));
 
@@ -168,8 +168,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $this->assertEquals($expectedData, $this->context->getRequestData());
-        $this->assertEquals(
+        self::assertEquals($expectedData, $this->context->getRequestData());
+        self::assertEquals(
             [
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
@@ -179,7 +179,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
                     ->setSource(ErrorSource::createByPropertyPath('toManyRelation.0')),
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('cannot normalize id'))
-                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.1')),
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation.1'))
             ],
             $this->context->getErrors()
         );

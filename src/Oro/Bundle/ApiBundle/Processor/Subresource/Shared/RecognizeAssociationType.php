@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Makes sure that the association name exists in the context.
@@ -18,7 +21,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class RecognizeAssociationType implements ProcessorInterface
 {
     /** @var SubresourcesProvider */
-    protected $subresourcesProvider;
+    private $subresourcesProvider;
 
     /**
      * @param SubresourcesProvider $subresourcesProvider
@@ -49,11 +52,7 @@ class RecognizeAssociationType implements ProcessorInterface
                     'The association name must be set in the context.'
                 )
             );
-
-            return;
-        }
-
-        if (!$this->setAssociationType($context, $associationName)) {
+        } elseif (!$this->setAssociationType($context, $associationName)) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::RELATIONSHIP,
@@ -69,20 +68,16 @@ class RecognizeAssociationType implements ProcessorInterface
      *
      * @return bool
      */
-    protected function setAssociationType(SubresourceContext $context, $associationName)
+    private function setAssociationType(SubresourceContext $context, string $associationName): bool
     {
-        $entitySubresources = $this->subresourcesProvider->getSubresources(
-            $context->getParentClassName(),
-            $context->getVersion(),
-            $context->getRequestType()
-        );
-        if (null === $entitySubresources) {
-            return false;
-        }
-        $subresource = $entitySubresources->getSubresource($associationName);
+        $subresource = $this->getSubresource($context, $associationName);
         if (null === $subresource) {
-            return false;
+            throw new NotFoundHttpException('Unsupported subresource.');
         }
+        if ($subresource->isExcludedAction($context->getAction())) {
+            throw new ActionNotAllowedException();
+        }
+
         $targetClassName = $subresource->getTargetClassName();
         if (!$targetClassName) {
             return false;
@@ -92,5 +87,26 @@ class RecognizeAssociationType implements ProcessorInterface
         $context->setIsCollection($subresource->isCollection());
 
         return true;
+    }
+
+    /**
+     * @param SubresourceContext $context
+     * @param string             $associationName
+     *
+     * @return ApiSubresource|null
+     */
+    private function getSubresource(SubresourceContext $context, string $associationName): ?ApiSubresource
+    {
+        $entitySubresources = $this->subresourcesProvider->getSubresources(
+            $context->getParentClassName(),
+            $context->getVersion(),
+            $context->getRequestType()
+        );
+
+        if (null === $entitySubresources) {
+            return null;
+        }
+
+        return $entitySubresources->getSubresource($associationName);
     }
 }

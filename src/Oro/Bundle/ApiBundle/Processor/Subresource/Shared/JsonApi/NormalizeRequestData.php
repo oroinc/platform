@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Prepares JSON.API request data to be processed by Symfony Forms.
+ * Prepares JSON.API request data for a relationship to be processed by Symfony Forms.
  */
 class NormalizeRequestData implements ProcessorInterface
 {
@@ -184,7 +184,7 @@ class NormalizeRequestData implements ProcessorInterface
     {
         $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
         if (null === $associationMetadata) {
-            throw new RuntimeException(sprintf(
+            throw new RuntimeException(\sprintf(
                 'The metadata for association "%s::%s" does not exist.',
                 $this->context->getParentClassName(),
                 $associationName

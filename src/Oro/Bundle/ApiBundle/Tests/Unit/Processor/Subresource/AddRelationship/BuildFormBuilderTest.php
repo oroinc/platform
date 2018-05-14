@@ -16,20 +16,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
-    const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    const TEST_ASSOCIATION_NAME  = 'testAssociation';
+    private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
+    private const TEST_ASSOCIATION_NAME  = 'testAssociation';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $formFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    private $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $propertyAccessor;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|PropertyAccessorInterface */
+    private $propertyAccessor;
 
     /** @var BuildFormBuilder */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -59,18 +59,18 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentMetadata = new EntityMetadata();
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('createNamedBuilder')
             ->willReturn($formBuilder);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('setDataMapper')
-            ->with($this->isInstanceOf(AppendRelationshipMapper::class));
+            ->with(self::isInstanceOf(AppendRelationshipMapper::class));
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
-        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 }
