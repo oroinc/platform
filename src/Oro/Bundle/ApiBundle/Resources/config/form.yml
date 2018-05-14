@@ -63,7 +63,7 @@ services:
     oro_api.form.type.nested_association:
         class: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType
         arguments:
-            - '@property_accessor'
+            - '@form.property_accessor'
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:

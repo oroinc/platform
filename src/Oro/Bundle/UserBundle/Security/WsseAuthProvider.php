@@ -32,6 +32,11 @@ class WsseAuthProvider extends Provider
     protected $providerKey;
 
     /**
+     * @var string The security firewall name whose urls should process by this provider
+     */
+    private $firewallName;
+
+    /**
      * @param UserCheckerInterface     $userChecker  A UserChecketerInterface instance
      * @param UserProviderInterface    $userProvider An UserProviderInterface instance
      * @param string                   $providerKey  The provider key
@@ -54,6 +59,16 @@ class WsseAuthProvider extends Provider
         $this->providerKey = $providerKey;
 
         parent::__construct($userChecker, $userProvider, $providerKey, $encoder, $nonceCache, $lifetime, $dateFormat);
+    }
+
+    /**
+     * Sets the security firewall name whose urls should process by this provider.
+     *
+     * @param string $firewallName
+     */
+    public function setFirewallName($firewallName)
+    {
+        $this->firewallName = $firewallName;
     }
 
     /**
@@ -174,5 +189,15 @@ class WsseAuthProvider extends Provider
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return parent::supports($token)
+            && $token->hasAttribute('firewallName')
+            && $token->getAttribute('firewallName') === $this->firewallName;
     }
 }

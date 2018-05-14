@@ -1,0 +1,8 @@
+Extend\Entity\TestApiE2:
+    target{1..3}:
+        name: 'Target Entity <current()>'
+Extend\Entity\TestApiE1:
+    entity:
+        name: 'Entity'
+        biM2O: '@target1'
+        biM2M: ['@target1', '@target2']

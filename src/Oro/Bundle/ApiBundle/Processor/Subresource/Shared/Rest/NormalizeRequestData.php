@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Prepares REST API request data to be processed by Symfony Forms.
+ * Prepares REST API request data for a relationship to be processed by Symfony Forms.
  */
 class NormalizeRequestData implements ProcessorInterface
 {

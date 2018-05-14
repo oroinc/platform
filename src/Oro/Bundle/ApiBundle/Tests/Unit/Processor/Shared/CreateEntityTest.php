@@ -5,13 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\CreateEntity;
-use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
-use Symfony\Component\HttpFoundation\Response;
 
 class CreateEntityTest extends FormProcessorTestCase
 {
@@ -160,10 +158,7 @@ class CreateEntityTest extends FormProcessorTestCase
 
         self::assertNull($this->context->getResult());
         self::assertEquals(
-            [
-                Error::createValidationError(Constraint::CONFLICT, 'The entity already exists')
-                    ->setStatusCode(Response::HTTP_CONFLICT)
-            ],
+            [Error::createConflictValidationError('The entity already exists')],
             $this->context->getErrors()
         );
     }

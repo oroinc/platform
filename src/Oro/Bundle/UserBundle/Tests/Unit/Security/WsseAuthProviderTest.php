@@ -10,6 +10,8 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
 use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
@@ -243,6 +245,34 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $token->setAttribute('created', $time);
 
         $this->provider->authenticate($token);
+    }
+
+    public function testIsSupportWithWrongTokenType()
+    {
+        $token = new AnonymousToken('test', 'test');
+        $this->assertFalse($this->provider->supports($token));
+    }
+
+    public function testIsSupportWithoutFirewallNameAttribute()
+    {
+        $token = new Token([]);
+        $this->assertFalse($this->provider->supports($token));
+    }
+
+    public function testIsSupportWithNotSupportedFirewallNameAttribute()
+    {
+        $token = new Token([]);
+        $token->setAttribute('firewallName', 'notSupported');
+        $this->provider->setFirewallName('test');
+        $this->assertFalse($this->provider->supports($token));
+    }
+
+    public function testIsSupport()
+    {
+        $token = new Token([]);
+        $token->setAttribute('firewallName', 'test');
+        $this->provider->setFirewallName('test');
+        $this->assertTrue($this->provider->supports($token));
     }
 
     /**
