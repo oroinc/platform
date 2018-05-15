@@ -73,8 +73,8 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'path',
                         null,
                         InputOption::VALUE_OPTIONAL,
-                        'Dump destination (or upload source), relative to %kernel.root_dir%',
-                        '/Resources/language-pack/'
+                        'Dump destination (or upload source), relative to %kernel.project_dir%',
+                        '/var/language-pack/'
                     ),
                     new InputOption(
                         'dump',
@@ -106,7 +106,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                 <<<EOF
 The <info>%command.name%</info> command extract translation files for each bundle in
 specified vendor namespace(project) and creates language pack that's placed at
-%kernel.root_dir%/Resources/language-pack
+%kernel.project_dir%/var/language-pack
 
     <info>php %command.full_name% --dump OroCRM</info>
     <info>php %command.full_name% --upload OroCRM</info>
@@ -138,7 +138,7 @@ EOF
             return 1;
         }
 
-        $this->path = $this->getContainer()->getParameter('kernel.root_dir')
+        $this->path = $this->getContainer()->getParameter('kernel.project_dir')
             . str_replace('//', '/', $input->getOption('path') . '/');
 
         $locale           = $input->getArgument('locale');

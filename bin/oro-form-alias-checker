@@ -16,7 +16,7 @@ function createConnection(): \Doctrine\DBAL\Connection
 {
     $config = new \Doctrine\DBAL\Configuration();
     $parser = new \Symfony\Component\Yaml\Parser();
-    $configParams = $parser->parse(file_get_contents(getcwd() . '/app/config/parameters.yml'));
+    $configParams = $parser->parse(file_get_contents(getcwd() . '/config/parameters.yml'));
     $configParams = $configParams['parameters'];
 
     return \Doctrine\DBAL\DriverManager::getConnection([

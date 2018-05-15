@@ -145,6 +145,5 @@
     "autoload": {
         "psr-4": {"": "src/"},
         "exclude-from-classmap": ["/Tests/"]
-    },
-    "bin": ["bin/oro-form-alias-checker"]
+    }
 }

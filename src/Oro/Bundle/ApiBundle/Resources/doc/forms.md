@@ -50,7 +50,7 @@ Consequently, all the data API form types, extensions, and guessers should be re
 - Use the application configuration file.
 - Tag the form elements by appropriate tags in the dependency injection container.
 
-To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `app/config/config.yml` of your application:
+To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `config/config.yml` of your application:
 
 ```yaml
 api:

@@ -25,7 +25,7 @@ The path to the file can be defined as bundles/bundle/path/to/file.ext. There is
 used for correct work.
 
 To turn off compression of the css files in the `css_group` group, the following configuration should be added
-to the app/config/config.yml (or app/config/config_{mode}.yml) file:
+to the config/config.yml (or config/config_{mode}.yml) file:
 
 ```yaml
 oro_assetic:

@@ -175,7 +175,7 @@ class ImportExportContext extends OroFeatureContext implements
             ]
         ));
         $this->template = tempnam(
-            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
             'import_template_'
         );
 
@@ -369,7 +369,7 @@ class ImportExportContext extends OroFeatureContext implements
     public function iFillTemplateWithData(TableNode $table)
     {
         $this->importFile = tempnam(
-            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
             'import_data_'
         );
         $fp = fopen($this->importFile, 'w');
@@ -445,7 +445,11 @@ class ImportExportContext extends OroFeatureContext implements
 
         /** @var File $exportFile */
         $exportFile = reset($exportFiles);
-        $path = $this->getContainer()->getParameter('kernel.root_dir') . DIRECTORY_SEPARATOR . 'import_export';
+        $path = $this->getContainer()->getParameter('kernel.project_dir')
+            .DIRECTORY_SEPARATOR
+            .'var'
+            .DIRECTORY_SEPARATOR
+            .'import_export';
         $this->importFile = $path . DIRECTORY_SEPARATOR . $exportFile->getName();
         $this->tryImportFile();
     }

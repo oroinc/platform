@@ -5,7 +5,7 @@ services:
     oro_installer.yaml_persister:
         class: '%oro_installer.yaml_persister.class%'
         arguments:
-            - '%kernel.root_dir%/config'
+            - '%kernel.project_dir%/config'
             - '%kernel.environment%'
 
     kernel.listener.install.event:
@@ -30,7 +30,7 @@ services:
         class: Oro\Bundle\InstallerBundle\EventListener\AssetsInstallCommandListener
         arguments:
             - '@filesystem'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
         tags:
             - { name: kernel.event_listener, event: console.command, method: beforeExecute }
             - { name: kernel.event_listener, event: console.terminate, method: afterExecute }

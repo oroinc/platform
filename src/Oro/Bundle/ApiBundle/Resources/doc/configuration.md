@@ -51,7 +51,7 @@ php bin/console oro:api:config:dump-reference --max-nesting-level=0
 The default nesting level is `3`. It is specified in the configuration of ApiBundle via the `config_max_nesting_level` parameter. If needed, change this value:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_api:
     config_max_nesting_level: 3
