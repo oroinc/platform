@@ -6,7 +6,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
- * Provides an interface for different kind of error completers.
+ * Provides an interface for classes that complete properties of the Error objects
+ * for different kind of Data API requests.
  */
 interface ErrorCompleterInterface
 {

@@ -87,3 +87,18 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
             - { name: oro.api.processor, action: update, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+
+    oro_api.tests.subresource.json_api.validate_request_data.custom:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\ValidateSubresourceRequestData
+        arguments:
+            - false
+            - true
+        tags:
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, collection: false, requestType: json_api, priority: 89 }
+
+    oro_api.tests.subresource.json_api.load_entity.custom:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestSubresourceEntity
+        arguments:
+            - '@form.property_accessor'
+        tags:
+            - { name: oro.api.processor, action: update_subresource, group: load_data, collection: false, priority: -100 }

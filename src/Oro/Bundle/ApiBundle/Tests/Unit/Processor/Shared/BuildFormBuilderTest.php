@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -30,7 +31,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     /** @var BuildFormBuilder */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -45,7 +46,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
      *
      * @return FieldMetadata
      */
-    protected function createFieldMetadata($fieldName)
+    private function createFieldMetadata($fieldName)
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -58,7 +59,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
      *
      * @return AssociationMetadata
      */
-    protected function createAssociationMetadata($associationName)
+    private function createAssociationMetadata($associationName)
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
@@ -85,9 +86,25 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The entity object must be added to the context before creation of the form builder.
+     */
+    public function testProcessWhenNoEntity()
+    {
+        $this->formFactory->expects(self::never())
+            ->method('createNamedBuilder');
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setMetadata(new EntityMetadata());
+        $this->processor->process($this->context);
+    }
+
     public function testProcessForCustomForm()
     {
         $entityClass = 'Test\Entity';
+        $data = new \stdClass();
         $formType = 'test_form';
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -100,7 +117,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(
                 null,
                 $formType,
-                null,
+                $data,
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api', 'my_group'],
@@ -114,6 +131,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
+        $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
@@ -644,6 +662,72 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForEnabledFullValidation()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('addEventSubscriber')
+            ->with(self::isInstanceOf(EnableFullValidationListener::class));
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setResult($data);
+        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container), true);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForDisabledFullValidation()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'api_context'          => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::never())
+            ->method('addEventSubscriber');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setMetadata(new EntityMetadata());
         $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());

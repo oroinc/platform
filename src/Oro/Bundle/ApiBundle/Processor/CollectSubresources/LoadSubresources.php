@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
@@ -17,13 +15,39 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * The base class for different kind of processors that load sub-resources.
+ */
 abstract class LoadSubresources implements ProcessorInterface
 {
+    protected const SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS = [
+        ApiActions::UPDATE_SUBRESOURCE,
+        ApiActions::ADD_SUBRESOURCE,
+        ApiActions::DELETE_SUBRESOURCE
+    ];
+
+    protected const SUBRESOURCE_ACTIONS = [
+        ApiActions::GET_SUBRESOURCE,
+        ApiActions::UPDATE_SUBRESOURCE,
+        ApiActions::ADD_SUBRESOURCE,
+        ApiActions::DELETE_SUBRESOURCE,
+        ApiActions::GET_RELATIONSHIP,
+        ApiActions::UPDATE_RELATIONSHIP,
+        ApiActions::ADD_RELATIONSHIP,
+        ApiActions::DELETE_RELATIONSHIP
+    ];
+
+    protected const RELATIONSHIP_CHANGE_ACTIONS = [
+        ApiActions::UPDATE_RELATIONSHIP,
+        ApiActions::ADD_RELATIONSHIP,
+        ApiActions::DELETE_RELATIONSHIP
+    ];
+
     /** @var ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var MetadataProvider */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /**
      * @param ConfigProvider   $configProvider
@@ -38,7 +62,7 @@ abstract class LoadSubresources implements ProcessorInterface
     /**
      * @param AssociationMetadata $association
      * @param array               $accessibleResources
-     * @param array               $subresourceExcludedActions
+     * @param string[]            $subresourceExcludedActions
      *
      * @return ApiSubresource
      */
@@ -46,27 +70,21 @@ abstract class LoadSubresources implements ProcessorInterface
         AssociationMetadata $association,
         array $accessibleResources,
         array $subresourceExcludedActions
-    ) {
+    ): ApiSubresource {
         $subresource = new ApiSubresource();
         $subresource->setTargetClassName($association->getTargetClassName());
         $subresource->setAcceptableTargetClassNames($association->getAcceptableTargetClassNames());
         $subresource->setIsCollection($association->isCollection());
-        if ($association->isCollection()) {
-            if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
-                $subresource->setExcludedActions($this->getRelationshipExcludeActions());
-            } elseif (!empty($subresourceExcludedActions)) {
+        if ($this->isAccessibleSubresource($subresource, $accessibleResources)) {
+            if (!empty($subresourceExcludedActions)) {
                 $subresource->setExcludedActions($subresourceExcludedActions);
             }
-        } else {
-            if (!$this->isAccessibleAssociation($association, $accessibleResources)) {
-                $subresource->setExcludedActions($this->getRelationshipExcludeActions());
-            } else {
-                if (!empty($subresourceExcludedActions)) {
-                    $subresource->setExcludedActions($subresourceExcludedActions);
-                }
+            if (!$association->isCollection()) {
                 $this->ensureActionExcluded($subresource, ApiActions::ADD_RELATIONSHIP);
                 $this->ensureActionExcluded($subresource, ApiActions::DELETE_RELATIONSHIP);
             }
+        } else {
+            $subresource->setExcludedActions(self::SUBRESOURCE_ACTIONS);
         }
 
         return $subresource;
@@ -76,9 +94,9 @@ abstract class LoadSubresources implements ProcessorInterface
      * @param ApiSubresource $subresource
      * @param string         $action
      */
-    protected function ensureActionExcluded(ApiSubresource $subresource, $action)
+    protected function ensureActionExcluded(ApiSubresource $subresource, string $action): void
     {
-        if (!in_array($action, $subresource->getExcludedActions(), true)) {
+        if (!$subresource->isExcludedAction($action)) {
             $subresource->addExcludedAction($action);
         }
     }
@@ -88,65 +106,43 @@ abstract class LoadSubresources implements ProcessorInterface
      *
      * @return string[]
      */
-    protected function getSubresourceExcludedActions(ApiResource $resource)
+    protected function getSubresourceExcludedActions(ApiResource $resource): array
     {
         $resourceExcludedActions = $resource->getExcludedActions();
         if (empty($resourceExcludedActions)) {
-            return [];
+            return self::SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS;
         }
 
-        $result = array_intersect(
-            $resourceExcludedActions,
-            [
-                ApiActions::GET_SUBRESOURCE,
-                ApiActions::GET_RELATIONSHIP,
-                ApiActions::UPDATE_RELATIONSHIP,
-                ApiActions::ADD_RELATIONSHIP,
-                ApiActions::DELETE_RELATIONSHIP
-            ]
-        );
-
-        if (in_array(ApiActions::UPDATE, $resourceExcludedActions, true)) {
-            $result = array_unique(
-                array_merge(
-                    $result,
-                    [
-                        ApiActions::UPDATE_RELATIONSHIP,
-                        ApiActions::ADD_RELATIONSHIP,
-                        ApiActions::DELETE_RELATIONSHIP
-                    ]
-                )
-            );
+        // keep only sub-resource related actions
+        $result = \array_intersect($resourceExcludedActions, self::SUBRESOURCE_ACTIONS);
+        // make sure that default excluded actions for sub-resource exist
+        $result = \array_merge($result, self::SUBRESOURCE_DEFAULT_EXCLUDED_ACTIONS);
+        // disable changes of relationships if the parent entity modification is disabled
+        if (\in_array(ApiActions::UPDATE, $resourceExcludedActions, true)) {
+            $result = \array_merge($result, self::RELATIONSHIP_CHANGE_ACTIONS);
         }
 
-        return array_values($result);
+        return \array_values(\array_unique($result));
     }
 
     /**
-     * @return string[]
-     */
-    protected function getRelationshipExcludeActions()
-    {
-        return [
-            ApiActions::GET_SUBRESOURCE,
-            ApiActions::GET_RELATIONSHIP,
-            ApiActions::UPDATE_RELATIONSHIP,
-            ApiActions::ADD_RELATIONSHIP,
-            ApiActions::DELETE_RELATIONSHIP
-        ];
-    }
-
-    /**
-     * @param string                      $fieldName
-     * @param EntityDefinitionConfig|null $config
+     * @param ApiResource $resource
      *
      * @return bool
      */
-    protected function isExcludedAssociation($fieldName, EntityDefinitionConfig $config = null)
+    protected function isSubresourcesEnabled(ApiResource $resource): bool
     {
-        if (null === $config) {
-            return false;
-        }
+        return !\in_array(ApiActions::GET_SUBRESOURCE, $resource->getExcludedActions(), true);
+    }
+
+    /**
+     * @param string                 $fieldName
+     * @param EntityDefinitionConfig $config
+     *
+     * @return bool
+     */
+    protected function isExcludedAssociation(string $fieldName, EntityDefinitionConfig $config): bool
+    {
         $field = $config->getField($fieldName);
         if (null === $field) {
             return false;
@@ -158,14 +154,14 @@ abstract class LoadSubresources implements ProcessorInterface
     }
 
     /**
-     * @param AssociationMetadata $association
-     * @param array               $accessibleResources
+     * @param ApiSubresource $subresource
+     * @param array          $accessibleResources
      *
      * @return bool
      */
-    protected function isAccessibleAssociation(AssociationMetadata $association, array $accessibleResources)
+    protected function isAccessibleSubresource(ApiSubresource $subresource, array $accessibleResources): bool
     {
-        $targetClassNames = $association->getAcceptableTargetClassNames();
+        $targetClassNames = $subresource->getAcceptableTargetClassNames();
         if (empty($targetClassNames)) {
             return true;
         }
@@ -186,50 +182,30 @@ abstract class LoadSubresources implements ProcessorInterface
      *
      * @return EntityDefinitionConfig|null
      */
-    protected function getConfig($entityClass, $version, RequestType $requestType)
-    {
+    protected function getConfig(
+        string $entityClass,
+        string $version,
+        RequestType $requestType
+    ): ?EntityDefinitionConfig {
         return $this->configProvider
-            ->getConfig($entityClass, $version, $requestType, $this->getConfigExtras())
+            ->getConfig($entityClass, $version, $requestType, [new EntityDefinitionConfigExtra()])
             ->getDefinition();
     }
 
     /**
-     * @param string                      $entityClass
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     * @param EntityDefinitionConfig|null $config
+     * @param string                 $entityClass
+     * @param string                 $version
+     * @param RequestType            $requestType
+     * @param EntityDefinitionConfig $config
      *
      * @return EntityMetadata|null
      */
     protected function getMetadata(
-        $entityClass,
-        $version,
+        string $entityClass,
+        string $version,
         RequestType $requestType,
-        EntityDefinitionConfig $config = null
-    ) {
-        return $this->metadataProvider->getMetadata(
-            $entityClass,
-            $version,
-            $requestType,
-            $config,
-            $this->getMetadataExtras(),
-            true
-        );
-    }
-
-    /**
-     * @return ConfigExtraInterface[]
-     */
-    protected function getConfigExtras()
-    {
-        return [new EntityDefinitionConfigExtra()];
-    }
-
-    /**
-     * @return MetadataExtraInterface[]
-     */
-    protected function getMetadataExtras()
-    {
-        return [];
+        EntityDefinitionConfig $config
+    ): ?EntityMetadata {
+        return $this->metadataProvider->getMetadata($entityClass, $version, $requestType, $config, [], true);
     }
 }

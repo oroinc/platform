@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 
 /**
- * An instance of this class can be added to the metadata extras of the Context
+ * An instance of this class can be added to the metadata extras of the context
  * to request metadata for a particular action.
  */
 class ActionMetadataExtra implements MetadataExtraInterface

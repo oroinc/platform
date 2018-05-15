@@ -9,6 +9,9 @@
    - [**create** Action](#create-action)
    - [**update** Action](#update-action)
    - [**get_subresource** Action](#get_subresource-action)
+   - [**update_subresource** Action](#update_subresource-action)
+   - [**add_subresource** Action](#add_subresource-action)
+   - [**delete_subresource** Action](#delete_subresource-action)
    - [**get_relationship** Action](#get_relationship-action)
    - [**update_relationship** Action](#update_relationship-action)
    - [**add_relationship** Action](#add_relationship-action)
@@ -49,6 +52,9 @@ The following table shows all actions provided out of the box:
 | [create](#create-action) | Creates a new entity. |
 | [update](#update-action) | Updates an existing entity. |
 | [get_subresource](#get_subresource-action) | Returns a list of related entities represented by a relationship. |
+| [update_subresource](#update_subresource-action) | Updates an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource. |
+| [add_subresource](#add_subresource-action) | Adds an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource. |
+| [delete_subresource](#delete_subresource-action) | Deletes an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource. |
 | [get_relationship](#get_relationship-action) | Returns a relationship data. |
 | [update_relationship](#update_relationship-action) | Updates "to-one" relationship and completely replaces all members of "to-many" relationship. |
 | [add_relationship](#add_relationship-action) | Adds one or several entities to a relationship. This action is applicable only for "to-many" relationships. |
@@ -87,7 +93,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility of Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | To add a new processor to this group, include it to the **security_check** group of actions that execute this action. For example, compare with the **security_check** group of the [create](#create-action) or [update](#update-action) actions. |
@@ -98,7 +104,7 @@ This action has the following processor groups:
 | finalize | Final validation of loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleGet` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleGet` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## get_list Action
 
@@ -120,7 +126,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -131,7 +137,7 @@ This action has the following processor groups:
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleGetList` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleGetList` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## delete Action
 
@@ -153,7 +159,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -163,7 +169,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleDelete` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleDelete` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## delete_list Action
 
@@ -191,7 +197,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -202,7 +208,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleDeleteList` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleDeleteList` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## create Action
 
@@ -224,7 +230,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the created entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
@@ -236,7 +242,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleCreate` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleCreate` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## update Action
 
@@ -252,13 +258,13 @@ The context class: [UpdateContext](../../Processor/Update/UpdateContext.php). Se
 
 The main processor class: [UpdateProcessor](../../Processor/UpdateProcessor.php).
 
-Existing worker processors: [processors.update.yml](../../Resources/config/processors.update.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug update`  to display the list of processors..
+Existing worker processors: [processors.update.yml](../../Resources/config/processors.update.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug update`  to display the list of processors.
 
 This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the updated entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
@@ -270,7 +276,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleUpdate` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleUpdate` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## get_subresource Action
 
@@ -286,13 +292,13 @@ The context class: [GetSubresourceContext](../../Processor/Subresource/GetSubres
 
 The main processor class: [GetSubresourceProcessor](../../Processor/Subresource/GetSubresourceProcessor.php).
 
-Existing worker processors: [processors.get_subresource.yml](../../Resources/config/processors.get_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug get_subresource`  to display the list of processors..
+Existing worker processors: [processors.get_subresource.yml](../../Resources/config/processors.get_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug get_subresource`  to display the list of processors.
 
 This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -303,7 +309,109 @@ This action has the following processor groups:
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleGetSubresource` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleGetSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
+
+## update_subresource Action
+
+Updates an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+
+The route name for REST API: `oro_rest_api_subresource`.
+
+The URL template for REST API: `/api/{entity}/{id}/{association}`.
+
+The HTTP method for REST API: `PATCH`.
+
+The context class: [ChangeSubresourceContext](../../Processor/Subresource/ChangeSubresourceContext.php). See the [SubresourceContext](#subresourcecontext-class) class for more details.
+
+The main processor class: [ChangeSubresourceProcessor](../../Processor/Subresource/ChangeSubresourceProcessor.php).
+
+Existing worker processors: [processors.change_subresource.yml](../../Resources/config/processors.change_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug update_subresource` to display the list of processors.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| resource_check | Checking whether the requested resource type is accessible via API. | |
+| normalize_input | Preparing the input data for use by processors from the next groups. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
+| load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
+| save_data | Validating and persisting the entity. | |
+| normalize_data | Converting the result entity into an array. | |
+| finalize | Adding the required response headers. | |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+For examples of usage, see the `handleUpdateSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
+
+## add_subresource Action
+
+Adds an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+
+The route name for REST API: `oro_rest_api_subresource`.
+
+The URL template for REST API: `/api/{entity}/{id}/{association}`.
+
+The HTTP method for REST API: `POST`.
+
+The context class: [ChangeSubresourceContext](../../Processor/Subresource/ChangeSubresourceContext.php). See the [SubresourceContext](#subresourcecontext-class) class for more details.
+
+The main processor class: [ChangeSubresourceProcessor](../../Processor/Subresource/ChangeSubresourceProcessor.php).
+
+Existing worker processors: [processors.change_subresource.yml](../../Resources/config/processors.change_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug add_subresource` to display the list of processors.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| resource_check | Checking whether the requested resource type is accessible via API. | |
+| normalize_input | Preparing the input data for to use by processors from the next groups. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
+| load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
+| save_data | Validating and persisting the entity. | |
+| normalize_data | Converting the result entity into an array. | |
+| finalize | Adding the required response headers. | |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+For examples of usage, see the `handleAddSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
+
+## delete_subresource Action
+
+Deletes an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+
+The route name for REST API: `oro_rest_api_subresource`.
+
+The URL template for REST API: `/api/{entity}/{id}/{association}`.
+
+The HTTP method for REST API: `POST`.
+
+The context class: [ChangeSubresourceContext](../../Processor/Subresource/ChangeSubresourceContext.php). See the [SubresourceContext](#subresourcecontext-class) class for more details.
+
+The main processor class: [ChangeSubresourceProcessor](../../Processor/Subresource/ChangeSubresourceProcessor.php).
+
+Existing worker processors: [processors.change_subresource.yml](../../Resources/config/processors.change_subresource.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug delete_subresource` to display the list of processors.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
+| --- | --- | --- |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| resource_check | Checking whether the requested resource type is accessible via API. | |
+| normalize_input | Preparing input data for use by processors from the next groups. | |
+| security_check | Checking whether access to the requested resource type is granted. | |
+| load_data | Loading an entity object to be updated. | |
+| data_security_check | Checking whether access to the loaded data is granted. | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data.  | |
+| save_data | Validating and persisting the entity. | |
+| normalize_data | Converting the result entity into an array. | |
+| finalize | Adding the required response headers. | |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+For examples of usage, see the `handleDeleteSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## get_relationship Action
 
@@ -319,13 +427,13 @@ The context class: [GetRelationshipContext](../../Processor/Subresource/GetRelat
 
 The main processor class: [GetRelationshipProcessor](../../Processor/Subresource/GetRelationshipProcessor.php).
 
-Existing worker processors: [processors.get_relationship.yml](../../Resources/config/processors.get_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug get_relationship`  to display the list of processors..
+Existing worker processors: [processors.get_relationship.yml](../../Resources/config/processors.get_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug get_relationship`  to display the list of processors.
 
 This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -336,7 +444,7 @@ This action has the following processor groups:
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleGetRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleGetRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## update_relationship Action
 
@@ -352,13 +460,13 @@ The context class: [UpdateRelationshipContext](../../Processor/Subresource/Updat
 
 The main processor class: [UpdateRelationshipProcessor](../../Processor/Subresource/UpdateRelationshipProcessor.php).
 
-Existing worker processors: [processors.update_relationship.yml](../../Resources/config/processors.update_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug update_relationship` to display the list of processors..
+Existing worker processors: [processors.update_relationship.yml](../../Resources/config/processors.update_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug update_relationship` to display the list of processors.
 
 This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -369,7 +477,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleUpdateRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleUpdateRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## add_relationship Action
 
@@ -391,7 +499,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for to use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -402,7 +510,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleAddRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleAddRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## delete_relationship Action
 
@@ -418,13 +526,13 @@ The context class: [AddRelationshipContext](../../Processor/Subresource/AddRelat
 
 The main processor class: [AddRelationshipProcessor](../../Processor/Subresource/AddRelationshipProcessor.php).
 
-Existing worker processors: [processors.delete_relationship.yml](../../Resources/config/processors.delete_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug delete_relationship` to display the list of processors..
+Existing worker processors: [processors.delete_relationship.yml](../../Resources/config/processors.delete_relationship.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug delete_relationship` to display the list of processors.
 
 This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | The processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -435,7 +543,7 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleDeleteRelationship` method of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleDeleteRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## customize_loaded_data Action
 
@@ -600,7 +708,7 @@ This action has the following processor groups:
 | build_response | Building the action response body, if the current request type requires it. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
-For examples of usage, see the `handleNotAllowedItem`, `handleNotAllowedList`, `handleNotAllowedSubresource` and `handleNotAllowedRelationship` methods of [RequestActionHandler](../../Request/Rest/RequestActionHandler.php).
+For examples of usage, see the `handleNotAllowedItem`, `handleNotAllowedList`, `handleNotAllowedSubresource` and `handleNotAllowedRelationship` methods of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## Context class
 

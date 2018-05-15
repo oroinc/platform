@@ -32,6 +32,11 @@ class FormUtils
         if (array_key_exists('auto_initialize', $options)) {
             $options['auto_initialize'] = false;
         }
+
+        //@TODO: Should be removed in scope #BAP-17037
+        if (array_key_exists('choices_as_values', $options)) {
+            $options['choices_as_values'] = null;
+        }
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
         $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);

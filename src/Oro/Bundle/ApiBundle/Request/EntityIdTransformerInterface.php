@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
 /**
- * An interface for classes that transform entity identifier value to and from a string representation.
+ * Provides an interface for classes that transform entity identifier value to and from a string representation.
  */
 interface EntityIdTransformerInterface
 {

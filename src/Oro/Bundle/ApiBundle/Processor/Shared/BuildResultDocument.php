@@ -13,8 +13,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * A base class for processors responsible to build a response using the response document builder
- * and add the filled document builder to the Context
+ * The base class for processors responsible to build a response using the response document builder
+ * and add the filled document builder to the context
  */
 abstract class BuildResultDocument implements ProcessorInterface
 {
@@ -53,7 +53,7 @@ abstract class BuildResultDocument implements ProcessorInterface
             $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder($context->getRequestType());
             try {
                 $documentBuilder->setErrorCollection($context->getErrors());
-                // remove errors from the Context to avoid processing them by other processors
+                // remove errors from the context to avoid processing them by other processors
                 $context->resetErrors();
             } catch (\Exception $e) {
                 $this->processException($documentBuilder, $context, $e);

@@ -14,7 +14,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     use RendererEngineTrait;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $environment;
 
@@ -26,20 +26,10 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $defaultThemes = [], Environment $environment = null)
+    public function __construct(array $defaultThemes, Environment $environment)
     {
         $this->environment = $environment;
         parent::__construct($defaultThemes, $environment);
-    }
-
-    /**
-     * {@inheritdoc}
-     * Note that Twig\Environment is alias of \Twig_Environment
-     */
-    public function setEnvironment(\Twig_Environment $environment)
-    {
-        parent::setEnvironment($environment);
-        $this->environment = $environment;
     }
 
     /**

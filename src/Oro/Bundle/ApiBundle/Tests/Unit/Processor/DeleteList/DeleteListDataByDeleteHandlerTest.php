@@ -64,7 +64,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The result property of the Context should be array or Traversable, "stdClass" given.
+     * @expectedExceptionMessage The result property of the context should be array or Traversable, "stdClass" given.
      */
     public function testProcessForNotArrayResult()
     {

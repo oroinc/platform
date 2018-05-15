@@ -15,9 +15,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
 {
-    const TEST_CLASS_NAME   = 'Test\Class';
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_CLASS_NAME   = 'Test\Class';
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var MetadataContext */
     protected $context;
@@ -60,11 +60,11 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
     protected function getClassMetadataMock($className = null)
     {
         if ($className) {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->disableOriginalConstructor()
                 ->getMock();
         }

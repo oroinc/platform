@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Criteria;
 
 /**
- * A base class for filters that can be used independently from other filters.
+ * The base class for filters that can be used independently from other filters.
  * Also this class can be used for some custom filters which cannot have a default value.
  */
 class StandaloneFilter implements FilterInterface

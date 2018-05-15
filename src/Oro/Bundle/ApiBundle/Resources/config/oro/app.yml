@@ -368,6 +368,81 @@ oro_api:
                     priority: -70
                 normalize_result:
                     priority: -80
+        delete_subresource:
+            processor_service_id: oro_api.delete_subresource.processor
+            processing_groups:
+                initialize:
+                    priority: -10
+                resource_check:
+                    priority: -15
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                data_security_check:
+                    priority: -45
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                normalize_data:
+                    priority: -70
+                finalize:
+                    priority: -80
+                normalize_result:
+                    priority: -90
+        add_subresource:
+            processor_service_id: oro_api.add_subresource.processor
+            processing_groups:
+                initialize:
+                    priority: -10
+                resource_check:
+                    priority: -15
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                data_security_check:
+                    priority: -45
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                normalize_data:
+                    priority: -70
+                finalize:
+                    priority: -80
+                normalize_result:
+                    priority: -90
+        update_subresource:
+            processor_service_id: oro_api.update_subresource.processor
+            processing_groups:
+                initialize:
+                    priority: -10
+                resource_check:
+                    priority: -15
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                data_security_check:
+                    priority: -45
+                transform_data:
+                    priority: -50
+                save_data:
+                    priority: -60
+                normalize_data:
+                    priority: -70
+                finalize:
+                    priority: -80
+                normalize_result:
+                    priority: -90
         get_relationship:
             processor_service_id: oro_api.get_relationship.processor
             processing_groups:

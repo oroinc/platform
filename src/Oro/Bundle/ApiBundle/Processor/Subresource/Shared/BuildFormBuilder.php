@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Builds the form builder based on the parent entity configuration
- * and sets it to the Context.
+ * and sets it to the context.
  */
 class BuildFormBuilder implements ProcessorInterface
 {
@@ -42,6 +43,13 @@ class BuildFormBuilder implements ProcessorInterface
         if ($context->hasForm()) {
             // the form is already built
             return;
+        }
+
+        if (!$context->hasParentEntity()) {
+            // the entity is not defined
+            throw new RuntimeException(
+                'The parent entity object must be added to the context before creation of the form builder.'
+            );
         }
 
         $context->setFormBuilder($this->getFormBuilder($context));

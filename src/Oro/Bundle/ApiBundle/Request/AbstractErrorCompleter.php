@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * A base class for different kind of error completers.
+ * The base class for different kind of error completers.
  */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {

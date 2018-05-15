@@ -13,6 +13,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Dumps translation messages and optionally uploads them to third-party service
+ */
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
     /** @var string */
@@ -282,7 +285,7 @@ EOF
         $dumper = new TranslationPackDumper(
             $container->get('translation.writer'),
             $container->get('translation.extractor'),
-            $container->get('translation.loader'),
+            $container->get('translation.reader'),
             new Filesystem(),
             $container->get('oro_translation.packages_provider.translation'),
             $container->get('kernel')->getBundles()

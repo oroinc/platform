@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var ValidateRequestData */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -20,239 +20,81 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new ValidateRequestData();
     }
 
-    /**
-     * @dataProvider validRequestDataToOneAssociation
-     */
-    public function testProcessWithValidRequestDataForToOneAssociation($requestData)
+    public function testProcessWhenRequestDataAlreadyValidated()
     {
+        $this->context->setRequestData([]);
+        $this->context->setProcessed(ValidateRequestData::OPERATION_NAME);
+        $this->processor->process($this->context);
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessWithValidRequestDataForToOneAssociation()
+    {
+        $requestData = [
+            'data' => ['type' => 'products', 'id' => '123']
+        ];
+
         $this->context->setRequestData($requestData);
         $this->context->setIsCollection(false);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function validRequestDataToOneAssociation()
+    public function testProcessWithValidRequestDataForToManyAssociation()
     {
-        return [
-            [
-                ['data' => ['type' => 'products', 'id' => '123']]
-            ],
-            [
-                ['data' => null]
-            ],
+        $requestData = [
+            'data' => [
+                ['type' => 'products', 'id' => '123']
+            ]
         ];
-    }
 
-    /**
-     * @dataProvider validRequestDataToManyAssociation
-     */
-    public function testProcessWithValidRequestDataForToManyAssociation($requestData)
-    {
         $this->context->setRequestData($requestData);
         $this->context->setIsCollection(true);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function validRequestDataToManyAssociation()
+    public function testProcessWithInvalidRequestDataForToOneAssociation()
     {
-        return [
-            [
-                ['data' => [['type' => 'products', 'id' => '123']]]
-            ],
-            [
-                ['data' => []]
-            ],
-        ];
-    }
+        $requestData = ['data' => []];
 
-    /**
-     * @dataProvider invalidRequestDataToOneAssociation
-     */
-    public function testProcessWithInvalidRequestDataForToOneAssociation($requestData, $expectedErrors)
-    {
         $this->context->setRequestData($requestData);
         $this->context->setIsCollection(false);
         $this->processor->process($this->context);
 
-        $errors = [];
-        foreach ($expectedErrors as $expectedError) {
-            $errors[] = Error::createValidationError(Constraint::REQUEST_DATA, $expectedError[0])
-                ->setSource(ErrorSource::createByPointer($expectedError[1]));
-        }
-        $this->assertEquals(
-            $errors,
+        $error = Error::createValidationError(
+            Constraint::REQUEST_DATA,
+            'The resource identifier object should be not empty object'
+        );
+        $error->setSource(ErrorSource::createByPointer('/data'));
+        self::assertEquals(
+            [$error],
             $this->context->getErrors()
         );
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function invalidRequestDataToOneAssociation()
+    public function testProcessWithInvalidRequestDataForToManyAssociation()
     {
-        return [
-            [
-                [],
-                [
-                    ['The "data" top-level section should exist', '/data']
-                ]
-            ],
-            [
-                [123],
-                [
-                    ['The "data" top-level section should exist', '/data']
-                ]
-            ],
-            [
-                ['data' => []],
-                [
-                    ['The resource identifier object should be not empty object', '/data']
-                ]
-            ],
-            [
-                ['data' => 123],
-                [
-                    ['The resource identifier object should be NULL or an object', '/data']
-                ]
-            ],
-            [
-                ['data' => [123]],
-                [
-                    ['The resource identifier object should be an object', '/data']
-                ]
-            ],
-            [
-                ['data' => ['attr1' => 'val1']],
-                [
-                    ['The \'id\' property is required', '/data/id'],
-                    ['The \'type\' property is required', '/data/type']
-                ]
-            ],
-            [
-                ['data' => ['type' => null, 'id' => null]],
-                [
-                    ['The \'id\' property should not be null', '/data/id'],
-                    ['The \'type\' property should not be null', '/data/type']
-                ]
-            ],
-            [
-                ['data' => ['type' => '', 'id' => '']],
-                [
-                    ['The \'id\' property should not be blank', '/data/id'],
-                    ['The \'type\' property should not be blank', '/data/type']
-                ]
-            ],
-            [
-                ['data' => ['type' => ' ', 'id' => ' ']],
-                [
-                    ['The \'id\' property should not be blank', '/data/id'],
-                    ['The \'type\' property should not be blank', '/data/type']
-                ]
-            ],
-            [
-                ['data' => ['type' => 123, 'id' => 456]],
-                [
-                    ['The \'id\' property should be a string', '/data/id'],
-                    ['The \'type\' property should be a string', '/data/type']
-                ]
-            ],
-        ];
-    }
+        $requestData = ['data' => null];
 
-    /**
-     * @dataProvider invalidRequestDataToManyAssociation
-     */
-    public function testProcessWithInvalidRequestDataForToManyAssociation($requestData, $expectedErrors)
-    {
         $this->context->setRequestData($requestData);
         $this->context->setIsCollection(true);
         $this->processor->process($this->context);
 
-        $errors = [];
-        foreach ($expectedErrors as $expectedError) {
-            $errors[] = Error::createValidationError(Constraint::REQUEST_DATA, $expectedError[0])
-                ->setSource(ErrorSource::createByPointer($expectedError[1]));
-        }
-        $this->assertEquals(
-            $errors,
+        $error = Error::createValidationError(
+            Constraint::REQUEST_DATA,
+            'The list of resource identifier objects should be an array'
+        );
+        $error->setSource(ErrorSource::createByPointer('/data'));
+        self::assertEquals(
+            [$error],
             $this->context->getErrors()
         );
-    }
-
-    public function invalidRequestDataToManyAssociation()
-    {
-        return [
-            [
-                [],
-                [
-                    ['The "data" top-level section should exist', '/data']
-                ]
-            ],
-            [
-                [123],
-                [
-                    ['The "data" top-level section should exist', '/data']
-                ]
-            ],
-            [
-                ['data' => null],
-                [
-                    ['The list of resource identifier objects should be an array', '/data']
-                ]
-            ],
-            [
-                ['data' => 123],
-                [
-                    ['The list of resource identifier objects should be an array', '/data']
-                ]
-            ],
-            [
-                ['data' => [123]],
-                [
-                    ['The resource identifier object should be an object', '/data/0']
-                ]
-            ],
-            [
-                ['data' => ['attr1' => 'val1']],
-                [
-                    ['The list of resource identifier objects should be an array', '/data']
-                ]
-            ],
-            [
-                ['data' => [['attr1' => 'val1']]],
-                [
-                    ['The \'id\' property is required', '/data/0/id'],
-                    ['The \'type\' property is required', '/data/0/type']
-                ]
-            ],
-            [
-                ['data' => [['type' => null, 'id' => null]]],
-                [
-                    ['The \'id\' property should not be null', '/data/0/id'],
-                    ['The \'type\' property should not be null', '/data/0/type']
-                ]
-            ],
-            [
-                ['data' => [['type' => '', 'id' => '']]],
-                [
-                    ['The \'id\' property should not be blank', '/data/0/id'],
-                    ['The \'type\' property should not be blank', '/data/0/type']
-                ]
-            ],
-            [
-                ['data' => [['type' => ' ', 'id' => ' ']]],
-                [
-                    ['The \'id\' property should not be blank', '/data/0/id'],
-                    ['The \'type\' property should not be blank', '/data/0/type']
-                ]
-            ],
-            [
-                ['data' => [['type' => 123, 'id' => 456]]],
-                [
-                    ['The \'id\' property should be a string', '/data/0/id'],
-                    ['The \'type\' property should be a string', '/data/0/type']
-                ]
-            ],
-        ];
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 }
