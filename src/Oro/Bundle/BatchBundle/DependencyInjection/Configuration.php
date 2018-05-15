@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('oro_batch')
             ->children()
                 ->scalarNode('log_batch')
-                    ->info('Enables/Disables writing of batch log files for each batch job in app/logs/batch directory')
+                    ->info('Enables/Disables writing of batch log files for each batch job in var/logs/batch directory')
                     ->defaultFalse()
                 ->end()
                 ->scalarNode('cleanup_interval')

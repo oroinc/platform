@@ -21,7 +21,7 @@ $ git clone https://github.com/orocrm/crm-application.git
 $ cd crm-application
 $ wget http://getcomposer.org/composer.phar
 $ php composer.phar install
-$ php app/console oro:install
+$ php bin/console oro:install
 ```
 
 ## Events
@@ -138,4 +138,4 @@ by web server
 
  - Nginx: `fastcgi_param PHP_PATH /usr/bin/php;`
 
- - PHP Built-in server: `/usr/bin/php app/console...`
+ - PHP Built-in server: `/usr/bin/php bin/console...`

@@ -5,6 +5,9 @@ namespace Oro\Bundle\TagBundle\Autocomplete;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler as BaseSearchHandler;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Autocomplete search handler responsible for searching of Tag entities
+ */
 class SearchHandler extends BaseSearchHandler
 {
     /** @var TokenAccessorInterface */
@@ -60,11 +63,11 @@ class SearchHandler extends BaseSearchHandler
         return [
             'id'     => json_encode(
                 [
-                    'id'   => $this->propertyAccessor->getValue($item, 'id'),
-                    'name' => $this->propertyAccessor->getValue($item, 'name'),
+                    'id'   => $this->getPropertyValue('id', $item),
+                    'name' => $this->getPropertyValue('name', $item),
                 ]
             ),
-            'name'   => $this->propertyAccessor->getValue($item, 'name')
+            'name'   => $this->getPropertyValue('name', $item)
         ];
     }
 }

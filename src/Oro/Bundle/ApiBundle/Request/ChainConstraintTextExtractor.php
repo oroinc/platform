@@ -4,12 +4,13 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Symfony\Component\Validator;
 
+/**
+ * Delegates the extraction of information from a validation constraint object to all child extractors.
+ */
 class ChainConstraintTextExtractor implements ConstraintTextExtractorInterface
 {
-    /**
-     * @var ConstraintTextExtractorInterface[]
-     */
-    protected $extractors = [];
+    /** @var ConstraintTextExtractorInterface[] */
+    private $extractors = [];
 
     /**
      * Registers a given extractor in the chain.

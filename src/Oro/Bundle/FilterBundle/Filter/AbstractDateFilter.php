@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The base class for different kind of "datetime", "date" and "time" filters.
+ */
 abstract class AbstractDateFilter extends AbstractFilter
 {
     /** DateTime object as string format */
@@ -50,10 +53,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName   = $ds->generateParameterName($this->getName());
 
         if (null !== $dateStartValue) {
-            $ds->setParameter($startDateParameterName, $dateStartValue);
+            $this->setParameter($ds, $startDateParameterName, $dateStartValue);
         }
         if (null !== $dateEndValue) {
-            $ds->setParameter($endDateParameterName, $dateEndValue);
+            $this->setParameter($ds, $endDateParameterName, $dateEndValue);
         }
         if ($data['type'] === DateRangeFilterType::TYPE_NOT_EQUAL &&
             $comparisonType === DateRangeFilterType::TYPE_EQUAL
@@ -82,11 +85,24 @@ abstract class AbstractDateFilter extends AbstractFilter
     }
 
     /**
+     * Sets a parameter for the given data source.
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string|integer                   $key   The parameter position or name.
+     * @param mixed                            $value The parameter value.
+     * @param string|null                      $type  The parameter type.
+     */
+    protected function setParameter(FilterDatasourceAdapterInterface $ds, $key, $value, $type = null)
+    {
+        $ds->setParameter($key, $value, $type);
+    }
+
+    /**
      * Build expression using "between" filtering
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param string                           $dateStartValue
-     * @param string                           $dateEndValue
+     * @param \DateTime                        $dateStartValue
+     * @param \DateTime                        $dateEndValue
      * @param string                           $startDateParameterName
      * @param string                           $endDateParameterName
      * @param string                           $fieldName
@@ -120,8 +136,8 @@ abstract class AbstractDateFilter extends AbstractFilter
      * Apply expression using one condition (less or more)
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param                                  $dateValue
-     * @param                                  $dateParameterName
+     * @param \DateTime                        $dateValue
+     * @param string                           $dateParameterName
      * @param string                           $fieldName
      * @param bool                             $isLess less/more mode, true if 'less than', false if 'more than'
      *
@@ -145,8 +161,8 @@ abstract class AbstractDateFilter extends AbstractFilter
      * Build  expression using "not between" filtering
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param string                           $dateStartValue
-     * @param string                           $dateEndValue
+     * @param \DateTime                        $dateStartValue
+     * @param \DateTime                        $dateEndValue
      * @param string                           $startDateParameterName
      * @param string                           $endDateParameterName
      * @param string                           $fieldName
@@ -184,7 +200,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      * Build expression using one condition (equal or not equal)
      *
      * @param FilterDatasourceAdapterInterface $ds
-     * @param string                           $dateValue
+     * @param \DateTime                        $dateValue
      * @param string                           $dateParameterName
      * @param string                           $fieldName
      * @param bool                             $isEqual
@@ -212,12 +228,13 @@ abstract class AbstractDateFilter extends AbstractFilter
      *
      * @param int                              $type
      * @param FilterDatasourceAdapterInterface $ds
-     * @param string                           $dateStartValue
-     * @param string                           $dateEndValue
+     * @param \DateTime                        $dateStartValue
+     * @param \DateTime                        $dateEndValue
      * @param string                           $startDateParameterName
      * @param string                           $endDateParameterName
      * @param                                  $fieldName
      *
+     * @return mixed
      */
     protected function buildDependingOnType(
         $type,

@@ -19,8 +19,10 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     public const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
 
-    private const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
-    private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
+    private const ACTION_PROCESSOR_BAG_SERVICE_ID               = 'oro_api.action_processor_bag';
+    private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
+    private const FILTER_OPERATOR_REGISTRY_SERVICE_ID           = 'oro_api.filter_operator_registry';
+    private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
 
     /**
      * {@inheritdoc}
@@ -34,6 +36,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('data_transformers.yml');
+        $loader->load('filters.yml');
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
@@ -49,6 +52,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.create.yml');
         $loader->load('processors.update.yml');
         $loader->load('processors.get_subresource.yml');
+        $loader->load('processors.change_subresource.yml');
         $loader->load('processors.get_relationship.yml');
         $loader->load('processors.delete_relationship.yml');
         $loader->load('processors.add_relationship.yml');
@@ -64,6 +68,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
          */
         $this->registerConfigParameters($container, $config);
         $this->registerActionProcessors($container, $config);
+        $this->registerFilterOperators($container, $config);
         $this->registerConfigExtensions($container, $config);
 
         try {
@@ -219,6 +224,28 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                         ->setPublic(false);
                 }
             }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    private function registerFilterOperators(ContainerBuilder $container, array $config)
+    {
+        $filterOperatorRegistryDef = DependencyInjectionUtil::findDefinition(
+            $container,
+            self::FILTER_OPERATOR_REGISTRY_SERVICE_ID
+        );
+        if (null !== $filterOperatorRegistryDef) {
+            $filterOperatorRegistryDef->replaceArgument(0, $config['filter_operators']);
+        }
+        $restFilterValueAccessorFactoryDef = DependencyInjectionUtil::findDefinition(
+            $container,
+            self::REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID
+        );
+        if (null !== $restFilterValueAccessorFactoryDef) {
+            $restFilterValueAccessorFactoryDef->replaceArgument(1, $config['filter_operators']);
         }
     }
 

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -17,26 +18,22 @@ use Symfony\Component\Validator\Validation;
 
 class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
 {
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var FormContext|SingleItemContext */
     protected $context;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var MetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
     protected $metadataProvider;
 
     protected function setUp()
     {
-        $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = $this->createContext();
         $this->context->setVersion(self::TEST_VERSION);
@@ -66,7 +63,7 @@ class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
         $formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
             ->getFormFactory();
-        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         return new FormBuilder(null, null, $dispatcher, $formFactory);
     }

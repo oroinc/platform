@@ -199,6 +199,22 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
                     return trim(strip_tags($value));
                 }
             );
+        $this->htmlTagHelper->expects($this->any())
+            ->method('stripLongWords')
+            ->willReturnCallback(
+                function ($value) {
+                    $words = preg_split('/\s+/', $value);
+
+                    $words = array_filter(
+                        $words,
+                        function ($item) {
+                            return \strlen($item) <= HtmlTagHelper::MAX_STRING_LENGTH;
+                        }
+                    );
+
+                    return implode(' ', $words);
+                }
+            );
 
         $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
         $this->mapper->setMappingProvider($this->mapperProvider);
@@ -235,6 +251,49 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
                 'count' => $this->product->getCount(),
             ]
         ];
+
+        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+    }
+
+    public function testAllTextLimitation()
+    {
+        // create a product name exceeding the 256 length limitation
+        $productName        = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
+                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
+                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
+                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
+                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
+                              ' ';
+        $expectedProductName = 'zUWidBOhT9IzqNyPhYvchY QJfPB2teh0ukQ';
+        $productName .= $expectedProductName;
+        $productDescription = 'description';
+        $manufacturerName   = $this->product->getManufacturer()->getName();
+
+        $allData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
+        $allTextData = sprintf('%s %s %s', $expectedProductName, $productDescription, $manufacturerName);
+
+        $expectedMapping = [
+            'text' => $this->clearTextData(
+                [
+                   'name'                       => $productName,
+                   'description'                => $productDescription,
+                   'manufacturer'               => $manufacturerName,
+                   'all_data'                   => $allData,
+                   Indexer::TEXT_ALL_DATA_FIELD => $allTextData
+                ]
+            ),
+            'decimal' => [
+                'price' => $this->product->getPrice(),
+            ],
+            'integer' => [
+                'count' => $this->product->getCount(),
+            ]
+        ];
+
+        $this->product
+            ->setName($productName)
+            ->setDescription($productDescription);
+
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
 

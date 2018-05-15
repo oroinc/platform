@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
- * A base class for filters that can be used to filter data by different kind of custom associations.
+ * The base class for filters that can be used to filter data by different kind of custom associations.
  */
 abstract class AssociationFilter extends ComparisonFilter implements
     NamedValueFilterInterface,

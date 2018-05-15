@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * Adds an identifier of the current logged in user to the Context.
+ * Adds an identifier of the current logged in user to the context.
  */
 class SetUserProfileEntityId implements ProcessorInterface
 {

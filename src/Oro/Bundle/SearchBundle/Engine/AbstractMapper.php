@@ -9,6 +9,11 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Mapping index data from entities' data - common code.
+ *
+ * @package Oro\Bundle\SearchBundle\Engine
+ */
 abstract class AbstractMapper
 {
     /**
@@ -128,45 +133,6 @@ abstract class AbstractMapper
         }
 
         return $value;
-    }
-
-    /**
-     * Set related fields values
-     *
-     * @param string $alias
-     * @param array  $objectData
-     * @param array  $relationFields
-     * @param object $relationObject
-     * @param string $parentName
-     * @param bool   $isArray
-     *
-     * @deprecated since 1.8
-     *
-     * @return array
-     */
-    protected function setRelatedFields(
-        $alias,
-        $objectData,
-        $relationFields,
-        $relationObject,
-        $parentName,
-        $isArray = false
-    ) {
-        foreach ($relationFields as $relationObjectField) {
-            $value = $this->getFieldValue($relationObject, $relationObjectField['name']);
-            if ($value) {
-                $relationObjectField['name'] = $parentName;
-                $objectData = $this->setDataValue(
-                    $alias,
-                    $objectData,
-                    $relationObjectField,
-                    $value,
-                    $isArray
-                );
-            }
-        }
-
-        return $objectData;
     }
 
     /**

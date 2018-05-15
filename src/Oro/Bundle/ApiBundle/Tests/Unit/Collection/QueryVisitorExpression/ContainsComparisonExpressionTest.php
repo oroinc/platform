@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ContainsComparisonExpression;
@@ -14,24 +13,23 @@ class ContainsComparisonExpressionTest extends \PHPUnit_Framework_TestCase
     {
         $expression = new ContainsComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'CONTAINS', 'text');
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $fieldName = 'e.test';
+        $parameterName = 'test_1';
+        $value = 'text';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
             $fieldName,
-            $parameterName
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            new OrmComparison('a.test', 'LIKE', ':test_2'),
+        self::assertEquals(
+            new Comparison($fieldName, 'LIKE', ':' . $parameterName),
             $result
         );
-
-        $this->assertEquals(
-            [new Parameter('test_2', '%text%', \PDO::PARAM_STR)],
+        self::assertEquals(
+            [new Parameter($parameterName, '%' . $value . '%', \PDO::PARAM_STR)],
             $expressionVisitor->getParameters()
         );
     }

@@ -133,7 +133,7 @@ provoke self-triggering.
 
  - If you want to test this process configuration in real application, you can put this configuration in file
 ``Oro/Bundle/WorkflowBundle/Resources/config/oro/processes.yml`` and reload definitions using console command
-``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
+``bin/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
  - Expression `$.` allows you to access main data container, for processes it is instance of `Oro\Bundle\WorkflowBundle\Model\ProcessData`.
  - Expression `$` (shortcut) or `$.data` allows you to access current entity, above in example it's `Oro\Bundle\ContactBundle\Entity\Contact`.

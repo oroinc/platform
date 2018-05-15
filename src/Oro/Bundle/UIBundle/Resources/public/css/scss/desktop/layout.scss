@@ -1,0 +1,32 @@
+.responsive-block{
+  min-width: 340px;
+  padding-right: 5px;
+  &.border-right {
+    border-right: 2px solid #f4f4f4;
+  }
+}
+
+#left-panel,
+#right-panel {
+  overflow: visible;
+}
+#left-panel, #right-panel, #main {
+  float: left;
+}
+
+.oro-page {
+  &.collapsible-sidebar {
+    .oro-page-sidebar {
+      > .dropdown-menu {
+        display: block !important;
+        z-index: inherit;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.container-fluid {
+  padding-right: $contentPadding;
+  padding-left: $contentPadding;
+}

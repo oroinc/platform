@@ -7,19 +7,22 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 
+/**
+ * Walks an expression graph and collects fields are used in all comparison expressions.
+ */
 class FieldVisitor extends ExpressionVisitor
 {
     /** @var array */
-    protected $fields = [];
+    private $fields = [];
 
     /**
-     * Gets all fields are used in a visited expression.
+     * Gets all fields are used in a visited expression graph.
      *
      * @return string[]
      */
     public function getFields()
     {
-        return array_keys($this->fields);
+        return \array_keys($this->fields);
     }
 
     /**

@@ -1,0 +1,123 @@
+@import "bootstrap/variables";
+
+// Oro variables
+$enable-safe-area:                true;
+$contentPadding:                  12px;
+$horizontalPadding:               $contentPadding;
+$verticalPadding:                 $contentPadding;
+$topPadding:                      $contentPadding;
+$bottomPadding:                   $contentPadding;
+$marginBottomBox:                 $contentPadding;
+$generalBorderColor:              #ddd;
+$widthPage:                       960px;
+$widthBodyPage:                   980px;
+$widthPopup:                      $widthPage/2;
+$widthClosePanel:                 25px;
+$widthLeftPanel:                  230px;
+$widthLeftPanel2:                 210;
+$widthInput:                      280px;
+$baseBtnBorderRadius:             3px;
+$iconSpritePath:                  "../../img/glyphicons-halflings.png";
+$iconWhiteSpritePath:             "../../img/glyphicons-halflings-white.png";
+$bodyColor:                       #444;
+$bodyBackground:                  #3e434a;
+$wellBackground:                  #f8f8f8;
+$baseGradientColorStart:          #39464f;
+$baseGradientColorEnd:            #333e48;
+$baseGradientColorBorder:         #1e2833;
+$logoBackgroundColor:             #2d333b;
+$titleBackgroundStart:            #47505a;
+$titleBackgroundEnd:              #353d45;
+$headerIconButtonColorStart:      #58626e;
+$headerIconButtonColorEnd:        #454f58;
+$headerIconButtonTextColor:       #2a313a;
+$headerTextColor:                 #cad2da;
+$inlineActionColor:               #94b4c9;
+$inlineActionBackground:          #edf5fb;
+$cellSelectedBackground:          $inlineActionBackground;
+$rowSelectedBackground:           #fdf8e4;
+$rowHighlightBackground:          lighten($rowSelectedBackground, 2%);
+$cellSuccessBackground:           #f1f8dc;
+$cellSuccessColor:                #96b76d;
+$cellErrorBackground:             #fcd4d3;
+$cellLoadingBackground:           #f5f5f5;
+$sideBarClosedWidth:              33px;
+$sideBarOpenedWidth:              200px;
+
+$progressBarGradientStart:        #dcdcdc;
+$progressBarGradientEnd:          #d3d3d3;
+
+$pageBorderColor:                 #ccc;
+$navigationBackgroundColor:       #f8f8f8;
+$pageSidebarBackgroundColor:      $navigationBackgroundColor;
+
+$baseFontFamily:                  Helvetica, Arial, sans-serif;
+$baseFontSize:                    13px;
+$baseLineHeight:                  20px;
+
+$fontSizeLarge:                   $baseFontSize * 1.25; // ~16px
+$fontSizeSmall:                   $baseFontSize * .85; // ~11px
+$fontSizeMini:                    $baseFontSize * .75; // ~10px
+
+$inputBorderRadius:               3px;
+$WindowBorderRadius:              3px;
+
+$baseTextColor:                   #444;
+$btnTextColor:                    #666;
+
+$accordionHeadingBackgroundColor: #eaeaea;
+
+$successBackground:               #e3f3c3;
+$successBorder:                   #89a86d;
+$successText:                     #3d7c04;
+$successClose:                    #bfd78f;
+
+$errorBackground:                 #fdcece;
+$errorBorder:                     #b48d8d;
+$errorText:                       #c81717;
+$errorClose:                      #e5acac;
+
+$warningBackground:               #fff8d7;
+$warningBorder:                   #b4a68d;
+$warningText:                     #444;
+$warningClose:                    #e2d59a;
+
+$infoText:                        #447fe9;
+$infoBackground:                  #d9edf7;
+$infoBorder:                      #bce8f1;
+$infoClose:                       #b6d0dc;
+
+$tagItemColor:                    #fff;
+$tagItemBackground:               #aaa;
+$tagMyItemBackground:             #ccc;
+
+$errorMessageBalloonBackground:   lighten($errorText, 20%);
+
+// Links
+$linkColor:                       #006acc;
+$linkColorHover:                  darken($linkColor, 10%);
+$menuItemColor:                   #444;
+
+// Screen sizes
+$smallScreen:                     1024px;
+$mediumScreen:                    1340px;
+$largeScreen:                     1920px;
+
+// Screen sizes
+$sideBarClosedWidth:              33px;
+$sideBarOpenedWidth:              200px;
+
+// Z-indexs
+$oroZindexDropdown:               900;
+$oroMobileHeaderZindex:           99999;
+
+$dotMenuDropdownMinHeight:        168px;
+$dotMenuDropdownMaxHeight:        330px;
+
+// highlight variables
+$highlightTextColor: #ffefa5;
+
+// Jstree variables
+$treeLinkColor: #858585;
+$treeLinkBgColor: #fafafa;
+$treeIconColor: #969696;

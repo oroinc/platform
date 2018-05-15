@@ -359,7 +359,11 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function getFieldsWithoutAggregateFunctions($condition)
     {
-        preg_match_all('/(?:(MIN|MAX|AVG|COUNT|SUM|GROUP_CONCAT))|(\w+\([\w\.]+\))/i', $condition, $matches);
+        preg_match_all(
+            '/(?:(MIN|MAX|AVG|COUNT|SUM|GROUP_CONCAT))|(\w+\((((?>[^()]+)|(?R))*)\))/i',
+            $condition,
+            $matches
+        );
 
         return isset($matches[2]) ? array_unique(array_filter($matches[2])) : [];
     }

@@ -64,6 +64,17 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $parameters['filter'][$key] = $filter;
             }
         }
+        if (array_key_exists('filters', $parameters)) {
+            $filters = $parameters['filters'];
+            if ($filters) {
+                $separator = '?';
+                if (false !== strpos($uri, '?')) {
+                    $separator = '&';
+                }
+                $uri .= $separator . $filters;
+            }
+            unset($parameters['filters']);
+        }
 
         if (!isset($server['HTTP_X-WSSE'])) {
             $server = array_replace($server, $this->getWsseAuthHeader());
@@ -305,6 +316,46 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
+     * Sends POST request for a sub-resource of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function postSubresource(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'POST',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_CREATED, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'post subresource'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
      * Sends PATCH request for a single entity.
      *
      * @param array        $routeParameters
@@ -374,6 +425,46 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 Response::HTTP_NO_CONTENT,
                 $entityType,
                 'patch relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends PATCH request for a sub-resource of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function patchSubresource(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'patch subresource'
             );
         }
 
@@ -484,6 +575,46 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 Response::HTTP_NO_CONTENT,
                 $entityType,
                 'delete relationship'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Sends DELETE request for a sub-resource of a single entity.
+     *
+     * @param array $routeParameters
+     * @param array $parameters
+     * @param array $server
+     * @param bool  $assertValid
+     *
+     * @return Response
+     */
+    protected function deleteSubresource(
+        array $routeParameters = [],
+        array $parameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'DELETE',
+            $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
+            $parameters,
+            $server
+        );
+
+        $this->getEntityManager()->clear();
+
+        if ($assertValid) {
+            $entityType = $this->extractEntityType($routeParameters);
+            self::assertApiResponseStatusCodeEquals(
+                $response,
+                [Response::HTTP_OK, Response::HTTP_NO_CONTENT],
+                $entityType,
+                'delete subresource'
             );
         }
 

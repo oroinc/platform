@@ -21,7 +21,7 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
         if (!\is_array($data) && !$data instanceof \Traversable) {
             throw new \RuntimeException(
                 \sprintf(
-                    'The result property of the Context should be array or Traversable, "%s" given.',
+                    'The result property of the context should be array or Traversable, "%s" given.',
                     \is_object($data) ? \get_class($data) : \gettype($data)
                 )
             );

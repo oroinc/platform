@@ -3,6 +3,7 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType'
         tags:
             - { name: form.type, alias: oro_test_workflow_aware_entity_type }
+            - { name: oro_embedded_form, label: oro.test.workflow_aware_entity_type.label }
 
     oro_test.form.type.oro_layout_form_stub:
         class: 'Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\LayoutFormStub'

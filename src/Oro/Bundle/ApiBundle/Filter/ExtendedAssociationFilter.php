@@ -64,9 +64,9 @@ class ExtendedAssociationFilter extends AssociationFilter
     {
         $this->assertFilterValuePath($field, $path);
 
-        $fieldName = $this->getFieldName(substr($path, strlen($field) + 1));
+        $fieldName = $this->getFieldName(\substr($path, \strlen($field) + 1));
         if (RelationType::MANY_TO_MANY === $this->associationType) {
-            $expr = new Comparison($fieldName, 'MEMBER OF', $value);
+            $expr = new Comparison($fieldName, Comparison::MEMBER_OF, $value);
             if (self::NEQ === $operator) {
                 $expr = new CompositeExpression('NOT', [$expr]);
             }
@@ -93,7 +93,7 @@ class ExtendedAssociationFilter extends AssociationFilter
         );
         if (!isset($associationTargets[$targetEntityClass])) {
             throw new RuntimeException(
-                sprintf('An association with "%s" is not supported.', $filterValueName)
+                \sprintf('An association with "%s" is not supported.', $filterValueName)
             );
         }
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Psr\Log\LoggerInterface;
@@ -12,7 +13,7 @@ use Psr\Log\LoggerInterface;
 abstract class RemoveRelationQuery extends RemoveFieldQuery
 {
     /**
-     * Returns the type of the relation, for example manyToMany, or manyToOne
+     * Returns the type of the relation, e.g. manyToMany, oneToMany, manyToOne
      *
      * @return string
      */
@@ -47,7 +48,8 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
         }
         $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Type::TARRAY);
 
-        if (!$this->isOwningSide($entityData, $fieldData)) {
+        $isSystemRelation = $this->isSystemRelation($fieldData);
+        if (!$isSystemRelation && !$this->isOwningSide($entityData, $fieldData)) {
             $logger->info("Removal of relation config is possible only from owning side");
 
             return;
@@ -55,6 +57,12 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
 
         // delete owning side field config
         $this->removeFieldConfig($logger, $fieldRow['id']);
+
+        if ($isSystemRelation) {
+            // system relations do not need any modifications in entity configuration.
+
+            return;
+        }
 
         $relationKey = $fieldData['extend']['relation_key'];
 
@@ -92,6 +100,16 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
                 );
             }
         }
+    }
+
+    /**
+     * @param array $fieldData
+     *
+     * @return bool
+     */
+    protected function isSystemRelation($fieldData)
+    {
+        return $fieldData['extend']['owner'] === ExtendScope::OWNER_SYSTEM;
     }
 
     /**

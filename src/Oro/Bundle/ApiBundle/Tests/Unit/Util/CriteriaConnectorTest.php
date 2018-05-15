@@ -31,15 +31,17 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     {
         parent::setUp();
 
-        $this->criteria = new Criteria(new EntityClassResolver($this->doctrine));
+        $entityClassResolver = new EntityClassResolver($this->doctrine);
+        $this->criteria = new Criteria($entityClassResolver);
         $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
             ['OR' => new OrCompositeExpression()],
             ['=' => new EqComparisonExpression()]
         );
         $this->criteriaConnector = new CriteriaConnector(
-            new CriteriaNormalizer(),
+            new CriteriaNormalizer($this->doctrineHelper),
             new CriteriaPlaceholdersResolver(),
-            $this->expressionVisitorFactory
+            $this->expressionVisitorFactory,
+            $entityClassResolver
         );
     }
 
@@ -71,6 +73,16 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testOrderByAssociation()
+    {
+        $this->criteria->orderBy(['id' => Criteria::ASC, 'category' => Criteria::ASC]);
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.category category'
+            . ' ORDER BY e.id ASC, e.category ASC'
+        );
+    }
+
     public function testWhere()
     {
         $this->criteria->andWhere(
@@ -88,6 +100,23 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testWhereByAssociation()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->orX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->eq('groups', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE e.category = :category OR e.groups = :groups'
+        );
+    }
+
     public function testNestedFieldInOrderBy()
     {
         $this->criteria->orderBy(['id' => Criteria::ASC, 'products.category.name' => Criteria::ASC]);
@@ -97,6 +126,18 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN e.products products'
             . ' LEFT JOIN products.category category'
             . ' ORDER BY e.id ASC, category.name ASC'
+        );
+    }
+
+    public function testNestedAssociationInOrderBy()
+    {
+        $this->criteria->orderBy(['id' => Criteria::ASC, 'products.category' => Criteria::ASC]);
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.products products'
+            . ' LEFT JOIN products.category category'
+            . ' ORDER BY e.id ASC, products.category ASC'
         );
     }
 
@@ -111,6 +152,20 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' INNER JOIN e.products products'
             . ' INNER JOIN products.category category'
             . ' WHERE category.name = :category_name'
+        );
+    }
+
+    public function testNestedAssociationInWhere()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->eq('products.category', 'test_category')
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.products products'
+            . ' INNER JOIN products.category category'
+            . ' WHERE products.category = :products_category'
         );
     }
 

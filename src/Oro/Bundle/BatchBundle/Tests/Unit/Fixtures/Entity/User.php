@@ -89,4 +89,9 @@ class User
      * @ORM\OneToMany(targetEntity="UserEmail", mappedBy="user", orphanRemoval=true, cascade={"persist"})
      */
     protected $emails;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $createdAt;
 }
