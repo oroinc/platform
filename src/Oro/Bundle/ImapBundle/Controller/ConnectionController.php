@@ -49,7 +49,7 @@ class ConnectionController extends Controller
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
-        if ($form->isValid() && null !== $origin) {
+        if ($form->isSubmitted() && $form->isValid() && null !== $origin) {
             $response = [];
             $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
 

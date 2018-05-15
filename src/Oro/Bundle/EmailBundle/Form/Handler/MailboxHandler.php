@@ -76,7 +76,7 @@ class MailboxHandler implements FormAwareInterface
                 $this->processReload();
             } else {
                 $this->form->handleRequest($request);
-                if ($this->form->isValid()) {
+                if ($this->form->isSubmitted() && $this->form->isValid()) {
                     $this->onSuccess();
 
                     return true;

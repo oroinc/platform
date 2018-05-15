@@ -351,6 +351,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($form);
 
         $form->expects($this->once())->method('handleRequest')->with($request);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(true);
 
         return $form;

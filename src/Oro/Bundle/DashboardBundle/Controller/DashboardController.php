@@ -118,7 +118,7 @@ class DashboardController extends Controller
         $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
             $this->getEntityManager()->flush();
             $saved = true;
@@ -185,8 +185,8 @@ class DashboardController extends Controller
                 'create_new' => !$dashboardModel->getId()
             ]
         );
-
-        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
+        $form->handleRequest($request);
+        if ($request->isMethod('POST') && $form->isSubmitted() && $form->isValid()) {
             $this->getDashboardManager()->save($dashboardModel, true);
             $this->get('session')->getFlashBag()->add(
                 'success',

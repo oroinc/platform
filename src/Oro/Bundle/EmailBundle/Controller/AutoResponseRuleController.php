@@ -101,7 +101,7 @@ class AutoResponseRuleController extends Controller
         $form = $this->createForm(AutoResponseRuleType::class, $rule);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getAutoResponseRuleManager();
             $em->persist($rule);
             $em->flush();

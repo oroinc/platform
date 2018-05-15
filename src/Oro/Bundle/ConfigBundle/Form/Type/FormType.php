@@ -119,16 +119,21 @@ class FormType extends AbstractType
         $view->vars['valid'] = $this->isFormValid($form);
     }
 
+    /**
+     * @param FormInterface $form
+     *
+     * @return bool
+     */
     protected function isFormValid(FormInterface $form)
     {
-        if (!$form->isValid() && $form->getErrors()->count()) {
+        if ($form->isSubmitted() && !$form->isValid() && $form->getErrors()->count()) {
             return false;
         }
 
         $isChildValid = true;
 
         foreach ($form as $child) {
-            if (!$child->isValid() && $child->getErrors(true)->count()) {
+            if ($child->isSubmitted() && !$child->isValid() && $child->getErrors(true)->count()) {
                 $isChildValid = false;
             }
         }
