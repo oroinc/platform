@@ -228,12 +228,10 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Determines if wait for ajax on afterStep hook needs to be bypassed because next step checks for flash message.
+     * Returns true if the next step checks for a flash message to bypass wait for ajax on afterStep hook.
      *
-     * This helps to overcome situations similar to one in ContactBundle/Tests/Behat/Features/contacts_crud.feature.
-     * The problem is that when contact is added and user is redirected to contact's view
-     * page then the next step that checks for flash message is not executed until google map is fully loaded.
-     * And flash message check fails as flash message disappears before google map is fully loaded.
+     * This helps to overcome a delay introduced by ajax calls after current step execution which prevent flash
+     * message check (executed by the next step) to be done before flash message disappears.
      *
      * @param StepNode $currentStep
      * @param FeatureNode $feature
