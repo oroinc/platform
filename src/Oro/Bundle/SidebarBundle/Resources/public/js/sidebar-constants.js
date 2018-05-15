@@ -1,10 +1,6 @@
-
 define(function() {
     'use strict';
 
-    /**
-     * @export  orosidebar/js/constants
-     */
     var constants = {};
 
     /**
@@ -41,6 +37,11 @@ define(function() {
      * Maximized on hover widget
      */
     constants.WIDGET_MAXIMIZED_HOVER = 'WIDGET_MAXIMIZED_HOVER';
+
+    /**
+     * Delay value for options of `jquery.sortable` plugin applied to sidebar widgets
+     */
+    constants.WIDGET_SORT_DELAY = 100;
 
     return constants;
 });

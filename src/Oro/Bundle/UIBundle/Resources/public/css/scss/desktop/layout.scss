@@ -17,6 +17,7 @@
 }
 
 .app-page {
+  box-sizing: border-box;
   display: flex;
   &__left-panel,
   &__right-panel {

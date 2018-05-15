@@ -4,12 +4,22 @@ define(function(require) {
     var WidgetSetupModalView;
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var Modal = require('oroui/js/modal');
+    var ModalView = require('oroui/js/modal');
 
-    WidgetSetupModalView = Modal.extend({
+    WidgetSetupModalView = ModalView.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal widget-setup',
 
+        /**
+         * @inheritDoc
+         */
+        constructor: function WidgetSetupModalView(options) {
+            WidgetSetupModalView.__super__.constructor.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             options.snapshot = options.snapshot || {};
 

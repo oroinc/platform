@@ -1,26 +1,5 @@
 .sidebar-widget-recent-emails {
-  .sidebar-widget .sidebar-widget-header-icon {
-    &.loading {
-      .icon-with-counter {
-        .item-counter {
-          display: inline-block;
-          opacity: 0;
-        }
-      }
-    }
-    .item-counter {
-      top: -2px;
-    }
-    .fa-refresh {
-      left: 13px;
-      top: 3px;
-      font-size: 7px;
-      padding: 2px 3px;
-      background: #c4c4c4;
-    }
-  }
-  .sidebar-widget-content {
-    background-color: #e0e0e0;
+  .sidebar-widget__content {
     .header {
       padding: 0 8px;
       .my-emails {
@@ -33,8 +12,7 @@
       }
     }
     .items {
-      margin: 8px;
-      border-radius: 6px;
+      margin: 8px 0;
       overflow: hidden;
       overflow-y: auto;
     }
@@ -47,15 +25,8 @@
       color: #666;
     }
   }
-  .fa-envelope.highlight, i.fa-envelope.highlight:before{
-    color: #fabb18;
-    .item-counter, .fa-refresh {
-      background: #eeeeee;
-      font-size: 8px;
-    }
-  }
-  &.sidebar-widget-popup {
-    .sidebar-widget {
+  .sidebar.minimized &.sidebar-widget.poppedup {
+    .sidebar-widget__popup {
       width: 360px;
       padding-bottom: 0;
       .content {
@@ -66,21 +37,6 @@
     .short-emails-list .items li .footer .reply-action,
     .short-emails-list .items li .footer .forward-action {
       display: inline;
-    }
-  }
-  &.sidebar-widget-embedded {
-    .sidebar-widget-content {
-      .short-emails-list {
-        .items {
-          li {
-            padding: 9px 10px 5px;
-            .fa-envelope {
-              right: 7px;
-              top: 8px;
-            }
-          }
-        }
-      }
     }
   }
 }

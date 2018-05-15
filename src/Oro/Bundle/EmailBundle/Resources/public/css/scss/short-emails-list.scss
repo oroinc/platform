@@ -35,7 +35,10 @@
 
     li {
       border-bottom: 1px solid #f5eff3;
-      padding: 10px 17px 10px;
+      &:last-child {
+        border-bottom: none;
+      }
+      padding: 10px 16px;
       position: relative;
       background: #fff;
       .fa-envelope {

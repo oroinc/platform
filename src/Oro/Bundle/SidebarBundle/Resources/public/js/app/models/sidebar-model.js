@@ -3,10 +3,10 @@ define(function(require) {
 
     var SidebarModel;
     var _ = require('underscore');
-    var Backbone = require('backbone');
-    var constants = require('./constants');
+    var BaseModel = require('oroui/js/app/models/base/model');
+    var constants = require('orosidebar/js/sidebar-constants');
 
-    SidebarModel = Backbone.Model.extend({
+    SidebarModel = BaseModel.extend({
         defaults: {
             position: constants.SIDEBAR_LEFT,
             state: constants.SIDEBAR_MINIMIZED
@@ -15,8 +15,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function SidebarModel() {
-            SidebarModel.__super__.constructor.apply(this, arguments);
+        constructor: function SidebarModel(data, options) {
+            SidebarModel.__super__.constructor.call(this, data, options);
         },
 
         /**
@@ -24,7 +24,7 @@ define(function(require) {
          */
         initialize: function(data, options) {
             _.extend(this, _.pick(options, ['urlRoot']));
-            SidebarModel.__super__.initialize.apply(this, arguments);
+            SidebarModel.__super__.initialize.call(this, data, options);
         },
 
         /**
@@ -40,6 +40,24 @@ define(function(require) {
                     this.set('state', constants.SIDEBAR_MINIMIZED);
                     break;
             }
+        },
+
+        /**
+         * Check if current state in model is SIDEBAR_MAXIMIZED
+         *
+         * @return {boolean}
+         */
+        isMaximized: function() {
+            return this.get('state') === constants.SIDEBAR_MAXIMIZED;
+        },
+
+        /**
+         * Check if current state in model is SIDEBAR_MINIMIZED
+         *
+         * @return {boolean}
+         */
+        isMinimized: function() {
+            return this.get('state') === constants.SIDEBAR_MINIMIZED;
         }
     });
 
