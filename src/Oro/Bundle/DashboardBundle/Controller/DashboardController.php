@@ -185,15 +185,18 @@ class DashboardController extends Controller
                 'create_new' => !$dashboardModel->getId()
             ]
         );
-        $form->handleRequest($request);
-        if ($request->isMethod('POST') && $form->isSubmitted() && $form->isValid()) {
-            $this->getDashboardManager()->save($dashboardModel, true);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.dashboard.saved_message')
-            );
 
-            return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->getDashboardManager()->save($dashboardModel, true);
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                );
+
+                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+            }
         }
 
         return ['entity' => $dashboardModel, 'form' => $form->createView()];
