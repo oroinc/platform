@@ -138,7 +138,7 @@ class EmbeddedFormController extends Controller
         $form->handleRequest($this->get('request_stack')->getCurrentRequest());
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
             $em->persist($entity);
             $em->flush();

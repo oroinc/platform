@@ -18,7 +18,6 @@ class OroUserBundle extends Bundle
         parent::build($container);
         $container->addCompilerPass(new EscapeWsseConfigurationPass());
         $container->addCompilerPass(new PrivilegeCategoryPass());
-        // TODO: uncomment in scope of BAP-17065
-//        $container->addCompilerPass(new SecurityFirewallCompilerPass());
+        $container->addCompilerPass(new SecurityFirewallCompilerPass());
     }
 }

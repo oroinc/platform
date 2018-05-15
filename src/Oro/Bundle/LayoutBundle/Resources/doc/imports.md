@@ -27,7 +27,7 @@ To import the same layout update repeatedly, provide unique ids for all layout b
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'layout.html.twig'
+            themes: 'AcmeLayoutBundle:layouts:default/layout.html.twig'
         - '@addTree':
             items:
                 __update:
@@ -121,7 +121,7 @@ layout:
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'layout.html.twig'
+            themes: 'AcmeLayoutBundle:layouts:default/layout.html.twig'
         - '@addTree':
             items:
                 __datagrid_toolbar:

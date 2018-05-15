@@ -70,7 +70,7 @@ class EmbedFormController extends Controller
             $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);
         }
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
 
             /**

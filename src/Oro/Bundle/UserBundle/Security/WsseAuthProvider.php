@@ -191,14 +191,13 @@ class WsseAuthProvider extends Provider
         return false;
     }
 
-    // TODO: uncomment in scope of BAP-17065
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function supports(TokenInterface $token)
-//    {
-//        return parent::supports($token)
-//            && $token->hasAttribute('firewallName')
-//            && $token->getAttribute('firewallName') === $this->firewallName;
-//    }
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(TokenInterface $token)
+    {
+        return parent::supports($token)
+            && $token->hasAttribute('firewallName')
+            && $token->getAttribute('firewallName') === $this->firewallName;
+    }
 }

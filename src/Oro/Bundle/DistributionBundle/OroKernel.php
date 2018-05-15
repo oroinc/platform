@@ -131,8 +131,8 @@ abstract class OroKernel extends Kernel
     {
         $files = $this->findBundles(
             array(
-                $this->getRootDir() . '/../src',
-                $this->getRootDir() . '/../vendor'
+                $this->getProjectDir() . '/src',
+                $this->getProjectDir() . '/vendor'
             )
         );
 
@@ -215,7 +215,7 @@ abstract class OroKernel extends Kernel
     {
         $phpVersion = phpversion();
 
-        include_once $this->getRootDir() . '/OroRequirements.php';
+        include_once $this->getProjectDir() . '/var/OroRequirements.php';
 
         if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
             throw new \Exception(

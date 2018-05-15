@@ -68,7 +68,7 @@ class ScriptHandler extends SensioScriptHandler
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
         }
-        if (file_exists($importExportDir = 'app/import_export')) {
+        if (file_exists($importExportDir = 'var/import_export')) {
             $permissionHandler->setPermissions($importExportDir);
         }
     }
@@ -135,7 +135,7 @@ class ScriptHandler extends SensioScriptHandler
     {
         return isset($options['incenteev-parameters']['file'])
             ? $options['incenteev-parameters']['file']
-            : 'app/config/parameters.yml';
+            : 'config/parameters.yml';
     }
 
     /**

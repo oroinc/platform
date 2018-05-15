@@ -149,8 +149,8 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
         $ds         = DIRECTORY_SEPARATOR;
         $dateObject = new \DateTime($userData['createdAt']);
         $suffix     = $dateObject->format('Y-m');
-        $path       = $this->container->getParameter('kernel.root_dir')
-            . '/../web/uploads' . $ds . 'users' . $ds . $suffix . $ds . $userData['image'];
+        $path       = $this->container->getParameter('kernel.project_dir')
+            . '/public/uploads' . $ds . 'users' . $ds . $suffix . $ds . $userData['image'];
 
         return realpath($path);
     }

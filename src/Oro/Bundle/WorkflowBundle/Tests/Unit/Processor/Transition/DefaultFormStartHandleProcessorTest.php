@@ -68,6 +68,7 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit_Framework_TestCase
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('handleRequest')->with($this->request);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(true);
         $form->expects($this->once())->method('getData')->willReturn($workflowData);
 

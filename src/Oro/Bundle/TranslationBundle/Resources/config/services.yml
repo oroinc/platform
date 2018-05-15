@@ -150,7 +150,7 @@ services:
             - '@oro_translation.controller'
             - '@router'
             - '%oro_translation.js_translation.domains%'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
             - '@oro_translation.provider.language'
         lazy: true
 
@@ -167,7 +167,7 @@ services:
         arguments:
             - '@oro_distribution.package_manager'
             - '%kernel.bundles%'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
             - '%oro_distribution.composer_cache_home%'
             - ['@oro_translation.packages_provider.translation']
 

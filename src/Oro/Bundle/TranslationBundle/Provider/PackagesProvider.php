@@ -15,7 +15,7 @@ class PackagesProvider implements PackageProviderInterface
     protected $bundles;
 
     /** @var  string */
-    protected $kernelRootDir;
+    protected $kernelProjectDir;
 
     /** @var  string */
     protected $composerCacheHome;
@@ -28,21 +28,21 @@ class PackagesProvider implements PackageProviderInterface
 
     /**
      * @param PackageManager $pm
-     * @param array $bundles
-     * @param string $kernelRootDir
-     * @param string $composerCacheHome
-     * @param array $packageProviders
+     * @param array          $bundles
+     * @param string         $kernelProjectDir
+     * @param string         $composerCacheHome
+     * @param array          $packageProviders
      */
     public function __construct(
         PackageManager $pm,
         array $bundles,
-        $kernelRootDir,
+        $kernelProjectDir,
         $composerCacheHome,
         array $packageProviders = []
     ) {
         $this->pm = $pm;
         $this->bundles = $bundles;
-        $this->kernelRootDir = $kernelRootDir;
+        $this->kernelProjectDir = $kernelProjectDir;
         $this->composerCacheHome = $composerCacheHome;
         $this->packageProviders = $packageProviders;
     }
@@ -59,7 +59,7 @@ class PackagesProvider implements PackageProviderInterface
             putenv(sprintf('COMPOSER_HOME=%s', $this->composerCacheHome));
 
             // avoid change of current directory, just give correct vendor dir
-            $rootPath                            = realpath($this->kernelRootDir . '/../') . DIRECTORY_SEPARATOR;
+            $rootPath                            = realpath($this->kernelProjectDir . '/') . DIRECTORY_SEPARATOR;
             Config::$defaultConfig['vendor-dir'] = $rootPath . Config::$defaultConfig['vendor-dir'];
         }
 

@@ -11,7 +11,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'web/js/require-config.js',
+      'public/js/require-config.js',
       '**/Karma/main.js',
 
       // test framework's libs and their configuration
@@ -21,20 +21,20 @@ module.exports = function(config) {
       // fixtures
       {pattern: '**/Tests/JS/Fixture/**/*', included: false},
 
-      {pattern: 'web/js/**/*.js', watched: false, included: false},
-      {pattern: 'web/bundles/**/*.js', included: false},
-      {pattern: 'web/bundles/**/*.html', included: false},
+      {pattern: 'public/js/**/*.js', watched: false, included: false},
+      {pattern: 'public/bundles/**/*.js', included: false},
+      {pattern: 'public/bundles/**/*.html', included: false},
       {pattern: '**/Tests/JS/**/*Spec.js', included: false}
     ],
 
     // list of files to exclude
     exclude: [
-      'web/bundles/bowerassets/**/*Spec.js',
-      'web/bundles/npmassets/**/*Spec.js',
+      'public/bundles/bowerassets/**/*Spec.js',
+      'public/bundles/npmassets/**/*Spec.js',
     ],
 
     preprocessors: {
-      'web/bundles/*/js/**/*.js': ['requirejs-exposure']//, 'coverage']
+      'public/bundles/*/js/**/*.js': ['requirejs-exposure']//, 'coverage']
     },
 
     // use dots reporter, as travis terminal does not support escaping sequences
