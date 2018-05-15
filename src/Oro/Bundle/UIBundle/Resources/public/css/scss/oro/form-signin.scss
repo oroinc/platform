@@ -6,6 +6,7 @@
   .app-page {
     &__central-panel {
       display: table;
+      width: 100%;
       > .container{
         display: table-cell;
         vertical-align: middle;

@@ -255,6 +255,7 @@ config:
         'oroui/js/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
 
         'oroui/js/desktop/side-menu': 'bundles/oroui/js/desktop/side-menu.js'
+        'oroui/js/desktop/side-menu-overlay': 'bundles/oroui/js/desktop/side-menu-overlay.js'
 
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'

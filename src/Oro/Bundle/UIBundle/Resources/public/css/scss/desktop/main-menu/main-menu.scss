@@ -1,0 +1,39 @@
+.main-menu {
+    margin: 0;
+
+    font-size: $menu-font-size;
+    // reset global styles
+    list-style: none;
+
+    background-color: $menu-background-color;
+
+    &__header {
+        min-height: $menu-header-height;
+        background-color: $menu-header-background-color;
+    }
+
+    .dropdown-menu-wrapper {
+        z-index: $zindexDropdown;
+
+        &.hidden {
+            display: none;
+        }
+
+        &__scrollable {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    }
+
+    .dropdown-menu {
+        z-index: $zindexFixedNavbar;
+    }
+
+    .divider {
+        height: 1px;
+        margin: 4px 0;
+
+        border: 1px solid $menu-item-divider-color;
+        border-width: 1px 0 0;
+    }
+}

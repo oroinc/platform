@@ -1,0 +1,237 @@
+.main-menu-top {
+    .main-menu {
+        padding-left: 5px;
+
+        @include clearfix();
+    }
+
+    .dropdown-menu {
+        margin: 0;
+        padding: 3px 0;
+        min-width: 175px;
+
+        background-color: $menu-dropdown-background-color;
+        border: 0;
+        border-radius: 0 2px 2px 2px;
+        box-shadow: $menu-dropdown-box-shadow;
+    }
+
+    .title {
+        display: block;
+        padding: $menu-item-offset;
+
+        color: $menu-item-text-color;
+
+        white-space: nowrap;
+
+        &-level-1 {
+            padding: 14px 16px;
+
+            font-weight: bold;
+
+            color: $menu-item-first-level-text-color;
+
+            .menu-icon {
+                display: none;
+            }
+        }
+    }
+
+    // Arrow for menu item, who has nested child
+    .menu-level-1 {
+        .dropdown {
+            > .unclickable {
+                position: relative;
+
+                @include fa-icon($fa-var-angle-right, after);
+
+                &::after {
+                    position: absolute;
+                    top: 50%;
+                    right: 10px;
+
+                    margin-top: -($menu-font-size / 2);
+
+                    line-height: 1;
+
+                    color: $menu-item-text-color;
+                }
+
+            }
+        }
+    }
+
+    .dropdown-menu-title {
+        &-level-1 {
+            display: none;
+
+            + .divider {
+                display: none;
+            }
+        }
+    }
+
+    .dropdown {
+        > .dropdown-menu {
+            top: 0;
+            left: 100%;
+        }
+
+        &-level-1 {
+            float: left;
+
+            &.active {
+                background-color: $menu-dropdown-background-color-active;
+
+                .title-level-1 {
+                    color: $menu-item-first-level-text-color-active;
+                }
+            }
+
+            // Open menu
+            &:hover {
+                .title {
+                    &:hover {
+                        background: $menu-background-color-active;
+                    }
+
+                    &-level-1 {
+                        position: relative;
+
+                        background-color: $menu-dropdown-background-color;
+                        color: $menu-item-text-color;
+
+                        // Hide box-shadow from dropdown-menu
+                        &::after {
+                            content: '';
+
+                            position: absolute;
+                            bottom: 0;
+                            right: 0;
+                            left: 0;
+                            z-index: $zindexDropdown + 1;
+
+                            height: 10px;
+
+                            background: $menu-dropdown-background-color;
+                        }
+
+                        &:hover {
+                            background-color: $menu-dropdown-background-color;
+                        }
+                    }
+                }
+            }
+        }
+
+        &:hover {
+            > .dropdown-menu,
+            > .dropdown-menu-wrapper__child,
+                /* Opens on hover for all 2+ levels */
+            .dropdown-menu-wrapper__scrollable {
+                display: block;
+            }
+        }
+    }
+
+    .dropdown,
+    .dropdown-menu-single-item {
+        // reset global styles .dropdown-menu > li > a
+        > a {
+            padding: 0;
+        }
+
+        // reset global styles .dropdown-menu > li > div
+        > .dropdown-menu-wrapper {
+            padding: 0;
+        }
+
+        // reset global styles .dropdown-menu li.dropdown:after
+        &::after {
+            content: none;
+        }
+
+        &:hover {
+            // reset global styles .dropdown-menu > li > a:hover
+            > a {
+                background: transparent;
+                color: inherit;
+            }
+        }
+    }
+
+    .dropdown-menu-wrapper {
+        > .dropdown-menu {
+            position: relative;
+            top: 0;
+            left: 0;
+
+            display: block;
+        }
+
+        &__child {
+            display: none;
+
+            position: absolute;
+        }
+
+        &__scrollable {
+            display: none;
+
+            box-shadow: $menu-dropdown-box-shadow;
+
+            > .dropdown-menu {
+                position: static;
+
+                > .dropdown {
+                    position: static;
+                }
+            }
+        }
+
+        &__placeholder {
+            position: absolute;
+        }
+    }
+
+    // 'Dashboard' menu item
+    .only-icon {
+        > .unclickable {
+            .title {
+                padding-left: 22px;
+
+                font-size: 0;
+                line-height: 1;
+            }
+
+            .menu-icon {
+                display: block;
+
+                font-size: 19px;
+
+                @include fa-icon($fa-var-caret-down, after);
+
+                &::after {
+                    margin-left: 9px;
+
+                    font-size: $menu-font-size;
+                }
+            }
+        }
+
+        .dropdown-menu-title-level-1,
+        .divider {
+            display: list-item;
+        }
+
+        .dropdown-menu-title-level-1 {
+            padding: $menu-item-offset;
+
+            font-weight: bold;
+
+            .menu-icon {
+                display: none;
+            }
+        }
+    }
+}

@@ -1,9 +1,5 @@
-.fa-bars:before {
-  content: "\f0c9";
-}
-
 #oroplatform-header {
-  .logo, #main-menu-toggle {
+  .logo {
     float: left;
     font-weight: bold;
     font-size: 17px;
@@ -36,16 +32,6 @@
   }
   #search-bar-search{
     width: 100%;
-  }
-  #main-menu-toggle {
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    margin: 0;
-    padding: 0 10px 10px 10px;
-    &.open > [class^="fa-"] {
-      @include header-button-active;
-    }
   }
   .container {
     position: relative;
@@ -187,8 +173,7 @@
 
 #oroplatform-header .fa-user,
 #oroplatform-header .fa-search,
-#oroplatform-header .fa-share-square,
-#oroplatform-header .fa-bars {
+#oroplatform-header .fa-share-square {
   font-size: 24px !important;
   line-height: 32px !important;
   margin: 0px !important;
@@ -198,8 +183,7 @@
 
 #oroplatform-header .fa-user,
 #oroplatform-header .fa-search,
-#oroplatform-header .fa-share-square,
-#oroplatform-header .fa-bars {
+#oroplatform-header .fa-share-square {
   text-align: center;
   width: 32px !important;
   height: 32px !important;

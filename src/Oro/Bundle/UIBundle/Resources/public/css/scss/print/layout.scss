@@ -5,6 +5,7 @@ body,
   height: auto !important;
 }
 .app-page {
+  display: block;
   &__left-panel,
   &__right-panel {
     display: none;
