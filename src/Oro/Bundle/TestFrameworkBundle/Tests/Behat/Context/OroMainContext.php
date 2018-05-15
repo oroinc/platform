@@ -234,13 +234,14 @@ class OroMainContext extends MinkContext implements
      */
     private function isNextStepNeedSkip(StepNode $currentStep, FeatureNode $feature): bool
     {
+        $isNextStep = false;
         foreach ($feature->getScenarios() as $scenario) {
             foreach ($scenario->getSteps() as $step) {
-                if ($currentStep->getLine() + 1 === $step->getLine()
-                    && preg_match(self::SKIP_WAIT_PATTERN, $step->getText())
-                ) {
-                    return true;
+                if ($isNextStep) {
+                    return preg_match(self::SKIP_WAIT_PATTERN, $step->getText());
                 }
+
+                $isNextStep = $currentStep->getLine() === $step->getLine();
             }
         }
 
