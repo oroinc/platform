@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
@@ -14,9 +15,15 @@ class TwigRendererEngineTest extends RendererEngineTest
      */
     protected $twigRendererEngine;
 
+    /**
+     * @var Environment|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $environment;
+
     protected function setUp()
     {
-        $this->twigRendererEngine = new TwigRendererEngine();
+        $this->environment = $this->createMock(Environment::class);
+        $this->twigRendererEngine = $this->createRendererEngine();
     }
 
     public function testRenderBlock()
@@ -59,19 +66,19 @@ class TwigRendererEngineTest extends RendererEngineTest
             ]
         );
 
-        /** @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject $environment */
-        $environment = $this->createMock('\Twig_Environment');
-        $environment->expects($this->once())
+        $this->environment->expects($this->once())
             ->method('mergeGlobals')
             ->with($result)
             ->will($this->returnValue([$template, 'root']));
-        $this->twigRendererEngine->setEnvironment($environment);
 
         $this->twigRendererEngine->renderBlock($view, [$template, 'root'], 'root', $variables);
     }
 
+    /**
+     * @return TwigRendererEngine
+     */
     public function createRendererEngine()
     {
-        return new TwigRendererEngine();
+        return new TwigRendererEngine([], $this->environment);
     }
 }

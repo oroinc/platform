@@ -229,4 +229,13 @@ class FormIntegrationTestCase extends BaseTestCase
 
         return $path;
     }
+
+    /**
+     * @param \DateTime $expected
+     * @param \DateTime $actual
+     */
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    {
+        self::assertEquals($expected->format('c'), $actual->format('c'));
+    }
 }

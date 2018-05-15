@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+use Symfony\Component\Translation\Reader\TranslationReader;
 
 class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,7 +40,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->service = new TranslationServiceProvider(
             $this->adapter,
             $this->dumper,
-            new TranslationLoader(),
+            new TranslationReader(),
             $this->databasePersister,
             $this->testPath
         );
@@ -99,7 +99,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['download', 'upload', 'cleanup'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $dir = $this->getLangFixturesDir();
@@ -148,7 +148,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $tempDir = $this->testPath . DIRECTORY_SEPARATOR . ltrim(uniqid(), DIRECTORY_SEPARATOR);
@@ -189,7 +189,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $path = $this->testPath . DIRECTORY_SEPARATOR;
@@ -330,7 +330,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->getServiceMock(
             ['__construct'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
+            [$this->adapter, $this->dumper, new TranslationReader(), $this->databasePersister, $this->testPath]
         );
 
         $method = new \ReflectionMethod(

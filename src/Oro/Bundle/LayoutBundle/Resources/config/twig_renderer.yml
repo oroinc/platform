@@ -17,6 +17,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Form\TwigRendererEngine
         arguments:
             - '%oro_layout.twig.resources%'
+            - '@twig'
         calls:
             - [setConfigManager, ['@oro_config.user']]
 

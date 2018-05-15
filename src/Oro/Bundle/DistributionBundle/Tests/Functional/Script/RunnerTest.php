@@ -16,13 +16,13 @@ class RunnerTest extends WebTestCase
     /**
      * @var string
      */
-    protected $applicationRootDir;
+    protected $applicationProjectDir;
 
     protected function setUp()
     {
         $this->initClient();
-        $this->applicationRootDir = $this->client->getKernel()->getRootDir();
-        if (!is_dir($this->applicationRootDir . '/config/dist')) {
+        $this->applicationProjectDir = $this->client->getKernel()->getProjectDir();
+        if (!is_dir($this->applicationProjectDir . '/config/dist')) {
             $this->markTestSkipped('Distribution tests are not compatibility with CRM environment');
         }
     }
@@ -327,7 +327,7 @@ class RunnerTest extends WebTestCase
      * @param PackageInterface $package
      * @param LoggerInterface $logger
      * @param string $targetDir
-     * @param string $applicationRootDir
+     * @param string $applicationProjectDir
      *
      * @return Runner
      */
@@ -335,12 +335,12 @@ class RunnerTest extends WebTestCase
         PackageInterface $package = null,
         LoggerInterface $logger = null,
         $targetDir = null,
-        $applicationRootDir = null
+        $applicationProjectDir = null
     ) {
         return new Runner(
             $this->createInstallationManagerMock($package, $targetDir),
             $logger ? : $this->createLoggerMock(),
-            $applicationRootDir ? $applicationRootDir : $this->applicationRootDir,
+            $applicationProjectDir ? $applicationProjectDir : $this->applicationProjectDir,
             'test'
         );
     }

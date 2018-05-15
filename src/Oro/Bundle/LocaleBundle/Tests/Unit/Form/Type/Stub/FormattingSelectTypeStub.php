@@ -24,7 +24,7 @@ class FormattingSelectTypeStub extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => Intl::getLocaleBundle()->getLocaleNames(),
+            'choices' => array_flip(Intl::getLocaleBundle()->getLocaleNames())
         ]);
     }
 

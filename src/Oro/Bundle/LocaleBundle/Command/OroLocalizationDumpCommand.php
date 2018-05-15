@@ -23,7 +23,7 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $targetDir = realpath($this->getContainer()->getParameter('kernel.root_dir') . '/../web') . '/js';
+        $targetDir = realpath($this->getContainer()->getParameter('kernel.project_dir') . '/public') . '/js';
         /** @var LocaleSettings $localeSettings */
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
         $addressFormats = $this->getAddressFormats($localeSettings);

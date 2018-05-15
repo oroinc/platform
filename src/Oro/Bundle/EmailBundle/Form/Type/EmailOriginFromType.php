@@ -85,8 +85,6 @@ class EmailOriginFromType extends AbstractType
     {
         $choices = $this->createChoices();
         $resolver->setDefaults([
-            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-            'choices_as_values' => true,
             'choices' => $choices,
             'attr' => [],
         ]);

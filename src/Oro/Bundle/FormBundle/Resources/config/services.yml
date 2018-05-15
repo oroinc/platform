@@ -63,15 +63,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_form.update_factory'
 
-    oro_form.update_handler:
-        class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
-        arguments:
-            - '@request_stack'
-            - '@session'
-            - '@oro_ui.router'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_form.update_factory'
-
     oro_form.provider.from_template_data.default:
         class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider
         tags:

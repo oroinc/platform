@@ -62,8 +62,6 @@ class OroIconType extends AbstractType
         $resolver->setDefaults(
             [
                 'placeholder' => 'oro.form.choose_value',
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'     => $choices,
                 'placeholder' => '',
                 'configs'     => [

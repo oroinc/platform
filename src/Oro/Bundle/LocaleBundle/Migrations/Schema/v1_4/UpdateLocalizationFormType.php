@@ -21,7 +21,8 @@ class UpdateLocalizationFormType implements Migration
                 Localization::class,
                 'form',
                 'form_type',
-                LocalizationSelectType::class
+                LocalizationSelectType::class,
+                'oro_locale_localization_select'
             )
         );
     }

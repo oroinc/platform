@@ -23,10 +23,6 @@ class ScriptHandler extends SensioScriptHandler
 
         $config = [
             [
-                'from' => __DIR__.'/../Resources/public',
-                'to' => $webDir.'/bundles/oroinstaller',
-            ],
-            [
                 'from' => $vendorDir.'/bower-asset',
                 'to' => $webDir.'/bundles/bowerassets',
             ],
@@ -72,7 +68,7 @@ class ScriptHandler extends SensioScriptHandler
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
         }
-        if (file_exists($importExportDir = 'app/import_export')) {
+        if (file_exists($importExportDir = 'var/import_export')) {
             $permissionHandler->setPermissions($importExportDir);
         }
     }
@@ -139,7 +135,7 @@ class ScriptHandler extends SensioScriptHandler
     {
         return isset($options['incenteev-parameters']['file'])
             ? $options['incenteev-parameters']['file']
-            : 'app/config/parameters.yml';
+            : 'config/parameters.yml';
     }
 
     /**

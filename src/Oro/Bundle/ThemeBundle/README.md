@@ -37,9 +37,9 @@ Logo that will be displayed in the UI.
 _optional_
 This be displayed in theme management UI.
 
-## Adding a theme using app/config.yml
+## Adding a theme using config.yml
 
-To add a theme you can use _app/config.yml_ file.
+To add a theme you can use _config.yml_ file.
 
 ```
 # add to config.yml next string to use mytheme theme
@@ -62,7 +62,7 @@ with all used files.
 ## Adding a theme using a bundle
 
 Theme could be added in any bundle, place a file in _Resources/public/themes/\<theme_name\>/settings.yml_ path inside of bundle.
-This file contains same configuration like in app/config.yml:
+This file contains same configuration like in config.yml:
 
 ```
 styles:
@@ -85,7 +85,7 @@ by placing a file with theme _Resources/public/themes/\<theme_name\>/settings.ym
 When application has active theme it's styles append to the end of the list of all CSS assets of bundles. Theme's styles
 will override existing bundles styles to change look and feel of application.
 
-To set active theme add next settings to _app/config.yml_
+To set active theme add next settings to _config.yml_
 
 ```
 oro_theme:
@@ -104,7 +104,7 @@ bin/console assetic:dump
 ## Debugging theme styles
 
 Each theme is appended to the list of OroAsseticBundle's CSS assets in group "theme". So, if you want to debug theme's
-styles, you should use next configuration in _app/config.yml_:
+styles, you should use next configuration in _config.yml_:
 
 ```
 oro_assetic:

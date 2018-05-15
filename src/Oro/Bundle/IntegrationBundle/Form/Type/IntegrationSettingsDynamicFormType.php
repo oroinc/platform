@@ -16,14 +16,6 @@ class IntegrationSettingsDynamicFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['fields'] as $fieldName => $field) {
-            // TODO: remove 'if' statement below in scope of BAP-15236
-            if (isset($field['options']['choices'])) {
-                $field['options'] = array_merge(
-                    ['choices_as_values' => true],
-                    $field['options']
-                );
-            }
-
             $builder->add($fieldName, $field['type'], $field['options']);
         }
     }

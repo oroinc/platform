@@ -216,7 +216,7 @@ You can avoid usage of breadcrumb provider. For that you should create layout up
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'product_index.html.twig'
+            themes: 'WebCatalogBundle:layouts:blank/oro_product_frontend_product_index/product_index.html.twig'
         - '@addTree':
             items:
                 category_breadcrumbs:

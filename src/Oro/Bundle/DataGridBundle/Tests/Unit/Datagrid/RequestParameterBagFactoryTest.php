@@ -36,11 +36,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue($gridParameters));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue(array()));
 
         $parameters = $this->factory->createParameters($gridName);
@@ -60,11 +60,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue($gridParameters));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue($minifiedParameters));
 
         $parameters = $this->factory->createParameters($gridName);
@@ -83,11 +83,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue('foo'));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue(null));
 
         $parameters = $this->factory->createParameters($gridName);

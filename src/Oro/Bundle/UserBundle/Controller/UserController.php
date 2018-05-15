@@ -90,7 +90,7 @@ class UserController extends Controller
 
             $responseData = ['data' => [], 'status' => 'success'];
             $status = Response::HTTP_OK;
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $this->saveUserApi($user, $userApi);
                 $responseData['data'] = ['apiKey' => $userApi->getApiKey()];
             } else {

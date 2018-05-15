@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Form;
 
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\FormView;
+use Twig\Environment;
 
 /**
  * Extends TwigRendererEngine to add possability to render parent blocks without "extend"
@@ -13,7 +14,7 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     use RendererEngineTrait;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $environment;
 
@@ -25,10 +26,10 @@ class BaseTwigRendererEngine extends TwigRendererEngine implements TwigRendererE
     /**
      * {@inheritdoc}
      */
-    public function setEnvironment(\Twig_Environment $environment)
+    public function __construct(array $defaultThemes, Environment $environment)
     {
-        parent::setEnvironment($environment);
         $this->environment = $environment;
+        parent::__construct($defaultThemes, $environment);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\DependencyInjection\Compiler;
 use Escape\WSSEAuthenticationBundle\DependencyInjection\Security\Factory\Factory;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * This compiller pass adds the firewall name to the WSSE request listener and authentication provider. This allows
@@ -17,6 +18,9 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        $listenerDefinition = $container->getDefinition('escape_wsse_authentication.listener');
+        $listenerDefinition->addArgument(new Reference('oro_user.token.factory.wsse'));
+
         $securityConfigs = $container->getExtensionConfig('security');
         if (empty($securityConfigs[0]['firewalls'])) {
             return;

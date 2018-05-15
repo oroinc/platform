@@ -46,6 +46,10 @@ class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $loaderDef->expects($this->once())
+            ->method('setFactory')
+            ->with('Oro\Bundle\EntityExtendBundle\Validator\Validation::createValidatorBuilder');
+
         $container->expects($this->at(3))
             ->method('hasDefinition')
             ->with('validator.builder')

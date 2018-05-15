@@ -97,8 +97,6 @@ class UserSubscriber implements EventSubscriberInterface
                     'label' => 'oro.user.enabled.label',
                     'required' => true,
                     'disabled' => false,
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => $enabledChoices,
                     'placeholder' => 'Please select',
                     'empty_data' => '',

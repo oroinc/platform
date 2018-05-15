@@ -130,7 +130,7 @@ class WorkflowDefinitionController extends Controller
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
                 $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
 
@@ -205,7 +205,7 @@ class WorkflowDefinitionController extends Controller
         $response = ['form' => $form->createView()];
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
             $helper = $this->get('oro_workflow.helper.workflow_deactivation');
             $data = $form->getData();

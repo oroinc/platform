@@ -83,8 +83,6 @@ class FieldType extends AbstractType
             'type',
             Select2ChoiceType::class,
             [
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {
                     $parts = explode('||', $choiceKey);
