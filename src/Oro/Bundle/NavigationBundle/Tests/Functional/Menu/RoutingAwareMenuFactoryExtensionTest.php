@@ -26,7 +26,7 @@ class RoutingAwareMenuFactoryExtensionTest extends WebTestCase
 
     public function testBuildOptions()
     {
-        $router = self::getContainer()->get('router.default');
+        $router = self::getContainer()->get('oro_test.router.default.alias');
         $router->getContext()->setBaseUrl('index.php');
         $this->assertStringStartsWith(
             self::INDEX_PHP_FILE,
