@@ -7,8 +7,6 @@ use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
-
 class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const INDEX_PHP_FILE = 'index.php';
