@@ -145,5 +145,6 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader->load('services.yml');
         $loader->load('doctrine.yml');
         $loader->load('session.yml');
+        $loader->load('commands.yml');
     }
 }

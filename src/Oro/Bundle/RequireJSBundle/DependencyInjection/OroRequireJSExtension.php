@@ -25,6 +25,7 @@ class OroRequireJSExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
         $container->setParameter('oro_require_js', $config);
         $container->setParameter('oro_require_js.web_root', $config['web_root']);

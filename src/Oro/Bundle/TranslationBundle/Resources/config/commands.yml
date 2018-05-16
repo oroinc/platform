@@ -1,0 +1,30 @@
+services:
+    Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroTranslationPackCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\OroTranslationResetCommand:
+        public: false
+        class: Oro\Bundle\TranslationBundle\Command\OroTranslationResetCommand
+        tags:
+            - { name: console.command }

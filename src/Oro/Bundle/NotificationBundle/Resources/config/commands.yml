@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\NotificationBundle\Command\MassNotificationCommand:
+        public: false
+        class: Oro\Bundle\NotificationBundle\Command\MassNotificationCommand
+        tags:
+            - { name: console.command }

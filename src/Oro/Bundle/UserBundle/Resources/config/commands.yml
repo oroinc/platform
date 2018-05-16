@@ -1,0 +1,30 @@
+services:
+    Oro\Bundle\UserBundle\Command\CreateUserCommand:
+        public: false
+        class: Oro\Bundle\UserBundle\Command\CreateUserCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand:
+        public: false
+        class: Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\UserBundle\Command\ImpersonateUserCommand:
+        public: false
+        class: Oro\Bundle\UserBundle\Command\ImpersonateUserCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\UserBundle\Command\ListUserCommand:
+        public: false
+        class: Oro\Bundle\UserBundle\Command\ListUserCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\UserBundle\Command\UpdateUserCommand:
+        public: false
+        class: Oro\Bundle\UserBundle\Command\UpdateUserCommand
+        tags:
+            - { name: console.command }

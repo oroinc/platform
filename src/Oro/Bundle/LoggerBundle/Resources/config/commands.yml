@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand:
+        public: false
+        class: Oro\Bundle\LoggerBundle\Command\LoggerEmailNotificationCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand:
+        public: false
+        class: Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand
+        tags:
+            - { name: console.command }

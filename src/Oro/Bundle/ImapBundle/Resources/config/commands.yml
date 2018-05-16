@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand:
+        public: false
+        class: Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ImapBundle\Command\Cron\SendCredentialNotificationsCommand:
+        public: false
+        class: Oro\Bundle\ImapBundle\Command\Cron\SendCredentialNotificationsCommand
+        tags:
+            - { name: console.command }
