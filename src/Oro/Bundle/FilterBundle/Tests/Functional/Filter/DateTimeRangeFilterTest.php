@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Functional\Filter;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Tests\Functional\Fixtures\LoadUserWithBUAndOrganization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -19,11 +20,22 @@ class DateTimeRangeFilterTest extends WebTestCase
     /** @var DateTimeRangeFilter */
     protected $filter;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);
         $this->filter = $this->getContainer()->get('oro_filter.datetime_range_filter');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->filter);
     }
 
     /**
@@ -34,6 +46,7 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     public function testFilter(callable $filterFormData, array $expectedResult)
     {
+        $this->updateUserCreatedAt();
         $qb = $this->createQueryBuilder('u');
         $qb
             ->select('u.username')
@@ -47,9 +60,9 @@ class DateTimeRangeFilterTest extends WebTestCase
         $this->assertTrue($filterForm->isValid());
 
         $this->filter->init(
-            'updatedAt',
+            'createdAt',
             [
-                'data_name' => 'u.updatedAt',
+                'data_name' => 'u.createdAt',
                 'type'      => 'datetime'
             ]
         );
@@ -59,7 +72,9 @@ class DateTimeRangeFilterTest extends WebTestCase
          * Fix timezone for filter datetime field
          */
         $index = $formData['type'] === DateTimeRangeFilterType::TYPE_EQUAL ? 'start' : 'end';
-        $timeString = $formData['value'][$index]->format('Y-m-d H:i');
+        /** @var \DateTime $dateTimeValue */
+        $dateTimeValue = $formData['value'][$index];
+        $timeString = $dateTimeValue->format('Y-m-d H:i');
         $time = new \DateTime($timeString, new \DateTimeZone('UTC'));
         $formData['value'][$index] = $time;
 
@@ -92,17 +107,27 @@ class DateTimeRangeFilterTest extends WebTestCase
         ];
     }
 
+    private function updateUserCreatedAt()
+    {
+        $em = $this->getUserEntityManager();
+        $user = $this->getUser();
+        $dateFilter = clone $user->getCreatedAt();
+        $user->setCreatedAt($dateFilter->modify('-1 day'));
+        $em->persist($user);
+        $em->flush($user);
+    }
+
     /**
      * @return \Closure
      */
     private function getFilterFormEqualCallback()
     {
         return function () {
-            $updatedAt = $this->getUser()->getUpdatedAt();
+            $createdAt = $this->getUser()->getCreatedAt();
             return [
                 'type' => DateTimeRangeFilterType::TYPE_EQUAL,
                 'value' => [
-                    'start' => $updatedAt->format('Y-m-d H:i'),
+                    'start' => $createdAt->format('Y-m-d H:i'),
                     'end'   => ""
                 ],
             ];
@@ -115,28 +140,36 @@ class DateTimeRangeFilterTest extends WebTestCase
     private function getFilterFormNotEqualCallback()
     {
         return function () {
-            $updatedAt = $this->getUser()->getUpdatedAt();
+            $createdAt = $this->getUser()->getCreatedAt();
             return [
                 'type' => DateTimeRangeFilterType::TYPE_NOT_EQUAL,
                 'value' => [
                     'start' => "",
-                    'end'   => $updatedAt->format('Y-m-d H:i')
+                    'end'   => $createdAt->format('Y-m-d H:i')
                 ],
             ];
         };
     }
 
     /**
-     * @return ObjectRepository
+     * @return UserRepository
      */
     private function getUserRepository()
     {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $objectManager = $doctrine->getManagerForClass(User::class);
-        $repository = $objectManager->getRepository(User::class);
-
-        return $repository;
+        return $this->getUserEntityManager()->getRepository(User::class);
     }
+
+    /**
+     * @return EntityManager
+     */
+    private function getUserEntityManager()
+    {
+        $doctrine = $this->getContainer()->get('doctrine');
+        $manager = $doctrine->getManagerForClass(User::class);
+
+        return $manager;
+    }
+
 
     /**
      * @return User
