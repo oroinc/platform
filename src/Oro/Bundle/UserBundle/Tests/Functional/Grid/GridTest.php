@@ -3,9 +3,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GridTest extends WebTestCase
 {
