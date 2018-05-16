@@ -23,6 +23,12 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand:
         public: false
         class: Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand

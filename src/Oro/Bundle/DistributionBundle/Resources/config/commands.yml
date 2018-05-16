@@ -22,3 +22,9 @@ services:
         class: Oro\Bundle\DistributionBundle\Command\ListUpdatesCommand
         tags:
             - { name: console.command }
+
+    Oro\Bundle\DistributionBundle\Command\UpdatePackageCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\UpdatePackageCommand
+        tags:
+            - { name: console.command }

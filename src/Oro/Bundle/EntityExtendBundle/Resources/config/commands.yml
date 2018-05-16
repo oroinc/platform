@@ -25,6 +25,11 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
+        tags:
+            - { name: console.command }
 
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
         public: false
