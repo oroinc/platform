@@ -20,8 +20,14 @@ class EntityTreeSelectType extends AbstractType
 
         $resolver->setDefault(
             'page_component_module',
-            'oroform/js/app/components/entity-tree-select-form-type-component'
+            'oroform/js/app/components/entity-tree-select-form-type-view'
         );
+
+        $resolver->setDefault(
+            'page_component_options',
+            []
+        );
+
         $resolver->setNormalizer(
             'multiple',
             function () {
@@ -32,6 +38,7 @@ class EntityTreeSelectType extends AbstractType
         $resolver->setAllowedTypes('tree_data', ['array', 'callable']);
         $resolver->setAllowedTypes('tree_key', ['string']);
         $resolver->setAllowedTypes('page_component_module', ['string']);
+        $resolver->setAllowedTypes('page_component_options', ['array']);
     }
 
     /**
@@ -45,13 +52,13 @@ class EntityTreeSelectType extends AbstractType
             $treeData = $options['tree_data'];
         }
 
-        $view->vars['treeOptions'] = [
+        $view->vars['treeOptions'] = array_merge([
             'view' => $options['page_component_module'],
             'key' => $options['tree_key'],
-            'data' => $treeData,
+            'data' => [],
             'nodeId' => $form->getData() ? $form->getData()->getId() : null,
             'fieldSelector' => '#' . $view->vars['id']
-        ];
+        ], $options['page_component_options']);
     }
 
     /**

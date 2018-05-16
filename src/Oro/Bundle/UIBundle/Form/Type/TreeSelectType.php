@@ -38,7 +38,7 @@ class TreeSelectType extends AbstractType
         $resolver->setDefault('data_class', TreeItem::class);
         $resolver->setDefault(
             'page_component_module',
-            'oroform/js/app/components/entity-tree-select-form-type-component'
+            'oroform/js/app/components/entity-tree-select-form-type-view'
         );
 
         $resolver->setAllowedTypes('tree_data', ['array']);
