@@ -1,30 +1,30 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresource\JsonApi;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\ValidateSubresourceRequestData;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\ValidateRequestData;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
 
-class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestCase
+class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
 {
-    /** @var ValidateSubresourceRequestData */
+    /** @var ValidateRequestData */
     private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new ValidateSubresourceRequestData();
+        $this->processor = new ValidateRequestData();
     }
 
     public function testProcessWhenRequestDataAlreadyValidated()
     {
         $this->context->setRequestData([]);
-        $this->context->setProcessed(ValidateSubresourceRequestData::OPERATION_NAME);
+        $this->context->setProcessed(ValidateRequestData::OPERATION_NAME);
         $this->processor->process($this->context);
         self::assertFalse($this->context->hasErrors());
     }
@@ -43,7 +43,7 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithInvalidRequestDataForAssociationWithoutIdentifier()
@@ -66,7 +66,7 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
             [$error],
             $this->context->getErrors()
         );
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithValidRequestDataForToOneAssociation()
@@ -84,7 +84,7 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithValidRequestDataForToManyAssociation()
@@ -104,7 +104,7 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithInvalidRequestDataForToOneAssociation()
@@ -128,7 +128,7 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
             [$error],
             $this->context->getErrors()
         );
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithInvalidRequestDataForToManyAssociation()
@@ -152,6 +152,6 @@ class ValidateSubresourceRequestDataTest extends ChangeSubresourceProcessorTestC
             [$error],
             $this->context->getErrors()
         );
-        self::assertTrue($this->context->isProcessed(ValidateSubresourceRequestData::OPERATION_NAME));
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 }

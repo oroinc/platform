@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
@@ -11,9 +11,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Validates that the request data contains valid JSON.API object
  * that can be used to update a sub-resource.
- * This processor validates both "to-one" and "to-many" relationship data.
  */
-class ValidateSubresourceRequestData implements ProcessorInterface
+class ValidateRequestData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_request_data';
 
@@ -59,7 +58,7 @@ class ValidateSubresourceRequestData implements ProcessorInterface
      *
      * @return Error[]
      */
-    private function validateRequestData(ChangeSubresourceContext $context): array
+    protected function validateRequestData(ChangeSubresourceContext $context): array
     {
         $validator = new RequestDataValidator();
 

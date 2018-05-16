@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\Rest;
 
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\AbstractNormalizeRequestData;
@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 /**
  * Prepares REST API request data for a sub-resource to be processed by Symfony Forms.
  */
-class NormalizeSubresourceRequestData extends AbstractNormalizeRequestData
+class NormalizeRequestData extends AbstractNormalizeRequestData
 {
     /**
      * {@inheritdoc}
