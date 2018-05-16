@@ -55,7 +55,7 @@ class EntityTreeSelectType extends AbstractType
         $view->vars['treeOptions'] = array_merge([
             'view' => $options['page_component_module'],
             'key' => $options['tree_key'],
-            'data' => [],
+            'data' => $treeData,
             'nodeId' => $form->getData() ? $form->getData()->getId() : null,
             'fieldSelector' => '#' . $view->vars['id']
         ], $options['page_component_options']);

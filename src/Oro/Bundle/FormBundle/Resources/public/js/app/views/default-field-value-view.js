@@ -29,7 +29,6 @@ define(function(require) {
         render: function() {
             if (this.$(this.checkboxSelector).is(':checked')) {
                 this.$(this.checkboxSelector).filter(':checked').each(_.bind(function(i, e) {
-                    console.log($(e))
                     this._setFieldsState($(e), true);
                 }, this))
             }
