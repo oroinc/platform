@@ -90,7 +90,8 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
             ],
             'variable' => [
                 'Requirement field: "e.a < a.b" - syntax error: ' .
-                '"Variable "e" is not valid around position 1 for expression `e.a < a.b`.". ' .
+                '"Variable "e" is not valid around position 1 for expression `e.a < a.b`. ' .
+                "Did you mean \"wd\"?\". " .
                 'Valid context variables are: ' .
                 'wd [Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition], ' .
                 'wi [Oro\Bundle\WorkflowBundle\Entity\WorkflowItem], ' .

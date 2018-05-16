@@ -30,7 +30,7 @@ class ImportExportIsolator implements IsolatorInterface
     {
         $this->fs = new Filesystem();
         $this->finder = new Finder();
-        $this->path = $kernel->getRootDir().DIRECTORY_SEPARATOR.'import_export';
+        $this->path = $kernel->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export';
     }
 
     /** {@inheritdoc} */

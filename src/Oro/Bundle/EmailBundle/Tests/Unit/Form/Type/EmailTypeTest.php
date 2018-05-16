@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -12,10 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
@@ -25,7 +21,6 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -116,7 +111,6 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function getExtensions()
     {
-        $emailAddressType  = new EmailAddressType();
         $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
             ->disableOriginalConstructor()
             ->getMock();
@@ -162,17 +156,6 @@ class EmailTypeTest extends TypeTestCase
         $helper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $select2TranslatableEntityType = new Select2Type(
-            TranslatableEntityType::class,
-            'oro_select2_translatable_entity'
-        );
-        $select2ChoiceType  = new Select2Type(
-            'choice',
-            'oro_select2_choice'
-        );
-        $emailTemplateList = new EmailTemplateSelectType();
-        $attachmentsType   = new EmailAttachmentsType();
 
         $this->emailOriginHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper')
             ->disableOriginalConstructor()->getMock();
@@ -258,14 +241,9 @@ class EmailTypeTest extends TypeTestCase
                 [
                     EmailType::class => $this->createEmailType(),
                     TranslatableEntityType::class      => $translatableType,
-                    $select2TranslatableEntityType->getName() => $select2TranslatableEntityType,
-                    $emailTemplateList->getName()     => $emailTemplateList,
-                    $emailAddressType->getName()      => $emailAddressType,
                     $richTextType->getName()          => $richTextType,
                     $resizableRichTextType->getName() => $resizableRichTextType,
-                    $attachmentsType->getName()       => $attachmentsType,
                     ContextsSelectType::class          => $contextsSelectType,
-                    $select2ChoiceType->getName()     => $select2ChoiceType,
                     $emailAddressFromType->getName()       => $emailAddressFromType,
                     $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                     $emailOriginFromType->getName() => $emailOriginFromType
@@ -352,7 +330,7 @@ class EmailTypeTest extends TypeTestCase
                     ],
                     'subject' => 'Test subject',
                     'type' => 'text',
-                    'attachments' => new ArrayCollection(),
+                    'attachments' => [],
                     'template' => new EmailTemplate(),
                 ],
                 ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],

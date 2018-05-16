@@ -44,7 +44,7 @@ services:
         arguments:
             - '@oro_translation.uploader.default_adapter'
             - '@oro_translation.js_dumper'
-            - '@translation.loader'
+            - '@translation.reader'
             - '@oro_translation.database_translation.persister'
             - '%kernel.cache_dir%'
         lazy: true
@@ -150,7 +150,7 @@ services:
             - '@oro_translation.controller'
             - '@router'
             - '%oro_translation.js_translation.domains%'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
             - '@oro_translation.provider.language'
         lazy: true
 
@@ -167,7 +167,7 @@ services:
         arguments:
             - '@oro_distribution.package_manager'
             - '%kernel.bundles%'
-            - '%kernel.root_dir%'
+            - '%kernel.project_dir%'
             - '%oro_distribution.composer_cache_home%'
             - ['@oro_translation.packages_provider.translation']
 
@@ -339,3 +339,7 @@ services:
            - '@oro_translation.service_provider'
            - '@oro_translation.helper.language'
            - '@oro_entity.doctrine_helper'
+
+    oro_translation.strategy.provider_link:
+        tags:
+            - { name: oro_service_link, service: oro_translation.strategy.provider }

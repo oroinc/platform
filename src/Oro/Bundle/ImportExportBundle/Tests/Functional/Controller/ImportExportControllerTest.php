@@ -82,7 +82,7 @@ class ImportExportControllerTest extends WebTestCase
     {
         $this->client->followRedirects(true);
 
-        $tmpDirName = $this->getContainer()->getParameter('kernel.root_dir') . '/import_export';
+        $tmpDirName = $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
         $tmpFileName = tempnam($tmpDirName, 'download.txt');
         $tmp = explode('/', $tmpFileName);
         $filename = array_pop($tmp);
@@ -187,7 +187,7 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testImportForm()
     {
-        $tmpDirName = $this->getContainer()->getParameter('kernel.root_dir') . '/import_export';
+        $tmpDirName = $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
         $fileDir = __DIR__ . '/Import/fixtures';
         $file = $fileDir . '/testLineEndings.csv';
 

@@ -343,7 +343,7 @@ class AttachmentManager
     }
 
     /**
-     * Generate url for prod env (without prefix "/app_dev.php")
+     * Generate url for prod env (without prefix "/index_dev.php")
      *
      * @param string $name
      * @param array $parameters

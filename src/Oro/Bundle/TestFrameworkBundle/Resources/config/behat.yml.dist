@@ -31,7 +31,7 @@ default: &default
             artifacts:
                 handlers:
                     local:
-                        directory: '%paths.base%/web/uploads/behat'
+                        directory: '%paths.base%/public/uploads/behat'
                         base_url: '%mink.base_url%/uploads/behat'
                         auto_clear: false
             shared_contexts:

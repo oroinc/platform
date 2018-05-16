@@ -121,8 +121,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1
@@ -383,8 +381,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1
@@ -452,8 +448,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1
@@ -569,8 +563,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1
@@ -659,8 +651,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1
@@ -808,8 +798,6 @@ datagrids:
                     data_name: u.enabled
                     options:
                         field_options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 Disabled: 2
                                 Enabled: 1

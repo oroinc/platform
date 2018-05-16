@@ -109,7 +109,7 @@ class AcmeAppBundle extends Bundle
 }
 ```
 
-The last thing you need to do is to register a root routing resource for your application in `app/config/routing.yml`:
+The last thing you need to do is to register a root routing resource for your application in `config/routing.yml`:
 
 ``` yaml
 acme_auto_routing:

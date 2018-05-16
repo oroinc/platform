@@ -10,7 +10,6 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -163,16 +162,10 @@ class FieldTypeTest extends TypeTestCase
             new ConstraintValidatorFactory()
         );
 
-        $select2ChoiceType = new Select2Type(
-            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-            'oro_select2_choice'
-        );
-
         return [
             new PreloadedExtension(
                 [
-                    FieldType::class => $this->type,
-                    Select2Type::class => $select2ChoiceType,
+                    FieldType::class => $this->type
                 ],
                 [
                     FormType::class => [

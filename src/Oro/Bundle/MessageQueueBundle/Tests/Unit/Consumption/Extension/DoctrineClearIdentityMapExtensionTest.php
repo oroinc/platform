@@ -8,11 +8,11 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMap
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|IntrospectableContainerInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     private $container;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
@@ -23,7 +23,7 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->createMock(IntrospectableContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->extension = new DoctrineClearIdentityMapExtension($this->container);

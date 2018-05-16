@@ -10,8 +10,6 @@ entity_config:
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No:         0
                                 Yes:        1
@@ -30,8 +28,6 @@ entity_config:
                         type:                   Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
                         options:
                             block:              attachments
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label: 0
                                 oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label: 1

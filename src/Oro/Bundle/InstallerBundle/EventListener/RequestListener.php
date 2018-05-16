@@ -41,43 +41,23 @@ class RequestListener
         }
 
         if (!$this->installed) {
-            $allowedRoutes = array(
-                'oro_installer_flow',
-                'sylius_flow_display',
-                'sylius_flow_forward',
-            );
-
+            $allowedRoutes = [];
             if ($this->debug) {
-                $allowedRoutes = array_merge(
-                    $allowedRoutes,
-                    array(
-                        '_wdt',
-                        '_profiler',
-                        '_profiler_search',
-                        '_profiler_search_bar',
-                        '_profiler_search_results',
-                        '_profiler_router',
-                    )
-                );
+                $allowedRoutes = [
+                    '_wdt',
+                    '_profiler',
+                    '_profiler_search',
+                    '_profiler_search_bar',
+                    '_profiler_search_results',
+                    '_profiler_router',
+                ];
             }
 
             if (!in_array($event->getRequest()->get('_route'), $allowedRoutes, true)) {
-                $event->setResponse(new RedirectResponse($event->getRequest()->getBasePath() . '/install.php'));
+                $event->setResponse(new RedirectResponse($event->getRequest()->getBasePath() . '/notinstalled.html'));
             }
 
             $event->stopPropagation();
-        } else {
-            // allow open the installer even if the application is already installed
-            // this is required because we are clearing the cache on the last installation step
-            // and as the result the login page is appeared instead of the final installer page
-            if ($event->getRequest()->attributes->get('scenarioAlias') === 'oro_installer' &&
-                (
-                    $event->getRequest()->attributes->get('_route') === 'sylius_flow_forward' ||
-                    $event->getRequest()->attributes->get('_route') === 'sylius_flow_display'
-                )
-            ) {
-                $event->stopPropagation();
-            }
         }
     }
 }

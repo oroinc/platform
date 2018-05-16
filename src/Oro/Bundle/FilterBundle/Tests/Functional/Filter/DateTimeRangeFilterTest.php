@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Functional\Filter;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
@@ -45,6 +46,7 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     public function testFilter(callable $filterFormData, array $expectedResult)
     {
+        $this->updateUserCreatedAt();
         $qb = $this->createQueryBuilder('u');
         $qb
             ->select('u.username')
@@ -58,9 +60,9 @@ class DateTimeRangeFilterTest extends WebTestCase
         $this->assertTrue($filterForm->isValid());
 
         $this->filter->init(
-            'updatedAt',
+            'createdAt',
             [
-                'data_name' => 'u.updatedAt',
+                'data_name' => 'u.createdAt',
                 'type'      => 'datetime'
             ]
         );
@@ -105,17 +107,27 @@ class DateTimeRangeFilterTest extends WebTestCase
         ];
     }
 
+    private function updateUserCreatedAt()
+    {
+        $em = $this->getUserEntityManager();
+        $user = $this->getUser();
+        $dateFilter = clone $user->getCreatedAt();
+        $user->setCreatedAt($dateFilter->modify('-1 day'));
+        $em->persist($user);
+        $em->flush($user);
+    }
+
     /**
      * @return \Closure
      */
     private function getFilterFormEqualCallback()
     {
         return function () {
-            $updatedAt = $this->getUser()->getUpdatedAt();
+            $createdAt = $this->getUser()->getCreatedAt();
             return [
                 'type' => DateTimeRangeFilterType::TYPE_EQUAL,
                 'value' => [
-                    'start' => $updatedAt->format('Y-m-d H:i'),
+                    'start' => $createdAt->format('Y-m-d H:i'),
                     'end'   => ""
                 ],
             ];
@@ -128,12 +140,12 @@ class DateTimeRangeFilterTest extends WebTestCase
     private function getFilterFormNotEqualCallback()
     {
         return function () {
-            $updatedAt = $this->getUser()->getUpdatedAt();
+            $createdAt = $this->getUser()->getCreatedAt();
             return [
                 'type' => DateTimeRangeFilterType::TYPE_NOT_EQUAL,
                 'value' => [
                     'start' => "",
-                    'end'   => $updatedAt->format('Y-m-d H:i')
+                    'end'   => $createdAt->format('Y-m-d H:i')
                 ],
             ];
         };
@@ -144,12 +156,20 @@ class DateTimeRangeFilterTest extends WebTestCase
      */
     private function getUserRepository()
     {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $objectManager = $doctrine->getManagerForClass(User::class);
-        $repository = $objectManager->getRepository(User::class);
-
-        return $repository;
+        return $this->getUserEntityManager()->getRepository(User::class);
     }
+
+    /**
+     * @return EntityManager
+     */
+    private function getUserEntityManager()
+    {
+        $doctrine = $this->getContainer()->get('doctrine');
+        $manager = $doctrine->getManagerForClass(User::class);
+
+        return $manager;
+    }
+
 
     /**
      * @return User

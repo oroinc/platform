@@ -103,7 +103,7 @@ class ConnectionControllerManager
         $form->setData($data);
         $form->handleRequest($request);
 
-        if (!$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             throw new Exception("Incorrect setting for IMAP authentication");
         }
 

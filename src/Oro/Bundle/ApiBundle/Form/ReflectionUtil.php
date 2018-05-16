@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\Inflector\Inflector;
 
 /**
  * A set of utility methods for performing reflective operations are used in Data API forms.
@@ -22,7 +22,7 @@ class ReflectionUtil
     {
         $result = [];
         $camelized = self::camelize($property);
-        $singulars = (array)StringUtil::singularify($camelized);
+        $singulars = (array)Inflector::singularize($camelized);
         foreach ($singulars as $singular) {
             $result[] = ['add' . $singular, 'remove' . $singular];
         }
@@ -42,7 +42,7 @@ class ReflectionUtil
     {
         $reflClass = new \ReflectionClass($object);
         $camelized = self::camelize($property);
-        $singulars = (array)StringUtil::singularify($camelized);
+        $singulars = (array)Inflector::singularize($camelized);
         foreach ($singulars as $singular) {
             $addMethod = 'add' . $singular;
             $removeMethod = 'remove' . $singular;

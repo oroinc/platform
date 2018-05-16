@@ -511,14 +511,6 @@ abstract class AbstractProvider implements ProviderInterface
             $configFieldOptions
         );
 
-        // TODO: remove 'if' statement below in scope of BAP-15236
-        if (isset($configFieldOptions['target_field_options']['choices'])) {
-            $configFieldOptions['target_field_options'] = array_merge(
-                ['choices_as_values' => true],
-                $configFieldOptions['target_field_options']
-            );
-        }
-
         if ($fieldDefinition->needsPageReload()) {
             $configFieldOptions['target_field_options']['attr']['data-needs-page-reload'] = '';
             $configFieldOptions['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
