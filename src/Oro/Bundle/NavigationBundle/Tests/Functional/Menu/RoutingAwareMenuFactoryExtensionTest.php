@@ -26,7 +26,7 @@ class RoutingAwareMenuFactoryExtensionTest extends WebTestCase
 
     public function testBuildOptions()
     {
-        $router = self::getContainer()->get('router');
+        $router = self::getContainer()->get('router.default');
         $router->getContext()->setBaseUrl('index.php');
         $this->assertStringStartsWith(
             self::INDEX_PHP_FILE,
