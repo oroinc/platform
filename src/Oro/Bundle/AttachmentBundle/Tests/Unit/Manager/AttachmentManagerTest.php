@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
-use Symfony\Component\Routing\RouterInterface;
 
 class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -72,7 +74,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                     'codedString' => $expectsString,
                     'extension' => 'txt'
                 ],
-                RouterInterface::ABSOLUTE_URL
+                true
             );
         $this->attachmentManager->getFileUrl($parentEntity, $fieldName, $this->attachment, 'download', true);
     }
