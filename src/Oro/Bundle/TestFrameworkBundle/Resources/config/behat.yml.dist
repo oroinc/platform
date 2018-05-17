@@ -2,7 +2,7 @@
 default: &default
     extensions:
         Behat\MinkExtension:
-            base_url: 'http://dev.commerce-crm-ee.com'
+            base_url: 'http://localhost.com/'
             default_session: 'first_session'
             sessions:
                 second_session:
