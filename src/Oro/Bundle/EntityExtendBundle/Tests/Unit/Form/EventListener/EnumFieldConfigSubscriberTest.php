@@ -4,8 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormInterface;
 
 class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +20,9 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $enumSynchronizer;
+
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
 
     /** @var EnumFieldConfigSubscriber */
     protected $subscriber;
@@ -35,11 +41,14 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->subscriber = new EnumFieldConfigSubscriber(
             $this->configManager,
             $this->translator,
             $this->enumSynchronizer
         );
+        $this->subscriber->setLogger($this->logger);
     }
 
     public function testPreSetDataForEntityConfigModel()
@@ -469,6 +478,86 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ['enum'],
             ['multiEnum'],
         ];
+    }
+
+    /**
+     * @dataProvider enumTypeProvider
+     * @param string $dataType
+     */
+    public function testPostSubmitForEnumSyncError($dataType)
+    {
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum';
+        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $locale = 'en_GB';
+
+        $configModel = $this->createMock(FieldConfigModel::class);
+        $configModel->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
+        $configModel->expects($this->any())
+            ->method('getType')
+            ->willReturn($dataType);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $event = $this->getFormEventMock($configModel, $form);
+
+        $enumOptions   = [
+            ['id' => 'val1', 'label' => 'Value 1', 'priority' => 1],
+        ];
+        $submittedData = [
+            'enum' => [
+                'enum_name'    => $enumName,
+                'enum_public'  => true,
+                'enum_options' => $enumOptions
+            ]
+        ];
+
+        $event->expects($this->any())
+            ->method('getData')
+            ->willReturn($submittedData);
+        $configModel->expects($this->any())
+            ->method('toArray')
+            ->with('enum')
+            ->willReturn([]);
+
+        $this->translator->expects($this->any())
+            ->method('getLocale')
+            ->willReturn($locale);
+
+        $enumConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->with($enumValueClassName)
+            ->willReturn(true);
+
+        $event->expects($this->never())
+            ->method('setData');
+
+        $this->enumSynchronizer->expects($this->any())
+            ->method('applyEnumNameTrans');
+
+        $exception = new \Exception();
+        $this->enumSynchronizer->expects($this->once())
+            ->method('applyEnumOptions')
+            ->with($enumValueClassName, $enumOptions, $locale)
+            ->willThrowException($exception);
+
+        $form->expects($this->once())
+            ->method('addError');
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('Error occurred during enum options save', ['exception'=> $exception]);
+
+        $this->subscriber->postSubmit($event);
     }
 
     /**
