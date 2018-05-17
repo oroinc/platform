@@ -109,4 +109,52 @@ class BinaryNodeTest extends AbstractNodeTest
             ],
         ];
     }
+
+    /**
+     * @return array
+     */
+    public function getDumpData()
+    {
+        $array = new ArrayNode();
+        $array->addElement(new ConstantNode('a'));
+        $array->addElement(new ConstantNode('b'));
+
+        return [
+            ['(true or false)', new BinaryNode('or', new ConstantNode(true), new ConstantNode(false))],
+            ['(true || false)', new BinaryNode('||', new ConstantNode(true), new ConstantNode(false))],
+            ['(true and false)', new BinaryNode('and', new ConstantNode(true), new ConstantNode(false))],
+            ['(true && false)', new BinaryNode('&&', new ConstantNode(true), new ConstantNode(false))],
+
+            ['(2 & 4)', new BinaryNode('&', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 | 4)', new BinaryNode('|', new ConstantNode(2), new ConstantNode(4))],
+            ['(2 ^ 4)', new BinaryNode('^', new ConstantNode(2), new ConstantNode(4))],
+
+            ['(1 < 2)', new BinaryNode('<', new ConstantNode(1), new ConstantNode(2))],
+            ['(1 <= 2)', new BinaryNode('<=', new ConstantNode(1), new ConstantNode(2))],
+
+            ['(1 > 2)', new BinaryNode('>', new ConstantNode(1), new ConstantNode(2))],
+            ['(1 >= 2)', new BinaryNode('>=', new ConstantNode(1), new ConstantNode(2))],
+
+            ['(true = true)', new BinaryNode('=', new ConstantNode(true), new ConstantNode(true))],
+            ['(true != true)', new BinaryNode('!=', new ConstantNode(true), new ConstantNode(true))],
+
+            ['(1 - 2)', new BinaryNode('-', new ConstantNode(1), new ConstantNode(2))],
+            ['(1 + 2)', new BinaryNode('+', new ConstantNode(1), new ConstantNode(2))],
+            ['(2 * 2)', new BinaryNode('*', new ConstantNode(2), new ConstantNode(2))],
+            ['(2 / 2)', new BinaryNode('/', new ConstantNode(2), new ConstantNode(2))],
+            ['(5 % 2)', new BinaryNode('%', new ConstantNode(5), new ConstantNode(2))],
+            ['(5 ** 2)', new BinaryNode('**', new ConstantNode(5), new ConstantNode(2))],
+            ['("a" ~ "b")', new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'))],
+
+            ['("a" in ["a", "b"])', new BinaryNode('in', new ConstantNode('a'), $array)],
+            ['("c" not in ["a", "b"])', new BinaryNode('not in', new ConstantNode('c'), $array)],
+
+            ['(1 .. 3)', new BinaryNode('..', new ConstantNode(1), new ConstantNode(3))],
+
+            [
+                '("abc" matches "/^[a-z]+/i$/")',
+                new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('/^[a-z]+/i$/'))
+            ],
+        ];
+    }
 }

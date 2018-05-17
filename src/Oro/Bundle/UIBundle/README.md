@@ -57,7 +57,7 @@ placeholders:
           <one_more_item_name>: ~      # sort order will be set to 0
 ```
 
-Any configuration defined in bundle `placeholders.yml` file can be overridden in `app/config/config.yml` file.
+Any configuration defined in bundle `placeholders.yml` file can be overridden in `config/config.yml` file.
 
 ```yaml
 

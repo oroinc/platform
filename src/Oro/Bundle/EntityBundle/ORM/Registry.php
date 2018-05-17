@@ -6,6 +6,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry as BaseRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 
+/**
+ * Handles services registry logic
+ * @TODO: Deprecate setContainer should be removed after doctrine updated to corresponding symfony version #BAP-16324
+ */
 class Registry extends BaseRegistry
 {
     /** @var string[] [entity class => manager hash, ...] */

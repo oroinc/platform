@@ -88,12 +88,6 @@ class TranslatableEntityType extends AbstractType
         );
 
         $resolver->setRequired(array('class'));
-
-        //TODO: Remove in scope of BAP-15236
-        $resolver->setNormalizer('choices_as_values', function () {
-            return true;
-        });
-
         $resolver->setNormalizer('choice_value', function (Options $options, $value) {
             if ($value) {
                 return $value;

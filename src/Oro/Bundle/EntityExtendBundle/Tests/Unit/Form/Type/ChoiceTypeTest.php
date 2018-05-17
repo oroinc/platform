@@ -31,7 +31,7 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
             ChoiceType::class,
             [
                 'config_id' => new EntityConfigId('test', 'Test\Entity'),
-                'choices'   => [false => 'No', true => 'Yes']
+                'choices'   => ['No' => false, 'Yes' => true]
             ],
             [],
             $newVal,
@@ -62,7 +62,6 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
 
     public function testGetParent()
     {
-        $type = $this->getFormType();
         $this->assertEquals(
             SymfonyChoiceType::class,
             $this->getFormType()->getParent()

@@ -5,9 +5,9 @@ namespace Oro\Bundle\WindowsBundle\Twig;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
-use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class WindowsExtension extends \Twig_Extension
@@ -111,9 +111,9 @@ class WindowsExtension extends \Twig_Extension
         try {
             $uri = $this->getWindowsStateRequestManager()->getUri($windowState->getData());
 
-            /** @var HttpKernelExtension $httpKernelExtension */
-            $httpKernelExtension = $environment->getExtension('http_kernel');
-            $result = $httpKernelExtension->renderFragment($uri);
+            /** @var FragmentHandler $fragmentHandler */
+            $fragmentHandler = $this->container->get('fragment.handler');
+            $result = $fragmentHandler->render($uri);
             $windowState->setRenderedSuccessfully(true);
 
             return $result;

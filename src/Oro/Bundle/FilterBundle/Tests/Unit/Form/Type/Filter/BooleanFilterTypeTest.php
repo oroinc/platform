@@ -57,7 +57,6 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
             [
                 'defaultOptions' => [
                     'field_options' => [
-                        'choices_as_values' => true,
                         'choices' => $this->booleanChoices,
                     ],
                 ],
@@ -86,7 +85,6 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices_as_values' => true,
                         'choices' => $this->booleanChoices,
                     ),
                 )
@@ -99,7 +97,6 @@ class BooleanFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices_as_values' => true,
                         'choices' => $this->booleanChoices
                     ),
                 )

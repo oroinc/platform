@@ -21,7 +21,8 @@ class UpdateOrganizationFormType implements Migration
                 Organization::class,
                 'form',
                 'form_type',
-                OrganizationSelectType::class
+                OrganizationSelectType::class,
+                'oro_organization_select'
             )
         );
     }

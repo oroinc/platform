@@ -89,8 +89,6 @@ class MailboxType extends AbstractType
 
         $builder->add('processType', ChoiceType::class, [
             'label'       => 'oro.email.mailbox.process.type.label',
-            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-            'choices_as_values' => true,
             'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
             'mapped'      => false,

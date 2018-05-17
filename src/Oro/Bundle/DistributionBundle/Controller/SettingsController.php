@@ -31,7 +31,7 @@ class SettingsController extends Controller
         $form->handleRequest($request);
 
         $saved = false;
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $config->flush();
             $saved = true;
         }

@@ -70,7 +70,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if ($form->has('region')) {
                 $regionTypeConfig = $form->get('region')->getConfig();
                 $config = $regionTypeConfig->getOptions();
-                unset($config['choice_list']);
                 unset($config['choices']);
                 $formType = get_class($regionTypeConfig->getType()->getInnerType());
             } else {
@@ -84,9 +83,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if (array_key_exists('auto_initialize', $config)) {
                 $config['auto_initialize'] = false;
             }
-
-            //@TODO Remove in scope BAP-16504
-            unset($config['cascade_validation']);
 
             $form->add(
                 $this->factory->createNamed(
@@ -116,11 +112,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form = $event->getForm();
 
             $config = $form->get('region')->getConfig()->getOptions();
-            unset($config['choice_list']);
             unset($config['choices']);
-
-            //@TODO Remove in scope BAP-16504
-            unset($config['cascade_validation']);
 
             $config['country'] = $country;
             $config['query_builder'] = $this->getRegionClosure($country);
@@ -128,9 +120,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if (array_key_exists('auto_initialize', $config)) {
                 $config['auto_initialize'] = false;
             }
-
-            //@TODO Remove in scope BAP-15236
-            unset($config['csrf_provider']);
 
             $form->add(
                 $this->factory->createNamed(

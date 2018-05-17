@@ -74,7 +74,7 @@ class CollectFormErrors implements ProcessorInterface
     {
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            if (!$child->isValid()) {
+            if ($child->isSubmitted() && !$child->isValid()) {
                 foreach ($child->getErrors() as $error) {
                     $errorObject = $this->createErrorObject(
                         $error,

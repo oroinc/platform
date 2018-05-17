@@ -70,7 +70,7 @@ class GenderTypeTest extends FormIntegrationTestCase
         $view = $form->createView();
         $this->assertFalse($view->vars['multiple']);
         $this->assertFalse($view->vars['expanded']);
-        $this->assertNotEmpty($view->vars['empty_value']);
+        $this->assertNotEmpty($view->vars['placeholder']);
         $this->assertNotEmpty($view->vars['choices']);
 
         $actualChoices = array();

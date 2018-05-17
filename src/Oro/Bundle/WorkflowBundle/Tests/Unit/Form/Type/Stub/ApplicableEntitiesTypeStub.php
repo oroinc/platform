@@ -19,8 +19,8 @@ class ApplicableEntitiesTypeStub extends AbstractType
         $resolver->setDefaults(
             [
                 'choices' => [
-                    StubEntity::class => Inflector::tableize(StubEntity::class),
-                    \stdClass::class => Inflector::tableize(\stdClass::class)
+                    Inflector::tableize(StubEntity::class) => StubEntity::class,
+                    Inflector::tableize(\stdClass::class) => \stdClass::class
                 ]
             ]
         );

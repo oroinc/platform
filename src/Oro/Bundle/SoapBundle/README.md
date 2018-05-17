@@ -8,7 +8,7 @@ OroSoapBundle extends FOSRestBundle and provides developers with a way to create
 
 Bundle adds support of SOAP controller classes and builds a single WSDL file for SOAP API definition.
 
-Configuration in app/config/config.yml file:
+Configuration in config/config.yml file:
 
     be_simple_soap:
         ...
@@ -17,7 +17,7 @@ Configuration in app/config/config.yml file:
             soap:
                 namespace:     http://symfony.loc/Api/1.0/
                 binding:       rpc-literal
-                resource:      "%kernel.root_dir%/../src/Oro/Bundle/SoapBundle/Resources/config/soap.yml"
+                resource:      "%kernel.project_dir%/src/Oro/Bundle/SoapBundle/Resources/config/soap.yml"
                 resource_type: yml
 
 Parameters:

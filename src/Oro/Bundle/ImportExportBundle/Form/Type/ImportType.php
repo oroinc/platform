@@ -43,8 +43,6 @@ class ImportType extends AbstractType
             ChoiceType::class,
             array_merge(
                 [
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => $processorChoices,
                     'required' => true,
                     'empty_data' => reset($processorNames)

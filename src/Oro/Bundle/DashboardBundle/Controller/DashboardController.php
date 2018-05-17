@@ -118,7 +118,7 @@ class DashboardController extends Controller
         $form->setData($this->get('oro_dashboard.widget_configs')->getFormValues($widget));
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $widget->setOptions($form->getData());
             $this->getEntityManager()->flush();
             $saved = true;
@@ -186,14 +186,17 @@ class DashboardController extends Controller
             ]
         );
 
-        if ($request->isMethod('POST') && $form->handleRequest($request)->isValid()) {
-            $this->getDashboardManager()->save($dashboardModel, true);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.dashboard.saved_message')
-            );
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->getDashboardManager()->save($dashboardModel, true);
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.dashboard.saved_message')
+                );
 
-            return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+                return $this->get('oro_ui.router')->redirect($dashboardModel->getEntity());
+            }
         }
 
         return ['entity' => $dashboardModel, 'form' => $form->createView()];

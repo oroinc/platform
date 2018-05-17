@@ -332,7 +332,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 $val = $this->convertConfigValueToHumanReadableRepresentation($val);
             }
         );
-        $output->write(Yaml::dump($config, 100, 4, true, true));
+        $output->write(Yaml::dump($config, 100, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT));
     }
 
     /**

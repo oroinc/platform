@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 
-use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToRfc3339Transformer as Wrapper;
+use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToLocalizedStringTransformer as Wrapper;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Oro\Bundle\ApiBundle\Form\Extension\DateTimeExtension;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -25,12 +25,12 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(DateTimeType::class, $this->extension->getExtendedType());
     }
 
-    public function testBuildFormShouldWrapDateTimeToRfc3339TransformerIfItIsWrappedWithNullValueTransformer()
+    public function testBuildFormShouldWrapDateTimeTransformerIfItIsWrappedWithNullValueTransformer()
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $rfc3339Transformer = $this->createMock(DateTimeToRfc3339Transformer::class);
+        $dateTimeToLocalizedStringTransformer = $this->createMock(DateTimeToLocalizedStringTransformer::class);
 
-        $viewTransformers = [new NullValueTransformer($rfc3339Transformer)];
+        $viewTransformers = [new NullValueTransformer($dateTimeToLocalizedStringTransformer)];
 
         $builder->expects(self::once())
             ->method('getViewTransformers')
@@ -39,21 +39,21 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->buildForm($builder, []);
 
         self::assertInstanceOf(NullValueTransformer::class, $viewTransformers[0]);
-        self::assertNotSame($rfc3339Transformer, $viewTransformers[0]->getInnerTransformer());
+        self::assertNotSame($dateTimeToLocalizedStringTransformer, $viewTransformers[0]->getInnerTransformer());
         self::assertInstanceOf(Wrapper::class, $viewTransformers[0]->getInnerTransformer());
         self::assertAttributeSame(
-            $rfc3339Transformer,
+            $dateTimeToLocalizedStringTransformer,
             'innerTransformer',
             $viewTransformers[0]->getInnerTransformer()
         );
     }
 
-    public function testBuildFormShouldNotWrapDateTimeToRfc3339TransformerIfItIsNotWrappedWithNullValueTransformer()
+    public function testBuildFormShouldNotWrapDateTimeTransformerIfItIsNotWrappedWithNullValueTransformer()
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $rfc3339Transformer = $this->createMock(DateTimeToRfc3339Transformer::class);
+        $dateTimeToLocalizedStringTransformer = $this->createMock(DateTimeToLocalizedStringTransformer::class);
 
-        $viewTransformers = [$rfc3339Transformer];
+        $viewTransformers = [$dateTimeToLocalizedStringTransformer];
 
         $builder->expects(self::once())
             ->method('getViewTransformers')
@@ -61,10 +61,10 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->buildForm($builder, []);
 
-        self::assertSame($rfc3339Transformer, $viewTransformers[0]);
+        self::assertSame($dateTimeToLocalizedStringTransformer, $viewTransformers[0]);
     }
 
-    public function testBuildFormShouldWrapOnlyDateTimeToRfc3339Transformer()
+    public function testBuildFormShouldWrapOnlyDateTimeToLocalizedStringTransformer()
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $anotherTransformer = $this->createMock(DataTransformerInterface::class);

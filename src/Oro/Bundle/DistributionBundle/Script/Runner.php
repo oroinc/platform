@@ -21,7 +21,7 @@ class Runner
     /**
      * @var string|null
      */
-    protected $applicationRootDir;
+    protected $applicationProjectDir;
 
     /**
      * @var LoggerInterface
@@ -40,19 +40,19 @@ class Runner
 
     /**
      * @param InstallationManager $installationManager
-     * @param LoggerInterface $logger
-     * @param string $applicationRootDir
-     * @param string $environment
+     * @param LoggerInterface     $logger
+     * @param string              $applicationProjectDir
+     * @param string              $environment
      */
     public function __construct(
         InstallationManager $installationManager,
         LoggerInterface $logger,
-        $applicationRootDir,
+        $applicationProjectDir,
         $environment
     ) {
         $this->installationManager = $installationManager;
         $this->logger = $logger;
-        $this->applicationRootDir = realpath($applicationRootDir);
+        $this->applicationProjectDir = realpath($applicationProjectDir);
         $this->environment = $environment;
     }
 
@@ -138,12 +138,12 @@ class Runner
      */
     public function removeCachedFiles()
     {
-        if (!$this->applicationRootDir) {
+        if (!$this->applicationProjectDir) {
             return;
         }
         $finder = new Finder();
         $finder->files()
-            ->in($this->applicationRootDir)
+            ->in($this->applicationProjectDir)
             ->name('bundles.php')
             ->name('*ProjectContainer.php');
 
@@ -203,16 +203,10 @@ class Runner
     {
         $phpPath = $this->getPhpExecutablePath();
 
-        $path = $this->applicationRootDir;
-
-        if ($application == 'console') {
-            $path = $this->applicationRootDir . '/../bin';
-        }
-
         $command = sprintf(
             '"%s" "%s/%s" %s --env=%s',
             $phpPath,
-            $path,
+            $this->applicationProjectDir . '/bin',
             $application,
             $command,
             $this->environment
@@ -221,7 +215,7 @@ class Runner
         $this->logger->info(sprintf('Executing "%s"', $command));
 
         $process = new Process($command);
-        $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
+        $process->setWorkingDirectory(realpath($this->applicationProjectDir)); // project root
         $process->setTimeout($this->timeout);
 
         $process->run();

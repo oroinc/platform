@@ -14,7 +14,7 @@ Configuration extensions help add:
 
 ## Creating a Configuration Extension
 
-Each configuration extension must implement [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php) (you can also use [AbstractConfigExtension](../../Config/AbstractConfigExtension) as a superclass). To register a new configuration extension, add it to `Resources/config/oro/app.yml` of your bundle or use `app/config/config.yml` of your application:
+Each configuration extension must implement [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php) (you can also use [AbstractConfigExtension](../../Config/AbstractConfigExtension) as a superclass). To register a new configuration extension, add it to `Resources/config/oro/app.yml` of your bundle or use `config/config.yml` of your application:
 
 ```php
 <?php
@@ -28,7 +28,7 @@ class MyConfigExtension extends AbstractConfigExtension
 ```
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 services:
   acme.api.my_config_extension:
     class: Acme\Bundle\AcmeBundle\Api\MyConfigExtension

@@ -78,7 +78,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices' => array(1 => 'One', 2 => 'Two')
+                        'choices' => array('One' => 1, 'Two' => 2)
                     ),
                 )
             ),
@@ -90,7 +90,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices' => array(1 => 'One')
+                        'choices' => array('One' => 1)
                     ),
                 )
             ),
@@ -103,7 +103,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 'customOptions' => array(
                     'field_options' => array(
                         'multiple' => true,
-                        'choices' => array(1 => 'One', 2 => 'Two', 3 => 'Three')
+                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
                     ),
                 )
             ),
@@ -116,7 +116,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 'customOptions' => array(
                     'field_options' => array(
                         'multiple' => true,
-                        'choices' => array(1 => 'One', 2 => 'Two', 3 => 'Three')
+                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
                     ),
                 )
             ),

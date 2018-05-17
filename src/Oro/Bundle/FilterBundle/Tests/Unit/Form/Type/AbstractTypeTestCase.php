@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormExtensionInterface;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -161,7 +163,10 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        return $this->formExtensions;
+        return array_merge(
+            $this->formExtensions,
+            [new PreloadedExtension([], ['datetime' => [new DateTimeExtension()]])]
+        );
     }
 
     /**

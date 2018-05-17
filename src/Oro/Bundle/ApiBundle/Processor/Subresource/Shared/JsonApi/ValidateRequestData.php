@@ -11,7 +11,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Validates that the request data contains valid JSON.API object
  * that can be used to update a relationship.
- * This processor validates both "to-one" and "to-many" relationship data.
  */
 class ValidateRequestData implements ProcessorInterface
 {

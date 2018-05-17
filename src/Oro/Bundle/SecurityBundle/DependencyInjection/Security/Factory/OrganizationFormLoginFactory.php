@@ -3,10 +3,13 @@
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FormLoginFactory;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Handles from login definition
+ */
 class OrganizationFormLoginFactory extends FormLoginFactory
 {
     public function __construct()
@@ -26,7 +29,7 @@ class OrganizationFormLoginFactory extends FormLoginFactory
         $container
             ->setDefinition(
                 $provider,
-                new DefinitionDecorator('oro_security.authentication.provider.username_password_organization')
+                new ChildDefinition('oro_security.authentication.provider.username_password_organization')
             )
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(2, $id);

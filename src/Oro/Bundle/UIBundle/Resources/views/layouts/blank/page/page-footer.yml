@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'page-footer.html.twig'
+            themes: 'OroUIBundle:layouts:blank/page/page-footer.html.twig'
 
         - '@addTree':
             items:

@@ -32,7 +32,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 
         $this->twigLoader = $this->createMock('Twig_Loader_Filesystem');
 
-        $this->logger = $this->createMock('Symfony\Component\HttpKernel\Log\LoggerInterface');
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

@@ -2,7 +2,7 @@
 default: &default
     extensions:
         Behat\MinkExtension:
-            base_url: 'http://localhost.com/'
+            base_url: 'http://dev.commerce-crm-ee.com'
             default_session: 'first_session'
             sessions:
                 second_session:
@@ -31,7 +31,7 @@ default: &default
             artifacts:
                 handlers:
                     local:
-                        directory: '%paths.base%/web/uploads/behat'
+                        directory: '%paths.base%/public/uploads/behat'
                         base_url: '%mink.base_url%/uploads/behat'
                         auto_clear: false
             shared_contexts:

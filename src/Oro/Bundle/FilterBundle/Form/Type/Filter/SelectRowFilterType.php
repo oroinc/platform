@@ -66,8 +66,6 @@ class SelectRowFilterType extends AbstractChoiceType
             [
                 'field_type' => ChoiceType::class,
                 'field_options' => [
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => [
                         $this->translator->trans('oro.filter.form.label_not_selected') => self::NOT_SELECTED_VALUE,
                         $this->translator->trans('oro.filter.form.label_selected') => self::SELECTED_VALUE,

@@ -56,7 +56,7 @@ operations:
                         attribute: $.form
                         service: form.factory
                         method: createNamed
-                        method_parameters: ["oro_workflow_definition_form", "oro_workflow_definition", null]
+                        method_parameters: ["oro_workflow_definition_form", Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType, null]
                     - '@call_method':
                         object: $.form
                         method: setData

@@ -124,14 +124,6 @@ class KernelStub extends OroKernel implements KernelInterface
 
     /**
      * {@inheritdoc}
-     * TODO: remove deprecated method in scope of BAP-15564
-     */
-    public function isClassInActiveBundle($class)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function locateResource($name, $dir = null, $first = true)
     {

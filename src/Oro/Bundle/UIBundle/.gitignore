@@ -5,6 +5,6 @@ var/logs/*
 build/
 vendor
 composer.phar
-app/config/parameters.yml
+config/parameters.yml
 .idea
 .idea/*

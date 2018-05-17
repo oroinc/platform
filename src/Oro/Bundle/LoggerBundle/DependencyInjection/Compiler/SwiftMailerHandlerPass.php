@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -40,8 +40,8 @@ class SwiftMailerHandlerPass implements CompilerPassInterface
     ) {
         $pluginName = sprintf('swiftmailer.mailer.%s.plugin.no_recipient', $name);
 
-        $definitionDecorator = new DefinitionDecorator('swiftmailer.plugin.no_recipient.abstract');
-        $container->setDefinition($pluginName, $definitionDecorator);
+        $childDefinition = new ChildDefinition('swiftmailer.plugin.no_recipient.abstract');
+        $container->setDefinition($pluginName, $childDefinition);
 
         $container->getDefinition($mailer)
             ->addMethodCall('registerPlugin', [new Reference($pluginName)]);

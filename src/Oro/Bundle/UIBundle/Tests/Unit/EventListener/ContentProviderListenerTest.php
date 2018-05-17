@@ -76,7 +76,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     array(
-                        array('_enableContentProviders', null, false, 'test1,test2')
+                        array('_enableContentProviders', null, 'test1,test2')
                     )
                 )
             );
@@ -125,7 +125,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     array(
-                        array('_displayContentProviders', null, false, 'test2')
+                        array('_displayContentProviders', null, 'test2')
                     )
                 )
             );

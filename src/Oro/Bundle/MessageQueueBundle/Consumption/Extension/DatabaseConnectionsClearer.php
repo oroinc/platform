@@ -4,14 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 
 /**
  * Closes all active database connections to prevent "Too many connections" exception.
  */
 class DatabaseConnectionsClearer implements ClearerInterface
 {
-    /** @var ContainerInterface|IntrospectableContainerInterface */
+    /** @var ContainerInterface */
     private $container;
 
     /** @var array [connection name => connection service id, ...] */

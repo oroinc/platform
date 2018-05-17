@@ -21,7 +21,8 @@ class UpdateUserFormType implements Migration
                 User::class,
                 'form',
                 'form_type',
-                UserSelectType::class
+                UserSelectType::class,
+                'oro_user_select'
             )
         );
     }

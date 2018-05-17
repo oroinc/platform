@@ -8,11 +8,11 @@
 
 namespace Oro\Component\PropertyAccess;
 
+use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-use Symfony\Component\PropertyAccess\StringUtil;
 
 /**
  * Writes and reads values to/from an object/array graph.
@@ -545,7 +545,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (is_object($object)) {
             $reflClass = new \ReflectionClass($object);
             $camelized = $this->camelize($property);
-            $singulars = (array)StringUtil::singularify($camelized);
+            $singulars = (array)Inflector::singularize($camelized);
 
             $isCollection = $this->checkValueIsCollection($object, $property, $value, $reflClass, $singulars);
 
@@ -736,7 +736,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             return true;
         }
 
-        $singulars = (array) StringUtil::singularify($camelized);
+        $singulars = (array) Inflector::singularize($camelized);
 
         // Any of the two methods is required, but not yet known
         if (null !== $this->findAdderAndRemover($reflClass, $singulars)) {
