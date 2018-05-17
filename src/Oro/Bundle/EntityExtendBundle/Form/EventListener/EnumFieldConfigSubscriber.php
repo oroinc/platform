@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\EventListener;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -15,7 +18,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * Manage Entity Config Enum Options
  */
-class EnumFieldConfigSubscriber implements EventSubscriberInterface
+class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAwareInterface
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -25,6 +28,11 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface
 
     /** @var EnumSynchronizer */
     protected $enumSynchronizer;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @param ConfigManager       $configManager
@@ -39,6 +47,14 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface
         $this->configManager    = $configManager;
         $this->translator       = $translator;
         $this->enumSynchronizer = $enumSynchronizer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -134,25 +150,36 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface
         $enumConfigProvider = $this->configManager->getProvider('enum');
 
         if ($enumConfigProvider->hasConfig($enumValueClassName)) {
-            // existing enum
-            if ($configModel->getId()) {
-                if ($enumName !== null) {
-                    $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+            try {
+                // existing enum
+                if ($configModel->getId()) {
+                    if ($enumName !== null) {
+                        $this->enumSynchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
+                    }
+                    $enumOptions = $this->getValue($data['enum'], 'enum_options');
+                    if ($enumOptions !== null) {
+                        $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+                    }
+                    $enumPublic = $this->getValue($data['enum'], 'enum_public');
+                    if ($enumPublic !== null) {
+                        $this->enumSynchronizer->applyEnumEntityOptions($enumValueClassName, $enumPublic);
+                    }
                 }
-                $enumOptions = $this->getValue($data['enum'], 'enum_options');
-                if ($enumOptions !== null) {
-                    $this->enumSynchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
-                }
-                $enumPublic = $this->getValue($data['enum'], 'enum_public');
-                if ($enumPublic !== null) {
-                    $this->enumSynchronizer->applyEnumEntityOptions($enumValueClassName, $enumPublic);
+
+                unset($data['enum']['enum_name']);
+                unset($data['enum']['enum_options']);
+                unset($data['enum']['enum_public']);
+                $event->setData($data);
+            } catch (\Exception $e) {
+                $form->addError(
+                    new FormError(
+                        $this->translator->trans('oro.entity_extend.enum.options_error.message', [], 'validators')
+                    )
+                );
+                if (null !== $this->logger) {
+                    $this->logger->error('Error occurred during enum options save', ['exception'=> $e]);
                 }
             }
-
-            unset($data['enum']['enum_name']);
-            unset($data['enum']['enum_options']);
-            unset($data['enum']['enum_public']);
-            $event->setData($data);
         } else {
             // new enum
             $this->sortOptions($data['enum']['enum_options']);

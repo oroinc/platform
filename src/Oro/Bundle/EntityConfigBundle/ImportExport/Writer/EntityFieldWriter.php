@@ -175,21 +175,10 @@ class EntityFieldWriter implements ItemWriterInterface
 
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
-        $enumOptions = array_map(
-            function ($option) {
-                if (!isset($option['id'])) {
-                    $option['id'] = $option['label'];
-                }
-
-                return $option;
-            },
-            $data['enum_options']
-        );
-
         if ($provider->hasConfig($enumValueClassName)) {
             $this->enumSynchronizer->applyEnumOptions(
                 $enumValueClassName,
-                $enumOptions,
+                $this->getUniqueOptions($data['enum_options']),
                 $this->translationHelper->getLocale()
             );
         }
@@ -235,5 +224,33 @@ class EntityFieldWriter implements ItemWriterInterface
         }
 
         return $this->stateChecker;
+    }
+
+    /**
+     * @param array $options
+     * @return array
+     */
+    private function getUniqueOptions(array $options)
+    {
+        $processedIds = [];
+        $processedLabels = [];
+        $result = [];
+
+        foreach ($options as $key => $opts) {
+            if (isset($opts['id']) && $opts['id'] !== null && $opts['id'] !== '') {
+                if (empty($processedIds[$opts['id']])) {
+                    $processedIds[$opts['id']] = true;
+                    $result[$key] = $opts;
+                }
+            } elseif (isset($opts['label'])) {
+                $labelKey = strtolower(trim($opts['label']));
+                if (empty($processedLabels[$labelKey])) {
+                    $processedLabels[$labelKey] = true;
+                    $result[$key] = $opts;
+                }
+            }
+        }
+
+        return $result;
     }
 }
