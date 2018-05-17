@@ -63,7 +63,7 @@
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.x-dev"
+                "dev-3.0-rc": "3.0.x-dev"
             }
         },
         "installation-source": "dist",
@@ -109,7 +109,7 @@
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "1.x-dev"
+                "dev-3.0-rc": "3.0.x-dev"
             }
         },
         "installation-source": "dist",
