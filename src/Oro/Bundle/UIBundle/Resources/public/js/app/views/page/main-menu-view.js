@@ -141,23 +141,19 @@ define([
                 'margin-top': 0
             });
 
+            // align elements horizontally
             var $scrollable = $child.closest('.dropdown-menu-wrapper__scrollable');
-            var scrollControlWidth = $scrollable.outerWidth() - $toggle.outerWidth();
+            var scrollControlWidth = $scrollable.outerWidth() - $scrollable[0].clientWidth;
+            $child.css({'margin-left': 'calc(100% - ' + scrollControlWidth + 'px)'});
 
-            var scrollTop = $scrollable.scrollTop();
-            var toggleHeight = $toggle.outerHeight();
-
-            var marginTop = -1 * (toggleHeight + scrollTop);
-            $child.css({
-                'margin-left': 'calc(100% - ' + scrollControlWidth + 'px)',
-                'margin-top': marginTop + 'px'
-            });
+            // align elements vertically
+            $child.offset({top: $toggle.offset().top});
 
             //change dropdown direction if necessary
             var childHeight = $child.outerHeight();
             var childTop = $child.get(0).getBoundingClientRect().top;
             if (childHeight + childTop > window.innerHeight) {
-                marginTop = -1 * (childHeight + scrollTop);
+                var marginTop = -1 * (childHeight - $toggle.outerHeight());
                 $child.css({
                     'margin-top': marginTop + 'px'
                 });
