@@ -8,8 +8,8 @@
     visibility: hidden;
   }
   &:hover {
-    background: $inlineActionBackground;
-    @include inline-actions-element-outline($inlineActionBackground);
+    background: $inline-action-background;
+    @include inline-actions-element-outline($inline-action-background);
     .inline-actions-element_actions {
       visibility: visible;
     }
@@ -47,8 +47,8 @@
       height: 20px;
       margin:0 1px;
       &:before {
-        font: $baseFontSize/26px 'FontAwesome';
-        color: $inlineActionColor;
+        font: $base-font-size/26px 'FontAwesome';
+        color: $inline-action-color;
         font-size: 15px;
         line-height: 22px;
         height: 22px;

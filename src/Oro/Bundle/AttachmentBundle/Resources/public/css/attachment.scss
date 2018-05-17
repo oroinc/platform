@@ -45,12 +45,12 @@
       width: 345px;
     }
     input:hover ~ span.action {
-      color: $linkColorHover;
+      color: $link-color-hover;
     }
     span.action {
       border: none;
       background: none;
-      color: $linkColor;
+      color: $link-color;
       cursor: pointer;
     }
     .active  span.action {
@@ -68,7 +68,7 @@
     border: none;
     box-shadow: none;
     span.action {
-      color: $linkColor;
+      color: $link-color;
     }
   }
 }

@@ -12,9 +12,9 @@ html {
 }
 
 body {
-    font-family: $baseFontFamily;
-    font-size: $baseFontSize;
-    color: $bodyColor;
+    font-family: $base-font-family;
+    font-size: $base-font-size;
+    color: $body-color;
     margin: 0;
     padding: 0;
     min-width: 980px;
@@ -44,7 +44,7 @@ body.error-page {
 }
 
 a {
-    color: $linkColor;
+    color: $link-color;
 
     &:hover,
     &:active,
@@ -89,7 +89,7 @@ h6 {
 .dropdown-menu {
     margin-top: -1px;
     border-radius: 3px;
-    z-index: $oroZindexDropdown;
+    z-index: $oro-zindex-dropdown;
 
     li.dropdown {
         position: relative;
@@ -438,7 +438,7 @@ body .select2-container {
     box-sizing: content-box;
     border-color: #ddd;
     color: #333;
-    font-size: $baseFontSize;
+    font-size: $base-font-size;
 }
 
 .btn-group > .btn:last-child,
@@ -460,7 +460,7 @@ body .select2-container {
 .dropdown-menu > li > a {
     padding-left: 13px;
     padding-right: 13px;
-    color: $menuItemColor;
+    color: $menu-item-color;
 }
 
 .dropdown-menu > li > a:hover,
@@ -471,7 +471,7 @@ body .select2-container {
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
     background: #f3f3f3;
-    color: $menuItemColor;
+    color: $menu-item-color;
 }
 
 .navbar .nav li.dropdown.open > .dropdown-toggle,
@@ -504,7 +504,7 @@ body .select2-container {
 .badge-info { background: #92b2d6; }
 
 .job-progress {
-    background-image: linear-gradient(to bottom, $progressBarGradientStart, $progressBarGradientEnd)!important;
+    background-image: linear-gradient(to bottom, $progress-bar-gradient-start, $progress-bar-gradient-end)!important;
     position: relative;
 
     .label {
@@ -543,36 +543,36 @@ footer {
 }
 
 #aside {
-    padding: 0 $horizontalPadding;
+    padding: 0 $horizontal-padding;
 }
 
 #sidebar {
-    padding: 0 $horizontalPadding;
+    padding: 0 $horizontal-padding;
 }
 
 #content {
-    padding: 0 $horizontalPadding;
+    padding: 0 $horizontal-padding;
 }
 
 .one-column {
-    padding: $horizontalPadding;
+    padding: $horizontal-padding;
     border-radius: $baseBorderRadius;
-    border: 1px solid $generalBorderColor;
-    margin: 0 0 $marginBottomBox;
+    border: 1px solid $general-border-color;
+    margin: 0 0 $margin-bottom-box;
 }
 
 .page-container {
-    padding: 0 $widthClosePanel;
+    padding: 0 $width-close-panel;
     height: 1%;
     position: relative;
 }
 
 .page-container.left-locked {
-    padding-left: $widthLeftPanel;
+    padding-left: $width-left-panel;
 }
 
 .page-container.right-locked {
-    padding-right: $widthLeftPanel;
+    padding-right: $width-left-panel;
 }
 
 .page-container:after {
@@ -606,7 +606,7 @@ footer {
         h3 {
             float: left;
             margin: 0;
-            font-size: $fontSizeSmall;
+            font-size: $base-font-size--s;
             line-height: 12px;
             text-transform: uppercase;
         }
@@ -726,8 +726,8 @@ footer {
 
 .left-panel {
     float: left;
-    width: $widthClosePanel;
-    margin: 0 0 0 -#{$widthClosePanel};
+    width: $width-close-panel;
+    margin: 0 0 0 -#{$width-close-panel};
     display: inline;
 }
 
@@ -735,7 +735,7 @@ footer {
     position: absolute;
     top: 0;
     left: 0;
-    width: $widthLeftPanel;
+    width: $width-left-panel;
     padding: 10px 0;
     margin: 0;
 
@@ -749,7 +749,7 @@ footer {
     }
 
     .side-nav-opener {
-        width: $widthLeftPanel;
+        width: $width-left-panel;
 
         .fa-arrow-right {
             display: block;
@@ -776,9 +776,9 @@ footer {
 
 .left-panel.side-nav-locked {
     position: relative;
-    width: $widthLeftPanel;
+    width: $width-left-panel;
     padding: 10px 0;
-    margin: 0 0 0 -#{$widthLeftPanel};
+    margin: 0 0 0 -#{$width-left-panel};
 
     .nav-title {
         background: none;
@@ -790,7 +790,7 @@ footer {
     }
 
     .side-nav-opener {
-        width: $widthClosePanel;
+        width: $width-close-panel;
     }
 
     .fa-unlock {
@@ -872,8 +872,8 @@ footer {
 .right-panel {
     display: inline;
     float: right;
-    width: $widthClosePanel;
-    margin: 0 -#{$widthClosePanel} 0 0;
+    width: $width-close-panel;
+    margin: 0 -#{$width-close-panel} 0 0;
     background-position: 0 0;
     padding: 0 0 18px 5px;
 
@@ -886,7 +886,7 @@ footer {
     .side-nav-opener {
         right: auto;
         left: 5px;
-        width: $widthClosePanel;
+        width: $width-close-panel;
 
         .fa-arrow-left {
             display: none;
@@ -924,7 +924,7 @@ footer {
     position: absolute;
     top: 0;
     right: 0;
-    width: $widthLeftPanel;
+    width: $width-left-panel;
     overflow: hidden;
     padding: 10px 0;
     margin: 0;
@@ -949,7 +949,7 @@ footer {
     }
 
     .side-nav-opener {
-        width: $widthLeftPanel;
+        width: $width-left-panel;
 
         .fa-arrow-left {
             display: block;
@@ -967,9 +967,9 @@ footer {
 
 .right-panel.side-nav-locked {
     position: relative;
-    width: $widthLeftPanel;
+    width: $width-left-panel;
     padding: 10px 0;
-    margin: 0 -#{$widthLeftPanel} 0 0;
+    margin: 0 -#{$width-left-panel} 0 0;
 
     .bar-tools > li {
         margin: 0 0 0 5px;
@@ -989,7 +989,7 @@ footer {
     }
 
     .side-nav-opener {
-        width: ($widthLeftPanel - 5);
+        width: ($width-left-panel - 5);
 
         .fa-arrow-left {
             display: block;
@@ -1022,8 +1022,8 @@ footer {
 
 #wrapper {
     border-radius: $baseBorderRadius;
-    border: 1px solid $generalBorderColor;
-    margin: 0 0 $marginBottomBox;
+    border: 1px solid $general-border-color;
+    margin: 0 0 $margin-bottom-box;
 }
 
 .form-pass-reset {
@@ -1037,11 +1037,11 @@ footer {
 }
 
 .form-row {
-    padding: 0 0 $marginBottomBox/2;
+    padding: 0 0 $margin-bottom-box/2;
 }
 
 .small-text {
-    font-size: $fontSizeSmall;
+    font-size: $base-font-size--s;
 }
 
 .small-text.checkbox {
@@ -1049,17 +1049,17 @@ footer {
 }
 
 .top-frame {
-    padding-top: $topPadding/2;
+    padding-top: $top-padding/2;
 }
 
 .popup-box {
-    width: $widthPopup;
+    width: $width-popup;
     margin: 0 auto;
 }
 
 /* dialog jQuery ui  start */
 .ui-dialog {
-    background: $bodyBackground;
+    background: $body-background;
     border-radius: 6px;
     box-shadow: 0 1px 22px rgba(0, 0, 0, .4) !important;
     z-index: 990;
@@ -1069,7 +1069,7 @@ footer {
 .ui-dialog-titlebar {
     border-radius: $baseBorderRadius $baseBorderRadius 0 0;
     cursor: move;
-    padding: $verticalPadding/2 $horizontalPadding;
+    padding: $vertical-padding/2 $horizontal-padding;
 }
 
 .ui-dialog-titlebar-min {
@@ -1079,7 +1079,7 @@ footer {
 }
 
 .ui-dialog-content {
-    padding: $verticalPadding/2 $horizontalPadding/2 0 $verticalPadding/2;
+    padding: $vertical-padding/2 $horizontal-padding/2 0 $vertical-padding/2;
     margin: 0 auto;
     position: relative;
     min-width: 250px;
@@ -1155,12 +1155,12 @@ footer {
 }
 
 .nav-header {
-    color: $bodyColor;
+    color: $body-color;
     font-size: 12px;
 }
 
 .nav-header-title {
-    font-size: $baseFontSize;
+    font-size: $base-font-size;
     text-transform: none;
 }
 
@@ -1225,7 +1225,7 @@ footer {
             &.active {
                 a {
                     border-bottom-color: #fff;
-                    color: $bodyColor;
+                    color: $body-color;
                 }
             }
         }
@@ -1250,7 +1250,7 @@ footer {
             border-width: 1px 1px 0 1px;
             height: 26px;
             color: #b8b8b8;
-            font-size: $baseFontSize;
+            font-size: $base-font-size;
             line-height: 26px;
             text-shadow: 1px 1px 2px #00324d;
             background-color: #232426;
@@ -1289,7 +1289,7 @@ footer {
 
 .application-menu .tab-content > .tab-pane > .nav a {
     color: #dedddd;
-    font-size: $baseFontSize;
+    font-size: $base-font-size;
     font-weight: bold;
 
     &:hover {
@@ -1327,7 +1327,7 @@ footer {
 
 .page-title h1 {
     min-height: 28px;
-    font-size: 20px;
+    font-size: $base-font-size--xxl;
     line-height: 1.2em;
 }
 
@@ -1444,7 +1444,7 @@ a {
     table.table thead th {
         padding: 3px 20px;
         text-transform: uppercase;
-        font: bold 11px/12px $baseFontFamily;
+        font: bold 11px/12px $base-font-family;
         border: solid #dfdfdf;
         border-width: 1px 0;
     }
@@ -1479,7 +1479,7 @@ a {
     border: solid #ddd;
     border-width: 1px 1px 0;
     padding-bottom: 1px;
-    color: $bodyColor;
+    color: $body-color;
     font-weight: bold;
 }
 
@@ -1711,7 +1711,7 @@ a {
     margin-top: 12px;
     margin-right: 15px;
     line-height: 24px;
-    color: $bodyColor;
+    color: $body-color;
 }
 
 .navigation {
@@ -1814,7 +1814,7 @@ a {
         }
 
         h3 {
-            font: bold 16px/18px $baseFontFamily;
+            font: bold 16px/18px $base-font-family;
         }
     }
 }
@@ -1830,7 +1830,7 @@ a {
     }
 
     .modal-body {
-        color: $bodyColor;
+        color: $body-color;
         font-size: 14px;
         padding-left: 20px;
     }
@@ -1857,7 +1857,7 @@ a {
     }
 
     .modal-body {
-        color: $bodyColor;
+        color: $body-color;
         font-size: 14px;
         padding-left: 20px;
     }
@@ -1875,7 +1875,7 @@ a {
     }
 
     .modal-body {
-        color: $bodyColor;
+        color: $body-color;
         font-size: 14px;
         padding-left: 20px;
     }
@@ -1900,46 +1900,46 @@ a {
     position: absolute;
     background-color: #fff;
     box-shadow: 0 2px 32px 1px rgba(0, 0, 0, .8);
-    font-family: $baseFontFamily !important;
+    font-family: $base-font-family !important;
 
     .alert {
-        background-color: $warningBackground;
+        background-color: $warning-background;
         background-image: url(../../img/warning-ico.png);
         background-position: 10px 50%;
         background-repeat: no-repeat;
         padding: 12px 35px 12px 37px;
-        border: 1px solid $warningBorder;
+        border: 1px solid $warning-border;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
         word-break: break-word;
         border-radius: 0;
 
         .close {
             font-size: 18px;
-            color: $warningClose;
+            color: $warning-close;
             opacity: 1;
         }
     }
 
     .alert-success {
-        background-color: $successBackground;
+        background-color: $success-background;
         background-image: url(../../img/sucsses-ico.png);
-        border-color: $successBorder;
-        color: $successText;
+        border-color: $success-border;
+        color: $success-text;
 
         .close {
-            color: $successClose;
+            color: $success-close;
         }
     }
 
     .alert-danger,
     .alert-error {
         background-image: url(../../img/error-ico.png);
-        background-color: $errorBackground;
-        border-color: $errorBorder;
-        color: $errorText;
+        background-color: $error-background;
+        border-color: $error-border;
+        color: $error-text;
 
         .close {
-            color: $errorClose;
+            color: $error-close;
         }
     }
 
@@ -1951,14 +1951,14 @@ a {
         margin-bottom: 0;
         background: #fafafa;
         padding: 10px;
-        border-radius: 0 0 $WindowBorderRadius $WindowBorderRadius;
+        border-radius: 0 0 $window-border-radius $window-border-radius;
     }
 
     .ui-dialog-titlebar {
         margin: -1px -1px 0 -1px;
         border-bottom: 1px solid #000;
-        background: $titleBackgroundStart;
-        background: linear-gradient($titleBackgroundStart, $titleBackgroundEnd);
+        background: $title-background-start;
+        background: linear-gradient($title-background-start, $title-background-end);
         padding: 6px 45px 6px 15px;
         position: absolute;
         width: 100%;
@@ -2106,7 +2106,7 @@ a {
         overflow: hidden;
         border-top: 1px solid #dfdfdf;
         background: #fafafa;
-        font-family: $baseFontFamily;
+        font-family: $base-font-family;
     }
 
     .ui-widget-content {
@@ -2145,7 +2145,7 @@ a {
                 &:before {
                     border-right: none;
                     color: #999;
-                    font-size: $baseFontSize;
+                    font-size: $base-font-size;
                     text-shadow: 0 1px 0 #ddd;
                 }
 
@@ -2186,9 +2186,9 @@ a {
     background: none;
     padding: 0 0 7px 0;
     text-shadow: none;
-    color: $bodyColor;
+    color: $body-color;
     font-weight: normal;
-    font-size: $baseFontSize;
+    font-size: $base-font-size;
     line-height: 1.2em;
 }
 
@@ -2226,14 +2226,14 @@ a {
             &.active {
                 border-bottom-color: #fff;
                 box-shadow: none;
-                color: $bodyColor;
+                color: $body-color;
                 background: #fff;
                 text-decoration: none;
             }
 
             &:hover {
                 text-decoration: none;
-                color: $bodyColor;
+                color: $body-color;
             }
         }
     }
@@ -2280,7 +2280,7 @@ a {
         text-shadow: none;
         padding: 4px 6px;
         border: none;
-        color: $bodyColor;
+        color: $body-color;
 
         .select2-search-choice-close {
             position: relative;
@@ -2325,7 +2325,7 @@ a {
     }
 
     .sub-title {
-        font-size: 17px;
+        font-size: $base-font-size--xl;
         color: #999;
         display: inline-block;
         margin-bottom: 3px;
@@ -2342,7 +2342,9 @@ a {
         min-height: 15px;
         display: inline-block;
         float: none !important;
-        font: bold 17px/18px Helvetica, Arial, sans-serif;
+        font-size: $base-font-size--xl;
+        line-height: $base-line-height;
+        font-weight: normal;
     }
 
     .dropdown.open .caret,
@@ -2459,7 +2461,7 @@ ul.inline-extra {
                 > li a {
                     padding: 5px 15px;
                     color: #666;
-                    font-size: $baseFontSize;
+                    font-size: $base-font-size;
 
                     &:hover {
                         border-bottom: 3px solid #ddd;
@@ -2523,7 +2525,7 @@ ul.inline-extra {
 }
 
 .navbar-extra-right {
-    padding-right: $contentPadding;
+    padding-right: $content-padding;
 
     .title-buttons-container {
         .btn-group {
@@ -2583,7 +2585,7 @@ label.required em,
 input,
 textarea,
 .uneditable-input {
-    width: $widthInput;
+    width: $width-input;
 }
 
 body .mce-tinymce {
@@ -2605,7 +2607,7 @@ textarea {
 
     /* background: linear-gradient(#fafafa, #f7f7f7); */
     padding: 4px 20px;
-    color: lighten($bodyColor, 20%);
+    color: lighten($body-color, 20%);
     text-shadow: 0 1px 0 #fff;
     line-height: 18px;
 }
@@ -2649,7 +2651,7 @@ textarea {
 }
 
 .btn-group > .btn-small {
-    font-size: $fontSizeSmall;
+    font-size: $base-font-size--s;
 }
 
 .btn-group > a.btn {
@@ -2679,12 +2681,12 @@ textarea {
 
 .popup-box-errors .popup-content {
     background-color: #fff;
-    font: 14px/20px $baseFontFamily;
+    font: 14px/20px $base-font-family;
     margin: 0 30px;
 }
 
 .popup-box-errors h1 {
-    font: bold 20px/46px $baseFontFamily;
+    font: bold 20px/46px $base-font-family;
     margin: 0 0 10px;
 }
 
@@ -3259,13 +3261,13 @@ label.radio.error {
     float: left;
     background: none;
     margin: 0;
-    padding: 6px 15px 6px $contentPadding;
+    padding: 6px 15px 6px $content-padding;
 }
 
 .breadcrumb > li.active,
 .breadcrumb > li {
     color: #777;
-    font: 11px/14px $baseFontFamily;
+    font: 11px/14px $base-font-family;
     word-break: break-all;
 }
 
@@ -3379,11 +3381,11 @@ iframe.email-body {
     min-height: 5em;
     font-family: $monoFontFamily;
     color: $grayDark;
-    padding: ($baseLineHeight - 1) / 2;
-    margin: 0 0 $baseLineHeight / 2;
+    padding: ($base-line-height - 1) / 2;
+    margin: 0 0 $base-line-height / 2;
     display: block;
-    font-size: $baseFontSize - 1; // 14px to 13px
-    line-height: $baseLineHeight;
+    font-size: $base-font-size - 1; // 14px to 13px
+    line-height: $base-line-height;
     background-color: #f5f5f5;
     border: 1px solid #ccc; // fallback for IE7-8
     border: 1px solid rgba(0, 0, 0, .15);
@@ -3428,7 +3430,7 @@ iframe.email-body {
 }
 
 span.validation-failed {
-    color: $errorText;
+    color: $error-text;
     display: block;
     margin: 5px 0 5px 14px;
     line-height: 1.1em;
@@ -3436,7 +3438,7 @@ span.validation-failed {
 
     &:before {
         content: '\f00d';
-        color: $errorText;
+        color: $error-text;
         font: normal 1.15em/1em FontAwesome;
         display: inline-block;
         width: 14px;
@@ -3610,8 +3612,8 @@ span.validation-failed {
         }
 
         li.dropdown.open .caret {
-            border-top-color: $linkColor !important;
-            border-bottom-color: $linkColor !important;
+            border-top-color: $link-color !important;
+            border-bottom-color: $link-color !important;
         }
 
         li.dropdown.open.active .caret {

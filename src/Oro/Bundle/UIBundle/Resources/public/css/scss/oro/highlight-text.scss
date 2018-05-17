@@ -2,7 +2,7 @@
     &-text {
         span& {
             text-decoration: underline;
-            background-color: $highlightTextColor;
+            background-color: $highlight-text-color;
             font-family: inherit;
             font-weight: bold;
             font-size: inherit;
@@ -27,17 +27,17 @@
 
     &-element[class^="fa-"],
     &-element[class*=" fa-"] {
-        background-color: $highlightTextColor;
-        box-shadow: 0 -1px 0 0 $highlightTextColor,
-                    2px 0 0 0 $highlightTextColor,
-                    0 1px 0 0 $highlightTextColor,
-                    -2px 0 0 0 $highlightTextColor;
+        background-color: $highlight-text-color;
+        box-shadow: 0 -1px 0 0 $highlight-text-color,
+                    2px 0 0 0 $highlight-text-color,
+                    0 1px 0 0 $highlight-text-color,
+                    -2px 0 0 0 $highlight-text-color;
     }
 
     &-element.selector,
     input&-element,
     textarea&-element {
-        background: $highlightTextColor;
+        background: $highlight-text-color;
     }
 
     &-not-found {

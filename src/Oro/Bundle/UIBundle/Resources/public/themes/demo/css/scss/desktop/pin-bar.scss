@@ -1,28 +1,28 @@
 .list-bar-wrapper {
-  background-color: $logoBackgroundColor;
+  background-color: $logo-background-color;
 }
 .list-bar{
   li {
-    color: $headerTextColor;
+    color: $header-text-color;
     .pin-holder {
-      border-right-color: $baseGradientColorBorder;
+      border-right-color: $base-gradient-color-border;
       a {
-        color: $headerTextColor;
+        color: $header-text-color;
         &.fa-close {
           &:before {
-            color:$headerTextColor;
+            color:$header-text-color;
           }
         }
       }
       &:hover {
         a {
-          color: lighten($headerTextColor, 10%);
+          color: lighten($header-text-color, 10%);
         }
       }
     }
     &.active {
       .pin-holder {
-        background-color: darken($logoBackgroundColor, 5%);
+        background-color: darken($logo-background-color, 5%);
       }
     }
   }

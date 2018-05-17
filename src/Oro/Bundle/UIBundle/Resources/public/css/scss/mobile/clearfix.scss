@@ -7,7 +7,7 @@ html& {
 }
 & {
   min-width: inherit;
-  font-size: $baseFontSize;
+  font-size: $base-font-size;
 }
 
 #page.hidden-page {
@@ -15,7 +15,7 @@ html& {
 }
 
 .btn-group > .dropdown-menu li a {
-  font-size: $baseFontSize;
+  font-size: $base-font-size;
 }
 
 .container,

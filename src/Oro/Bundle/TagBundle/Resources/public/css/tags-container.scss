@@ -8,8 +8,8 @@
     padding-bottom: 2px;
   }
   &__tag-entry {
-    color: $tagItemColor;
-    background-color: $tagItemBackground;
+    color: $tag-item-color;
+    background-color: $tag-item-background;
     border-radius: 10px;
     font-size: 12px;
     line-height: 12px;
@@ -18,12 +18,12 @@
     display: inline-block;
     vertical-align: top;
     &:hover, &:focus {
-      color: $tagItemColor;
+      color: $tag-item-color;
       outline-style: none;
     }
   }
   &__tag-entry_is-my {
-    background-color: $tagItemBackground;
+    background-color: $tag-item-background;
   }
 }
 
@@ -40,8 +40,8 @@
       font-size: 11px;
       line-height: 12px;
       padding: 5px 20px 5px 8px;
-      color: $tagItemColor;
-      background: $tagItemBackground;
+      color: $tag-item-color;
+      background: $tag-item-background;
       border: 0 none;
       border-radius: 10px;
       box-shadow: none;
@@ -50,7 +50,7 @@
       .select2-search-choice-close {
         top: 6px;
         &:before {
-          color: $tagItemColor;
+          color: $tag-item-color;
         }
       }
       &.select2-locked {

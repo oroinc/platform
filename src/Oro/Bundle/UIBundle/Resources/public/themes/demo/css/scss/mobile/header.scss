@@ -1,24 +1,24 @@
 #oroplatform-header {
     .navbar-inner .logo a {
         background-color: transparent;
-        color: $headerTextColor;
+        color: $header-text-color;
     }
 
     #main-menu-toggle {
         &:hover [class^='fa-'] {
             border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+            background: linear-gradient($base-gradient-color-start, darken($base-gradient-color-start, 20%));
         }
 
         &:active [class^='fa-'],
         &:focus [class^='fa-'] {
             border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient(darken($baseGradientColorStart, 10%), darken($baseGradientColorStart, 20%));
+            background: linear-gradient(darken($base-gradient-color-start, 10%), darken($base-gradient-color-start, 20%));
         }
 
         &.open > .dropdown-toggle [class^='fa-'] {
             border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+            background: linear-gradient($base-gradient-color-start, darken($base-gradient-color-start, 20%));
         }
     }
 }

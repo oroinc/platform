@@ -74,7 +74,7 @@
     border: 1px solid #d3d3d3;
     display: block;
     visibility: hidden;
-    z-index: $oroZindexDropdown;
+    z-index: $oro-zindex-dropdown;
     margin-top: 7px;
     top: auto;
 }
@@ -273,11 +273,11 @@
 }
 
 .ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
-    border-top-color: #005099; /* $linkColorHover; */
+    border-top-color: #005099; /* $link-color-hover; */
 }
 
 .ui-multiselect.select-filter-widget:hover a {
-    color: #005099; /* $linkColorHover; */
+    color: #005099; /* $link-color-hover; */
 }
 
 .ui-multiselect.select-filter-widget span.caret {

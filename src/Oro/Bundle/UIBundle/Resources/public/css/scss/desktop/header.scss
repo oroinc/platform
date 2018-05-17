@@ -9,7 +9,7 @@
         line-height: 26px;
         float: left;
         text-shadow: 1px 1px 3px rgba(0, 0, 0, .25);
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
 
         &:before {
             width: 0;
@@ -45,7 +45,7 @@
             display: block;
             position: relative;
             text-transform: uppercase;
-            padding: 0 10px 0 $contentPadding;
+            padding: 0 10px 0 $content-padding;
 
             [class^="fa-"] {
                 font-size: 1.2em;
@@ -72,8 +72,8 @@
     }
 
     .nav.user-menu {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-        border-left: 1px solid $baseGradientColorBorder;
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
+        border-left: 1px solid $base-gradient-color-border;
 
         > li {
             &:not(:first-child) {
@@ -85,7 +85,7 @@
                     width: 1px;
                     height: 16px;
                     display: block;
-                    background-color: $baseGradientColorBorder;
+                    background-color: $base-gradient-color-border;
                 }
             }
 
@@ -98,7 +98,7 @@
         a.help:hover,
         .dropdown > .dropdown-toggle:hover,
         .dropdown > .oro-dropdown-toggle:hover {
-            background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+            background: linear-gradient(lighten($base-gradient-color-start, 3%), lighten($base-gradient-color-end, 3%));
         }
 
         .dropdown {
@@ -112,9 +112,9 @@
     }
 
     .nav.top-search {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
         padding: 0 10px 0 5px;
-        border-right: 1px solid $baseGradientColorBorder;
+        border-right: 1px solid $base-gradient-color-border;
 
         .dropdown {
             > .dropdown-toggle {
@@ -134,7 +134,7 @@
                 }
 
                 &:hover > [class^="fa-"] {
-                    background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+                    background: linear-gradient(lighten($base-gradient-color-start, 3%), lighten($base-gradient-color-end, 3%));
                 }
             }
 

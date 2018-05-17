@@ -59,7 +59,7 @@
 }
 .responsive-section {
   .email-content .responsive-cell .comment-list {
-    padding-left: $horizontalPadding;
+    padding-left: $horizontal-padding;
   }
   &.responsive-small .email-content .responsive-cell .comment-list {
     padding-left: 0;
@@ -68,7 +68,7 @@
 .email-content {
   .responsive-cell {
     .comment-list {
-      padding-left: $horizontalPadding;
+      padding-left: $horizontal-padding;
     }
   }
 }

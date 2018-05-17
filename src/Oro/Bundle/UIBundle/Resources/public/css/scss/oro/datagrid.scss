@@ -3,7 +3,7 @@
   /* FE */
   position: relative;
   margin: 0 0 -15px;
-  padding: 8px $contentPadding 8px;
+  padding: 8px $content-padding 8px;
   .actions-panel {
     margin-left: 5px;
   }
@@ -85,7 +85,7 @@
           display:inline-block;
           margin:4px 1px 0 0;
           color:#666;
-          font-size:$baseFontSize;
+          font-size:$base-font-size;
           line-height:1.3em;
           margin-left:1px;
         }
@@ -105,7 +105,7 @@
   .caret { margin-top:11px; }
 }
 .other-scroll-container {
-  margin: $contentPadding;
+  margin: $content-padding;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -134,9 +134,9 @@
   padding: 0;
   overflow: auto;
   > .loader-mask {
-    left: $verticalPadding;
-    right: $verticalPadding;
-    top: $topPadding/2;
+    left: $vertical-padding;
+    right: $vertical-padding;
+    top: $top-padding/2;
   }
 }
 .grid-container {
@@ -216,7 +216,7 @@
     @include header-cell-dropdown();
     [class^="fa-"],
     [class*=" fa-"] {
-      font-size: $baseFontSize;
+      font-size: $base-font-size;
       margin:0 2px 0 0;
     }
     .dropdown-menu {
@@ -282,9 +282,9 @@
 }
 .table thead th {
   padding: 4px 10px;
-  font-size: $fontSizeSmall;
+  font-size: $base-font-size--s;
   a {
-    color: lighten($bodyColor,10%);
+    color: lighten($body-color,10%);
     text-shadow: 0 1px 0 darken(#ffffff,5%);
   }
 }
@@ -297,7 +297,7 @@
   }
 
   tr:hover .renderable {
-    background-color: $cellLoadingBackground;
+    background-color: $cell-loading-background;
   }
 
   tr > td {

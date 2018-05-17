@@ -5,13 +5,13 @@
     .btn[disabled],
     .btn.disabled:active,
     .btn[disabled]:active {
-    font-size:$baseFontSize;
+    font-size:$base-font-size;
   }
   & > .btn-small {
-    font-size: $fontSizeSmall;
+    font-size: $base-font-size--s;
   }
   & > .btn-mini {
-    font-size: $fontSizeMini;
+    font-size: $base-font-size--m;
   }
 }
 .btn {
@@ -25,7 +25,7 @@
 .btn.disabled:active,
 .btn[disabled]:active,
 .ui-datepicker .ui-datepicker-buttonpane button {
-  border-radius: $baseBtnBorderRadius;
+  border-radius: $base-btn-border-radius;
   padding: 0 12px;
   font-weight:bold;
   background-repeat: none;
@@ -62,7 +62,7 @@
 .btn-small {
   height: 24px;
   line-height: 24px;
-  font-size: $baseFontSize;
+  font-size: $base-font-size;
 }
 .btn-large {
   font-size: 15px;
@@ -245,7 +245,7 @@
     padding-top:1px;
     padding-bottom:1px;
     font-size:12px;
-    color:$bodyColor;
+    color:$body-color;
     text-shadow:none !important;
     &:hover {
       background:#f3f3f3;

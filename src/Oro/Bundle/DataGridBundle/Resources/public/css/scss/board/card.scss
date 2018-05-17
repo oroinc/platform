@@ -74,14 +74,14 @@ $dark-border-color: #ccc;
     }
 
     &[data-transition-status="error"] {
-        background: $cellErrorBackground;
+        background: $cell-error-background;
     }
 
     &[data-transition-status="success"].transition-status-just-changed {
-        background: $cellSuccessBackground;
+        background: $cell-success-background;
     }
 
     &[data-transition-status="in_progress"] {
-        background: $cellLoadingBackground;
+        background: $cell-loading-background;
     }
 }

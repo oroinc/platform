@@ -29,10 +29,10 @@
       }
     }
     .email-view-toggle {
-      padding: $contentPadding;
+      padding: $content-padding;
     }
     .email-content {
-      padding: 0 $contentPadding $contentPadding;
+      padding: 0 $content-padding $content-padding;
     }
     &:only-child {
       .email-view-toggle {
@@ -45,7 +45,7 @@
   }
   .email-detailed-info-table {
     .dropdown-menu {
-      padding: 0px $contentPadding;
+      padding: 0px $content-padding;
     }
     .control-group:last-child {
       margin-bottom: 0;
@@ -61,10 +61,10 @@
     .email-info {
       &:last-child, &:only-child  {
         .email-view-toggle {
-          padding: $contentPadding;
+          padding: $content-padding;
         }
         .email-content {
-          padding: 0 $contentPadding;
+          padding: 0 $content-padding;
         }
       }
     }

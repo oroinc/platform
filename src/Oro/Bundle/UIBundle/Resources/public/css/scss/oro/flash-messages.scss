@@ -3,7 +3,7 @@
   position: relative;
   .alert {
     margin: 3px 0 0;
-    background-color: $warningBackground;
+    background-color: $warning-background;
     background-image: url('../../img/warning-ico.png');
     background-position: 10px 48%;
     background-repeat: no-repeat;
@@ -12,7 +12,7 @@
     text-shadow: 0 1px 0 rgba(255,255,255,.5);
     .close {
       font-size: 18px;
-      color: $warningClose;
+      color: $warning-close;
       opacity: 1;
     }
     .separator {
@@ -28,39 +28,39 @@
     }
   }
   .alert-success {
-    background-color: $successBackground;
+    background-color: $success-background;
     background-image: url('../../img/sucsses-ico.png');
     border:1px solid rgba(77,161,36,.3);
-    color: $successText;
+    color: $success-text;
     .close, .separator {
-      color: $successClose;
+      color: $success-close;
     }
   }
   .alert-danger,
   .alert-error {
     background-image: url('../../img/error-ico.png');
-    background-color: $errorBackground;
+    background-color: $error-background;
     border:1px solid rgba(203,17,17,.3);
-    color: $errorText;
+    color: $error-text;
     .close, .separator {
-      color: $errorClose;
+      color: $error-close;
     }
   }
   .alert-warning {
     background-image: none;
     padding-left: 20px;
     .separator {
-      color: $warningClose;
+      color: $warning-close;
     }
   }
   .alert-info {
-    background-color: $infoBackground;
-    border-color: $infoBorder;
-    color: $infoText;
+    background-color: $info-background;
+    border-color: $info-border;
+    color: $info-text;
     background-image: none;
     padding-left: 20px;
     .close, .separator {
-      color: $infoClose;
+      color: $info-close;
     }
   }
   .alert-empty {

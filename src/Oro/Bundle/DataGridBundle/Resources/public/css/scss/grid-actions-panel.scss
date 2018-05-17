@@ -14,8 +14,8 @@
 
     [class^='fa-'],
     [class*=' fa-'] {
-        font: $baseFontSize/26px FontAwesome;
-        color: $btnTextColor;
+        font: $base-font-size/26px FontAwesome;
+        color: $btn-text-color;
 
         &.hide-text {
             @include hide-text();

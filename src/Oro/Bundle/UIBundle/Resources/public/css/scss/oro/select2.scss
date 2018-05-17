@@ -462,7 +462,7 @@ disabled look for disabled choices in the results dropdown
 .select2-container-multi .select2-choices .select2-search-field input {
     padding: 3px 5px 1px;
     margin: 1px 0;
-    font-family: $baseFontFamily;
+    font-family: $base-font-family;
     font-size: 100%;
     color: #666;
     outline: 0;
@@ -667,20 +667,20 @@ disabled look for disabled choices in the results dropdown
 
     .select2-breadcrumb-item {
         display: inline-block;
-        font-size: $fontSizeSmall;
-        line-height: $baseLineHeight * .8;
-        color: $linkColor;
+        font-size: $base-font-size--s;
+        line-height: $base-line-height * .8;
+        color: $link-color;
         cursor: pointer;
 
         &:hover {
-            color: $linkColorHover;
+            color: $link-color-hover;
         }
 
         &:after {
             content: '/';
             display: inline;
             padding: 0 2px;
-            color: $bodyColor;
+            color: $body-color;
             cursor: default;
         }
 
@@ -731,10 +731,10 @@ disabled look for disabled choices in the results dropdown
 
 .select-values-autocomplete {
     &[type="text"] {
-        font-size: $baseFontSize;
+        font-size: $base-font-size;
     }
 
     &::placeholder {
-        color: $btnTextColor;
+        color: $btn-text-color;
     }
 }

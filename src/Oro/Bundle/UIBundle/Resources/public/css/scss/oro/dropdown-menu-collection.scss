@@ -17,10 +17,10 @@
       a {
         display: block;
         padding: 2px 12px;
-        color: $menuItemColor;
+        color: $menu-item-color;
         &:hover, &:focus {
           background: #f3f3f3;
-          color: $menuItemColor;
+          color: $menu-item-color;
         }
       }
     }

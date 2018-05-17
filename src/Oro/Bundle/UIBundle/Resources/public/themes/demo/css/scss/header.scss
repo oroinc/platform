@@ -10,22 +10,22 @@
 #oroplatform-header {
     .navbar-inner .logo a,
     header .logo a {
-        background-color: $logoBackgroundColor;
+        background-color: $logo-background-color;
     }
 
     .navbar-inner .logo:before,
     header .logo:before {
-        border-color: transparent transparent transparent $logoBackgroundColor;
+        border-color: transparent transparent transparent $logo-background-color;
     }
 
     .navbar-inner .logo:after,
     header .logo:after {
-        border-color: transparent transparent transparent $logoBackgroundColor;
+        border-color: transparent transparent transparent $logo-background-color;
     }
 
     .navbar-inner {
-        border-bottom-color: $baseGradientColorBorder;
-        background: linear-gradient($logoBackgroundColor, $logoBackgroundColor);
+        border-bottom-color: $base-gradient-color-border;
+        background: linear-gradient($logo-background-color, $logo-background-color);
     }
 
     .nav.top-search { // Includes Shortcuts and Search
@@ -33,17 +33,17 @@
             > .dropdown-toggle {
                 &:hover [class^="fa-"] {
                     border: 1px solid darken(#2a5ab1, 10%);
-                    background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+                    background: linear-gradient($base-gradient-color-start, darken($base-gradient-color-start, 20%));
                 }
                 &:active [class^="fa-"],
                 &:focus [class^="fa-"] {
                     border: 1px solid darken(#2a5ab1, 10%);
-                    background: linear-gradient(darken($baseGradientColorStart, 10%), darken($baseGradientColorStart, 20%));
+                    background: linear-gradient(darken($base-gradient-color-start, 10%), darken($base-gradient-color-start, 20%));
                 }
             }
             &.open > .dropdown-toggle [class^="fa-"] {
                 border: 1px solid darken(#2a5ab1, 10%);
-                background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+                background: linear-gradient($base-gradient-color-start, darken($base-gradient-color-start, 20%));
             }
         }
     }

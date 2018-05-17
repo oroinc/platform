@@ -44,7 +44,7 @@
     width: 100% !important;
     top: 0;
     left: 0;
-    z-index: $oroMobileHeaderZindex;
+    z-index: $oro-mobile-header-zindex;
     border-radius: 0;
     @include safe-area-offset(padding, 12px, 60px, 12px, 12px);
     margin: 0;

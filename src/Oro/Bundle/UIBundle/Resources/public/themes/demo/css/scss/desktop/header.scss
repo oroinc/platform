@@ -1,6 +1,6 @@
 #oroplatform-header {
     .logo {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
         padding: 0;
 
         &:before {
@@ -13,28 +13,28 @@
     }
 
     .nav.user-menu {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-        border-left-color: $baseGradientColorBorder;
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
+        border-left-color: $base-gradient-color-border;
 
         a.help:before {
-            background-color: $baseGradientColorBorder;
+            background-color: $base-gradient-color-border;
         }
 
         a.help:hover,
         .dropdown > .dropdown-toggle:hover,
         .dropdown > .oro-dropdown-toggle:hover {
-            background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+            background: linear-gradient(lighten($base-gradient-color-start, 3%), lighten($base-gradient-color-end, 3%));
         }
     }
 
     .nav.top-search {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
         padding: 0 10px 0 5px;
 
         .dropdown {
             > .dropdown-toggle {
                 &:hover > [class^="fa-"] {
-                    background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
+                    background: linear-gradient(lighten($base-gradient-color-start, 3%), lighten($base-gradient-color-end, 3%));
                 }
             }
         }
@@ -43,7 +43,7 @@
     .navbar-inner {
         .nav {
             > li > a {
-                color: $headerTextColor;
+                color: $header-text-color;
             }
         }
     }

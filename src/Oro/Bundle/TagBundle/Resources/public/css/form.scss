@@ -36,8 +36,8 @@
       font-size: 12px;
       line-height: 12px;
       padding: 5px 20px 5px 8px;
-      color: $tagItemColor;
-      background: $tagItemBackground;
+      color: $tag-item-color;
+      background: $tag-item-background;
       border: 0 none;
       border-radius: 10px;
       box-shadow: none;
@@ -46,7 +46,7 @@
       .select2-search-choice-close {
         top: 6px;
         &:before {
-          color: $tagItemColor;
+          color: $tag-item-color;
         }
       }
       &.select2-locked {

@@ -1,7 +1,7 @@
 .inline-editable-wrapper:not(:hover) {
   &.save-success .inline-actions-element {
-    background: $cellSuccessBackground;
-    @include inline-actions-element-outline($cellSuccessBackground);
+    background: $cell-success-background;
+    @include inline-actions-element-outline($cell-success-background);
     &:after {
       position: relative;
       font-family: 'FontAwesome';
@@ -10,15 +10,15 @@
       line-height: 22px;
       height: 22px;
       padding: 0 4px;
-      color: $cellSuccessColor;
+      color: $cell-success-color;
     }
     .inline-actions-element_actions {
       display: none;
     }
   }
   &.save-fail .inline-actions-element {
-    background: $cellErrorBackground;
-    @include inline-actions-element-outline($cellErrorBackground);
+    background: $cell-error-background;
+    @include inline-actions-element-outline($cell-error-background);
     .inline-actions-element_actions {
       display: none;
     }
@@ -26,8 +26,8 @@
 }
 .inline-editable-wrapper {
   &.loading .inline-actions-element {
-    background: $cellLoadingBackground;
-    @include inline-actions-element-outline($cellLoadingBackground);
+    background: $cell-loading-background;
+    @include inline-actions-element-outline($cell-loading-background);
     &:after {
       background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center transparent;
       display: block !important;

@@ -12,11 +12,11 @@ $spacerHeight: 10px;
     border-radius: 0;
     font-weight: normal;
     outline: none;
-    color: $linkColor;
+    color: $link-color;
 
     &:hover,
     &:focus {
-        color: $linkColorHover;
+        color: $link-color-hover;
     }
 }
 
@@ -138,7 +138,7 @@ $spacerHeight: 10px;
         .condition-item {
             border: 1px solid #e1e1e1;
             border-radius: 4px;
-            padding: $horizontalPadding * .5 $verticalPadding * .8;
+            padding: $horizontal-padding * .5 $vertical-padding * .8;
 
             input[type='text'] {
                 margin-bottom: 0;
@@ -147,7 +147,7 @@ $spacerHeight: 10px;
 
         & > .conditions-group {
             border-left: 3px solid #efefef;
-            padding-left: $verticalPadding * .8;
+            padding-left: $vertical-padding * .8;
         }
 
         & > .close {
@@ -185,7 +185,7 @@ $spacerHeight: 10px;
     .hint {
         text-transform: uppercase;
         margin: 5px 0 3px 0;
-        font-size: $fontSizeMini;
+        font-size: $base-font-size--m;
         text-align: center;
     }
 
@@ -242,12 +242,12 @@ $spacerHeight: 10px;
             box-shadow: none;
             border: none;
             padding: 0;
-            color: $linkColor;
+            color: $link-color;
             height: auto;
 
             &:hover,
             &:focus {
-                color: $linkColorHover;
+                color: $link-color-hover;
             }
 
             .select2-arrow {
@@ -364,7 +364,7 @@ $spacerHeight: 10px;
     }
 
     .left-area.filter-criteria {
-        padding: 0 $contentPadding * .5 $contentPadding * .5 - 4;
+        padding: 0 $content-padding * .5 $content-padding * .5 - 4;
         width: 150px;
     }
 
@@ -384,7 +384,7 @@ $spacerHeight: 10px;
 }
 
 .deleted-field {
-    color: $errorText;
+    color: $error-text;
 }
 
 #oro_report-designer .form-horizontal {

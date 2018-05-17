@@ -9,7 +9,7 @@
     }
 
     .row-edit-mode {
-        background: $rowHighlightBackground;
+        background: $row-highlight-background;
     }
 
     .view-mode > .inline-editor__edit-action {
@@ -18,7 +18,7 @@
 
     .editable {
         &.save-success {
-            background: $cellSuccessBackground;
+            background: $cell-success-background;
             position: relative;
 
             &:before {
@@ -28,7 +28,7 @@
                 font-size: 14px;
                 top: 4px;
                 right: 6px;
-                color: $cellSuccessColor;
+                color: $cell-success-color;
             }
 
             &:hover:before {
@@ -37,7 +37,7 @@
         }
 
         &.save-fail {
-            background: $cellErrorBackground;
+            background: $cell-error-background;
         }
 
         &.edit-mode {
@@ -60,14 +60,14 @@
 
         &.view-mode.has-error {
             position: relative;
-            background: $cellErrorBackground;
+            background: $cell-error-background;
 
             &:hover {
-                background: $cellErrorBackground;
+                background: $cell-error-background;
 
                 > .inline-editor__edit-action {
                     &:before {
-                        color: $errorMessageBalloonBackground;
+                        color: $error-message-balloon-background;
                     }
                 }
             }
@@ -84,7 +84,7 @@
         }
 
         &.view-mode:hover {
-            background: $cellSelectedBackground;
+            background: $cell-selected-background;
             position: relative;
 
             > .inline-editor__edit-action {
@@ -99,13 +99,13 @@
                 padding-left: 2px;
 
                 &:before {
-                    color: $inlineActionColor;
+                    color: $inline-action-color;
                 }
             }
         }
 
         &.loading {
-            background: $cellLoadingBackground;
+            background: $cell-loading-background;
 
             &.view-mode > .inline-editor__edit-action {
                 display: none !important;
@@ -126,7 +126,7 @@
 }
 
 .grid thead th.header-cell-highlight {
-    background: linear-gradient($rowHighlightBackground, $rowSelectedBackground);
+    background: linear-gradient($row-highlight-background, $row-selected-background);
 }
 
 .inline-editor__actions {

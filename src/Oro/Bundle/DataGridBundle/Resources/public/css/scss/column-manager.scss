@@ -54,15 +54,15 @@
     }
 
     .column-manager-title {
-        font-size: $fontSizeLarge;
-        line-height: $fontSizeLarge;
+        font-size: $base-font-size--l;
+        line-height: $base-font-size--l;
         font-weight: bold;
         margin-bottom: -3px;
     }
 
     .column-manager-hint {
-        font-size: $fontSizeSmall;
-        color: $btnTextColor;
+        font-size: $base-font-size--s;
+        color: $btn-text-color;
     }
 
     .ui-sortable-placeholder {
@@ -97,8 +97,8 @@
             &.empty:after {
                 content: "\f002";
                 font-family: FontAwesome;
-                font-size: $baseFontSize * 1.15;
-                color: lighten($btnTextColor, 15%);
+                font-size: $base-font-size * 1.15;
+                color: lighten($btn-text-color, 15%);
                 position: absolute;
                 top: 5px;
                 right: 8px;
@@ -113,10 +113,10 @@
                 font-size: 20px;
                 font-weight: bold;
                 line-height: 20px;
-                color: lighten($btnTextColor, 15%);
+                color: lighten($btn-text-color, 15%);
 
                 &:hover {
-                    color: $btnTextColor;
+                    color: $btn-text-color;
                 }
             }
 
@@ -132,7 +132,7 @@
         line-height: 0;
 
         .disabled {
-            color: lighten($btnTextColor, 35%);
+            color: lighten($btn-text-color, 35%);
             pointer-events: none;
         }
     }

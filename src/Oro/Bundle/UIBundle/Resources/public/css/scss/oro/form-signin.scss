@@ -27,7 +27,7 @@
     padding:10px 18px;
     color: #fff;
     border-radius: 5px 5px 0 0;
-    background: linear-gradient($titleBackgroundStart, $titleBackgroundEnd);
+    background: linear-gradient($title-background-start, $title-background-end);
     .divider-vertical {
       float: left;
       background: url("../../img/vertical-divider.png") no-repeat;
@@ -46,7 +46,7 @@
       }
     }
     .title {
-      font: 20px/28px $baseFontFamily;
+      font: 20px/28px $base-font-family;
       margin: 0;
       text-shadow: 1px 1px 1px #000000;
     }
@@ -57,7 +57,7 @@
   .add-on {
     width: 105px;
     height: 36px;
-    font: bold 14px/36px $baseFontFamily;
+    font: bold 14px/36px $base-font-family;
     color: #5b636d;
     background: linear-gradient(#dde0e3, #d2d7db);
     padding:0 10px;
@@ -67,7 +67,7 @@
   input[type="password"],
   select{
     height: 16px;
-    font: 14px/16px $baseFontFamily;
+    font: 14px/16px $base-font-family;
     color: #000;
     padding: 9px 10px;
     width: 300px;

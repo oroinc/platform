@@ -43,7 +43,7 @@
       margin-left: 6px;
       &:after {
         border-width: 4px 6px 4px 0;
-        border-color: transparent $errorMessageBalloonBackground;
+        border-color: transparent $error-message-balloon-background;
         top: -16px;
         left: -6px;
       }
@@ -63,7 +63,7 @@
       }
       &:after {
         border-width: 4px 0 4px 6px;
-        border-color: transparent $errorMessageBalloonBackground;
+        border-color: transparent $error-message-balloon-background;
         top: -16px;
         right: -6px;
         left: auto;

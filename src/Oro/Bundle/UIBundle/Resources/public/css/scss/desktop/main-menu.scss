@@ -68,14 +68,14 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             border: 1px solid #e8e8e8;
             width: auto;
             padding: 0;
-            font-size: $baseFontSize;
+            font-size: $base-font-size;
             margin-top: 0;
             top: 0;
             left: 100%;
             border-radius: 0 3px 3px 0;
             a {
                 padding: 5px 10px;
-                color: $bodyColor;
+                color: $body-color;
                 white-space: nowrap;
             }
 
@@ -128,8 +128,8 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
     }
 
     width: 100%;
-    background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-    border-bottom: 1px solid $baseGradientColorBorder;
+    background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
+    border-bottom: 1px solid $base-gradient-color-border;
 
     &:after {
         content: '';
@@ -143,7 +143,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             position: relative;
             margin: 2px 1px;
             padding: 3px 10px;
-            font-size: $baseFontSize;
+            font-size: $base-font-size;
             font-weight: bold;
             color: $menuItemFirstLevelTextColor;
             text-shadow: none;
@@ -161,7 +161,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 border-bottom-color: darken(#354150, 20%);
                 border-radius: 4px;
                 background: #5e6772;
-                background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
+                background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
             }
         }
 
@@ -212,7 +212,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             position: relative;
             margin: 2px 1px;
             padding: 3px 10px;
-            font-size: $baseFontSize;
+            font-size: $base-font-size;
             font-weight: bold;
             color: $menuItemFirstLevelTextColor;
             text-shadow: none;
@@ -230,7 +230,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 border-bottom-color: darken(#354150, 20%);
                 border-radius: 4px;
                 background: #5e6772;
-                background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
+                background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
             }
         }
 
@@ -267,7 +267,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 vertical-align: -webkit-baseline-middle;
                 display: inline-block !important;
                 color: $menuItemFirstLevelTextColor;
-                font-size: $baseFontSize;
+                font-size: $base-font-size;
 
                 &:after {
                     content: "\f0dd";
@@ -301,7 +301,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             > a {
                 margin: 2px 0;
                 border-color: darken(#354150, 7%);
-                background: linear-gradient(lighten($headerIconButtonColorStart, 2%), $headerIconButtonColorEnd);
+                background: linear-gradient(lighten($header-icon-button-color-start, 2%), $header-icon-button-color-end);
             }
         }
 
@@ -328,7 +328,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 }
 
                 span {
-                    font-size: $baseFontSize * 1.15;
+                    font-size: $base-font-size * 1.15;
                     font-weight: bold;
                     padding: 9px 10px 5px;
                     display: block;
@@ -351,7 +351,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 vertical-align: -webkit-baseline-middle;
                 display: inline-block !important;
                 color: $menuItemFirstLevelTextColor;
-                font-size: $baseFontSize;
+                font-size: $base-font-size;
             }
         }
 
@@ -377,7 +377,7 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             > a {
                 margin: 2px 0;
                 border-color: darken(#354150,7%);
-                background: linear-gradient(lighten($headerIconButtonColorStart, 2%), $headerIconButtonColorEnd);
+                background: linear-gradient(lighten($header-icon-button-color-start, 2%), $header-icon-button-color-end);
             }
         }
     }
@@ -475,9 +475,9 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
         }
 
         > li.accordion-group > .accordion-heading > .accordion-toggle {
-            background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
-            border-top-color: darken($headerIconButtonColorStart, 1%);
-            border-bottom-color: darken($headerIconButtonColorEnd, 8%);
+            background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
+            border-top-color: darken($header-icon-button-color-start, 1%);
+            border-bottom-color: darken($header-icon-button-color-end, 8%);
             padding: 0 20px;
 
             &.collapsed {
@@ -490,9 +490,9 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
             }
 
             &:hover {
-                background: linear-gradient(lighten($headerIconButtonColorStart, 2%), $headerIconButtonColorEnd);
-                border-top-color: darken($headerIconButtonColorStart, 3%);
-                border-bottom-color: darken($headerIconButtonColorEnd, 10%);
+                background: linear-gradient(lighten($header-icon-button-color-start, 2%), $header-icon-button-color-end);
+                border-top-color: darken($header-icon-button-color-start, 3%);
+                border-bottom-color: darken($header-icon-button-color-end, 10%);
                 color: #fff;
             }
         }
@@ -637,9 +637,9 @@ $menuItemBorderBottomColor:    darken($menuBackGroundColor, 2%);
                 height: 36px;
 
                 &.active {
-                    background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
-                    border-top-color: darken($headerIconButtonColorStart, 1%);
-                    border-bottom-color: darken($headerIconButtonColorEnd, 8%);
+                    background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
+                    border-top-color: darken($header-icon-button-color-start, 1%);
+                    border-bottom-color: darken($header-icon-button-color-end, 8%);
 
                     > a i[class^="fa-"] {
                         color: #fff;

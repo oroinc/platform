@@ -120,8 +120,8 @@
                 clear: none;
                 border-left: 1px solid darken(#ecf1f9, 8%);
                 background-color: #fff;
-                min-height: $dotMenuDropdownMinHeight;
-                max-height: $dotMenuDropdownMaxHeight;
+                min-height: $dot-menu-dropdown-min-height;
+                max-height: $dot-menu-dropdown-max-height;
                 overflow: auto;
                 z-index: 99;
 
@@ -171,9 +171,9 @@
     }
 
     .dot-menu-empty-message {
-        padding: ($dotMenuDropdownMinHeight / 2 - 10px) 15px 15px;
+        padding: ($dot-menu-dropdown-min-height / 2 - 10px) 15px 15px;
         text-align: center;
-        color: lighten($bodyColor, 30%);
+        color: lighten($body-color, 30%);
         font-style: italic;
     }
 }

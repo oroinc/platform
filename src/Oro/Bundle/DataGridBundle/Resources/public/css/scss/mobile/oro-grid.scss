@@ -8,8 +8,8 @@
   margin-left: 0;
 }
 .grid-toolbar {
-  padding: 0 10px $contentPadding;
-  margin-bottom: -$contentPadding;
+  padding: 0 10px $content-padding;
+  margin-bottom: -$content-padding;
   &:after {
     content: '';
     clear: both;
@@ -17,7 +17,7 @@
     line-height: 0;
   }
   label {
-    font-size: $baseFontSize;
+    font-size: $base-font-size;
     line-height: 32px;
     display: inline-block;
     padding: 0;
@@ -27,7 +27,7 @@
   .pagination-container {
     min-width: 210px;
     box-sizing: content-box;
-    margin-bottom: $contentPadding / 2;
+    margin-bottom: $content-padding / 2;
   }
   .separator{
     float: left;
@@ -53,7 +53,7 @@
       height: 32px;
       padding-left: 12px;
       padding-right: 14px;
-      font-size: $baseFontSize;
+      font-size: $base-font-size;
       &.dropdown-toggle{
         padding-right: 9px;
       }
@@ -79,7 +79,7 @@
   }
 }
 .oro-datagrid:first-child > .toolbar:first-child > .grid-toolbar {
-  padding-top: $contentPadding;
+  padding-top: $content-padding;
 }
 
 .other-scroll-container {
@@ -100,8 +100,8 @@
   max-width: auto;
   width: auto;
   > .loader-mask {
-    left: $verticalPadding;
-    right: $verticalPadding;
-    top: $topPadding;
+    left: $vertical-padding;
+    right: $vertical-padding;
+    top: $top-padding;
   }
 }

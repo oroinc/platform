@@ -49,7 +49,11 @@
 
     .sub-title {
         a {
-            color: #006acc;
+            color: $link-color;
+
+            &:hover {
+                color: $link-color-hover;
+            }
         }
     }
 }

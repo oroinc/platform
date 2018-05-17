@@ -1,6 +1,6 @@
 h4.accordion-toggle {
   margin:0;
-  font-size: $baseFontSize * 1.3;
+  font-size: $base-font-size * 1.3;
   @include accordion-toggle();
 }
 h4.accordion-toggle:before {

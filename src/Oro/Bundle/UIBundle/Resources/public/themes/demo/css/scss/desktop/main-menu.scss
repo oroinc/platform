@@ -1,4 +1,4 @@
-$menuItemTextColor:            $headerTextColor;
+$menuItemTextColor:            $header-text-color;
 $menuBackGroundColor:          #2762c6;
 $menuItemBorderTopColor:       lighten($menuBackGroundColor, 5%);
 $menuItemBorderBottomColor:    darken($menuBackGroundColor, 4%);
@@ -6,8 +6,8 @@ $menuItemTreeLine:             darken($menuBackGroundColor, 20%);
 
 // menu top decoration
 .main-menu-top .main-menu {
-    background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-    border-bottom-color: $baseGradientColorBorder;
+    background: linear-gradient($base-gradient-color-start, $base-gradient-color-end);
+    border-bottom-color: $base-gradient-color-border;
 
     > li.dropdown.only-icon,
     > li.dropdown,
@@ -22,8 +22,8 @@ $menuItemTreeLine:             darken($menuBackGroundColor, 20%);
 
         &.active {
             > a {
-                border-bottom-color: $baseGradientColorBorder;
-                background: linear-gradient(darken($baseGradientColorStart, 5%), darken($baseGradientColorEnd, 5%));
+                border-bottom-color: $base-gradient-color-border;
+                background: linear-gradient(darken($base-gradient-color-start, 5%), darken($base-gradient-color-end, 5%));
             }
         }
     }
@@ -44,9 +44,9 @@ $menuItemTreeLine:             darken($menuBackGroundColor, 20%);
         }
 
         > li.accordion-group > .accordion-heading > .accordion-toggle {
-            background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
-            border-top-color: darken($headerIconButtonColorStart, 1%);
-            border-bottom-color: darken($headerIconButtonColorEnd, 8%);
+            background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
+            border-top-color: darken($header-icon-button-color-start, 1%);
+            border-bottom-color: darken($header-icon-button-color-end, 8%);
             color: #fff;
 
             &.collapsed {
@@ -55,9 +55,9 @@ $menuItemTreeLine:             darken($menuBackGroundColor, 20%);
             }
 
             &:hover {
-                background: linear-gradient(lighten($headerIconButtonColorStart, 2%), $headerIconButtonColorEnd);
-                border-top-color: darken($headerIconButtonColorStart, 3%);
-                border-bottom-color: darken($headerIconButtonColorEnd, 10%);
+                background: linear-gradient(lighten($header-icon-button-color-start, 2%), $header-icon-button-color-end);
+                border-top-color: darken($header-icon-button-color-start, 3%);
+                border-bottom-color: darken($header-icon-button-color-end, 10%);
                 color: #fff;
             }
         }
@@ -104,9 +104,9 @@ $menuItemTreeLine:             darken($menuBackGroundColor, 20%);
             // first level
             > li.dropdown {
                 &.active {
-                    background: linear-gradient(lighten($headerIconButtonColorStart, 5%), lighten($headerIconButtonColorEnd, 1%));
-                    border-top-color: darken($headerIconButtonColorStart, 1%);
-                    border-bottom-color: darken($headerIconButtonColorEnd, 8%);
+                    background: linear-gradient(lighten($header-icon-button-color-start, 5%), lighten($header-icon-button-color-end, 1%));
+                    border-top-color: darken($header-icon-button-color-start, 1%);
+                    border-bottom-color: darken($header-icon-button-color-end, 8%);
 
                     a {
                         background-image: none;

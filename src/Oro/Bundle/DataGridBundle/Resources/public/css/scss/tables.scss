@@ -2,7 +2,7 @@
     th,
     td {
         // should center content in cell right
-        line-height: 19px; // $baseFontSize + 2 * floor(($baseLineHeight - $baseFontSize)/2);
+        line-height: 19px; // $base-font-size + 2 * floor(($base-line-height - $base-font-size)/2);
     }
 }
 
@@ -90,10 +90,10 @@ table.grid {
     }
 
     tbody tr.row-selected {
-        background-color: $rowHighlightBackground;
+        background-color: $row-highlight-background;
 
         &:hover {
-            background-color: $rowSelectedBackground;
+            background-color: $row-selected-background;
         }
     }
 
@@ -326,11 +326,11 @@ td > .nowrap-ellipsis {
 
         &.renderable {
             td {
-                background: $rowHighlightBackground;
+                background: $row-highlight-background;
             }
 
             &:hover td {
-                background: $rowSelectedBackground;
+                background: $row-selected-background;
             }
         }
 

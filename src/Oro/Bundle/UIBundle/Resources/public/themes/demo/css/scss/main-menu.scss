@@ -7,7 +7,7 @@
     }
     & > li.dropdown.active {
         & > a {
-            background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 5%));
+            background: linear-gradient($base-gradient-color-start, darken($base-gradient-color-start, 5%));
             border-color: #2a5ab1;
         }
 
