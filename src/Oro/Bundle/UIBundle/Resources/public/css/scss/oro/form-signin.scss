@@ -50,6 +50,8 @@
 }
 
 .form-signin {
+    width: 100%;
+
     &__footer {
         display: flex;
         align-items: center;
@@ -222,7 +224,7 @@
     input[type="email"],
     input[type="password"],
     select {
-        width: 310px;
+        width: calc(100% - 24px);
     }
 }
 

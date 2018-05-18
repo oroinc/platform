@@ -11,6 +11,7 @@
 }
 
 .form-wrapper {
+  width: 100%;
   padding: 0 0 30px;
 
   &__title {
@@ -30,6 +31,8 @@
 }
 
 .form-signin {
+  margin: 0 auto;
+
   &__info {
     margin: 16px 0;
   }

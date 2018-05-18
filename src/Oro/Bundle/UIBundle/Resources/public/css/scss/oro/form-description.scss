@@ -12,19 +12,13 @@
     &__logo-img {
         display: block;
         margin: 0 auto;
-
-        &--commerce {
-            max-width: 286px;
-        }
-
-        &--crm {
-            max-width: 190px;
-        }
+        max-height: 40px;
     }
 
     &__main {
         font-size: 22px;
         font-weight: 300;
+        line-height: 1.2;
         text-align: center;
         color: #565656;
         margin-bottom: 16px;
