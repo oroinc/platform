@@ -1,13 +1,13 @@
 # OroThemeBundle
 
-OroThemeBundle provides the basic theme support with the ability to change the original UI applying the extra CSS / LESS files that are grouped into themes.
+OroThemeBundle provides the basic theme support with the ability to change the original UI applying the extra CSS/SCSS files that are grouped into themes.
 
 ## Basic statements
 
 * Bundle can provide CSS and templates that are required for it's UI;
 * UI of bundles (css and templates markup) should be "themable", it means that CSS and UI components of bundle should
   be affectable by theme to change look and feel of application (at least colors and icons);
-* A theme is a set of CSS/LESS files that will be included at the end of all CSS files to cascade styles and change look and feel;
+* A theme is a set of CSS/SCSS files that will be included at the end of all CSS files to cascade styles and change look and feel;
 
 ## Theme Properties
 
@@ -23,7 +23,7 @@ This will be displayed in theme management UI.
 
 * **styles**
 _required_
-The list of CSS and LESS files that represent a theme.
+The list of CSS and SCSS files that represent a theme.
 
 * **icon**
 _optional_
@@ -115,7 +115,7 @@ oro_assetic:
 When you are making changes to theme's CSS don't forget to run next commands:
 
 ```
-bin/console cache:clear # if you have changed some theme's setting, including adding/removing CSS/LESS styles files.
+bin/console cache:clear # if you have changed some theme's setting, including adding/removing CSS/SCSS styles files.
 bin/console assets:install # if you have changed themes files, you can use --symlink parameter, in this case you should install it only once
 bin/console assetic:dump # if you are not using oro_assetic.css_debug: [theme] or oro_assetic.css_debug_all: true options
 ```
