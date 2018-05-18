@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
-use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\ObjectType;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -33,55 +31,26 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
     }
 
     /**
+     * @param FormBuilderInterface     $formBuilder
      * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface|null
      */
-    protected function getFormBuilder(ChangeSubresourceContext $context): ?FormBuilderInterface
+    protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
-        $config = $context->getConfig();
-        if (null === $config) {
-            return null;
+        $entryDataClass = $context->getClassName();
+        $entryFormOptions = $this->getEntryFormOptions($context);
+        if (\array_key_exists('data_class', $entryFormOptions)) {
+            $entryDataClass = $entryFormOptions['data_class'];
+            unset($entryFormOptions['data_class']);
         }
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
-            return null;
-        }
-
-        $formBuilder = $this->createFormBuilder($context);
         $formBuilder->add(
             $context->getAssociationName(),
             CollectionType::class,
             [
                 'by_reference'     => !$this->enableAdderAndRemover,
-                'entry_data_class' => $context->getClassName(),
+                'entry_data_class' => $entryDataClass,
                 'entry_type'       => ObjectType::class,
-                'entry_options'    => [
-                    'metadata' => $metadata,
-                    'config'   => $config
-                ]
+                'entry_options'    => $entryFormOptions
             ]
         );
-
-        return $formBuilder;
-    }
-
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface
-     */
-    protected function createFormBuilder(ChangeSubresourceContext $context): FormBuilderInterface
-    {
-        $formBuilder = $this->formHelper->createFormBuilder(
-            FormType::class,
-            $context->getResult(),
-            []
-        );
-        if ($this->enableFullValidation) {
-            $formBuilder->addEventSubscriber(new EnableFullValidationListener());
-        }
-
-        return $formBuilder;
     }
 }

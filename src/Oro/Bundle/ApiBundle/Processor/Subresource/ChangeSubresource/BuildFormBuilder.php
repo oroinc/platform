@@ -69,25 +69,15 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormBuilder(ChangeSubresourceContext $context): ?FormBuilderInterface
     {
-        $config = $context->getConfig();
-        if (null === $config) {
+        if (null === $context->getConfig()) {
             return null;
         }
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
+        if (null === $context->getMetadata()) {
             return null;
         }
 
         $formBuilder = $this->createFormBuilder($context);
-        $formBuilder->add(
-            $context->getAssociationName(),
-            ObjectType::class,
-            [
-                'data_class' => $context->getClassName(),
-                'metadata'   => $metadata,
-                'config'     => $config
-            ]
-        );
+        $this->addFormFields($formBuilder, $context);
 
         return $formBuilder;
     }
@@ -102,12 +92,70 @@ class BuildFormBuilder implements ProcessorInterface
         $formBuilder = $this->formHelper->createFormBuilder(
             FormType::class,
             $context->getResult(),
-            []
+            $this->getFormOptions($context)
         );
         if ($this->enableFullValidation) {
             $formBuilder->addEventSubscriber(new EnableFullValidationListener());
         }
 
         return $formBuilder;
+    }
+
+    /**
+     * @param FormBuilderInterface     $formBuilder
+     * @param ChangeSubresourceContext $context
+     */
+    protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
+    {
+        $entryFormOptions = $this->getEntryFormOptions($context);
+        if (!\array_key_exists('data_class', $entryFormOptions)) {
+            $entryFormOptions['data_class'] = $context->getClassName();
+        }
+        $formBuilder->add(
+            $context->getAssociationName(),
+            ObjectType::class,
+            $entryFormOptions
+        );
+    }
+
+    /**
+     * @param ChangeSubresourceContext $context
+     *
+     * @return array
+     */
+    protected function getFormOptions(ChangeSubresourceContext $context): array
+    {
+        $formOptions = [];
+        $options = $context->getConfig()->getFormOptions();
+        if (!empty($options)) {
+            unset($options['entry_options']);
+            $formOptions = \array_replace($formOptions, $options);
+        }
+
+        return $formOptions;
+    }
+
+    /**
+     * @param ChangeSubresourceContext $context
+     *
+     * @return array
+     */
+    protected function getEntryFormOptions(ChangeSubresourceContext $context): array
+    {
+        $config = $context->getConfig();
+
+        $entryFormOptions = [
+            'metadata' => $context->getMetadata(),
+            'config'   => $config
+        ];
+        $options = $config->getFormOptions();
+        if (!empty($options) && \array_key_exists('entry_options', $options)) {
+            $entryOptions = $options['entry_options'];
+            if (!empty($entryOptions)) {
+                $entryFormOptions = \array_replace($entryFormOptions, $entryOptions);
+            }
+        }
+
+        return $entryFormOptions;
     }
 }
