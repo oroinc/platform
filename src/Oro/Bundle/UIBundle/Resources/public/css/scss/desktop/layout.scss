@@ -23,6 +23,7 @@
   &__right-panel {
     display: flex;
     overflow: visible;
+    flex-shrink: 0;
   }
   &__central-panel {
     flex-grow: 1;
