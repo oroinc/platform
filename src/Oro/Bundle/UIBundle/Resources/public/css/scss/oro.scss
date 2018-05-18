@@ -3787,37 +3787,6 @@ span.validation-failed {
     cursor: pointer;
 }
 
-#container .popover {
-    // prevent menu and loading wrapper overlapping
-    z-index: 800;
-}
-
-.popover {
-    position: fixed;
-    max-width: 315px; /* little increase to fit usual content */
-
-    .popover-content {
-        padding: 13px 30px 13px 15px;
-        height: 100%;
-
-        &.popover-no-close-button {
-            padding-right: 15px;
-        }
-    }
-
-    .oro-popover-content {
-        overflow-y: auto;
-        height: 100%;
-    }
-
-    .popover-close {
-        position: absolute;
-        top: 9px;
-        right: 9px;
-        cursor: pointer;
-    }
-}
-
 label .popover-content {
     text-transform: none;
 }
