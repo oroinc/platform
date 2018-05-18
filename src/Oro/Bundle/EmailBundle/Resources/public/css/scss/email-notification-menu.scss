@@ -1,22 +1,25 @@
 @import "oroui/css/scss/variables";
 
 .email-notification-menu {
-    .fa-envelope {
-        color: #fff;
+    background-color: inherit;
 
+    .fa-envelope {
         &.highlight {
             color: #fabb18;
         }
     }
 
-    .oro-dropdown-toggle {
+    .email-notification-icon {
+        background-color: inherit;
+
         .fa-envelope {
             position: relative;
-            padding-top: 3px;
+            top: -1px;
+            background-color: inherit;
 
             span {
                 display: none;
-                background: #36424c;
+                background-color: inherit;
             }
 
             &.highlight {
@@ -63,5 +66,11 @@
             top: -6px;
             right: 24px;
         }
+    }
+}
+
+.navbar .nav > li > a.email-notification-icon {
+    &:hover, &:focus {
+        background-color: inherit;
     }
 }

@@ -9,7 +9,7 @@ placeholders:
                 user_dots_menu:
                     order: 150
                 help:
-                    order: 200
+                    order: 100
         form_buttons:
             items:
                 add_update_delete:

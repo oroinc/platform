@@ -235,12 +235,89 @@ define([
         event.preventDefault();
     });
 
+    var insertView = function(list, viewEl, position, length, itemSelector) {
+        var children, childrenLength, insertInMiddle, isEnd, method; // eslint-disable-line one-var
+        insertInMiddle = (0 < position && position < length);
+        isEnd = function(length) {
+            return length === 0 || position >= length;
+        };
+        if (insertInMiddle || itemSelector) {
+            children = list.children(itemSelector);
+            childrenLength = children.length;
+            if (children[position] !== viewEl) {
+                if (isEnd(childrenLength)) {
+                    return list.append(viewEl);
+                } else {
+                    if (position === 0) {
+                        return children.eq(position).before(viewEl);
+                    } else {
+                        return children.eq(position - 1).after(viewEl);
+                    }
+                }
+            }
+        } else {
+            method = isEnd(length) ? 'append' : 'prepend';
+            return list[method](viewEl);
+        }
+    };
+
+    /**
+     * insertView is reverted to version 1.0.0, due to this method in 1.2.0 version has issues:
+     *  - helper function `insertView` gets invoked only for views that passed filter function and marked as `included`
+     *  - `insertView` is called only from `itemAdded` and `renderAllItems`,
+     *    so if a view passes filter function later it still wont be added to HTML
+     *  - on attempt to add a passed filter view manually to HTML with the help of `insertView -- another issue pops up:
+     *  wrong position (order) of elements in HTML. Assume `renderAllItems` renders only one model with index 3,
+     *  the view element in HTML it will get index 0. Late another model with index 2 passes filter as well,
+     *  it will be inserted after view element of model with index 3.
+     * @override
+     */
+    Chaplin.CollectionView.prototype.insertView = function(item, view, position, enableAnimation) {
+        var elem, included, length, list, // eslint-disable-line one-var
+            _this = this;
+        if (enableAnimation == null) {
+            enableAnimation = true;
+        }
+        if (this.animationDuration === 0) {
+            enableAnimation = false;
+        }
+        if (typeof position !== 'number') {
+            position = this.collection.indexOf(item);
+        }
+        included = typeof this.filterer === 'function' ? this.filterer(item, position) : true;
+        elem = $ ? view.$el : view.el;
+        if (included && enableAnimation) {
+            if (this.useCssAnimation) {
+                elem.addClass(this.animationStartClass);
+            } else {
+                elem.css('opacity', 0);
+            }
+        }
+        if (this.filterer) {
+            this.filterCallback(view, included);
+        }
+        length = this.collection.length;
+        list = $ ? this.$list : this.list;
+        insertView(list, elem, position, length, this.itemSelector);
+        view.trigger('addedToParent');
+        this.updateVisibleItems(item, included);
+        if (included && enableAnimation) {
+            if (this.useCssAnimation) {
+                setTimeout(function() {
+                    return elem.addClass(_this.animationEndClass);
+                }, 0);
+            } else {
+                elem.animate({opacity: 1}, this.animationDuration);
+            }
+        }
+        return view;
+    };
+
     /**
      * Since IE removes content form child elements when parent node is emptied
      * we need re-render item subviews manually
      * (see https://jsfiddle.net/3hrfhppe/)
      */
-
     if (/(MSIE\s|Trident\/|Edge\/)/.test(window.navigator.userAgent)) {
         Chaplin.CollectionView.prototype.insertView = _.wrap(
             Chaplin.CollectionView.prototype.insertView, function(func, item, view) {

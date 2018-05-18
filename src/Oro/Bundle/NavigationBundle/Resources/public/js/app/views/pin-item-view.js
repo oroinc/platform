@@ -8,6 +8,8 @@ define([
     var PinItemView;
 
     PinItemView = BookmarkItemView.extend({
+        className: 'pin-holder',
+
         /**
          * @inheritDoc
          */
@@ -31,7 +33,7 @@ define([
         outdatedContentHandler: function(event) {
             var url = this.model.get('url');
             if (mediator.execute('compareUrl', url, event.path)) {
-                if (!this.getPinStatusIcon().is('.outdated')) {
+                if (!this.$el.hasClass('outdated')) {
                     this.markOutdated();
                     this.listenTo(mediator, 'page:afterRefresh', this.onPageRefresh);
                 }
@@ -46,15 +48,17 @@ define([
         },
 
         markOutdated: function() {
-            this.getPinStatusIcon().addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+            this.$el
+                .addClass('outdated')
+                .tooltip({
+                    title: __('Content of pinned page is outdated')
+                });
         },
 
         markNormal: function() {
-            this.getPinStatusIcon().removeClass('outdated').removeAttr('title');
-        },
-
-        getPinStatusIcon: function() {
-            return this.$('.pin-status');
+            this.$el
+                .removeClass('outdated')
+                .tooltip('destroy');
         }
     });
 

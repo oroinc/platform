@@ -63,7 +63,7 @@
         {% endif %}
         <div id="central-panel" class="app-page__central-panel">
             {% block header %}
-                <header class="navbar" id="oroplatform-header">
+                <header class="navbar app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
                     {% placeholder before_navigation %}
                     <div class="navbar-inner">
                         <div class="container">

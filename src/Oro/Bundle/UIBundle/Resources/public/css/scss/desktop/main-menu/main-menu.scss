@@ -10,6 +10,13 @@
     &__header {
         min-height: $menu-header-height;
         background-color: $menu-header-background-color;
+
+        .app-logo {
+            width: 100%;
+            margin: 9px 0;
+            text-align: center;
+            height: 30px;
+        }
     }
 
     .dropdown-menu-wrapper {

@@ -9,7 +9,14 @@
             toggleSelector: '#main-menu-toggler'
         }
     }) }}>
-        <header class="main-menu__header"></header>
+        <header class="main-menu__header">
+            {% set organization_name %}
+                {% spaceless %}
+                    {% placeholder organization_name %}
+                {% endspaceless %}
+            {% endset %}
+            {{ UI.app_logo(organization_name) }}
+        </header>
 
         <div class="scroller" id="main-menu">
             {{ block('application_menu') }}

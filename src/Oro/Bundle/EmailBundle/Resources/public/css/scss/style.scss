@@ -1,6 +1,4 @@
 @import "oroui/css/scss/mixins";
-@import "./header";
-@import "./email-notification-menu";
 @import "./short-emails-list";
 @import "./sidebar-widget";
 
@@ -916,7 +914,7 @@ a.attachment .icon .fa-link {
     color: #f80;
 }
 
-.has-new-emails .fa-user {
+.has-new-emails .fa-user-circle {
     color: #f80;
 }
 

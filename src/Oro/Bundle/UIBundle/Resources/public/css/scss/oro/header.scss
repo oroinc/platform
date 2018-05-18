@@ -1,157 +1,28 @@
-@mixin header-button-active {
-    & {
-        margin: 5px 2px 6px;
-        border: 1px solid darken(#354150, 22%);
-        background: linear-gradient(#354150, #474f58);
-        border-radius: 4px;
-        box-shadow: inset 0 2px 6px 0 darken(rgba(53, 65, 80, .8), 20%);
-    }
-}
-
-@mixin header-button-inactive {
-    & {
-        margin: 6px 2px 0;
-        border: none;
-        background: none;
-        box-shadow: none;
-    }
-}
-
-@mixin header-button {
-    & > [class^="fa-"] {
-        @include header-button-inactive;
-
-        width: 28px;
-        height: 29px;
-        color: #fff;
-        font-size: 18px;
-        line-height: 28px;
-        vertical-align: middle;
-        text-align: center;
-        text-shadow: 0 1px 1px #292d33;
-    }
-
-    &:hover > [class^="fa-"] {
-        margin: 5px 2px 6px;
-        border: 1px solid darken(#354150, 10%);
-        background: linear-gradient(#4c5663, darken(#354150, 5%));
-        border-radius: 4px;
-        text-decoration: none;
-    }
-
-    &:active > [class^="fa-"],
-    &:focus > [class^="fa-"] {
-        @include header-button-active;
-    }
-}
-
-.header-button-active {
-    @include header-button-active;
-}
-
-.header-button-inactive {
-    @include header-button-inactive;
-}
-
-.header-button {
-    @include header-button;
-}
-
-// GLOBAL LAYOUT ELEMENTS
-
 /* Header */
-.navbar .navbar-inner .divider-vertical {
-    border: none;
-}
+.navbar.app-header {
+    margin-bottom: 0;
 
-.navbar-inner {
-    min-height: 0;
-
-    .nav {
-        margin-right: 0;
-    }
-}
-
-#oroplatform-header {
     .unclickable {
         cursor: default;
     }
+
     .navbar-inner {
-        @include safe-area-offset(padding, 0);
-
-        display: block;
-        width: 100%;
-        clear: both;
-        position: relative;
-        margin: 0;
-        border: none;
-        border-bottom: 1px solid $baseGradientColorBorder;
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        min-height: initial;
+        background: none;
+        background-color: inherit;
         border-radius: 0;
+        border-width: 0;
 
-        .divider-vertical {
-            border: none;
-            margin: 5px 6px;
-            height: 22px;
-        }
-
-        .btn-group {
-            margin: 0;
-        }
-
-        .extra-divider {
-            height: 100%;
-            background: url(../../img/vertical-divider-general.gif) repeat-y;
-            width: 2px;
-            border: 0 !important;
-            float: left;
-        }
-
-        .nav {
-            margin: 0;
-            >li {
-                > a {
-                    color: #fff;
-                    font-weight: bold;
-                    text-shadow: none;
-                }
-            }
-        }
-
-        .notifications {
-            padding: 0 0 0 5px !important;
-            margin: 10px 10px 0 0;
-
-            i {
-                margin: 0 5px 0 0;
-            }
-        }
-
-        .dark {
-            border: 1px solid #eaeaea;
-            border-width: 1px 0;
-            background-color: #fbfbfb;
-            padding: 15px 15px 7px;
+        > .container {
+            background-color: inherit;
         }
     }
+
     .nav.top-search { // Includes Shortcuts and Search
         .dropdown {
             float: left;
-            .title {
-                color: #444;
-                font-size: 14px;
-                padding: 5px 0 10px 12px;
-                margin: 0 0 18px;
-                border-bottom: 1px solid #ccc;
-            }
-
-            > .dropdown-toggle {
-                @include header-button;
-            }
 
             .dropdown-menu {
-                margin-top: -3px;
-
                 &:before {
                     border-bottom: 7px solid rgba(0, 0, 0, .2);
                     border-left: 7px solid transparent;
@@ -172,6 +43,13 @@
                     left: 10px;
                     position: absolute;
                     top: -6px;
+                }
+
+                .dark {
+                    border: 1px solid #eaeaea;
+                    border-width: 1px 0;
+                    background-color: #fbfbfb;
+                    padding: 15px 15px 7px;
                 }
 
                 .nav-header { /* Dropdown smaller section title */
@@ -195,8 +73,6 @@
 
             /* Header search dropdown */
             &.header-dropdown-search {
-                margin-left: 5px;
-
                 .dark {
                     border-bottom: none;
                     border-radius: 0 0 3px 3px;
@@ -415,55 +291,5 @@
             }
         } // Ends .dropdown
 
-        .dropdown.open > .dropdown-toggle > [class^="fa-"] {
-            @include header-button-active;
-        }
     } // Ends .top-search
-
-    .divider-vertical {
-        float: left;
-        margin-right: 0;
-    }
-
-    /* Header right */
-    .nav.pull-right {
-        li.dropdown {
-            > a {
-                padding: 6px;
-                text-shadow: none;
-
-                [class^="fa-"] {
-                    vertical-align: top;
-                    font-size: 14px;
-                    margin: 0 4px;
-                }
-            }
-
-            .dropdown-menu {
-                width: 100px;
-                margin: -4px -4px 0 0;
-
-                li {
-                    a {
-                        padding: 2px 12px;
-                    }
-                }
-            }
-        }
-    }
-}
-
-header {
-    &:after {
-        content: "";
-        clear: both;
-        display: block;
-    }
-
-    &.navbar {
-        position: relative;
-        margin: 0;
-        z-index: $oroZindexDropdown + 25; // .dropdown-menu z-index + 25 to be able to play with z-indexes
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-    }
 }

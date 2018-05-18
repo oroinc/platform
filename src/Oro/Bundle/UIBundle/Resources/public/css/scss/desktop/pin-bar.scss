@@ -1,13 +1,55 @@
 .list-bar-wrapper {
-    background-image: none;
-    background-color: $logoBackgroundColor;
-    height: 24px;
+    .pin-holder {
+        position: relative;
+
+        &.outdated a {
+            color: $pin-item-outdated-color;
+
+            &:hover,
+            &:active,
+            &:focus {
+                color: $pin-item-outdated-hover-color;
+            }
+        }
+
+    }
+
+    .btn-close {
+        position: absolute;
+        top: 50%;
+        right: 6px;
+        width: 14px;
+        height: 14px;
+        display: block;
+        background-color: transparent;
+        color: transparent;
+        font-size: 0;
+        padding: 0;
+        margin: -7px 0 0 0;
+        border-width: 0;
+
+        &:active,
+        &:focus {
+            outline: none;
+        }
+
+        &:before {
+            font-size: 12px;
+            color: $pin-item-close-color;
+        }
+
+        &:hover:before {
+            color: $pin-item-close-hover-color;
+        }
+    }
 }
 
 .show-more {
+    display: none; // don't show dropbox by default
     position: absolute;
     top: 0;
     margin-left: -20px;
+    height: 100%;
 
     &:before {
         content: '';
@@ -17,26 +59,22 @@
         right: 100%;
         height: 100%;
         width: 32px;
-        background-image: linear-gradient(to left, $logoBackgroundColor, transparent);
+        background-image: linear-gradient(to left, $app-header-bg-color, transparent);
         pointer-events: none;
     }
 
     a.dropdown-toggle {
         position: relative;
-        color: $headerTextColor;
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
+        background-color: $app-header-bg-color;
+        color: $pin-item-close-color;
         width: 20px;
-        height: 24px;
+        font-size: $app-header-icon-font-size;
         display: inline-block;
-        line-height: 25px;
-        font-size: 10px;
         text-align: center;
-        border-left: 1px solid $baseGradientColorBorder;
-        box-shadow: inset 0 -1px 2px rgba(0, 0, 0, .15);
 
-        &:hover,
-        &:focus {
-            background: lighten($logoBackgroundColor, 5%);
+        &:hover {
+            cursor: pointer;
+            color: $pin-item-close-hover-color;
         }
     }
 
@@ -45,182 +83,64 @@
         margin: 0;
     }
 
-    .pin-holder {
-        position: relative;
-    }
-
     li {
-        a {
-            color: #444;
-            display: block;
-            min-height: 23px;
-            line-height: 17px;
-            padding: 3px 26px 3px 23px;
-            min-width: 180px;
-
-            &:hover {
-                background: #f3f3f3;
-            }
-        }
-
         &.active a {
             font-weight: bold;
         }
-    }
 
-    .fa-close {
-        position: absolute;
-        right: 1px;
-        height: 23px;
-        width: 19px;
-        text-indent: -400px;
-        background: transparent;
-        border: none;
-        color: #ddd;
-
-        &:hover {
-            color: #bbb;
-        }
-
-        &:before {
-            position: absolute;
-            margin-left: 413px;
-        }
-    }
-
-    .pin-status {
-        font-size: 6px;
-        position: absolute;
-        margin: 5px -11px;
-
-        &.outdated {
-            color: #feca67;
-            font-size: 8px;
-            margin: 4px -12px;
+        a {
+            padding: 7px 26px 7px 13px;
         }
     }
 }
 
 .list-bar {
     padding-right: 20px;
-    height: 24px;
     overflow: hidden;
-
-    .pin-bar-empty a {
-        display: inline-block;
-        margin: 2px 10px;
-        color: #b2bac2;
-        font-size: 12px;
-        line-height: 20px;
-    }
 
     ul {
         margin: 0;
         padding: 0;
         list-style: none;
         display: block;
-        height: 24px;
         white-space: nowrap;
-
         &:empty {
             display: none;
         }
     }
 
-    li {
+    .pin-holder {
         display: inline-block;
-        color: $headerTextColor;
         text-align: left;
-        text-shadow: 0 -1px 2px #37485f;
-        line-height: 22px;
-        font-size: $fontSizeSmall;
+        line-height: inherit;
         position: relative;
-
-        .pin-holder {
-            position: relative;
-            padding: 1px 25px 1px 18px;
-            border-right: 1px solid $baseGradientColorBorder;
-            box-shadow: inset 0 -1px 2px rgba(0, 0, 0, .15);
-
-            a {
-                color: $headerTextColor;
-                white-space: nowrap;
-                margin: 0 -1px 0 -19px;
-                display: inline-block;
-                padding-left: 19px;
-                max-width: 150px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-
-                &:hover {
-                    text-decoration: none;
-                    color: lighten($headerTextColor, .2);
-
-                    &.fa-close {
-                        color: transparent;
-
-                        &:before {
-                            color: $headerTextColor;
-                        }
-
-                        &:hover:before {
-                            color: lighten($headerTextColor, .2);
-                        }
-                    }
-                }
-
-                div.pin-frame {
-                    white-space: nowrap;
-                    width: 48px;
-                    -o-text-overflow: ellipsis;
-                    text-overflow: ellipsis;
-                }
-            }
-
-            .fa-close {
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                width: 14px;
-                height: 14px;
-                display: block;
-                background-color: transparent;
-                color: transparent;
-                font-size: 0;
-                padding: 0;
-                margin: 0;
-                border-width: 0;
-
-                &:before {
-                    font-size: 12px;
-                    color: $headerTextColor;
-                }
-
-                &:hover:before {
-                    color: lighten($headerTextColor, 20%);
-                }
-            }
-        }
+        padding: 0 22px 0 8px;
 
         &.active {
-            .pin-holder {
-                background-color: lighten($logoBackgroundColor, 5%);
-                box-shadow: inset 0 -2px 5px rgba(0, 0, 0, .15);
+            background-color: $pin-item-active-bg-color;
+        }
+
+        a {
+            color: inherit;
+            white-space: nowrap;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover,
+            &:active,
+            &:focus {
+                color: $app-header-text-hover-color;
+                outline: none;
             }
         }
     }
 
-    .pin-status {
-        position: absolute;
-        font-size: 6px;
-        top: 9px;
-        left: 4px;
-
-        &.outdated {
-            color: #feca67;
-            font-size: 8px;
-            left: 3px;
-            top: 7px;
-        }
+    .pin-bar-empty a {
+        display: inline-block;
+        margin: 2px 10px;
+        color: inherit;
+        font-size: 12px;
+        line-height: 20px;
     }
 }

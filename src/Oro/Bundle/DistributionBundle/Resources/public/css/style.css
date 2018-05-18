@@ -11,21 +11,6 @@ header {
     padding: 0;
 }
 
-div.navbar-inner .help {
-    padding: 2px;
-    line-height: 19px;
-}
-
-div.navbar-inner .help a {
-    color: #fff;
-    font-size: 14px;
-    text-decoration: none;
-}
-
-div.navbar-inner .help a:hover {
-    text-decoration: none;
-}
-
 .logo a {
     font-weight: bold;
 }
@@ -217,13 +202,8 @@ table.table {
     opacity: 0.5;
 }
 
-.desktop-version #oroplatform-header .logo {
-    font-size: 0;
-}
-
-.desktop-version #oroplatform-header .logo a {
-    display: inline-block;
-    font-size: 17px;
+.desktop-version .app-page {
+    overflow: auto;
 }
 
 #load-demo-data {

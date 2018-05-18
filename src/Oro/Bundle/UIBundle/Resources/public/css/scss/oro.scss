@@ -559,6 +559,15 @@ footer {
 
     .navbar-inner {
         z-index: 1;
+        min-height:0;
+
+        .divider-vertical {
+            border:none;
+        }
+
+        .nav {
+            margin-right:0;
+        }
     }
 }
 

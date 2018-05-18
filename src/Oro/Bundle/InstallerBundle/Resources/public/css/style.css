@@ -183,20 +183,20 @@ a:hover {
 }
 
 .header, header {
-    padding: 14px 15px;
-    background-color: #3b4651;
-    background: -webkit-gradient(linear, 0 0, 0 100%, from(#3b4651), to(#323b45));
-    background: -webkit-linear-gradient(top, #3b4651, #323b45);
-    background: -moz-linear-gradient(top, #3b4651, #323b45);
-    background: -ms-linear-gradient(top, #3b4651, #323b45);
-    background: -o-linear-gradient(top, #3b4651, #323b45)
+    padding: 0 25px;
+    color: #7d7d7f;
+    background-color: #f8f8f8;
+    line-height: 48px;
+    height: 48px;
 }
 
 .logo {
-    font: 16px/16px 'Helvetica Neue', Arial, sans-serif;
-    text-transform: uppercase;
-    color: #fff;
-    float: left
+    color: #404041;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: inherit;
+    margin: 0;
+    display: inline-block;
 }
 
 .header:after, header:after {
