@@ -12,10 +12,14 @@ $primary-700: lighten($primary, 48%) !default;
 $primary-800: lighten($primary, 64%) !default;
 $primary-900: lighten($primary, 72%) !default;
 
+$primary-inverse: #fff !default;
+
 $secondary: #0c84a3 !default;
 $secondary-100: lighten($secondary, 6%) !default;
-$secondary-200: lighten($secondary, 60%) !default;
-$secondary-300: lighten($secondary, 62%) !default;
+$secondary-200: lighten($secondary, 40%) !default;
+$secondary-300: lighten($secondary, 60%) !default;
+$secondary-400: lighten($secondary, 62%) !default;
+$secondary-dark: darken($secondary, 8%) !default;
 
 $extra: #f9b700 !default;
 $extra-100: lighten($extra, 22%) !default;
@@ -48,6 +52,7 @@ $success: #5aa20f !default;
 $success-light: lighten($success, 4%) !default;
 $success-lighten: lighten($success, 10%) !default;
 $success-extra-light: lighten($success, 45%) !default;
+$success-extra-lighten: lighten($success, 54%) !default;
 $success-ultra-light: lighten($success, 58%) !default;
 $success-dark: darken($success, 8%) !default;
 $success-darken: desaturate($success, 54%) !default;
@@ -56,5 +61,6 @@ $additional: #5c5c5c !default;
 $additional-light: lighten($additional, 26%) !default;
 $additional-lighten: lighten($additional, 38%) !default;
 $additional-extra-light: lighten($additional, 50%) !default;
+$additional-extra-lighten: lighten($additional, 54%) !default;
 $additional-ultra-light: lighten($additional, 56%) !default;
 $additional-dark: darken($additional, 12%) !default;
