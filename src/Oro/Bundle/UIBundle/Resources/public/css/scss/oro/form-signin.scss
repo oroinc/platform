@@ -41,7 +41,6 @@
 
     &__inner {
         display: flex;
-        align-items: center;
         flex-grow: 1;
         margin: 0 auto;
         padding: 0 65px;
@@ -50,6 +49,8 @@
 }
 
 .form-signin {
+    width: 100%;
+
     &__footer {
         display: flex;
         align-items: center;

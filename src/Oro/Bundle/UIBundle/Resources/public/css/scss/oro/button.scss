@@ -19,7 +19,9 @@
   height: 32px;
   font-size: 12px;
   line-height: 30px;
+  font-weight: bold;
   color: #68686a;
+  text-transform: uppercase;
   text-shadow: none;
   padding: 0 16px;
   border: 2px solid #eee;
@@ -70,10 +72,16 @@
   font-size: $baseFontSize;
 }
 .btn-large {
-  font-size: 12px;
+  font-size: 15px;
   padding: 0 20px;
-  height: 32px;
-  line-height: 30px;
+  height: 40px;
+  line-height: 38px;
+  border-radius: 20px;
+
+  [class^="fa-"],
+  [class*=" fa-"] {
+    font-size: 14px;
+  }
 }
 .btn-mini {
   height: 22px;
@@ -162,22 +170,22 @@
 
 /* .btn-success */
 .btn-success {
-  border-color: #49982b #3b8d1c #267507;
-  text-shadow:0 1px 0 #3b8d1c;
-  &, &:focus {
-    background-color: #4fae0d;
-    background: linear-gradient(#82ce20, #57ac0b);
-    color:#fff;
-  }
+  background: #5aa20f;
+  border-color: #5aa20f;
+  color: #fff;
+  text-shadow: none;
+
+  &:focus,
   &:hover {
-    background-color: #8cd42f;
-    background: linear-gradient(#8cd42f, #49982b);
+    background: #457d0c;
+    border-color: #457d0c;
     color: #fff;
   }
   &:active {
-    background-color: #369511;
-    background: linear-gradient(#369511, #55ad34);
-    color: #fff;
+    background: #e3efd6;
+    border-color: #457d0c;
+    color: #457d0c;
+    box-shadow: none;
   }
 }
 
