@@ -18,6 +18,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * The base class for Data API functional tests.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class ApiTestCase extends WebTestCase
 {
@@ -217,6 +218,72 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return self::processTemplateData($request);
+    }
+
+    /**
+     * Replaces all values in the given expected response content
+     * with correxponding value from the actual response content
+     * when the key of an element is equal to the given key
+     * and the value of this element is equal to the given placeholder.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     * @param Response     $response        The response object
+     * @param string       $key             The key for with a value shoul be updated
+     * @param string       $placeholder     The marker value
+     *
+     * @return array
+     */
+    protected function updateResponseContent(
+        $expectedContent,
+        Response $response,
+        string $key = 'id',
+        string $placeholder = 'new'
+    ): array {
+        $expectedContent = $this->loadResponseData($expectedContent);
+        $content = self::jsonToArray($response->getContent());
+        $this->walkResponseContent($expectedContent, $content, $key, $placeholder);
+
+        return $expectedContent;
+    }
+
+    /**
+     * @param array  $expectedContent
+     * @param array  $content
+     * @param string $key
+     * @param string $placeholder
+     * @param array  $path
+     */
+    private function walkResponseContent(
+        array &$expectedContent,
+        array $content,
+        string $key,
+        string $placeholder,
+        array $path = []
+    ): void {
+        foreach ($expectedContent as $k => &$v) {
+            if ($k === $key && $v === $placeholder) {
+                $contentItem = $content;
+                $i = 0;
+                foreach ($path as $p) {
+                    if (!is_array($contentItem) || !array_key_exists($p, $contentItem)) {
+                        break;
+                    }
+                    $contentItem = $contentItem[$p];
+                    $i++;
+                }
+                if (count($path) === $i && is_array($contentItem) && array_key_exists($k, $contentItem)) {
+                    $v = $contentItem[$k];
+                }
+            } elseif (is_array($v)) {
+                $this->walkResponseContent(
+                    $expectedContent[$k],
+                    $content,
+                    $key,
+                    $placeholder,
+                    array_merge($path, [$k])
+                );
+            }
+        }
     }
 
     /**

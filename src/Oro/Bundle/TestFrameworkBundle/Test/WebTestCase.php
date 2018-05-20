@@ -611,11 +611,19 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository|null
+     * @return bool
+     */
+    protected function hasReferenceRepository()
+    {
+        return null !== self::$referenceRepository;
+    }
+
+    /**
+     * @return ReferenceRepository
      */
     protected function getReferenceRepository()
     {
-        if (false == self::$referenceRepository) {
+        if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
         }
 
