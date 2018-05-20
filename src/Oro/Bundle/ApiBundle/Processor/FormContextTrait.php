@@ -27,6 +27,9 @@ trait FormContextTrait
     /** @var FormInterface|null */
     protected $form;
 
+    /** @var bool */
+    protected $skipFormValidation = false;
+
     /**
      * Returns request data.
      *
@@ -145,5 +148,25 @@ trait FormContextTrait
     public function setForm(FormInterface $form = null)
     {
         $this->form = $form;
+    }
+
+    /**
+     * Indicates whether the validation of the form should be skipped or not.
+     *
+     * @return bool
+     */
+    public function isFormValidationSkipped()
+    {
+        return $this->skipFormValidation;
+    }
+
+    /**
+     * Sets a flag indicates whether the validation of the form should be skipped or not.
+     *
+     * @param bool $skipFormValidation
+     */
+    public function skipFormValidation($skipFormValidation)
+    {
+        $this->skipFormValidation = $skipFormValidation;
     }
 }

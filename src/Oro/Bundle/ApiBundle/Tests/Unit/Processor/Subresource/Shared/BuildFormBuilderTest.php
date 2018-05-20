@@ -30,7 +30,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     private $container;
 
     /** @var BuildFormBuilder */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -100,7 +100,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -143,7 +144,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => $parentBaseEntityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -187,7 +189,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -232,7 +235,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -273,7 +277,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -317,7 +322,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -364,7 +370,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -405,7 +412,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);

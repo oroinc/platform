@@ -372,7 +372,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_type_extensions')
                 ->info('The form type extensions that can be reused in Data API')
-                ->example(['form.type_extension.form.http_foundation', 'form.type_extension.form.validator'])
+                ->example(['form.type_extension.form.http_foundation'])
                 ->prototype('scalar')
                 ->end()
             ->end();
