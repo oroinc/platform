@@ -44,7 +44,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ReadUnreadIcon:
-      selector: 'i.fa-envelope'
+      selector: 'i.mail-icon'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     RemoveEmail:

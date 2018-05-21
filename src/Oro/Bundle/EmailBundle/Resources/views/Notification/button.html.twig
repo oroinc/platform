@@ -11,9 +11,9 @@
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
         <% if (seen) {  %>
-        <i class="fa-envelope" title="{{ 'oro.email.datagrid.emails.action.mark_as_unread'|trans }}" data-role="toggle-read-status"></i>
+        <i class="mail-icon" title="{{ 'oro.email.datagrid.emails.action.mark_as_unread'|trans }}" data-role="toggle-read-status"></i>
         <% } else { %>
-        <i class="fa-envelope highlight" title="{{ 'oro.email.datagrid.emails.action.mark_as_read'|trans }}" data-role="toggle-read-status"></i>
+        <i class="mail-icon highlight" title="{{ 'oro.email.datagrid.emails.action.mark_as_read'|trans }}" data-role="toggle-read-status"></i>
         <% } %>
     </div>
     <div class="footer row-fluid">

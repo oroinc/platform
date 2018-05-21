@@ -1,18 +1,30 @@
+@import "email-variables";
+
+.sidebar-widget-icon.mail-icon {
+  @include fa-icon($email-inactive-mail-icon);
+  font-style: normal;
+  vertical-align: baseline;
+
+  .item-counter {
+    display: none;
+    color: $email-item-counter-text-color;
+    background-color: $email-item-counter-bg;
+  }
+  &.has-icon-counter {
+    @include fa-icon($email-active-mail-icon);
+
+    .item-counter {
+      display: inline-block;
+    }
+  }
+}
+
 .sidebar-widget-recent-emails {
   .sidebar-widget__content {
     .header {
-      padding: 0 8px;
-      .my-emails {
-        margin-top: 8px;
-      }
-      .mark-as-read, .mark-visible-as-read {
-        i:before {
-          color: #fff;
-        }
-      }
+      padding: 2px 17px;
     }
     .items {
-      margin: 8px 0;
       overflow: hidden;
       overflow-y: auto;
     }
@@ -27,6 +39,7 @@
   }
   .sidebar.minimized &.sidebar-widget.poppedup {
     .sidebar-widget__popup {
+      background: $email-dropdown-bg;
       width: 360px;
       padding-bottom: 0;
       .content {

@@ -1,7 +1,7 @@
 @import 'sidebar-variables';
 @import "oroui/css/scss/mixins";
 
-@keyframes spin {
+@include keyframe(spin) {
   from {
     transform: rotate(0deg);
   }
@@ -140,7 +140,7 @@
 
 // sidebar-widget
 .sidebar-widget {
-  border-bottom: 1px solid #fff;
+  border-bottom: 1px solid $primary-inverse;
   &__popup,
   &__content {
     display: none;
@@ -227,6 +227,7 @@
   }
 
   &__icon {
+    color: $sidebar-widget-title-color;
     font-size: 16px;
     line-height: 16px;
     width: 100%;
@@ -249,8 +250,9 @@
   }
 
   &__header-icon {
+    color: $sidebar-widget-title-color;
     background-color: inherit;
-    padding-right: 3px;
+    padding-right: 4px;
   }
 
   &__header-toggle {
@@ -311,13 +313,6 @@
   &.highlight:before {
     color: #fabb18;
   }
-  .item-counter {
-    position: absolute;
-    background-color: inherit;
-    top: -3px;
-    left: 3px;
-    padding: 0 2px;
-  }
   .loading-icon {
     display: none;
   }
@@ -326,17 +321,32 @@
       display: none;
     }
     .loading-icon {
+      @include fa-icon($fa-var-refresh);
       display: inline-block;
       position: absolute;
       top: -4px;
-      left: -5px;
-      font-size: 8px;
+      right: -9px;
       margin: 0;
-      padding: 1px 2px;
+      padding: 0;
+      border-radius: 8px;
       background-color: inherit;
-      border-radius: 50%;
-      @include fa-icon($fa-var-refresh);
+      font-size: 11px;
+      line-height: 15px;
+      height: 15px;
+      width: 15px;
+      text-align: center;
       animation: spin 1000ms infinite linear;
+    }
+  }
+  .sidebar.minimized & {
+    .loading-icon {
+      top: -7px;
+      right: 0;
+    }
+    .item-counter {
+      top: -11px;
+      margin-left: -20px;
+      margin-right: 0;
     }
   }
 }
