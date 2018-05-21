@@ -223,7 +223,7 @@
     input[type="email"],
     input[type="password"],
     select {
-        width: 310px;
+        width: calc(100% - 24px);
     }
 }
 

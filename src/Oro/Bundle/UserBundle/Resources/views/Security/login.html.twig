@@ -26,19 +26,17 @@
         <div class="form-wrapper__inner">
             <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
                 <div class="form-description">
-                    <div class="form-description__logo">
-                        <img src="{{ asset('bundles/oroui/img/orocommerce_logo.svg') }}" alt="{{ 'oro.auth.description.commerce.logo'|trans }}" class="form-description__logo-img form-description__logo-img--commerce">
-                    </div>
-                    <div class="form-description__main">{{ 'oro.auth.description.commerce.main'|trans }}</div>
-                    <div class="form-description__text">{{ 'oro.auth.description.commerce.text'|trans }}</div>
+                    {% if oro_theme_logo() %}
+                        <div class="form-description__logo">
+                            <img src="{{ asset(oro_theme_logo()) }}"
+                                 alt="{{ 'oro.auth.description.logo'|trans }}"
+                                 class="form-description__logo-img">
+                        </div>
+                    {% endif %}
+                    <div class="form-description__main">{{ 'oro.auth.description.main'|trans }}</div>
+                    <div class="form-description__text">{{ 'oro.auth.description.text'|trans }}</div>
                 </div>
                 <div class="title-box">
-                    {% if oro_theme_logo() %}
-                    <h1 class="title logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
-                        <img src="{{ asset(oro_theme_logo()) }}">
-                    </h1>
-                    <span class="divider-vertical"></span>
-                    {% endif %}
                     <h2 class="title">{{ 'Login'|trans }}</h2>
                 </div>
                 <fieldset>
