@@ -1,50 +1,23 @@
-.app-header {
-    .logo {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-        padding: 0;
+.navbar.app-header {
+  color: $app-header-text-color;
+  background-color: $app-header-bg-color;
 
-        &:before {
-            display: none;
-        }
+  .logo {
+    color: $app-header-logo-text-color;
+  }
 
-        &:after {
-            display: none;
-        }
+  .nav.top-search {
+    a.dropdown-toggle {
+      &:hover,
+      &:active {
+        color: $app-header-text-hover-color;
+      }
     }
+  }
 
-    .nav.user-menu {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-        border-left-color: $baseGradientColorBorder;
-
-        a.help:before {
-            background-color: $baseGradientColorBorder;
-        }
-
-        a.help:hover,
-        .dropdown > .dropdown-toggle:hover,
-        .dropdown > .oro-dropdown-toggle:hover {
-            background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
-        }
+  .user-menu-dropdown {
+    &:before {
+      border-left: 1px solid $app-header-divider-color;
     }
-
-    .nav.top-search {
-        background: linear-gradient($baseGradientColorStart, $baseGradientColorEnd);
-        padding: 0 10px 0 5px;
-
-        .dropdown {
-            > .dropdown-toggle {
-                &:hover > [class^="fa-"] {
-                    background: linear-gradient(lighten($baseGradientColorStart, 3%), lighten($baseGradientColorEnd, 3%));
-                }
-            }
-        }
-    }
-
-    .navbar-inner {
-        .nav {
-            > li > a {
-                color: $headerTextColor;
-            }
-        }
-    }
+  }
 }

@@ -1,5 +1,8 @@
 .desktop-version {
+  @import "../../../../css/scss/desktop/variables";
+
   @import "header";
   @import "pin-bar";
-  @import "main-menu";
+  @import "main-menu/main";
+  @import "sidebar";
 }

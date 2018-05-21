@@ -1,28 +1,53 @@
 .list-bar-wrapper {
-  background-color: $logoBackgroundColor;
-}
-.list-bar{
-  li {
-    color: $headerTextColor;
-    .pin-holder {
-      border-right-color: $baseGradientColorBorder;
-      a {
-        color: $headerTextColor;
-        &.fa-close {
-          &:before {
-            color:$headerTextColor;
-          }
-        }
-      }
-      &:hover {
-        a {
-          color: lighten($headerTextColor, 10%);
-        }
+  .pin-holder {
+    &.outdated a {
+      color: $pin-item-outdated-color;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: $pin-item-outdated-hover-color;
       }
     }
+  }
+
+  .btn-close {
+    &:before {
+      color: $pin-item-close-color;
+    }
+
+    &:hover:before {
+      color: $pin-item-close-hover-color;
+    }
+  }
+}
+
+.show-more {
+  &:before {
+    background-image: linear-gradient(to left, $app-header-bg-color, transparent);
+  }
+
+  a.dropdown-toggle {
+    background-color: $app-header-bg-color;
+    color: $pin-item-close-color;
+
+    &:hover {
+      color: $pin-item-close-hover-color;
+    }
+  }
+}
+
+.list-bar {
+  .pin-holder {
     &.active {
-      .pin-holder {
-        background-color: darken($logoBackgroundColor, 5%);
+      background-color: $pin-item-active-bg-color;
+    }
+
+    a {
+      &:hover,
+      &:active,
+      &:focus {
+        color: $app-header-text-hover-color;
       }
     }
   }

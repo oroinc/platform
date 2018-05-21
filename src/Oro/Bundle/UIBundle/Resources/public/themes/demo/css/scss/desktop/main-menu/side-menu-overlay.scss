@@ -1,0 +1,37 @@
+.side-menu-overlay {
+    &__button {
+        color: $menu-full-screen-button-color;
+
+        &:hover,
+        &:focus {
+            color: $menu-minimized-item-first-level-text-color-active;
+        }
+    }
+
+    &__fill::after {
+        background-color: $menu-dropdown-background-color;
+    }
+
+    &__fill-blur::after {
+        background-color: $menu-dropdown-background-color;
+    }
+
+    &__fill-blur-inner::after {
+        background-color: rgba($primary-inverse, .5);
+    }
+
+    .title {
+        color: $menu-full-screen-title-color;
+
+        &:hover,
+        &:focus {
+            background-color: $menu-background-color-active;
+        }
+    }
+
+    .active {
+        .title {
+            background-color: $menu-background-color-active;
+        }
+    }
+}

@@ -1,3 +1,6 @@
 .mobile-version {
+  @import "../../../../css/scss/mobile/variables";
+
+  @import "main-menu";
   @import "header";
 }
