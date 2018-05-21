@@ -30,7 +30,7 @@ class RoutingAwareMenuFactoryExtensionTest extends WebTestCase
         $router->getContext()->setBaseUrl('index.php');
         $this->assertStringStartsWith(
             self::INDEX_PHP_FILE,
-            $router->generate('oro_test_item_index', [], RouterInterface::ABSOLUTE_PATH)
+            ltrim($router->generate('oro_test_item_index', [], RouterInterface::ABSOLUTE_PATH), '/')
         );
 
         $options = $this->extension->buildOptions(['route' => 'oro_test_item_index']);
