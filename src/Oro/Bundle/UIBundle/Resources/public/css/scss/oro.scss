@@ -1686,10 +1686,6 @@ a {
         line-height: 24px;
     }
 
-    .btn {
-        padding: 0 11px;
-    }
-
     .icons-holder a {
         height: 24px;
         line-height: 24px;
@@ -2648,15 +2644,6 @@ textarea {
     > input[type='checkbox']:only-child {
         margin-top: 10px;
     }
-}
-
-.btn-group > .btn-small {
-    font-size: $base-font-size--s;
-}
-
-.btn-group > a.btn {
-    height: 28px;
-    line-height: 26px;
 }
 
 .oro-action .btn-group > .btn,
@@ -3765,13 +3752,10 @@ span.validation-failed {
 
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {
-    .btn,
-    .btn-group a,
     #main label,
     .oro-subtitle,
     .title,
     .ui-dialog-title,
-    .btn-group .dropdown-menu button,
     .breadcrumb li {
         text-transform: capitalize;
     }
