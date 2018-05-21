@@ -9,6 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for a collection of objects.
+ * Usually this form type is used if an association should be represented as a field in Data API.
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isAssociationAsField
+ */
 class ScalarCollectionType extends AbstractType
 {
     /**
@@ -42,21 +47,5 @@ class ScalarCollectionType extends AbstractType
             'entry_data_class',
             'entry_data_property'
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_scalar_collection';
     }
 }

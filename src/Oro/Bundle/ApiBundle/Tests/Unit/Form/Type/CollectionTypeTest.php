@@ -57,14 +57,14 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('addGroup')
             ->with($group2);
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => [['name' => 'group1'], ['name' => 'group2']]]);
-        $this->assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testShouldUseRemover()
@@ -99,11 +99,11 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('removeGroup')
-            ->with($this->identicalTo($group2));
+            ->with(self::identicalTo($group2));
 
         $form->submit(['groups' => [['name' => 'group1']]]);
         self::assertTrue($form->isSynchronized());
@@ -137,9 +137,9 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => [['name' => 'group2']]]);
@@ -176,11 +176,11 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->once())
+        $entity->expects(self::once())
             ->method('removeGroup')
-            ->with($this->identicalTo($group1));
+            ->with(self::identicalTo($group1));
 
         $form->submit(['groups' => []]);
         self::assertTrue($form->isSynchronized());
@@ -214,9 +214,9 @@ class CollectionTypeTest extends TypeTestCase
         );
         $form = $formBuilder->getForm();
 
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('addGroup');
-        $entity->expects($this->never())
+        $entity->expects(self::never())
             ->method('removeGroup');
 
         $form->submit(['groups' => ['']]);
