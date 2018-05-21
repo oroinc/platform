@@ -164,10 +164,21 @@ define(function(require) {
         convertToFlatStructure: function($menu) {
             var self = this;
             var collection = [];
-            var createFlatStructure = function($menu) {
-                $menu.children().each(function(index, menuItem) {
+
+            var createFlatStructure = function($menu, parentIndex, parentGroupIndex) {
+                var $items = $menu.children();
+
+                $items.each(function(index, menuItem) {
                     var $menuItem = $(menuItem).clone(true, true);
                     var $nestedMenuItem = null;
+                    var uniqueIndex = null;
+                    var uniqueGroupIndex = null;
+
+                    if (!parentIndex) {
+                        uniqueIndex = 'id:' + index;
+                    } else {
+                        uniqueIndex = parentIndex + '-' + index;
+                    }
 
                     if ($menuItem.hasClass('dropdown')) {
                         $nestedMenuItem = $menuItem.clone(true, true);
@@ -177,18 +188,30 @@ define(function(require) {
                     }
 
                     if (!$menuItem.hasClass('divider')) {
-                        collection.push(
-                            $menuItem.addClass(self.options.innerMenItemClassName)[0]
-                        );
+                        if (parentIndex) {
+                            uniqueGroupIndex = (parentGroupIndex ? parentGroupIndex : parentIndex) + ';' + uniqueIndex;
+                            $menuItem.attr('data-related-groups', uniqueGroupIndex);
+                        }
+
+                        $menuItem
+                            .attr('data-index', uniqueIndex)
+                            .attr('data-original-text', $menuItem.text())
+                            .addClass(self.options.innerMenItemClassName);
+
+                        collection.push($menuItem[0]);
                     }
 
                     if ($nestedMenuItem) {
-                        createFlatStructure($nestedMenuItem.find(self.options.innerMenuSelector));
+                        createFlatStructure(
+                            $nestedMenuItem.find(self.options.innerMenuSelector),
+                            uniqueIndex,
+                            uniqueGroupIndex
+                        );
                     }
                 }, this);
             };
 
-            createFlatStructure($menu);
+            createFlatStructure($menu, null, null);
 
             return $('<ul>', {'class': $menu.attr('class')}).append(collection);
         }

@@ -40,6 +40,38 @@ $side-menu-overlay-header-height: 100px;
         padding: 24px 0 14px 14px;
     }
 
+    &__search {
+        position: relative;
+    }
+
+    &__search-icon {
+        position: absolute;
+        right: 0;
+        top: 1px;
+        padding: 4px;
+
+        background-color: transparent;
+        border-width: 0;
+        color: $menu-item-text-color;
+
+        transition: $menu-animation;
+
+        &--interactive {
+            &:hover,
+            &:focus {
+                color: $menu-full-screen-button-color;
+            }
+        }
+    }
+
+    &__field {
+        width: 100%;
+        height: 30px;
+        padding-right: 24px;
+
+        box-sizing: border-box;
+    }
+
     &__title {
         font-size: 21px;
     }
@@ -67,7 +99,6 @@ $side-menu-overlay-header-height: 100px;
         &:hover,
         &:focus {
             color: $menu-minimized-item-first-level-text-color-active;
-            outline: none;
         }
     }
 
@@ -140,8 +171,9 @@ $side-menu-overlay-header-height: 100px;
         position: relative;
 
         display: block;
-
         padding: 14px;
+
+        text-transform: none;
 
         color: $menu-full-screen-title-color;
 
@@ -202,5 +234,10 @@ $side-menu-overlay-header-height: 100px;
                 background-color: transparent;
             }
         }
+    }
+
+    .highlight {
+        text-decoration: underline;
+        background-color: $menu-item-text-highlight-color;
     }
 }

@@ -1,9 +1,25 @@
 <div class="side-menu-overlay__header">
     <p class="side-menu-overlay__title" data-role="overlay-title"></p>
+    <div class="side-menu-overlay__search">
+        <input class="side-menu-overlay__field"
+               type="text"
+               placeholder="<%= _.__('oro.datagrid.column_manager.filter.search_placeholder') %>"
+               data-role="search"
+        >
+        <span class="side-menu-overlay__search-icon"
+            data-role="search-icon">
+            <span class="fa-search"></span>
+        </span>
+        <button class="side-menu-overlay__search-icon side-menu-overlay__search-icon--interactive hide"
+                data-role="clear-search">
+            <span class="fa-times"></span>
+        </button>
+    </div>
+
+    <p class="hide" data-role="no-result"><%= _.__('oro.ui.jstree.search.search_no_found') %></p>
 </div>
 
-<div class="side-menu-overlay__content"
-     data-role="overlay-content"></div>
+<div class="side-menu-overlay__content" data-role="overlay-content"></div>
 
 <div class="side-menu-overlay__ui-helper" data-role="overlay-design-helper">
     <div class="side-menu-overlay__fill">
