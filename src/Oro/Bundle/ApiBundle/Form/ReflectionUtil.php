@@ -91,7 +91,10 @@ class ReflectionUtil
     public static function markFormChildrenAsSubmitted(FormInterface $form): void
     {
         foreach ($form as $child) {
-            if ($child instanceof Form && !$child->isSubmitted()) {
+            if (!$child instanceof Form) {
+                continue;
+            }
+            if (!$child->isSubmitted()) {
                 $markClosure = \Closure::bind(
                     function ($form) {
                         $form->submitted = true;
@@ -100,9 +103,9 @@ class ReflectionUtil
                     $child
                 );
                 $markClosure($child);
-                if ($child->count() > 0) {
-                    self::markFormChildrenAsSubmitted($child);
-                }
+            }
+            if ($child->count() > 0) {
+                self::markFormChildrenAsSubmitted($child);
             }
         }
     }

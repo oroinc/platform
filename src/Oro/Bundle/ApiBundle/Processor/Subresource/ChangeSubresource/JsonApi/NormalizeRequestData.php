@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi;
 
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AbstractNormalizeRequestData;
@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 /**
  * Prepares JSON.API request data for a sub-resource to be processed by Symfony Forms.
  */
-class NormalizeSubresourceRequestData extends AbstractNormalizeRequestData
+class NormalizeRequestData extends AbstractNormalizeRequestData
 {
     /**
      * {@inheritdoc}
@@ -33,13 +33,18 @@ class NormalizeSubresourceRequestData extends AbstractNormalizeRequestData
                 $metadata = $context->getMetadata();
                 $this->context = $context;
                 try {
+                    $pointer = $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA);
                     if ($context->isCollection()) {
                         $normalizedData = [];
                         foreach ($data as $key => $value) {
-                            $normalizedData[$key] = $this->normalizeData($data, $metadata);
+                            $normalizedData[$key] = $this->normalizeData(
+                                $this->buildPointer($pointer, (string)$key),
+                                $value,
+                                $metadata
+                            );
                         }
                     } else {
-                        $normalizedData = $this->normalizeData($data, $metadata);
+                        $normalizedData = $this->normalizeData($pointer, $data, $metadata);
                     }
                     $context->setRequestData($normalizedData);
                 } finally {

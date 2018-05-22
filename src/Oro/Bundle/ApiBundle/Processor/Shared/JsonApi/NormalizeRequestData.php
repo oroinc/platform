@@ -25,7 +25,11 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
                 $this->context = $context;
                 try {
                     $context->setRequestData(
-                        $this->normalizeData($requestData[JsonApiDoc::DATA], $context->getMetadata())
+                        $this->normalizeData(
+                            $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA),
+                            $requestData[JsonApiDoc::DATA],
+                            $context->getMetadata()
+                        )
                     );
                 } finally {
                     $this->context = null;

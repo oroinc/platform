@@ -15,3 +15,8 @@
 "The '{{ value }}' word is reserved for system purposes.": "The '{{ value }}' word is reserved for system purposes."
 "The field name must be '{{ field }}'.": "The field name must be '{{ field }}'."
 "The field can't be set to 'Yes' when target entity isn't extended": "The field can't be set to 'Yes' when target entity isn't extended."
+
+oro:
+    entity_extend:
+        enum:
+            options_error.message: Invalid enum options provided

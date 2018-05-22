@@ -10,7 +10,7 @@ define(function(require) {
     var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var Grid = require('orodatagrid/js/datagrid/grid');
+    var GridView = require('orodatagrid/js/datagrid/grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
@@ -250,7 +250,7 @@ define(function(require) {
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
 
-            Grid = modules.GridView || Grid;
+            var Grid = modules.GridView || GridView;
             PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};

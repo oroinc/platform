@@ -8,29 +8,30 @@ use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
 
 class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CsvFileWriter
-     */
+    /** @var CsvFileWriter */
     protected $writer;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $filePath;
 
-    /**
-     * @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var string */
+    private $tmpDir;
+
+    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextRegistry;
 
     protected function setUp()
     {
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getByStepExecution'))
+            ->setMethods(['getByStepExecution'])
             ->getMock();
 
-        $this->filePath = __DIR__ . '/fixtures/new_file.csv';
+        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'CsvFileWriterTest';
+
+        @\mkdir($this->tmpDir);
+        $this->filePath = $this->tmpDir . DIRECTORY_SEPARATOR . 'new_file.csv';
+
         $this->writer = new CsvFileWriter($this->contextRegistry);
     }
 
@@ -40,6 +41,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         if (is_file($this->filePath)) {
             unlink($this->filePath);
         }
+        @\rmdir($this->tmpDir);
     }
 
     /**
@@ -48,7 +50,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetStepExecutionNoFileException()
     {
-        $this->writer->setStepExecution($this->getMockStepExecution(array()));
+        $this->writer->setStepExecution($this->getMockStepExecution([]));
     }
 
     /**
@@ -58,40 +60,41 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     {
         $this->writer->setStepExecution(
             $this->getMockStepExecution(
-                array(
-                    'filePath' =>  __DIR__ . '/unknown/new_file.csv'
-                )
+                [
+                    'filePath' => $this->tmpDir . '/unknown/new_file.csv'
+                ]
             )
         );
     }
 
     public function testSetStepExecution()
     {
-        $options = array(
-            'filePath' => $this->filePath,
-            'delimiter' => ',',
-            'enclosure' => "'''",
+        $options = [
+            'filePath'          => $this->filePath,
+            'delimiter'         => ',',
+            'enclosure'         => "'''",
             'firstLineIsHeader' => false,
-            'header' => array('one', 'two')
-        );
+            'header'            => ['one', 'two']
+        ];
 
-        $this->assertAttributeEquals(',', 'delimiter', $this->writer);
-        $this->assertAttributeEquals('"', 'enclosure', $this->writer);
-        $this->assertAttributeEquals(true, 'firstLineIsHeader', $this->writer);
-        $this->assertAttributeEmpty('header', $this->writer);
+        self::assertAttributeEquals(',', 'delimiter', $this->writer);
+        self::assertAttributeEquals('"', 'enclosure', $this->writer);
+        self::assertAttributeEquals(true, 'firstLineIsHeader', $this->writer);
+        self::assertAttributeEmpty('header', $this->writer);
 
         $this->writer->setStepExecution($this->getMockStepExecution($options));
 
-        $this->assertAttributeEquals($options['delimiter'], 'delimiter', $this->writer);
-        $this->assertAttributeEquals($options['enclosure'], 'enclosure', $this->writer);
-        $this->assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->writer);
-        $this->assertAttributeEquals($options['header'], 'header', $this->writer);
+        self::assertAttributeEquals($options['delimiter'], 'delimiter', $this->writer);
+        self::assertAttributeEquals($options['enclosure'], 'enclosure', $this->writer);
+        self::assertAttributeEquals($options['firstLineIsHeader'], 'firstLineIsHeader', $this->writer);
+        self::assertAttributeEquals($options['header'], 'header', $this->writer);
     }
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $data
+     *
+     * @param array  $options
+     * @param array  $data
      * @param string $expected
      */
     public function testWrite($options, $data, $expected)
@@ -99,68 +102,69 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $stepExecution = $this->getMockStepExecution($options);
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write($data);
-        $this->assertFileExists($expected);
+        self::assertFileExists($expected);
         $expectedContent = file_get_contents($expected);
         $actualContent = file_get_contents($options['filePath']);
 
         $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
         $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
 
-        $this->assertEquals($expectedContent, $actualContent);
+        self::assertEquals($expectedContent, $actualContent);
     }
 
     public function optionsDataProvider()
     {
-        $filePath = __DIR__ . '/fixtures/new_file.csv';
-        return array(
-            'first_item_header' => array(
-                array('filePath' => $filePath),
-                array(
-                    array(
-                        'field_one' => '1',
-                        'field_two' => '2',
+        $filePath = sys_get_temp_dir() . '/CsvFileWriterTest/new_file.csv';
+
+        return [
+            'first_item_header' => [
+                ['filePath' => $filePath],
+                [
+                    [
+                        'field_one'   => '1',
+                        'field_two'   => '2',
                         'field_three' => '3',
-                    ),
-                    array(
-                        'field_one' => 'test1',
-                        'field_two' => 'test2',
+                    ],
+                    [
+                        'field_one'   => 'test1',
+                        'field_two'   => 'test2',
                         'field_three' => 'test3',
-                    )
-                ),
+                    ]
+                ],
                 __DIR__ . '/fixtures/first_item_header.csv'
-            ),
-            'defined_header' => array(
-                array(
+            ],
+            'defined_header'    => [
+                [
                     'filePath' => $filePath,
-                    'header' => array('h1', 'h2', 'h3')
-                ),
-                array(
-                    array(
+                    'header'   => ['h1', 'h2', 'h3']
+                ],
+                [
+                    [
                         'h1' => 'field_one',
                         'h2' => 'field_two',
                         'h3' => 'field_three'
-                    )
-                ),
+                    ]
+                ],
                 __DIR__ . '/fixtures/defined_header.csv'
-            ),
-            'no_header' => array(
-                array(
-                    'filePath' => $filePath,
+            ],
+            'no_header'         => [
+                [
+                    'filePath'          => $filePath,
                     'firstLineIsHeader' => false
-                ),
-                array(
-                    array('1', '2', '3'),
-                    array('test1', 'test2', 'test3')
-                ),
+                ],
+                [
+                    ['1', '2', '3'],
+                    ['test1', 'test2', 'test3']
+                ],
                 __DIR__ . '/fixtures/no_header.csv'
-            )
-        );
+            ]
+        ];
     }
 
     public function testWriteBackslashWhenBackslashes()
     {
         $options = [
-            'filePath' => __DIR__ . '/fixtures/new_file.csv',
+            'filePath'          => $this->tmpDir . '/new_file.csv',
             'firstLineIsHeader' => false
         ];
         $stepExecution = $this->getMockStepExecution($options);
@@ -169,20 +173,21 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $expected = __DIR__ . '/fixtures/backslashes.csv';
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write($data);
-        $this->assertFileExists($expected);
+        self::assertFileExists($expected);
         $expectedContent = file_get_contents($expected);
         $actualContent = file_get_contents($options['filePath']);
 
         $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
         $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
 
-        $this->assertEquals($expectedContent, $actualContent);
+        self::assertEquals($expectedContent, $actualContent);
     }
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $data
+     *
+     * @param array  $options
+     * @param array  $data
      * @param string $expected
      */
     public function testWriteWithClearWriter($options, $data, $expected)
@@ -197,7 +202,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
             ->with($data);
         $this->writer->setClearWriter($clearWriter);
         $this->writer->write($data);
-        $this->assertFileExists($expected);
+        self::assertFileExists($expected);
 
         $expectedContent = file_get_contents($expected);
         $actualContent = file_get_contents($options['filePath']);
@@ -205,11 +210,12 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
         $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
 
-        $this->assertEquals($expectedContent, $actualContent);
+        self::assertEquals($expectedContent, $actualContent);
     }
 
     /**
      * @param array $jobInstanceRawConfiguration
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
@@ -220,7 +226,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext')
             ->disableOriginalConstructor()
-            ->setMethods(array('getConfiguration'))
+            ->setMethods(['getConfiguration'])
             ->getMock();
         $context->expects($this->any())
             ->method('getConfiguration')

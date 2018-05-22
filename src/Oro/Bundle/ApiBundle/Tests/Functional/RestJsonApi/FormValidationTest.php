@@ -54,7 +54,7 @@ class FormValidationTest extends RestJsonApiTestCase
         // Make sure Entity can be created without setting Owner or Organization
         // Owner and or Organization will be set from context for configurable entities
         if ($this->configProvider->hasConfig($entityClass)) {
-            $content = json_decode($response->getContent(), true);
+            $content = self::jsonToArray($response->getContent());
             if (isset($content['errors'])) {
                 /** @var OwnershipMetadataInterface $classMetadata */
                 $classMetadata = $this->metadataProvider->getMetadata($entityClass);

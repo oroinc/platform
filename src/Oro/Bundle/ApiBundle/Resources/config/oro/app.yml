@@ -138,7 +138,6 @@ oro_api:
 
     form_type_extensions:
         - form.type_extension.form.http_foundation
-        - form.type_extension.form.validator
         - form.type_extension.repeated.validator
         - form.type_extension.form.data_collector
         - oro_security.form.extension.aclprotected_fields_type
