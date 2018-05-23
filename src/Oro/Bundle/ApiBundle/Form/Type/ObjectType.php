@@ -9,6 +9,10 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for an object that properties are built based of Data API metadata
+ * and contain all properties classified as fields and associations.
+ */
 class ObjectType extends AbstractType
 {
     /** @var FormHelper */
@@ -44,21 +48,5 @@ class ObjectType extends AbstractType
             ->setRequired(['metadata', 'config'])
             ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\EntityMetadata'])
             ->setAllowedTypes('config', ['Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_object';
     }
 }

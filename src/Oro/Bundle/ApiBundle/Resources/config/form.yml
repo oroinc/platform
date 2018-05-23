@@ -18,6 +18,13 @@ services:
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
 
+    oro_api.form.extension.validation:
+        class: Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+        arguments:
+            - '@validator'
+        tags:
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
     oro_api.form.extension.empty_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
         arguments:
@@ -43,6 +50,12 @@ services:
         arguments:
             - '@form.factory'
             - '@service_container'
+
+    oro_api.form_validation_handler:
+        class: Oro\Bundle\ApiBundle\Form\FormValidationHandler
+        public: false
+        arguments:
+            - '@validator'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser

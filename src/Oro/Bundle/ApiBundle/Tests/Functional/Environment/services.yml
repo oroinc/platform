@@ -109,3 +109,13 @@ services:
             - { name: oro.api.processor, action: delete_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
             - { name: oro.api.processor, action: update_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
+
+    oro_api.tests.add_order_line_items_to_order:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddOrderLineItemsToOrder
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder, priority: -55 }
+
+    oro_api.tests.add_order_line_item_to_order:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddOrderLineItemToOrder
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem, priority: -55 }
