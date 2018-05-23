@@ -34,7 +34,8 @@ define(function(require) {
          * @inheritDoc
          */
         listen: {
-            'page:beforeChange mediator': 'onBeforeChange'
+            'page:beforeChange mediator': 'onBeforeChange',
+            'leave-focus': 'setFocus'
         },
 
         isOpen: false,
@@ -63,8 +64,12 @@ define(function(require) {
          */
         delegateEvents: function(events) {
             SideMenuOverlayView.__super__.delegateEvents.call(this, events);
-            $(document).on('keyup.side-menu-overlay-close' + this.eventNamespace(), function(event) {
-                if (event.keyCode === ESCAPE_KEY_CODE) {
+            $(document).on('keyup' + this.eventNamespace(), function(event) {
+                if (!this.isOpen) {
+                    return;
+                }
+
+                if (event.keyCode === ESCAPE_KEY_CODE && $(event.target).data('role') !== 'search') {
                     this.close();
                 }
             }.bind(this));
@@ -100,6 +105,12 @@ define(function(require) {
             return this;
         },
 
+        setFocus: function() {
+            if (this.isOpen) {
+                this.$('[data-role="search"]').focus();
+            }
+        },
+
         /**
          * @param title
          */
@@ -116,7 +127,7 @@ define(function(require) {
             this.isOpen = true;
             this.$el.addClass('open');
             this.clearSearch();
-            this.$('[data-role="search"]').trigger('focus');
+            this.setFocus();
         },
 
         /**
@@ -142,16 +153,23 @@ define(function(require) {
          * @param event
          */
         onSearch: function(event) {
+            if (this.disposed) {
+                return;
+            }
+
             var value = $(event.target).val();
 
-            event.stopPropagation();
+            if (event.keyCode === ESCAPE_KEY_CODE) {
+                if (value.length !== 0) {
+                    this.clearSearch();
+                    event.stopPropagation();
+                } else {
+                    this.close();
+                }
+            }
 
             this.toggleClearButton(value.length);
             this.search(value);
-
-            if (event.keyCode === ESCAPE_KEY_CODE) {
-                value ? this.clearSearch() : this.close();
-            }
         },
 
         clearSearch: function() {
@@ -175,11 +193,11 @@ define(function(require) {
                 var $this = $(this);
                 var $title = $this.find('.title');
 
-                $title.html(
-                    $this.data('original-text').replace(regex, highlight)
-                );
-
                 if (testValue($this.text().trim())) {
+                    $title.html(
+                        $this.data('original-text').replace(regex, highlight)
+                    );
+
                     $this.show();
 
                     var groups = $this.data('related-groups');
@@ -199,9 +217,14 @@ define(function(require) {
         /**
          * @param {Boolean} hasValue
          */
-        toggleClearButton: function(hasValue ) {
-            this.$('[data-role="clear-search"]').toggleClass('hide', !hasValue);
-            this.$('[data-role="search-icon"]').toggleClass('hide', hasValue);
+        toggleClearButton: function(hasValue) {
+            if (hasValue) {
+                this.$('[data-role="clear-search"]').removeClass('hide');
+                this.$('[data-role="search-icon"]').addClass('hide');
+            } else {
+                this.$('[data-role="clear-search"]').addClass('hide');
+                this.$('[data-role="search-icon"]').removeClass('hide');
+            }
         },
 
         /**
@@ -221,7 +244,6 @@ define(function(require) {
             }
 
             delete this.isOpen;
-            $(document).off('.side-menu-overlay-close');
 
             SideMenuOverlayView.__super__.dispose.call(this);
         }

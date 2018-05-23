@@ -24,6 +24,8 @@ define(function(require) {
 
         dropdownIndex: null,
 
+        timeout: 50,
+
         /**
          * Do initial changes
          */
@@ -37,7 +39,8 @@ define(function(require) {
         _create: function() {
             this._super();
 
-            this.listener.listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, 50).bind(this));
+            this.listener
+                .listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, this.timeout).bind(this));
 
             this.$mainiMenu = this.element.find(this.options.menuSelector);
             this.$triggers = this.element.find(this.options.dropdownSelector);
@@ -47,6 +50,12 @@ define(function(require) {
             this.overlay = new SideMenuOverlay();
             this.overlay.render();
             this.$mainiMenu.append(this.overlay.$el);
+
+            $(document).on('focusout.side-menu-focusout', _.debounce(function() {
+                if (!$.contains(this.$mainiMenu[0], document.activeElement)) {
+                    this.overlay.trigger('leave-focus');
+                }
+            }.bind(this), this.timeout));
         },
 
         /**
@@ -89,6 +98,8 @@ define(function(require) {
             this.overlay.dispose();
             delete this.overlay;
             delete this.dropdownIndex;
+
+            $(document).off('.side-menu-focusout');
         },
 
         /**
