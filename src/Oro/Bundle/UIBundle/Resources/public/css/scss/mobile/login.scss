@@ -1,107 +1,123 @@
 &.login-page {
-  height: 100%;
-  position: absolute;
-  #page {
     height: 100%;
-  }
-  #top-page {
-    padding-top: 0;
-    height: 100%;
-  }
+    position: absolute;
+    #page {
+        height: 100%;
+    }
+    #top-page {
+        padding-top: 0;
+        height: 100%;
+    }
 }
 
 .form-wrapper {
-  width: 100%;
-  padding: 0 0 30px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 0 30px;
 
-  &__title {
-    background: #5e5e60;
-    font-size: 17px;
-    font-weight: bold;
-    color: #fff;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 16px;
-    padding: 14px 16px;
-  }
+    &__title {
+        background: #5e5e60;
+        font-size: 17px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+    }
 
-  &__inner {
-    padding: 0 16px;
-  }
+    &__inner {
+        padding: 25px 15px;
+        max-width: 575px;
+        min-width: inherit;
+    }
 }
 
 .form-signin {
-  margin: 0 auto;
+    margin: 0 auto;
 
-  &__info {
-    margin: 16px 0;
-  }
-  &__footer {
-    padding-left: 0;
-  }
+    &__info {
+        margin: 16px 0;
+        .alert {
+            padding: 8px;
+        }
+    }
 
-  &__oauth {
-    padding-left: 0;
-  }
+    &__footer {
+        padding-left: 0;
+    }
 
-  &__roles-item {
-    display: block;
-    margin: 8px 0;
-  }
+    &__oauth {
+        padding-left: 0;
+    }
 
-  .title-box {
-    margin: 0 0 5px;
+    &__roles-item {
+        display: block;
+    }
 
-    .title {
-      font-size: 20px;
-      line-height: 1.5;
+    .title-box {
+        margin: 0 0 5px;
 
-      &--crm-demo {
+        .title {
+            font-size: 20px;
+            line-height: 1.5;
+
+            &--crm-demo {
+                text-align: ce;
+            }
+        }
+    }
+    .add-on {
+        height: auto;
+        line-height: normal;
         text-align: left;
-      }
-    }
-  }
-  .add-on {
-    height: auto;
-    line-height: normal;
-    text-align: left;
 
-    & + input[type="text"],
-    & + input[type="email"],
-    & + input[type="password"] {
-      width: calc(100% - 24px);
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: calc(100% - 24px);
+        }
+        & + select {
+            width: 174px;
+            height: 36px;
+            box-sizing: border-box;
+        }
     }
-    & + select {
-      width: 174px;
-      height: 36px;
-      box-sizing: border-box;
+    .oro-remember-me {
+        padding-left: 0;
     }
-  }
-  .oro-remember-me {
-    padding-left: 0;
-  }
-  span.validation-failed {
-    font-size: 13px;
-  }
-  .input-field-group {
-    margin-bottom: 15px;
-  }
-  .input-append,
-  .input-prepend {
-    white-space: normal;
-  }
+    span.validation-failed {
+        font-size: 13px;
+    }
+    .input-field-group {
+        margin-bottom: 15px;
+    }
+    .input-append,
+    .input-prepend {
+        white-space: normal;
+    }
 }
 
 .form-reset {
-  max-width: 320px !important;
-  .add-on {
-    width: 120px;
-    font-size: 12px;
+    max-width: 320px !important;
+    .add-on {
+        width: 120px;
+        font-size: 12px;
 
-    & + input[type="text"],
-    & + input[type="email"],
-    & + input[type="password"] {
-      width: 138px;
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: 138px;
+        }
     }
-  }
+}
+
+@media only screen and (min-width: 600px) {
+    .form-signin {
+        &__roles {
+            display: flex;
+            justify-content: space-around;
+        }
+    }
 }

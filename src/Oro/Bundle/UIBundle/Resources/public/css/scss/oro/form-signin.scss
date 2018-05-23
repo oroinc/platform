@@ -15,7 +15,6 @@
         #top-page {
             > .container {
                 width: auto;
-                max-width: 1366px;
             }
         }
     }
@@ -41,6 +40,7 @@
 
     &__inner {
         display: flex;
+        align-items: center;
         flex-grow: 1;
         margin: 0 auto;
         padding: 0 65px;
@@ -78,15 +78,21 @@
 
     &__roles-item {
         display: inline-block;
+        margin: 8px 0;
     }
 
     &__info {
         margin: 30px 0;
+
+        .alert {
+            padding: 8px 35px;
+        }
     }
 
     .title-box {
         color: #565656;
         margin: 0 0 27px;
+        text-align: left;
 
         .divider-vertical {
             float: left;
@@ -109,10 +115,6 @@
             font: bold 18px/1 $baseFontFamily;
             color: #565656;
             margin: 0;
-
-            &--crm-demo {
-                text-align: center;
-            }
         }
     }
     // Ends .title-box
