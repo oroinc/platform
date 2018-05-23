@@ -1,79 +1,13 @@
-#flash-messages,
 .flash-messages {
-  position: relative;
-  .alert {
-    margin: 3px 0 0;
-    background-color: $warning-background;
-    background-image: url('../../img/warning-ico.png');
-    background-position: 10px 48%;
-    background-repeat: no-repeat;
-    padding: 3px 35px 1px 37px;
-    border:1px solid rgba(241,216,103,.3);
-    text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    .close {
-      font-size: 18px;
-      color: $warning-close;
-      opacity: 1;
-    }
-    .separator {
-      margin-left: 10px;
-      margin-right: 10px;
-    }
-  }
-  .alert-process {
-    background-image: url('../../img/loader-16.gif');
-    background-position: 12px 45%;
-    .close {
-      display: none;
-    }
-  }
-  .alert-success {
-    background-color: $success-background;
-    background-image: url('../../img/sucsses-ico.png');
-    border:1px solid rgba(77,161,36,.3);
-    color: $success-text;
-    .close, .separator {
-      color: $success-close;
-    }
-  }
-  .alert-danger,
-  .alert-error {
-    background-image: url('../../img/error-ico.png');
-    background-color: $error-background;
-    border:1px solid rgba(203,17,17,.3);
-    color: $error-text;
-    .close, .separator {
-      color: $error-close;
-    }
-  }
-  .alert-warning {
-    background-image: none;
-    padding-left: 20px;
-    .separator {
-      color: $warning-close;
-    }
-  }
-  .alert-info {
-    background-color: $info-background;
-    border-color: $info-border;
-    color: $info-text;
-    background-image: none;
-    padding-left: 20px;
-    .close, .separator {
-      color: $info-close;
-    }
-  }
-  .alert-empty {
-    display: none;
-  }
+    position: relative;
 }
-.flash-messages-frame {
-  position: absolute;
-  left: 25%;
-  z-index: 900;
-  width: 50%;
 
-  box-sizing: border-box;
-  padding: 0 10px;
-  opacity: 0.9;
+.flash-messages-frame {
+    position: absolute;
+    left: 25%;
+    z-index: 900;
+    width: 50%;
+    box-sizing: border-box;
+    padding: 0 10px;
+    opacity: .9;
 }
