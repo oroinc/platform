@@ -10,8 +10,13 @@ $dialog-position: absolute !default;
 $dialog-display: flex !default;
 $dialog-flex-direction: column !default;
 
+$dialog-resizable-width: auto !important !default;
+
 $dialog-buttonpane-background: none !default;
 $dialog-buttonpane-flex-shrink: 0 !default;
+
+$dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
+$dialog-buttonpane-action-wrapper-offset-left: 8px !default;
 
 $dialog-titlebar-inner-offset: 16px 45px 14px 15px !default;
 $dialog-titlebar-outer-offset: -1px -1px 0 -1px !default;

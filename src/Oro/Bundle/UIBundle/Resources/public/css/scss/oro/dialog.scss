@@ -72,9 +72,13 @@
         cursor: $dialog-titlebar-min-cursor;
     }
 
-    &.ui-resizable:not(.ui-dialog-buttons) {
-        .ui-dialog-content {
-            height: $dialog-content-not-button-height;
+    &.ui-resizable {
+        width: $dialog-resizable-width;
+
+        &:not(.ui-dialog-buttons) {
+            .ui-dialog-content {
+                height: $dialog-content-not-button-height;
+            }
         }
     }
 
@@ -228,6 +232,14 @@
         background: $dialog-buttonpane-background;
         border-radius: 0 0 $dialog-border-radius $dialog-border-radius;
         flex-shrink: $dialog-buttonpane-flex-shrink;
+
+        .widget-actions-section {
+            margin-left: $dialog-buttonpane-widget-actions-section-offset-left;
+        }
+
+        .action-wrapper {
+            margin-left: $dialog-buttonpane-action-wrapper-offset-left;
+        }
     }
 }
 
