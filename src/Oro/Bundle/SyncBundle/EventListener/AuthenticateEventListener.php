@@ -51,9 +51,15 @@ class AuthenticateEventListener implements LoggerAwareInterface
         if ($ticket) {
             $conn->Authenticated = $this->ticketProvider->isTicketValid($ticket);
 
-            $this->logger->debug('Sync ticket was found in the request', \func_get_args());
+            $this->logger->debug(
+                'Sync ticket was found in the request',
+                ['remoteAddress' => $conn->remoteAddress, 'connectionId' => $conn->resourceId]
+            );
         } else {
-            $this->logger->warning('Sync ticket was not found in the request', \func_get_args());
+            $this->logger->warning(
+                'Sync ticket was not found in the request',
+                ['remoteAddress' => $conn->remoteAddress, 'connectionId' => $conn->resourceId]
+            );
         }
     }
 }

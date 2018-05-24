@@ -98,7 +98,6 @@ services:
         decorates: gos_web_socket.topic.dispatcher
         arguments:
             - '@oro_sync.authentication.ticket_authentication_aware_topic_dispatcher_decorator.inner'
-            - '@oro_sync.registry.subscribed_topics'
         calls:
             - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]
 
@@ -121,7 +120,3 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_sync_auth_tickets' ]]
-
-    oro_sync.registry.subscribed_topics:
-        class: 'Oro\Bundle\SyncBundle\Registry\SubscribedTopicsRegistry'
-        public: false

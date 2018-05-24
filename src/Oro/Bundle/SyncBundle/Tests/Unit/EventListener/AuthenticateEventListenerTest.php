@@ -59,6 +59,8 @@ class AuthenticateEventListenerTest extends \PHPUnit_Framework_TestCase
         $conn->WebSocket->request = $request;
         $conn->WebSocket->established = false;
         $conn->WebSocket->closing = false;
+        $conn->remoteAddress = 'localhost';
+        $conn->resourceId = 45654;
 
         $connection = new WampConnection(new Connection($conn));
 

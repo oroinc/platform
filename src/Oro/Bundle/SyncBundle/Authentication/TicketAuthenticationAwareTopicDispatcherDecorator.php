@@ -4,7 +4,6 @@ namespace Oro\Bundle\SyncBundle\Authentication;
 
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Gos\Bundle\WebSocketBundle\Server\App\Dispatcher\TopicDispatcherInterface;
-use Oro\Bundle\SyncBundle\Registry\SubscribedTopicsRegistryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -24,20 +23,11 @@ class TicketAuthenticationAwareTopicDispatcherDecorator implements TopicDispatch
     private $decoratedTopicDispatcher;
 
     /**
-     * @var SubscribedTopicsRegistryInterface
+     * @param TopicDispatcherInterface $decoratedTopicDispatcher
      */
-    private $subscribedTopicsRegistry;
-
-    /**
-     * @param TopicDispatcherInterface          $decoratedTopicDispatcher
-     * @param SubscribedTopicsRegistryInterface $subscribedTopicsRegistry
-     */
-    public function __construct(
-        TopicDispatcherInterface $decoratedTopicDispatcher,
-        SubscribedTopicsRegistryInterface $subscribedTopicsRegistry
-    ) {
+    public function __construct(TopicDispatcherInterface $decoratedTopicDispatcher)
+    {
         $this->decoratedTopicDispatcher = $decoratedTopicDispatcher;
-        $this->subscribedTopicsRegistry = $subscribedTopicsRegistry;
         $this->logger = new NullLogger();
     }
 
@@ -46,17 +36,20 @@ class TicketAuthenticationAwareTopicDispatcherDecorator implements TopicDispatch
      */
     public function onSubscribe(ConnectionInterface $conn, Topic $topic, WampRequest $request)
     {
-        // Save topic to registry.
-        $this->subscribedTopicsRegistry->addTopic($topic);
-
         if (!isset($conn->Authenticated) || !$conn->Authenticated) {
             // Remove not authorized client from the topic.
             $topic->remove($conn);
 
             $this->logger->warning(
                 'Skip subscribing to the topic "{topic}", because the client is not authenticated',
-                \func_get_args()
+                [
+                    'remoteAddress' => $conn->remoteAddress,
+                    'connectionId' => $conn->resourceId,
+                    'topic' => $topic,
+                ]
             );
+
+            return;
         }
 
         $this->decoratedTopicDispatcher->onSubscribe($conn, $topic, $request);
@@ -68,8 +61,14 @@ class TicketAuthenticationAwareTopicDispatcherDecorator implements TopicDispatch
     public function onUnSubscribe(ConnectionInterface $conn, Topic $topic, WampRequest $request)
     {
         $this->decoratedTopicDispatcher->onUnSubscribe($conn, $topic, $request);
-
-        $this->logger->debug('Unsubscribe client from the topic "{topic}"', \func_get_args());
+        $this->logger->debug(
+            'Unsubscribe client from the topic "{topic}"',
+            [
+                'remoteAddress' => $conn->remoteAddress,
+                'connectionId' => $conn->resourceId,
+                'topic' => $topic,
+            ]
+        );
     }
 
     /**
@@ -91,14 +90,20 @@ class TicketAuthenticationAwareTopicDispatcherDecorator implements TopicDispatch
         array $exclude,
         array $eligible
     ) {
+        $logContent = [
+            'remoteAddress' => $conn->remoteAddress,
+            'connectionId' => $conn->resourceId,
+            'topic' => $topic,
+        ];
+
         if (isset($conn->Authenticated) && $conn->Authenticated) {
             $this->decoratedTopicDispatcher->onPublish($conn, $topic, $request, $event, $exclude, $eligible);
 
-            $this->logger->debug('Send a message to the topic "{topic}"', \func_get_args());
+            $this->logger->debug('Send a message to the topic "{topic}"', $logContent);
         } else {
             $this->logger->warning(
                 'Skip the sending of a message to the topic "{topic}", because the client is not authenticated',
-                \func_get_args()
+                $logContent
             );
         }
     }

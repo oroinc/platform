@@ -24,14 +24,9 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
     private $decoratedTopicDispatcher;
 
     /**
-     * @var SubscribedTopicsRegistryInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $subscribedTopicsRegistry;
-
-    /**
      * @var TicketAuthenticationAwareTopicDispatcherDecorator
      */
-    private $ticketAuthenticationAwareTopicDispatcherDecorator;
+    private $decorator;
 
     /**
      * @var WampConnection
@@ -51,14 +46,12 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
     protected function setUp()
     {
         $this->decoratedTopicDispatcher = $this->createMock(TopicDispatcherInterface::class);
-        $this->subscribedTopicsRegistry = $this->createMock(SubscribedTopicsRegistryInterface::class);
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator = new TicketAuthenticationAwareTopicDispatcherDecorator(
-            $this->decoratedTopicDispatcher,
-            $this->subscribedTopicsRegistry
+        $this->decorator = new TicketAuthenticationAwareTopicDispatcherDecorator(
+            $this->decoratedTopicDispatcher
         );
 
-        $this->setUpLoggerMock($this->ticketAuthenticationAwareTopicDispatcherDecorator);
+        $this->setUpLoggerMock($this->decorator);
 
         $conn = $this->createMock(ConnectionInterface::class);
         $conn->WebSocket = new \StdClass();
@@ -84,7 +77,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->method('onUnSubscribe')
             ->with($this->connection, $this->topic, $this->wampRequest);
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onUnSubscribe($this->connection, $this->topic, $this->wampRequest);
     }
 
@@ -99,7 +92,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->method('onSubscribe')
             ->with($this->connection, $this->topic, $this->wampRequest);
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onSubscribe($this->connection, $this->topic, $this->wampRequest);
 
         self::assertTrue($this->topic->has($this->connection));
@@ -111,12 +104,9 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
 
         $this->assertLoggerWarningMethodCalled();
 
-        $this->decoratedTopicDispatcher
-            ->expects(self::once())
-            ->method('onSubscribe')
-            ->with($this->connection, $this->topic, $this->wampRequest);
+        $this->decoratedTopicDispatcher->expects(self::never())->method('onSubscribe');
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onSubscribe($this->connection, $this->topic, $this->wampRequest);
 
         self::assertFalse($this->topic->has($this->connection));
@@ -130,12 +120,9 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
 
         $this->assertLoggerWarningMethodCalled();
 
-        $this->decoratedTopicDispatcher
-            ->expects(self::once())
-            ->method('onSubscribe')
-            ->with($this->connection, $this->topic, $this->wampRequest);
+        $this->decoratedTopicDispatcher->expects(self::never())->method('onSubscribe');
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onSubscribe($this->connection, $this->topic, $this->wampRequest);
 
         self::assertFalse($this->topic->has($this->connection));
@@ -149,7 +136,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->expects(self::never())
             ->method('onPublish');
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onPublish($this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
     }
 
@@ -163,7 +150,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->expects(self::never())
             ->method('onPublish');
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onPublish($this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
     }
 
@@ -178,7 +165,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->method('onPublish')
             ->with($this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->onPublish($this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
     }
 
@@ -190,7 +177,7 @@ class TicketAuthenticationAwareTopicDispatcherDecoratorTest extends \PHPUnit_Fra
             ->method('dispatch')
             ->with($calledMethod, $this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
 
-        $this->ticketAuthenticationAwareTopicDispatcherDecorator
+        $this->decorator
             ->dispatch($calledMethod, $this->connection, $this->topic, $this->wampRequest, self::PAYLOAD, [], []);
     }
 }
