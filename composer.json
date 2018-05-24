@@ -49,7 +49,7 @@
         "leafo/scssphp": "0.6.3",
         "zendframework/zend-mail": "2.4.0",
         "mtdowling/cron-expression": "1.2.*",
-        "gos/web-socket-bundle": "1.8.*",
+        "gos/web-socket-bundle": "1.8.11",
         "guzzle/guzzle": "3.7.*",
         "lexik/maintenance-bundle": "2.1.*",
         "composer/composer": "1.6.*",
