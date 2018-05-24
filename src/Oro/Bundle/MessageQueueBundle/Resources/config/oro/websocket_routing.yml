@@ -1,0 +1,4 @@
+oro_message_queue.message_queue_heartbeat:
+    channel: 'oro/message_queue_heartbeat'
+    handler:
+        callback: 'oro_message_queue.message_queue_heartbeat'
