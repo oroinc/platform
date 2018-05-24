@@ -234,7 +234,7 @@ define([
                     dialogOptions: {
                         modal: true,
                         resizable: false,
-                        width: 475,
+                        width: 585,
                         autoResize: true,
                         close: _.bind(function() {
                             delete this.addressEditDialog;
