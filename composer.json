@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "7.1.*",
+        "php": "~7.1.17",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "ext-gd": "*",
@@ -18,7 +18,7 @@
         "ext-zip": "*",
         "ext-openssl": "*",
         "ext-mcrypt": "*",
-        "symfony/symfony": "3.4.*",
+        "symfony/symfony": "3.4.9",
         "symfony/security-acl": "~3.0.0",
         "twig/twig": "1.35.*",
         "doctrine/orm": "2.5.5",
