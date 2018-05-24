@@ -37,10 +37,10 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $result = $this->decoratedClient->connect($target);
 
             $this->logger->debug('Connected to websocket server');
-        } catch (WebsocketException $e) {
-            $this->logger->error('Could not connect to websocket server', [$e]);
         } catch (BadResponseException $e) {
             $this->logBadResponseException($e);
+        } catch (WebsocketException $e) {
+            $this->logger->error('Could not connect to websocket server', [$e]);
         }
 
         return $result;
@@ -71,10 +71,10 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $result = $this->decoratedClient->publish($topicUri, $payload, $exclude, $eligible);
 
             $this->logger->debug(sprintf('PUBLISH in %s websocket server', $topicUri));
-        } catch (WebsocketException $e) {
-            $this->logWebsocketException($e);
         } catch (BadResponseException $e) {
             $this->logBadResponseException($e);
+        } catch (WebsocketException $e) {
+            $this->logWebsocketException($e);
         } catch (ValidationFailedException $e) {
             $this->logValidationFailedException($e);
         }
@@ -93,10 +93,10 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $result = $this->decoratedClient->prefix($prefix, $uri);
 
             $this->logger->debug(sprintf('PREFIX %s in %s websocket server', $prefix, $uri));
-        } catch (WebsocketException $e) {
-            $this->logWebsocketException($e);
         } catch (BadResponseException $e) {
             $this->logBadResponseException($e);
+        } catch (WebsocketException $e) {
+            $this->logWebsocketException($e);
         }
 
         return $result;
@@ -113,10 +113,10 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $result = $this->decoratedClient->call($procUri, $arguments);
 
             $this->logger->debug(sprintf('CALL in %s websocket server', $procUri));
-        } catch (WebsocketException $e) {
-            $this->logWebsocketException($e);
         } catch (BadResponseException $e) {
             $this->logBadResponseException($e);
+        } catch (WebsocketException $e) {
+            $this->logWebsocketException($e);
         }
 
         return $result;
@@ -133,10 +133,10 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $result = $this->decoratedClient->event($topicUri, $payload);
 
             $this->logger->debug(sprintf('EVENT in %s websocket server', $topicUri));
-        } catch (WebsocketException $e) {
-            $this->logWebsocketException($e);
         } catch (BadResponseException $e) {
             $this->logBadResponseException($e);
+        } catch (WebsocketException $e) {
+            $this->logWebsocketException($e);
         } catch (ValidationFailedException $e) {
             $this->logValidationFailedException($e);
         }

@@ -136,6 +136,22 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
         self::assertFalse($this->loggerAwareClientDecorator->prefix($prefix, $uri));
     }
 
+    public function testPrefixWithBadResponseException()
+    {
+        $exception = new BadResponseException();
+
+        $this->decoratedClient
+            ->expects(self::once())
+            ->method('prefix')
+            ->willThrowException($exception);
+
+        $this->loggerMock->expects($this->once())
+            ->method('error')
+            ->with('Error occured while communicating with websocket server', [$exception]);
+
+        self::assertFalse($this->loggerAwareClientDecorator->prefix('samplePrefix', 'sampleUrl'));
+    }
+
     public function testCall()
     {
         $procUri = 'sampleUri';
