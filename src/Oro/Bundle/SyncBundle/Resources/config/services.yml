@@ -4,8 +4,6 @@ parameters:
     # the time in seconds determines how often a websocket ping service being called
     oro_sync.websocket_ping.interval: 50
 
-    oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
-
 services:
     oro_sync.periodic.db_ping:
         class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
@@ -33,12 +31,11 @@ services:
         tags:
             - { name: twig.extension }
 
-    kernel.listener.maintenance.event:
-        class: '%oro_wamp.listener.maintenance.class%'
+    oro_sync.event_listener.maintenance:
+        class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
         arguments:
             - "@oro_sync.websocket_client"
             - "@oro_security.token_accessor"
-            - "@logger"
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
@@ -127,5 +124,12 @@ services:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
         arguments:
             - 'oro_sync.data_update'
+        tags:
+            - { name: gos_web_socket.topic }
+
+    oro_sync.topic.maintenance:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_sync.maintenance'
         tags:
             - { name: gos_web_socket.topic }

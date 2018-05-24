@@ -40,10 +40,10 @@ class MaintenanceListener
     /**
      * @param bool $isOn
      */
-    private function onMode($isOn)
+    private function onMode(bool $isOn)
     {
         $userId = $this->tokenAccessor->getUserId();
 
-        $this->client->publish('oro/maintenance', ['isOn' => (bool)$isOn, 'userId' => $userId]);
+        $this->client->publish('oro/maintenance', ['isOn' => $isOn, 'userId' => $userId]);
     }
 }
