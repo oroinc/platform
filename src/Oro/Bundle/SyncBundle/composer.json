@@ -8,6 +8,7 @@
     "require": {
         "php": "7.1.*",
         "symfony/symfony": "^3.4 <3.4.11",
+        "gos/web-socket-bundle": "1.8.*",
         "oro/platform-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/ui-bundle": "dev-master",
