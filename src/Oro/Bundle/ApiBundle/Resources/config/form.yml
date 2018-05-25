@@ -41,8 +41,15 @@ services:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
         arguments:
             - '@oro_api.customize_form_data.processor'
+            - '@oro_api.customize_form_data_handler'
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_api.customize_form_data_handler:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler
+        public: false
+        arguments:
+            - '@oro_api.customize_form_data.processor'
 
     oro_api.form_helper:
         class: Oro\Bundle\ApiBundle\Form\FormHelper
@@ -56,6 +63,7 @@ services:
         public: false
         arguments:
             - '@validator'
+            - '@oro_api.customize_form_data_handler'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser

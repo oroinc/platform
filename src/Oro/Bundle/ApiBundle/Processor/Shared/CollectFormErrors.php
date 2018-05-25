@@ -209,13 +209,17 @@ class CollectFormErrors implements ProcessorInterface
             if (\count($causePath) > \count($path)) {
                 $path = $causePath;
             }
-            $result = \implode('.', $path);
-        }
-        if (!$result) {
-            $result = $field->getName();
+        } else {
+            $path = [$field->getName()];
+            $parent = $field->getParent();
+            while (null !== $parent && !$parent->isRoot()) {
+                $path[] = $parent->getName();
+                $parent = $parent->getParent();
+            }
+            $path = \array_reverse($path);
         }
 
-        return $result;
+        return \implode('.', $path);
     }
 
     /**

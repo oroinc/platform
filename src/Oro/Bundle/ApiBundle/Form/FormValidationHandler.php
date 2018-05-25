@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormEvent;
@@ -16,12 +18,17 @@ class FormValidationHandler
     /** @var ValidatorInterface */
     protected $validator;
 
+    /** @var CustomizeFormDataHandler */
+    private $customizationHandler;
+
     /**
-     * @param ValidatorInterface $validator
+     * @param ValidatorInterface       $validator
+     * @param CustomizeFormDataHandler $customizationHandler
      */
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, CustomizeFormDataHandler $customizationHandler)
     {
         $this->validator = $validator;
+        $this->customizationHandler = $customizationHandler;
     }
 
     /**
@@ -41,7 +48,12 @@ class FormValidationHandler
         }
 
         $validationListener = $this->getValidationListener();
-        $validationListener->validateForm(new FormEvent($form, null));
+        $event = $this->createFormEvent($form);
+        $validationListener->validateForm($event);
+        $this->dispatchFinishSubmitEventForChildren($form);
+        if ($this->isFinishSubmitEventSupported($form)) {
+            $this->dispatchFinishSubmitEvent($event);
+        }
     }
 
     /**
@@ -53,5 +65,48 @@ class FormValidationHandler
             $this->validator,
             new ViolationMapper()
         );
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return FormEvent
+     */
+    private function createFormEvent(FormInterface $form): FormEvent
+    {
+        return new FormEvent($form, $form->getViewData());
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return bool
+     */
+    private function isFinishSubmitEventSupported(FormInterface $form): bool
+    {
+        return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
+    }
+    /**
+     * @param FormEvent $event
+     */
+    private function dispatchFinishSubmitEvent(FormEvent $event): void
+    {
+        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_FINISH_SUBMIT, $event);
+    }
+
+    /**
+     * @param FormInterface $form
+     */
+    private function dispatchFinishSubmitEventForChildren(FormInterface $form): void
+    {
+        /** @var FormInterface $child */
+        foreach ($form as $child) {
+            if ($child->count() > 0) {
+                $this->dispatchFinishSubmitEventForChildren($child);
+            }
+            if ($this->isFinishSubmitEventSupported($child)) {
+                $this->dispatchFinishSubmitEvent($this->createFormEvent($child));
+            }
+        }
     }
 }
