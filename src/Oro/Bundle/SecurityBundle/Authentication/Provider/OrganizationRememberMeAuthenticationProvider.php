@@ -56,7 +56,7 @@ class OrganizationRememberMeAuthenticationProvider extends RememberMeAuthenticat
             ->create(
                 $user,
                 $authenticatedToken->getProviderKey(),
-                $authenticatedToken->getKey(),
+                $authenticatedToken->getSecret(),
                 $organization
             );
 

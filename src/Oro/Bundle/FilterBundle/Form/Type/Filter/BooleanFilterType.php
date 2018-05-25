@@ -47,8 +47,6 @@ class BooleanFilterType extends AbstractChoiceType
         $resolver->setDefaults(
             [
                 'field_options' => [
-                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices' => $fieldChoices,
                 ],
             ]

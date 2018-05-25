@@ -111,10 +111,17 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $realTransport->expects($this->once())
             ->method('stop');
 
+        $this->container
+            ->expects($this->any())
+            ->method('initialized')
+            ->willReturnMap([
+                ['swiftmailer.mailer.test1', true],
+                ['swiftmailer.mailer.test2', true]
+            ]);
+
         $mailer = new DirectMailer($this->baseMailer, $this->container);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
-
 
     /**
      * @expectedException \Exception

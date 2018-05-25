@@ -8,7 +8,7 @@ use CG\Generator\PhpProperty;
 use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\Inflector\Inflector as SymfonyIflector;
 
 /**
  * The main extension of the entity generator. This extension is responsible for generate extend entity skeleton
@@ -341,7 +341,7 @@ METHOD_BODY;
      */
     protected function getSingular($fieldName)
     {
-        $singular = StringUtil::singularify(Inflector::classify($fieldName));
+        $singular = SymfonyIflector::singularize(Inflector::classify($fieldName));
         if (is_array($singular)) {
             $singular = reset($singular);
         }

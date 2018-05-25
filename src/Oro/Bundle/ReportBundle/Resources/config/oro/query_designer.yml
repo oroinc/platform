@@ -22,11 +22,14 @@ query_designer:
         date:
             applicable: [{type: date}, {type: datetime}]
             functions:
-                - { name: Count, expr: COUNT($column), return_type: integer }
-                - { name: Min,   expr: MIN($column) }
-                - { name: Max,   expr: MAX($column) }
+                - { name: Count,       expr: COUNT($column), return_type: integer }
+                - { name: Min,         expr: MIN($column) }
+                - { name: Max,         expr: MAX($column) }
+                - { name: Month,       expr: MONTH($column), return_type: integer }
+                - { name: Year,        expr: YEAR($column), return_type: integer }
+                - { name: Day,         expr: DAY($column), return_type: integer }
+                - { name: Day of year, expr: DAYOFYEAR($column), return_type: integer }
             query_type: [report]
-
     filters:
         boolean:
             placeholder: oro.query_designer.filter.boolean.select_value.label

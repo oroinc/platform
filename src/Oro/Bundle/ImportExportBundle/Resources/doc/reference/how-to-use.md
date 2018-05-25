@@ -566,4 +566,4 @@ class CustomExportTypeExtension extends AbstractTypeExtension
 
 OroImportExportBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) to provide a filesystem abstraction layer.
 
-By default, it is configured to store files in the `app/import_export` directory of your project. You can change it in the `Resources/config/oro/app.yml` file. A user can reconfigure these settings. More information about the KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
+By default, it is configured to store files in the `var/import_export` directory of your project. You can change it in the `Resources/config/oro/app.yml` file. A user can reconfigure these settings. More information about the KnpGaufretteBundle configuration can be found in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).

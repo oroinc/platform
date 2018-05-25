@@ -16,8 +16,6 @@ system_configuration:
             priority: 200
             options:
                 label: oro.grid.system_configuration.fields.default_per_page.label
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     10:     10
                     25:     25

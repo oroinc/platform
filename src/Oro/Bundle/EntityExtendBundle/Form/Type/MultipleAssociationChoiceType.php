@@ -63,8 +63,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         $resolver->setDefaults(
             [
                 'placeholder' => false,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'     => function (Options $options) {
                     return $this->getChoices($options['association_class']);
                 },

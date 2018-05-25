@@ -56,7 +56,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         return [
             [null, null],
             ['', null],
-            [[], null],
+            [[], null]
         ];
     }
 
@@ -84,7 +84,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         return [
             [null, new ArrayCollection()],
             ['', new ArrayCollection()],
-            [[], new ArrayCollection()],
+            [[], new ArrayCollection()]
         ];
     }
 

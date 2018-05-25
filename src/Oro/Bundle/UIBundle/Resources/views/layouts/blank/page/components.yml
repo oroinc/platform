@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'components.html.twig'
+            themes: 'OroUIBundle:layouts:blank/page/components.html.twig'
 
         - '@add':
             id: copyright

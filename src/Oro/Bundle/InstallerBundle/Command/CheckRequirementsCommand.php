@@ -76,7 +76,9 @@ EOT
     protected function getRequirements(InputInterface $input)
     {
         if (!class_exists('OroRequirements')) {
-            require_once $this->getContainer()->getParameter('kernel.root_dir')
+            require_once $this->getContainer()->getParameter('kernel.project_dir')
+                . DIRECTORY_SEPARATOR
+                .'var'
                 . DIRECTORY_SEPARATOR
                 . 'OroRequirements.php';
         }

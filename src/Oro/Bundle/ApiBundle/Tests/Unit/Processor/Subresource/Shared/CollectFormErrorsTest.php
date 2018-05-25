@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -13,6 +14,9 @@ use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
+    /** @var ErrorCompleterRegistry */
+    private $errorCompleterRegistry;
+
     /** @var CollectFormErrors */
     private $processor;
 
@@ -23,7 +27,12 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
+        $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
+
+        $this->processor = new CollectFormErrors(
+            new ConstraintTextExtractor(),
+            $this->errorCompleterRegistry
+        );
     }
 
     public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()

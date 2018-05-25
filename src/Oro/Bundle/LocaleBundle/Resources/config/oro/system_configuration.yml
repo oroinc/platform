@@ -119,8 +119,6 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     oro.locale.system_configuration.fields.temperature_unit.choices.fahrenheit: fahrenheit
                     oro.locale.system_configuration.fields.temperature_unit.choices.celsius: celsius
@@ -136,8 +134,6 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     oro.locale.system_configuration.fields.wind_speed_unit.choices.miles_per_hour: miles_per_hour
                     oro.locale.system_configuration.fields.wind_speed_unit.choices.kilometers_per_hour: kilometers_per_hour

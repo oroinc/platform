@@ -31,7 +31,6 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
         $expectedOptions = [
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
             'entityClass' => 'TestEntityClass',
-            'choices_as_values' => true,
             'choices' => ['First Segment' => 1, 'Second Segment' => 5],
         ];
 

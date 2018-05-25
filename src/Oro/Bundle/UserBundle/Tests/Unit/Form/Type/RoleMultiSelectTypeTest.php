@@ -9,8 +9,6 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
-use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -142,7 +140,6 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
             new PreloadedExtension(
                 [
                     $this->formType,
-                    Select2HiddenType::class => new Select2Type('hidden', 'oro_select2_hidden'),
                     OroJquerySelect2HiddenType::class => new OroJquerySelect2HiddenType(
                         $this->em,
                         $searchRegistry,

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\Inflector\Inflector;
 
 /**
  * A set of utility methods for performing reflective operations are used in Data API forms.
@@ -22,7 +22,7 @@ class ReflectionUtil
     {
         $result = [];
         $camelized = self::camelize($property);
-        $singulars = (array)StringUtil::singularify($camelized);
+        $singulars = (array)Inflector::singularize($camelized);
         foreach ($singulars as $singular) {
             $result[] = ['add' . $singular, 'remove' . $singular];
         }
@@ -42,7 +42,7 @@ class ReflectionUtil
     {
         $reflClass = new \ReflectionClass($object);
         $camelized = self::camelize($property);
-        $singulars = (array)StringUtil::singularify($camelized);
+        $singulars = (array)Inflector::singularize($camelized);
         foreach ($singulars as $singular) {
             $addMethod = 'add' . $singular;
             $removeMethod = 'remove' . $singular;
@@ -91,7 +91,10 @@ class ReflectionUtil
     public static function markFormChildrenAsSubmitted(FormInterface $form): void
     {
         foreach ($form as $child) {
-            if ($child instanceof Form && !$child->isSubmitted()) {
+            if (!$child instanceof Form) {
+                continue;
+            }
+            if (!$child->isSubmitted()) {
                 $markClosure = \Closure::bind(
                     function ($form) {
                         $form->submitted = true;
@@ -100,9 +103,9 @@ class ReflectionUtil
                     $child
                 );
                 $markClosure($child);
-                if ($child->count() > 0) {
-                    self::markFormChildrenAsSubmitted($child);
-                }
+            }
+            if ($child->count() > 0) {
+                self::markFormChildrenAsSubmitted($child);
             }
         }
     }

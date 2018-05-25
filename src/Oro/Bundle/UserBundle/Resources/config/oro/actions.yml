@@ -101,12 +101,7 @@ operations:
                         id: $id
 
     reset_password:
-        exclude_datagrids:
-            - owner-users-select-grid
-            - users-select-grid
         label: oro.user.password.reset_password.label
-        entities:
-            - Oro\Bundle\UserBundle\Entity\User
         groups:
             - datagridRowAction
         datagrids:
@@ -173,13 +168,8 @@ operations:
                 parameters: [$.gridName]
 
     user_enable:
-        exclude_datagrids:
-            - owner-users-select-grid
-            - users-select-grid
         label: oro.user.action.enable.label
         acl_resource: oro_user_user_update
-        entities:
-            - Oro\Bundle\UserBundle\Entity\User
         routes:
             - oro_user_view
             - oro_user_index
@@ -228,13 +218,8 @@ operations:
                 parameters: [$.gridName]
 
     user_disable:
-        exclude_datagrids:
-            - owner-users-select-grid
-            - users-select-grid
         label: oro.user.action.disable.label
         acl_resource: oro_user_user_update
-        entities:
-            - Oro\Bundle\UserBundle\Entity\User
         routes:
             - oro_user_view
             - oro_user_index

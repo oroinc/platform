@@ -36,8 +36,6 @@ class TargetFieldType extends AbstractType
                 'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
                 'placeholder'     => 'oro.entity.form.choose_entity_field',
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'auto_initialize' => false
             ]
         );

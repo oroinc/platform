@@ -44,7 +44,7 @@ Command used to dump, upload, download and update translations data on third-par
 
 - `output-format` - output format for translation files, default is yml.
 
-- `path` - Dump destination (or upload source), relative to `%kernel.root_dir%`, default is `/Resources/language-pack/`
+- `path` - Dump destination (or upload source), relative to `%kernel.project_dir%`, default is `/var/language-pack/`
 
 - `dump` - action flag, used to scan project, find all translatable string and dump them in `path`
 

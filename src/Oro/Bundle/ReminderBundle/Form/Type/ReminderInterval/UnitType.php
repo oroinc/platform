@@ -16,8 +16,6 @@ class UnitType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'  => [
                     'oro.reminder.interval.unit.minute.label' => ReminderInterval::UNIT_MINUTE,
                     'oro.reminder.interval.unit.hour.label' => ReminderInterval::UNIT_HOUR,

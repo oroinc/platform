@@ -116,8 +116,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => $choices,
                 'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
             ]

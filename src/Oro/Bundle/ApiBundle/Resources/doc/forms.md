@@ -50,7 +50,7 @@ Consequently, all the data API form types, extensions, and guessers should be re
 - Use the application configuration file.
 - Tag the form elements by appropriate tags in the dependency injection container.
 
-To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `app/config/config.yml` of your application:
+To register a new form elements using the application configuration file, add `Resources/config/oro/app.yml` in any bundle or use `config/config.yml` of your application:
 
 ```yaml
 api:
@@ -58,7 +58,7 @@ api:
         - Symfony\Component\Form\Extension\Core\Type\DateType # the class name of a form type
         - form.type.date # the service id of a form type
     form_type_extensions:
-        - form.type_extension.form.validator # service id of Symfony form validation extension
+        - form.type_extension.form.http_foundation # service id of a form type extension
     form_type_guessers:
         - acme.form.type_guesser # service id of a form type guesser
     form_type_guesses:

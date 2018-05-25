@@ -20,20 +20,4 @@ class CollectionEntryType extends AbstractType
             ['constraints' => [new Assert\NotBlank()]]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'collection_entry';
-    }
 }
