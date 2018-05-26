@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -10,7 +11,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -71,15 +71,17 @@ abstract class ApiTestCase extends WebTestCase
 
         /**
          * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
-         * This is needed to prevent unexpected exceptions in case if some database related exception
-         * occurrs during handling of API request (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
-         * As functional tests work inside a database transaction, any query to the database after such exception
-         * can raise "current transaction is aborted, commands ignored until end of transaction block" SQL exception
+         * This is needed to prevent unexpected exceptions in case if
+         * some database related exception occurrs during handling of API request
+         * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+         * As functional tests work inside a database transaction, any query to the database
+         * after such exception can raise "current transaction is aborted,
+         * commands ignored until end of transaction block" SQL exception
          * in case if PostgreSQL is used in the tests.
          */
         if (!$this->isKernelTerminateHandlerDisabled) {
             $container = $client->getKernel()->getContainer();
-            $handler = new KernelTerminateHandler($container);
+            $handler = new KernelTerminateHandler($container, true);
             $eventDispatcher = $container->get('event_dispatcher');
             $eventDispatcher->addListener(
                 KernelEvents::TERMINATE,
@@ -468,6 +470,31 @@ abstract class ApiTestCase extends WebTestCase
     protected function getEntityManager()
     {
         return self::getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * Clears the default entity manager.
+     */
+    protected function clearEntityManager()
+    {
+        try {
+            $this->getEntityManager()->clear();
+        } catch (DBALException $e) {
+            /**
+             * Suppress database related exceptions during the clearing of the entity manager,
+             * if it was requested for safe handling of "kernel.terminate" event.
+             * This is needed to prevent unexpected exceptions in case if
+             * some database related exception occurrs during handling of API request
+             * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+             * As functional tests work inside a database transaction, any query to the database
+             * after such exception can raise "current transaction is aborted,
+             * commands ignored until end of transaction block" SQL exception
+             * in case if PostgreSQL is used in the tests.
+             */
+            if ($this->isKernelTerminateHandlerDisabled) {
+                throw $e;
+            }
+        }
     }
 
     /**

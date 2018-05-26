@@ -12,15 +12,20 @@ class KernelTerminateHandler
     /** @var ContainerInterface */
     private $container;
 
+    /** @var bool */
+    private $stopSendingOfMessages;
+
     /** @var TokenInterface|null */
     private $securityToken;
 
     /**
      * @param ContainerInterface $container
+     * @param bool               $stopSendingOfMessages
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, bool $stopSendingOfMessages = false)
     {
         $this->container = $container;
+        $this->stopSendingOfMessages = $stopSendingOfMessages;
     }
 
     public function onBeforeTerminate()
@@ -29,9 +34,11 @@ class KernelTerminateHandler
         $this->securityToken = $securityTokenStorage->getToken();
         $securityTokenStorage->setToken(null);
 
-        $messageProducer = $this->getMessageProducer();
-        if (null !== $messageProducer) {
-            $messageProducer->stopSendingOfMessages();
+        if ($this->stopSendingOfMessages) {
+            $messageProducer = $this->getMessageProducer();
+            if (null !== $messageProducer) {
+                $messageProducer->stopSendingOfMessages();
+            }
         }
     }
 
@@ -42,9 +49,11 @@ class KernelTerminateHandler
             $this->securityToken = null;
         }
 
-        $messageProducer = $this->getMessageProducer();
-        if (null !== $messageProducer) {
-            $messageProducer->restoreSendingOfMessages();
+        if ($this->stopSendingOfMessages) {
+            $messageProducer = $this->getMessageProducer();
+            if (null !== $messageProducer) {
+                $messageProducer->restoreSendingOfMessages();
+            }
         }
     }
 
