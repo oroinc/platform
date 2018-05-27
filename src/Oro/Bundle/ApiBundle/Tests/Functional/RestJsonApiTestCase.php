@@ -228,7 +228,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -264,7 +264,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -300,7 +300,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -340,7 +340,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -380,7 +380,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -416,7 +416,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -456,7 +456,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -496,7 +496,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -531,7 +531,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -566,7 +566,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -606,7 +606,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);

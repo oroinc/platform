@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -14,6 +16,8 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -31,6 +35,9 @@ abstract class ApiTestCase extends WebTestCase
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
+    /** @var bool */
+    private $isKernelTerminateHandlerDisabled = false;
+
     /**
      * {@inheritdoc}
      */
@@ -40,7 +47,59 @@ abstract class ApiTestCase extends WebTestCase
         $container = self::getContainer();
 
         $this->valueNormalizer = $container->get('oro_api.value_normalizer');
-        $this->doctrineHelper  = $container->get('oro_api.doctrine_helper');
+        $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
+    }
+
+    /**
+     * Disables clearing the security token and stopping sending messages
+     * during handling of "kernel.terminate" event.
+     * @see initClient
+     *
+     * @param bool $disable
+     */
+    protected function disableKernelTerminateHandler(bool $disable = true)
+    {
+        $this->isKernelTerminateHandlerDisabled = $disable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initClient(array $options = [], array $server = [], $force = false)
+    {
+        $client = parent::initClient($options, $server, $force);
+
+        /**
+         * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
+         * This is needed to prevent unexpected exceptions in case if
+         * some database related exception occurrs during handling of API request
+         * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+         * As functional tests work inside a database transaction, any query to the database
+         * after such exception can raise "current transaction is aborted,
+         * commands ignored until end of transaction block" SQL exception
+         * in case if PostgreSQL is used in the tests.
+         */
+        if (!$this->isKernelTerminateHandlerDisabled) {
+            $container = $client->getKernel()->getContainer();
+            $handler = new KernelTerminateHandler($container, true);
+            $eventDispatcher = $container->get('event_dispatcher');
+            $eventDispatcher->addListener(
+                KernelEvents::TERMINATE,
+                function (PostResponseEvent $event) use ($handler) {
+                    $handler->onBeforeTerminate();
+                },
+                255
+            );
+            $eventDispatcher->addListener(
+                KernelEvents::TERMINATE,
+                function (PostResponseEvent $event) use ($handler) {
+                    $handler->onAfterTerminate();
+                },
+                -255
+            );
+        }
+
+        return $client;
     }
 
     /**
@@ -350,8 +409,8 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Asserts response status code equals.
      *
-     * @param Response  $response
-     * @param int|int[] $statusCode
+     * @param Response    $response
+     * @param int|int[]   $statusCode
      * @param string|null $message
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -414,6 +473,31 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * Clears the default entity manager.
+     */
+    protected function clearEntityManager()
+    {
+        try {
+            $this->getEntityManager()->clear();
+        } catch (DBALException $e) {
+            /**
+             * Suppress database related exceptions during the clearing of the entity manager,
+             * if it was requested for safe handling of "kernel.terminate" event.
+             * This is needed to prevent unexpected exceptions in case if
+             * some database related exception occurrs during handling of API request
+             * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+             * As functional tests work inside a database transaction, any query to the database
+             * after such exception can raise "current transaction is aborted,
+             * commands ignored until end of transaction block" SQL exception
+             * in case if PostgreSQL is used in the tests.
+             */
+            if ($this->isKernelTerminateHandlerDisabled) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
      * @return TestConfigRegistry
      */
     protected function getConfigRegistry()
@@ -429,7 +513,7 @@ abstract class ApiTestCase extends WebTestCase
      * Please note that the configuration is restored after each test and you do not need to do it manually.
      *
      * @param string $entityClass          The class name of API resource
-     * @param array $config                The config to append,
+     * @param array  $config               The config to append,
      *                                     e.g. ['fields' => ['renamedField' => ['property_path' => 'field']]]
      * @param bool   $affectResourcesCache Whether the appended config affects the API resources or sub-resources
      *                                     cache. E.g. this can happen when an association is renamed or excluded,
