@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
  * Column type is `twig` and cannot be changed.
  * If `entity_name` option is not specified, tries to guess it from `extended_entity_name` or select's `from` clause
  *
- * Default configuration in datagrid.yml:
+ * Default configuration in datagrids.yml:
  * datagrid:
  *     tasks-grid:
  *         # extension configuration
