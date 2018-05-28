@@ -12,8 +12,6 @@ Retrieve a specific localization record.
 
 Retrieve a collection of localization records.
 
-The list of records that will be returned, could be limited by filters.
-
 {@inheritdoc}
 
 ## SUBRESOURCES
@@ -62,8 +60,6 @@ Retrieve a specific LocalizedFallbackValue record.
 
 Retrieve a collection of LocalizedFallbackValue records.
 
-The list of records that will be returned, could be limited by filters.
-
 {@inheritdoc}
 
 ### create
@@ -76,8 +72,6 @@ The created record is returned in the response.
 
 {@request:json_api}
 Example:
-
-`</admin/api/localizedfallbackvalues>`
 
 ```JSON
 {
@@ -111,8 +105,6 @@ The updated record is returned in the response.
 
 {@request:json_api}
 Example:
-
-`</admin/api/localizedfallbackvalues/1>`
 
 ```JSON
 {
@@ -157,8 +149,6 @@ Replace localization assigned to a specific localizedfallbackvalues record
 
 {@request:json_api}
 Example:
-
-`</admin/api/localizedfallbackvalues/1/relationships/localization>`
 
 ```JSON
 {
