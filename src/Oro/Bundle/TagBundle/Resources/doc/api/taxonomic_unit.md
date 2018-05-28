@@ -23,7 +23,6 @@ Delete a specific taxonomic unit record.
 ### delete_list
 
 Delete a collection of taxonomic unit records.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
