@@ -1,0 +1,7 @@
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/colors";
+
+$dashboard-wrapper-bg: $primary-900 !default; // #f8f8f8
+$dashboard-widget-bg: $primary-inverse; // #ffffff
+$dashboard-widget-border-color: $primary-inverse !default; // #ffffff
+$dashboard-widget-title-color: $primary-400; // #68686a

@@ -134,6 +134,19 @@
     }
 }
 
+.box-type1 {
+    margin: 0 $contentPadding $contentPadding;
+    border-radius: 3px;
+
+    .title {
+        padding: $contentPadding $contentPadding $contentPadding 0;
+    }
+
+    .calendar-container {
+        padding: 0;
+    }
+}
+
 .dashboard-container {
     .responsive-cell {
         .box-type1 {

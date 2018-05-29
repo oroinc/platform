@@ -1,5 +1,80 @@
 @import "oroui/css/scss/mixins";
-$dashboardBackgroundColor:  #f1f1f1;
+
+/* TODO: remove after main page element are redesigned */
+
+.collapsed .widget-header .collapse-expand-action-container .collapse-action:before {
+    content: normal;
+}
+
+.dashboard-widget {
+    .widget-header {
+        [class^="fa-"], [class*=" fa-"] {
+            font-size: 16px;
+        }
+
+        .btn-link {
+            color: $primary-700;
+            &:hover, &:active, &:focus {
+                color: $primary-400;
+                outline: none;
+            }
+        }
+        .dropdown-menu {
+            &:before {
+                border-bottom: 7px solid rgba(0, 0, 0, .2);
+                border-left: 7px solid transparent;
+                border-right: 7px solid transparent;
+                content: "";
+                display: inline-block;
+                left: 13px;
+                position: absolute;
+                top: -7px;
+            }
+
+            &:after {
+                border-bottom: 6px solid $primary-inverse;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                content: "";
+                display: inline-block;
+                left: 14px;
+                position: absolute;
+                top: -6px;
+            }
+        }
+        .dropdown.pull-right .dropdown-menu, .dropup.pull-right .dropdown-menu {
+            &:before {
+                left: auto;
+                right: 13px;
+            }
+
+            &:after {
+                left: auto;
+                right: 14px;
+            }
+        }
+
+      .dropup.pull-right .dropdown-menu {
+        &:before {
+          border-top: 7px solid rgba(0, 0, 0, .2);
+          border-bottom: none;
+          top: auto;
+          bottom: -7px;
+        }
+
+        &:after {
+          border-top: 6px solid $primary-inverse;
+          border-bottom: none;
+          top: auto;
+          bottom: -6px;
+        }
+      }
+    }
+}
+html body {
+    font-size: 14px;
+}
+/* end TODO block */
 
 .dashboard-selector-container {
     label {
@@ -36,12 +111,14 @@ $dashboardBackgroundColor:  #f1f1f1;
 }
 
 .dashboard-container-wrapper {
+    background-color: $dashboard-wrapper-bg;
+
     .page-title {
         border-bottom: 1px solid #f2f2f2;
     }
 
     .responsive-section {
-        background: $dashboardBackgroundColor;
+        background: $dashboard-wrapper-bg;
         padding-top: 13px;
         padding-left: 13px;
 
@@ -52,7 +129,7 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 
     .scrollable-container {
-        background: $dashboardBackgroundColor;
+        background: $dashboard-wrapper-bg;
 
         @include safe-area-offset(padding, 0);
     }
@@ -64,7 +141,7 @@ $dashboardBackgroundColor:  #f1f1f1;
     .launchpad-container {
         .box-type1 {
             border: 0;
-            background-color: $dashboardBackgroundColor;
+            background-color: $dashboard-wrapper-bg;
         }
 
         .oro-subtitle {
@@ -85,56 +162,41 @@ $dashboardBackgroundColor:  #f1f1f1;
         .default-actions-container {
             display: block;
         }
-
-        .widget-actions-container .widget-actions-section {
-            .action-wrapper {
-                &:last-child {
-                    border-right: 1px solid #ddd;
-                }
-            }
-        }
     }
 
     .dashboard-widget {
-        border-radius: 3px;
+        border-radius: 1px;
         position: relative;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
         .widget-header {
             display: flex;
-            min-height: 38px;
+            min-height: 44px;
+            padding: 3px 0 2px;
+
+            .dropdown-menu {
+                margin-top: -3px;
+                min-width: 100px;
+                > li > a {
+                    padding-left: 8px;
+                    padding-right: 8px;
+                    i[class^="fa-"] {
+                        min-width: 14px;
+                    }
+                }
+            }
         }
 
         .actions-container {
-            margin-top: 10px;
-
-            .collapse-expand-action-container {
-                margin-top: -1px;
-            }
+            margin-top: 9px;
 
             .collapse-action {
-                color: #727272;
-                font-size: 13px;
-                font-family: Helvetica, Arial, sans-serif;
-                font-weight: bold;
-
-                &:before {
-                    content: '−';
-                    display: inline-block;
-                    width: 13px;
-                    height: 13px;
-                    font-weight: normal;
-                    border: 1px solid #c3c3c3;
-                    margin-right: 8px;
-                    font-size: 12px;
-                    line-height: 12px;
-                    padding: 1px 0 0 0;
-                    text-align: center;
-                    color: #727272;
-                    background: linear-gradient(#fcfcfc, #e9e9e9);
+                .collapse-action-icon {
+                    @include fa-icon($fa-var-minus-square-o);
                 }
 
-                &.collapsed:before {
-                    content: '+';
+                &.collapsed .collapse-action-icon {
+                    @include fa-icon($fa-var-plus-square-o);
                 }
             }
         }
@@ -165,7 +227,6 @@ $dashboardBackgroundColor:  #f1f1f1;
             white-space: nowrap;
 
             .action-wrapper {
-                border-right: 1px solid #ddd;
                 padding: 3px 13px;
             }
         }
@@ -177,12 +238,6 @@ $dashboardBackgroundColor:  #f1f1f1;
                 > a {
                     padding: 10px 8px;
                 }
-            }
-        }
-
-        .widget-actions-container .widget-actions-section {
-            .action-wrapper:last-child {
-                border-right: none;
             }
         }
 
@@ -205,13 +260,13 @@ $dashboardBackgroundColor:  #f1f1f1;
         }
 
         .widget-title {
-            padding-left: 0;
-            padding-right: 0;
-            padding-bottom: 3px;
+            padding: 11px 0 3px;
             order: 50;
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
+            font-size: 18px;
+            color: $dashboard-widget-title-color;
             text-overflow: ellipsis;
 
             &:before {
@@ -222,7 +277,7 @@ $dashboardBackgroundColor:  #f1f1f1;
         }
 
         .row-fluid {
-            border-top: 1px solid #ddd;
+            border-top: 1px solid $primary-860;
         }
 
         .dashboard-widget-content {
@@ -273,19 +328,7 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 
     .collapse-expand-action-container {
-        padding: 0 2px 0 10px;
-    }
-}
-
-.dashboard-container {
-    .responsive-cell {
-        .box-type1 {
-            border: 1px solid #ccc;
-
-            .calendar-events {
-                margin: 0 0 10px 10px;
-            }
-        }
+        padding: 0 2px 0 5px;
     }
 }
 
@@ -338,7 +381,7 @@ $dashboardBackgroundColor:  #f1f1f1;
     }
 
     .list-wrap {
-        background: $dashboardBackgroundColor;
+        background: $dashboard-wrapper-bg;
         border-left: 1px solid #e5e5e5;
         width: 60%;
         margin-left: -1px;

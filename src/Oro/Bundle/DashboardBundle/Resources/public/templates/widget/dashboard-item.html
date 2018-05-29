@@ -2,32 +2,41 @@
     <div class="widget-header clearfix">
         <div class="pull-left actions-container">
             <div class="pull-left collapse-expand-action-container">
-                <a class="collapse-action<%= collapsed ? ' collapsed' : '' %>" href="#"
+                <button class="btn-link collapse-action<%= collapsed ? ' collapsed' : '' %>" href="#"
                     data-collapsed-title="<%- _.__('oro.dashboard.widget.expand') %>"
-                    data-expanded-title="<%- _.__('oro.dashboard.widget.collapse') %>"></a>
+                    data-expanded-title="<%- _.__('oro.dashboard.widget.collapse') %>">
+                    <i class="fa-icon collapse-action-icon"></i>
+                </button>
             </div>
         </div>
         <div class="pull-right actions-container">
             <div class="pull-right default-actions-container">
-                <span class="action-wrapper sortable">
-                    <a class="move-action" href="#" title="<%- _.__('oro.dashboard.widget.move') %>">
-                        <i class="fa-arrows hide-text"></i>
-                    </a>
-                </span>
                 <% if (showConfig) { %>
+                <div class="dropdown pull-right action-wrapper">
+                    <button data-toggle="dropdown" class="btn-link"><i class="fa-ellipsis-h"></i></button>
+                    <ul class="dropdown-menu" data-options="<%- JSON.stringify({flipMode: true}) %>">
+                        <li>
+                            <a class="configure-action" href="#"
+                               title="<%- _.__('oro.dashboard.widget.configure') %>">
+                                <i class="fa-cog hide-text"></i> <%- _.__('oro.dashboard.widget.configure') %>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="remove-action" href="#"
+                               title="<%- _.__('oro.dashboard.widget.remove') %>">
+                                <i class="fa-trash-o hide-text"></i> <%- _.__('oro.dashboard.widget.remove') %>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <% } else { %>
                 <span class="action-wrapper">
-                    <a class="configure-action" href="#"
-                        title="<%- _.__('oro.dashboard.widget.configure') %>">
-                        <i class="fa-cog hide-text"></i>
-                    </a>
+                    <button class="btn-link remove-action"
+                        title="<%- _.__('oro.dashboard.widget.remove') %>">
+                        <i class="fa-trash-o"></i>
+                    </button>
                 </span>
                 <% } %>
-                <span class="action-wrapper">
-                    <a class="remove-action" href="#"
-                        title="<%- _.__('oro.dashboard.widget.remove') %>">
-                        <i class="fa-trash-o hide-text"></i>
-                    </a>
-                </span>
             </div>
         </div>
         <div class="title sortable widget-title pull-left" title="<%- title %>"><%- title %></div>
