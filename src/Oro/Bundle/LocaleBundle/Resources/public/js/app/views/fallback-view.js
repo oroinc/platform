@@ -46,7 +46,7 @@ define(function(require) {
             },
             icons: {
                 'new': {
-                    html: '<i class="fa-folder-o"></i>',
+                    html: '<i class="fa-language"></i>',
                     event: 'expandChildItems'
                 },
                 'edited': {

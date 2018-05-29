@@ -40,7 +40,7 @@
         color: #777;
         padding-top: 6px;
 
-        label {
+        label, .checkbox-view__text {
             float: left;
             margin: 0 4px 0 0;
         }
@@ -56,6 +56,12 @@
 
     .container-fluid:after {
         clear: none;
+    }
+
+    .controls {
+        > .checkbox-view:only-child {
+            margin-top: 6px;
+        }
     }
 }
 

@@ -48,20 +48,21 @@
         }
 
         .select2-search-choice-close {
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
 
             &:before {
                 content: "\f00d";
-                font: normal 11px FontAwesome;
+                font-family: FontAwesome;
+                font-size: $base-font-size--lx;
                 right: 3px;
                 top: 2px;
-                color: #444;
+                color: $primary-200;
                 line-height: 1em;
             }
 
             &:hover:before {
-                color: #666;
+                color: $primary-400;
             }
         }
     }

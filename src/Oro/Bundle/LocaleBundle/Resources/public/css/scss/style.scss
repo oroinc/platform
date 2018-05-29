@@ -22,9 +22,10 @@
 
     td.fallback-item-use-fallback,
     .fallback-status {
-        width: 30px;
-        padding-left: 6px;
-        padding-right: 6px;
+        width: 36px;
+        text-align: center;
+        line-height: 32px;
+        height: 32px;
     }
 
     input {
@@ -87,7 +88,7 @@
 
 .fallback-status {
     i {
-        font-size: 20px;
+        font-size: 16px;
         cursor: pointer;
     }
 
@@ -107,6 +108,10 @@
     .validation-failed {
         width: 100%;
         order: 1;
+    }
+
+    input[type="text"] {
+        width: 244px;
     }
 }
 

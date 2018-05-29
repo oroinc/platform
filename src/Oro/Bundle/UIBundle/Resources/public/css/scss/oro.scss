@@ -430,17 +430,6 @@ input[type='checkbox'] + label {
     display: inline-block;
 }
 
-textarea,
-input,
-select,
-.uneditable-input,
-body .select2-container {
-    box-sizing: content-box;
-    border-color: #ddd;
-    color: #333;
-    font-size: $base-font-size;
-}
-
 .btn-group > .btn:last-child,
 .btn-group > .dropdown-toggle {
     border-top-right-radius: 3px;
@@ -1686,11 +1675,6 @@ a {
         line-height: 24px;
     }
 
-    .icons-holder a {
-        height: 24px;
-        line-height: 24px;
-    }
-
     > .row > div {
         margin-top: 10px;
         margin-bottom: 5px;
@@ -2642,7 +2626,7 @@ textarea {
     }
 
     > input[type='checkbox']:only-child {
-        margin-top: 10px;
+        margin-top: 6px;
     }
 }
 
@@ -2739,102 +2723,6 @@ div.uploader input {
     float: right;
     height: 25px;
     font-size: 40px; /* to expand real file input through whole ui substrate */
-}
-
-/* Select */
-
-select {
-    height: 26px;
-    line-height: 26px;
-}
-
-div.selector {
-    line-height: 30px;
-    height: 30px;
-    width: 235px;
-    border: 1px solid #ddd;
-    background-color: #fafafa;
-    background-image: linear-gradient(#fff, #f3f3f3);
-    background-repeat: repeat-x;
-    border-radius: 3px;
-
-    option {
-        padding-left: 6px;
-    }
-}
-
-div.selector span {
-    height: 30px;
-    display: block;
-    line-height: 30px;
-    box-sizing: border-box;
-    padding: 0 5px 0 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-
-    &:after {
-        margin: 3px 3px 0 0;
-        display: inline-block;
-        font: 16px FontAwesome;
-        content: "\f0dd";
-        position: absolute;
-        right: 5px;
-    }
-}
-
-div.selector select {
-    z-index: 1;
-    padding: 0 5px;
-    left: 0;
-    width: auto;
-    box-sizing: border-box;
-}
-
-div.selector.input-widget-select select {
-    width: 100%;
-}
-
-/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls select {
-    width: 279px;
-}
-
-.controls .selector select {
-    width: 100%;
-}
-
-/* end uniformjs customization */
-
-div.selector:active,
-div.selector.active {
-    background-position: -483px -156px;
-}
-
-div.selector.focus,
-div.selector.hover,
-div.selector:hover {
-    background-position: -483px -182px;
-}
-
-div.selector.focus:active,
-div.selector.focus.active,
-div.selector:hover:active,
-div.selector.active:hover {
-    background-position: -483px -208px;
-}
-
-div.selector.disabled {
-    background-position: left top !important;
-}
-
-div.selector.disabled span {
-    color: #aaa;
-
-    &:after {
-        color: #ddd;
-    }
 }
 
 .ui-slider {
@@ -2943,20 +2831,6 @@ h5.user-fieldset {
     min-width: 20px;
 }
 
-input:focus:invalid:focus,
-textarea:focus:invalid:focus,
-select:focus:invalid:focus,
-div.selector.focus,
-div.uploader.focus,
-.select2-container-active .select2-choice,
-.select2-container-active .select2-choices {
-    border-color: rgba(82, 168, 236, .8);
-    outline: 0;
-    outline: thin dotted \9;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
-    color: #555;
-}
-
 .separator-btn {
     border-left: 1px solid #e9e9e9;
     margin: 4px 8px 0;
@@ -2994,12 +2868,7 @@ div.uploader.focus,
 /* validation-error */
 .validation-error {
     .error {
-        border: 1px solid #e9322d;
-        border-radius: 3px;
-        outline: 0;
-        outline: thin dotted \9;
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(211, 33, 33, .6);
-        color: #555;
+        outline: none;
 
         &.validate-group {
             margin-left: -6px;
@@ -3133,17 +3002,6 @@ label.radio.error {
 .choice-filter .input-append,
 .choice-filter .input-prepend {
     margin-bottom: 0;
-}
-
-.input-append .add-on,
-.input-prepend .add-on {
-    float: none;
-    height: 30px;
-
-    input[type='checkbox'],
-    input[type='radio'] {
-        margin-top: -1px;
-    }
 }
 
 .add-list-item {
@@ -3417,7 +3275,7 @@ iframe.email-body {
 }
 
 span.validation-failed {
-    color: $error-text;
+    color: $danger-dark;
     display: block;
     margin: 5px 0 5px 14px;
     line-height: 1.1em;
@@ -3425,7 +3283,7 @@ span.validation-failed {
 
     &:before {
         content: '\f00d';
-        color: $error-text;
+        color: $danger-dark;
         font: normal 1.15em/1em FontAwesome;
         display: inline-block;
         width: 14px;
@@ -3908,9 +3766,7 @@ label .popover-content {
     .entity-create-btn,
     .entity-create-btn[disabled],
     .entity-create-btn[disabled]:active {
-        padding: 0 6px;
-        margin-left: 3px;
-        height: 30px;
+        margin-left: -2px;
     }
 
     &.entity-create-multi-enabled {
@@ -3952,7 +3808,7 @@ label .popover-content {
 .entity-create-enabled {
     .input-prepend .select2-container,
     .input-append .select2-container {
-        width: 229px;
+        width: 235px;
     }
 }
 

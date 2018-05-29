@@ -1,8 +1,8 @@
 .mce-tinymce {
     &.mce-panel {
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        padding: 1px;
+        border: 2px solid $primary-750 !important;
+        border-radius: 2px;
+        padding: 0;
         box-sizing: border-box;
     }
 
