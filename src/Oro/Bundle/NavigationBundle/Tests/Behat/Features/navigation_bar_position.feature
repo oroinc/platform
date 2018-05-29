@@ -1,7 +1,5 @@
 @regression
 @ticket-BAP-16267
-@skip
-# unskip after BAP-17043
 Feature: Navigation bar position
   In order to provide better navigation for users
   As a configurator
@@ -39,6 +37,13 @@ Feature: Navigation bar position
       | Dashboards/ Manage Dashboards      | "Dashboards/ Manage Dashboards"      |
       | System/ Localization/ Translations | "System/ Localization/ Translations" |
       | Activities/ Calendar Events        | "Activities/ Calendar Events"        |
+
+  Scenario: Filter menu items using search input
+    When I select "Reports & Segments" in the side menu
+    And I fill in "MenuSearch" with "To"
+    Then I should see "Total Forecast"
+    When I go to Reports & Segments/ Reports/ Opportunities/ Total Forecast
+    Then I should see "Reports & Segments/ Reports/ Opportunities/ Total Forecast"
 
   Scenario: Expand main manu
     When I click "Main Menu Toggler"

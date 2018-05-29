@@ -1,8 +1,6 @@
 @regression
 @ticket-BAP-10860
 @automatically-ticket-tagged
-@skip
-# unskip after BAP-17043
 Feature: Change menu view
   In order to have best user experience for working with menu
   As an administrator

@@ -31,6 +31,10 @@ class MainMenu extends Element
         $items = explode('/', $path);
         $linkLocator = trim(array_pop($items));
 
+        if ($this->hasClass('scroller') && $this->getParent()->hasClass('minimized')) {
+            return $this->walkSideMenu($path);
+        }
+
         if ($this->hasClass('scroller') && !$this->getParent()->hasClass('minimized')) {
             $this->clickByMenuTree($path);
         } else {
@@ -62,6 +66,24 @@ class MainMenu extends Element
     }
 
     /**
+     * @param string $item
+     */
+    public function selectSideSubmenu(string $item)
+    {
+        $link = $this->findVisibleLink($item);
+        if (!$link->find('xpath', './span')->hasClass('title-level-1')) {
+            throw new \LogicException(sprintf('Cannot find submenu "%s" in the side menu', $item));
+        }
+
+        $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
+
+        // Do not click already opened menu
+        if (!$menuOverlay->hasClass('open') || !$link->getParent()->hasClass('active')) {
+            $link->click();
+        }
+    }
+
+    /**
      * @param string $path
      */
     private function moveByMenuTree($path)
@@ -88,6 +110,64 @@ class MainMenu extends Element
                 $link->click();
             }
         }
+    }
+
+    /**
+     * @param string $path
+     * @return NodeElement
+     */
+    private function walkSideMenu(string $path)
+    {
+        $items = explode('/', $path);
+        $this->selectSideSubmenu(array_shift($items));
+
+        $currentItem = trim(array_shift($items));
+        $currentLevel = 1;
+
+        /** @var NodeElement $menuTitle */
+        foreach ($this->findAll('css', '.side-menu-overlay ul.menu-level-1 > li span.title') as $menuTitle) {
+            $menuLevel = $this->getMenuLevel($menuTitle);
+
+            if ($menuLevel <= $currentLevel) {
+                break; // it's needed to check only nested menu items
+            }
+
+            if ($menuLevel !== $currentLevel + 1) {
+                continue; // it's needed to check only direct children
+            }
+
+            if (!$menuTitle->has(
+                'xpath',
+                sprintf('ancestor::li[normalize-space(@data-original-text)="%s"]', $currentItem)
+            )) {
+                continue;
+            }
+
+            if (empty($items)) {
+                return $menuTitle->getParent()->click();
+            }
+
+            $currentItem = trim(array_shift($items));
+            $currentLevel = $menuLevel;
+        }
+
+        throw new \LogicException(sprintf('Menu "%s" was not found on the page', $path));
+    }
+
+    /**
+     * @param NodeElement $menuItem
+     * @return int
+     */
+    private function getMenuLevel(NodeElement $menuTitle)
+    {
+        $class = $menuTitle->getAttribute('class');
+
+        $matches = [];
+        if (!preg_match('/title-level-(\d)/', $class, $matches)) {
+            throw new \LogicException(sprintf('Cannot determine "%s" menu level', $menuTitle->getText()));
+        }
+
+        return (int)$matches[1];
     }
 
     /**

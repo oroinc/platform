@@ -4,6 +4,13 @@ oro_behat_extension:
       selector: 'div#main-menu'
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
 
+    SideMenuOverlay:
+      selector: 'div.side-menu-overlay'
+
+    MenuSearch:
+      selector: 'input.side-menu-overlay__field'
+      class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
+
     MainMenuDropdown:
       selector: '.dropdown-menu'
 
