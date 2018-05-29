@@ -43,7 +43,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('twig', $twig)
             ->getContainer($this);
 
-        $this->extension = new OroRequireJSExtension($this->container, './web/root', false);
+        $this->extension = new OroRequireJSExtension($this->container, './public/root', false);
     }
 
     public function testGetRequireJSConfig()
@@ -135,7 +135,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequireJSBuildLoggerReturnEmptyString()
     {
-        $extension = new OroRequireJSExtension($this->container, './web/root', false);
+        $extension = new OroRequireJSExtension($this->container, './public/root', false);
         $result = $extension->getRequireJSBuildLogger();
 
         $this->assertEquals('', $result);
@@ -143,7 +143,7 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequireJSBuildLogger()
     {
-        $extension = new OroRequireJSExtension($this->container, './web/root', true);
+        $extension = new OroRequireJSExtension($this->container, './public/root', true);
 
         $this->config->expects($this->once())
             ->method('getBuildConfig')

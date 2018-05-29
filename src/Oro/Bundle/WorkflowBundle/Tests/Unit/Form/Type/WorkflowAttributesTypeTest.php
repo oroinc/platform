@@ -445,8 +445,10 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'childrenOptions' => array(
                     'first'  => array(
                         'label' => 'Guessed Label',
-                        'max_length' => 50,
-                        'required' => false
+                        'required' => false,
+                        'attr' => [
+                            'maxlength' => 50
+                        ]
                     ),
                 ),
                 'guessedData' => array(
@@ -455,7 +457,9 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         'form_type' => TextType::class,
                         'form_options' => array(
                             'label' => 'Guessed Label',
-                            'max_length' => 50,
+                            'attr' => [
+                                'maxlength' => 50
+                            ]
                         )
                     )
                 ),

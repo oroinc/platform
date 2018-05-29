@@ -7,7 +7,9 @@ use Oro\Bundle\SyncBundle\Exception\WebSocket\Rfc6455Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Ratchet\Wamp\ServerProtocol;
+
+//@TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
+//use Ratchet\Wamp\ServerProtocol;
 
 class TopicPublisher implements LoggerAwareInterface
 {
@@ -86,7 +88,8 @@ class TopicPublisher implements LoggerAwareInterface
             return false;
         }
 
-        $ws->sendData(
+    //@TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
+       /* $ws->sendData(
             json_encode(
                 [
                     ServerProtocol::MSG_PUBLISH,
@@ -94,7 +97,7 @@ class TopicPublisher implements LoggerAwareInterface
                     $msg,
                 ]
             )
-        );
+        );*/
 
         return true;
     }

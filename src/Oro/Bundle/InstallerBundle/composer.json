@@ -7,8 +7,6 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "symfony/framework-bundle": "2.8.*",
-        "sylius/flow-bundle": "dev-master",
         "oro/config": "dev-master",
         "oro/cache-bundle": "dev-master",
         "components/jquery": "2.1.*",

@@ -24,7 +24,7 @@ class NumberTypeTest extends TypeTestCase
             [null, '1.23456789', '1.23456789'],
             [0, '123456789', '123456789'],
             [3, '1.23456789', '1.235'],
-            [3, '1.234', '1.234'],
+            [3, '1.234', '1.234']
         ];
     }
 
@@ -44,7 +44,7 @@ class NumberTypeTest extends TypeTestCase
             [null, 'test'],
             [0, 'test'],
             [3, 'test'],
-            [0, '1.2'],
+            [0, '1.2']
         ];
     }
 }

@@ -99,9 +99,6 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->will($this->returnValue(array()));
         $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('oro_region'));
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));
@@ -217,9 +214,6 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array()));
         $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('oro_region'));
         $configMock->expects($this->any())
             ->method('getType')
             ->will($this->returnValue($type));

@@ -39,7 +39,7 @@ a web gui where you can monitor jobs status and interrupt jobs.
 First, you have to configure a transport layer and set one to be default. For the config settings
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     transport:
@@ -53,7 +53,7 @@ we can configure one of the supported transports via parameters:
 ### DBAL transport 
 
 ```yaml
-# app/config/parameters.yml
+# config/parameters.yml
 
     message_queue_transport: DBAL
     message_queue_transport_config: ~
@@ -181,7 +181,7 @@ redirect_stderr=true
 To use several independent Message Queues on single RabbitMQ instance, configure a name prefix for the Message Queue. For example:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     ...
@@ -246,7 +246,7 @@ Also, in case if you need custom logic for manage sent messages, you can use [Or
 Before you start to use traits in functional tests, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
 ```yaml
-# app/config/config_test.yml
+# config/config_test.yml
 
 services:
     oro_message_queue.test.message_collector:

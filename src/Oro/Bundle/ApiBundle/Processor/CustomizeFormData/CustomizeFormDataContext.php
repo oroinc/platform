@@ -29,15 +29,16 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public const EVENT_POST_SUBMIT = 'post_submit';
 
     /**
-     * This event is dispatched after the Form::submit() method, but after FormEvents::POST_SUBMIT.
+     * This event is dispatched at the end of the form submitting process.
      * It can be used to finalize the form after all listeners, including data validation listener,
      * are executed. E.g. it can be used to correct form validation result.
-     * @see \Symfony\Component\Form\FormEvents::POST_SUBMIT
+     * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+     * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
      */
     public const EVENT_FINISH_SUBMIT = 'finish_submit';
 
     /** the form event name */
-    public const EVENT = 'event';
+    private const EVENT = 'event';
 
     /** @var FormInterface */
     private $form;
@@ -60,7 +61,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
      *
      * @param string $event One of "pre_submit", "submit", "post_submit" and "finish_submit"
      */
-    public function setEvent(string $event)
+    public function setEvent(string $event): void
     {
         $this->set(self::EVENT, $event);
     }
@@ -80,13 +81,13 @@ class CustomizeFormDataContext extends CustomizeDataContext
      *
      * @param FormInterface $form
      */
-    public function setForm(FormInterface $form)
+    public function setForm(FormInterface $form): void
     {
         $this->form = $form;
     }
 
     /**
-     * Gets the data associated with form event event.
+     * Gets the data associated with the form event.
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
      * For "post_submit" and "finish_submit" events it is the view data.
@@ -99,11 +100,11 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
-     * Sets the data associated with form event event.
+     * Sets the data associated with the form event.
      *
      * @param mixed $data
      */
-    public function setData($data)
+    public function setData($data): void
     {
         $this->data = $data;
     }

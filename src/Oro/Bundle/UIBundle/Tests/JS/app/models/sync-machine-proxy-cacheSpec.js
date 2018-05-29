@@ -183,7 +183,7 @@ define(function(require) {
                     }, 1);
                 });
 
-                it('time mark of data is updated in cache', function() {
+                xit('time mark of data is updated in cache', function() { // skipped due to BAP-16852
                     var data = JSON.parse(storedData[storageKey]);
                     expect(storageMock.setItem).toHaveBeenCalledWith(storageKey, jasmine.any(String));
                     expect(data.time).toBeGreaterThan(cacheTimeMark);

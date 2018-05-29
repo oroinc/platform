@@ -17,7 +17,7 @@ that is why you can use configuration reference described in the [Require.js con
 
 | Option | Description | Required |
 |------- |-------------|----------|
-| `build_path` | Relative path from the theme scripts folder (`web/js/layout/{theme_name}/`) | no |
+| `build_path` | Relative path from the theme scripts folder (`public/js/layout/{theme_name}/`) | no |
 
 **Example:**
 
@@ -46,12 +46,12 @@ When you execute the following command in the console,
 php bin/console oro:requirejs:build
 ```
 
-it produces `web/js/layout/base/scripts.min.js` as the result.
+it produces `public/js/layout/base/scripts.min.js` as the result.
 
 ## RequireJS Config Provider
 
 The [RequireJSBundle](../../../RequireJSBundle/README.md) has its own config provider `oro_requirejs.provider.requirejs_config`
-which is **used in the theme by default** (`web/js/oro.min.js` minimized scripts by default).
+which is **used in the theme by default** (`public/js/oro.min.js` minimized scripts by default).
 
 If you want use your own minimized scripts in the theme, define the `requires`  block type with the `provider_alias: 'oro_layout_requirejs_config_provider'`.
 

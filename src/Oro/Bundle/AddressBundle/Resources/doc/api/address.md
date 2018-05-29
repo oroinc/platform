@@ -17,14 +17,13 @@ Retrieve a collection of address records.
 ### create
 
 Create a new address record.
-The created record is returned in the response body.
+
+The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/addresses>`
 
 ```JSON
 {  
@@ -71,8 +70,6 @@ Edit a specific address record.
 {@request:json_api}
 Example:
 
-`</api/addresses/51>`
-
 ```JSON
 {  
    "data":{  
@@ -118,7 +115,6 @@ Delete a specific address record.
 ### delete_list
 
 Delete a collection of address records.
-The list of records to be deleted can be limited by filters.
 
 {@inheritdoc}
 
@@ -199,8 +195,6 @@ Replace the country record configured for a specific address record.
 {@request:json_api}
 Example:
 
-`</api/addresses/1/relationships/country>`
-
 ```JSON
 {
   "data": {
@@ -227,8 +221,6 @@ Replace the region record configured for a specific address record.
 
 {@request:json_api}
 Example:
-
-`</api/addresses/1/relationships/region>`
 
 ```JSON
 {

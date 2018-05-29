@@ -1,11 +1,9 @@
 parameters:
-    test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
     oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
     oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
-    test.session.listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener
 
 services:
     oro_test.provider.exclusion_provider:
@@ -93,7 +91,7 @@ services:
     oro_test.provider.container_tags_documentation_information:
         class: Oro\Bundle\TestFrameworkBundle\Provider\ContainerTagsDocumentationInformationProvider
         arguments:
-            - '%kernel.root_dir%/../'
+            - '%kernel.project_dir%/'
 
     oro_search.extension.mass_action.iterable_result_factory.alias:
         alias: oro_search.extension.mass_action.iterable_result_factory
@@ -155,3 +153,6 @@ services:
             - default
             - default
             - default
+
+    oro_test.router.default.alias:
+        alias: router.default

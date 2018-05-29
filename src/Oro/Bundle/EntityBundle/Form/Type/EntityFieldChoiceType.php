@@ -58,8 +58,6 @@ class EntityFieldChoiceType extends AbstractType
                 'entity'               => null,
                 'with_relations'       => false,
                 'with_virtual_fields'  => false,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'              => function (Options $options) {
                     return empty($options['entity']) || $options['skip_load_data']
                         ? [] // return empty list if entity is not specified or skip_load_data = true

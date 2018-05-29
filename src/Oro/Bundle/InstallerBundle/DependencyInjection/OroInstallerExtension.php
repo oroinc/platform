@@ -14,7 +14,6 @@ class OroInstallerExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.yml');
-        $loader->load('form.yml');
 
         $this->addClassesToCompile(['Oro\Bundle\InstallerBundle\EventListener\RequestListener']);
     }

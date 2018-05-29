@@ -104,7 +104,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $output->writeln(
                 'To proceed with install: '
             );
-            $output->writeln(' - set parameter <info>installed: false</info> in app/config/parameters.yml.');
+            $output->writeln(' - set parameter <info>installed: false</info> in config/parameters.yml.');
             $output->writeln(' - remove caches in var/cache folder manually');
             $output->writeln(' - drop database manually or reinstall over existing database.');
             $output->writeln(

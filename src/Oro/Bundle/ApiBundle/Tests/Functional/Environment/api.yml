@@ -79,6 +79,20 @@ api:
             sorters:
                 fields:
                     email: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder:
+            fields:
+                poNumber:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
+                items:
+                    property_path: lineItems
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:
+            fields:
+                quantity:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
         Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
             subresources:
                 accessible-target:

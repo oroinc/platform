@@ -80,20 +80,4 @@ class EntityType extends AbstractType
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('included_entities', ['null', IncludedEntityCollection::class]);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_entity';
-    }
 }

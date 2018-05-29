@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -13,6 +14,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Handle remove and unremove of extend fields
+ */
 class RemoveRestoreConfigFieldHandler
 {
     /** @var ConfigManager */
@@ -30,25 +34,31 @@ class RemoveRestoreConfigFieldHandler
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var ManagerRegistry */
+    private $registry;
+
     /**
      * @param ConfigManager $configManager
      * @param FieldNameValidationHelper $validationHelper
      * @param ConfigHelper $configHelper
      * @param Session $session
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ManagerRegistry $registry
      */
     public function __construct(
         ConfigManager $configManager,
         FieldNameValidationHelper $validationHelper,
         ConfigHelper $configHelper,
         Session $session,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ManagerRegistry $registry
     ) {
         $this->configManager = $configManager;
         $this->validationHelper = $validationHelper;
         $this->configHelper = $configHelper;
         $this->session = $session;
         $this->eventDispatcher = $eventDispatcher;
+        $this->registry = $registry;
     }
 
     /**
@@ -112,12 +122,15 @@ class RemoveRestoreConfigFieldHandler
             );
         }
 
-        // TODO: property_exists works only for regular fields, not for relations and option sets. Need better approach
-        $isFieldExist = class_exists($field->getEntity()->getClassName())
-            && property_exists(
-                $field->getEntity()->getClassName(),
-                $field->getFieldName()
-            );
+        $entityClass = $field->getEntity()->getClassName();
+
+        $isFieldExist = false;
+        if (class_exists($entityClass) && ($em = $this->registry->getManagerForClass($entityClass))) {
+            $metadata = $em->getClassMetadata($entityClass);
+
+            $fieldName = $field->getFieldName();
+            $isFieldExist = $metadata->hasField($fieldName) || $metadata->hasAssociation($fieldName);
+        }
 
         $fieldConfig = $this->configHelper->getFieldConfig($field, 'extend');
         $fieldConfig->set(

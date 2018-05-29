@@ -18,14 +18,14 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $processorBag;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    private $processorBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $errorCompleter;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ErrorCompleterInterface */
+    private $errorCompleter;
 
     /** @var ProcessIncludedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -40,7 +40,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->with($this->context->getRequestType())
             ->willReturn($this->errorCompleter);
 
-        $this->processor = new ProcessIncludedEntitiesStub(
+        $this->processor = new ProcessIncludedEntities(
             $this->processorBag,
             $errorCompleterRegistry
         );
@@ -83,6 +83,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -139,6 +140,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -199,6 +201,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 
@@ -255,6 +258,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setId('id');
         $expectedContext->setRequestData(['data' => ['type' => 'testType', 'id' => 'testId']]);
         $expectedContext->setResult($includedEntity);
+        $expectedContext->skipFormValidation(true);
         $expectedContext->setLastGroup('transform_data');
         $expectedContext->setSoftErrorsHandling(true);
 

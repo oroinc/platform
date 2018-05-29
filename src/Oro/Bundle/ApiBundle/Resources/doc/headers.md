@@ -11,7 +11,7 @@ For some types of the REST API requests, you can retrieve an additional informat
 The following example shows how to get the total number of accounts:
 
 ```bash
-curl "http://orocrm.loc/app_dev.php/api/accounts?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
+curl "http://orocrm.loc/index_dev.php/api/accounts?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
 ```
 
 The corresponding response:
@@ -29,7 +29,6 @@ The corresponding response:
 
 The following table describes all existing *keys* for `X-Include` header.
 
-```html
 <table>
 <tr>
     <th nowrap>Request Type</th>
@@ -38,24 +37,23 @@ The following table describes all existing *keys* for `X-Include` header.
     <th>Description</th>
 </tr>
 <tr>
-	<td nowrap>get a list of entities</td>
-	<td nowrap>totalCount</td>
-	<td nowrap>X-Include-Total-Count</td>
-	<td>Returns the total number of entities. It is calculated based on input filters.</td>
+    <td nowrap>get a list of entities</td>
+    <td nowrap>totalCount</td>
+    <td nowrap>X-Include-Total-Count</td>
+    <td>Returns the total number of entities. It is calculated based on input filters.</td>
 </tr>
 <tr>
-	<td nowrap rowspan="2">delete a list of entities</td>
-	<td nowrap>totalCount</td>
-	<td nowrap>X-Include-Total-Count</td>
-	<td>Returns the total number of entities. It is calculated based on input filters.</td>
+    <td nowrap rowspan="2">delete a list of entities</td>
+    <td nowrap>totalCount</td>
+    <td nowrap>X-Include-Total-Count</td>
+    <td>Returns the total number of entities. It is calculated based on input filters.</td>
 </tr>
 <tr>
-	<td nowrap>deletedCount</td>
-	<td nowrap>X-Include-Deleted-Count</td>
-	<td>Returns the number of deleted entities</td>
+    <td nowrap>deletedCount</td>
+    <td nowrap>X-Include-Deleted-Count</td>
+    <td>Returns the number of deleted entities</td>
 </tr>
 </table>
-```
 
 ## Add new X-Include Key
 

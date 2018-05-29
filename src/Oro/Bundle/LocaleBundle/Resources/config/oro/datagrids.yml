@@ -111,7 +111,6 @@ datagrids:
                     data_name: lng.id
                     options:
                         field_options:
-                            choices_as_values: true
                             choices: "@oro_locale.provider.localization_choices->getLanguageChoices"
                             translatable_options: false
                 formattingCode:
@@ -119,7 +118,6 @@ datagrids:
                     data_name: l.formattingCode
                     options:
                         field_options:
-                            choices_as_values: true
                             choices: "@oro_locale.provider.localization_choices->getFormattingChoices"
                             translatable_options: false
                 parentName:
@@ -127,7 +125,6 @@ datagrids:
                     data_name: pl.id
                     options:
                         field_options:
-                            choices_as_values: true
                             choices: "@oro_locale.provider.localization_choices->getLocalizationChoices"
                             translatable_options: false
                 createdAt:

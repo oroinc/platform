@@ -8,3 +8,4 @@ security:
                 realm:    "Secured API"
                 profile:  "UsernameToken"
             context: main
+            logout_on_user_change: true

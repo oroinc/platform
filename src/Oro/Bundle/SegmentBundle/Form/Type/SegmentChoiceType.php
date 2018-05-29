@@ -33,8 +33,6 @@ class SegmentChoiceType extends AbstractType
     {
         $resolver->setDefaults([
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
-            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-            'choices_as_values' => true,
         ]);
         $resolver->setRequired('entityClass');
         $resolver->setNormalizer(

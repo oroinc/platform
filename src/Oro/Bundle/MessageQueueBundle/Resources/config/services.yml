@@ -41,7 +41,7 @@ services:
             - '@oro_platform.maintenance'
             - '%oro_message_queue.maintenance.idle_time%'
         calls:
-            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
+            - ['setFilePathServerLockFromConfig', ['%kernel.project_dir%/config/oro_env.conf']]
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 

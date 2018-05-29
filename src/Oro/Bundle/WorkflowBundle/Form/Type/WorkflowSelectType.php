@@ -66,8 +66,6 @@ class WorkflowSelectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'entity_class' => null,
                 'config_id' => null, // can be extracted from parent form
             ]

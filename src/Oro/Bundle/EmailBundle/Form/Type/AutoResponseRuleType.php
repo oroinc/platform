@@ -36,7 +36,6 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
         $builder
             ->add('active', ChoiceType::class, [
                 'label' => 'oro.email.autoresponserule.status.label',
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
                 'choices' => [
                     'oro.email.autoresponserule.status.inactive' => 0,
                     'oro.email.autoresponserule.status.active' => 1,

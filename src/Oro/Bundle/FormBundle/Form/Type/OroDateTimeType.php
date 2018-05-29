@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,7 +17,7 @@ class OroDateTimeType extends OroDateType
     {
         parent::configureOptions($resolver);
 
-        $resolver->setDefaults(['format' => DateTimeType::HTML5_FORMAT]);
+        $resolver->setDefaults(['format' => DateTimeExtension::HTML5_FORMAT_WITH_TIMEZONE]);
     }
 
     /**

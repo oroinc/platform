@@ -2,26 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors as BaseCollectFormErrors;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
-use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Collects errors occurred during the the form submit and adds them into the context.
+ * Collects errors occurred during submit of forms for primary and included entities
+ * and adds them into the context.
  */
 class CollectFormErrors extends BaseCollectFormErrors
 {
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    protected function collectFormErrors(FormContext $context): void
     {
-        /** @var SubresourceContext $context */
-
-        parent::process($context);
+        parent::collectFormErrors($context);
 
         // remove the association name from the begin of the property path of error source
         if ($context->hasErrors()) {
+            /** @var SubresourceContext $context */
             $associationName = $context->getAssociationName();
             $errors = $context->getErrors();
             foreach ($errors as $error) {
@@ -36,8 +36,8 @@ class CollectFormErrors extends BaseCollectFormErrors
 
                 if ($propertyPath === $associationName) {
                     $errorSource->setPropertyPath('');
-                } elseif (0 === strpos($propertyPath, $associationName . '.')) {
-                    $errorSource->setPropertyPath(substr($propertyPath, strlen($associationName) + 1));
+                } elseif (0 === \strpos($propertyPath, $associationName . '.')) {
+                    $errorSource->setPropertyPath(\substr($propertyPath, \strlen($associationName) + 1));
                 }
             }
         }

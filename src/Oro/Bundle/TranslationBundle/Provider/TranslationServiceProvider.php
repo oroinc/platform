@@ -5,11 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReader;
 
+/**
+ * Merges generated files over downloaded and upload result back to remoter
+ */
 class TranslationServiceProvider
 {
     const FILE_NAME_SUFFIX      = '.zip';
@@ -24,8 +27,8 @@ class TranslationServiceProvider
     /** @var NullLogger */
     protected $logger;
 
-    /** @var TranslationLoader */
-    protected $translationLoader;
+    /** @var TranslationReader */
+    protected $translationReader;
 
     /** @var DatabasePersister  */
     protected $databasePersister;
@@ -36,20 +39,20 @@ class TranslationServiceProvider
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
-     * @param TranslationLoader   $translationLoader
+     * @param TranslationReader   $translationReader
      * @param DatabasePersister   $databasePersister
      * @param string              $cacheDir
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
         JsTranslationDumper $jsTranslationDumper,
-        TranslationLoader $translationLoader,
+        TranslationReader $translationReader,
         DatabasePersister $databasePersister,
         $cacheDir
     ) {
         $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
-        $this->translationLoader   = $translationLoader;
+        $this->translationReader   = $translationReader;
         $this->databasePersister   = $databasePersister;
         $this->cacheDir            = $cacheDir;
 
@@ -312,7 +315,7 @@ class TranslationServiceProvider
             YamlFixer::fixStrings($fileInfo->getPathname());
         }
 
-        $this->translationLoader->loadMessages($sourceDir, $catalog);
+        $this->translationReader->read($sourceDir, $catalog);
         $this->databasePersister->persist($locale, $catalog->all());
     }
 

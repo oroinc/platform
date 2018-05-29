@@ -30,20 +30,4 @@ class NumberType extends AbstractType
             ->setDefaults(['scale' => null, 'compound' => false])
             ->setAllowedTypes('scale', ['null', 'int']);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_number';
-    }
 }

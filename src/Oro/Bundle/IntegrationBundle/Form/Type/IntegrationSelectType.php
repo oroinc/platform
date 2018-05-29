@@ -11,7 +11,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -28,8 +27,11 @@ class IntegrationSelectType extends AbstractType
     /** @var TypesRegistry */
     protected $typesRegistry;
 
-    /** @var ChoiceListFactoryInterface */
-    protected $choiceListFactory;
+    /** @var AssetHelper */
+    protected $assetHelper;
+
+    /** @var AclHelper */
+    protected $aclHelper;
 
     /**
      * @param EntityManager $em
@@ -41,14 +43,12 @@ class IntegrationSelectType extends AbstractType
         EntityManager $em,
         TypesRegistry $typesRegistry,
         AssetHelper $assetHelper,
-        AclHelper $aclHelper,
-        ChoiceListFactoryInterface $choiceListFactory
+        AclHelper $aclHelper
     ) {
         $this->em            = $em;
         $this->typesRegistry = $typesRegistry;
         $this->assetHelper   = $assetHelper;
         $this->aclHelper     = $aclHelper;
-        $this->choiceListFactory = $choiceListFactory;
     }
 
     /**
@@ -70,7 +70,6 @@ class IntegrationSelectType extends AbstractType
             $types = $options['allowed_types'] ?? null;
 
             return new DoctrineChoiceLoader(
-                $this->choiceListFactory,
                 $em,
                 'OroIntegrationBundle:Channel',
                 null,

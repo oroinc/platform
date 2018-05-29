@@ -228,7 +228,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -264,7 +264,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -300,7 +300,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -340,7 +340,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -380,7 +380,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -416,7 +416,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -456,7 +456,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -496,7 +496,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -531,7 +531,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -566,7 +566,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -606,7 +606,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -634,7 +634,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
         self::assertArrayContains($expectedContent, $content);
@@ -679,7 +679,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected static function assertResponseCount($expectedCount, Response $response)
     {
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         self::assertCount($expectedCount, $content[JsonApiDoc::DATA]);
     }
 
@@ -690,7 +690,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected static function assertResponseNotEmpty(Response $response)
     {
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         self::assertNotEmpty($content[JsonApiDoc::DATA]);
     }
 
@@ -715,7 +715,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     {
         static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains([JsonApiDoc::ERRORS => $expectedErrors], $response);
             self::assertCount(
@@ -747,32 +747,33 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected function dumpYmlTemplate($fileName, Response $response)
     {
-        $data = json_decode($response->getContent(), true);
+        $data = self::jsonToArray($response->getContent());
         if (null === $data) {
             throw new \RuntimeException('The response does not have the content.');
         }
 
-        $idReferences = [];
-        $references = $this->getReferenceRepository()->getReferences();
-        foreach ($references as $referenceId => $entity) {
-            $entityClass = ClassUtils::getClass($entity);
-            $entityType = $this->getEntityType($entityClass, false);
-            if ($entityType) {
-                $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
-                if (null !== $metadata) {
-                    $entityId = $metadata->getIdentifierValues($entity);
-                    if (count($entityId) === 1) {
-                        $entityId = (string)reset($entityId);
-                        $idReferences[$entityType . '::' . $entityId] = [
-                            $referenceId,
-                            $metadata->getSingleIdentifierFieldName()
-                        ];
+        if ($this->hasReferenceRepository()) {
+            $idReferences = [];
+            $references = $this->getReferenceRepository()->getReferences();
+            foreach ($references as $referenceId => $entity) {
+                $entityClass = ClassUtils::getClass($entity);
+                $entityType = $this->getEntityType($entityClass, false);
+                if ($entityType) {
+                    $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
+                    if (null !== $metadata) {
+                        $entityId = $metadata->getIdentifierValues($entity);
+                        if (count($entityId) === 1) {
+                            $entityId = (string)reset($entityId);
+                            $idReferences[$entityType . '::' . $entityId] = [
+                                $referenceId,
+                                $metadata->getSingleIdentifierFieldName()
+                            ];
+                        }
                     }
                 }
             }
+            $this->normalizeYmlTemplate($data, $idReferences);
         }
-
-        $this->normalizeYmlTemplate($data, $idReferences);
 
         $content = Yaml::dump($data, 8);
         // replace "data: {}" with "data: []" to correct representation of empty collection
@@ -840,7 +841,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected function getResourceId(Response $response)
     {
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         self::assertInternalType('array', $content);
         self::assertArrayHasKey(JsonApiDoc::DATA, $content);
         self::assertInternalType('array', $content[JsonApiDoc::DATA]);
@@ -858,7 +859,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      */
     protected function getResponseErrors(Response $response)
     {
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         self::assertInternalType('array', $content);
         self::assertArrayHasKey(JsonApiDoc::ERRORS, $content);
         self::assertInternalType('array', $content[JsonApiDoc::ERRORS]);

@@ -6,14 +6,17 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Reader\TranslationReader;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 
+/**
+ * Dumps translations
+ */
 class TranslationPackDumper implements LoggerAwareInterface
 {
     /** @var TranslationWriter */
@@ -22,8 +25,8 @@ class TranslationPackDumper implements LoggerAwareInterface
     /** @var ExtractorInterface */
     protected $extractor;
 
-    /** @var TranslationLoader */
-    protected $loader;
+    /** @var TranslationReader */
+    protected $translationReader;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -43,7 +46,7 @@ class TranslationPackDumper implements LoggerAwareInterface
     /**
      * @param TranslationWriter  $writer
      * @param ExtractorInterface $extractor
-     * @param TranslationLoader  $loader
+     * @param TranslationReader  $translationReader
      * @param Filesystem         $filesystem
      * @param TranslationPackageProvider $provider
      * @param array              $bundles
@@ -51,14 +54,14 @@ class TranslationPackDumper implements LoggerAwareInterface
     public function __construct(
         TranslationWriter $writer,
         ExtractorInterface $extractor,
-        TranslationLoader $loader,
+        TranslationReader $translationReader,
         Filesystem $filesystem,
         TranslationPackageProvider $provider,
         array $bundles
     ) {
         $this->writer     = $writer;
         $this->extractor  = $extractor;
-        $this->loader     = $loader;
+        $this->translationReader     = $translationReader;
         $this->filesystem = $filesystem;
         $this->provider   = $provider;
         $this->bundles    = $bundles;
@@ -194,7 +197,7 @@ class TranslationPackDumper implements LoggerAwareInterface
 
             $currentCatalogue   = new MessageCatalogue($locale);
             if ($this->filesystem->exists($translationsPath)) {
-                $this->loader->loadMessages($translationsPath, $currentCatalogue);
+                $this->translationReader->read($translationsPath, $currentCatalogue);
                 $this->loadedTranslations[$bundle->getName()] = $currentCatalogue;
             }
         }

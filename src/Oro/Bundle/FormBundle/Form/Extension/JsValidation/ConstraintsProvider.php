@@ -46,7 +46,8 @@ class ConstraintsProvider
 
         $result = array();
         foreach ($constraints as $constraint) {
-            if (array_intersect($validationGroups, $constraint->groups)) {
+            $groups = $constraint->groups ?? [Constraint::DEFAULT_GROUP];
+            if (array_intersect($validationGroups, $groups)) {
                 $result[] = $constraint;
             }
         }
