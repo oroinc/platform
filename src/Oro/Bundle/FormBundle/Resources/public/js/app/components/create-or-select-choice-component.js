@@ -1,11 +1,12 @@
-define([
-    'underscore',
-    'jquery',
-    'oroui/js/app/components/base/component',
-    'routing',
-    'oroui/js/mediator'
-], function(_, $, BaseComponent, routing, mediator) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var tinyMCE = require('tinymce/tinymce');
 
     return BaseComponent.extend({
 
@@ -202,7 +203,12 @@ define([
                     );
                     $modifiedField.prop('checked', $element.is(':checked')).change();
                 } else {
-                    $modifiedField.val($element.val()).change();
+                    var editor = tinyMCE.get($modifiedField.attr('id'));
+                    if (editor) {
+                        editor.setContent($element.val());
+                    } else {
+                        $modifiedField.val($element.val()).change();
+                    }
                 }
             }, this));
         },
