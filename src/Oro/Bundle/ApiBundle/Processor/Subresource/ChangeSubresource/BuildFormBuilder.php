@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Type\ObjectType;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -155,6 +156,7 @@ class BuildFormBuilder implements ProcessorInterface
                 $entryFormOptions = \array_replace($entryFormOptions, $entryOptions);
             }
         }
+        $entryFormOptions[CustomizeFormDataHandler::API_CONTEXT] = $context;
 
         return $entryFormOptions;
     }

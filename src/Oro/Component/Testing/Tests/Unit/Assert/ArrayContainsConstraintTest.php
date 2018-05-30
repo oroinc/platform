@@ -421,4 +421,58 @@ TEXT;
         $constraint = new ArrayContainsConstraint($expected, false);
         $constraint->evaluate($actual);
     }
+
+    public function testNotStrictArraysNotEqualForWhenSeveralNotMatchedItemsFoundBeforeCallOfTryMatchIndexedElement()
+    {
+        $expected = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222',
+                        'key223' => 'value223'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '1'],
+                        ['type' => 'test', 'key' => '2']
+                    ]
+                ]
+            ]
+        ];
+        $actual = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222_a',
+                        'key223' => 'value223_a'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '2'],
+                        ['type' => 'test', 'key' => '1']
+                    ]
+                ]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "0.key2.key22.key222". Error: Failed asserting that 'value222_a' is identical to 'value222'.
+Path: "0.key2.key22.key223". Error: Failed asserting that 'value223_a' is identical to 'value223'.
+TEXT;
+
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
 }

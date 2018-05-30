@@ -37,7 +37,7 @@ account_users
 ``` 
 
 Where `account_users` is the main block, which corresponds to block `id` of `datagrid` type. 
-Block `account_users` contains two other blocks: `account_users_header_row` and `account_users_row`. First responds to the table header, second - table row. In `account_users_header_row` we can see `<block_id>_cell_<column1...N>` blocks which corresponds to  `<th>...</th>` HTML structure. Columns `column1` ... `columnN` were taken from `datagrid.yml` config file:
+Block `account_users` contains two other blocks: `account_users_header_row` and `account_users_row`. First responds to the table header, second - table row. In `account_users_header_row` we can see `<block_id>_cell_<column1...N>` blocks which corresponds to  `<th>...</th>` HTML structure. Columns `column1` ... `columnN` were taken from `datagrids.yml` config file:
 
 ``` yaml
     columns:

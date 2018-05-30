@@ -255,7 +255,7 @@ class AttachmentManager
                 'codedString' => $urlString,
                 'extension'   => $entity->getExtension()
             ],
-            $absolute
+            $absolute ? RouterInterface::ABSOLUTE_URL : RouterInterface::ABSOLUTE_PATH
         );
     }
 

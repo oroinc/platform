@@ -17,14 +17,13 @@ Retrieve a collection of comment records.
 ### create
 
 Create a new comment record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/comments>`
 
 ```JSON
 {  
@@ -72,8 +71,6 @@ Edit a specific comment record.
 
 {@request:json_api}
 Example:
-
-`</api/comments/11>`
 
 ```JSON
 {  
@@ -123,7 +120,6 @@ Delete a specific comment record.
 ### delete_list
 
 Delete a collection of comment records.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
@@ -176,8 +172,6 @@ Replace the file attached to a specific comment.
 {@request:json_api}
 Example:
 
-`</api/comments/11/relationships/attachment>`
-
 ```JSON
 {
   "data": {
@@ -204,8 +198,6 @@ Replace the organization that a specific comment belongs to.
 
 {@request:json_api}
 Example:
-
-`</api/comments/1/relationships/organization>`
 
 ```JSON
 {
@@ -234,8 +226,6 @@ Replace the owner of a specific comment record.
 {@request:json_api}
 Example:
 
-`</api/comments/1/relationships/owner>`
-
 ```JSON
 {
   "data": {
@@ -263,8 +253,6 @@ Replace a record that the comment was made on.
 {@request:json_api}
 Example:
 
-`</api/comments/1/relationships/target>`
-
 ```JSON
 {
   "data": {
@@ -291,8 +279,6 @@ Replace the user who last updated a specific comment.
 
 {@request:json_api}
 Example:
-
-`</api/comments/11/relationships/updatedBy>`
 
 ```JSON
 {

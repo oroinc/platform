@@ -17,14 +17,13 @@ Retrieve a collection of user role records.
 ### create
 
 Create a new user role.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/userroles>`
 
 ```JSON
 {  
@@ -56,8 +55,6 @@ Edit a specific user role record.
 
 {@request:json_api}
 Example:
-
-`</api/userroles/10>`
 
 ```JSON
 {  
@@ -91,7 +88,6 @@ Remove a specific user role.
 ### delete_list
 
 Delete a collection of user roles.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
@@ -132,8 +128,6 @@ Replace the organization that a specific user role belongs to.
 {@request:json_api}
 Example:
 
-`</api/userroles/10/relationships/organization>`
-
 ```JSON
 {
   "data": {
@@ -161,8 +155,6 @@ Assign the user records to a specific user role record.
 {@request:json_api}
 Example:
 
-`</api/userroles/1/relationships/users>`
-
 ```JSON
 {
   "data": [
@@ -189,8 +181,6 @@ Replace the user records that are assigned to a specific user role record.
 
 {@request:json_api}
 Example:
-
-`</api/userroles/1/relationships/users>`
 
 ```JSON
 {

@@ -12,21 +12,18 @@ Retrieve a specific attribute family record.
 
 Retrieve a collection of attribute family records.
 
-The list of records that will be returned, could be limited by filters.
-
 {@inheritdoc}
 
 ### update
 
 Edit a specific attribute family record.
+
 The updated record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</admin/api/attributefamilies/1>`
 
 ```JSON
 {
@@ -90,8 +87,6 @@ Replace the list of label records assigned to a specific attribute family record
 {@request:json_api}
 Example:
 
-`</admin/api/attributefamilies/1/relationships/labels>`
-
 ```JSON
 {
   "data": [
@@ -111,8 +106,6 @@ Set label records for a specific attribute family record.
 {@request:json_api}
 Example:
 
-`</admin/api/attributefamilies/1/relationships/labels>`
-
 ```JSON
 {
   "data": [
@@ -131,8 +124,6 @@ Remove label records from a specific attribute family record.
 
 {@request:json_api}
 Example:
-
-`</admin/api/attributefamilies/1/relationships/labels>`
 
 ```JSON
 {
@@ -163,8 +154,6 @@ Replace the organization a specific attribute family record belongs to.
 {@request:json_api}
 Example:
 
-`</admin/api/attributefamilies/1/relationships/organization>`
-
 ```JSON
 {
   "data": {
@@ -192,8 +181,6 @@ Replace the owner of a specific attribute family record.
 {@request:json_api}
 Example:
 
-`</admin/api/attributefamilies/1/relationships/owner>`
-
 ```JSON
 {
   "data": {
@@ -220,8 +207,6 @@ Replace image assigned to a specific attribute family record
 
 {@request:json_api}
 Example:
-
-`</admin/api/attributefamilies/1/relationships/image>`
 
 ```JSON
 {

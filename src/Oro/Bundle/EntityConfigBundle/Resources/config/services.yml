@@ -246,6 +246,7 @@ services:
             - '@oro_entity_config.config.config_helper'
             - '@session'
             - '@event_dispatcher'
+            - '@doctrine'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
