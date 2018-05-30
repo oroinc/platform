@@ -1,21 +1,6 @@
+/* @theme: admin.oro; */
+
 @import "../colors";
-
-$app-logo-background:                url(../../img/oro_icon.svg) no-repeat center center !default;
-
-// app-header
-$app-header-height:                  32px !default;
-$app-header-thick-height:            48px !default;
-$app-header-font-size:               14px !default;
-$app-header-icon-font-size:          16px !default;
-$app-header-bg-color:                $primary-900 !default;
-$app-header-logo-text-color:         $primary !default;
-$app-header-text-color:              $primary-500 !default;
-$app-header-text-hover-color:        $primary-400 !default;
-$app-header-divider-color:           $primary-800 !default;
-
-// pin-bar
-$pin-item-active-bg-color:           $extra-200 !default;
-$pin-item-close-color:               $primary-700 !default;
-$pin-item-close-hover-color:         darken($pin-item-close-color, 8%) !default;
-$pin-item-outdated-color:            $warning-dark !default;
-$pin-item-outdated-hover-color:      darken($pin-item-outdated-color, 8%) !default;
+@import "variables/app-header";
+@import "variables/app-logo";
+@import "variables/pin-bar";

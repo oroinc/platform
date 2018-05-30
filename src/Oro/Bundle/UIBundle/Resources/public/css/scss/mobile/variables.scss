@@ -1,4 +1,8 @@
+/* @theme: admin.oro; */
+
 @import "../colors";
+@import "variables/app-header";
+
 $accordionHeadingBackgroundColor:          #eaeaea;
 $contentPadding:                           10px;
 $horizontalPadding:                        $contentPadding;
@@ -11,10 +15,3 @@ $baseFontSize:                             14px;
 $fontSizeLarge:                            $baseFontSize * 1.25; // ~18px
 $fontSizeSmall:                            $baseFontSize * 0.85; // ~12px
 $fontSizeMini:                             $baseFontSize * 0.75; // ~11px
-
-// app-header
-$app-header-height:                        48px !default;
-$app-header-bg-color:                      $primary !default;
-$app-header-logo-text-color:               $primary-inverse !default;
-$app-header-text-color:                    $primary-800 !default;
-$app-header-icon-font-size:                24px !default;

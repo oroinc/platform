@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 @import "email-variables";
 @import "oroui/css/scss/mixins";
 
@@ -12,7 +14,6 @@
             font-weight: normal;
             font-size: 16px;
             line-height: 16px;
-            color: $primary-500;
             .item-counter {
                 display: none;
                 color: $primary-inverse;

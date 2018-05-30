@@ -1,4 +1,8 @@
+/* @theme: admin.demo; */
+
 .main-menu-top {
+    background-color: $menu-background-color;
+
     .dropdown-menu {
         background-color: $menu-dropdown-background-color;
     }
@@ -8,17 +12,6 @@
 
         &-level-1 {
             color: $menu-item-first-level-text-color;
-        }
-    }
-
-    // Arrow for menu item, who has nested child
-    .menu-level-1 {
-        .dropdown {
-            > .unclickable {
-                &::after {
-                    color: $menu-item-text-color;
-                }
-            }
         }
     }
 
@@ -49,6 +42,20 @@
                         &:hover {
                             background-color: $menu-dropdown-background-color;
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    .menu-level-1 {
+        .align-menu {
+            &-left,
+            &-right {
+                .unclickable {
+                    &::before,
+                    &::after {
+                        color: $menu-item-text-color;
                     }
                 }
             }
