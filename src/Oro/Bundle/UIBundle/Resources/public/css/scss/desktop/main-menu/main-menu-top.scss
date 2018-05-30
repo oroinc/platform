@@ -1,5 +1,12 @@
 .main-menu-top {
+    background-color: $menu-background-color;
+
+    @include clearfix();
+
     .main-menu {
+        display: flex;
+        align-items: center;
+        float: left;
         padding-left: 5px;
 
         @include clearfix();
@@ -37,30 +44,6 @@
         }
     }
 
-    // Arrow for menu item, who has nested child
-    .menu-level-1 {
-        .dropdown {
-            > .unclickable {
-                position: relative;
-
-                @include fa-icon($fa-var-angle-right, after);
-
-                &::after {
-                    position: absolute;
-                    top: 50%;
-                    right: 10px;
-
-                    margin-top: -($menu-font-size / 2);
-
-                    line-height: 1;
-
-                    color: $menu-item-text-color;
-                }
-
-            }
-        }
-    }
-
     .dropdown-menu-title {
         &-level-1 {
             display: none;
@@ -75,6 +58,10 @@
         > .dropdown-menu {
             top: 0;
             left: 100%;
+
+            display: block;
+
+            visibility: hidden;
         }
 
         &-level-1 {
@@ -109,9 +96,9 @@
                             bottom: 0;
                             right: 0;
                             left: 0;
-                            z-index: $zindexDropdown + 1;
+                            z-index: $zindexDropdown + 2;
 
-                            height: 10px;
+                            height: 6px;
 
                             background: $menu-dropdown-background-color;
                         }
@@ -119,6 +106,17 @@
                         &:hover {
                             background-color: $menu-dropdown-background-color;
                         }
+                    }
+                }
+
+                .dropdown-menu-wrapper {
+                    z-index: $zindexDropdown + 1;
+
+
+                    &__placeholder {
+                        height: auto;
+
+                        overflow: inherit;
                     }
                 }
             }
@@ -129,7 +127,7 @@
             > .dropdown-menu-wrapper__child,
                 /* Opens on hover for all 2+ levels */
             .dropdown-menu-wrapper__scrollable {
-                display: block;
+                visibility: visible;
             }
         }
     }
@@ -170,15 +168,16 @@
         }
 
         &__child {
-            display: none;
-
             position: absolute;
+            left: 100%;
+
+            visibility: hidden;
         }
 
         &__scrollable {
-            display: none;
-
             box-shadow: $menu-dropdown-box-shadow;
+
+            visibility: hidden;
 
             > .dropdown-menu {
                 position: static;
@@ -191,6 +190,9 @@
 
         &__placeholder {
             position: absolute;
+
+            height: 0;
+            overflow: hidden;
         }
     }
 
@@ -202,6 +204,11 @@
 
                 font-size: 0;
                 line-height: 1;
+            }
+
+            .title-level-1 {
+                padding-top: 15px;
+                padding-bottom: 14px;
             }
 
             .menu-icon {
@@ -231,6 +238,138 @@
 
             .menu-icon {
                 display: none;
+            }
+        }
+    }
+
+    &.narrow-mode {
+        .menu-icon {
+            display: block;
+            margin-bottom: 4px;
+
+            font-size: 21px;
+            text-align: center;
+        }
+
+        .only-icon {
+            .menu-icon {
+                margin-bottom: 0;
+            }
+        }
+
+        .title-level-1 {
+            padding: 6px 12px;
+            max-width: 100px;
+
+            font-size: 11px;
+            line-height: 1;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .align-menu {
+        &-left {
+            > .dropdown-menu-wrapper__placeholder {
+                right: 0;
+            }
+
+            > .dropdown-menu-wrapper__child,
+            > .dropdown-menu {
+                right: 100%;
+                left: auto;
+
+                margin-right: -22px;
+            }
+        }
+
+        &-right {
+            > .dropdown-menu-wrapper__placeholder {
+                left: 0;
+            }
+
+            > .dropdown-menu-wrapper__child,
+            > .dropdown-menu {
+                left: 100%;
+
+                margin-left: -22px;
+            }
+        }
+    }
+
+    .menu-level-1 {
+        .align-menu {
+            &-left,
+            &-right {
+                .unclickable {
+                    position: relative;
+
+                    &::before,
+                    &::after {
+                        position: absolute;
+                        top: 50%;
+
+                        margin-top: -($menu-font-size / 2);
+
+                        line-height: 1;
+
+                        color: $menu-item-text-color;
+
+                        content: none;
+                    }
+                }
+            }
+
+            &-left {
+                > .unclickable {
+                    @include fa-icon($fa-var-angle-left, before);
+
+                    &:before {
+                        left: 16px;
+                    }
+
+                    .title:not(.title-level-1) {
+                        padding-left: 26px;
+                    }
+                }
+            }
+
+            &-right {
+                > .unclickable {
+                    @include fa-icon($fa-var-angle-right, after);
+
+                    &::after {
+                        right: 16px;
+                    }
+
+                    .title:not(.title-level-1) {
+                        padding-right: 26px;
+                    }
+                }
+            }
+        }
+    }
+
+    .align-single-item {
+        &-left {
+            > .dropdown-menu-wrapper__placeholder,
+            > .dropdown-menu-wrapper__child,
+            > .dropdown-menu {
+                .dropdown-menu-single-item .title {
+                    padding-left: 26px;
+                }
+            }
+        }
+
+        &-right {
+            > .dropdown-menu-wrapper__placeholder,
+            > .dropdown-menu-wrapper__child,
+            > .dropdown-menu {
+                .dropdown-menu-single-item .title {
+                    padding-right: 26px;
+                }
             }
         }
     }
