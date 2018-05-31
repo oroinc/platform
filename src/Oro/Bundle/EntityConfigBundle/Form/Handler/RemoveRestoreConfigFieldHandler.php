@@ -143,6 +143,7 @@ class RemoveRestoreConfigFieldHandler
             'state',
             $isFieldExist ? ExtendScope::STATE_RESTORE : ExtendScope::STATE_NEW
         );
+        $fieldConfig->set('is_deleted', false);
 
         $entityConfig = $this->configHelper->getEntityConfigByField($field, 'extend');
         $entityConfig->set('upgradeable', true);
