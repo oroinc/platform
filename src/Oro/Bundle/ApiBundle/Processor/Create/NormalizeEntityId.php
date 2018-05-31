@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether a string representation of entity identifier exists in the Context,
+ * Checks whether a string representation of entity identifier exists in the context,
  * and if so, converts it to its original type.
  */
 class NormalizeEntityId implements ProcessorInterface
@@ -39,6 +39,11 @@ class NormalizeEntityId implements ProcessorInterface
         }
 
         $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            // the metadata does not exist
+            return;
+        }
+
         if ($metadata->hasIdentifierGenerator()) {
             // keep an entity identifier as is if the entity has a generator for identifier value
             return;

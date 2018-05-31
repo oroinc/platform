@@ -288,10 +288,10 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                         'options' => [
                             'field_options' => [
                                 'choices' => [
-                                    'day' => 'Day',
-                                    'month' => 'Month',
-                                    'quarter' => 'Quarter',
-                                    'year' => 'Year',
+                                    'Day' => 'day',
+                                    'Month' => 'month',
+                                    'Quarter' => 'quarter',
+                                    'Year' => 'year',
                                 ]
                             ],
                             'default_value' => 'Day'
@@ -348,8 +348,8 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                             'options' => [
                                 'field_options' => [
                                     'choices' => [
-                                        'No',
-                                        'Yes'
+                                        'No' => 0,
+                                        'Yes' => 1,
                                     ]
                                 ],
                                 'default_value' => 'Yes'

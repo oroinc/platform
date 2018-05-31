@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
@@ -42,7 +43,7 @@ class TimezoneType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'choices' => self::$timezones,
+                'choices' => self::$timezones ? array_flip(self::$timezones) : null,
             )
         );
     }
@@ -52,7 +53,7 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

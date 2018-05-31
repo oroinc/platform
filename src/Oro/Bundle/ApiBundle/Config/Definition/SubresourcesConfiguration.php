@@ -3,34 +3,39 @@
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "subresources" section.
+ */
 class SubresourcesConfiguration extends AbstractConfigurationSection
 {
     /** @var ActionsConfiguration */
-    protected $actionsConfiguration;
+    private $actionsConfiguration;
 
     /** @var FiltersConfiguration */
-    protected $filtersConfiguration;
+    private $filtersConfiguration;
 
     /**
-     * @param string[] $permissibleActions
+     * @param string[]               $permissibleActions
+     * @param FilterOperatorRegistry $filterOperatorRegistry
      */
-    public function __construct($permissibleActions)
+    public function __construct(array $permissibleActions, FilterOperatorRegistry $filterOperatorRegistry)
     {
         $this->actionsConfiguration = new ActionsConfiguration(
             $permissibleActions,
             'subresources.subresource.action'
         );
-        $this->filtersConfiguration = new FiltersConfiguration();
+        $this->filtersConfiguration = new FiltersConfiguration($filterOperatorRegistry);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setSettings(ConfigurationSettingsInterface $settings)
+    public function setSettings(ConfigurationSettingsInterface $settings): void
     {
         parent::setSettings($settings);
         $this->actionsConfiguration->setSettings($settings);
@@ -40,7 +45,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         /** @var NodeBuilder $subresourceNode */
         $subresourceNode = $node->end()
@@ -59,15 +64,15 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function isApplicable($section)
+    public function isApplicable(string $section): bool
     {
-        return $section === 'entities.entity';
+        return 'entities.entity' === $section;
     }
 
     /**
      * @param NodeBuilder $node
      */
-    protected function configureSubresourceNode(NodeBuilder $node)
+    protected function configureSubresourceNode(NodeBuilder $node): void
     {
         $sectionName = 'subresources.subresource';
 
@@ -102,7 +107,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessSubresourceConfig(array $config)
+    protected function postProcessSubresourceConfig(array $config): array
     {
         if (!empty($config[SubresourceConfig::TARGET_TYPE])) {
             if ('collection' === $config[SubresourceConfig::TARGET_TYPE]) {

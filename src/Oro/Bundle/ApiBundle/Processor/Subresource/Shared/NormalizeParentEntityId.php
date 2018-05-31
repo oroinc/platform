@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Checks whether a string representation of the parent entity identifier exists in the Context,
+ * Checks whether a string representation of the parent entity identifier exists in the context,
  * and if so, converts it to its original type.
  */
 class NormalizeParentEntityId implements ProcessorInterface

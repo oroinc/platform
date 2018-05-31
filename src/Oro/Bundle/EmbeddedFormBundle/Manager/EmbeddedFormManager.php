@@ -40,8 +40,6 @@ class EmbeddedFormManager
      */
     public function createForm($type, $data = null, $options = [])
     {
-        $type    = $this->getTypeInstance($type) ? : $type;
-
         return $this->formFactory->create($type, $data, $options);
     }
 
@@ -70,6 +68,14 @@ class EmbeddedFormManager
     public function getAll()
     {
         return $this->formTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllChoices()
+    {
+        return array_flip($this->formTypes);
     }
 
     /**

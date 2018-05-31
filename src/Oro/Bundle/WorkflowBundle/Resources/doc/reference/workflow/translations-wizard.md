@@ -12,7 +12,7 @@ First of all, you should have your workflow configuration itself loaded, those a
 
 *For example*:
 ```bash
-app/console oro:workflow:definitions:load --directories=$YOUR_BUNDLE_DIR/Resources/config/oro
+bin/console oro:workflow:definitions:load --directories=$YOUR_BUNDLE_DIR/Resources/config/oro
 ```
 
 ***Second Step***:
@@ -25,7 +25,7 @@ For that purpose, to fill valid keys with translation text, you can use special 
 
 *For example*, you have workflow named "my_workflow" and creating a translation file directly by redirecting output of command to a file:
 ```bash
-app/console oro:workflow:translations:dump my_workflow --locale=en > $YOUR_BUNDLE_DIR/Resources/translations/workflows.en.yml
+bin/console oro:workflow:translations:dump my_workflow --locale=en > $YOUR_BUNDLE_DIR/Resources/translations/workflows.en.yml
 ```
 Now, file <YourBundleDirectory>/Resources/translations/workflows.en.yml will be filled by translation keys tree with empty strings, so a developer can fill their values with proper text (English in our case).
 
@@ -33,7 +33,7 @@ Now, file <YourBundleDirectory>/Resources/translations/workflows.en.yml will be 
 
 When translation file was updated you might need to load translations into the system from that file. It can be performed by `oro:translation:load` command by simply running:
 ```bash 
-app/console oro:translation:load
+bin/console oro:translation:load
 ```
 
 Now, if you need to **update** an existing workflow you can perform same operations because dumped translations of `oro:workflow:translations:dump` would be filled by existing one and newly created nodes of text.

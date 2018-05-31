@@ -38,11 +38,6 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
         unset($this->formatter, $this->type);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(LanguageFilterType::NAME, $this->type->getName());
-    }
-
     public function testGetBlockPrefix()
     {
         $this->assertEquals(LanguageFilterType::NAME, $this->type->getBlockPrefix());
@@ -50,7 +45,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EntityFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EntityFilterType::class, $this->type->getParent());
     }
 
     public function testFinishView()

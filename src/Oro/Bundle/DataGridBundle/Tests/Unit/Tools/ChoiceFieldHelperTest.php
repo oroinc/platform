@@ -109,8 +109,8 @@ class ChoiceFieldHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getResult')
             ->will($this->returnValue([['key' => 'a1', 'label' => 'A1'], ['key' => 'a2', 'label' => 'A2']]));
         $expected = [
-            'a1' => 'A1',
-            'a2' => 'A2'
+            'A1' => 'a1',
+            'A2' => 'a2',
         ];
         $this->assertEquals($expected, $this->choiceHelper->getChoices('entity', 'key', 'label'));
     }
@@ -143,8 +143,8 @@ class ChoiceFieldHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getResult')
             ->will($this->returnValue([['key' => 'a1', 'label' => 'A1_t'], ['key' => 'a2', 'label' => 'A2_t']]));
         $expected = [
-            'a1' => 'A1_t',
-            'a2' => 'A2_t'
+            'A1_t' => 'a1',
+            'A2_t' => 'a2',
         ];
         $this->assertEquals($expected, $this->choiceHelper->getChoices('entity', 'key', 'label', null, true));
     }

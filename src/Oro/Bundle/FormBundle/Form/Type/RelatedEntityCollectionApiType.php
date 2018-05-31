@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RelatedEntityCollectionApiType extends AbstractType
@@ -15,7 +16,7 @@ class RelatedEntityCollectionApiType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'          => true,
-                'type'               => 'oro_related_entity_api'
+                'entry_type'         => RelatedEntityApiType::class
             ]
         );
     }
@@ -25,7 +26,7 @@ class RelatedEntityCollectionApiType extends AbstractType
      */
     public function getParent()
     {
-        return 'collection';
+        return CollectionType::class;
     }
 
     /**

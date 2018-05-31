@@ -38,6 +38,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestOrderTables($schema);
     }
 
     /**
@@ -508,6 +509,44 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             $targetName,
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * Create test_api_order and test_api_order_line_item tables
+     *
+     * @param Schema $schema
+     */
+    protected function createTestOrderTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_order') || $schema->hasTable('test_api_order_line_item')) {
+            return;
+        }
+
+        $orderTable = $schema->createTable('test_api_order');
+        $orderTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $orderTable->addColumn('po_number', 'string', ['notnull' => false, 'length' => 255]);
+        $orderTable->setPrimaryKey(['id']);
+
+        $orderLineItemTable = $schema->createTable('test_api_order_line_item');
+        $orderLineItemTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $orderLineItemTable->addColumn('product_id', 'integer', ['notnull' => false]);
+        $orderLineItemTable->addColumn('order_id', 'integer', ['notnull' => false]);
+        $orderLineItemTable->addColumn('quantity', 'float', ['notnull' => false]);
+        $orderLineItemTable->setPrimaryKey(['id']);
+        $orderLineItemTable->addIndex(['product_id']);
+        $orderLineItemTable->addIndex(['order_id']);
+        $orderLineItemTable->addForeignKeyConstraint(
+            $schema->getTable('test_product'),
+            ['product_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $orderLineItemTable->addForeignKeyConstraint(
+            $orderTable,
+            ['order_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
         );
     }
 }

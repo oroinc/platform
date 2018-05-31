@@ -5,7 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\HttpFoundation\Response;
 
-class RestPlainApiTestCase extends ApiTestCase
+/**
+ * The base class for plain REST API functional tests.
+ */
+abstract class RestPlainApiTestCase extends RestApiTestCase
 {
     const JSON_CONTENT_TYPE = 'application/json';
 
@@ -14,8 +17,7 @@ class RestPlainApiTestCase extends ApiTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-
+        $this->initClient();
         parent::setUp();
     }
 
@@ -28,15 +30,28 @@ class RestPlainApiTestCase extends ApiTestCase
     }
 
     /**
+     * Sends REST API request.
+     *
      * @param string $method
      * @param string $uri
      * @param array  $parameters
+     * @param array  $server
      *
      * @return Response
      */
-    protected function request($method, $uri, array $parameters = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [])
     {
-        $this->client->request($method, $uri, $parameters);
+        if (!isset($server['HTTP_X-WSSE'])) {
+            $server = array_replace($server, $this->getWsseAuthHeader());
+        }
+
+        $this->client->request(
+            $method,
+            $uri,
+            $parameters,
+            [],
+            $server
+        );
 
         return $this->client->getResponse();
     }
@@ -54,7 +69,7 @@ class RestPlainApiTestCase extends ApiTestCase
             $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
         self::assertArrayContains($expectedContent, $content);
@@ -81,7 +96,7 @@ class RestPlainApiTestCase extends ApiTestCase
     {
         static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains($expectedErrors, $response);
             self::assertCount(

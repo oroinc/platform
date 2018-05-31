@@ -3,8 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider;
 
 use Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\FormProviderStub;
+use Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\LayoutFormStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\Unit\Form\Type\Stub\FormStub;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,7 +36,6 @@ class AbstractFormProviderTest extends WebTestCase
     /**
      * @dataProvider formDataProvider
      *
-     * @param string $formName
      * @param string $routeName
      * @param mixed  $data
      * @param array  $options
@@ -45,7 +44,6 @@ class AbstractFormProviderTest extends WebTestCase
      * @param string $expectedCacheKey
      */
     public function testGetFormAndFormView(
-        $formName,
         $routeName,
         $data,
         array $options,
@@ -63,18 +61,18 @@ class AbstractFormProviderTest extends WebTestCase
             ->with($routeName)
             ->willReturn($formAction);
 
-        $resultForm = $this->formProvider->getTestForm($formName, $routeName, $data, $options, $cacheKeyOptions);
+        $resultForm = $this->formProvider->getTestForm($routeName, $data, $options, $cacheKeyOptions);
 
-        $expectedForm = $this->getForm($expectedData['formName'], $expectedData['data'], $expectedData['options']);
+        $expectedForm = $this->getForm($expectedData['data'], $expectedData['options']);
 
         // check local cache
-        $cachedForm = $this->formProvider->getTestForm($formName, $routeName, $data, $options, $cacheKeyOptions);
+        $cachedForm = $this->formProvider->getTestForm($routeName, $data, $options, $cacheKeyOptions);
 
         // check local cache for form view
         $cachedFormView1 = $this->formProvider
-            ->getTestFormView($formName, $routeName, $data, $options, $cacheKeyOptions);
+            ->getTestFormView($routeName, $data, $options, $cacheKeyOptions);
         $cachedFormView2 = $this->formProvider
-            ->getTestFormView($formName, $routeName, $data, $options, $cacheKeyOptions);
+            ->getTestFormView($routeName, $data, $options, $cacheKeyOptions);
 
         $this->assertEquals($expectedForm, $resultForm);
         $this->assertSame($expectedForm->getData(), $resultForm->getData());
@@ -82,7 +80,7 @@ class AbstractFormProviderTest extends WebTestCase
         $this->assertSame($cachedFormView1, $cachedFormView2);
         $this->assertSame(
             $expectedCacheKey,
-            $this->formProvider->getTestCacheKey($formName, $options, $cacheKeyOptions)
+            $this->formProvider->getTestCacheKey($options, $cacheKeyOptions)
         );
     }
 
@@ -95,24 +93,21 @@ class AbstractFormProviderTest extends WebTestCase
     {
         return [
             'form' => [
-                'formName' => 'form_name',
                 'routeName' => 'form_name',
                 'data' => null,
                 'options' => [],
                 'cacheKeyOptions' => [],
                 'expectedData' => [
-                    'formName' => 'form_name',
                     'data' => null,
                     'options' => [
                         'action' => 'form_action',
                     ],
                 ],
-                'expectedCacheKey' => $this->getCacheKey(FormStub::class, [
+                'expectedCacheKey' => $this->getCacheKey(LayoutFormStub::class, [
                     'action' => 'form_action'
                 ])
             ],
             'form with data' => [
-                'formName' => 'form_name',
                 'routeName' => 'form_name',
                 'data' => [
                     'test_data' => 'Test Data',
@@ -120,7 +115,6 @@ class AbstractFormProviderTest extends WebTestCase
                 'options' => [],
                 'cacheKeyOptions' => [],
                 'expectedData' => [
-                    'formName' => 'form_name',
                     'data' => [
                         'test_data' => 'Test Data',
                     ],
@@ -128,12 +122,11 @@ class AbstractFormProviderTest extends WebTestCase
                         'action' => 'form_action',
                     ],
                 ],
-                'expectedCacheKey' => $this->getCacheKey(FormStub::class, [
+                'expectedCacheKey' => $this->getCacheKey(LayoutFormStub::class, [
                     'action' => 'form_action'
                 ])
             ],
             'form with options' => [
-                'formName' => 'form_name',
                 'routeName' => 'form_name',
                 'data' => null,
                 'options' => [
@@ -144,7 +137,6 @@ class AbstractFormProviderTest extends WebTestCase
                 ],
                 'cacheKeyOptions' => [],
                 'expectedData' => [
-                    'formName' => 'form_name',
                     'data' => null,
                     'options' => [
                         'action' => 'form_action',
@@ -154,7 +146,7 @@ class AbstractFormProviderTest extends WebTestCase
                         ]
                     ],
                 ],
-                'expectedCacheKey' => $this->getCacheKey(FormStub::class, [
+                'expectedCacheKey' => $this->getCacheKey(LayoutFormStub::class, [
                     'action' => 'form_action',
                     'attr' => [
                         'attr1' => 'Attr 1',
@@ -163,7 +155,6 @@ class AbstractFormProviderTest extends WebTestCase
                 ])
             ],
             'form with cache options' => [
-                'formName' => 'form_name',
                 'routeName' => 'form_name',
                 'data' => null,
                 'options' => [
@@ -176,7 +167,6 @@ class AbstractFormProviderTest extends WebTestCase
                     'cache_option1' => 'Cache Option 1',
                 ],
                 'expectedData' => [
-                    'formName' => 'form_name',
                     'data' => null,
                     'options' => [
                         'action' => 'form_action',
@@ -186,7 +176,7 @@ class AbstractFormProviderTest extends WebTestCase
                         ]
                     ]
                 ],
-                'expectedCacheKey' => $this->getCacheKey(FormStub::class, [
+                'expectedCacheKey' => $this->getCacheKey(LayoutFormStub::class, [
                     'action' => 'form_action',
                     'attr' => [
                         'attr1' => 'Attr 1',
@@ -196,7 +186,6 @@ class AbstractFormProviderTest extends WebTestCase
                 ])
             ],
             'form with overridden options for cache' => [
-                'formName' => 'form_name',
                 'routeName' => 'form_name',
                 'data' => null,
                 'options' => [
@@ -210,7 +199,6 @@ class AbstractFormProviderTest extends WebTestCase
                     'cache_option1' => 'Cache Option 1',
                 ],
                 'expectedData' => [
-                    'formName' => 'form_name',
                     'data' => null,
                     'options' => [
                         'action' => 'form_action',
@@ -220,7 +208,7 @@ class AbstractFormProviderTest extends WebTestCase
                         ]
                     ]
                 ],
-                'expectedCacheKey' => $this->getCacheKey(FormStub::class, [
+                'expectedCacheKey' => $this->getCacheKey(LayoutFormStub::class, [
                     'action' => 'form_action',
                     'attr' => [],
                     'cache_option1' => 'Cache Option 1',
@@ -230,17 +218,14 @@ class AbstractFormProviderTest extends WebTestCase
     }
 
     /**
-     * @param string $formName
      * @param mixed  $data
      * @param array  $options
      *
      * @return FormInterface
      */
-    private function getForm($formName, $data = null, array $options = [])
+    private function getForm($data = null, array $options = [])
     {
-        $type = new FormStub($formName);
-
-        return $this->formFactory->create($type, $data, $options);
+        return $this->formFactory->create(LayoutFormStub::class, $data, $options);
     }
 
     /**

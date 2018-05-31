@@ -88,6 +88,10 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($executionForm);
         $executionForm
             ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $executionForm
+            ->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
@@ -154,6 +158,10 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($executionForm);
         $executionForm
             ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $executionForm
+            ->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -198,6 +206,10 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
+        $executionForm
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
         $executionForm
             ->expects($this->once())
             ->method('isValid')
@@ -293,7 +305,7 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($executionForm);
         $executionForm
             ->expects($this->once())
-            ->method('submit')
+            ->method('handleRequest')
             ->willThrowException(new AlreadySubmittedException('form already submitted'));
 
         $definition = new OperationDefinition();
@@ -332,6 +344,10 @@ class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getOperationExecutionForm')
             ->with($this->operation, $this->actionData)
             ->willReturn($executionForm);
+        $executionForm
+            ->expects($this->once())
+            ->method('isSubmitted')
+            ->willReturn(true);
         $executionForm
             ->expects($this->once())
             ->method('isValid')

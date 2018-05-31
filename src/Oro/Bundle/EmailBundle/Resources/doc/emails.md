@@ -113,8 +113,8 @@ As you have seen in code blocks above, it is pretty easy to configure new owner.
  - Implement EmailOwnerProviderInterface in your bundle. This interface has two methods. The getEmailOwnerClass one should return full name of your entity class. The findEmailOwner method searches an owner entity by given email address.
  - Register your email owner provider as a service and mark it by oro_email.owner.provider tag. The order attribute is optional and can be used to resolve ambiguous when several email address owners have the same email address. In this case wins an owner with lower value of the order attribute.
 Before the system can work with your email address owner you have to do two things:
- - Update the database schema using **php app/console doctrine:schema:update** command. The new foreign key will be created in oro_email_address table.
- - Run **php app/console cache:warmup** command to regenerate doctrine proxy class used to work with EmailAddress entity. This class is located at app/entities/Extend/Cache/OroEmailBundle/Entity directory.
+ - Update the database schema using **php bin/console doctrine:schema:update** command. The new foreign key will be created in oro_email_address table.
+ - Run **php bin/console cache:warmup** command to regenerate doctrine proxy class used to work with EmailAddress entity. This class is located at app/entities/Extend/Cache/OroEmailBundle/Entity directory.
 
 Email Body and Attachments Loaders
 ----------------------------------

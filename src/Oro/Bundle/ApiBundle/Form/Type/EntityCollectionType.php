@@ -6,6 +6,9 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+/**
+ * The form type for a collection of manageable entities.
+ */
 class EntityCollectionType extends AbstractType
 {
     /**
@@ -19,24 +22,8 @@ class EntityCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_entity_collection';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
-        return 'oro_api_collection';
+        return CollectionType::class;
     }
 }

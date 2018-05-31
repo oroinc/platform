@@ -3,8 +3,13 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CollectListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,18 +69,39 @@ class CollectListManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessInsertEntities()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
         $testEntity = new \stdClass();
+
+        $organization = new Organization();
+        $user = new User();
+        $user->setId(2);
+
+        $newActivityOwner = new ActivityOwner();
+        $newActivityOwner->setOrganization($organization);
+        $newActivityOwner->setUser($user);
+
         $resultActivityList = new ActivityList();
+
+        $activityListProvider = $this->createMock(ActivityListProviderInterface::class);
+        $activityListProvider->expects($this->once())
+            ->method('getActivityOwners')
+            ->willReturn([$newActivityOwner]);
+        $this->chainProvider->expects($this->once())
+            ->method('getProviderForEntity')
+            ->willReturn($activityListProvider);
         $this->chainProvider->expects($this->once())
             ->method('getActivityListEntitiesByActivityEntity')
             ->with($testEntity)
             ->willReturn($resultActivityList);
+
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('persist')
             ->with($resultActivityList);
+
         $this->assertTrue($this->manager->processInsertEntities([$testEntity], $em));
+
+        $activityOwners = $resultActivityList->getActivityOwners();
+        $this->assertTrue($activityOwners->contains($newActivityOwner));
     }
 
     public function testProcessEmptyUpdateEntities()

@@ -10,17 +10,26 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $commandExecutor;
 
+    /** @var string */
+    protected $temporaryFilePath;
+
     protected function setUp()
     {
         $this->commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->temporaryFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test_options.bin';
+    }
+
+    protected function tearDown()
+    {
+        @\unlink($this->temporaryFilePath);
     }
 
     public function testGetDescription()
     {
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
-        $options     = ['test'];
+        $options = ['test'];
 
         $this->commandExecutor->expects($this->once())
             ->method('runCommand')
@@ -43,17 +52,17 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,
             $this->commandExecutor,
-            $optionsPath
+            $this->temporaryFilePath
         );
 
-        $this->assertEquals(['test message'], $migrationQuery->getDescription());
+        self::assertEquals(['test message'], $migrationQuery->getDescription());
+        self::assertFileNotExists($this->temporaryFilePath);
     }
 
     public function testExecute()
     {
         $logger = new ArrayLogger();
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
-        $options     = ['test'];
+        $options = ['test'];
 
         $this->commandExecutor->expects($this->once())
             ->method('runCommand')
@@ -76,11 +85,12 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $migrationQuery = new UpdateExtendConfigMigrationQuery(
             $options,
             $this->commandExecutor,
-            $optionsPath
+            $this->temporaryFilePath
         );
 
         $migrationQuery->execute($logger);
 
-        $this->assertEquals(['test message'], $logger->getMessages());
+        self::assertEquals(['test message'], $logger->getMessages());
+        self::assertFileNotExists($this->temporaryFilePath);
     }
 }

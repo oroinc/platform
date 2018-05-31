@@ -138,7 +138,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
                 $fieldLabelPath =
                     ($currentLabelPath ? implode(self::LABEL_GLUE, $currentLabelPath).self::LABEL_GLUE : '').
                     $fieldLabel;
-                $choices[$fieldPath] = $fieldLabelPath;
+                $choices[$fieldLabelPath] = $fieldPath;
             }
 
             if (count($currentPath) < self::MAX_NESTING_LEVEL - 1) {

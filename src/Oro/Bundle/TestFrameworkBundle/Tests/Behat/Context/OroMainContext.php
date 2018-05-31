@@ -5,6 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
+use Behat\Gherkin\Node\FeatureNode;
+use Behat\Gherkin\Node\StepNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
@@ -184,7 +186,10 @@ class OroMainContext extends MinkContext implements
      */
     public function afterStep(AfterStepScope $scope)
     {
-        if ($this->skipWait || !$this->getMink()->isSessionStarted()) {
+        if ($this->skipWait
+            || !$this->getMink()->isSessionStarted()
+            || $this->isNextStepNeedSkip($scope->getStep(), $scope->getFeature())
+        ) {
             return;
         }
 
@@ -220,6 +225,32 @@ class OroMainContext extends MinkContext implements
                 sprintf('There is an error message "%s" found on the page, something went wrong', $error->getText())
             );
         }
+    }
+
+    /**
+     * Returns true if the next step checks for a flash message to bypass wait for ajax on afterStep hook.
+     *
+     * This helps to overcome a delay introduced by ajax calls after current step execution which prevent flash
+     * message check (executed by the next step) to be done before flash message disappears.
+     *
+     * @param StepNode $currentStep
+     * @param FeatureNode $feature
+     * @return bool
+     */
+    private function isNextStepNeedSkip(StepNode $currentStep, FeatureNode $feature): bool
+    {
+        $isNextStep = false;
+        foreach ($feature->getScenarios() as $scenario) {
+            foreach ($scenario->getSteps() as $step) {
+                if ($isNextStep) {
+                    return preg_match(self::SKIP_WAIT_PATTERN, $step->getText());
+                }
+
+                $isNextStep = $currentStep->getLine() === $step->getLine();
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -703,6 +734,59 @@ class OroMainContext extends MinkContext implements
             $text,
             $element->getText(),
             sprintf('Element %s contains text %s', $elementName, $text)
+        );
+    }
+
+    /**
+     * Example: Then I should see that "Header" contains "Some Text" placeholder
+     * @Then /^(?:|I )should see that "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)" placeholder$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementContainsPlaceholder($locator, $value)
+    {
+        $locator = $this->fixStepArgument($locator);
+        $value = $this->fixStepArgument($value);
+        $field = $this->getPage()->find('named', ['field', $locator]);
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        if (null === $field) {
+            // try to find field among defined elements
+            $field = $this->createElement($locator);
+        }
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'form field',
+                'id|name|label|value|element',
+                $locator
+            );
+        }
+
+        self::assertContains(
+            $value,
+            $field->getAttribute('placeholder'),
+            sprintf('Element %s does not contains placeholder %s', $locator, $value)
+        );
+    }
+
+    /**
+     * Example: Then I should see that "Header" does not contain "Some Text" placeholder
+     * @Then /^I should see that "(?P<elementName>[^"]*)" does not contain "(?P<text>[^"]*)" placeholder$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementNotContainsPlaceholder($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertNotContains(
+            $text,
+            $element->getAttribute('placeholder'),
+            sprintf('Element %s does not contains placeholder %s', $elementName, $text)
         );
     }
 

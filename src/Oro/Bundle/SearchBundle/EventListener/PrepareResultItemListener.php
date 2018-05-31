@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
 class PrepareResultItemListener
@@ -83,7 +84,7 @@ class PrepareResultItemListener
 
         if ($this->mapper->getEntityMapParameter($name, 'route')) {
             $routeParameters = $this->mapper->getEntityMapParameter($name, 'route');
-            $routeData = array();
+            $routeData = [];
 
             if ($this->isParametersDefined($routeParameters)) {
                 /**
@@ -112,7 +113,7 @@ class PrepareResultItemListener
             return $this->router->generate(
                 $routeParameters['name'],
                 $routeData,
-                true
+                UrlGeneratorInterface::ABSOLUTE_URL
             );
         }
 

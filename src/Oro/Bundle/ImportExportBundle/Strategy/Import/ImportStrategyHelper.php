@@ -17,9 +17,9 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolationInterface;
-// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportStrategyHelper
 {
@@ -134,7 +134,7 @@ class ImportStrategyHelper
      * @param array $excludedProperties
      * @throws InvalidArgumentException
      */
-    public function importEntity($basicEntity, $importedEntity, array $excludedProperties = array())
+    public function importEntity($basicEntity, $importedEntity, array $excludedProperties = [])
     {
         $basicEntityClass = ClassUtils::getClass($basicEntity);
         if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
@@ -159,14 +159,14 @@ class ImportStrategyHelper
      * Validate entity, returns list of errors or null
      *
      * @param object $entity
-     * @param null   $groups
+     * @param Constraint|Constraint[]|null $constraints
+     * @param array|null $groups
      *
      * @return array|null
      */
-    public function validateEntity($entity, $groups = null)
+    public function validateEntity($entity, $constraints = null, $groups = null)
     {
-        // TODO: change to $violations = $this->validator->validate($entity, null, $groups); in scope of BAP-15236
-        $violations = $this->validator->validate($entity, $groups);
+        $violations = $this->validator->validate($entity, $constraints, $groups);
         if (count($violations)) {
             $errors = [];
 
@@ -209,9 +209,9 @@ class ImportStrategyHelper
             }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
-                array(
+                [
                     '%number%' => $rowNumber
-                )
+                ]
             );
         }
         foreach ($validationErrors as $validationError) {

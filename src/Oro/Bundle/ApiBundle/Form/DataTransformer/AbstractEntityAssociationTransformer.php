@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\ORMException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * The base class for transformers for different kind of entity associations.
+ */
 abstract class AbstractEntityAssociationTransformer implements DataTransformerInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var EntityLoader */
     protected $entityLoader;
@@ -21,16 +24,16 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
     protected $metadata;
 
     /**
-     * @param ManagerRegistry     $doctrine
+     * @param DoctrineHelper      $doctrineHelper
      * @param EntityLoader        $entityLoader
      * @param AssociationMetadata $metadata
      */
     public function __construct(
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,
         AssociationMetadata $metadata
     ) {
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
         $this->entityLoader = $entityLoader;
         $this->metadata = $metadata;
     }
@@ -52,7 +55,7 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
         if (null === $value || '' === $value) {
             return null;
         }
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new TransformationFailedException('Expected an array.');
         }
         if (empty($value)) {
@@ -72,12 +75,12 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
             if (!$this->metadata->isEmptyAcceptableTargetsAllowed()) {
                 throw new TransformationFailedException('There are no acceptable classes.');
             }
-        } elseif (!in_array($entityClass, $acceptableClassNames, true)) {
+        } elseif (!\in_array($entityClass, $acceptableClassNames, true)) {
             throw new TransformationFailedException(
-                sprintf(
+                \sprintf(
                     'The "%s" class is not acceptable. Acceptable classes: %s.',
                     $entityClass,
-                    implode(',', $acceptableClassNames)
+                    \implode(',', $acceptableClassNames)
                 )
             );
         }
@@ -101,10 +104,9 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
      */
     protected function loadEntity($entityClass, $entityId)
     {
-        $manager = $this->doctrine->getManagerForClass($entityClass);
-        if (null === $manager) {
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             throw new TransformationFailedException(
-                sprintf(
+                \sprintf(
                     'The "%s" class must be a managed Doctrine entity.',
                     $entityClass
                 )
@@ -115,7 +117,7 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
             $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->metadata->getTargetMetadata());
         } catch (ORMException $e) {
             throw new TransformationFailedException(
-                sprintf(
+                \sprintf(
                     'An "%s" entity with "%s" identifier cannot be loaded.',
                     $entityClass,
                     $this->humanizeEntityId($entityId)
@@ -126,7 +128,7 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
         }
         if (null === $entity) {
             throw new TransformationFailedException(
-                sprintf(
+                \sprintf(
                     'An "%s" entity with "%s" identifier does not exist.',
                     $entityClass,
                     $this->humanizeEntityId($entityId)
@@ -144,13 +146,13 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
      */
     protected function humanizeEntityId($entityId)
     {
-        if (is_array($entityId)) {
+        if (\is_array($entityId)) {
             $elements = [];
             foreach ($entityId as $fieldName => $fieldValue) {
-                $elements[] = sprintf('%s = %s', $fieldName, $fieldValue);
+                $elements[] = \sprintf('%s = %s', $fieldName, $fieldValue);
             }
 
-            return sprintf('array(%s)', implode(', ', $elements));
+            return \sprintf('array(%s)', \implode(', ', $elements));
         }
 
         return (string)$entityId;

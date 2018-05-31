@@ -43,7 +43,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityManagerBag = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag');
 
-        $this->configManager  = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
+        $this->configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
 
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
         $this->configManager->expects($this->any())
@@ -55,7 +55,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
 
-        $this->cacheDir = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
+        $this->cacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ExtendConfigDumperTest' . DIRECTORY_SEPARATOR
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
         $this->dumper = new ExtendConfigDumper(
@@ -67,6 +67,15 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             $this->extendEntityConfigProvider,
             $this->cacheDir
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        $fileSystem = new Filesystem();
+        $fileSystem->remove(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ExtendConfigDumperTest');
     }
 
     public function testCheckConfigWhenAliasesExists()
@@ -131,7 +140,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
                 'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
@@ -142,7 +151,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')->get('schema')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
                 'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
@@ -219,53 +228,74 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             'boolean',
             [
                 'is_extend' => true,
-                'default' => true
+                'default'   => true
             ]
         );
 
         $this->dumper->addExtension($extension);
         $this->dumper->updateConfig();
 
-        $this->assertEquals(
+        self::assertEquals(
             new Config(
                 $configId,
                 [
-                    'param1' => 'value1',
-                    'upgradeable' => true,
-                    'schema' => [
-                        'class' => 'SomeClass',
-                        'entity' => \stdClass::class,
-                        'type' => 'Extend',
-                        'property' => [
+                    'param1'       => 'value1',
+                    'upgradeable'  => true,
+                    'schema'       => [
+                        'class'     => 'SomeClass',
+                        'entity'    => \stdClass::class,
+                        'type'      => 'Extend',
+                        'property'  => [
                             'field1' => []
                         ],
-                        'relation' => [],
-                        'default' => [],
+                        'relation'  => [],
+                        'default'   => [],
                         'addremove' => [],
-                        'doctrine' => [
+                        'doctrine'  => [
                             \stdClass::class => [
-                                'type' => 'mappedSuperclass',
+                                'type'   => 'mappedSuperclass',
                                 'fields' => [
                                     'field1' => [
-                                        'column' => 'field1',
-                                        'type' => 'boolean',
-                                        'nullable' => true,
-                                        'length' => null,
+                                        'column'    => 'field1',
+                                        'type'      => 'boolean',
+                                        'nullable'  => true,
+                                        'length'    => null,
                                         'precision' => null,
-                                        'scale' => null,
-                                        'default' => true,
+                                        'scale'     => null,
+                                        'default'   => true,
                                     ]
                                 ]
                             ]
                         ],
-                        'parent' => false,
-                        'inherit' => false
+                        'parent'    => false,
+                        'inherit'   => false
                     ],
-                    'state' => ExtendScope::STATE_ACTIVE,
+                    'state'        => ExtendScope::STATE_ACTIVE,
                     'extend_class' => \stdClass::class
                 ]
             ),
             $config
         );
+    }
+
+    public function testClearWithEntityEliasExists()
+    {
+        $fs = new Filesystem();
+        $entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
+        $fs->mkdir($entityCacheDir);
+        $aliasDataFile = ExtendClassLoadingUtils::getAliasesPath($this->cacheDir);
+        $fs->touch($aliasDataFile);
+        self::assertTrue($fs->exists($aliasDataFile));
+
+        $this->entityManagerBag->expects($this->once())
+            ->method('getEntityManagers')
+            ->willReturn([]);
+
+        $this->dumper->clear();
+
+        self::assertFalse($fs->exists($aliasDataFile));
+        self::assertTrue($fs->exists($entityCacheDir));
+
+        $fs->remove($entityCacheDir);
     }
 }

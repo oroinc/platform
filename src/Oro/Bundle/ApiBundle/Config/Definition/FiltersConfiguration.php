@@ -4,15 +4,30 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "filters" section.
+ */
 class FiltersConfiguration extends AbstractConfigurationSection
 {
+    /** @var FilterOperatorRegistry */
+    private $filterOperatorRegistry;
+
+    /**
+     * @param FilterOperatorRegistry $filterOperatorRegistry
+     */
+    public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
+    {
+        $this->filterOperatorRegistry = $filterOperatorRegistry;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         $sectionName = 'filters';
 
@@ -47,7 +62,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'filters.field';
 
@@ -74,6 +89,19 @@ class FiltersConfiguration extends AbstractConfigurationSection
                 ->prototype('variable')->end()
             ->end()
             ->arrayNode(FilterFieldConfig::OPERATORS)
+                ->validate()
+                    ->always(function ($value) {
+                        if (\is_array($value) && !empty($value)) {
+                            $operators = [];
+                            foreach ($value as $val) {
+                                $operators[] = $this->filterOperatorRegistry->resolveOperator($val);
+                            }
+                            $value = $operators;
+                        }
+
+                        return $value;
+                    })
+                ->end()
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
@@ -86,7 +114,7 @@ class FiltersConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessFieldConfig(array $config)
+    protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[FilterFieldConfig::OPTIONS])) {
             unset($config[FilterFieldConfig::OPTIONS]);

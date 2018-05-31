@@ -51,7 +51,7 @@ class ExceptionListener extends BaseExceptionListener
     protected function setTargetPath(Request $request)
     {
         if (!$request->hasSession() ||
-            !$request->isMethodSafe() ||
+            !$request->isMethodSafe(false) ||
             ($request->isXmlHttpRequest() && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
         ) {
             return;

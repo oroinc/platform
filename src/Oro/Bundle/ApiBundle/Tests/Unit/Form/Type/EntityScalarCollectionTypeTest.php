@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -21,11 +20,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         return [
-            new ValidatorExtension(Validation::createValidator()),
-            new PreloadedExtension(
-                ['oro_api_scalar_collection' => new ScalarCollectionType()],
-                []
-            )
+            new ValidatorExtension(Validation::createValidator())
         ];
     }
 
@@ -36,7 +31,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
             ->setMethods(['clear'])
             ->getMock();
 
-        $groups->expects($this->once())
+        $groups->expects(self::once())
             ->method('clear');
 
         $entity = new User();
@@ -55,7 +50,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         );
         $formBuilder->add(
             'groups',
-            new EntityScalarCollectionType(),
+            EntityScalarCollectionType::class,
             [
                 'entry_data_class'    => Group::class,
                 'entry_data_property' => 'name'
@@ -64,18 +59,12 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
         $form = $formBuilder->getForm();
 
         $form->submit(['groups' => []]);
-        $this->assertTrue($form->isSynchronized());
-    }
-
-    public function testGetName()
-    {
-        $type = new EntityScalarCollectionType();
-        $this->assertEquals('oro_api_entity_scalar_collection', $type->getName());
+        self::assertTrue($form->isSynchronized());
     }
 
     public function testGetParent()
     {
         $type = new EntityScalarCollectionType();
-        $this->assertEquals('oro_api_scalar_collection', $type->getParent());
+        self::assertEquals(ScalarCollectionType::class, $type->getParent());
     }
 }

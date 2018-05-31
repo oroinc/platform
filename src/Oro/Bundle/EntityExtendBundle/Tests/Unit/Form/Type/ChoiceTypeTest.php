@@ -6,17 +6,16 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType as SymfonyChoiceType;
 
 class ChoiceTypeTest extends AbstractConfigTypeTestCase
 {
-    /** @var ChoiceType */
-    protected $type;
-
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
     {
-        parent::setUp();
-
-        $this->type = new ChoiceType(
+        return new ChoiceType(
             new ConfigTypeHelper($this->configManager),
             $this->configManager
         );
@@ -29,10 +28,10 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     {
         $this->doTestSubmit(
             'testAttr',
-            $this->type,
+            ChoiceType::class,
             [
                 'config_id' => new EntityConfigId('test', 'Test\Entity'),
-                'choices'   => [false => 'No', true => 'Yes']
+                'choices'   => ['No' => false, 'Yes' => true]
             ],
             [],
             $newVal,
@@ -57,15 +56,15 @@ class ChoiceTypeTest extends AbstractConfigTypeTestCase
     {
         $this->assertEquals(
             'oro_entity_extend_choice',
-            $this->type->getName()
+            $this->getFormType()->getName()
         );
     }
 
     public function testGetParent()
     {
         $this->assertEquals(
-            'choice',
-            $this->type->getParent()
+            SymfonyChoiceType::class,
+            $this->getFormType()->getParent()
         );
     }
 }

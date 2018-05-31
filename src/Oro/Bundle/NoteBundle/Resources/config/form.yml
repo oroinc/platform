@@ -22,14 +22,14 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - 'oro_note_form'
-            - 'oro_note'
+            - Oro\Bundle\NoteBundle\Form\Type\NoteType
 
     oro_note.form.note.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
         arguments:
             - ~
-            - 'oro_note_api'
+            - Oro\Bundle\NoteBundle\Form\Type\NoteApiType
 
     oro_note.form.handler.note:
         class: '%oro_note.form.handler.note.class%'

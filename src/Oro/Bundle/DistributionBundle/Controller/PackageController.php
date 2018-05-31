@@ -24,9 +24,9 @@ class PackageController extends Controller
 
     protected function setUpEnvironment()
     {
-        $kernelRootDir = $this->container->getParameter('kernel.root_dir');
+        $kernelProjectDir = $this->container->getParameter('kernel.project_dir');
         putenv(sprintf('COMPOSER_HOME=%s', $this->container->getParameter('oro_distribution.composer_cache_home')));
-        chdir(realpath($kernelRootDir . '/../'));
+        chdir(realpath($kernelProjectDir . '/'));
         set_time_limit(0);
     }
 
@@ -259,11 +259,11 @@ class PackageController extends Controller
     protected function getNotWritablePaths()
     {
         $paths = $this->container->getParameter('oro_distribution.package_manager.system_paths');
-        $kernelRootDir = $this->container->getParameter('kernel.root_dir');
+        $kernelProjectDir = $this->container->getParameter('kernel.project_dir');
 
         $notWritablePaths = [];
         foreach ($paths as $path) {
-            $realPath = realpath($kernelRootDir . '/../' . $path);
+            $realPath = realpath($kernelProjectDir . '/' . $path);
             if (!is_writable($realPath)) {
                 $notWritablePaths[] = $path;
             }

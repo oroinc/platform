@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -39,7 +40,7 @@ class EnumChoiceType extends AbstractEnumType
      */
     public function getParent()
     {
-        return 'translatable_entity';
+        return TranslatableEntityType::class;
     }
 
     /**

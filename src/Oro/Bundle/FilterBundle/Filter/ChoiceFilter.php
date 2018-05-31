@@ -14,7 +14,7 @@ class ChoiceFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceFilterType::class;
     }
 
     /**

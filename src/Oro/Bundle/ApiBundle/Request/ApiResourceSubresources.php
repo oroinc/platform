@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Represents a collection of Data API sub-resources for a specific entity.
+ */
 class ApiResourceSubresources
 {
     /** @var string */
-    protected $entityClass;
+    private $entityClass;
 
     /** @var ApiSubresource[] */
-    protected $subresources = [];
+    private $subresources = [];
 
     /**
      * @param $entityClass
@@ -26,6 +29,16 @@ class ApiResourceSubresources
     public function getEntityClass()
     {
         return $this->entityClass;
+    }
+
+    /**
+     * Checks if at least one sub-resource exists in this collection.
+     *
+     * @return bool
+     */
+    public function hasSubresources()
+    {
+        return !empty($this->subresources);
     }
 
     /**
@@ -47,9 +60,7 @@ class ApiResourceSubresources
      */
     public function getSubresource($associationName)
     {
-        return isset($this->subresources[$associationName])
-            ? $this->subresources[$associationName]
-            : null;
+        return $this->subresources[$associationName] ?? null;
     }
 
     /**

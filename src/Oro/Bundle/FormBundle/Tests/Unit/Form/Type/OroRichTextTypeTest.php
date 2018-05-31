@@ -5,8 +5,11 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroRichTextTypeTest extends FormIntegrationTestCase
@@ -20,19 +23,22 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|Packages */
     protected $assetsHelper;
 
+    /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $context;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->assetsHelper = $this->createMock(Packages::class);
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
-        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
+        $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider, $this->context);
         $this->formType->setAssetHelper($this->assetsHelper);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -41,9 +47,24 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         unset($this->formType, $this->configManager);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    OroRichTextType::class => $this->formType
+                ],
+                []
+            ),
+        ];
+    }
+
     public function testGetParent()
     {
-        $this->assertEquals('textarea', $this->formType->getParent());
+        $this->assertEquals(TextareaType::class, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -75,11 +96,11 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $routing = $this->createMock(PathPackage::class);
-        $routing->expects($this->any())
+        $this->context->expects($this->any())
             ->method('getBasePath')
             ->willReturn($subfolder);
-        $routing->expects($this->any())
+
+        $this->assetsHelper->expects($this->any())
             ->method('getUrl')
             ->will(
                 $this->returnCallback(
@@ -88,10 +109,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                     }
                 )
             );
-
-        $this->assetsHelper->expects($this->once())
-            ->method('getPackage')
-            ->willReturn($routing);
 
         $this->htmlTagProvider->expects($this->once())
             ->method('getAllowedElements')
@@ -102,7 +119,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             $viewData['attr']['data-page-component-options']
         );
 
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroRichTextType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
@@ -258,15 +275,15 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => '/subfolder/bundles/oroform/css/wysiwyg-editor.css',
-                                'skin_url' => '/subfolder/bundles/oroform/css/tinymce'
+                                'content_css' => 'subfolder/bundles/oroform/css/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/bundles/oroform/css/tinymce'
                             ]
                         )
                     ]
                 ],
                 $elements,
                 true,
-                '/subfolder/'
+                '/subfolder'
             ],
         ];
     }

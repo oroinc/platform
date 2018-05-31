@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FormBundle\Twig;
 
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
-use Symfony\Bridge\Twig\Form\TwigRendererInterface;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 
 class FormExtension extends \Twig_Extension
@@ -12,7 +12,7 @@ class FormExtension extends \Twig_Extension
     const BLOCK_NAME       = 'oro_form_js_validation';
 
     /**
-     * @var TwigRendererInterface
+     * @var FormRendererInterface
      */
     public $renderer;
 
@@ -27,12 +27,12 @@ class FormExtension extends \Twig_Extension
     protected $defaultOptions;
 
     /**
-     * @param TwigRendererInterface $renderer
+     * @param FormRendererInterface $renderer
      * @param string $templateName
      * @param array $defaultOptions
      */
     public function __construct(
-        TwigRendererInterface $renderer,
+        FormRendererInterface $renderer,
         $templateName = self::DEFAULT_TEMPLATE,
         $defaultOptions = []
     ) {

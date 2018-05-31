@@ -100,7 +100,7 @@ class CurrencyNameHelperTest extends \PHPUnit_Framework_TestCase implements View
             new CurrencyListProviderStub()
         );
 
-        $this->assertEquals(['USD' => '$', 'EUR' => '€'], $currencyNameHelper->getCurrencyChoices());
+        $this->assertEquals(['$' => 'USD', '€' => 'EUR'], $currencyNameHelper->getCurrencyChoices());
     }
 
     /**

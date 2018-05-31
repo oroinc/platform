@@ -110,9 +110,9 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($targetMetaData, 'group_field')
             ->will($this->returnValue('label'));
         $choices = [
-            'identification_alignment' => 'Identification Alignment',
-            'in_progress' => 'In Progress',
-            'lost' => 'Lost'
+            'Identification Alignment' => 'identification_alignment',
+            'In Progress' => 'in_progress',
+            'Lost' => 'lost',
         ];
         $this->choiceHelper->expects($this->once())
             ->method('getChoices')

@@ -134,7 +134,7 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $this->formFactory->expects($this->once())
             ->method('create')
-            ->with(EnumFilterType::NAME)
+            ->with(EnumFilterType::class)
             ->will($this->returnValue($form));
 
         $this->assertSame(

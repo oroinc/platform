@@ -4,7 +4,7 @@ parameters:
     oro_wamp.ping.interval: 60000 # 1 minute
     # the time in milliseconds determines how often a ping service being called
     # set 0 or false to disable pinging
-    oro_wamp.client_ping.interval: 45000 # 45 seconds
+    oro_wamp.client_ping.interval: null #45000 # 45 seconds
 
     oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
 
@@ -25,19 +25,20 @@ services:
     # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
     # is used by ClankSessionHandlerConfigurationPass to add it to a list of periodic services
     # in case if PdoSessionHandler is configured as a session storage handler
-    oro_wamp.ping.pdo:
-        class: Oro\Bundle\SyncBundle\Wamp\DbPing
-        arguments:
-            - "@?doctrine.dbal.session_connection.wrapped"
+#    oro_wamp.ping.pdo:
+#        class: Oro\Bundle\SyncBundle\Wamp\DbPing
+#        arguments:
+#            - "@?doctrine.dbal.session_connection.wrapped"
 
     # this service is used to broadcast messages to clients to prevent connection loose
     # by default, the connection could be closed if no data were transmitted between client and server
     # for more details see http://nginx.org/en/docs/http/websocket.html
-    oro_wamp.client.ping:
-        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
-        arguments:
-            - '@oro_sync.authentication.topic_handler'
-            - '@logger'
+    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
+#    oro_wamp.client.ping:
+#        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
+#        arguments:
+#            - '@oro_sync.authentication.topic_handler'
+#            - '@logger'
 
     oro_wamp.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
@@ -111,20 +112,21 @@ services:
             - '@logger'
             - '%secret%'
 
-    oro_sync.authentication.topic_handler:
-        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
-        decorates: jdare_clank.clank_handler_topic
-        arguments:
-            - '@oro_sync.authentication.topic_handler.inner'
-            - '@logger'
+    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
+#    oro_sync.authentication.topic_handler:
+#        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
+#        decorates: jdare_clank.clank_handler_topic
+#        arguments:
+#            - '@oro_sync.authentication.topic_handler.inner'
+#            - '@logger'
 
-    oro_sync.authentication.listener:
-        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
-        arguments:
-            - '@oro_sync.authentication.ticket_provider'
-            - '@logger'
-        tags:
-            - { name: kernel.event_listener, event: clank.client.connected, method: onClientConnect }
+#    oro_sync.authentication.listener:
+#        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
+#        arguments:
+#            - '@oro_sync.authentication.ticket_provider'
+#            - '@logger'
+#        tags:
+#            - { name: kernel.event_listener, event: clank.client.connected, method: onClientConnect }
 
     oro_sync.authentication.ticket_storage_cache:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\CacheTicketDigestStorage

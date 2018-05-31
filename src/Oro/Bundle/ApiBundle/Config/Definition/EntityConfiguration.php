@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The builder for "entities" and "relations" configuration sections.
+ */
 class EntityConfiguration
 {
     /** @var string */
@@ -27,10 +30,10 @@ class EntityConfiguration
      * @param int                                 $maxNestingLevel
      */
     public function __construct(
-        $sectionName,
+        string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection,
         ConfigurationSettingsInterface $settings,
-        $maxNestingLevel
+        int $maxNestingLevel
     ) {
         $this->sectionName       = $sectionName;
         $this->definitionSection = $definitionSection;
@@ -64,7 +67,7 @@ class EntityConfiguration
      *
      * @return string
      */
-    public function getSectionName()
+    public function getSectionName(): string
     {
         return $this->sectionName;
     }
@@ -75,7 +78,7 @@ class EntityConfiguration
      * @param NodeBuilder $node
      * @param string      $currentSectionName
      */
-    public function configure(NodeBuilder $node, $currentSectionName = '')
+    public function configure(NodeBuilder $node, string $currentSectionName = ''): void
     {
         $node->booleanNode(ConfigUtil::INHERIT)->end();
         $this->configureEntity($node, $currentSectionName);
@@ -87,7 +90,7 @@ class EntityConfiguration
      * @param NodeBuilder $node
      * @param string      $currentSectionName
      */
-    protected function configureEntity(NodeBuilder $node, $currentSectionName)
+    protected function configureEntity(NodeBuilder $node, string $currentSectionName): void
     {
         $this->definitionSection->configure($node);
         $definitionSectionName = $this->definitionSection->getSectionName();
@@ -116,7 +119,7 @@ class EntityConfiguration
      *
      * @return array
      */
-    protected function postProcessConfig(array $config)
+    protected function postProcessConfig(array $config): array
     {
         $extraSections = $this->settings->getExtraSections();
         foreach ($extraSections as $name => $configuration) {

@@ -3,31 +3,21 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroChoiceTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroChoiceType
-     */
-    protected $formType;
-
-    protected function setUp()
+    public function testGetParent()
     {
-        parent::setUp();
-        $this->formType = new OroChoiceType();
+        $formType = new OroChoiceType();
+        $this->assertEquals(Select2ChoiceType::class, $formType->getParent());
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_choice', $this->formType->getName());
-    }
-
-    public function testGetParent()
-    {
-        $this->assertEquals('oro_select2_choice', $this->formType->getParent());
+        $formType = new OroChoiceType();
+        $this->assertEquals('oro_choice', $formType->getName());
     }
 
     /**
@@ -41,7 +31,7 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
         array $viewData,
         array $options = []
     ) {
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroChoiceType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
@@ -68,29 +58,9 @@ class OroChoiceTypeTest extends FormIntegrationTestCase
                     'value' => 'c1'
                 ],
                 'options' => [
-                    'choices' => ['c1', 'c2', 'c3'],
-                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                    'choices_as_values' => true,
+                    'choices' => ['c1', 'c2', 'c3']
                 ]
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getExtensions()
-    {
-        return [
-            new PreloadedExtension(
-                [
-                    'oro_select2_choice' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-                        'oro_select2_choice'
-                    )
-                ],
-                []
-            )
         ];
     }
 }

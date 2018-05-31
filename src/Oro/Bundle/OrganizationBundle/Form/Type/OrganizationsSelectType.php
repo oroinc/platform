@@ -7,6 +7,7 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -103,7 +104,7 @@ class OrganizationsSelectType extends AbstractType
         $this->addOrganizationsField($builder);
         $builder->add(
             'businessUnits',
-            'oro_type_business_unit_select_autocomplete',
+            BusinessUnitSelectAutocomplete::class,
             [
                 'required' => false,
                 'label' => 'oro.user.form.business_units.label',
@@ -155,10 +156,10 @@ class OrganizationsSelectType extends AbstractType
     {
         $builder->add(
             'organizations',
-            'entity',
+            EntityType::class,
             [
                 'class'    => 'OroOrganizationBundle:Organization',
-                'property' => 'name',
+                'choice_label' => 'name',
                 'multiple' => true
             ]
         );

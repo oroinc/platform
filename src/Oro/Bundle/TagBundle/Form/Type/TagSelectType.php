@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\TagBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -98,6 +99,6 @@ class TagSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_jqueryselect2_hidden';
+        return OroJquerySelect2HiddenType::class;
     }
 }

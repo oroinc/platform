@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,22 +18,22 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $router;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $mapper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var PrepareResultItemEvent|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $event;
 
@@ -43,7 +48,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     protected $entity;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $entityNameResolver;
 
@@ -151,7 +156,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->mapper->expects($this->exactly(2))
             ->method('getEntityMapParameter')
             ->with(get_class($this->entity), 'route')
-            ->will($this->returnValue(array('parameters' => array('parameter' => 'field'), 'name' => 'test_route')));
+            ->will($this->returnValue(['parameters' => ['parameter' => 'field'], 'name' => 'test_route']));
 
         $this->mapper->expects($this->once())
             ->method('getFieldValue')
@@ -160,7 +165,7 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('test_route', array('parameter' => 'test_data'), true)
+            ->with('test_route', ['parameter' => 'test_data'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('test_url'));
 
         $this->listener->process($this->event);
@@ -265,11 +270,11 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->mapper->expects($this->atLeastOnce())
             ->method('getEntityMapParameter')
             ->with(get_class($this->entity), 'route')
-            ->will($this->returnValue(array('parameters' => array('parameter' => 'field'), 'name' => 'test_route')));
+            ->will($this->returnValue(['parameters' => ['parameter' => 'field'], 'name' => 'test_route']));
 
         $this->router->expects($this->once())
             ->method('generate')
-            ->with('test_route', array('parameter' => '1'), true)
+            ->with('test_route', ['parameter' => '1'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->will($this->returnValue('test_url'));
 
         $this->listener->process($this->event);

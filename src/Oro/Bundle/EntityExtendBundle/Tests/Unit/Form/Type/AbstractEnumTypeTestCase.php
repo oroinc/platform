@@ -320,7 +320,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $this->assertEquals($expanded, $resolvedOptions['expanded']);
         $this->assertEquals($enumCode, $resolvedOptions['enum_code']);
         $this->assertEquals($enumValueClassName, $resolvedOptions['class']);
-        $this->assertEquals('name', $resolvedOptions['property']);
+        $this->assertEquals('name', $resolvedOptions['choice_label']);
         $this->assertNotNull($resolvedOptions['query_builder']);
 
         unset(
@@ -328,7 +328,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             $resolvedOptions['expanded'],
             $resolvedOptions['enum_code'],
             $resolvedOptions['class'],
-            $resolvedOptions['property'],
+            $resolvedOptions['choice_label'],
             $resolvedOptions['query_builder']
         );
 

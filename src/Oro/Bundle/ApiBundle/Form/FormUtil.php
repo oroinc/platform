@@ -25,6 +25,18 @@ class FormUtil
     }
 
     /**
+     * Checks whether the form is not submitted or submitted and does not have errors.
+     *
+     * @param FormInterface $form
+     *
+     * @return bool
+     */
+    public static function isNotSubmittedOrSubmittedAndValid(FormInterface $form)
+    {
+        return !$form->isSubmitted() || $form->isValid();
+    }
+
+    /**
      * Adds an error to a form.
      *
      * @param FormInterface $form

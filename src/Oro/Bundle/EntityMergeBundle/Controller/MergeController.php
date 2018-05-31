@@ -8,6 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
+use Oro\Bundle\EntityMergeBundle\Form\Type\MergeType;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -16,10 +17,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
-// TODO: change to Symfony\Component\Validator\Validator\ValidatorInterface in scope of BAP-15236
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/merge")
@@ -75,8 +74,7 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
-        // TODO: change to $this->getValidator()->validate($entityData, null, ['validateCount']) in scope of BAP-15236
-        $constraintViolations = $this->getValidator()->validate($entityData, ['validateCount']);
+        $constraintViolations = $this->getValidator()->validate($entityData, null, ['validateCount']);
         if ($constraintViolations->count()) {
             foreach ($constraintViolations as $violation) {
                 /* @var ConstraintViolation $violation */
@@ -90,17 +88,17 @@ class MergeController extends Controller
         }
 
         $form = $this->createForm(
-            'oro_entity_merge',
+            MergeType::class,
             $entityData,
-            array(
+            [
                 'metadata' => $entityData->getMetadata(),
                 'entities' => $entityData->getEntities(),
-            )
+            ]
         );
 
         if ($request->isMethod('POST')) {
-            $form->submit($request);
-            if ($form->isValid()) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
                 $merger = $this->getEntityMerger();
 
                 try {
@@ -128,24 +126,24 @@ class MergeController extends Controller
                 return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),
-                        array('id' => $entityData->getMasterEntity()->getId())
+                        ['id' => $entityData->getMasterEntity()->getId()]
                     )
                 );
             }
         }
 
-        return array(
+        return [
             'formAction' => $this->generateUrl(
                 'oro_entity_merge',
-                array(
+                [
                     'className' => $className,
                     'ids' => $this->getDoctineHelper()->getEntityIds($entityData->getEntities()),
-                )
+                ]
             ),
             'entityLabel' => $entityData->getMetadata()->get('label'),
             'cancelPath' => $this->generateUrl($this->getEntityIndexRoute($className)),
             'form' => $form->createView()
-        );
+        ];
     }
 
     /**

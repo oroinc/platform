@@ -29,22 +29,17 @@ class FormUtils
         $config  = $form->get($fieldName)->getConfig();
         $options = $config->getOptions();
 
-        //@TODO replace in scope BAP-15236
-        unset($options['options']);
-
-        //@TODO Remove in scope BAP-15236
-        unset($options['csrf_provider']);
-
         if (array_key_exists('auto_initialize', $options)) {
             $options['auto_initialize'] = false;
         }
 
-        //@TODO Remove in scope BAP-15236
-        unset($options['cascade_validation']);
-
+        //@TODO: Should be removed in scope #BAP-17037
+        if (array_key_exists('choices_as_values', $options)) {
+            $options['choices_as_values'] = null;
+        }
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
-        $form->add($fieldName, $config->getType()->getName(), $options);
+        $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
     /**
@@ -61,7 +56,7 @@ class FormUtils
         $options = $config->getOptions();
 
         $options = array_replace_recursive($options, $mergeOptions);
-        $form->add($fieldName, $config->getType()->getName(), $options);
+        $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
     /**

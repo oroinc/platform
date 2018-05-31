@@ -206,7 +206,7 @@ workflows:
                 form_options:
                     attribute_fields:
                         test_name:
-                            form_type: text
+                            form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                 init_entities: ['entity1', 'entity2']
             start_transition_from_routes:
                 step_to: step2
@@ -221,7 +221,7 @@ workflows:
                 form_options:
                     attribute_fields:
                         test_name:
-                            form_type: text
+                            form_type: Symfony\Component\Form\Extension\Core\Type\TextType
             start_transition_from_datagrids:
                 step_to: step2
                 is_start: true

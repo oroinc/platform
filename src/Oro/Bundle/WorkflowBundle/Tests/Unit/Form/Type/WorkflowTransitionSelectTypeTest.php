@@ -10,10 +10,11 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -30,12 +31,11 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = new WorkflowTransitionSelectType($this->workflowRegistry, $this->translator);
+        parent::setUp();
     }
 
     public function testSubmit()
@@ -57,20 +57,15 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
             ->with('test_workflow')
             ->willReturn($workflow);
 
-        $form = $this->factory->create($this->type, null, ['workflowName' => 'test_workflow']);
+        $form = $this->factory->create(WorkflowTransitionSelectType::class, null, ['workflowName' => 'test_workflow']);
 
-        $this->assertFormOptionEqual([$transition->getName() => $transition->getLabel()], 'choices', $form);
+        $this->assertFormOptionEqual([$transition->getLabel() => $transition->getName()], 'choices', $form);
         $this->assertNull($form->getData());
 
         $form->submit($transition->getName());
 
         $this->assertFormIsValid($form);
         $this->assertEquals($transition->getName(), $form->getData());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowTransitionSelectType::NAME, $this->type->getName());
     }
 
     public function testConfigureOptions()
@@ -86,7 +81,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(OroChoiceType::NAME, $this->type->getParent());
+        $this->assertEquals(OroChoiceType::class, $this->type->getParent());
     }
 
     /**
@@ -101,7 +96,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
     {
         $this->expectExceptionMessage($exceptionMessage);
 
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowTransitionSelectType::class, null, $options);
     }
 
     /**
@@ -131,10 +126,16 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
             ->setMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
 
         return [
-            new PreloadedExtension(['oro_choice' => $choiceType], [])
+            new PreloadedExtension(
+                [
+                    $this->type,
+                    OroChoiceType::class => $choiceType
+                ],
+                []
+            )
         ];
     }
 

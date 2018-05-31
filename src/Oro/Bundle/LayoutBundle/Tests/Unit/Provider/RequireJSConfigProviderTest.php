@@ -62,7 +62,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->webRoot = './web/root';
+        $this->webRoot = './public/root';
 
         $this->provider = new RequireJSConfigProvider(
             $this->engineInterface,
@@ -88,7 +88,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetConfig()
     {
         $requireConfig = [
-            'require-config' => './web/root/js/layout/default/require-config',
+            'require-config' => './public/root/js/layout/default/require-config',
             'require-lib' => 'npmassets/requirejs/require'
         ];
 

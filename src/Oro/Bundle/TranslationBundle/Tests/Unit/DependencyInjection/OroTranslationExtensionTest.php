@@ -12,7 +12,7 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $expectedDefinitions = array(
         'oro_translation.form.type.translatable_entity',
-        'oro_translation.form.type.jqueryselect2_translatable_entity',
+        'oro_translation.form.type.select2_translatable_entity',
         'oro_translation.controller',
     );
 
@@ -35,7 +35,11 @@ class OroTranslationExtensionTest extends \PHPUnit_Framework_TestCase
             'js_translation' => array(
                 'domains' => array('validators'),
                 'debug' => false,
-            )
+            ),
+            'locales' => ['en'],
+            'default_required' => true,
+            'manager_registry' => 'doctrine',
+            'templating' => 'foo.html.twig'
         )
     );
 

@@ -4,6 +4,8 @@ namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -51,7 +53,7 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
      */
     public function getParent()
     {
-        return FilterType::NAME;
+        return FilterType::class;
     }
 
     /**
@@ -68,7 +70,9 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 if (!empty($data['type']) && in_array($data['type'], self::ARRAY_TYPES)) {
                     $options = $form->get('value')->getConfig()->getOptions();
                     $form->remove('value');
-                    $form->add('value', 'text', ['label' => $options['label'], 'required' => $options['required']]);
+                    $form->add('value', TextType::class, [
+                        'label' => $options['label'], 'required' => $options['required']
+                    ]);
                 }
             }
         );
@@ -79,22 +83,22 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $operatorChoices = array(
-            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equal'),
-            self::TYPE_NOT_EQUAL          => $this->translator->trans('oro.filter.form.label_type_not_equal'),
-            self::TYPE_GREATER_EQUAL      => $this->translator->trans('oro.filter.form.label_type_greater_equal'),
-            self::TYPE_GREATER_THAN       => $this->translator->trans('oro.filter.form.label_type_greater_than'),
-            self::TYPE_LESS_EQUAL         => $this->translator->trans('oro.filter.form.label_type_less_equal'),
-            self::TYPE_LESS_THAN          => $this->translator->trans('oro.filter.form.label_type_less_than'),
-            self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
-            self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
-            FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
-            FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
-        );
+        $operatorChoices = [
+            $this->translator->trans('oro.filter.form.label_type_equal') => self::TYPE_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_not_equal') => self::TYPE_NOT_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_equal') => self::TYPE_GREATER_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_greater_than') => self::TYPE_GREATER_THAN,
+            $this->translator->trans('oro.filter.form.label_type_less_equal') => self::TYPE_LESS_EQUAL,
+            $this->translator->trans('oro.filter.form.label_type_less_than') => self::TYPE_LESS_THAN,
+            $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
+            $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
+            $this->translator->trans('oro.filter.form.label_type_empty') => FilterUtility::TYPE_EMPTY,
+            $this->translator->trans('oro.filter.form.label_type_not_empty') => FilterUtility::TYPE_NOT_EMPTY,
+        ];
 
         $resolver->setDefaults(
             array(
-                'field_type'        => 'number',
+                'field_type'        => NumberType::class,
                 'operator_choices'  => $operatorChoices,
                 'data_type'         => self::DATA_INTEGER,
                 'formatter_options' => array()

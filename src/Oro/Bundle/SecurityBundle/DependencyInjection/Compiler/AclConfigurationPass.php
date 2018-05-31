@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AclConfigurationPass implements CompilerPassInterface
 {
+    const DEFAULT_ACL_DBAL_PROVIDER = 'security.acl.dbal.provider';
     const NEW_ACL_PROVIDER = 'oro_security.acl.provider';
-    const NEW_ACL_DBAL_PROVIDER_CLASS = 'oro_security.acl.dbal.provider.class';
 
     const DEFAULT_ACL_VOTER = 'security.acl.voter.basic_permissions';
-    const DEFAULT_ACL_DBAL_PROVIDER_CLASS = 'security.acl.dbal.provider.class';
 
     const ACL_EXTENSION_SELECTOR = 'oro_security.acl.extension_selector';
     const ACL_EXTENSION_TAG = 'oro_security.acl.extension';
@@ -46,14 +46,8 @@ class AclConfigurationPass implements CompilerPassInterface
      */
     protected function configureDefaultAclProvider(ContainerBuilder $container)
     {
-        if ($container->hasParameter(self::DEFAULT_ACL_DBAL_PROVIDER_CLASS)) {
-            if ($container->hasParameter(self::NEW_ACL_DBAL_PROVIDER_CLASS)) {
-                // change implementation of ACL DBAL provider
-                $container->setParameter(
-                    self::DEFAULT_ACL_DBAL_PROVIDER_CLASS,
-                    $container->getParameter(self::NEW_ACL_DBAL_PROVIDER_CLASS)
-                );
-            }
+        if ($container->hasDefinition(self::DEFAULT_ACL_DBAL_PROVIDER)) {
+            $container->getDefinition(self::DEFAULT_ACL_DBAL_PROVIDER)->setClass(MutableAclProvider::class);
         }
     }
 

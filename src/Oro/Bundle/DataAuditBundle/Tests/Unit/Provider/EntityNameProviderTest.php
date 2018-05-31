@@ -77,7 +77,21 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eget quam lacus. Vestibulum ' .
                 'quis erat at sapien aliquet placerat. Nunc maximus nec sapien vitae mattis. Nulla ultricies metus ' .
                 'at est semper rutrum. Sed vulputate purus id turpis consecte'
-            ]
+            ],
+            'more than 255 symbols UTF-8' => [
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付',
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付票驗驗後付' .
+                '票驗驗後付',
+            ],
         ];
     }
 }

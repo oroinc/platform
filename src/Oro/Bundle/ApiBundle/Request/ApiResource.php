@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Represents Data API resource.
+ */
 class ApiResource
 {
     /** @var string */
-    protected $entityClass;
+    private $entityClass;
 
     /** @var string[] */
-    protected $excludedActions = [];
+    private $excludedActions = [];
 
     /**
      * @param $entityClass
@@ -57,7 +60,7 @@ class ApiResource
      */
     public function isExcludedAction($action)
     {
-        return in_array($action, $this->excludedActions, true);
+        return \in_array($action, $this->excludedActions, true);
     }
 
     /**
@@ -67,7 +70,7 @@ class ApiResource
      */
     public function addExcludedAction($action)
     {
-        if (!in_array($action, $this->excludedActions, true)) {
+        if (!\in_array($action, $this->excludedActions, true)) {
             $this->excludedActions[] = $action;
         }
     }
@@ -79,10 +82,10 @@ class ApiResource
      */
     public function removeExcludedAction($action)
     {
-        $key = array_search($action, $this->excludedActions, true);
+        $key = \array_search($action, $this->excludedActions, true);
         if (false !== $key) {
             unset($this->excludedActions[$key]);
-            $this->excludedActions = array_values($this->excludedActions);
+            $this->excludedActions = \array_values($this->excludedActions);
         }
     }
 }

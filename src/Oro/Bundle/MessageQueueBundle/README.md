@@ -39,7 +39,7 @@ a web gui where you can monitor jobs status and interrupt jobs.
 First, you have to configure a transport layer and set one to be default. For the config settings
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     transport:
@@ -53,7 +53,7 @@ we can configure one of the supported transports via parameters:
 ### DBAL transport 
 
 ```yaml
-# app/config/parameters.yml
+# config/parameters.yml
 
     message_queue_transport: DBAL
     message_queue_transport_config: ~
@@ -107,7 +107,7 @@ oro_channel.async.change_integration_status_processor:
 Now you can start consuming messages:
 
 ```bash
-./app/console oro:message-queue:consume
+./bin/console oro:message-queue:consume
 ```
 
 _**Note**: Add -vvv to find out what is going while you are consuming messages. There is a lot of valuable debug info there._
@@ -123,7 +123,7 @@ the used memory amount after each message processing and terminates if it is exc
 was run:
 
 ```bash
-./app/console oro:message-queue:consume --memory-limit=700
+./bin/console oro:message-queue:consume --memory-limit=700
 ``` 
 
 then:
@@ -162,11 +162,11 @@ In the all cases above the interrupted consumer should be re-run. So you must ke
 `oro:message-queue:consume` command and to do this best we advise you to delegate this responsibility 
 to [Supervisord](http://supervisord.org/). With next program configuration supervisord keeps running 
 four simultaneous instances of `oro:message-queue:consume` command and cares about relaunch if instance 
-has dead by any reason.
+has dead by any reason. Pay attention that the [program name](http://supervisord.org/configuration.html#program-x-section-settings) defined in the `[program:oro_message_consumer]` must be unique from any other instances deployed on the same supervisord server even if they are for staging purposes only. As an example, set the following programs `[program:prod_oro_message_consumer]` and `[program:dev_oro_message_consumer]`.
 
 ```ini
 [program:oro_message_consumer]
-command=/path/to/app/console --env=prod --no-debug oro:message-queue:consume
+command=/path/to/bin/console --env=prod --no-debug oro:message-queue:consume
 process_name=%(program_name)s_%(process_num)02d
 numprocs=4
 autostart=true
@@ -181,7 +181,7 @@ redirect_stderr=true
 To use several independent Message Queues on single RabbitMQ instance, configure a name prefix for the Message Queue. For example:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_message_queue:
     ...
@@ -246,7 +246,7 @@ Also, in case if you need custom logic for manage sent messages, you can use [Or
 Before you start to use traits in functional tests, you need to register `oro_message_queue.test.message_collector` service for `test` environment.
 
 ```yaml
-# app/config/config_test.yml
+# config/config_test.yml
 
 services:
     oro_message_queue.test.message_collector:

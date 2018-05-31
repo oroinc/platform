@@ -2,10 +2,14 @@
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides reusable methods that provide the database access for the Organization entity.
+ */
 class OrganizationRepository extends EntityRepository
 {
     /**
@@ -24,26 +28,13 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
-     * Get organization by id
-     *
-     * @param $id
-     * @return Organization
-     */
-    public function getOrganizationById($id)
-    {
-        return $this->createQueryBuilder('org')
-            ->select('org')
-            ->where('org.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getSingleResult();
-    }
-
-    /**
-     * Get organization by name
+     * Gets organization by its name.
      *
      * @param string $name
+     *
      * @return Organization
+     *
+     * @throws NoResultException if the organization was not found
      */
     public function getOrganizationByName($name)
     {

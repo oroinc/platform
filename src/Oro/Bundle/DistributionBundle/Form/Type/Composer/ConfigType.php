@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DistributionBundle\Form\Type\Composer;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
@@ -13,11 +15,11 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('oauth', 'text', ['label' => 'Github OAuth', 'required' => false])
+            ->add('oauth', TextType::class, ['label' => 'Github OAuth', 'required' => false])
             ->add(
                 'repositories',
-                'collection',
-                ['type' => 'oro_composer_repository', 'allow_add' => true, 'allow_delete' => true]
+                CollectionType::class,
+                ['entry_type' => RepositoryType::class, 'allow_add' => true, 'allow_delete' => true]
             );
     }
 

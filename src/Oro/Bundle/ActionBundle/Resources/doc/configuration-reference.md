@@ -61,7 +61,7 @@ bundles, validate and merge. Merged configuration is stored in app cache.
 Eexecute a command to validate configuration manually:
 
 ```
-php app/console oro:action:configuration:validate
+php bin/console oro:action:configuration:validate
 ```
 
 ## Configuration Merging
@@ -504,7 +504,7 @@ operations:
         form_options:
             attribute_fields:
                 demo_attr:
-                    form_type: text
+                    form_type: Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
                             required: true
                             constraints:

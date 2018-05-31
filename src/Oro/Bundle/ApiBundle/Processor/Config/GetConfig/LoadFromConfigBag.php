@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHe
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
-use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -47,7 +46,6 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     /**
      * @param ConfigExtensionRegistry      $configExtensionRegistry
      * @param ConfigLoaderFactory          $configLoaderFactory
-     * @param ResourceHierarchyProvider    $resourceHierarchyProvider
      * @param ConfigBagRegistry            $configBagRegistry
      * @param ResourcesProvider            $resourcesProvider
      * @param EntityConfigMerger           $entityConfigMerger
@@ -58,7 +56,6 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        ResourceHierarchyProvider $resourceHierarchyProvider,
         ConfigBagRegistry $configBagRegistry,
         ResourcesProvider $resourcesProvider,
         EntityConfigMerger $entityConfigMerger,
@@ -66,12 +63,7 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         MergeActionConfigHelper $mergeActionConfigHelper,
         MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
     ) {
-        parent::__construct(
-            $configExtensionRegistry,
-            $configLoaderFactory,
-            $resourceHierarchyProvider,
-            $entityConfigMerger
-        );
+        parent::__construct($configExtensionRegistry, $configLoaderFactory, $entityConfigMerger);
         $this->configBagRegistry = $configBagRegistry;
         $this->resourcesProvider = $resourcesProvider;
         $this->mergeParentResourceHelper = $mergeParentResourceHelper;

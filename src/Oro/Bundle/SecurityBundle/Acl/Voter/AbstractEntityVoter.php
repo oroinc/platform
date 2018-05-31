@@ -45,19 +45,25 @@ abstract class AbstractEntityVoter implements VoterInterface
     }
 
     /**
-     * {@inheritDoc}
-     * TODO: change public to protected in scope of BAP-15236
+     * Checks if the voter supports the given attribute.
+     *
+     * @param mixed $attribute An attribute (usually the attribute name string)
+     *
+     * @return bool true if this Voter supports the attribute, false otherwise
      */
-    public function supportsAttribute($attribute)
+    protected function supportsAttribute($attribute)
     {
         return in_array($attribute, $this->supportedAttributes);
     }
 
     /**
-     * {@inheritdoc}
-     * TODO: change public to protected in scope of BAP-15236
+     * Checks if the voter supports the given class.
+     *
+     * @param string $class A class name
+     *
+     * @return bool true if this Voter can process the class
      */
-    public function supportsClass($class)
+    protected function supportsClass($class)
     {
         if (!$this->className) {
             throw new \InvalidArgumentException('className was not provided');

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Type;
 
+use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
+use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,7 +17,7 @@ class ReminderType extends AbstractType
     {
         $builder->add(
             'method',
-            'oro_reminder_method',
+            MethodType::class,
             array(
                 'required' => true,
                 'attr'     => array('class' => 'method'),
@@ -24,7 +26,7 @@ class ReminderType extends AbstractType
 
         $builder->add(
             'interval',
-            'oro_reminder_interval',
+            ReminderIntervalType::class,
             array('required' => true)
         );
     }

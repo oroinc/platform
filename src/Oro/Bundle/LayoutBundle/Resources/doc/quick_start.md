@@ -22,7 +22,7 @@ See the [config definition](./config_definition.md) topic for more details.
 
 ## Set Default Theme
 
-To set a default layout theme for your application, add the following configuration to the `app/config/config.yml` file:
+To set a default layout theme for your application, add the following configuration to the `config/config.yml` file:
 
 ```yaml
 oro_layout:

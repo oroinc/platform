@@ -390,6 +390,6 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getFormType()
     {
-        return ActivityListFilterType::NAME;
+        return ActivityListFilterType::class;
     }
 }

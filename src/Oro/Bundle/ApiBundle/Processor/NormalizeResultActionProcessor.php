@@ -89,8 +89,8 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     {
         if (null !== $this->logger) {
             $this->logger->info(
-                sprintf('Error(s) occurred in "%s" processor.', $processorId),
-                array_merge(
+                \sprintf('Error(s) occurred in "%s" processor.', $processorId),
+                \array_merge(
                     ['errors' => $this->getErrorsForLog($context->getErrors())],
                     $this->getLogContext($context)
                 )
@@ -120,9 +120,9 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
 
         if (self::NORMALIZE_RESULT_GROUP === $group || !$this->isNormalizeResultEnabled($context)) {
-            // rethrow an exception occurred in any processor from the "normalize_result" group,
+            // rethrow an exception occurred in any processor from the "normalize_result" group
+            // or if the "normalize_result" group is disabled,
             // this is required to prevent circular handling of such exception
-            // also rethrow an exception in case if the "normalize_result" group is disabled
             if (!$context->isSoftErrorsHandling()) {
                 throw $e;
             }
@@ -146,21 +146,21 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         $underlyingException = ExceptionUtil::getProcessorUnderlyingException($e);
         if ($context->isSoftErrorsHandling() || $this->isSafeException($underlyingException)) {
             $this->logger->info(
-                sprintf('An exception occurred in "%s" processor.', $processorId),
-                array_merge(['exception' => $e], $this->getLogContext($context))
+                \sprintf('An exception occurred in "%s" processor.', $processorId),
+                \array_merge(['exception' => $e], $this->getLogContext($context))
             );
         } elseif ($underlyingException instanceof UnhandledErrorsException) {
             $this->logger->error(
-                sprintf('Unhandled error(s) occurred in "%s" processor.', $processorId),
-                array_merge(
+                \sprintf('Unhandled error(s) occurred in "%s" processor.', $processorId),
+                \array_merge(
                     ['errors' => $this->getErrorsForLog($underlyingException->getErrors())],
                     $this->getLogContext($context)
                 )
             );
         } else {
             $this->logger->error(
-                sprintf('The execution of "%s" processor is failed.', $processorId),
-                array_merge(['exception' => $e], $this->getLogContext($context))
+                \sprintf('The execution of "%s" processor is failed.', $processorId),
+                \array_merge(['exception' => $e], $this->getLogContext($context))
             );
         }
     }
@@ -222,8 +222,8 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             } catch (\Exception $e) {
                 if (null !== $this->logger) {
                     $this->logger->error(
-                        sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
-                        array_merge(['exception' => $e], $this->getLogContext($context))
+                        \sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
+                        \array_merge(['exception' => $e], $this->getLogContext($context))
                     );
                 }
 
@@ -261,7 +261,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      */
     private function getErrorsForLog(array $errors): array
     {
-        return array_map(
+        return \array_map(
             function (Error $error) {
                 return $this->getErrorForLog($error);
             },
@@ -295,11 +295,11 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
         }
         $exception = $error->getInnerException();
         if (null !== $exception) {
-            $result['exception'] = sprintf('%s: %s', get_class($exception), $exception->getMessage());
+            $result['exception'] = \sprintf('%s: %s', get_class($exception), $exception->getMessage());
         }
         $source = $error->getSource();
         if (null !== $source) {
-            $result = array_merge($result, $this->getErrorSourceForLog($source));
+            $result = \array_merge($result, $this->getErrorSourceForLog($source));
         }
 
         return $result;

@@ -2,13 +2,20 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
+use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -67,65 +74,65 @@ class ConfigurationType extends AbstractType
         $this->finalDataCleaner($builder);
 
         $builder
-            ->add('useImap', 'checkbox', [
+            ->add('useImap', CheckboxType::class, [
                 'label'    => 'oro.imap.configuration.use_imap.label',
                 'attr'     => ['class' => 'imap-config check-connection'],
                 'required' => false,
                 'mapped'   => false,
                 'tooltip'  => 'oro.imap.configuration.use_imap.tooltip'
             ])
-            ->add('imapHost', 'text', [
+            ->add('imapHost', TextType::class, [
                 'label'    => 'oro.imap.configuration.imap_host.label',
                 'required' => false,
                 'attr'     => ['class' => 'critical-field imap-config check-connection switchable-field'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
-            ->add('imapPort', 'number', [
+            ->add('imapPort', NumberType::class, [
                 'label'    => 'oro.imap.configuration.imap_port.label',
                 'attr'     => ['class' => 'imap-config check-connection switchable-field'],
                 'required' => false
             ])
-            ->add('imapEncryption', 'choice', [
+            ->add('imapEncryption', ChoiceType::class, [
                 'label'       => 'oro.imap.configuration.imap_encryption.label',
-                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'choices'     => ['SSL' => 'ssl', 'TLS' => 'tls'],
                 'attr'        => ['class' => 'imap-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'placeholder' => '',
                 'required'    => false
             ])
-            ->add('useSmtp', 'checkbox', [
+            ->add('useSmtp', CheckboxType::class, [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config check-connection'],
                 'required' => false,
                 'mapped'   => false,
                 'tooltip'  => 'oro.imap.configuration.use_smtp.tooltip'
             ])
-            ->add('smtpHost', 'text', [
+            ->add('smtpHost', TextType::class, [
                 'label'    => 'oro.imap.configuration.smtp_host.label',
                 'attr'     => ['class' => 'critical-field smtp-config check-connection switchable-field'],
                 'required' => false,
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
-            ->add('smtpPort', 'number', [
+            ->add('smtpPort', NumberType::class, [
                 'label'    => 'oro.imap.configuration.smtp_port.label',
                 'attr'     => ['class' => 'smtp-config check-connection switchable-field'],
                 'required' => false
             ])
-            ->add('smtpEncryption', 'choice', [
+            ->add('smtpEncryption', ChoiceType::class, [
                 'label'       => 'oro.imap.configuration.smtp_encryption.label',
-                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'choices'     => ['SSL' => 'ssl', 'TLS' => 'tls'],
                 'attr'        => ['class' => 'smtp-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'placeholder' => '',
                 'required'    => false
             ])
-            ->add('user', 'text', [
+            ->add('user', TextType::class, [
                 'label'    => 'oro.imap.configuration.user.label',
                 'required' => true,
                 'attr'     => ['class' => 'critical-field check-connection'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
-            ->add('password', 'password', [
+            ->add('password', PasswordType::class, [
                 'label' => 'oro.imap.configuration.password.label',
                 'required' => true,
                 'attr' => [
@@ -134,11 +141,11 @@ class ConfigurationType extends AbstractType
                 ]
             ]);
         if ($options['add_check_button']) {
-            $builder->add('check_connection', 'oro_imap_configuration_check', [
+            $builder->add('check_connection', CheckButtonType::class, [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
             ]);
         }
-        $builder->add('folders', 'oro_email_email_folder_tree', [
+        $builder->add('folders', EmailFolderTreeType::class, [
                 'label'   => $this->translator->trans('oro.email.folders.label'),
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',

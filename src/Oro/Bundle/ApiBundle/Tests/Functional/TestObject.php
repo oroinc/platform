@@ -25,6 +25,11 @@ class TestObject
     private $description;
 
     /**
+     * @var bool
+     */
+    private $enabled;
+
+    /**
      * @return int
      */
     public function getId()
@@ -70,5 +75,21 @@ class TestObject
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool|null $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
     }
 }

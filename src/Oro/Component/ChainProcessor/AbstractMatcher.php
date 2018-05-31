@@ -3,7 +3,7 @@
 namespace Oro\Component\ChainProcessor;
 
 /**
- * A base class for check whether a value of a specific processor attribute
+ * The base class for check whether a value of a specific processor attribute
  * is matched a corresponding value from the execution context.
  */
 abstract class AbstractMatcher

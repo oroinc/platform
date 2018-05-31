@@ -74,7 +74,6 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
-            - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag_registry'
             - '@oro_api.resources_provider'
             - '@oro_api.config_merger.entity'
@@ -99,19 +98,15 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -45 }
 
-    oro_api.get_config.add_owner_validator:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_security.owner.ownership_metadata_provider'
-            - '@oro_api.validation_helper'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -50 }
-
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, requestType: json_api, priority: -100 }
+
+    oro_api.get_config.complete_disable_inclusion:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\CompleteDisableInclusion
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -105 }
 
     oro_api.get_config.filter_fields_by_extra:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
@@ -140,7 +135,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler
         arguments:
             - '@oro_api.customize_loaded_data.processor'
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&customize_loaded_data&definition, priority: -160 }
 
@@ -177,7 +171,6 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
-            - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag_registry'
             - '@oro_api.config_merger.relation'
         tags:

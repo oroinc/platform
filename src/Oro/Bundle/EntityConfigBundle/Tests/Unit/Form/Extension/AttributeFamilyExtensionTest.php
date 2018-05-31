@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
@@ -27,11 +25,6 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     protected $attributeConfigProvider;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $doctrineHelper;
-
-    /**
      * @var AttributeFamilyExtension
      */
     protected $extension;
@@ -40,15 +33,9 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->extension = new AttributeFamilyExtension($this->attributeConfigProvider, $this->doctrineHelper);
+        $this->extension = new AttributeFamilyExtension($this->attributeConfigProvider);
     }
 
     /**
@@ -196,23 +183,12 @@ class AttributeFamilyExtensionTest extends TypeTestCase
                 [
                     'class' => AttributeFamily::class,
                     'label' => 'oro.entity_config.attribute_family.entity_label',
-                    'choices' => [],
+                    'query_builder' => function () {
+                    },
                     'required' => true,
                     'constraints' => [new NotBlank()]
                 ]
             );
-
-        $repository = $this->getMockBuilder(AttributeFamilyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->once())
-            ->method('findBy')
-            ->with(['entityClass' => self::DATA_CLASS])
-            ->willReturn([]);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')
-            ->with(AttributeFamily::class)
-            ->willReturn($repository);
 
         $this->extension->onPreSetData(new FormEvent($form, $entity));
     }

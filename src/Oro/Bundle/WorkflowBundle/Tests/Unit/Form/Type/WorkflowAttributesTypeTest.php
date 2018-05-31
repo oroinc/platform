@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -57,8 +59,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->workflowRegistry = $this->createWorkflowRegistryMock();
         $this->attributeGuesser = $this->createAttributeGuesserMock();
         $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
@@ -78,6 +78,23 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->propertyPathSecurityHelper,
             $this->translator
         );
+        parent::setUp();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type
+                ],
+                []
+            ),
+        ];
+        parent::setUp();
     }
 
     /**
@@ -116,7 +133,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('attr', 'text', $expectedOptions)
+            ->with('attr', TextType::class, $expectedOptions)
             ->willReturnSelf();
 
         $this->type->buildForm($builder, $formOptions);
@@ -130,7 +147,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         return [
             'root label' => [
                 'attribute' => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'label' => 'RootLabel1',
                 ],
                 'expected' => [
@@ -140,7 +157,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'option label' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'options' => [
                         'label' => 'OptionsLabel2',
                     ],
@@ -152,7 +169,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'array option label' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'options' => [
                         'label' => ['OptionsLabel3'],
                     ],
@@ -164,7 +181,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'no translation' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'options' => [
                         'label' => 'OptionsLabel4',
                         'translation_domain' => 'custom',
@@ -178,7 +195,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'custom translation domain' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'options' => [
                         'label' => 'OptionsLabel4',
                         'translation_domain' => 'messages',
@@ -192,7 +209,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'no label' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                 ],
                 'expected' => [
                     'label' => 'AttributeLabel',
@@ -201,7 +218,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
             'workflow label' => [
                 'attribute'  => [
-                    'form_type' => 'text',
+                    'form_type' => TextType::class,
                     'label' => 'oro.workflow.attribute6.label',
                 ],
                 'expected' => [
@@ -278,7 +295,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ->will($this->returnValue($typeGuess));
         }
 
-        $form = $this->factory->create($this->type, $sourceWorkflowData, $formOptions);
+        $form = $this->factory->create(WorkflowAttributesType::class, $sourceWorkflowData, $formOptions);
 
         $this->assertSameSize($childrenOptions, $form->all());
 
@@ -334,12 +351,12 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     'workflow_item' => $this->createWorkflowItem($workflow),
                     'attribute_fields' => array(
                         'first'  => array(
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'First Custom',
                             'options' => array('required' => true)
                         ),
                         'second' => array(
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'options' => array('required' => false, 'label' => 'Second Custom')
                         ),
                     ),
@@ -370,7 +387,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     'workflow_item' => $this->createWorkflowItem($workflow),
                     'attribute_fields' => array(
                         'first'  => array(
-                            'form_type' => 'text',
+                            'form_type' => TextType::class,
                             'label' => 'First Custom',
                             'options' => array('required' => true)
                         ),
@@ -400,8 +417,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
                     'attribute_fields' => array(
-                        'first'  => array('form_type' => 'text', 'options' => array('required' => true)),
-                        'second' => array('form_type' => 'text', 'options' => array('required' => false)),
+                        'first'  => array('form_type' => TextType::class, 'options' => array('required' => true)),
+                        'second' => array('form_type' => TextType::class, 'options' => array('required' => false)),
                     ),
                     'disable_attribute_fields' => true
                 ),
@@ -428,17 +445,21 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'childrenOptions' => array(
                     'first'  => array(
                         'label' => 'Guessed Label',
-                        'max_length' => 50,
-                        'required' => false
+                        'required' => false,
+                        'attr' => [
+                            'maxlength' => 50
+                        ]
                     ),
                 ),
                 'guessedData' => array(
                     array(
                         'entity' => 'RelatedEntity',
-                        'form_type' => 'text',
+                        'form_type' => TextType::class,
                         'form_options' => array(
                             'label' => 'Guessed Label',
-                            'max_length' => 50,
+                            'attr' => [
+                                'maxlength' => 50
+                            ]
                         )
                     )
                 ),
@@ -457,7 +478,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMessage);
 
-        $form = $this->factory->create($this->type, null, $options);
+        $form = $this->factory->create(WorkflowAttributesType::class, null, $options);
         $form->submit(array());
     }
 
@@ -480,7 +501,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     'workflow' => $workflow = $this->createWorkflow('test_workflow'),
                     'workflow_item' => $this->createWorkflowItem($workflow),
                     'attribute_fields' => array(
-                        'first'  => array('form_type' => 'text', 'options' => array('required' => true))
+                        'first'  => array('form_type' => TextType::class, 'options' => array('required' => true))
                     ),
                 ),
             ),
@@ -537,8 +558,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             'workflow' => $workflow,
             'workflow_item' => $this->createWorkflowItem($workflow),
             'attribute_fields' => array(
-                'first'  => array('form_type' => 'text'),
-                'second' => array('form_type' => 'text')
+                'first'  => array('form_type' => TextType::class),
+                'second' => array('form_type' => TextType::class)
             )
         );
 
@@ -551,7 +572,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->with($entity, 'second', 'EDIT')
             ->willReturn(false);
 
-        $form = $this->factory->create($this->type, $formData, $formOptions);
+        $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
         $this->assertTrue($form->has('first'));
         $this->assertFalse($form->has('second'));
@@ -573,14 +594,14 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             'workflow' => $workflow,
             'workflow_item' => $this->createWorkflowItem($workflow),
             'attribute_fields' => [
-                'first'  => ['form_type' => 'text'],
-                'second' => ['form_type' => 'text'],
+                'first'  => ['form_type' => TextType::class],
+                'second' => ['form_type' => TextType::class],
             ],
         ];
 
         $this->propertyPathSecurityHelper->expects($this->never())->method('isGrantedByPropertyPath');
 
-        $form = $this->factory->create($this->type, $formData, $formOptions);
+        $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
         $this->assertTrue($form->has('first'));
         $this->assertTrue($form->has('second'));
@@ -597,6 +618,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->workflowRegistry->expects($this->once())->method('getWorkflow')
             ->with($expectedWorkflow->getName())->will($this->returnValue($expectedWorkflow));
 
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowAttributesType::class, null, $options);
     }
 }

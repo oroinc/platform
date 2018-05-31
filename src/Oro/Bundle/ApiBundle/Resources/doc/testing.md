@@ -25,10 +25,14 @@ To simplify creation of the functional test for REST API resources that conform 
 | delete | Sends the DELETE request for a single entity. See [delete action](./actions.md#delete-action). |
 | cdelete | Sends the DELETE request for a list of entities. See [delete_list action](./actions.md#delete_list-action). |
 | getSubresource | Sends the GET request for a sub-resource of a single entity. See [get_subresource action](./actions.md#get_subresource-action). |
+| postSubresource | Sends the POST request for a sub-resource of a single entity. See [add_relationship action](./actions.md#add_subresource-action). |
+| patchSubresource | Sends the PATCH request for a sub-resource of a single entity. See [update_relationship action](./actions.md#update_subresource-action). |
+| deleteSubresource | Sends the DELETE request for a sub-resource of a single entity. See [delete_relationship action](./actions.md#delete_subresource-action). |
 | getRelationship | Sends the GET request for a relationship of a single entity. See [get_relationship action](./actions.md#get_relationship-action). |
 | postRelationship | Sends the POST request for a relationship of a single entity. See [add_relationship action](./actions.md#add_relationship-action). |
 | patchRelationship | Sends the PATCH request for a relationship of a single entity. See [update_relationship action](./actions.md#update_relationship-action). |
 | deleteRelationship | Sends the DELETE request for a relationship of a single entity. See [delete_relationship action](./actions.md#delete_relationship-action). |
+| updateResponseContent | Replaces all values in the given expected response content with correxponding value from the actual response content when the key of an element is equal to the given key and the value of this element is equal to the given placeholder. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
 | assertResponseContains | Asserts that the response content contains the given data. If the first parameter is a file name, the file should be located in the `responses` directory next to the PHP file that contains the test. |
 | assertResponseCount | Asserts that the response contains the given number of data items. |
 | assertResponseNotEmpty | Asserts that the response data are not empty. |

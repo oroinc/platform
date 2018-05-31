@@ -42,7 +42,7 @@ class AttributeGroupType extends AbstractType
     {
         $builder->add(
             'labels',
-            LocalizedFallbackValueCollectionType::NAME,
+            LocalizedFallbackValueCollectionType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.labels.label',
                 'required' => true,
@@ -68,7 +68,7 @@ class AttributeGroupType extends AbstractType
 
         $builder->add(//This needed for new forms which will be dynamically added
             'attributeRelations',
-            AttributeMultiSelectType::NAME,
+            AttributeMultiSelectType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [
@@ -96,7 +96,7 @@ class AttributeGroupType extends AbstractType
         $form = $event->getForm();
         $form->add(
             'attributeRelations',
-            AttributeMultiSelectType::NAME,
+            AttributeMultiSelectType::class,
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [

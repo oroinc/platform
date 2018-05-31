@@ -60,8 +60,8 @@ Arguments:
 
 ##### Usage
 
-- Displays a list of current actions `php app/console oro:debug:action`;
-- Shows a full description `php app/console oro:debug:action [<name>]`.
+- Displays a list of current actions `php bin/console oro:debug:action`;
+- Shows a full description `php bin/console oro:debug:action [<name>]`.
 
 #### oro:debug:condition
 
@@ -76,5 +76,5 @@ Arguments:
 
 ##### Usage
 
-- Displays list of all conditions `php app/console oro:debug:condition`;
-- Shows a full description `php app/console oro:debug:condition [<name>]`.
+- Displays list of all conditions `php bin/console oro:debug:condition`;
+- Shows a full description `php bin/console oro:debug:condition [<name>]`.

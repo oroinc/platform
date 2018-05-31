@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,19 +42,23 @@ class UniqueKeyCollectionType extends AbstractType
             }
 
             $fieldName = $fieldConfigId->getFieldName();
-
-            $fields[$fieldName] = $this
+            $fieldLabel = $this
                 ->entityProvider
                 ->getConfig($className, $fieldName)
                 ->get('label', false, ucfirst($fieldName));
+
+            $fields[$fieldLabel] =  $fieldName;
         }
 
         $builder->add(
             'keys',
-            'collection',
+            CollectionType::class,
             array(
                 'required'       => true,
-                'type'           => new UniqueKeyType($fields),
+                'entry_type'           => UniqueKeyType::class,
+                'entry_options'        => [
+                    'key_choices' => $fields
+                ],
                 'allow_add'      => true,
                 'allow_delete'   => true,
                 'prototype'      => true,

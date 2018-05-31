@@ -529,7 +529,6 @@ abstract class AbstractFilter implements FilterInterface
     {
         if (!$this->dataFieldName) {
             $this->dataFieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-            QueryBuilderUtil::checkField($this->dataFieldName);
         }
 
         return $this->dataFieldName;

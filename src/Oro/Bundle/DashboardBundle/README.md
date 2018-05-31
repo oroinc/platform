@@ -23,7 +23,7 @@ dashboards:
 ```
 To view all configuration options you can launch `config:dump-reference` command:
 ```bash
-php app/console config:dump-reference OroDashboardBundle
+php bin/console config:dump-reference OroDashboardBundle
 ```
 
 ## How to add new dashboard
@@ -94,7 +94,7 @@ class LoadDashboardData extends AbstractDashboardFixture implements DependentFix
  
 ## How to make a dashboard a first page of your application
  
-Make the following changes in `app/config/routing.yml`:
+Make the following changes in `config/routing.yml`:
 ```yaml
 oro_default:
     pattern:  /

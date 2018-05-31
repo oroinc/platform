@@ -21,10 +21,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 class ExcludeNotAccessibleRelations implements ProcessorInterface
 {
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ResourcesProvider */
-    protected $resourcesProvider;
+    private $resourcesProvider;
 
     /**
      * @param DoctrineHelper    $doctrineHelper
@@ -64,7 +64,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
      * @param string                 $version
      * @param RequestType            $requestType
      */
-    protected function updateRelations(
+    private function updateRelations(
         EntityDefinitionConfig $definition,
         $entityClass,
         $version,
@@ -99,10 +99,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAvailable(
+    private function isResourceForRelatedEntityAvailable(
         EntityDefinitionFieldConfig $field,
         ClassMetadata $targetMetadata,
-        $version,
+        string $version,
         RequestType $requestType
     ) {
         return DataType::isAssociationAsField($field->getDataType())
@@ -117,9 +117,9 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityKnown(
+    private function isResourceForRelatedEntityKnown(
         ClassMetadata $targetMetadata,
-        $version,
+        string $version,
         RequestType $requestType
     ) {
         if ($this->resourcesProvider->isResourceKnown($targetMetadata->name, $version, $requestType)) {
@@ -144,9 +144,9 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAccessible(
+    private function isResourceForRelatedEntityAccessible(
         ClassMetadata $targetMetadata,
-        $version,
+        string $version,
         RequestType $requestType
     ) {
         if ($this->resourcesProvider->isResourceAccessible($targetMetadata->name, $version, $requestType)) {

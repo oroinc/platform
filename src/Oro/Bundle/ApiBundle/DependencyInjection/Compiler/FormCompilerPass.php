@@ -72,9 +72,18 @@ class FormCompilerPass implements CompilerPassInterface
             );
 
             // reuse existing form types, form type extensions and form type guessers
+            $formTypeClassNames = [];
+            $formTypeServiceIds = [];
+            foreach ($config['form_types'] as $formType) {
+                if ($container->hasDefinition($formType)) {
+                    $formTypeServiceIds[] = $formType;
+                } else {
+                    $formTypeClassNames[] = $formType;
+                }
+            }
             $this->addFormApiTag(
                 $container,
-                $config['form_types'],
+                $formTypeServiceIds,
                 self::FORM_TYPE_TAG,
                 self::API_FORM_TYPE_TAG
             );
@@ -92,7 +101,7 @@ class FormCompilerPass implements CompilerPassInterface
             );
 
             // load form types, form type extensions and form type guessers for Data API form extension
-            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container));
+            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container, $formTypeClassNames));
             $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
             $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
         }
@@ -197,12 +206,13 @@ class FormCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param string[]         $formTypeClassNames
      *
      * @return array
      */
-    private function getApiFormTypes(ContainerBuilder $container)
+    private function getApiFormTypes(ContainerBuilder $container, array $formTypeClassNames)
     {
-        $types = [];
+        $types = array_fill_keys($formTypeClassNames, null);
         foreach ($container->findTaggedServiceIds(self::API_FORM_TYPE_TAG) as $serviceId => $tag) {
             $alias = DependencyInjectionUtil::getAttribute($tag[0], 'alias', $serviceId);
             $types[$alias] = $serviceId;

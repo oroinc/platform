@@ -10,7 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Builds the form builder based on the parent entity metadata and configuration
- * and sets it to the Context.
+ * and sets it to the context.
  */
 class BuildFormBuilder extends BaseBuildFormBuilder
 {

@@ -96,6 +96,11 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->fieldConfigModel, $successMessage)
             ->willReturn($response);
 
+        $this->configHelperHandler
+            ->expects($this->once())
+            ->method('showClearCacheMessage')
+            ->willReturn($this->configHelperHandler);
+
         $formAction = 'formAction';
         $this->assertEquals(
             $response,

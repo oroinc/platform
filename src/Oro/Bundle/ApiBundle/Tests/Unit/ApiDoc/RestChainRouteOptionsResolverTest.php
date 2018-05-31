@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestChainRouteOptionsResolver;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Form\Extension;
 
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -81,15 +82,12 @@ class ContextsExtension extends AbstractTypeExtension
                     'activity' => $alias,
                     'name'     => $alias
                 ],
-            ],
-            'attr' => [
-                'readonly' => false
             ]
         ];
 
         $builder->add(
             'contexts',
-            'oro_activity_contexts_select',
+            ContextsSelectType::class,
             array_merge($defaultOptions, $options['contexts_options'])
         );
 

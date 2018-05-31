@@ -27,8 +27,8 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
             [
                 'field_options' => [
                     'choices' => [
-                        'value1',
-                        'value2'
+                        'value1' => 0,
+                        'value2' => 1,
                     ]
                 ],
                 'operator_choices' => null
@@ -39,22 +39,17 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
             [
                 'field_options' => [
                     'choices' => [
-                        'value1',
-                        'value2'
+                        'value1' => 0,
+                        'value2' => 1
                     ]
                 ],
                 'operator_choices' => [
-                    'value1',
-                    'value2'
+                    'value1' => 0,
+                    'value2' => 1
                 ]
             ],
             $resolvedOptions
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(SearchEnumFilterType::NAME, $this->type->getName());
     }
 
     public function testGetBlockPrefix()
@@ -64,6 +59,6 @@ class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EnumFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EnumFilterType::class, $this->type->getParent());
     }
 }

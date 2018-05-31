@@ -61,7 +61,7 @@ define([
          * @inheritDoc
          */
         enterEditMode: function() {
-            if (this.column.get('editable')) {
+            if (this.isEditableColumn()) {
                 NumberCell.__super__.enterEditMode.apply(this, arguments);
             }
         },
@@ -70,7 +70,7 @@ define([
          * @inheritDoc
          */
         exitEditMode: function() {
-            if (!this.column.get('editable')) {
+            if (!this.isEditableColumn()) {
                 NumberCell.__super__.exitEditMode.apply(this, arguments);
             }
         }

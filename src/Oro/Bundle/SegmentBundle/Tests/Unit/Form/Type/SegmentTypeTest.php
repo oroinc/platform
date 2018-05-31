@@ -2,7 +2,14 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType;
+use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class SegmentTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +33,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'name',
-                'text',
+                TextType::class,
                 ['required' => true]
             )
             ->will($this->returnSelf());
@@ -35,7 +42,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'entity',
-                'oro_segment_entity_choice',
+                SegmentEntityChoiceType::class,
                 ['required' => true]
             )
             ->will($this->returnSelf());
@@ -44,10 +51,10 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'type',
-                'entity',
+                EntityType::class,
                 [
                     'class'       => 'OroSegmentBundle:SegmentType',
-                    'property'    => 'label',
+                    'choice_label' => 'label',
                     'required'    => true,
                     'placeholder' => 'oro.segment.form.choose_segment_type',
                     'tooltip'     => 'oro.segment.type.tooltip_text'
@@ -59,7 +66,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'recordsLimit',
-                'integer',
+                IntegerType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -68,7 +75,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'description',
-                'textarea',
+                TextareaType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -77,7 +84,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'definition',
-                'hidden',
+                HiddenType::class,
                 ['required' => false]
             )
             ->will($this->returnSelf());
@@ -95,8 +102,8 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
                     'column_column_field_choice_options' => [
                         'exclude_fields' => ['relation_type'],
                     ],
-                    'column_column_choice_type'   => 'hidden',
-                    'filter_column_choice_type'   => 'oro_entity_field_select',
+                    'column_column_choice_type'   => HiddenType::class,
+                    'filter_column_choice_type'   => EntityFieldSelectType::class,
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                     'csrf_token_id'               => 'segment',
                     'query_type'                  => 'segment',
@@ -104,10 +111,5 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->type->configureOptions($resolver);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_segment', $this->type->getName());
     }
 }

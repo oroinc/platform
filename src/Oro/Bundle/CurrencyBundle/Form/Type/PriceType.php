@@ -5,6 +5,8 @@ namespace Oro\Bundle\CurrencyBundle\Form\Type;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -40,7 +42,7 @@ class PriceType extends AbstractType
         $isRequiredPrice = $this->isRequired($options);
 
         if (empty($options['hide_currency'])) {
-            $currencyType = CurrencySelectionType::NAME;
+            $currencyType = CurrencySelectionType::class;
             $currencyOptions = [
                 'additional_currencies' => $options['additional_currencies'],
                 'currencies_list' => $options['currencies_list'],
@@ -50,7 +52,7 @@ class PriceType extends AbstractType
                 'placeholder' => $options['currency_empty_value'],
             ];
         } else {
-            $currencyType = 'hidden';
+            $currencyType = HiddenType::class;
             $currencyOptions = [
                 'data' => $options['default_currency']
             ];
@@ -59,7 +61,7 @@ class PriceType extends AbstractType
         $builder
             ->add(
                 'value',
-                'number',
+                NumberType::class,
                 [
                     'required' => $isRequiredPrice,
                     'scale' => Price::MAX_VALUE_SCALE

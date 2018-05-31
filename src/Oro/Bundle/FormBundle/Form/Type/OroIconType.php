@@ -53,13 +53,11 @@ class OroIconType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $configFile = $this->kernel->locateResource('@OroFormBundle/Resources/config/config_icon.yml');
-        $config      = Yaml::parse(file_get_contents($configFile));
-        $choices = array_map(
-            function ($value) {
-                return 'oro.form.icon_select.' . $value;
-            },
-            array_flip($config['oro_icon_select'])
-        );
+        $config = Yaml::parse(file_get_contents($configFile));
+        $choices = [];
+        foreach ($config['oro_icon_select'] as $label => $value) {
+            $choices['oro.form.icon_select.' . $label] = $value;
+        }
 
         $resolver->setDefaults(
             [
@@ -80,7 +78,7 @@ class OroIconType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**

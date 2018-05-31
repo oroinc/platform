@@ -32,7 +32,7 @@ class WorkflowTransitionType extends AbstractType
      */
     public function getParent()
     {
-        return WorkflowAttributesType::NAME;
+        return WorkflowAttributesType::class;
     }
 
     /**

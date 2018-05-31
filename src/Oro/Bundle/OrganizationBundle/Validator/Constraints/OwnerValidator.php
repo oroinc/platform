@@ -4,77 +4,75 @@ namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Validates that the current logged in user is granted to change the owner for an entity.
+ */
 class OwnerValidator extends ConstraintValidator
 {
+    /** @var ManagerRegistry */
+    private $doctrine;
+
     /** @var OwnershipMetadataProviderInterface */
-    protected $ownershipMetadataProvider;
-
-    /** @var EntityOwnerAccessor */
-    protected $ownerAccessor;
-
-    /** @var BusinessUnitManager */
-    protected $businessUnitManager;
-
-    /** @var AclVoter */
-    protected $aclVoter;
+    private $ownershipMetadataProvider;
 
     /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var OwnerTreeProvider */
-    protected $treeProvider;
+    private $ownerTreeProvider;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var AclVoter */
+    private $aclVoter;
 
-    /** @var object */
-    protected $object;
+    /** @var BusinessUnitManager */
+    private $businessUnitManager;
 
     /**
      * @param ManagerRegistry                    $doctrine
-     * @param BusinessUnitManager                $businessUnitManager
      * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityOwnerAccessor                $ownerAccessor
      * @param AuthorizationCheckerInterface      $authorizationChecker
      * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnerTreeProvider                  $treeProvider
+     * @param OwnerTreeProvider                  $ownerTreeProvider
      * @param AclVoter                           $aclVoter
+     * @param BusinessUnitManager                $businessUnitManager
      */
     public function __construct(
         ManagerRegistry $doctrine,
-        BusinessUnitManager $businessUnitManager,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
-        EntityOwnerAccessor $ownerAccessor,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        OwnerTreeProvider $treeProvider,
-        AclVoter $aclVoter
+        OwnerTreeProvider $ownerTreeProvider,
+        AclVoter $aclVoter,
+        BusinessUnitManager $businessUnitManager
     ) {
         $this->doctrine = $doctrine;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-        $this->ownerAccessor = $ownerAccessor;
         $this->businessUnitManager = $businessUnitManager;
         $this->aclVoter = $aclVoter;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->treeProvider = $treeProvider;
+        $this->ownerTreeProvider = $ownerTreeProvider;
     }
 
 
@@ -83,41 +81,28 @@ class OwnerValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $this->object = $value;
+        if (!$constraint instanceof Owner) {
+            throw new UnexpectedTypeException($constraint, Owner::class);
+        }
+
+        if (null === $value) {
+            return;
+        }
 
         $entityClass = ClassUtils::getClass($value);
-        $manager = $this->doctrine->getManagerForClass($entityClass);
-        if (null === $manager) {
+        $em = $this->doctrine->getManagerForClass($entityClass);
+        if (!$em instanceof EntityManagerInterface) {
+            // the validation is required only for ORM entities
             return;
         }
 
         $ownershipMetadata = $this->ownershipMetadataProvider->getMetadata($entityClass);
-        if (!$ownershipMetadata || !$ownershipMetadata->hasOwner()) {
+        if (null === $ownershipMetadata || !$ownershipMetadata->hasOwner()) {
+            // the validation is required only for ACL protected entities
             return;
         }
 
-        $owner = $this->ownerAccessor->getOwner($value);
-        if (!$owner) {
-            return;
-        }
-
-        $idValues = $manager->getClassMetadata($entityClass)->getIdentifierValues($value);
-        if (count($idValues) !== 0) {
-            $accessLevel = $this->getAccessLevel('ASSIGN', $value);
-        } else {
-            $accessLevel = $this->getAccessLevel('CREATE', 'entity:' . $entityClass);
-        }
-
-        $isOwnerValid = true;
-        if ($accessLevel === null) {
-            $isOwnerValid = false;
-        } elseif (null !== $owner->getId()) {
-            $isOwnerValid = $this->isValidOwner($ownershipMetadata, $owner, $accessLevel);
-        } elseif ($this->ownerAccessor->getOrganization($owner) !== $this->ownerAccessor->getOrganization($value)) {
-            $isOwnerValid = false;
-        }
-
-        if (!$isOwnerValid) {
+        if (!$this->validateOwner($ownershipMetadata, $em, $entityClass, $value)) {
             $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
             /** @var ExecutionContextInterface $context */
             $context = $this->context;
@@ -129,36 +114,99 @@ class OwnerValidator extends ConstraintValidator
     }
 
     /**
-     * Returns true if given owner can be used
+     * @param OwnershipMetadataInterface $ownershipMetadata
+     * @param EntityManagerInterface     $em
+     * @param string                     $entityClass
+     * @param object                     $entity
      *
-     * @param OwnershipMetadataInterface $metadata
+     * @return bool
+     */
+    protected function validateOwner(
+        OwnershipMetadataInterface $ownershipMetadata,
+        EntityManagerInterface $em,
+        $entityClass,
+        $entity
+    ) {
+        $entityMetadata = $em->getClassMetadata($entityClass);
+        $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
+        $owner = $entityMetadata->getFieldValue($entity, $ownerFieldName);
+        if (null === $owner || !$this->isEntityOwnerChanged($em, $entity, $ownerFieldName, $owner)) {
+            // skip validation for entities that do not assigned to any owner
+            // or the assigned owner was not changed
+            return true;
+        }
+
+        $accessLevel = $this->getGrantedAccessLevel($entityMetadata, $entityClass, $entity);
+        if (null === $accessLevel) {
+            // the access to change the entity is denied for the current logged in user
+            return false;
+        }
+
+        return $this->isValidOwner($ownershipMetadata, $entityMetadata, $entity, $owner, $accessLevel);
+    }
+
+    /**
+     * @param OwnershipMetadataInterface $ownershipMetadata
+     * @param ClassMetadata              $entityMetadata
+     * @param object                     $entity
+     * @param object                     $owner
+     * @param int                        $accessLevel
+     *
+     * @return bool
+     */
+    protected function isValidOwner(
+        OwnershipMetadataInterface $ownershipMetadata,
+        ClassMetadata $entityMetadata,
+        $entity,
+        $owner,
+        $accessLevel
+    ) {
+        if (null === $owner->getId()) {
+            return $this->isValidNewOwner($ownershipMetadata, $entityMetadata, $entity, $owner);
+        }
+
+        return $this->isValidExistingOwner($ownershipMetadata, $owner, $accessLevel);
+    }
+
+    /**
+     * @return Organization
+     */
+    protected function getOrganization()
+    {
+        return $this->tokenAccessor->getOrganization();
+    }
+
+    /**
+     * @param OwnershipMetadataInterface $ownershipMetadata
      * @param object                     $owner
      * @param integer                    $accessLevel
      *
      * @return bool
      */
-    protected function isValidOwner(OwnershipMetadataInterface $metadata, $owner, $accessLevel)
+    private function isValidExistingOwner(OwnershipMetadataInterface $ownershipMetadata, $owner, $accessLevel)
     {
-        if ($metadata->isUserOwned()) {
+        if ($ownershipMetadata->isUserOwned()) {
             return $this->businessUnitManager->canUserBeSetAsOwner(
                 $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
-                $this->treeProvider,
+                $this->ownerTreeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isBusinessUnitOwned()) {
+        }
+        if ($ownershipMetadata->isBusinessUnitOwned()) {
             return $this->businessUnitManager->canBusinessUnitBeSetAsOwner(
                 $this->tokenAccessor->getUser(),
                 $owner,
                 $accessLevel,
-                $this->treeProvider,
+                $this->ownerTreeProvider,
                 $this->getOrganization()
             );
-        } elseif ($metadata->isOrganizationOwned()) {
+        }
+        if ($ownershipMetadata->isOrganizationOwned()) {
             return in_array(
                 $owner->getId(),
-                $this->treeProvider->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),
+                $this->ownerTreeProvider->getTree()->getUserOrganizationIds($this->tokenAccessor->getUserId()),
                 true
             );
         }
@@ -167,13 +215,49 @@ class OwnerValidator extends ConstraintValidator
     }
 
     /**
-     * @param $permission
-     * @param $object
+     * @param OwnershipMetadataInterface $ownershipMetadata
+     * @param ClassMetadata              $entityMetadata
+     * @param object                     $entity
+     * @param object                     $owner
+     *
+     * @return bool
+     */
+    private function isValidNewOwner(
+        OwnershipMetadataInterface $ownershipMetadata,
+        ClassMetadata $entityMetadata,
+        $entity,
+        $owner
+    ) {
+        if ($ownershipMetadata->isOrganizationOwned()) {
+            return true;
+        }
+
+        $organization = $entityMetadata->getFieldValue(
+            $entity,
+            $ownershipMetadata->getOrganizationFieldName()
+        );
+
+        return $this->getOwnerOrganization($owner) === $organization;
+    }
+
+    /**
+     * @param ClassMetadata $entityMetadata
+     * @param string        $entityClass
+     * @param object        $entity
      *
      * @return int|null
      */
-    protected function getAccessLevel($permission, $object)
+    private function getGrantedAccessLevel(ClassMetadata $entityMetadata, $entityClass, $entity)
     {
+        $isExistinEntity = count($entityMetadata->getIdentifierValues($entity)) !== 0;
+        if ($isExistinEntity) {
+            $permission = 'ASSIGN';
+            $object = $entity;
+        } else {
+            $permission = 'CREATE';
+            $object = 'entity:' . $entityClass;
+        }
+
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         if ($this->authorizationChecker->isGranted($permission, $object)) {
@@ -184,12 +268,29 @@ class OwnerValidator extends ConstraintValidator
     }
 
     /**
-     * Returns current Organization
+     * @param User|BusinessUnit $owner
      *
-     * @return Organization
+     * @return Organization|null
      */
-    protected function getOrganization()
+    private function getOwnerOrganization($owner)
     {
-        return $this->tokenAccessor->getOrganization();
+        return $owner->getOrganization();
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param object                 $entity
+     * @param string                 $ownerFieldName
+     * @param object                 $owner
+     *
+     * @return bool
+     */
+    private function isEntityOwnerChanged(EntityManagerInterface $em, $entity, $ownerFieldName, $owner)
+    {
+        $originalEntityData = $em->getUnitOfWork()->getOriginalEntityData($entity);
+
+        return
+            !isset($originalEntityData[$ownerFieldName])
+            || $originalEntityData[$ownerFieldName] !== $owner;
     }
 }

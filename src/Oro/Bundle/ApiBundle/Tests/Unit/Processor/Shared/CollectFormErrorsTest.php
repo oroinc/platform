@@ -6,15 +6,24 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameValuePairType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormValidation\TestObject;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CollectFormErrorsTest extends FormProcessorTestCase
 {
+    /** @var ErrorCompleterRegistry */
+    private $errorCompleterRegistry;
+
     /** @var CollectFormErrors */
-    protected $processor;
+    private $processor;
 
     /**
      * {@inheritdoc}
@@ -23,13 +32,18 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new CollectFormErrors(new ConstraintTextExtractor());
+        $this->errorCompleterRegistry = $this->createMock(ErrorCompleterRegistry::class);
+
+        $this->processor = new CollectFormErrors(
+            new ConstraintTextExtractor(),
+            $this->errorCompleterRegistry
+        );
     }
 
     public function testProcessWithoutForm()
     {
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWithNotSubmittedForm()
@@ -39,37 +53,37 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWithoutFormConstraints()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text')
-            ->add('field2', 'text')
+            ->add('field1', TextType::class)
+            ->add('field2', TextType::class)
             ->getForm();
         $form->submit([]);
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessWithEmptyData()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit([]);
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1'),
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field2')
@@ -81,8 +95,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithDataKeyWhichDoesNotRegisteredInForm()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\NotBlank()]])
             ->getForm();
         $form->submit(
             [
@@ -94,9 +108,9 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject(
                     'extra fields constraint',
@@ -111,27 +125,27 @@ class CollectFormErrorsTest extends FormProcessorTestCase
 
     public function testProcessWithPropertyWhichDoesNotRegisteredInFormAndHasInvalidExistingValue()
     {
-        $dataClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormValidation\TestObject';
+        $dataClass = TestObject::class;
         $data = new $dataClass();
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
-            ->add('id', 'integer')
+            ->add('id', IntegerType::class)
             ->getForm();
         $form->setData($data);
         $form->submit(
             [
-                'id' => 123,
+                'id' => 123
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
-                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'title'),
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'title')
             ],
             $this->context->getErrors()
         );
@@ -139,27 +153,27 @@ class CollectFormErrorsTest extends FormProcessorTestCase
 
     public function testProcessWithInvalidRenamedPropertyValue()
     {
-        $dataClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormValidation\TestObject';
+        $dataClass = TestObject::class;
         $data = new $dataClass();
 
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
-            ->add('renamedTitle', 'text', ['property_path' => 'title'])
+            ->add('renamedTitle', TextType::class, ['property_path' => 'title'])
             ->getForm();
         $form->setData($data);
         $form->submit(
             [
-                'renamedTitle' => null,
+                'renamedTitle' => null
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
-                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'renamedTitle'),
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'renamedTitle')
             ],
             $this->context->getErrors()
         );
@@ -168,8 +182,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidPropertyValues()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
-            ->add('field2', 'text', ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
+            ->add('field2', TextType::class, ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
             ->getForm();
         $form->submit(
             [
@@ -181,9 +195,9 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1'),
                 $this->createErrorObject('not null constraint', 'This value should not be null.', 'field1'),
@@ -200,20 +214,20 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidCollectionPropertyValue()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', 'text', ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
+            ->add('field1', TextType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
             ->getForm();
         $form->submit(
             [
-                'field1' => [1, null],
+                'field1' => [1, null]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not null constraint', 'This value should not be null.', 'field1.1')
             ],
@@ -226,22 +240,22 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                'text',
+                TextType::class,
                 ['property_path' => '[field1]', 'constraints' => [new Constraints\All(new Constraints\NotNull())]]
             )
             ->getForm();
         $form->submit(
             [
-                'renamedField1' => [1, null],
+                'renamedField1' => [1, null]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not null constraint', 'This value should not be null.', 'renamedField1.1')
             ],
@@ -254,26 +268,26 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'entry_type'      => 'text',
-                    'entry_options'   => ['constraints' => [new Constraints\NotBlank()]],
-                    'allow_add' => true
+                    'entry_type'    => TextType::class,
+                    'entry_options' => ['constraints' => [new Constraints\NotBlank()]],
+                    'allow_add'     => true
                 ]
             )
             ->getForm();
         $form->submit(
             [
-                'field1' => [1, null],
+                'field1' => [1, null]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1.1')
             ],
@@ -286,27 +300,27 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                'collection',
+                CollectionType::class,
                 [
                     'property_path' => '[field1]',
-                    'entry_type'          => 'text',
-                    'entry_options'       => ['constraints' => [new Constraints\NotBlank()]],
+                    'entry_type'    => TextType::class,
+                    'entry_options' => ['constraints' => [new Constraints\NotBlank()]],
                     'allow_add'     => true
                 ]
             )
             ->getForm();
         $form->submit(
             [
-                'renamedField1' => [1, null],
+                'renamedField1' => [1, null]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'renamedField1.1')
             ],
@@ -319,13 +333,13 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'entry_type'      => new NameValuePairType(),
-                    'entry_options'   => [
+                    'entry_type'    => NameValuePairType::class,
+                    'entry_options' => [
                         'name_options' => ['constraints' => [new Constraints\NotBlank()]]
                     ],
-                    'allow_add' => true
+                    'allow_add'     => true
                 ]
             )
             ->getForm();
@@ -335,16 +349,16 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                     [
                         'name' => null
                     ]
-                ],
+                ]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1.0.name')
             ],
@@ -357,16 +371,16 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'field1',
-                'collection',
+                CollectionType::class,
                 [
-                    'entry_type'      => new NameValuePairType(),
-                    'entry_options'   => [
+                    'entry_type'    => NameValuePairType::class,
+                    'entry_options' => [
                         'name_options' => [
                             'constraints'    => [new Constraints\NotBlank()],
                             'error_bubbling' => true
                         ]
                     ],
-                    'allow_add' => true
+                    'allow_add'     => true
                 ]
             )
             ->getForm();
@@ -376,16 +390,16 @@ class CollectFormErrorsTest extends FormProcessorTestCase
                     [
                         'name' => null
                     ]
-                ],
+                ]
             ]
         );
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1.0.name')
             ],
@@ -402,7 +416,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
         $form = $this->createFormBuilder()
             ->create('testForm', null, ['compound' => true, 'constraints' => [$rootLevelConstraint]])
-            ->add('field1', 'text')
+            ->add('field1', TextType::class)
             ->getForm();
         $form->submit(
             [
@@ -413,11 +427,47 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->context->setForm($form);
         $this->processor->process($this->context);
 
-        $this->assertFalse($form->isValid());
-        $this->assertTrue($this->context->hasErrors());
-        $this->assertEquals(
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
             [
                 $this->createErrorObject('callback constraint', 'Some issue with a whole form data', 'testForm')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithCustomErrorOccured()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add(
+                'field1',
+                CollectionType::class,
+                [
+                    'entry_type' => NameValuePairType::class,
+                    'allow_add'  => true
+                ]
+            )
+            ->getForm();
+        $form->submit(
+            [
+                'field1' => [
+                    [
+                        'name' => 1
+                    ]
+                ]
+            ]
+        );
+        $form->get('field1')->get('0')->get('name')->addError(new FormError('custom error'));
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        self::assertFalse($form->isValid());
+        self::assertTrue($this->context->hasErrors());
+        self::assertEquals(
+            [
+                $this->createErrorObject('form constraint', 'custom error', 'field1.0.name')
             ],
             $this->context->getErrors()
         );
@@ -430,7 +480,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
      *
      * @return Error
      */
-    protected function createErrorObject($title, $detail, $propertyPath)
+    private function createErrorObject($title, $detail, $propertyPath)
     {
         $error = Error::createValidationError($title, $detail);
         if ($propertyPath) {

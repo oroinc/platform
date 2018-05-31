@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -84,7 +85,7 @@ class EmailOriginFromType extends AbstractType
     {
         $choices = $this->createChoices();
         $resolver->setDefaults([
-            'choices'   => $choices,
+            'choices' => $choices,
             'attr' => [],
         ]);
 
@@ -119,7 +120,7 @@ class EmailOriginFromType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_choice';
+        return Select2ChoiceType::class;
     }
 
     /**
@@ -153,7 +154,7 @@ class EmailOriginFromType extends AbstractType
                     $owner = $origin->getOwner();
                     $email = $origin->getOwner()->getEmail();
                     $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
-                    $origins[$origin->getId() . '|' . $origin->getOwner()->getEmail()] = $email;
+                    $origins[$email] = $origin->getId() . '|' . $origin->getOwner()->getEmail();
                 }
             }
         }
@@ -195,7 +196,7 @@ class EmailOriginFromType extends AbstractType
             } else {
                 $this->helper->preciseFullEmailAddress($email);
             }
-            $origins[$key] = $email;
+            $origins[$email] = $key;
         }
 
         return $origins;
@@ -219,7 +220,7 @@ class EmailOriginFromType extends AbstractType
                 $email = $mailbox->getEmail();
                 $this->helper->preciseFullEmailAddress($email);
                 $email .= ' (Mailbox)';
-                $origins[$origin->getId() . '|' . $mailbox->getEmail()] = $email;
+                $origins[$email] = $origin->getId() . '|' . $mailbox->getEmail();
             }
         }
 

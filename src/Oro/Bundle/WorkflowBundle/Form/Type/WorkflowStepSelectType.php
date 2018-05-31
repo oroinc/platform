@@ -8,6 +8,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
@@ -50,7 +51,7 @@ class WorkflowStepSelectType extends AbstractType
         $resolver->setDefaults(
             [
                 'class' => 'OroWorkflowBundle:WorkflowStep',
-                'property' => 'label'
+                'choice_label' => 'label'
             ]
         );
 
@@ -150,7 +151,7 @@ class WorkflowStepSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'entity';
+        return EntityType::class;
     }
 
     /**

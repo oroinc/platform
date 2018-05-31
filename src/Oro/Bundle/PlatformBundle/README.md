@@ -86,7 +86,7 @@ lazy_services:
 
 ## Add application configuration settings from any bundle
 
-Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _app/config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _app/config.yml_.
+Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _config.yml_.
 The following example shows how `money` data type can be registered:
 
 ``` yaml
@@ -96,7 +96,7 @@ doctrine:
             money: Oro\Bundle\EntityBundle\Entity\Type\MoneyType
 ```
 
-Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
+Please note that setting added through _app.yml_ can be overwrote in _config.yml_. So, you can consider settings in _app.yml_ as default ones.
 
 
 ## Optional listeners
@@ -108,7 +108,7 @@ Each console command have additional option `disabled_listeners`. Using this opt
 As value, this option takes `all` string or array of optional listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
 
 ```
- app/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
+ bin/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
 ```
 
 In this case, command will be run with disabled listeners: first_listener and second_listener.

@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\CriteriaNormalizer;
@@ -15,93 +16,51 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class CriteriaConnectorTest extends OrmRelatedTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
+    private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
 
     /** @var Criteria */
-    protected $criteria;
+    private $criteria;
 
     /** @var CriteriaConnector */
-    protected $criteriaConnector;
+    private $criteriaConnector;
 
-    protected $expressionVisitorFactory;
+    /** @var QueryExpressionVisitorFactory */
+    private $expressionVisitorFactory;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->criteria = new Criteria(new EntityClassResolver($this->doctrine));
+        $entityClassResolver = new EntityClassResolver($this->doctrine);
+        $this->criteria = new Criteria($entityClassResolver);
         $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
             ['OR' => new OrCompositeExpression()],
             ['=' => new EqComparisonExpression()]
         );
         $this->criteriaConnector = new CriteriaConnector(
-            new CriteriaNormalizer(),
+            new CriteriaNormalizer($this->doctrineHelper),
             new CriteriaPlaceholdersResolver(),
-            $this->expressionVisitorFactory
+            $this->expressionVisitorFactory,
+            $entityClassResolver
         );
-    }
-
-    /**
-     * @param string $entityShortClass
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityShortClass)
-    {
-        return self::ENTITY_NAMESPACE . $entityShortClass;
     }
 
     /**
      * @param $expectedDql
      */
-    protected function assertQuery($expectedDql)
+    private function assertQuery($expectedDql)
     {
         $qb = new QueryBuilder($this->em);
         $qb
             ->select('e')
-            ->from($this->getEntityClass('User'), 'e');
+            ->from(Entity\User::class, 'e');
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertEquals(
-            $this->sortJoins($expectedDql),
-            $this->sortJoins(str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL()))
+        self::assertEquals(
+            $expectedDql,
+            str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL())
         );
-    }
-
-    /**
-     * Update expected result to smooth the difference in sorting algorithm in php5 and php7
-     * https://bugs.php.net/bug.php?id=69158
-     *
-     * @param string $dql
-     *
-     * @return string
-     */
-    protected function sortJoins($dql)
-    {
-        $tail = '';
-        $pos = strpos($dql, ' WHERE ');
-        if (false !== $pos) {
-            $tail = substr($dql, $pos);
-            $dql = substr($dql, 0, $pos);
-        }
-        if (preg_match_all('/(LEFT|INNER) JOIN /', $dql, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
-            $joins = [];
-            for ($i = count($matches) - 1; $i >= 0; $i--) {
-                $pos = $matches[$i][0][1];
-                $join = substr($dql, $pos);
-                if (substr($join, -1) !== ' ') {
-                    $join .= ' ';
-                }
-                $joins[] = $join;
-                $dql = substr($dql, 0, $pos);
-            }
-            sort($joins, SORT_STRING);
-            $dql .= rtrim(implode('', $joins), ' ');
-        }
-        $dql .= $tail;
-
-        return $dql;
     }
 
     public function testOrderBy()
@@ -114,12 +73,22 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testOrderByAssociation()
+    {
+        $this->criteria->orderBy(['id' => Criteria::ASC, 'category' => Criteria::ASC]);
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.category category'
+            . ' ORDER BY e.id ASC, e.category ASC'
+        );
+    }
+
     public function testWhere()
     {
         $this->criteria->andWhere(
-            $this->criteria->expr()->orX(
-                $this->criteria->expr()->eq('category.name', 'test_category'),
-                $this->criteria->expr()->eq('groups.name', 'test_group')
+            $this->criteria::expr()->orX(
+                $this->criteria::expr()->eq('category.name', 'test_category'),
+                $this->criteria::expr()->eq('groups.name', 'test_group')
             )
         );
 
@@ -128,6 +97,23 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
             . ' WHERE category.name = :category_name OR groups.name = :groups_name'
+        );
+    }
+
+    public function testWhereByAssociation()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->orX(
+                $this->criteria::expr()->eq('category', 'test_category'),
+                $this->criteria::expr()->eq('groups', 'test_group')
+            )
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.category category'
+            . ' INNER JOIN e.groups groups'
+            . ' WHERE e.category = :category OR e.groups = :groups'
         );
     }
 
@@ -143,10 +129,22 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testNestedAssociationInOrderBy()
+    {
+        $this->criteria->orderBy(['id' => Criteria::ASC, 'products.category' => Criteria::ASC]);
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.products products'
+            . ' LEFT JOIN products.category category'
+            . ' ORDER BY e.id ASC, products.category ASC'
+        );
+    }
+
     public function testNestedFieldInWhere()
     {
         $this->criteria->andWhere(
-            $this->criteria->expr()->eq('products.category.name', 'test_category')
+            $this->criteria::expr()->eq('products.category.name', 'test_category')
         );
 
         $this->assertQuery(
@@ -154,6 +152,20 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' INNER JOIN e.products products'
             . ' INNER JOIN products.category category'
             . ' WHERE category.name = :category_name'
+        );
+    }
+
+    public function testNestedAssociationInWhere()
+    {
+        $this->criteria->andWhere(
+            $this->criteria::expr()->eq('products.category', 'test_category')
+        );
+
+        $this->assertQuery(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN e.products products'
+            . ' INNER JOIN products.category category'
+            . ' WHERE products.category = :products_category'
         );
     }
 
@@ -176,7 +188,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products')->setAlias('products');
         $this->criteria->addLeftJoin('products.category', '{products}.category')->setAlias('category');
         $this->criteria->andWhere(
-            $this->criteria->expr()->eq('products.category.name', 'test_category')
+            $this->criteria::expr()->eq('products.category.name', 'test_category')
         );
 
         $this->assertQuery(
@@ -192,7 +204,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products')->setAlias('products');
         $this->criteria->addLeftJoin('products.category', '{products}.category')->setAlias('category');
         $this->criteria->andWhere(
-            $this->criteria->expr()->eq('{products.category}.name', 'test_category')
+            $this->criteria::expr()->eq('{products.category}.name', 'test_category')
         );
 
         $this->assertQuery(
@@ -231,10 +243,10 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $this->criteria->addLeftJoin('products', '{root}.products');
         $this->criteria->addLeftJoin('products.category', '{products}.category');
         $this->criteria->andWhere(
-            $this->criteria->expr()->orX(
-                $this->criteria->expr()->eq('{root}.name', 'test_user'),
-                $this->criteria->expr()->eq('{category}.name', 'test_category'),
-                $this->criteria->expr()->eq('{products.category}.name', 'test_category')
+            $this->criteria::expr()->orX(
+                $this->criteria::expr()->eq('{root}.name', 'test_user'),
+                $this->criteria::expr()->eq('{category}.name', 'test_category'),
+                $this->criteria::expr()->eq('{products.category}.name', 'test_category')
             )
         );
 
@@ -263,43 +275,43 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     public function testCriteriaWhenFirstResultIsNotSet()
     {
         $qb = new QueryBuilder($this->em);
-        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $qb->select('e')->from(Entity\User::class, 'e');
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertNull($qb->getFirstResult());
+        self::assertNull($qb->getFirstResult());
     }
 
     public function testCriteriaWithFirstResult()
     {
         $qb = new QueryBuilder($this->em);
-        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $qb->select('e')->from(Entity\User::class, 'e');
 
         $this->criteria->setFirstResult(12);
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertSame(12, $qb->getFirstResult());
+        self::assertSame(12, $qb->getFirstResult());
     }
 
     public function testCriteriaWhenMaxResultsIsNotSet()
     {
         $qb = new QueryBuilder($this->em);
-        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $qb->select('e')->from(Entity\User::class, 'e');
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertNull($qb->getMaxResults());
+        self::assertNull($qb->getMaxResults());
     }
 
     public function testCriteriaWithMaxResults()
     {
         $qb = new QueryBuilder($this->em);
-        $qb->select('e')->from($this->getEntityClass('User'), 'e');
+        $qb->select('e')->from(Entity\User::class, 'e');
         $this->criteria->setMaxResults(3);
 
         $this->criteriaConnector->applyCriteria($qb, $this->criteria);
 
-        $this->assertSame(3, $qb->getMaxResults());
+        self::assertSame(3, $qb->getMaxResults());
     }
 }

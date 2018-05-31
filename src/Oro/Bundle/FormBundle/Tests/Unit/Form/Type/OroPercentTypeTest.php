@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
@@ -12,18 +13,12 @@ class OroPercentTypeTest extends FormIntegrationTestCase
      */
     protected $locale;
 
-    /**
-     * @var OroPercentType
-     */
-    protected $formType;
-
     protected function setUp()
     {
         parent::setUp();
 
         $this->locale = \Locale::getDefault();
         \Locale::setDefault('en');
-        $this->formType = new OroPercentType();
     }
 
     protected function tearDown()
@@ -32,17 +27,18 @@ class OroPercentTypeTest extends FormIntegrationTestCase
 
         \Locale::setDefault($this->locale);
         unset($this->locale);
-        unset($this->formType);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(OroPercentType::NAME, $this->formType->getName());
+        $formType = new OroPercentType();
+        $this->assertEquals(OroPercentType::NAME, $formType->getName());
     }
 
     public function testGetParent()
     {
-        $this->assertEquals('percent', $this->formType->getParent());
+        $formType = new OroPercentType();
+        $this->assertEquals(PercentType::class, $formType->getParent());
     }
 
     /**
@@ -56,7 +52,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         array $viewData,
         array $options = array()
     ) {
-        $form = $this->factory->create($this->formType, $data, $options);
+        $form = $this->factory->create(OroPercentType::class, $data, $options);
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
@@ -100,7 +96,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
         $expectedData,
         array $options = array()
     ) {
-        $form = $this->factory->create($this->formType, null, $options);
+        $form = $this->factory->create(OroPercentType::class, null, $options);
         $form->submit($data);
         self::assertTrue($form->isSynchronized());
         self::assertSame($expectedData, $form->getData());

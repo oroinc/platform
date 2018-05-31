@@ -9,6 +9,7 @@ use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -19,6 +20,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EmbedFormController extends Controller
 {
+    use RequestHandlerTrait;
+
     /**
      * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
      *
@@ -61,13 +64,13 @@ class EmbedFormController extends Controller
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
             $eventDispatcher = $this->get('event_dispatcher');
             $eventDispatcher->dispatch(EmbeddedFormSubmitBeforeEvent::EVENT_NAME, $event);
-            $form->submit($request);
+            $this->submitPostPutRequest($form, $request);
 
             $event = new EmbeddedFormSubmitAfterEvent($data, $formEntity, $form);
             $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);
         }
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entity = $form->getData();
 
             /**

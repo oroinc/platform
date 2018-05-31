@@ -9,7 +9,7 @@ entity_config:
                         priority:              10
                         default_value:         false
                     form:
-                        type: oro_entity_extend_association_choice
+                        type: Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
                         options:
                             block:             associations
                             required:          true

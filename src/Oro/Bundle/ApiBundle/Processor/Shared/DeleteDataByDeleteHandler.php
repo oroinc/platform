@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
@@ -9,6 +10,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The base class for processors that deletes entities by DeleteHandler.
+ */
 abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 {
     /** @var DoctrineHelper */
@@ -39,8 +43,8 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
             return;
         }
 
-        if (!$this->doctrineHelper->isManageableEntityClass($context->getClassName())) {
-            // only manageable entities are supported
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             return;
         }
 
@@ -51,7 +55,11 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
 
         $deleteHandler = $this->container->get($deleteHandlerServiceId);
         if ($deleteHandler instanceof DeleteHandler) {
-            $this->processDelete($context, $deleteHandler);
+            $this->processDelete(
+                $context->getResult(),
+                $deleteHandler,
+                $this->doctrineHelper->getEntityManagerForClass($entityClass)
+            );
             $context->removeResult();
         }
     }
@@ -65,10 +73,11 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
     }
 
     /**
-     * Deletes entity(es) stored in the result property of the Context using the delete handler
+     * Deletes entity(es) stored in the given result property of the context using the delete handler
      *
-     * @param Context       $context
-     * @param DeleteHandler $handler
+     * @param mixed                  $data
+     * @param DeleteHandler          $handler
+     * @param EntityManagerInterface $em
      */
-    abstract protected function processDelete(Context $context, DeleteHandler $handler);
+    abstract protected function processDelete($data, DeleteHandler $handler, EntityManagerInterface $em);
 }

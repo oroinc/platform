@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -15,7 +17,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Prepares JSON.API request data to be processed by Symfony Forms.
+ * Prepares JSON.API request data for a relationship to be processed by Symfony Forms.
  */
 class NormalizeRequestData implements ProcessorInterface
 {
@@ -63,7 +65,7 @@ class NormalizeRequestData implements ProcessorInterface
     protected function normalizeData(array $data)
     {
         $associationName = $this->context->getAssociationName();
-        $targetMetadata = $this->context->getParentMetadata()->getAssociation($associationName)->getTargetMetadata();
+        $targetMetadata = $this->getAssociationMetadata($associationName)->getTargetMetadata();
         $dataPointer = $this->buildPointer('', JsonApiDoc::DATA);
         if ($this->context->isCollection()) {
             $associationData = [];
@@ -171,5 +173,24 @@ class NormalizeRequestData implements ProcessorInterface
     protected function buildPointer($parentPath, $property)
     {
         return $parentPath . '/' . $property;
+    }
+
+    /**
+     * @param string $associationName
+     *
+     * @return AssociationMetadata
+     */
+    private function getAssociationMetadata($associationName)
+    {
+        $associationMetadata = $this->context->getParentMetadata()->getAssociation($associationName);
+        if (null === $associationMetadata) {
+            throw new RuntimeException(\sprintf(
+                'The metadata for association "%s::%s" does not exist.',
+                $this->context->getParentClassName(),
+                $associationName
+            ));
+        }
+
+        return $associationMetadata;
     }
 }

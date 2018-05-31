@@ -608,11 +608,23 @@ services:
             - '@translator'
             - '@oro_entity_extend.cache.enum_translation'
 
-    oro_entity_extend.listener.cache.enum_value_translation:
-        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueTranslationListener
+    oro_entity_extend.listener.cache.enum_value.abstract:
+        abstract: true
         arguments:
             - '@oro_entity_extend.cache.enum_translation_provider'
+
+    oro_entity_extend.listener.cache.enum_value_translation:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueTranslationListener
+        parent: oro_entity_extend.listener.cache.enum_value.abstract
         tags:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postUpdate }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation', event: postRemove }
+
+    oro_entity_extend.listener.cache.enum_value:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\Cache\EnumValueListener
+        parent: oro_entity_extend.listener.cache.enum_value.abstract
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postRemove }

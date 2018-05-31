@@ -15,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Validates and fill included entities.
  */
-abstract class ProcessIncludedEntities implements ProcessorInterface
+class ProcessIncludedEntities implements ProcessorInterface
 {
     /** @var ActionProcessorBagInterface */
     protected $processorBag;
@@ -50,7 +50,7 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
 
         $includedEntities = $context->getIncludedEntities();
         if (null === $includedEntities) {
-            // the Context does not have included entities
+            // the context does not have included entities
             return;
         }
 
@@ -99,22 +99,25 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setRequestData($entityRequestData);
         $actionContext->setResult($entity);
 
+        $actionContext->skipFormValidation(true);
         $actionContext->setLastGroup('transform_data');
         $actionContext->setSoftErrorsHandling(true);
 
         $actionProcessor->process($actionContext);
 
         if ($actionContext->hasErrors()) {
-            $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($actionContext->getRequestType());
+            $requestType = $actionContext->getRequestType();
+            $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
             $actionMetadata = $actionContext->getMetadata();
             $errors = $actionContext->getErrors();
             foreach ($errors as $error) {
-                $errorCompleter->complete($error, $actionContext->getRequestType(), $actionMetadata);
-                $this->fixErrorPath($error, $entityData->getPath());
+                $errorCompleter->complete($error, $requestType, $actionMetadata);
+                $this->fixIncludedEntityErrorPath($error, $entityData->getPath());
                 $context->addError($error);
             }
         } else {
             $entityData->setMetadata($actionContext->getMetadata());
+            $entityData->setForm($actionContext->getForm());
         }
     }
 
@@ -122,5 +125,8 @@ abstract class ProcessIncludedEntities implements ProcessorInterface
      * @param Error  $error
      * @param string $entityPath
      */
-    abstract protected function fixErrorPath(Error $error, $entityPath);
+    protected function fixIncludedEntityErrorPath(Error $error, string $entityPath): void
+    {
+        // no default implementation, the path to an included entity depends on the request type
+    }
 }

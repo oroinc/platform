@@ -30,9 +30,9 @@ class SearchStringFilterType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $choices = [
-            TextFilterType::TYPE_CONTAINS     => $this->translator->trans('oro.filter.form.label_type_contains'),
-            TextFilterType::TYPE_NOT_CONTAINS => $this->translator->trans('oro.filter.form.label_type_not_contains'),
-            TextFilterType::TYPE_EQUAL        => $this->translator->trans('oro.filter.form.label_type_equals'),
+            $this->translator->trans('oro.filter.form.label_type_contains') => TextFilterType::TYPE_CONTAINS,
+            $this->translator->trans('oro.filter.form.label_type_not_contains') => TextFilterType::TYPE_NOT_CONTAINS,
+            $this->translator->trans('oro.filter.form.label_type_equals') => TextFilterType::TYPE_EQUAL,
         ];
 
         $resolver->setDefaults(['operator_choices' => $choices]);
@@ -59,6 +59,6 @@ class SearchStringFilterType extends AbstractType
      */
     public function getParent()
     {
-        return TextFilterType::NAME;
+        return TextFilterType::class;
     }
 }

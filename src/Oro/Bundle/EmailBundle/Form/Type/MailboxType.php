@@ -4,11 +4,19 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
+use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -60,11 +68,11 @@ class MailboxType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('label', 'text', [
+        $builder->add('label', TextType::class, [
             'required'    => true,
             'label'       => 'oro.email.mailbox.label.label'
         ]);
-        $builder->add('email', 'oro_email_email_address', [
+        $builder->add('email', EmailAddressType::class, [
             'required'    => true,
             'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
@@ -74,12 +82,12 @@ class MailboxType extends AbstractType
         ]);
 
         if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
-            $builder->add('imapAccountType', 'oro_imap_choice_account_type', ['error_bubbling' => false]);
+            $builder->add('imapAccountType', ChoiceAccountType::class, ['error_bubbling' => false]);
         } else {
-            $builder->add('origin', 'oro_imap_configuration', ['error_bubbling' => false]);
+            $builder->add('origin', ConfigurationType::class, ['error_bubbling' => false]);
         }
 
-        $builder->add('processType', 'choice', [
+        $builder->add('processType', ChoiceType::class, [
             'label'       => 'oro.email.mailbox.process.type.label',
             'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
@@ -89,20 +97,20 @@ class MailboxType extends AbstractType
         ]);
         $builder->add(
             'authorizedUsers',
-            'oro_user_multiselect',
+            UserMultiSelectType::class,
             [
                 'label' => 'oro.user.entity_plural_label',
             ]
         );
         $builder->add(
             'authorizedRoles',
-            'oro_role_multiselect',
+            RoleMultiSelectType::class,
             [
                 'autocomplete_alias' => 'roles_authenticated',
                 'label' => 'oro.user.role.entity_plural_label',
             ]
         );
-        $builder->add('passwordHolder', 'hidden', [
+        $builder->add('passwordHolder', HiddenType::class, [
             'required' => false,
             'label' => '',
             'mapped' => false
@@ -304,7 +312,7 @@ class MailboxType extends AbstractType
 
         $form->add(
             'processSettings',
-            'hidden',
+            HiddenType::class,
             [
                 'data' => null,
             ]

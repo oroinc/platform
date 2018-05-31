@@ -31,7 +31,7 @@ class BooleanFilterType extends AbstractChoiceType
      */
     public function getParent()
     {
-        return ChoiceFilterType::NAME;
+        return ChoiceFilterType::class;
     }
 
     /**
@@ -39,15 +39,17 @@ class BooleanFilterType extends AbstractChoiceType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $fieldChoices = array(
-            self::TYPE_YES => $this->translator->trans('oro.filter.form.label_type_yes'),
-            self::TYPE_NO  => $this->translator->trans('oro.filter.form.label_type_no'),
-        );
+        $fieldChoices = [
+            $this->translator->trans('oro.filter.form.label_type_yes') => self::TYPE_YES,
+            $this->translator->trans('oro.filter.form.label_type_no') => self::TYPE_NO,
+        ];
 
         $resolver->setDefaults(
-            array(
-                'field_options' => array('choices' => $fieldChoices),
-            )
+            [
+                'field_options' => [
+                    'choices' => $fieldChoices,
+                ],
+            ]
         );
     }
 }

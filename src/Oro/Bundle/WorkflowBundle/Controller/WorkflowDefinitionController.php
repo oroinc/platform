@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
-use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -127,11 +126,11 @@ class WorkflowDefinitionController extends Controller
             throw new AccessDeniedException();
         }
 
-        $form = $this->createForm(WorkflowVariablesType::NAME, null, ['workflow' => $workflow]);
+        $form = $this->createForm(WorkflowVariablesType::class, null, ['workflow' => $workflow]);
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
                 $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
 
@@ -202,11 +201,11 @@ class WorkflowDefinitionController extends Controller
      */
     public function activateFormAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $form = $this->createForm(WorkflowReplacementType::NAME, null, ['workflow' => $workflowDefinition]);
+        $form = $this->createForm(WorkflowReplacementType::class, null, ['workflow' => $workflowDefinition]);
         $response = ['form' => $form->createView()];
 
         $form->handleRequest($request);
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
             $helper = $this->get('oro_workflow.helper.workflow_deactivation');
             $data = $form->getData();

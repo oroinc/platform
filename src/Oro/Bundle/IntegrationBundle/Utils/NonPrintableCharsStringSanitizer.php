@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
+/**
+ * Removes non printable symbols form string.
+ */
 class NonPrintableCharsStringSanitizer
 {
     /**
@@ -30,9 +33,11 @@ class NonPrintableCharsStringSanitizer
          * that is, characters with the Zs property.
          *
          * [:graph:] This matches characters that have glyphs that mark the page when printed.
-         * In Unicode property terms, it matches all characters with the L, M, N, P, S, or Cf properties,
+         * In Unicode property terms, it matches all characters with the L, M, N, P, S, or Cf properties.
+         *
+         * Also should be available "\n" characters that is Line feed for multi-line text (LF has code U+000A).
          */
-        $printProperties = '\p{L}\p{M}\p{N}\p{P}\p{S}\p{Cf}\p{Z}';
+        $printProperties = '\p{L}\p{M}\p{N}\p{P}\p{S}\p{Cf}\p{Z}\x{000A}';
 
         /*
          * except for:
