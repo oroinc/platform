@@ -34,8 +34,8 @@ oro:
     auth:
         description:
             logo: OroPlatform
-            main: OroPlatform is an Open Source Business Application Platform
-            text: Developers use our flexible platform to build new business applications on top of our native CRM capabilities
+            main: OroPlatform
+            text: The Rapid Application Development Platform for Web Applications
         copy: © 2018 Oro, Inc. All Rights Reserved
 
     ui:

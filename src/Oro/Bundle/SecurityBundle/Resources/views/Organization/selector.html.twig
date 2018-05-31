@@ -30,13 +30,13 @@
                     {% endfor %}
                 </ul>
             </div>
-            {{ _self.organization_name_and_logo(organization_name) }}
+            {{ _self.organization_name(organization_name) }}
         </div>
         <script type="text/javascript">
             require(['orosecurity/js/init-organization-selector'])
         </script>
-    {% else %}{# if organizations|length == 1 #}
-        {{ _self.organization_name_and_logo(organization_name) }}
+    {% else %}
+        {{ _self.organization_name(organization_name) }}
     {% endif %}
 {% else %}
     {# Mobile view #}
@@ -46,11 +46,7 @@
                 <h1 class="logo dropdown-toggle" data-toggle="dropdown">
                     <span>
                         <a href="javascript: void(0);">
-                            {% if oro_theme_logo() %}
-                                <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                            {% else %}
-                                {{- organization_name -}}
-                            {% endif %}
+                            {{- organization_name -}}
                         </a>
                         <span class="caret"></span>
                     </span>
@@ -73,27 +69,18 @@
         <h1 class="logo">
             <span>
                 <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-                    {% if oro_theme_logo() %}
-                        <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                    {% else %}
-                        {{- organization_name -}}
-                    {% endif %}
+                    {{- organization_name -}}
                 </a>
             </span>
         </h1>
     {% endif %}
 {% endif %}
 
-{% macro organization_name_and_logo(organization_name) %}
+{% macro organization_name(organization_name) %}
     {% if organization_name|length %}
-        {% set logo = oro_theme_logo() %}
-        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+        <h1 class="logo logo-text">
             <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
-                {% if logo %}
-                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
-                {% else %}
-                    {{- organization_name -}}
-                {% endif %}
+                {{- organization_name -}}
             </a>
         </h1>
     {% else %}
