@@ -202,7 +202,9 @@ class DeprecationErrorHandler
                     return "\x1B[{$color}m{$str}\x1B[0m";
                 };
             } else {
-                $colorize = function ($str) { return $str; };
+                $colorize = function ($str) {
+                    return $str;
+                };
             }
             register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize) {
                 $mode = $getMode();
@@ -213,7 +215,9 @@ class DeprecationErrorHandler
                 restore_error_handler();
 
                 if (DeprecationErrorHandler::MODE_WEAK === $mode) {
-                    $colorize = function ($str) { return $str; };
+                    $colorize = function ($str) {
+                        return $str;
+                    };
                 }
                 if ($currErrorHandler !== $deprecationHandler) {
                     echo "\n", $colorize('THE ERROR HANDLER HAS CHANGED!', true), "\n";
@@ -241,7 +245,7 @@ class DeprecationErrorHandler
                                     break;
                                 }
 
-                                if(self::$weakVendorsPattern && !preg_match(self::$weakVendorsPattern, $msg)) {
+                                if (self::$weakVendorsPattern && !preg_match(self::$weakVendorsPattern, $msg)) {
                                     --$deprecations[$group.'Count'];
                                     continue;
                                 }
@@ -333,7 +337,7 @@ class DeprecationErrorHandler
 
         if (DIRECTORY_SEPARATOR === '\\') {
             return (function_exists('sapi_windows_vt100_support')
-                    && sapi_windows_vt100_support(STDOUT))
+                && sapi_windows_vt100_support(STDOUT))
                 || false !== getenv('ANSICON')
                 || 'ON' === getenv('ConEmuANSI')
                 || 'xterm' === getenv('TERM');
