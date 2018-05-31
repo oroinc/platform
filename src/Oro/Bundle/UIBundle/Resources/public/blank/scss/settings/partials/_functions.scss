@@ -45,18 +45,17 @@
 
 @function z($layer: 'base') {
     $layers: (
-            'base': 1,
-            'dropdown': 50,
-            'fixed': 100,
-            'popup': 150,
-            'hidden': -1
+        'base': 1,
+        'dropdown': 50,
+        'fixed': 100,
+        'popup': 150,
+        'hidden': -1
     ) !default;
 
     $z-index: map-get($layers, $layer);
 
     @return $z-index;
 }
-
 
 // Remove the unit of a length
 // @return number
@@ -65,7 +64,6 @@
 @function strip-units($value) {
     @return $value / ($value * 0 + 1);
 }
-
 
 // In SASS we can only once set a value to variable with flag !default, all others values will be ignored.
 // The variable must be declared.
@@ -114,5 +112,5 @@
 // Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
 
 @function merge-breakpoints($breakpoints1, $news-breakpoint2) {
-    @return  map-merge-wo-null($breakpoints1, $news-breakpoint2);
+    @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
 }
