@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
-use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -21,7 +20,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
     protected function getExtensions()
     {
         return [
-            new ValidatorExtension(Validation::createValidator()),
+            new ValidatorExtension(Validation::createValidator())
         ];
     }
 
@@ -32,7 +31,7 @@ class EntityScalarCollectionTypeTest extends TypeTestCase
             ->setMethods(['clear'])
             ->getMock();
 
-        $groups->expects($this->once())
+        $groups->expects(self::once())
             ->method('clear');
 
         $entity = new User();

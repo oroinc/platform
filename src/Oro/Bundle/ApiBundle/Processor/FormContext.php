@@ -91,4 +91,18 @@ interface FormContext extends ContextInterface
      * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null);
+
+    /**
+     * Indicates whether the validation of the form should be skipped or not.
+     *
+     * @return bool
+     */
+    public function isFormValidationSkipped();
+
+    /**
+     * Sets a flag indicates whether the validation of the form should be skipped or not.
+     *
+     * @param bool $skipFormValidation
+     */
+    public function skipFormValidation($skipFormValidation);
 }

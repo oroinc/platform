@@ -11,6 +11,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for an object that properties are built based of Data API metadata
+ * and contain only properties classified as fields and associations that should be represented as a field.
+ * Usually this form type is used if an object should be represented as a field in Data API.
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isAssociationAsField
+ */
 class CompoundObjectType extends AbstractType
 {
     /** @var FormHelper */
@@ -57,21 +63,5 @@ class CompoundObjectType extends AbstractType
             ->setRequired(['metadata', 'config'])
             ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\EntityMetadata'])
             ->setAllowedTypes('config', ['Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig']);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_compound_object';
     }
 }

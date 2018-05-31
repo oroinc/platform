@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Async;
 
-use Doctrine\DBAL\Driver\DriverException;
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -13,6 +12,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Deletes attribute relations
+ */
 class DeletedAttributeRelationProcessor implements MessageProcessorInterface
 {
     /**
@@ -85,7 +87,8 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
                 ['exception' => $e]
             );
 
-            if ($e instanceof DriverException && $this->databaseExceptionHelper->isDeadlock($e)) {
+            $driverException = $this->databaseExceptionHelper->getDriverException($e);
+            if ($driverException && $this->databaseExceptionHelper->isDeadlock($driverException)) {
                 return self::REQUEUE;
             } else {
                 return self::REJECT;

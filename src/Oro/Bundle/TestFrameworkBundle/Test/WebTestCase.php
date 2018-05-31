@@ -4,10 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
@@ -18,7 +17,6 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -550,9 +548,41 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
-        $executor->execute($loader->getFixtures(), true);
+        $this->doLoadFixtures($executor, $loader);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @param DataFixturesExecutor $executor
+     * @param DataFixturesLoader   $loader
+     */
+    private function doLoadFixtures(DataFixturesExecutor $executor, DataFixturesLoader $loader)
+    {
+        /** @var TestBufferedMessageProducer|null $messageProducer */
+        $messageProducer = self::getContainer()->get(
+            'oro_message_queue.client.buffered_message_producer',
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+        if (null !== $messageProducer && !$messageProducer instanceof TestBufferedMessageProducer) {
+            $messageProducer = null;
+        }
+
+        // prevent sending of messages during loading of fixtures,
+        // because fixtures are used to prepare data for tests
+        // and it makes no sense to send messages before a test starts
+        $restoreSendingOfMessages = false;
+        if (null !== $messageProducer && !$messageProducer->isSendingOfMessagesStopped()) {
+            $messageProducer->stopSendingOfMessages();
+            $restoreSendingOfMessages = true;
+        }
+        try {
+            $executor->execute($loader->getFixtures(), true);
+        } finally {
+            if ($restoreSendingOfMessages) {
+                $messageProducer->restoreSendingOfMessages();
+            }
+        }
     }
 
     /**
@@ -611,11 +641,19 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @return ReferenceRepository|null
+     * @return bool
+     */
+    protected function hasReferenceRepository()
+    {
+        return null !== self::$referenceRepository;
+    }
+
+    /**
+     * @return ReferenceRepository
      */
     protected function getReferenceRepository()
     {
-        if (false == self::$referenceRepository) {
+        if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');
         }
 

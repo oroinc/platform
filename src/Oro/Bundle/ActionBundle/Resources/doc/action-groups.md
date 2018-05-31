@@ -19,7 +19,7 @@ Also, along with `parameters` and `actions`, there can be optionally declared sp
 
 ## ActionGroup Configuration
 
-File `<bundleResourceRoot>/config/oro/action.yml`
+File `<bundleResourceRoot>/config/oro/actions.yml`
 
 ```
 action_groups:                                  # root node for action groups

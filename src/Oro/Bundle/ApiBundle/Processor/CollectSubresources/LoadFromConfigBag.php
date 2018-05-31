@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CollectSubresources;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
@@ -308,10 +309,64 @@ class LoadFromConfigBag extends LoadSubresources
         $subresources = null;
         $config = $this->configBagRegistry->getConfigBag($requestType)->getConfig($entityClass, $version);
         if (null !== $config && !empty($config[ConfigUtil::SUBRESOURCES])) {
-            $subresourcesLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
-            $subresources = $subresourcesLoader->load($config[ConfigUtil::SUBRESOURCES]);
+            $subresources = $this->loadSubresourcesConfig($config[ConfigUtil::SUBRESOURCES]);
+            $actions = null;
+            if (!empty($config[ConfigUtil::ACTIONS])) {
+                $actions = $this->loadActionsConfig($config[ConfigUtil::ACTIONS]);
+            }
+            foreach ($subresources->getSubresources() as $subresource) {
+                $this->updateSubresourceActionExclusion($subresource, ApiActions::UPDATE_SUBRESOURCE, $actions);
+                $this->updateSubresourceActionExclusion($subresource, ApiActions::ADD_SUBRESOURCE, $actions);
+                $this->updateSubresourceActionExclusion($subresource, ApiActions::DELETE_SUBRESOURCE, $actions);
+            }
         }
 
         return $subresources;
+    }
+
+    /**
+     * @param SubresourceConfig  $subresource
+     * @param string             $actionName
+     * @param ActionsConfig|null $actions
+     */
+    private function updateSubresourceActionExclusion(
+        SubresourceConfig $subresource,
+        string $actionName,
+        ?ActionsConfig $actions
+    ): void {
+        $subresourceAction = $subresource->getAction($actionName);
+        if (null !== $subresourceAction && !$subresourceAction->hasExcluded()) {
+            $action = null;
+            if (null !== $actions) {
+                $action = $actions->getAction($actionName);
+            }
+            if (null === $action || !$action->isExcluded()) {
+                $subresourceAction->setExcluded(false);
+            }
+        }
+    }
+
+    /**
+     * @param array $subresourcesConfig
+     *
+     * @return SubresourcesConfig
+     */
+    private function loadSubresourcesConfig(array $subresourcesConfig): SubresourcesConfig
+    {
+        $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
+
+        return $actionsLoader->load($subresourcesConfig);
+    }
+
+    /**
+     * @param array $actionsConfig
+     *
+     * @return ActionsConfig
+     */
+    private function loadActionsConfig(array $actionsConfig): ActionsConfig
+    {
+        $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
+
+        return $actionsLoader->load($actionsConfig);
     }
 }

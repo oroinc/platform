@@ -215,40 +215,102 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
     public function testUpdateToOneSubresource()
     {
         $entityType = $this->getEntityType(Entity::class);
+        $entityId = $this->getReference('entity')->getId();
         $targetEntityType = $this->getEntityType(TargetEntity::class);
         $targetEntityId = $this->getReference('target1')->getId();
 
-        $response = $this->patchSubresource(
-            ['entity' => $entityType, 'id' => '@entity->id', 'association' => 'biM2O'],
-            [
-                'data' => [
-                    'type'       => $targetEntityType,
-                    'id'         => (string)$targetEntityId,
-                    'attributes' => [
-                        'name' => 'Updated Target Entity 1'
+        $data = [
+            'data' => [
+                'type'          => $targetEntityType,
+                'id'            => (string)$targetEntityId,
+                'attributes'    => [
+                    'name' => 'Updated Target Entity 1'
+                ],
+                'relationships' => [
+                    'biO2MOwner' => [
+                        'data' => ['type' => $entityType, 'id' => (string)$entityId]
                     ]
                 ]
             ]
+        ];
+
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => (string)$entityId, 'association' => 'biM2O'],
+            $data
         );
 
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'       => $targetEntityType,
-                    'id'         => (string)$targetEntityId,
-                    'attributes' => [
-                        'name' => 'Updated Target Entity 1'
-                    ]
-                ]
-            ],
-            $response
-        );
+        $this->assertResponseContains($data, $response);
 
         $updatedTargetEntity = $this->getEntityManager()
             ->getRepository(TargetEntity::class)
             ->find($targetEntityId);
         self::assertNotNull($updatedTargetEntity);
         self::assertSame('Updated Target Entity 1', $updatedTargetEntity->getName());
+        self::assertSame($entityId, $updatedTargetEntity->getBiO2MOwner()->getId());
+    }
+
+    public function testUpdateToOneSubresourceWithInvalidData()
+    {
+        $entityType = $this->getEntityType(Entity::class);
+        $targetEntityType = $this->getEntityType(TargetEntity::class);
+
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@entity->id', 'association' => 'biM2O'],
+            [
+                'data' => [
+                    'type'          => $targetEntityType,
+                    'id'            => '<toString(@target1->id)>',
+                    'relationships' => [
+                        'biO2MOwner' => [
+                            'data' => ['type' => $entityType, 'id' => 'foo']
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'entity identifier constraint',
+                'detail' => 'Expected integer value. Given "foo".',
+                'source' => ['pointer' => '/data/relationships/biO2MOwner/data/id']
+            ],
+            $response
+        );
+    }
+
+    public function testUpdateToOneSubresourceWithNotExistingRelatedEntity()
+    {
+        $entityType = $this->getEntityType(Entity::class);
+        $targetEntityType = $this->getEntityType(TargetEntity::class);
+
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@entity->id', 'association' => 'biM2O'],
+            [
+                'data' => [
+                    'type'          => $targetEntityType,
+                    'id'            => '<toString(@target1->id)>',
+                    'relationships' => [
+                        'biO2MOwner' => [
+                            'data' => ['type' => $entityType, 'id' => '123456789']
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'form constraint',
+                'detail' => 'This value is not valid.',
+                'source' => ['pointer' => '/data/relationships/biO2MOwner/data']
+            ],
+            $response
+        );
     }
 
     public function testAddToOneSubresource()
@@ -273,7 +335,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -301,7 +363,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -331,10 +393,44 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
+    }
+
+    public function testUpdateToManySubresourceWithInvalidData()
+    {
+        $entityType = $this->getEntityType(Entity::class);
+        $targetEntityType = $this->getEntityType(TargetEntity::class);
+
+        $response = $this->patchSubresource(
+            ['entity' => $entityType, 'id' => '@entity->id', 'association' => 'biM2M'],
+            [
+                'data' => [
+                    [
+                        'type'          => $targetEntityType,
+                        'id'            => '<toString(@target1->id)>',
+                        'relationships' => [
+                            'biO2MOwner' => [
+                                'data' => ['type' => $entityType, 'id' => 'foo']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'entity identifier constraint',
+                'detail' => 'Expected integer value. Given "foo".',
+                'source' => ['pointer' => '/data/0/relationships/biO2MOwner/data/id']
+            ],
+            $response
+        );
     }
 
     public function testAddToManySubresource()
@@ -361,7 +457,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -391,7 +487,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -419,7 +515,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -447,7 +543,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -475,7 +571,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The entity object must be added to the context before creation of the form builder.'
+            'detail' => 'The form builded was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);

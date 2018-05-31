@@ -7,6 +7,7 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
 class LayoutResourceTest extends \PHPUnit_Framework_TestCase
@@ -17,19 +18,43 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     /** @var ThemeManager */
     protected $themeManager;
 
+    /** @var string */
+    protected $temporaryDir;
+
     protected function setUp()
     {
+        $this->temporaryDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'LayoutResourceTest';
         $this->layoutResource = new LayoutResource(
             $this->getThemeManager(),
             new Filesystem(),
-            __DIR__
+            $this->temporaryDir
         );
         $this->layoutResource->setLogger($this->createMock(LoggerInterface::class));
+
+        $fs = new Filesystem();
+        $fs->copy(
+            __DIR__ . DIRECTORY_SEPARATOR . 'sample_data' . DIRECTORY_SEPARATOR . 'assets.yml',
+            $this->temporaryDir . DIRECTORY_SEPARATOR . 'assets.yml'
+        );
+        $fs->copy(
+            __DIR__ . DIRECTORY_SEPARATOR . 'sample_data' . DIRECTORY_SEPARATOR . 'styles.css',
+            $this->temporaryDir . DIRECTORY_SEPARATOR . 'styles.css'
+        );
     }
 
     protected function tearDown()
     {
         unset($this->layoutResource, $this->themeManager);
+
+        $fs = new Filesystem();
+        $finder = new Finder();
+
+        if (is_dir($this->temporaryDir)) {
+            $fs->remove($finder->files()->in($this->temporaryDir));
+        }
+        @\rmdir($this->temporaryDir);
+
+        self::assertDirectoryNotExists($this->temporaryDir);
     }
 
     /**
@@ -40,6 +65,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         if (!$this->themeManager) {
             $this->themeManager = new ThemeManager(new ThemeFactory(), $this->getThemes());
         }
+
         return $this->themeManager;
     }
 
@@ -49,32 +75,32 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     protected function getThemes()
     {
         $asset = [
-            'inputs' => ['sample_data/styles.css', 'styles.scss'],
+            'inputs'  => ['styles.css', 'styles.scss', 'styles.less'],
             'filters' => ['filters'],
-            'output' => 'output.css',
+            'output'  => 'output.css',
         ];
 
         return [
-            'without_assets' => [],
+            'without_assets'    => [],
             'with_empty_assets' => [
                 'config' => ['assets' => []],
             ],
-            'with_one_asset' => [
+            'with_one_asset'    => [
                 'config' => [
                     'assets' => [
                         'first' => $asset,
                     ]
                 ],
             ],
-            'with_two_asset' => [
+            'with_two_asset'    => [
                 'config' => [
                     'assets' => [
-                        'first' => $asset,
+                        'first'  => $asset,
                         'second' => $asset,
                     ]
                 ],
             ],
-            'with_parent' => [
+            'with_parent'       => [
                 'parent' => 'parent',
                 'config' => [
                     'assets' => [
@@ -82,7 +108,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ],
-            'parent' => [
+            'parent'            => [
                 'config' => [
                     'assets' => [
                         'first' => ['inputs' => ['parent_styles.css']],
@@ -95,16 +121,13 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
     public function testIsFresh()
     {
         $now = time();
-
-        touch(__DIR__ . '/sample_data/styles.css');
-
-        $this->assertFalse($this->layoutResource->isFresh($now + 1000));
-        $this->assertTrue($this->layoutResource->isFresh($now - 1000));
+        self::assertFalse($this->layoutResource->isFresh($now + 1000));
+        self::assertTrue($this->layoutResource->isFresh($now - 1000));
     }
 
     public function testToString()
     {
-        $this->assertEquals('layout', (string)$this->layoutResource);
+        self::assertEquals('layout', (string) $this->layoutResource);
     }
 
     public function testGetContent()
@@ -133,16 +156,16 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                     $asset['filters'],
                     [
                         'output' => $asset['output'],
-                        'name' => $name,
+                        'name'   => $name,
                     ],
                 ];
             }
         }
 
-        $this->assertArrayHasKey('layout_with_one_asset_first', $formulae);
-        $this->assertArrayHasKey('layout_with_two_asset_first', $formulae);
-        $this->assertArrayHasKey('layout_with_two_asset_second', $formulae);
-        $this->assertEquals($formulae, $this->layoutResource->getContent());
+        self::assertArrayHasKey('layout_with_one_asset_first', $formulae);
+        self::assertArrayHasKey('layout_with_two_asset_first', $formulae);
+        self::assertArrayHasKey('layout_with_two_asset_second', $formulae);
+        self::assertEquals($formulae, $this->layoutResource->getContent());
     }
 
     public function testOverwritingStylesInChildTheme()
@@ -162,18 +185,18 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            'child_theme' => [
+            'child_theme'  => [
                 'parent' => 'parent_theme',
                 'config' => [
                     'assets' => [
                         'styles' => [
-                            'inputs' => [
+                            'inputs'  => [
                                 'child-style1.css',
                                 ['parent-style2.css' => 'child-style2.css'],
                                 ['parent-style4.css' => null],
                                 'child-style3.css'
                             ],
-                            'output' => 'output.css',
+                            'output'  => 'output.css',
                             'filters' => ['filters'],
                         ]
                     ]
@@ -182,9 +205,9 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->themeManager = new ThemeManager(new ThemeFactory(), $themes);
-        $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), __DIR__);
+        $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), $this->temporaryDir);
 
-        $expectedContentAfterMergingThemes =  [
+        $expectedContentAfterMergingThemes = [
             'layout_child_theme_styles' => [
                 [
                     'parent-style1.css',
@@ -198,18 +221,18 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     'output' => 'output.css',
-                    'name' => 'layout_child_theme_styles'
+                    'name'   => 'layout_child_theme_styles'
                 ]
             ]
         ];
 
         $content = $this->layoutResource->getContent();
-        $this->assertEquals($expectedContentAfterMergingThemes, $content);
+        self::assertEquals($expectedContentAfterMergingThemes, $content);
     }
 
     public function testOverwritingStylesInChildThemeFromFile()
     {
-        $expectedContentAfterMergingThemes =  [
+        $expectedContentAfterMergingThemes = [
             'layout_custom_styles' => [
                 [
                     'my_sidebar2.css',
@@ -222,15 +245,15 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     'output' => 'output.css',
-                    'name' => 'layout_custom_styles'
+                    'name'   => 'layout_custom_styles'
                 ]
             ]
         ];
 
-        $themes = Yaml::parse(file_get_contents(__DIR__.'/sample_data/assets.yml'));
+        $themes = Yaml::parse(file_get_contents($this->temporaryDir.DIRECTORY_SEPARATOR.'assets.yml'));
         $this->themeManager = new ThemeManager(new ThemeFactory(), $themes);
-        $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), __DIR__);
+        $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), $this->temporaryDir);
         $content = $this->layoutResource->getContent();
-        $this->assertEquals($expectedContentAfterMergingThemes, $content);
+        self::assertEquals($expectedContentAfterMergingThemes, $content);
     }
 }

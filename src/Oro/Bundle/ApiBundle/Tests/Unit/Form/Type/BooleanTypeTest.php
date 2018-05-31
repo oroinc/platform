@@ -32,7 +32,7 @@ class BooleanTypeTest extends TypeTestCase
             [false, null], // Symfony Form treats false as NULL due to checkboxes
             [0, false],
             ['', null],
-            [null, null],
+            [null, null]
         ];
     }
 
@@ -49,13 +49,7 @@ class BooleanTypeTest extends TypeTestCase
     public function invalidValuesDataProvider()
     {
         return [
-            ['test'],
+            ['test']
         ];
-    }
-
-    public function testGetName()
-    {
-        $type = new BooleanType();
-        self::assertEquals('oro_api_boolean', $type->getName());
     }
 }

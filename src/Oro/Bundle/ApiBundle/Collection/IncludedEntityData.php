@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Collection;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Symfony\Component\Form\FormInterface;
 
 class IncludedEntityData
 {
@@ -20,6 +21,9 @@ class IncludedEntityData
 
     /** @var EntityMetadata|null */
     private $metadata;
+
+    /** @var FormInterface|null */
+    private $form;
 
     /**
      * @param string $path     A path to the entity in the request data
@@ -102,5 +106,25 @@ class IncludedEntityData
     public function setMetadata(EntityMetadata $metadata = null)
     {
         $this->metadata = $metadata;
+    }
+
+    /**
+     * Gets the form that is used to transform entity data.
+     *
+     * @return FormInterface|null
+     */
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    /**
+     * Sets the form that is used to transform entity data.
+     *
+     * @param FormInterface|null $form
+     */
+    public function setForm(FormInterface $form = null)
+    {
+        $this->form = $form;
     }
 }

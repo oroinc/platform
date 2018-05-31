@@ -527,3 +527,8 @@ services:
             - '@oro_entity.virtual_field_provider.chain'
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
+
+    oro_entity.importexport.normalizer.entity_fallback_value:
+        class: 'Oro\Bundle\EntityBundle\ImportExport\Serializer\EntityFieldFallbackValueNormalizer'
+        tags:
+            - { name: oro_importexport.normalizer, priority: 20 }

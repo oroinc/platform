@@ -48,7 +48,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         // test get list request
         $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
-        self::assertEquals($expects, json_decode($response->getContent(), true));
+        self::assertEquals($expects, self::jsonToArray($response->getContent()));
     }
 
     /**

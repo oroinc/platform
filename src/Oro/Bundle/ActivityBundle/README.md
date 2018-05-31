@@ -308,7 +308,7 @@ If these options (`context` or `default`) are not defined for an entity, the gri
 
 For any activity entity grid you can include a column that includes all context entities.
 
-Have a look at the following example of tasks configuration in *datagrid.yml*:
+Have a look at the following example of tasks configuration in *datagrids.yml*:
 
 ``` yml
 datagrids:
