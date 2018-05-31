@@ -39,7 +39,7 @@ define(function(require) {
             }));
             this.$checkboxContainer.toggleClass('empty-label', _.isEmpty(label));
 
-            this.$el.parent().append(this.$checkboxContainer);
+            this.$el.after(this.$checkboxContainer);
             this.$el
                 .addClass('checkbox-view__input')
                 .prependTo(this.$checkboxContainer);

@@ -1,32 +1,50 @@
-.controls{
-  .selector{
-    select{
-      width: 100% !important;
-      box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      -webkit-box-sizing: border-box;
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input,
+.selector {
+  height: $field-size;
+  width: 100%;
+  font-size: $field-font-size;
+  padding: $input-inner-offset;
+}
+
+.selector {
+  padding: 0;
+
+  span {
+    padding: $input-inner-offset;
+    line-height: 1;
+
+    &:after {
+      top: 5px;
+      font-size: $base-font-size--l;
     }
   }
+}
 
-  select,
-  input[type="text"],
-  input[type="date"],
-  input[type="time"],
-  input[type="number"],
-  input[type="search"],
-  input[type="email"]{
-    width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    height: 30px;
+.add-on,
+.btn {
+  .input-append &,
+  .input-prepend & {
+    height: 40px;
+    width: 40px;
   }
-  textarea, .mce-tinymce {
-    width: 100% !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-  }
+}
+
+.controls{
   .fields-row {
     .input-small {
       width: 140px !important;

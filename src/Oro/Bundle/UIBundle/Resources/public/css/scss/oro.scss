@@ -2562,12 +2562,6 @@ label.required em,
     margin: 0 0 5px 0;
 } */
 
-input,
-textarea,
-.uneditable-input {
-    width: $width-input;
-}
-
 body .mce-tinymce {
     width: 292px;
 }
@@ -3277,18 +3271,9 @@ iframe.email-body {
 span.validation-failed {
     color: $danger-dark;
     display: block;
-    margin: 5px 0 5px 14px;
-    line-height: 1.1em;
+    margin: 3px 0;
+    line-height: 1;
     clear: both;
-
-    &:before {
-        content: '\f00d';
-        color: $danger-dark;
-        font: normal 1.15em/1em FontAwesome;
-        display: inline-block;
-        width: 14px;
-        margin-left: -14px;
-    }
 }
 
 .default-field {
@@ -3808,7 +3793,7 @@ label .popover-content {
 .entity-create-enabled {
     .input-prepend .select2-container,
     .input-append .select2-container {
-        width: 235px;
+        width: 228px;
     }
 }
 

@@ -111,7 +111,7 @@
     }
 
     input[type="text"] {
-        width: 244px;
+        width: 258px;
     }
 }
 
@@ -144,7 +144,7 @@
                         padding-left: 1px;
 
                         input {
-                            width: calc(100% - 30px);
+                            width: calc(100% - 40px);
                         }
                     }
                 }
@@ -153,6 +153,17 @@
             .fallback-status {
                 padding-right: 0;
             }
+        }
+    }
+}
+
+.mobile-version {
+    .fallback-container {
+        td.fallback-item-use-fallback,
+        .fallback-status {
+            width: 40px;
+            line-height: 36px;
+            height: 40px;
         }
     }
 }
