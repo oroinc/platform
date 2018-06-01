@@ -15,7 +15,6 @@ define(function(require) {
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         options: {
             menuSelector: '#main-menu',
-            dropdownSelector: '.dropdown-level-1',
             innerMenuSelector: '.menu:eq(0)',
             innerMenItemClassName: 'menu-item'
         },
@@ -43,13 +42,12 @@ define(function(require) {
                 .listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, this.timeout).bind(this));
 
             this.$mainiMenu = this.element.find(this.options.menuSelector);
-            this.$triggers = this.element.find(this.options.dropdownSelector);
 
-            this._on(this.$triggers, {click: this.onMenuOpen});
+            this._on(this.element, {'click .dropdown-level-1': this.onMenuOpen});
 
             this.overlay = new SideMenuOverlay();
             this.overlay.render();
-            this.$mainiMenu.append(this.overlay.$el);
+            this.$mainiMenu.after(this.overlay.$el);
 
             $(document).on('focusout.side-menu-focusout', _.debounce(function() {
                 if (!$.contains(this.$mainiMenu[0], document.activeElement)) {

@@ -7,9 +7,9 @@ $main-menu-mobile-width: 320px;
     position: fixed;
     z-index: $oroMobileHeaderZindex;
 
-    height: 100%;
     width: 100%;
-    padding-bottom: 54px;
+    top: $app-header-height;
+    bottom: 0;
 
     font-size: $menu-font-size + 2;
 

@@ -181,6 +181,10 @@ define(function(require) {
          * @param {String} value
          */
         search: function(value) {
+            if (!value.length) {
+                return;
+            }
+
             var regex = tools.safeRegExp(value, 'ig');
             var highlight = '<span class="highlight">$&</span>';
             var testValue = function(string) {

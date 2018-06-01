@@ -198,52 +198,6 @@
         }
     }
 
-    // 'Dashboard' menu item
-    .only-icon {
-        > .unclickable {
-            .title {
-                padding-left: 22px;
-
-                font-size: 0;
-                line-height: 1;
-            }
-
-            .title-level-1 {
-                padding-top: 15px;
-                padding-bottom: 14px;
-            }
-
-            .menu-icon {
-                display: block;
-
-                font-size: 19px;
-
-                @include fa-icon($fa-var-caret-down, after);
-
-                &::after {
-                    margin-left: 9px;
-
-                    font-size: $menu-font-size;
-                }
-            }
-        }
-
-        .dropdown-menu-title-level-1,
-        .divider {
-            display: list-item;
-        }
-
-        .dropdown-menu-title-level-1 {
-            padding: $menu-item-offset;
-
-            font-weight: bold;
-
-            .menu-icon {
-                display: none;
-            }
-        }
-    }
-
     &.narrow-mode {
         .menu-icon {
             display: block;
@@ -251,12 +205,6 @@
 
             font-size: 21px;
             text-align: center;
-        }
-
-        .only-icon {
-            .menu-icon {
-                margin-bottom: 0;
-            }
         }
 
         .title-level-1 {

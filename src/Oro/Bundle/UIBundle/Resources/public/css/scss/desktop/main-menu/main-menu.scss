@@ -40,9 +40,13 @@
 
     .divider {
         height: 1px;
-        margin: 4px 0;
+        margin: 0;
 
         border: 1px solid $menu-item-divider-color;
         border-width: 1px 0 0;
+
+        .title {
+            display: none !important;
+        }
     }
 }

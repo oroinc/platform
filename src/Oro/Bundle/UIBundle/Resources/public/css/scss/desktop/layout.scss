@@ -21,11 +21,21 @@
 .app-page {
   box-sizing: border-box;
   display: flex;
+  &__content-side {
+    flex-shrink: 0;
+  }
+  &__content {
+    flex-grow: 1;
+    overflow: inherit;
+  }
+
+  &__main {
+    display: flex;
+    width: 100%;
+  }
   &__left-panel,
   &__right-panel {
-    display: flex;
     overflow: visible;
-    flex-shrink: 0;
   }
   &__central-panel {
     flex-grow: 1;

@@ -1,14 +1,12 @@
-{% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == placement %}
+{% if isDesktopVersion() and oro_config_value('oro_ui.navbar_position') == 'left' %}
     {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
 
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-    <div class="main-menu-sided minimized" {{ UI.renderPageComponentAttributes({
-        jquery: {
-            widgetModule: 'oroui/js/desktop/side-menu',
-            toggleSelector: '#main-menu-toggler'
-        }
-    }) }}>
+    <div id="side-menu" class="main-menu-sided minimized" data-page-component-options="{{ {
+         widgetModule: 'oroui/js/desktop/side-menu',
+         toggleSelector: '#main-menu-toggler'
+     }|json_encode }}">
         <header class="main-menu__header">
             {% set organization_name %}
                 {% spaceless %}

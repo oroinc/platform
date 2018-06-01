@@ -73,7 +73,7 @@
 
             .title {
                 display: block;
-                padding: 10px 15px;
+                padding: 7px 15px;
 
                 &:hover {
                     background-color: $menu-background-color-active;
@@ -192,9 +192,10 @@
 
         .title-level-1 {
             display: block;
-            padding: 10px 8px;
+            padding: 13px 8px;
 
             font-size: 11px;
+            line-height: 1.2;
 
             color: $menu-item-first-level-text-color;
 
@@ -203,10 +204,14 @@
             .menu-icon {
                 display: block;
                 width: 100%;
-                margin: 0;
+                margin: 0 0 5px;
 
                 font-size: 24px;
             }
         }
+    }
+
+    .menu-icon {
+        display: none;
     }
 }

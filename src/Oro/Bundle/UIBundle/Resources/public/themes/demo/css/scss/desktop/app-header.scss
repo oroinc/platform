@@ -17,6 +17,16 @@
     }
   }
 
+  .nav.user-menu {
+    > li {
+      > a {
+        &:hover {
+          color: $app-header-text-hover-color;
+        }
+      }
+    }
+  }
+
   .user-menu-dropdown {
     &:before {
       border-left: 1px solid $app-header-divider-color;

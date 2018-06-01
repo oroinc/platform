@@ -76,6 +76,7 @@ $side-menu-overlay-header-height: 100px;
 
     &__title {
         font-size: 21px;
+        line-height: 1.2;
     }
 
     &__content {
@@ -166,14 +167,14 @@ $side-menu-overlay-header-height: 100px;
 
         padding: 0;
 
-        line-height: 1;
+        line-height: 1.3;
     }
 
     .title {
         position: relative;
 
         display: block;
-        padding: 14px;
+        padding: 12px 14px;
 
         text-transform: none;
 
@@ -187,6 +188,8 @@ $side-menu-overlay-header-height: 100px;
         @include fa-icon($fa-var-angle-right, after);
 
         &::after {
+            padding-left: 2px;
+
             font-size: $menu-font-size;
 
             color: #b9b9b9;
@@ -205,7 +208,7 @@ $side-menu-overlay-header-height: 100px;
                 }
             }
 
-            $menu-overlay-title-offset: $menu-overlay-title-offset + 14;
+            $menu-overlay-title-offset: $menu-overlay-title-offset + 16;
         }
     }
 

@@ -32,16 +32,17 @@ class MainMenu extends Element
         $linkLocator = trim(array_pop($items));
 
         if ($this->hasClass('scroller') && $this->getParent()->hasClass('minimized')) {
-            return $this->walkSideMenu($path);
-        }
-
-        if ($this->hasClass('scroller') && !$this->getParent()->hasClass('minimized')) {
-            $this->clickByMenuTree($path);
+            $link = $this->walkSideMenu($path);
         } else {
-            $this->moveByMenuTree($path);
+            if ($this->hasClass('scroller') && !$this->getParent()->hasClass('minimized')) {
+                $this->clickByMenuTree($path);
+            } else {
+                $this->moveByMenuTree($path);
+            }
+
+            $link = $this->findVisibleLink($linkLocator);
         }
 
-        $link = $this->findVisibleLink($linkLocator);
         $link->click();
 
         return $link;
@@ -56,8 +57,22 @@ class MainMenu extends Element
             $items = explode('/', $path);
             $linkLocator = trim(array_pop($items));
 
-            $this->moveByMenuTree($path);
-            $this->findVisibleLink($linkLocator);
+            if ($this->hasClass('scroller') && $this->getParent()->hasClass('minimized')) {
+                $this->walkSideMenu($path);
+                $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
+                if ($menuOverlay->hasClass('open')) {
+                    $menuOverlayCloseButton = $this->elementFactory->createElement('SideMenuOverlayCloseButton');
+                    $menuOverlayCloseButton->click();
+                }
+            } else {
+                if ($this->hasClass('scroller') && !$this->getParent()->hasClass('minimized')) {
+                    $this->clickByMenuTree($path);
+                } else {
+                    $this->moveByMenuTree($path);
+                }
+
+                $this->findVisibleLink($linkLocator);
+            }
         } catch (\Exception $e) {
             return false;
         }
@@ -67,6 +82,7 @@ class MainMenu extends Element
 
     /**
      * @param string $item
+     * @return NodeElement
      */
     public function selectSideSubmenu(string $item)
     {
@@ -81,6 +97,8 @@ class MainMenu extends Element
         if (!$menuOverlay->hasClass('open') || !$link->getParent()->hasClass('active')) {
             $link->click();
         }
+
+        return $link;
     }
 
     /**
@@ -119,13 +137,19 @@ class MainMenu extends Element
     private function walkSideMenu(string $path)
     {
         $items = explode('/', $path);
-        $this->selectSideSubmenu(array_shift($items));
+        $link = $this->selectSideSubmenu(array_shift($items));
+
+        if (empty($items)) {
+            return $link; // single item of first level menu was passed within path
+        }
 
         $currentItem = trim(array_shift($items));
         $currentLevel = 1;
 
+        $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
+
         /** @var NodeElement $menuTitle */
-        foreach ($this->findAll('css', '.side-menu-overlay ul.menu-level-1 > li span.title') as $menuTitle) {
+        foreach ($menuOverlay->findAll('css', 'ul.menu-level-1 > li span.title') as $menuTitle) {
             $menuLevel = $this->getMenuLevel($menuTitle);
 
             if ($menuLevel <= $currentLevel) {
@@ -144,7 +168,7 @@ class MainMenu extends Element
             }
 
             if (empty($items)) {
-                return $menuTitle->getParent()->click();
+                return $menuTitle->getParent();
             }
 
             $currentItem = trim(array_shift($items));
