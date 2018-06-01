@@ -1,3 +1,7 @@
+/* @theme: admin.oro; */
+
 .mobile-version {
+  @import "./big-numbers";
   @import "./dashboard";
+  @import "./launchpad";
 }

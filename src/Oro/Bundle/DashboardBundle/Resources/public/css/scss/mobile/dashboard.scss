@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .dashboard-selector-container {
     label {
         display: none;
@@ -5,11 +7,13 @@
 
     div.selector {
         height: 34px;
+
         border-color: #ccc #ccc #b3b3b3;
 
         select,
         span {
             height: 32px;
+
             line-height: 32px;
 
             &:after {
@@ -30,50 +34,9 @@
         }
     }
 
-    .launchpad-container {
-        padding: 0 10px;
-    }
-
     .dashboard-widget {
         .action-wrapper.sortable {
             display: none;
-        }
-    }
-}
-
-.launchpad-widget-content {
-    & > div {
-        height: auto;
-        box-shadow: none;
-        border-radius: 3px;
-    }
-
-    .image-wrap,
-    .list-wrap {
-        float: none;
-        width: 100%;
-    }
-
-    .image-wrap {
-        .widget-image {
-            display: none !important;
-        }
-
-        p {
-            font-weight: bolder;
-            margin: 0;
-            padding: 10px 15px 5px 15px;
-            text-align: left;
-        }
-    }
-
-    .list-wrap {
-        a {
-            border: none;
-        }
-
-        li {
-            line-height: 25px;
         }
     }
 }
@@ -94,8 +57,9 @@
 
         .control-group .filter-select-oro {
             height: 32px;
-            line-height: 32px;
             max-width: initial;
+
+            line-height: 32px;
         }
 
         .filter-start-date,

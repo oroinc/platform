@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 @import "oroui/css/scss/mixins";
 
 /* TODO: remove after main page element are redesigned */
@@ -14,8 +16,10 @@
 
         .btn-link {
             color: $primary-700;
+
             &:hover, &:active, &:focus {
                 color: $primary-400;
+
                 outline: none;
             }
         }
@@ -42,7 +46,8 @@
                 top: -6px;
             }
         }
-        .dropdown.pull-right .dropdown-menu, .dropup.pull-right .dropdown-menu {
+        .dropdown.pull-right .dropdown-menu,
+        .dropup.pull-right .dropdown-menu {
             &:before {
                 left: auto;
                 right: 13px;
@@ -54,21 +59,21 @@
             }
         }
 
-      .dropup.pull-right .dropdown-menu {
-        &:before {
-          border-top: 7px solid rgba(0, 0, 0, .2);
-          border-bottom: none;
-          top: auto;
-          bottom: -7px;
-        }
+        .dropup.pull-right .dropdown-menu {
+            &:before {
+                border-top: 7px solid rgba(0, 0, 0, .2);
+                border-bottom: none;
+                top: auto;
+                bottom: -7px;
+            }
 
-        &:after {
-          border-top: 6px solid $primary-inverse;
-          border-bottom: none;
-          top: auto;
-          bottom: -6px;
+            &:after {
+                border-top: 6px solid $primary-inverse;
+                border-bottom: none;
+                top: auto;
+                bottom: -6px;
+            }
         }
-      }
     }
 }
 html body {
@@ -106,6 +111,7 @@ html body {
 
     .widget-query-filter .collapse-action {
         padding-top: 4px;
+
         display: inline-block;
     }
 }
@@ -118,9 +124,10 @@ html body {
     }
 
     .responsive-section {
-        background: $dashboard-wrapper-bg;
         padding-top: 13px;
         padding-left: 13px;
+
+        background: $dashboard-wrapper-bg;
 
         .responsive-cell > div {
             padding-right: 13px;
@@ -138,22 +145,6 @@ html body {
         word-break: break-all;
     }
 
-    .launchpad-container {
-        .box-type1 {
-            border: 0;
-            background-color: $dashboard-wrapper-bg;
-        }
-
-        .oro-subtitle {
-            margin: 10px 10px 10px 0;
-        }
-
-        .title-buttons-container {
-            margin-top: 10px;
-            margin-right: 13px;
-        }
-    }
-
     .dashboard-widget.editable {
         .sortable {
             cursor: move;
@@ -165,21 +156,25 @@ html body {
     }
 
     .dashboard-widget {
-        border-radius: 1px;
         position: relative;
+
+        border-radius: 1px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
         .widget-header {
-            display: flex;
             min-height: 44px;
             padding: 3px 0 2px;
+
+            display: flex;
 
             .dropdown-menu {
                 margin-top: -3px;
                 min-width: 100px;
+
                 > li > a {
                     padding-left: 8px;
                     padding-right: 8px;
+
                     i[class^="fa-"] {
                         min-width: 14px;
                     }
@@ -261,18 +256,21 @@ html body {
 
         .widget-title {
             padding: 11px 0 3px;
-            order: 50;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            font-size: 18px;
+
             color: $dashboard-widget-title-color;
+            font-size: 18px;
             text-overflow: ellipsis;
+            white-space: nowrap;
+
+            flex: 1;
+            order: 50;
+            overflow: hidden;
 
             &:before {
+                min-height: 40px;
+
                 content: '';
                 display: inline;
-                min-height: 40px;
             }
         }
 
@@ -288,35 +286,39 @@ html body {
             }
 
             > .tab-container {
-                padding-top: 0;
                 margin: -1px 0 0 -1px;
+                padding-top: 0;
             }
         }
 
         .widget-config-data {
             margin-left: 10px;
             margin-bottom: 5px;
+
             color: #9d9d9d;
         }
     }
 
     .hidden-empty-text {
         height: 0 !important;
-        visibility: hidden;
         padding: 0 !important;
         margin: 0 !important;
+
         overflow: hidden !important;
+        visibility: hidden;
     }
 
     .widget-placeholder {
-        background: #f5f5f5;
-        border: 2px dashed #ccc;
-        border-radius: 3px;
-        color: #aaa;
-        font-size: 24px;
         min-height: 200px;
         padding: 20px;
+
+        background: #f5f5f5;
+        border: 2px dashed #ccc;
+        color: #aaa;
+        font-size: 24px;
         text-align: center;
+
+        border-radius: 3px;
     }
 
     .dashboard-widget.collapsed {
@@ -342,143 +344,16 @@ html body {
     }
 }
 
-.launchpad-widget-content > div {
-    height: 190px;
-    border: 1px solid #b6b6b6;
-    overflow: hidden;
-    border-radius: 5px;
-    box-shadow: 1px 1px 5px rgba(50, 50, 50, .2);
-}
-
-.launchpad-widget-content {
-    max-width: 600px;
-    margin: 0 auto;
-
-    .image-wrap {
-        background: #fff;
-        display: block;
-        width: 40%;
-        height: 100%;
-
-        .widget-image {
-            display: block !important;
-            font-size: 64px;
-            width: 64px;
-            color: #cecece;
-            cursor: default;
-            margin: 0 auto;
-
-            &:hover {
-                color: #8baed9;
-            }
-        }
-
-        p {
-            padding: 35px 0 10px;
-            font-size: 17px;
-            color: #555;
-        }
-    }
-
-    .list-wrap {
-        background: $dashboard-wrapper-bg;
-        border-left: 1px solid #e5e5e5;
-        width: 60%;
-        margin-left: -1px;
-        height: 100%;
-
-        ul {
-            margin: 5px 0;
-
-            li {
-                > a {
-                    border-bottom: 1px solid #e5e5e5;
-                    font-size: 14px;
-                }
-
-                &.last {
-                    > a {
-                        border: none;
-                    }
-                }
-            }
-        }
-    }
-}
-
-.quick-launchpad-toolbar {
-    width: 100%;
-    margin: 0;
-    list-style: none;
-    display: table;
-    table-layout: fixed;
-
-    & > li {
-        border-left: 1px solid #eaeaea;
-        display: table-cell;
-        position: relative;
-        vertical-align: middle;
-        text-align: center;
-        padding-bottom: 60px;
-
-        /* width: 20%; calculated on backend and depends on a number of items */
-        background: linear-gradient(#fff, #f1f1f1);
-
-        a {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-        }
-
-        &:first-child {
-            border: 0;
-        }
-
-        &:hover {
-            background: linear-gradient(#f1f1f1, #fff);
-        }
-
-        .title-box {
-            margin-top: 15px;
-            margin-bottom: 19px;
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            width: 100%;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .list-content {
-            display: block;
-            position: absolute;
-            bottom: 25px;
-            left: 0;
-            width: 100%;
-
-            i {
-                font-size: 35px;
-                color: #444;
-            }
-        }
-
-        a {
-            color: #444;
-        }
-    }
-}
-
 .dashboard-link {
     font-weight: normal;
 }
 
 .chart-container {
     position: relative;
-    overflow-x: visible;
+
     margin-top: 5px;
+
+    overflow-x: visible;
 
     &.wrapped-chart-legend {
         margin: 0 auto;
@@ -489,8 +364,9 @@ html body {
 
         .chart-legend {
             position: relative;
-            min-width: 250px; // to wrap legend event if it's empty yet
+
             height: auto !important;
+            min-width: 250px; // to wrap legend event if it's empty yet
             padding-bottom: 20px;
 
             table {
@@ -499,6 +375,7 @@ html body {
                 left: 0;
                 bottom: 0;
                 right: 0;
+
                 margin: auto 0 auto 30px;
                 width: 90%;
                 height: auto;
@@ -515,13 +392,15 @@ html body {
 
         .funnel-label {
             position: absolute;
+
             padding-bottom: .5em;
         }
 
         .flotr-grid-label-x {
             line-height: 14px;
-            overflow-x: hidden;
             text-overflow: ellipsis;
+
+            overflow-x: hidden;
         }
     }
 }
@@ -529,13 +408,11 @@ html body {
 .chart-legend table {
     font-size: 13px !important;
 
-    .flotr-legend-color-box {
+    .flotr-legend-color-box > div {
+        border: 0 !important;
+
         & > div {
             border: 0 !important;
-
-            & > div {
-                border: 0 !important;
-            }
         }
     }
 
@@ -546,6 +423,7 @@ html body {
 
 .flotr-mouse-value {
     z-index: 1;
+
     cursor: default;
 }
 
@@ -568,40 +446,43 @@ html body {
     .tab-container {
         position: relative;
 
-        .nav-tabs {
-            & > li {
-                & > a {
-                    color: #555;
-                    background-color: #fafafa;
-                    border: 1px solid #ddd;
-                    margin-left: -1px;
-                    border-radius: 0;
-                    margin-right: 0;
-                    padding: 8px 12px;
-                    line-height: 20px;
-                    height: 38px;
+        .nav-tabs > li {
+            & > a {
+                height: 38px;
+                margin-left: -1px;
+                margin-right: 0;
+                padding: 8px 12px;
 
-                    &:focus {
-                        outline: none;
-                    }
-                }
+                color: #555;
+                line-height: 20px;
 
-                &.active > a,
-                &.active > a:hover,
-                &.active > a:focus {
-                    border: 1px solid #ddd;
-                    border-bottom-color: #fff;
-                    box-shadow: none;
-                    color: #444;
-                    background: #fff;
-                    text-decoration: none;
-                }
+                background-color: #fafafa;
+                border: 1px solid #ddd;
 
-                &:first-child > a,
-                &:first-child > a:hover,
-                &:first-child > a:focus {
-                    border-left: 1px solid #ccc;
+                border-radius: 0;
+
+                &:focus {
+                    outline: none;
                 }
+            }
+
+            &.active > a,
+            &.active > a:hover,
+            &.active > a:focus {
+                color: #444;
+                text-decoration: none;
+
+                background: #fff;
+                border: 1px solid #ddd;
+                border-bottom-color: #fff;
+
+                box-shadow: none;
+            }
+
+            &:first-child > a,
+            &:first-child > a:hover,
+            &:first-child > a:focus {
+                border-left: 1px solid #ccc;
             }
         }
     }
@@ -619,8 +500,9 @@ html body {
     }
 
     .widget-title-widget {
-        float: left;
         margin-right: 20px;
+
+        float: left;
     }
 
     .date-range-filter {
@@ -634,8 +516,9 @@ html body {
 
         .filter-select-oro {
             height: 20px;
-            line-height: 20px;
             width: 120px;
+
+            line-height: 20px;
         }
 
         .control-group .horizontal:last-of-type .selector {
@@ -663,15 +546,18 @@ html body {
 
         &.scrollable {
             tbody {
-                display: block;
                 height: 120px;
+
                 border-left: 1px solid #ddd;
+
+                display: block;
             }
 
             thead,
             tbody tr {
-                display: table;
                 width: 100%;
+
+                display: table;
                 table-layout: fixed;
             }
 
@@ -712,6 +598,7 @@ html body {
 
         .action-column {
             width: 116px;
+
             text-align: center;
         }
 
@@ -730,6 +617,7 @@ html body {
 
         span {
             height: 28px;
+
             line-height: 28px;
 
             &:after {
