@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\EmailBundle\Command\UpdateAssociationsCommand:
+        public: false
+        class: Oro\Bundle\EmailBundle\Command\UpdateAssociationsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand:
+        public: false
+        class: Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand
+        tags:
+            - { name: console.command }

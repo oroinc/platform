@@ -1,0 +1,18 @@
+services:
+    Oro\Bundle\MigrationBundle\Command\DumpMigrationsCommand:
+        public: false
+        class: Oro\Bundle\MigrationBundle\Command\DumpMigrationsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand:
+        public: false
+        class: Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\MigrationBundle\Command\LoadMigrationsCommand:
+        public: false
+        class: Oro\Bundle\MigrationBundle\Command\LoadMigrationsCommand
+        tags:
+            - { name: console.command }

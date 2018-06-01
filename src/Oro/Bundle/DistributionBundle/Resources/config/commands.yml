@@ -1,0 +1,30 @@
+services:
+    Oro\Bundle\DistributionBundle\Command\InstallPackageCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\InstallPackageCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\DistributionBundle\Command\ListAvailablePackagesCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\ListAvailablePackagesCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\DistributionBundle\Command\ListInstalledPackagesCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\ListInstalledPackagesCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\DistributionBundle\Command\ListUpdatesCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\ListUpdatesCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\DistributionBundle\Command\UpdatePackageCommand:
+        public: false
+        class: Oro\Bundle\DistributionBundle\Command\UpdatePackageCommand
+        tags:
+            - { name: console.command }

@@ -22,6 +22,7 @@ class OroTestFrameworkExtension extends Extension implements PrependExtensionInt
         $loader->load('services.yml');
         $loader->load('importexport_test.yml');
         $loader->load('form_types.yml');
+        $loader->load('commands.yml');
     }
 
     /**

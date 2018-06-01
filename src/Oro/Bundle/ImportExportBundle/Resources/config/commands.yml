@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\ImportExportBundle\Command\ImportCommand:
+        public: false
+        class: Oro\Bundle\ImportExportBundle\Command\ImportCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ImportExportBundle\Command\ImportCommand\Cron\CleanupStorageCommand:
+        public: false
+        class: Oro\Bundle\ImportExportBundle\Command\Cron\CleanupStorageCommand
+        tags:
+            - { name: console.command }
