@@ -1,4 +1,4 @@
-// @theme: blank;
+/* @theme: blank; */
 
 @mixin after() {
     content: '';
@@ -98,6 +98,15 @@
 //     )
 // );
 // Use: @include use-font-face($fonts);
+@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
+    @if ($font-family and $file-path) {
+        // Calling mixin font-face(family, path, $weigh, style);
+        @include font-face($font-family, $file-path, $font-weigh, $font-style);
+    } @else {
+        @warn 'Absent family or path keys in a list.';
+    }
+}
+
 @mixin use-font-face($fonts: ()) {
     // Iterate index;
     $font-index: 0;
@@ -105,15 +114,6 @@
     // List with section keys
     // ('main', 'secondary', 'icon')
     $font-names: map_keys($fonts);
-
-    @mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
-        @if ($font-family and $file-path) {
-            // Calling mixin font-face(family, path, $weigh, style);
-            @include font-face($font-family, $file-path, $font-weigh, $font-style);
-        } @else {
-            @warn 'Absent family or path keys in a list.';
-        }
-    }
 
     @if (length($fonts) >= 1) {
         @each $font in $fonts {
@@ -169,6 +169,7 @@
                     @if (map_has_key($font-variants, 'weight')) {
                         $font-weigh: map_get($font-variants, 'weight');
                     }
+
                     @if (map_has_key($font-variants, 'style')) {
                         $font-style: map_get($font-variants, 'style');
                     }
@@ -185,6 +186,7 @@
                         @if (map_has_key($font-variant, 'weight')) {
                             $font-weigh: map_get($font-variant, 'weight');
                         }
+
                         @if (map_has_key($font-variants, 'style')) {
                             $font-style: map_get($font-variant, 'style');
                         }
