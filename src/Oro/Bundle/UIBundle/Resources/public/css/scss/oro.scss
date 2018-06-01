@@ -1199,32 +1199,6 @@ a {
     }
 }
 
-.loading-wrapper {
-    background: #000;
-    opacity: .2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-}
-
-.loading-frame {
-    position: absolute;
-    top: 40%;
-    left: 48%;
-    width: 180px;
-    z-index: 9999;
-
-    .box {
-        background: #fff;
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 24px;
-    }
-}
-
 .holder-height {
     max-height: 200px;
     overflow: auto;
@@ -3306,7 +3280,7 @@ span.validation-failed {
 }
 
 .nav-tabs > li > a.widget-component-processing {
-    background: #ccc !important;
+    background: rgba($primary-inverse, .5) !important;
     border-bottom: 1px solid transparent !important;
 
     /* following two lines allow this tab handle overlay .tab-content while it is loading */

@@ -133,11 +133,6 @@
   margin: 0;
   padding: 0;
   overflow: auto;
-  > .loader-mask {
-    left: $verticalPadding;
-    right: $verticalPadding;
-    top: $topPadding/2;
-  }
 }
 .grid-container {
   .table-bordered {

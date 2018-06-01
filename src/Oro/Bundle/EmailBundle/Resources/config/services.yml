@@ -1239,11 +1239,6 @@ services:
         arguments:
             - '@oro_email.direct_mailer'
 
-    oro_email.command.email_body_sync:
-        class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
-        tags:
-            - { name: console.command }
-
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
         arguments:

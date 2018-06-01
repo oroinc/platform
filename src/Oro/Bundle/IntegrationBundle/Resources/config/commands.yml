@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\IntegrationBundle\Command\CleanupCommand:
+        public: false
+        class: Oro\Bundle\IntegrationBundle\Command\CleanupCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\IntegrationBundle\Command\SyncCommand:
+        public: false
+        class: Oro\Bundle\IntegrationBundle\Command\SyncCommand
+        tags:
+            - { name: console.command }

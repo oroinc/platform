@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\SearchBundle\Command\IndexCommand:
+        public: false
+        class: Oro\Bundle\SearchBundle\Command\IndexCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\SearchBundle\Command\ReindexCommand:
+        public: false
+        class: Oro\Bundle\SearchBundle\Command\ReindexCommand
+        tags:
+            - { name: console.command }
