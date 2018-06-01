@@ -17,7 +17,7 @@
 
 // Helper to clear inner floats
 @mixin clearfix() {
-    &::after {
+    &:after {
         content: '';
 
         display: block;
@@ -35,7 +35,7 @@
 
 // Use: @include breakpoint('desktop') {
 //  content
-//}
+// }
 @mixin breakpoint($type) {
     // $breakpoints - global variable;
 
@@ -62,6 +62,7 @@
         font-weight: $font-weight;
         font-style: $font-style;
     }
+
     // Chrome for Windows rendering fix: http://www.adtrak.co.uk/blog/font-face-chrome-rendering/
     @media screen and (-webkit-min-device-pixel-ratio: 0) {
         @font-face {
@@ -187,7 +188,7 @@
                             $font-weigh: map_get($font-variant, 'weight');
                         }
 
-                        @if (map_has_key($font-variants, 'style')) {
+                        @if (map_has_key($font-variant, 'style')) {
                             $font-style: map_get($font-variant, 'style');
                         }
 
