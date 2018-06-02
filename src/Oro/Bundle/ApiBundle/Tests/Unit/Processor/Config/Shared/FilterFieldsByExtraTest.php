@@ -723,4 +723,119 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
             $this->context->getResult()
         );
     }
+
+    public function testProcessForSubresourceWithDisabledFieldset()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'disable_fieldset' => true,
+            'fields'           => [
+                'id'           => null,
+                'association1' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'id'     => null,
+                        'field1' => null
+                    ]
+                ]
+            ]
+        ];
+        $this->context->setExtras([
+            new FilterFieldsConfigExtra(['primary_entity' => ['association1']])
+        ]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('association1')
+            ->willReturn('Test\Association1Target');
+
+        $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->willReturn(self::TEST_CLASS_NAME);
+
+        $this->context->setParentClassName(self::TEST_CLASS_NAME);
+        $this->context->setAssociationName('association1');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'disable_fieldset' => true,
+                'fields'           => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'     => null,
+                            'field1' => null
+                        ]
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException
+     * @expectedExceptionMessage Requested unsupported operation "filter_fields" when building config for "Test\Class".
+     */
+    public function testProcessForSubresourceWithDisabledFieldsetAndAdditionalFieldsFilter()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'disable_fieldset' => true,
+            'fields'           => [
+                'id'           => null,
+                'association1' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'id'     => null,
+                        'field1' => null
+                    ]
+                ]
+            ]
+        ];
+        $this->context->setExtras([
+            new FilterFieldsConfigExtra(['primary_entity' => ['association1', 'association2']])
+        ]);
+
+        $this->doctrineHelper->expects($this->never())
+            ->method('isManageableEntityClass');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('primary_entity', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false)
+            ->willReturn(self::TEST_CLASS_NAME);
+
+        $this->context->setParentClassName(self::TEST_CLASS_NAME);
+        $this->context->setAssociationName('association1');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+    }
 }

@@ -17,8 +17,9 @@ class NestedCollectionTest extends RestJsonApiTestCase
     protected function setUp()
     {
         parent::setUp();
-
-        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/nested_collection.yml']);
+        $this->loadFixtures([
+            '@OroApiBundle/Tests/Functional/DataFixtures/nested_collection.yml'
+        ]);
     }
 
     public function testGet()
@@ -31,13 +32,14 @@ class NestedCollectionTest extends RestJsonApiTestCase
 
         $result = self::jsonToArray($response->getContent());
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
-        self::assertEquals(
+        self::assertArrayContains(
             [
                 ['firstName' => 'Item 1', 'lastName'  => 'item1'],
-                ['firstName' => 'Item 2', 'lastName'  => 'item2'],
+                ['firstName' => 'Item 2', 'lastName'  => 'item2']
             ],
             $result['data']['attributes']['links']
         );
+        self::assertCount(2, $result['data']['attributes']['links']);
     }
 
     public function testCreate()
@@ -50,7 +52,7 @@ class NestedCollectionTest extends RestJsonApiTestCase
                 'attributes' => [
                     'links' => [
                         ['firstName' => 'Item 1', 'lastName'  => 'item1'],
-                        ['firstName' => 'Item 2', 'lastName'  => 'item2'],
+                        ['firstName' => 'Item 2', 'lastName'  => 'item2']
                     ]
                 ]
             ]
@@ -59,13 +61,14 @@ class NestedCollectionTest extends RestJsonApiTestCase
         $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        self::assertArrayContains(
             [
                 ['firstName' => 'Item 1', 'lastName'  => 'item1'],
-                ['firstName' => 'Item 2', 'lastName'  => 'item2'],
+                ['firstName' => 'Item 2', 'lastName'  => 'item2']
             ],
             $result['data']['attributes']['links']
         );
+        self::assertCount(2, $result['data']['attributes']['links']);
 
         // test that the data was created
         $this->getEntityManager()->clear();
@@ -116,7 +119,7 @@ class NestedCollectionTest extends RestJsonApiTestCase
                 'attributes' => [
                     'links' => [
                         ['firstName' => 'Item 2', 'lastName'  => 'item2'],
-                        ['firstName' => 'Item 3', 'lastName'  => 'item3'],
+                        ['firstName' => 'Item 3', 'lastName'  => 'item3']
                     ]
                 ]
             ]
@@ -128,13 +131,14 @@ class NestedCollectionTest extends RestJsonApiTestCase
         );
 
         $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        self::assertArrayContains(
             [
                 ['firstName' => 'Item 2', 'lastName'  => 'item2'],
-                ['firstName' => 'Item 3', 'lastName'  => 'item3'],
+                ['firstName' => 'Item 3', 'lastName'  => 'item3']
             ],
             $result['data']['attributes']['links']
         );
+        self::assertCount(2, $result['data']['attributes']['links']);
 
         // test that the data was updated
         $this->getEntityManager()->clear();

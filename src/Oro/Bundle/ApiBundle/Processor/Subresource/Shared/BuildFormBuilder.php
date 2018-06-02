@@ -65,6 +65,13 @@ class BuildFormBuilder implements ProcessorInterface
         $parentConfig = $context->getParentConfig();
         $associationName = $context->getAssociationName();
 
+        $formOptions = $parentConfig->getFormOptions();
+        if (null === $formOptions) {
+            $formOptions = [];
+        }
+        if (!\array_key_exists('data_class', $formOptions)) {
+            $formOptions['data_class'] = $this->getFormDataClass($context, $parentConfig);
+        }
         $formEventSubscribers = null;
         if (!$parentConfig->getFormType()) {
             $formEventSubscribers = $parentConfig->getFormEventSubscribers();
@@ -72,7 +79,7 @@ class BuildFormBuilder implements ProcessorInterface
         $formBuilder = $this->formHelper->createFormBuilder(
             FormType::class,
             $context->getParentEntity(),
-            ['data_class' => $this->getFormDataClass($context, $parentConfig)],
+            $formOptions,
             $formEventSubscribers
         );
         $this->formHelper->addFormField(
@@ -93,14 +100,9 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormDataClass(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig)
     {
-        $parentFormOptions = $parentConfig->getFormOptions();
-        if (null !== $parentFormOptions && array_key_exists('data_class', $parentFormOptions)) {
-            return $parentFormOptions['data_class'];
-        }
-
         $dataClass = $context->getParentClassName();
         $parentEntity = $context->getParentEntity();
-        if (is_object($parentEntity)) {
+        if (\is_object($parentEntity)) {
             $parentResourceClass = $parentConfig->getParentResourceClass();
             if ($parentResourceClass) {
                 $entityClass = ClassUtils::getClass($parentEntity);
