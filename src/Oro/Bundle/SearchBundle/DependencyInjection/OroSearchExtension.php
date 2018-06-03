@@ -50,6 +50,7 @@ class OroSearchExtension extends Extension
         $serviceLoader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $serviceLoader->load('services.yml');
         $serviceLoader->load('filters.yml');
+        $serviceLoader->load('commands.yml');
 
         $ymlLoader = new YamlCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml');
         $engineLoader = new CumulativeConfigLoader('oro_search', $ymlLoader);

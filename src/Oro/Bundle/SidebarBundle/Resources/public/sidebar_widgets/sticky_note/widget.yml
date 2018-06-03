@@ -1,5 +1,5 @@
 title: "Sticky Note"
-icon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon.ico"
+iconClass: "fa-sticky-note-o"
 dialogIcon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon-sticky.png"
 module: "orosidebar/widget/sticky-note"
 placement: "both"

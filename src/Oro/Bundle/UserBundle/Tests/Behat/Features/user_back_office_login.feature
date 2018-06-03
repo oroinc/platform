@@ -6,7 +6,7 @@ Feature: User back office login
   I want to be sure that "Login" functionality is working fine
 
   Scenario: successful back office login using username
-    Given I am logged out
+    And I am on dashboard
     And I am on Login page
     And I fill "Login Form" with:
       | Username | admin |
@@ -26,6 +26,7 @@ Feature: User back office login
 
   Scenario: successful back office login using email
     Given I am logged out
+    And I am on dashboard
     And I am on Login page
     And I fill "Login Form" with:
       | Username | charlie@example.com |

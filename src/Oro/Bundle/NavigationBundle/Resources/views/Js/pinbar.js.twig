@@ -1,6 +1,4 @@
 <script type="text/html" id="template-list-pin-item">
-    <div class="pin-holder">
-        <button class="btn-close fa-close" href="#">{{ 'close'|trans|e('html')|raw }}</button>
-        <div><a href="<%= url %>" data-options="{&quot;cache&quot;:true}" title="<%- title_rendered %>"><i class="fa-circle pin-status"></i><%- title_rendered_short %></a></div>
-    </div>
+    <button class="btn-close fa-close" >{{ 'close'|trans|e('html')|raw }}</button>
+    <a href="<%= url %>" data-options="{&quot;cache&quot;:true}" title="<%- title_rendered %>"><%- title_rendered_short %></a>
 </script>

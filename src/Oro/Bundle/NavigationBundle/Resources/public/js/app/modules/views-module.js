@@ -100,7 +100,7 @@ define([
             dropdownItemTemplate: template,
             dropdownOptions: {
                 el: '#pinbar .show-more',
-                listSelector: '.dropdown-menu ul'
+                listSelector: '.dropdown-menu'
             },
             barItemTemplate: template,
             barOptions: {

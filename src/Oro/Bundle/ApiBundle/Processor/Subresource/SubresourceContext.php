@@ -246,7 +246,12 @@ class SubresourceContext extends Context
     protected function createParentConfigExtras()
     {
         return [
-            new EntityDefinitionConfigExtra(),
+            new EntityDefinitionConfigExtra(
+                $this->getAction(),
+                $this->isCollection(),
+                $this->getParentClassName(),
+                $this->getAssociationName()
+            ),
             new CustomizeLoadedDataConfigExtra(),
             new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])

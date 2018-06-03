@@ -19,117 +19,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
     /* ============================================================
      * from layout.js
      * ============================================================ */
-
-    var realWidth = function($selector) {
-        if ($selector instanceof $ && $selector.length > 0) {
-            return $selector[0].getBoundingClientRect().width;
-        } else {
-            return 0;
-        }
-    };
-
     $(function() {
         var $pageTitle = $('#page-title');
         if ($pageTitle.length) {
             document.title = $('<div.>').html($('#page-title').text()).text();
         }
         layout.hideProgressBar();
-
-        /* side bar functionality */
-        $('div.side-nav').each(function() {
-            var myParent = $(this);
-            var myParentHolder = $(myParent).parent().height() - 18;
-            $(myParent).height(myParentHolder);
-            /* open close bar */
-            $(this).find('span.maximize-bar').click(function() {
-                if (($(myParent).hasClass('side-nav-open')) || ($(myParent).hasClass('side-nav-locked'))) {
-                    $(myParent).removeClass('side-nav-locked side-nav-open');
-                    if ($(myParent).hasClass('left-panel')) {
-                        $(myParent).parent('div.page-container').removeClass('left-locked');
-                    } else {
-                        $(myParent).parent('div.page-container').removeClass('right-locked');
-                    }
-                    $(myParent).find('.bar-tools').css({
-                        height: 'auto',
-                        overflow: 'visible'
-                    });
-                } else {
-                    $(myParent).addClass('side-nav-open');
-                    var openBarHeight = $('div.page-container').height() - 20;
-                    var testBarScroll = $(myParent).find('.bar-tools').height();
-                    /* minus top-padding and bottom-padding */
-                    $(myParent).height(openBarHeight);
-                    if (openBarHeight < testBarScroll) {
-                        $(myParent).find('.bar-tools').height((openBarHeight - 20)).css({
-                            overflow: 'auto'
-                        });
-                    }
-                }
-            });
-
-            /* lock&unlock bar */
-            $(this).find('span.lock-bar').click(function() {
-                if ($(this).hasClass('lock-bar-locked')) {
-                    $(myParent).addClass('side-nav-open')
-                        .removeClass('side-nav-locked');
-                    if ($(myParent).hasClass('left-panel')) {
-                        $(myParent).parent('div.page-container').removeClass('left-locked');
-                    } else {
-                        $(myParent).parent('div.page-container').removeClass('right-locked');
-                    }
-                } else {
-                    $(myParent).addClass('side-nav-locked')
-                        .removeClass('side-nav-open');
-                    if ($(myParent).hasClass('left-panel')) {
-                        $(myParent).parent('div.page-container').addClass('left-locked');
-                    } else {
-                        $(myParent).parent('div.page-container').addClass('right-locked');
-                    }
-                }
-                $(this).toggleClass('lock-bar-locked');
-            });
-
-            /* open&close popup for bar items when bar is minimized. */
-            $(this).find('.bar-tools li').each(function() {
-                var myItem = $(this);
-                $(myItem).find('.sn-opener').click(function() {
-                    $(myItem).find('div.nav-box').fadeToggle('slow');
-
-                    var $barOverlay = $('#bar-drop-overlay');
-                    var $page = $('#page');
-                    var overlayHeight = $page.height();
-                    var overlayWidth = $page.children('.wrapper').width();
-                    $barOverlay.width(overlayWidth).height(overlayHeight);
-                    $barOverlay.toggleClass('bar-open-overlay');
-                });
-                $(myItem).find('span.close').click(function() {
-                    $(myItem).find('div.nav-box').fadeToggle('slow');
-                    $('#bar-drop-overlay').toggleClass('bar-open-overlay');
-                });
-                $('#bar-drop-overlay').on({
-                    click: function() {
-                        $(myItem).find('div.nav-box').animate({
-                            opacity: 0,
-                            display: 'none'
-                        }, function() {
-                            $(this).css({
-                                opacity: 1,
-                                display: 'none'
-                            });
-                        });
-                        $('#bar-drop-overlay').removeClass('bar-open-overlay');
-                    }
-                });
-            });
-            /* open content for open bar */
-            $(myParent).find('ul.bar-tools > li').each(function() {
-                var _barLi = $(this);
-                $(_barLi).find('span.open-bar-item').click(function() {
-                    $(_barLi).find('div.nav-content').slideToggle();
-                    $(_barLi).toggleClass('open-item');
-                });
-            });
-        });
 
         /* ============================================================
          * Oro Dropdown close prevent
@@ -178,10 +73,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         }, true);
 
         var mainMenu = $('#main-menu');
-        var activeDropdownsSelector = $('.dropdown, .dropup, .oro-drop', mainMenu);
+        var sideMainMenu = $('#side-menu');
 
-        // trigger refresh of current page if active dropdown is clicked, despite the Backbone router limitations
-        $(activeDropdownsSelector).on('click', $('li.active a'), function(e) {
+        // trigger refresh of current page if active menu-item is clicked, despite the Backbone router limitations
+        (sideMainMenu.length ? sideMainMenu : mainMenu).on('click', 'li.active a', function(e) {
             var $target = $(e.target).closest('a');
             if (!$target.hasClass('unclickable') && $target[0] !== undefined && $target[0].pathname !== undefined) {
                 if (mediator.execute('compareUrl', $target[0].pathname)) {
@@ -265,15 +160,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     }
                 }
             };
-            var $main = $('#main');
-            var $topPage = $('#top-page');
-            var $leftPanel = $('#left-panel');
-            var $rightPanel = $('#right-panel');
             adjustHeight = function() {
                 initializeContent();
 
-                // set width for #main container
-                $main.width(realWidth($topPage) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
                 var sfToolbar = $('.sf-toolbarreset');
@@ -284,11 +173,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
                 $(content.get().reverse()).each(function(pos, el) {
                     el = $(el);
-                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
+                    el.height(anchorTop - el.position().top - footerHeight + fixContent);
                 });
-
-                // set height for #left-panel and #right-panel
-                $leftPanel.add($rightPanel).height($main.height());
 
                 scrollspy.adjust();
 
@@ -301,8 +187,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     zIndex: 9999
                 });
 
-                $('.sidebar').css({
-                    'margin-bottom': footersHeight
+                $('#page').css({
+                    'padding-bottom': debugBarHeight
                 });
 
                 mediator.trigger('layout:reposition');

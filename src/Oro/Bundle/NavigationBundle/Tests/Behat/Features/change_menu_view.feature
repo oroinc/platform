@@ -8,7 +8,7 @@ Feature: Change menu view
 
 Scenario: Try navigate on top menu
   Given I login as administrator
-  And menu is at the top
+  And menu is on the left side
   And I go to System/User Management/Users
   When click view John Doe in grid
   And username field should has admin value
@@ -17,9 +17,9 @@ Scenario: Change menu view
   Given I go to System/Configuration
   And I follow "System Configuration/General Setup/Display Settings" on configuration sidebar
   And uncheck "Use default" for "Position" field
-  And select "Left" from "Position"
+  And select "Top" from "Position"
   When I save setting
-  Then menu must be on left side
+  Then menu is at the top
 
 Scenario: Try to navigate on left menu
   Given I go to System/User Management/Users

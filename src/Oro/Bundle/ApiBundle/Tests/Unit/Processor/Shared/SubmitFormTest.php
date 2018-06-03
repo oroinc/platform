@@ -56,7 +56,7 @@ class SubmitFormTest extends FormProcessorTestCase
             'field1' => 123,
             'field2' => 'false',
             'field3' => [
-                'key1' => false
+                'key1' => 'false'
             ]
         ];
 

@@ -1,0 +1,248 @@
+/* @theme: admin.oro; */
+
+$side-menu-overlay-header-height: 100px;
+
+.side-menu-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    z-index: -1;
+
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    min-width: $widthBodyPage;
+    padding-left: 16px;
+
+    font-size: $menu-font-size;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    transition: opacity 300ms linear;
+
+    visibility: hidden;
+
+    &.open {
+        z-index: $oroZindexDropdown + 30;
+
+        visibility: visible;
+
+        opacity: 1;
+    }
+
+    &__header {
+        position: relative;
+
+        width: 232px;
+
+        height: $side-menu-overlay-header-height;
+        padding: 24px 0 14px 14px;
+    }
+
+    &__search {
+        position: relative;
+    }
+
+    &__search-icon {
+        position: absolute;
+        right: 0;
+        top: 1px;
+        padding: 4px;
+
+        background-color: transparent;
+        border-width: 0;
+        color: $menu-item-text-color;
+
+        transition: $menu-animation;
+
+        &--interactive {
+            &:hover,
+            &:focus {
+                color: $menu-full-screen-button-color;
+            }
+        }
+    }
+
+    &__field {
+        width: 100%;
+        height: 30px;
+        padding-right: 24px;
+
+        box-sizing: border-box;
+    }
+
+    &__title {
+        font-size: 21px;
+        line-height: 1.2;
+    }
+
+    &__content {
+        max-width: calc(100vw - #{$side-menu-overlay-header-height});
+        height: calc(100vh - #{$side-menu-overlay-header-height});
+        max-height: calc(100vh - #{$side-menu-overlay-header-height});
+        padding-bottom: 16px;
+    }
+
+    &__button {
+        position: absolute;
+        top: 10px;
+        z-index: 1;
+
+        font-size: 18px;
+
+        background-color: transparent;
+        border: none;
+        color: $menu-full-screen-button-color;
+
+        transition: $menu-animation;
+
+        &:hover,
+        &:focus {
+            color: $menu-minimized-item-first-level-text-color-active;
+        }
+    }
+
+    &__fill,
+    &__fill-blur,
+    &__fill-blur-inner {
+        text-align: right;
+
+        color: transparent;
+
+        &::after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+
+            width: 100%;
+
+            content: '';
+        }
+    }
+
+    &__fill::after {
+        z-index: -1;
+
+        background-color: $menu-dropdown-background-color;
+
+        transform: translate(-100%);
+
+        width: 300%;
+    }
+
+    &__fill-blur::after {
+        width: 36px;
+
+        background-color: $menu-dropdown-background-color;
+        box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, .19);
+    }
+
+    &__fill-blur-inner::after {
+        background-color: rgba($primary-inverse, .5);
+    }
+
+    .menu {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-content: flex-start;
+
+        max-height: inherit;
+        max-width: inherit;
+        min-height: 340px;;
+        height: inherit;
+        padding-bottom: 20px;
+        margin: 0;
+
+        list-style: none;
+
+        overflow: auto;
+    }
+
+    .menu-item {
+        width: 232px;
+
+        padding: 0;
+
+        line-height: 1.3;
+    }
+
+    .title {
+        position: relative;
+
+        display: block;
+        padding: 12px 14px;
+
+        text-transform: none;
+
+        color: $menu-full-screen-title-color;
+
+        &:hover,
+        &:focus {
+            background-color: $menu-background-color-active;
+        }
+
+        @include fa-icon($fa-var-angle-right, after);
+
+        &::after {
+            padding-left: 2px;
+
+            font-size: $menu-font-size;
+
+            color: #b9b9b9;
+        }
+
+        $menu-overlay-title-offset: 0;
+
+        @for $i from 1 through 5 {
+            $selector: '&-level-' + $i;
+
+            #{$selector} {
+                padding-left: $menu-overlay-title-offset * 1px;
+
+                @if $i == 2 {
+                    font-size: ($menu-font-size + 2);
+                }
+            }
+
+            $menu-overlay-title-offset: $menu-overlay-title-offset + 16;
+        }
+    }
+
+    .active {
+        .title {
+            background-color: $menu-background-color-active;
+        }
+
+        &.dropdown {
+            .title {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .unclickable {
+        cursor: default;
+
+        .title {
+            &:after {
+                content: none;
+            }
+        }
+
+        &:hover,
+        &:focus {
+            .title {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .highlight {
+        text-decoration: underline;
+        background-color: $menu-item-text-highlight-color;
+    }
+}

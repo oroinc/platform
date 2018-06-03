@@ -71,6 +71,7 @@ class CustomizeFormDataHandler
         $context->getRequestType()->set($formContext->getRequestType());
         $context->setConfig($formContext->getConfig());
         $context->setClassName($form->getConfig()->getDataClass());
+        $context->setParentAction($formContext->getAction());
         $context->setForm($form);
         if (null !== $form->getParent()) {
             $context->setRootClassName($rootFormConfig->getDataClass());

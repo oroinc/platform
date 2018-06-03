@@ -49,7 +49,7 @@ class Configuration implements ConfigurationInterface
             [
                 self::ORGANIZATION_NAME_KEY  => ['value' => 'ORO'],
                 self::APPLICATION_URL_KEY   => ['value' => 'http://localhost'],
-                'navbar_position'   => ['value' => 'top'],
+                'navbar_position'   => ['value' => 'left'],
             ]
         );
 

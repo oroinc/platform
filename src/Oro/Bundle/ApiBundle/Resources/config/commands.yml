@@ -1,0 +1,42 @@
+services:
+    Oro\Bundle\ApiBundle\Command\CacheClearCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\CacheClearCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DebugCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DebugCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DocCacheClearCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DocCacheClearCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DumpCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DumpCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DumpConfigCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DumpConfigCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DumpConfigReferenceCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DumpConfigReferenceCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\ApiBundle\Command\DumpMetadataCommand:
+        public: false
+        class: Oro\Bundle\ApiBundle\Command\DumpMetadataCommand
+        tags:
+            - { name: console.command }

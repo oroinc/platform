@@ -1,10 +1,21 @@
-html, body, #page, #top-page {
-  height: auto;
+/* @theme: admin.oro; */
+
+html,
+body,
+.app-page,
+.app-page__central-panel {
+  height: auto !important;
 }
-#left-panel,
-#right-panel {
-  display: none;
-}
-#main {
-  width: 100% !important;
+
+.app-page {
+  display: block;
+  &__main {
+    display: block;
+    width: 100% !important;
+  }
+
+  &__left-panel,
+  &__right-panel {
+    display: none;
+  }
 }
