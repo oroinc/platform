@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
@@ -45,6 +46,26 @@ class FormValidationHandler
         }
         if (!$form->isSubmitted()) {
             throw new \InvalidArgumentException('The submitted form is expected.');
+        }
+
+        /**
+         * Mark all children of the processing root form as submitted
+         * before start the form validation.
+         * Using Form::submit($clearMissing = false) with the setting all fields as submitted
+         * is a bit better approach than
+         * using Form::submit($clearMissing = true) with a "pre-submit" listener that replaces missing fields
+         * in submitted data with its default values from an entity.
+         * Using the first approach we can submit all Data API forms
+         * with $clearMissing = false and manage the validation just via "enable_full_validation" form option.
+         * @link https://symfony.com/doc/current/form/direct_submit.html
+         * @see \Symfony\Component\Form\Form::submit
+         * @link https://github.com/symfony/symfony/pull/10567
+         * @see \Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper::acceptsErrors
+         * @see \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
+         * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+         */
+        if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
+            ReflectionUtil::markFormChildrenAsSubmitted($form);
         }
 
         $validationListener = $this->getValidationListener();

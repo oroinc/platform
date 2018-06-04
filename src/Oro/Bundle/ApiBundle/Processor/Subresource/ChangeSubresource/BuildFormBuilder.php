@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
+use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Type\ObjectType;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
@@ -95,9 +95,6 @@ class BuildFormBuilder implements ProcessorInterface
             $context->getResult(),
             $this->getFormOptions($context)
         );
-        if ($this->enableFullValidation) {
-            $formBuilder->addEventSubscriber(new EnableFullValidationListener());
-        }
 
         return $formBuilder;
     }
@@ -132,6 +129,7 @@ class BuildFormBuilder implements ProcessorInterface
             unset($options['entry_options']);
             $formOptions = \array_replace($formOptions, $options);
         }
+        $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
 
         return $formOptions;
     }

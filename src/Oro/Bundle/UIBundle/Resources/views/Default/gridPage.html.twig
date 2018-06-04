@@ -1,9 +1,4 @@
 {% extends "OroUIBundle:Default:index.html.twig" %}
-{% block head %}
-    {{ parent() }}
-    <script type="text/javascript" src="{{ asset('bundles/bowerassets/bootstrap/docs/assets/js/bootstrap-tooltip.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/bowerassets/bootstrap/docs/assets/js/bootstrap-popover.js') }}"></script>
-{% endblock %}
 {% block content %}
         <div class="layout-content">
             <div class="clearfix"><div class="navbar application-menu">
@@ -2344,7 +2339,7 @@
                 require(['jquery'],
                 function($) {
                     $(function() {
-                        var _qtyTh = $('table.grid thead th').size();
+                        var _qtyTh = $('table.grid thead th').length;
                         $('table.grid .grid-info td').attr('colspan', _qtyTh);
                         $('table.grid tbody tr:not(.grid-info)').each(function(){
                             var _myRow = $(this);
@@ -2409,8 +2404,6 @@
                 });
             </script>
         </div>
-
-    </div>
 
     </div>
 {% endblock content %}

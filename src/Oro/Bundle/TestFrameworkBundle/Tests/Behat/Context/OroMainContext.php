@@ -977,6 +977,20 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Select top submenu item in the side menu
+     * Example: Given I select "System" in the side menu
+     * Example: And select "System" in the side menu
+     *
+     * @Given /^(?:|I )select "(?P<submenu>[^\"]+)" in the side menu$/
+     */
+    public function iSelectSideSubmenu(string $submenu)
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $mainMenu->selectSideSubmenu($submenu);
+    }
+
+    /**
      * Assert current page
      * Example: Then I should be on Search Result page
      * Example: Then I should be on Default Calendar View page

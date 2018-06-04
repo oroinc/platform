@@ -12,7 +12,7 @@ class UserProfileUpdate extends Page
     public function open(array $parameters = [])
     {
         $userMenu = $this->elementFactory->createElement('UserMenu');
-        $userMenu->find('css', 'i.fa-sort-desc')->click();
+        $userMenu->find('css', 'i.fa-caret-down')->click();
 
         $userMenu->clickLink('My User');
         $this->waitForAjax();

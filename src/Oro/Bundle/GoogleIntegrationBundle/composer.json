@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "symfony/symfony": "3.4.*",
+        "symfony/symfony": "^3.4 <3.4.11",
         "oro/config-bundle": "dev-master",
         "oro/migration-bundle": "dev-master",
         "hwi/oauth-bundle": "0.5.*",

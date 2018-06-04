@@ -68,7 +68,11 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
             [
                 'test_option' => 'test_value',
                 'constraints' => [
-                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'association2'])
+                    new HasAdderAndRemover([
+                        'class'    => self::TEST_CLASS_NAME,
+                        'property' => 'association2',
+                        'groups'   => ['api']
+                    ])
                 ]
             ],
             $configObject->getField('association2')->getFormOptions()
@@ -76,7 +80,11 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         self::assertEquals(
             [
                 'constraints' => [
-                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'realAssociation3'])
+                    new HasAdderAndRemover([
+                        'class'    => self::TEST_CLASS_NAME,
+                        'property' => 'realAssociation3',
+                        'groups'   => ['api']
+                    ])
                 ]
             ],
             $configObject->getField('association3')->getFormOptions()
@@ -95,7 +103,11 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $existingConstraint = new HasAdderAndRemover(['class' => User::class, 'property' => 'groups']);
+        $existingConstraint = new HasAdderAndRemover([
+            'class'    => User::class,
+            'property' => 'groups',
+            'groups'   => ['api']
+        ]);
 
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject($config);
@@ -169,7 +181,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         self::assertNull($configObject->getField('field1')->getFormOptions());
         self::assertEquals(
             [
-                'constraints' => [new AccessGranted()]
+                'constraints' => [new AccessGranted(['groups' => ['api']])]
             ],
             $configObject->getField('association1')->getFormOptions()
         );
@@ -177,8 +189,12 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
             [
                 'test_option' => 'test_value',
                 'constraints' => [
-                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'association2']),
-                    new All(new AccessGranted())
+                    new HasAdderAndRemover([
+                        'class'    => self::TEST_CLASS_NAME,
+                        'property' => 'association2',
+                        'groups'   => ['api']
+                    ]),
+                    new All(new AccessGranted(['groups' => ['api']]))
                 ]
             ],
             $configObject->getField('association2')->getFormOptions()
@@ -186,8 +202,12 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         self::assertEquals(
             [
                 'constraints' => [
-                    new HasAdderAndRemover(['class' => self::TEST_CLASS_NAME, 'property' => 'realAssociation3']),
-                    new All(new AccessGranted())
+                    new HasAdderAndRemover([
+                        'class'    => self::TEST_CLASS_NAME,
+                        'property' => 'realAssociation3',
+                        'groups'   => ['api']
+                    ]),
+                    new All(new AccessGranted(['groups' => ['api']]))
                 ]
             ],
             $configObject->getField('association3')->getFormOptions()

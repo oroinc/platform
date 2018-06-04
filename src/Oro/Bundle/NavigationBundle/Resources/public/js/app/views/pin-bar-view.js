@@ -7,6 +7,8 @@ define([
     var BarCollectionView;
 
     BarCollectionView = BaseCollectionView.extend({
+        animationDuration: 0,
+
         /**
          * @inheritDoc
          */

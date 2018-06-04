@@ -1,4 +1,4 @@
-// @theme: default;
+/* @theme: default; */
 
 $select-firefox-height: null;
 $select-firefox-line-height: null;
@@ -13,7 +13,7 @@ $select-bg: url('#{$global-url}/oroform/default/images/icons/arrow-down--gray.sv
 // Hover
 $select-border-color-hover-state: get-color('ui', 'normal');
 $select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-0 0 8px transparentize(get-color('ui', 'focus'), .6);
+    0 0 8px transparentize(get-color('ui', 'focus'), .6);
 
 // Focus
 $select-border-color-focus-state: get-color('ui', 'normal');

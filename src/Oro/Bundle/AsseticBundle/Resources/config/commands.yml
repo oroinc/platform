@@ -1,0 +1,13 @@
+services:
+    Oro\Bundle\AsseticBundle\Command\AssetsInstallCommand:
+        public: false
+        class: Oro\Bundle\AsseticBundle\Command\AssetsInstallCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\AsseticBundle\Command\OroAsseticGroupsCommand:
+        public: false
+        class: Oro\Bundle\AsseticBundle\Command\OroAsseticGroupsCommand
+        tags:
+            - { name: console.command }
+
