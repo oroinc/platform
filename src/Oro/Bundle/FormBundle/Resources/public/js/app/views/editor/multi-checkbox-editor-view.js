@@ -86,20 +86,66 @@ define(function(require) {
                 autoOpen: true,
                 classes: _.result(this, 'className'),
                 header: '',
-                height: 'auto',
+                height: '',
                 position: {
                     my: 'left top',
                     at: 'left top',
                     of: this.$el
                 },
                 beforeclose: function() {
-                    return false;
-                }
+                    if (this.prestine) {
+                        this.trigger('cancelAction');
+                    }
+                }.bind(this)
             }).multiselectfilter({
                 label: '',
                 placeholder: __('oro.form.inlineEditing.multi_checkbox_editor.filter.placeholder'),
                 autoReset: true
             });
+
+            this.multiselect.multiselect('getMenu').find('label')
+                .bindFirst('keydown' + this.eventNamespace(), function(event) {
+                    this.prestine = false;
+
+                    switch (event.keyCode) {
+                        case this.ENTER_KEY_CODE:
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            this.multiselect.multiselect('close');
+
+                            this.onGenericEnterKeydown(event);
+                            break;
+                        case this.TAB_KEY_CODE:
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            this.multiselect.multiselect('close');
+
+                            this.onGenericTabKeydown(event);
+                            break;
+                        case this.ESCAPE_KEY_CODE:
+                            event.stopImmediatePropagation();
+                            event.preventDefault();
+
+                            this.multiselect.multiselect('close');
+
+                            this.onGenericEscapeKeydown(event);
+                            break;
+                    }
+
+                    this.onGenericArrowKeydown(event);
+                }.bind(this));
+
+            this.multiselect.multiselectfilter('instance').input
+                .on('keydown' + this.eventNamespace(), function(event) {
+                    this.prestine = false;
+
+                    this.onGenericEnterKeydown(event);
+                    this.onGenericTabKeydown(event);
+                    this.onGenericArrowKeydown(event);
+                    this.onGenericEscapeKeydown(event);
+                }.bind(this));
         },
 
         onUpdatePosition: function() {
@@ -108,8 +154,7 @@ define(function(require) {
             }
         },
 
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
             } else if (_.isArray(value)) {
@@ -117,7 +162,7 @@ define(function(require) {
                     return item !== '';
                 });
             } else if (_.isNull(value) || value === void 0) {
-                return [];
+                value = [];
             }
             return value;
         },
