@@ -272,7 +272,7 @@ define(function(require) {
      * @param {Object} options
      * @param {string|boolean} options.container specifies selector of container that dropdown-menu have to be attached
      *   on open for floating menu. Or just have boolean value that says - container have to be defined automatically.
-     * @param {string} options.align specifies align for floating dropdown-menu,
+     * @param {string} [options.align] specifies align for floating dropdown-menu,
      *   by default menu left aligned, and this option allows to set 'right' aligning.
      */
     (function() {
@@ -364,6 +364,13 @@ define(function(require) {
      * Extends Bootstrap.Dropdown and makes dropdown floating with "position: fixed",
      * - update its position if it was with "position: absolute"
      * - converts dropdown to dropup and vice versa if it better fit visible area
+     *
+     * to configure additional behavior
+     *   <div class="dropdown-menu" data-options="{&quot;flipMode&quot;:true}"> ... </div>
+     * @param {Object} options
+     * @param {boolean} options.flipMode flag to turn on the functionality
+     * @param {string} [options.scrollableContainer] selector of closes scrollable container,
+     *   by default it is one of '.ui-dialog-content', '.scrollable-container' or '.grid-scrollable-container'
      */
     (function() {
         function isInRange(parent, child) {
@@ -390,7 +397,9 @@ define(function(require) {
             var eventData = e && e.data || {};
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-            var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
+            var scrollableContainer = _.result($dropdownMenu.data('options'), 'scrollableContainer');
+            var dropdownMenuContainer = scrollableContainer && $toggle.closest(scrollableContainer)[0] ||
+                $toggle.closest('.ui-dialog-content')[0] ||
                 $toggle.closest('.scrollable-container')[0] ||
                 $toggle.closest('.grid-scrollable-container')[0];
             var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);

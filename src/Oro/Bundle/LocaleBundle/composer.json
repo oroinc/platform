@@ -8,7 +8,7 @@
     "require": {
         "php": "7.1.*",
         "ext-intl": "*",
-        "symfony/symfony": "3.4.*",
+        "symfony/symfony": "^3.4 <3.4.11",
         "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/config-bundle": "dev-master",

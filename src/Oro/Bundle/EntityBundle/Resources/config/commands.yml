@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\EntityBundle\Command\EntityAliasDebugCommand:
+        public: false
+        class: Oro\Bundle\EntityBundle\Command\EntityAliasDebugCommand
+        tags:
+            - { name: console.command }

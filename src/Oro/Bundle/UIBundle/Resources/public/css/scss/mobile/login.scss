@@ -1,12 +1,14 @@
+/* @theme: admin.oro; */
+
 &.login-page {
   height: 100%;
   position: absolute;
-  #page {
+  .app-page {
     height: 100%;
-  }
-  #top-page {
-    padding-top: 0;
-    height: 100%;
+    &__central-panel {
+      padding-top: 0;
+      height: 100%;
+    }
   }
 }
 .form-signin {

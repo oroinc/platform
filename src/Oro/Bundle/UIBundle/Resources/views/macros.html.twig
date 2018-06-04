@@ -1240,3 +1240,8 @@
     } %}
     {% endembed %}
 {%- endmacro -%}
+
+{% macro app_logo(organization_name) %}
+    {% set organization_name = organization_name|default('') %}
+    <a href="{{ path('oro_default') }}" class="app-logo" title="{{- organization_name|trim -}}">{{- organization_name|trim -}}</a>
+{% endmacro %}

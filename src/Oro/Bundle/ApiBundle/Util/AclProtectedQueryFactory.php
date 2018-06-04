@@ -3,16 +3,27 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\QueryFactory;
 
+/**
+ * This query factory modifies Data API queries in order to protect data
+ * that can be retrieved via these queries.
+ */
 class AclProtectedQueryFactory extends QueryFactory
 {
-    const SKIP_ACL_FOR_ROOT_ENTITY = 'skip_acl_for_root_entity';
+    public const SKIP_ACL_FOR_ROOT_ENTITY = 'skip_acl_for_root_entity';
 
     /** @var AclHelper */
-    protected $aclHelper;
+    private $aclHelper;
+
+    /** @var QueryModifierRegistry */
+    private $queryModifier;
+
+    /** @var RequestType|null */
+    private $requestType;
 
     /**
      * @param AclHelper $aclHelper
@@ -23,11 +34,34 @@ class AclProtectedQueryFactory extends QueryFactory
     }
 
     /**
+     * @param QueryModifierRegistry $queryModifier
+     */
+    public function setQueryModifier(QueryModifierRegistry $queryModifier)
+    {
+        $this->queryModifier = $queryModifier;
+    }
+
+    /**
+     * @param RequestType|null $requestType
+     */
+    public function setRequestType(RequestType $requestType = null)
+    {
+        $this->requestType = $requestType;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
-        if ($config->get(self::SKIP_ACL_FOR_ROOT_ENTITY)) {
+        $skipRootEntity = (bool)$config->get(self::SKIP_ACL_FOR_ROOT_ENTITY);
+        if (null !== $this->requestType) {
+            // ensure that FROM clause is initialized
+            $qb->getRootAliases();
+            // do query modification
+            $this->queryModifier->modifyQuery($qb, $skipRootEntity, $this->requestType);
+        }
+        if ($skipRootEntity) {
             $this->aclHelper->setCheckRootEntity(false);
             try {
                 $query = $this->aclHelper->apply($qb);

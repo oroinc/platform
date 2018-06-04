@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Command;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -37,25 +38,37 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReindexOnlySingleClassIfClassArgumentExists()
     {
+        $shortClassName = 'Class:Name';
+        $fullClassName = 'Class\Entity\Name';
+
         $indexer = $this->createSearchIndexerMock();
         $indexer
             ->expects($this->once())
             ->method('reindex')
-            ->with('class-name')
+            ->with($fullClassName)
         ;
+
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($shortClassName)
+            ->willReturn($fullClassName);
 
         $container = new Container();
         $container->set('oro_search.search.engine.indexer', $indexer);
+        $container->set('oro_entity.doctrine_helper', $doctrineHelper);
 
         $command = new ReindexCommand();
         $command->setContainer($container);
 
         $tester = new CommandTester($command);
         $tester->execute([
-            'class' => 'class-name'
+            'class' => $shortClassName
         ]);
 
-        $this->assertContains('Started reindex task for "class-name" entity', $tester->getDisplay());
+        $this->assertContains(sprintf('Started reindex task for "%s" entity', $fullClassName), $tester->getDisplay());
     }
 
     public function testShouldReindexAsynchronouslyIfParameterSpecified()

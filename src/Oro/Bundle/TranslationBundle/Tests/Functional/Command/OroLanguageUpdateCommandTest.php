@@ -10,6 +10,9 @@ use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Symfony\Component\Intl\Intl;
 
+/**
+ * @dbIsolationPerTest
+ */
 class OroLanguageUpdateCommandTest extends WebTestCase
 {
     /** @var  ExternalTranslationsProvider|\PHPUnit_Framework_MockObject_MockObject */

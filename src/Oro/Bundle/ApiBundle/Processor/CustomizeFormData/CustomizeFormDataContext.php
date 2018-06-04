@@ -40,6 +40,9 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /** the form event name */
     private const EVENT = 'event';
 
+    /** the name of the action which causes this action, e.g. "create" or "update" */
+    private const PARENT_ACTION = 'parentAction';
+
     /** @var FormInterface */
     private $form;
 
@@ -64,6 +67,30 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function setEvent(string $event): void
     {
         $this->set(self::EVENT, $event);
+    }
+
+    /**
+     * Gets the name of the action which causes this action, e.g. "create" or "update".
+     *
+     * @return string|null
+     */
+    public function getParentAction()
+    {
+        return $this->get(self::PARENT_ACTION);
+    }
+
+    /**
+     * Sets the name of the action which causes this action, e.g. "create" or "update".
+     *
+     * @param string|null $action
+     */
+    public function setParentAction($action)
+    {
+        if ($action) {
+            $this->set(self::PARENT_ACTION, $action);
+        } else {
+            $this->remove(self::PARENT_ACTION);
+        }
     }
 
     /**

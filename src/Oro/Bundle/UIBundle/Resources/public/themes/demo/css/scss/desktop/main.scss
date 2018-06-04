@@ -1,5 +1,10 @@
+/* @theme: admin.demo; */
+
 .desktop-version {
-  @import "header";
+  @import "../../../../css/scss/desktop/variables";
+
+  @import "app-header";
   @import "pin-bar";
-  @import "main-menu";
+  @import "main-menu/main";
+  @import "sidebar";
 }

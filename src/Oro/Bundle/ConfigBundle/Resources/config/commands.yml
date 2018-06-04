@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\ConfigBundle\Command\ConfigUpdateCommand:
+        public: false
+        class: Oro\Bundle\ConfigBundle\Command\ConfigUpdateCommand
+        tags:
+            - { name: console.command }

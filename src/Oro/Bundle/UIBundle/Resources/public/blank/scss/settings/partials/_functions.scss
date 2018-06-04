@@ -1,4 +1,4 @@
-// @theme: blank;
+/* @theme: blank; */
 
 // @return the value with a nested map;
 // $map: (
@@ -71,12 +71,10 @@
 // Use: $component-var: reset-var($component-var, 10);
 
 @function update-default($var, $value: null) {
-    @if ($var) {
-        $var: null;
-        $var: $value !default;
+    $var: null;
+    $var: $value !default;
 
-        @return $var;
-    }
+    @return $var;
 }
 
 // Extended default map-merge

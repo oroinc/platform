@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ObjectTypeTest extends TypeTestCase
 {
@@ -40,6 +41,7 @@ class ObjectTypeTest extends TypeTestCase
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );
     }

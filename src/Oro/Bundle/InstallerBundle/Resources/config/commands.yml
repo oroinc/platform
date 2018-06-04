@@ -1,0 +1,42 @@
+services:
+    Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\ConfigUpgradeCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\ConfigUpgradeCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\InstallCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\InstallCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\RunScriptsCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\RunScriptsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\InstallerBundle\Command\UpgradeCommand:
+        public: false
+        class: Oro\Bundle\InstallerBundle\Command\UpgradeCommand
+        tags:
+            - { name: console.command }

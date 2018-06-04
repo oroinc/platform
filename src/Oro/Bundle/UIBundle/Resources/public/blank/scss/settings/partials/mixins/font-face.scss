@@ -1,17 +1,16 @@
-// @theme: blank;
+/* @theme: blank; */
 
 // Use: @include font-face('Lato', '../fonts/lato/lato-regular-webfont', 400, normal);
 @mixin font-face($font-family, $file-path, $font-weight, $font-style) {
     @font-face {
         font-family: $font-family;
-        src: url('#{$file-path}.eot');
-        src: url('#{$file-path}.eot?#iefix') format('embedded-opentype'),
-        url('#{$file-path}.woff') format('woff'),
-        url('#{$file-path}.ttf') format('truetype'),
-        url('#{$file-path}.svg##{$font-family}') format('svg');
+        src: url('#{$file-path}.woff') format('woff'),
+            url('#{$file-path}.ttf') format('truetype'),
+            url('#{$file-path}.svg##{$font-family}') format('svg');
         font-weight: $font-weight;
         font-style: $font-style;
     }
+
     // Chrome for Windows rendering fix: http://www.adtrak.co.uk/blog/font-face-chrome-rendering/
     @media screen and (-webkit-min-device-pixel-ratio: 0) {
         @font-face {
@@ -48,6 +47,15 @@
 //     )
 // );
 // Use: @include use-font-face($fonts);
+@mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
+    @if ($font-family and $file-path) {
+        // Calling mixin font-face(family, path, $weigh, style);
+        @include font-face($font-family, $file-path, $font-weigh, $font-style);
+    } @else {
+        @warn 'Absent family or path keys in a list.';
+    }
+}
+
 @mixin use-font-face($fonts: ()) {
     // Iterate index;
     $font-index: 0;
@@ -55,15 +63,6 @@
     // List with section keys
     // ('main', 'secondary', 'icon')
     $font-names: map_keys($fonts);
-
-    @mixin include-font-face($font-family, $file-path, $font-weigh, $font-style) {
-        @if ($font-family and $file-path) {
-            // Calling mixin font-face(family, path, $weigh, style);
-            @include font-face($font-family, $file-path, $font-weigh, $font-style);
-        } @else {
-            @warn 'Absent family or path keys in a list.';
-        }
-    }
 
     @if (length($fonts) >= 1) {
         @each $font in $fonts {
