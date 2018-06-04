@@ -228,7 +228,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -242,10 +242,10 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Sends POST request for an entity resource.
      *
-     * @param array $routeParameters
+     * @param array        $routeParameters
      * @param array|string $parameters
-     * @param array $server
-     * @param bool  $assertValid
+     * @param array        $server
+     * @param bool         $assertValid
      *
      * @return Response
      */
@@ -264,7 +264,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -300,7 +300,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -318,21 +318,21 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Sends POST request for a sub-resource of a single entity.
      *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
      *
      * @return Response
      */
     protected function postSubresource(
         array $routeParameters = [],
-        array $parameters = [],
+        $parameters = [],
         array $server = [],
         $assertValid = true
     ) {
         $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
+        $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'POST',
             $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
@@ -340,7 +340,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -380,7 +380,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -416,7 +416,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -434,21 +434,21 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Sends PATCH request for a sub-resource of a single entity.
      *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
      *
      * @return Response
      */
     protected function patchSubresource(
         array $routeParameters = [],
-        array $parameters = [],
+        $parameters = [],
         array $server = [],
         $assertValid = true
     ) {
         $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
+        $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'PATCH',
             $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
@@ -456,7 +456,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -496,7 +496,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -531,7 +531,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -566,7 +566,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -584,21 +584,21 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Sends DELETE request for a sub-resource of a single entity.
      *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
+     * @param array        $routeParameters
+     * @param array|string $parameters
+     * @param array        $server
+     * @param bool         $assertValid
      *
      * @return Response
      */
     protected function deleteSubresource(
         array $routeParameters = [],
-        array $parameters = [],
+        $parameters = [],
         array $server = [],
         $assertValid = true
     ) {
         $routeParameters = self::processTemplateData($routeParameters);
-        $parameters = self::processTemplateData($parameters);
+        $parameters = $this->getRequestData($parameters);
         $response = $this->request(
             'DELETE',
             $this->getUrl($this->getSubresourceRouteName(), $routeParameters),
@@ -606,7 +606,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $server
         );
 
-        $this->getEntityManager()->clear();
+        $this->clearEntityManager();
 
         if ($assertValid) {
             $entityType = $this->extractEntityType($routeParameters);
@@ -671,6 +671,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
         return $result;
     }
+
     /**
      * Asserts the response contains the given number of data items.
      *
@@ -699,10 +700,14 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      *
      * @param array    $expectedError
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationError($expectedError, Response $response)
-    {
-        $this->assertResponseValidationErrors([$expectedError], $response);
+    protected function assertResponseValidationError(
+        $expectedError,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        $this->assertResponseValidationErrors([$expectedError], $response, $statusCode);
     }
 
     /**
@@ -710,10 +715,14 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      *
      * @param array    $expectedErrors
      * @param Response $response
+     * @param int      $statusCode
      */
-    protected function assertResponseValidationErrors($expectedErrors, Response $response)
-    {
-        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+    protected function assertResponseValidationErrors(
+        $expectedErrors,
+        Response $response,
+        $statusCode = Response::HTTP_BAD_REQUEST
+    ) {
+        static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
         try {

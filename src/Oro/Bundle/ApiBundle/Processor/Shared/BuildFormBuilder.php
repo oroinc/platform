@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
-use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
-use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
+use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -78,9 +78,6 @@ class BuildFormBuilder implements ProcessorInterface
             $this->getFormOptions($context, $config),
             $config->getFormEventSubscribers()
         );
-        if ($this->enableFullValidation) {
-            $formBuilder->addEventSubscriber(new EnableFullValidationListener());
-        }
 
         if (FormType::class === $formType) {
             $metadata = $context->getMetadata();
@@ -107,7 +104,8 @@ class BuildFormBuilder implements ProcessorInterface
         if (!\array_key_exists('data_class', $options)) {
             $options['data_class'] = $this->getFormDataClass($context, $config);
         }
-        $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
+        $options[CustomizeFormDataHandler::API_CONTEXT] = $context;
+        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
 
         return $options;
     }

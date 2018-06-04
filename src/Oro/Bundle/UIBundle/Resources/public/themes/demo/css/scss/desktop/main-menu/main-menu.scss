@@ -1,0 +1,14 @@
+/* @theme: admin.demo; */
+
+.main-menu {
+    background-color: $menu-background-color;
+
+    &__header {
+        min-height: $menu-header-height;
+        background-color: $menu-header-background-color;
+    }
+
+    .divider {
+        border-color: $menu-item-divider-color;
+    }
+}

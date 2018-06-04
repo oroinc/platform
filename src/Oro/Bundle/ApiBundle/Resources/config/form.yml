@@ -41,14 +41,28 @@ services:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
         arguments:
             - '@oro_api.customize_form_data.processor'
+            - '@oro_api.customize_form_data_handler'
         tags:
             - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_api.customize_form_data_handler:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler
+        public: false
+        arguments:
+            - '@oro_api.customize_form_data.processor'
+
+    oro_api.form_property_accessor:
+        class: Oro\Bundle\ApiBundle\Form\FormPropertyAccessor
+        public: false
+        arguments:
+            - '@form.property_accessor'
 
     oro_api.form_helper:
         class: Oro\Bundle\ApiBundle\Form\FormHelper
         public: false
         arguments:
             - '@form.factory'
+            - '@oro_api.form_property_accessor'
             - '@service_container'
 
     oro_api.form_validation_handler:
@@ -56,6 +70,7 @@ services:
         public: false
         arguments:
             - '@validator'
+            - '@oro_api.customize_form_data_handler'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
@@ -76,7 +91,7 @@ services:
     oro_api.form.type.nested_association:
         class: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType
         arguments:
-            - '@form.property_accessor'
+            - '@oro_api.form_property_accessor'
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:

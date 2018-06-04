@@ -16,6 +16,9 @@ oro_behat_extension:
     ColorsConfigBlock:
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\ColorsConfigBlock
 
+    Configuration Quick Search:
+      selector: '.system-configuration-container input[data-name="search"]'
+
     Recent Emails:
       selector: '.email-notification-menu'
 
@@ -76,6 +79,7 @@ oro_behat_extension:
         - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroNavigationBundle::FeatureContext
+        - OroNavigationBundle::PinbarContext
         - OroActivityListBundle::ActivityContext
       paths:
         - '@OroConfigBundle/Tests/Behat/Features'

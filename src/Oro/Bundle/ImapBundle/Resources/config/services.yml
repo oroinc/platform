@@ -218,11 +218,6 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_imap.command.email_sync:
-        class: 'Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand'
-        tags:
-            - { name: console.command }
-
     oro_imap.validator.email_folders:
         class: 'Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator'
         tags:

@@ -1,0 +1,48 @@
+services:
+    Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\DebugWorkflowDefinitionsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\DefinitionUpgrade20Command
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\LoadWorkflowDefinitionsCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand:
+        public: false
+        class: Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand
+        tags:
+            - { name: console.command }

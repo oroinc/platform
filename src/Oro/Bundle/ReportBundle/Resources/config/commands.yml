@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\ReportBundle\Command\CalendarDateCommand:
+        public: false
+        class: Oro\Bundle\ReportBundle\Command\CalendarDateCommand
+        tags:
+            - { name: console.command }

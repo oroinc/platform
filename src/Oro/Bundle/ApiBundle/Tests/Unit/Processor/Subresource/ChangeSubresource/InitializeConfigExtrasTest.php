@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresource;
 
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
@@ -51,7 +53,9 @@ class InitializeConfigExtrasTest extends ChangeSubresourceProcessorTestCase
                     $this->context->isCollection(),
                     $this->context->getParentClassName(),
                     $this->context->getAssociationName()
-                )
+                ),
+                new CustomizeLoadedDataConfigExtra(),
+                new DataTransformersConfigExtra()
             ],
             $this->context->getConfigExtras()
         );

@@ -34,7 +34,7 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
         if (!empty($options['route']) && $this->getOptionValue($options, ['extras', 'isAllowed'], true)) {
             $params = $this->getOptionValue($options, ['routeParameters'], []);
 
-            $newOptions['uri'] = $this->router->generate($options['route'], $params, !empty($options['routeAbsolute']));
+            $newOptions['uri'] = $this->generateUriWithoutFrontendController($options, $params);
             $newOptions['extras']['routes'] = [$options['route']];
             $newOptions['extras']['routesParameters'] = [$options['route'] => $params];
 
@@ -42,6 +42,34 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
         }
 
         return $options;
+    }
+
+    /**
+     * Generates url without frontend controller php file if it's a path (not absolute) url
+     * as it will be added later (if needed).
+     *
+     * @param array $options
+     * @param array $params
+     * @return string
+     */
+    private function generateUriWithoutFrontendController(array $options, array $params): string
+    {
+        $referenceType = !empty($options['routeAbsolute'])
+            ? RouterInterface::ABSOLUTE_URL
+            : RouterInterface::ABSOLUTE_PATH;
+
+        if ($referenceType === RouterInterface::ABSOLUTE_PATH) {
+            $oldBaseURL = $this->router->getContext()->getBaseUrl();
+            $this->router->getContext()->setBaseUrl('');
+        }
+
+        $url = $this->router->generate($options['route'], $params, $referenceType);
+
+        if ($referenceType === RouterInterface::ABSOLUTE_PATH) {
+            $this->router->getContext()->setBaseUrl($oldBaseURL);
+        }
+
+        return $url;
     }
 
     /**

@@ -153,3 +153,6 @@ services:
             - default
             - default
             - default
+
+    oro_test.router.default.alias:
+        alias: router.default

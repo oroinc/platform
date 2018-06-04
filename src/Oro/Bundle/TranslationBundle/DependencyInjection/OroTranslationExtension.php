@@ -21,6 +21,7 @@ class OroTranslationExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('services.yml');
         $loader->load('importexport.yml');
+        $loader->load('commands.yml');
 
         $container
             ->getDefinition('oro_translation.controller')

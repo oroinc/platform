@@ -3,7 +3,7 @@ placeholders:
         dots_menu:
             items:
                 dots_menu_email:
-                    order: 100
+                    order: 150
         scripts_before:
             items:
                 email_filter_templates:

@@ -1,10 +1,12 @@
+/* @theme: admin.oro; */
+
 .mobile-version {
     @import "variables";
+    @import "app-header";
     @import "clearfix";
     @import "dialog";
     @import "filter";
     @import "form";
-    @import "header";
     @import "layout";
     @import "login";
     @import "main-menu";

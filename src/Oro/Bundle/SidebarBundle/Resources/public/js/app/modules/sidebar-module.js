@@ -8,7 +8,7 @@ define([
         'ready!dom'
     ], function($, SidebarComponent) {
         $('.sidebar[data-page-component-options]').each(function(i, elem) {
-            BaseController.addToReuse('emailNotification' + i, {
+            BaseController.addToReuse('appSidebar' + i, {
                 compose: function() {
                     var $sourceElement = $(elem);
                     var options = $sourceElement.data('pageComponentOptions');

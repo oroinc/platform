@@ -45,7 +45,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder
         arguments:
             - '@oro_api.form_helper'
-            - '@form.property_accessor'
+            - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: add_relationship, group: transform_data, priority: 100 }
 

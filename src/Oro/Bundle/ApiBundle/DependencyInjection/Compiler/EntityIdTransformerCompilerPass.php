@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all entity identifir transformers.
+ * Registers all entity identifier transformers.
  */
 class EntityIdTransformerCompilerPass implements CompilerPassInterface
 {

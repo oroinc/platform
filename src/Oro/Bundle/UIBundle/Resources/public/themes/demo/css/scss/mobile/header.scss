@@ -1,25 +1,36 @@
-#oroplatform-header {
-    .navbar-inner .logo a {
-        background-color: transparent;
-        color: $headerTextColor;
+/* @theme: admin.demo; */
+
+.app-header {
+    background-color: $app-header-bg-color;
+    color: $app-header-text-color;
+
+    .main-menu-toggler {
+        color: $app-header-logo-text-color;
     }
 
-    #main-menu-toggle {
-        &:hover [class^='fa-'] {
-            border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+    .organization-logo-wrapper {
+        .logo {
+            color: $app-header-logo-text-color;
         }
 
-        &:active [class^='fa-'],
-        &:focus [class^='fa-'] {
-            border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient(darken($baseGradientColorStart, 10%), darken($baseGradientColorStart, 20%));
+        li.dropdown.open > .logo {
+            color: $app-header-logo-text-color;
         }
+    }
 
-        &.open > .dropdown-toggle [class^='fa-'] {
-            border: 1px solid darken(#2a5ab1, 10%);
-            background: linear-gradient($baseGradientColorStart, darken($baseGradientColorStart, 20%));
+    .nav.top-search.shortcuts {
+        .dropdown{
+            > a {
+                color: $app-header-text-color;
+            }
+        }
+    }
+
+    .nav.user-menu {
+        .dropdown {
+            > a {
+                color: $app-header-text-color;
+            }
         }
     }
 }
-

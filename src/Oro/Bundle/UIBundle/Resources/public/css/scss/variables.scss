@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 @import "bowerassets/font-awesome/scss/_variables";
 @import "bootstrap/variables";
 
@@ -10,9 +12,8 @@ $topPadding:                      $contentPadding;
 $bottomPadding:                   $contentPadding;
 $marginBottomBox:                 $contentPadding;
 $generalBorderColor:              #ddd;
-$widthPage:                       960px;
 $widthBodyPage:                   980px;
-$widthPopup:                      $widthPage/2;
+$widthPopup:                      480px;
 $widthClosePanel:                 25px;
 $widthLeftPanel:                  230px;
 $widthLeftPanel2:                 210;
@@ -111,9 +112,6 @@ $sideBarOpenedWidth:              200px;
 // Z-indexs
 $oroZindexDropdown:               900;
 $oroMobileHeaderZindex:           99999;
-
-$dotMenuDropdownMinHeight:        168px;
-$dotMenuDropdownMaxHeight:        330px;
 
 // highlight variables
 $highlightTextColor: #ffefa5;

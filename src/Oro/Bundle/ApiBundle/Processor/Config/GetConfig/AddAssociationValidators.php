@@ -57,11 +57,12 @@ class AddAssociationValidators implements ProcessorInterface
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
                         'class'    => $entityClass,
-                        'property' => $fieldName
+                        'property' => $fieldName,
+                        'groups'   => ['api']
                     ]));
-                    $field->addFormConstraint(new Assert\All(new Assert\AccessGranted()));
+                    $field->addFormConstraint(new Assert\All(new Assert\AccessGranted(['groups' => ['api']])));
                 } else {
-                    $field->addFormConstraint(new Assert\AccessGranted());
+                    $field->addFormConstraint(new Assert\AccessGranted(['groups' => ['api']]));
                 }
             }
         }
@@ -82,7 +83,8 @@ class AddAssociationValidators implements ProcessorInterface
                 if (!$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
                         'class'    => $entityClass,
-                        'property' => $fieldName
+                        'property' => $fieldName,
+                        'groups'   => ['api']
                     ]));
                 }
             }

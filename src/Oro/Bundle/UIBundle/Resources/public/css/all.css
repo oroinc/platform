@@ -1,11 +1,5 @@
-#page{
-/*    display: table; need fix when create fotter at bottom
-    height: 100%; */
-    width: 100%;
-}
-#top-page{
-    width: 100%;
-}
+/* @theme: admin.oro; */
+
 .footer,footer,
 #footer{
     font-size: 13px;

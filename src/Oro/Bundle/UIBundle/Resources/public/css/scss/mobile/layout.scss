@@ -1,3 +1,14 @@
+/* @theme: admin.oro; */
+
+& {
+  min-height: 100%;
+}
+.app-page {
+  &__central-panel {
+    padding-top: $app-header-height;
+  }
+}
+
 .mobile-hide {
     display: none;
     width: 0;
@@ -8,37 +19,11 @@
     left: -9999px;
 }
 
-&,
-#page,
-#top-page {
-    height: auto;
-    min-height: 100%;
-    overflow: visible;
-}
-
-#main {
-    float: none;
-    height: 100%;
-}
-
-#top-page {
-    padding-top: $headerHeight;
-}
-
-#oroplatform-header {
-    position: fixed;
-    width: 100%;
-    height: $headerHeight;
-    max-height: $headerHeight;
-    top: 0;
-    left: 0;
-}
-
 /**
  * Fixes issue when header with position fixed loses its place after blur event on some input
  * $see fixStickyHeader() in oroui/js/mobile/layout.js
  */
-&.input-focused #oroplatform-header {
+&.input-focused .app-header {
     position: absolute;
 }
 
@@ -242,9 +227,4 @@
             }
         }
     }
-}
-
-&.loading > .loader-mask {
-    position: fixed;
-    bottom: 0;
 }

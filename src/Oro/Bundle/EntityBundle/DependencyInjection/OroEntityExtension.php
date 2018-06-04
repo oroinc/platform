@@ -32,6 +32,7 @@ class OroEntityExtension extends Extension
         $loader->load('services.yml');
         $loader->load('fallbacks.yml');
         $loader->load('services_api.yml');
+        $loader->load('commands.yml');
 
         $container->setParameter('oro_entity.default_query_cache_lifetime', $config['default_query_cache_lifetime']);
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);

@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+/**
+ * Performs indexation operations for search index
+ */
 interface IndexerInterface
 {
     /**
      * Save one of several entities to search index
      *
-     * @param object|array $entity
+     * @param object|object[] $entity
      * @param array        $context
      *
      * @return bool
@@ -17,7 +20,7 @@ interface IndexerInterface
     /**
      * Delete one or several entities from search index
      *
-     * @param object|array $entity
+     * @param object|object[] $entity
      * @param array $context
      *
      * @return bool
@@ -27,7 +30,7 @@ interface IndexerInterface
     /**
      * Returns classes required to reindex for one or several classes
      * Returns all indexed classes if $class is null
-     * @param string|string[] $class
+     * @param string|string[]|null $class
      * @param array $context
      * @return string[]
      */
@@ -37,7 +40,7 @@ interface IndexerInterface
      * Resets data for one or several classes in index
      * Resets data for all indexed classes if $class is null
      *
-     * @param string|string[] $class
+     * @param string|string[]|null $class
      * @param array $context
      */
     public function resetIndex($class = null, array $context = []);
@@ -46,7 +49,7 @@ interface IndexerInterface
      * Reindex data for one or several classes in index
      * Reindex data for all indexed classes if $class is null
      *
-     * @param string|string[] $class
+     * @param string|string[]|null $class
      * @param array           $context
      *
      * @return int Number of reindexed entities or null if information not available
