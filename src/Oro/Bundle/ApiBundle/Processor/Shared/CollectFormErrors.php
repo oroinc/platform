@@ -303,8 +303,10 @@ class CollectFormErrors implements ProcessorInterface
                 // see comments of "isExtraFieldsConstraint" method for more details
                 return Constraint::EXTRA_FIELDS;
             }
-
-            return $this->constraintTextExtractor->getConstraintType($cause->getConstraint());
+            $constraint = $cause->getConstraint();
+            if (null !== $constraint) {
+                return $this->constraintTextExtractor->getConstraintType($constraint);
+            }
         }
 
         // undefined constraint type
@@ -320,7 +322,10 @@ class CollectFormErrors implements ProcessorInterface
     {
         $cause = $formError->getCause();
         if ($cause instanceof ConstraintViolation) {
-            return $this->constraintTextExtractor->getConstraintStatusCode($cause->getConstraint());
+            $constraint = $cause->getConstraint();
+            if (null !== $constraint) {
+                return $this->constraintTextExtractor->getConstraintStatusCode($constraint);
+            }
         }
 
         return null;

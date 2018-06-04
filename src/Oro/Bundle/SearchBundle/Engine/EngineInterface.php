@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
+/**
+ * Performs search operation for search index
+ */
 interface EngineInterface
 {
     /**

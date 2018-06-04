@@ -7,13 +7,16 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * This constraint can be used to check if an access to read an associated entity is granted.
- * The VIEW permission is used to check.
+ * By default the VIEW permission is used to check.
  *
  * @Annotation
  */
 class AccessGranted extends Constraint implements ConstraintWithStatusCodeInterface
 {
     public $message = 'oro.api.form.no_access';
+
+    /** @var string */
+    public $permission = 'VIEW';
 
     /**
      * {@inheritdoc}

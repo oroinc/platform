@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -34,5 +36,7 @@ class InitializeConfigExtras implements ProcessorInterface
                 $context->getAssociationName()
             )
         );
+        $context->addConfigExtra(new CustomizeLoadedDataConfigExtra());
+        $context->addConfigExtra(new DataTransformersConfigExtra());
     }
 }

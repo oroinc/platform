@@ -31,7 +31,7 @@ class SubmitForm implements ProcessorInterface
 
         /**
          * always use $clearMissing = false, more details in:
-         * @see \Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener
+         * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler::validate
          * @see \Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder::$enableFullValidation
          */
         $form->submit($this->prepareRequestData($context->getRequestData()), false);
@@ -49,7 +49,7 @@ class SubmitForm implements ProcessorInterface
          * @see \Symfony\Component\Form\Form::submit
          * we have to convert false to its string representation here
          */
-        \array_walk(
+        \array_walk_recursive(
             $requestData,
             function (&$value) {
                 if (false === $value) {
