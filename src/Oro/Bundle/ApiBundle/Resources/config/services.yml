@@ -328,7 +328,7 @@ services:
             - ['setIsIdFieldProtected', [false]]
 
     oro_api.entity_serializer:
-        class: Oro\Component\EntitySerializer\EntitySerializer
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedEntitySerializer
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
@@ -362,13 +362,32 @@ services:
             - '@oro_entity.query_hint_resolver'
         calls:
             - [setAclHelper, ['@oro_security.acl_helper']]
+            - [setQueryModifier, ['@oro_api.entity_serializer.query_modifier_registry']]
+
+    oro_api.entity_serializer.query_modifier_registry:
+        class: Oro\Bundle\ApiBundle\Util\QueryModifierRegistry
+        public: false
+        arguments:
+            - [] # query modifiers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.field_accessor:
-        class: Oro\Component\EntitySerializer\FieldAccessor
+        class: Oro\Bundle\ApiBundle\Util\FieldAccessor
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
             - '@oro_api.entity_accessor'
+        calls:
+            - [setMandatoryFieldProvider, ['@oro_api.entity_serializer.mandatory_field_provider_registry']]
+
+    oro_api.entity_serializer.mandatory_field_provider_registry:
+        class: Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry
+        public: false
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer

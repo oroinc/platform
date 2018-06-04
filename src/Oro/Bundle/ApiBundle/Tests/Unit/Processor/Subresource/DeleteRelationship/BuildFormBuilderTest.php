@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -40,7 +41,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
         $this->processor = new BuildFormBuilder(
-            new FormHelper($this->formFactory, $this->container),
+            new FormHelper($this->formFactory, $this->propertyAccessor, $this->container),
             $this->propertyAccessor
         );
 
@@ -63,9 +64,12 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder')
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::once())
+        $formBuilder->expects(self::exactly(2))
             ->method('setDataMapper')
-            ->with(self::isInstanceOf(RemoveRelationshipMapper::class));
+            ->withConsecutive(
+                self::isInstanceOf(PropertyPathMapper::class),
+                self::isInstanceOf(RemoveRelationshipMapper::class)
+            );
 
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentMetadata($parentMetadata);

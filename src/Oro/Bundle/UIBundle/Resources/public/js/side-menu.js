@@ -78,6 +78,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
 
                 if ($group.hasClass('active')) {
                     $target.addClass('in');
+                    $header.removeClass('collapsed');
                 } else {
                     $header.addClass('collapsed');
                 }

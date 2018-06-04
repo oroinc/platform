@@ -63,6 +63,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
             $data = $field['data'];
 
             $data['extend']['state'] = ExtendScope::STATE_DELETE;
+            $data['extend']['is_deleted'] = true;
 
             $params = ['data' => $data, 'id' => $field['id']];
             $this->logQuery($logger, $query, $params, $types);

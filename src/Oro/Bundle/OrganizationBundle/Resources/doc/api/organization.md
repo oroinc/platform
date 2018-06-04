@@ -17,14 +17,13 @@ Retrieve a collection of organization records.
 ### create
 
 Create a new organization record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/organizations>`
 
 ```JSON
 {  
@@ -75,8 +74,6 @@ Edit a specific organization record.
 
 {@request:json_api}
 Example:
-
-`</api/organizations/2>`
 
 ```JSON
 {  
@@ -165,8 +162,6 @@ Set the business unit records to a specific organization record.
 {@request:json_api}
 Example:
 
-`</api/organizations/1/relationships/businessUnits>`
-
 ```JSON
 {
   "data": [
@@ -193,8 +188,6 @@ Replace the business units that belong to a specific organization record.
 
 {@request:json_api}
 Example:
-
-`</api/organizations/1/relationships/businessUnits>`
 
 ```JSON
 {
@@ -237,8 +230,6 @@ Set users who have access to a specific organization.
 {@request:json_api}
 Example:
 
-`</api/organizations/2/relationships/users>`
-
 ```JSON
 {  
    "data":[  
@@ -261,8 +252,6 @@ Replace users who have access to a specific organization.
 
 {@request:json_api}
 Example:
-
-`</api/organizations/2/relationships/users>`
 
 ```JSON
 {  

@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/colors";
+
+$sidebar-minimized-width:               32px;
+$sidebar-maximized-width:               252px;
+$sidebar-bg-color:                      $primary-830;
+$sidebar-active-color:                  $secondary-200;
+
+$sidebar-widget-header-bg-color:        $sidebar-bg-color;
+$sidebar-widget-header-active-bg-color: $sidebar-active-color;
+$sidebar-widget-title-color:            $primary-200;
+$sidebar-widget-actions-color:          $primary-700;
+$sidebar-widget-content-bg-color:       $primary-900;

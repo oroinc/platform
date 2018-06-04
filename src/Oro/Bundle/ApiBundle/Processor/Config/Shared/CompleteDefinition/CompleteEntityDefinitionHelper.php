@@ -102,8 +102,8 @@ class CompleteEntityDefinitionHelper
                 $version,
                 $requestType
             );
-            $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
             $this->completeFields($definition, $metadata, $existingFields, $requestType);
+            $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
         }
         // make sure that identifier field names are set
         $idFieldNames = $definition->getIdentifierFieldNames();

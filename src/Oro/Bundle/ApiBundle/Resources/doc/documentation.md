@@ -151,6 +151,7 @@ Use the `{@inheritdoc}` placeholder to get the common documentation for an actio
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
@@ -184,14 +185,13 @@ For example, to add a text for the JSON API request type for all requests exclud
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/entities>`
 
 ` ` `JSON
 {

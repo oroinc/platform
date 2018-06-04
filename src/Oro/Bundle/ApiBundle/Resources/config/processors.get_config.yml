@@ -96,7 +96,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming

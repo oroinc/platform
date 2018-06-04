@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "symfony/symfony": "3.4.*",
+        "symfony/symfony": "^3.4 <3.4.11",
         "genemu/form-bundle": "2.1.*",
         "oro/security-bundle": "dev-master",
         "oro/search-bundle": "dev-master",

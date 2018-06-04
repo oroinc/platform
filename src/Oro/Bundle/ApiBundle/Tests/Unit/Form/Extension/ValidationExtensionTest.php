@@ -44,7 +44,7 @@ class ValidationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->buildForm($builder, ['enable_validation' => true]);
     }
 
-    public function testConfigureOptionsShouldEnableValidationByDefault()
+    public function testConfigureOptionsShouldEnableValidationAndDisableFullValidationByDefault()
     {
         $resolver = new OptionsResolver();
 
@@ -59,7 +59,8 @@ class ValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'extra_fields_message'       => 'This form should not contain extra fields.',
                 'validation_groups'          => null,
                 'constraints'                => [],
-                'enable_validation'          => true
+                'enable_validation'          => true,
+                'enable_full_validation'     => false
             ],
             $resolver->resolve()
         );
@@ -80,9 +81,32 @@ class ValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'extra_fields_message'       => 'This form should not contain extra fields.',
                 'validation_groups'          => null,
                 'constraints'                => [],
-                'enable_validation'          => false
+                'enable_validation'          => false,
+                'enable_full_validation'     => false
             ],
             $resolver->resolve(['enable_validation' => false])
+        );
+    }
+
+    public function testConfigureOptionsWhenFullValidationEnabled()
+    {
+        $resolver = new OptionsResolver();
+
+        $this->extension->configureOptions($resolver);
+
+        self::assertEquals(
+            [
+                'error_mapping'              => [],
+                'invalid_message'            => 'This value is not valid.',
+                'invalid_message_parameters' => [],
+                'allow_extra_fields'         => false,
+                'extra_fields_message'       => 'This form should not contain extra fields.',
+                'validation_groups'          => null,
+                'constraints'                => [],
+                'enable_validation'          => true,
+                'enable_full_validation'     => true
+            ],
+            $resolver->resolve(['enable_full_validation' => true])
         );
     }
 }

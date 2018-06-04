@@ -10,7 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Connector abstract class
+ * Abstract standard search engine
  */
 abstract class AbstractEngine implements EngineInterface
 {

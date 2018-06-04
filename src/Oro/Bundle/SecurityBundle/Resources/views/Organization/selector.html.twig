@@ -1,3 +1,5 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 {% set curr_organization = get_current_organization() %}
 {% set organizations = get_enabled_organizations() %}
 
@@ -9,78 +11,87 @@
 
 {% if isDesktopVersion() %}
     {% if organizations|length > 1 %}
-        <div class="nav top-search fix_logo">
-            <div class="dropdown header-utility-dropdown">
-                <i class="fa-ellipsis-v dropdown-toggle btn-organization-switcher" data-toggle="dropdown"></i>
-                <ul class="dropdown-menu dropdown-organization-switcher">
-                    {% for organization in organizations %}
-                        <li>
-                            {% if curr_organization and curr_organization.getId() == organization.id %}
-                            <span class="selected"><b>{{ organization.name }}</b></span>
-                            {% else %}
-                            <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
-                               class="organization-switcher no-hash">
-                                {{- organization.name -}}
-                            </a>
-                            {% endif %}
-                        </li>
-                        {% if not loop.last %}
-                        <li class="divider"><span></span></li>
+        <div class="nav logo-wrapper dropdown header-utility-dropdown">
+            {{ UI.app_logo(organization_name) }}
+            {{ _self.organization_name_and_logo(organization_name) }}
+            <i class="fa-caret-down dropdown-toggle btn-organization-switcher" data-toggle="dropdown"></i>
+            <ul class="dropdown-menu dropdown-organization-switcher">
+                {% for organization in organizations %}
+                    <li>
+                        {% if curr_organization and curr_organization.getId() == organization.id %}
+                        <span class="selected"><b>{{ organization.name }}</b></span>
+                        {% else %}
+                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
+                           class="organization-switcher no-hash">
+                            {{- organization.name -}}
+                        </a>
                         {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-            {{ _self.organization_name(organization_name) }}
+                    </li>
+                    {% if not loop.last %}
+                    <li class="divider"><span></span></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
         </div>
         <script type="text/javascript">
             require(['orosecurity/js/init-organization-selector'])
         </script>
-    {% else %}
-        {{ _self.organization_name(organization_name) }}
+    {% else %}{# if organizations|length == 1 #}
+        <div class="nav logo-wrapper">
+            {{ UI.app_logo(organization_name) }}
+            {{ _self.organization_name_and_logo(organization_name) }}
+        </div>
     {% endif %}
 {% else %}
     {# Mobile view #}
     {% if organizations|length > 1 %}
-        <ul class="nav organization-switcher">
-            <li class="dropdown">
-                <h1 class="logo dropdown-toggle" data-toggle="dropdown">
-                    <span>
-                        <a href="javascript: void(0);">
-                            {{- organization_name -}}
+        <div class="nav organization-switcher dropdown">
+            <h1 class="logo dropdown-toggle" data-toggle="dropdown">
+                <a href="javascript: void(0);">
+                    {% if oro_theme_logo() %}
+                        <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
+                    {% else %}
+                        {{- organization_name -}}
+                    {% endif %}
+                </a>
+                <i class="fa-caret-down btn-organization-switcher"></i>
+            </h1>
+            <ul class="dropdown-menu">
+                {% for organization in organizations %}
+                    <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
+                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash">
+                            {{- organization.name -}}
                         </a>
-                        <span class="caret"></span>
-                    </span>
-                </h1>
-                <ul class="dropdown-menu">
-                    {% for organization in organizations %}
-                        <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
-                            <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash">
-                                {{- organization.name -}}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
         <script type="text/javascript">
             require(['orosecurity/js/init-organization-selector'])
         </script>
     {% else %}{# if organizations|length == 1 #}
         <h1 class="logo">
-            <span>
-                <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
+                {% if oro_theme_logo() %}
+                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
+                {% else %}
                     {{- organization_name -}}
-                </a>
-            </span>
+                {% endif %}
+            </a>
         </h1>
     {% endif %}
 {% endif %}
 
-{% macro organization_name(organization_name) %}
+{% macro organization_name_and_logo(organization_name) %}
     {% if organization_name|length %}
-        <h1 class="logo logo-text">
+        {% set logo = oro_theme_logo() %}
+        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
             <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
-                {{- organization_name -}}
+                {% if logo %}
+                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
+                {% else %}
+                    {{- organization_name -}}
+                {% endif %}
             </a>
         </h1>
     {% else %}

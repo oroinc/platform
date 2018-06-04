@@ -1,9 +1,12 @@
+/* @theme: admin.oro; */
 
-.desktop-version #oroplatform-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
-  right: 6px;
+.desktop-version {
+  .app-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
+    right: -7px;
+  }
 }
 
-#oroplatform-header .nav.pull-right {
+.app-header .nav.pull-right {
   li.email-notification-menu.dropdown .dropdown-menu li a {
     padding: 0;
   }

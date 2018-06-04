@@ -17,14 +17,13 @@ Retrieve a set of attachment records.
 ### create
 
 Create a new attachment record.
-The created record is returned in the response body.
+
+The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/attachments>`
 
 ```JSON
 {  
@@ -72,8 +71,6 @@ Edit a specific attachment record.
 
 {@request:json_api}
 Example:
-
-`</api/attachments/3>`
 
 ```JSON
 {  
@@ -123,7 +120,6 @@ Delete a specific attachment record.
 ### delete_list
 
 Delete a set of attachment records.
-The list of records to be deleted can be limited by filters.
 
 {@inheritdoc}
 
@@ -182,8 +178,6 @@ Replace the file assigned to a specific attachment record.
 {@request:json_api}
 Example:
 
-`</api/attachments/1/relationships/file>`
-
 ```JSON
 {
   "data": {
@@ -210,8 +204,6 @@ Replace the organization that a specific attachment record belongs to.
 
 {@request:json_api}
 Example:
-
-`</api/attachments/1/relationships/organization>`
 
 ```JSON
 {
@@ -240,8 +232,6 @@ Replace the owner of a specific attachment record.
 {@request:json_api}
 Example:
 
-`</api/attachments/1/relationships/owner>`
-
 ```JSON
 {
   "data": {
@@ -268,8 +258,6 @@ Replace the record which the attachment belongs to.
 
 {@request:json_api}
 Example:
-
-`</api/attachments/1/relationships/target>`
 
 ```JSON
 {

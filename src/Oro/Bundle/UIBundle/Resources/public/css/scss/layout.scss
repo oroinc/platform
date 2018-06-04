@@ -1,13 +1,4 @@
-body,
-#page,
-#top-page {
-    height: 100%;
-    overflow: hidden; // prevents scroll bar appearance
-}
-
-html{
-    overflow-x: auto;
-}
+/* @theme: admin.oro; */
 
 @mixin responsive-inline-position() {
     float: left;
