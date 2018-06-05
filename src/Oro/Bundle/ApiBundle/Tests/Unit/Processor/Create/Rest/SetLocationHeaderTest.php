@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -35,11 +36,17 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
+
         $this->processor = new SetLocationHeader(
             self::ITEM_ROUTE_NAME,
             $this->router,
             $this->valueNormalizer,
-            $this->entityIdTransformer
+            $entityIdTransformerRegistry
         );
     }
 
