@@ -73,7 +73,8 @@ define(function(require) {
         events: {
             'change select': 'onChange',
             'click [data-action]': 'rethrowAction',
-            'updatePosition': 'onUpdatePosition'
+            'updatePosition': 'onUpdatePosition',
+            'click [data-role="apply"]': 'onApplyChanges'
         },
 
         listen: {
@@ -87,6 +88,11 @@ define(function(require) {
             MultiCheckboxEditorView.__super__.constructor.apply(this, arguments);
         },
 
+        onApplyChanges: function() {
+            this.prestine = false;
+            this.multiselect.multiselect('close');
+        },
+
         onShow: function() {
             this.multiselect = this.$('select').multiselect({
                 autoOpen: true,
@@ -98,6 +104,7 @@ define(function(require) {
                     at: 'left top',
                     of: this.$el
                 },
+                outerTrigger: this.$('[data-role="apply"]'),
                 beforeclose: function() {
                     if (this.prestine) {
                         this.trigger('cancelAction');
