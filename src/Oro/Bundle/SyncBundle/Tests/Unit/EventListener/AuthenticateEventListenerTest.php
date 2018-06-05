@@ -2,41 +2,49 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
+use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\QueryString;
 use Guzzle\Http\Url;
-//use JDare\ClankBundle\Event\ClientEvent;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampConnection;
 use Ratchet\WebSocket\Version\RFC6455\Connection;
 
 class AuthenticateEventListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AuthenticateEventListener */
-    private $listener;
+    use LoggerAwareTraitTestTrait;
 
-    /** @var QueryString */
-    private $query;
-
-    /** @var ClientEvent */
-    private $event;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var TicketProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $ticketProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $logger;
+    /**
+     * @var AuthenticateEventListener
+     */
+    private $authenticateEventListener;
+
+    /**
+     * @var QueryString
+     */
+    private $query;
+
+    /**
+     * @var ClientEvent
+     */
+    private $clientEvent;
 
     protected function setUp()
     {
-        $this->markTestSkipped('Should be unskipped in scope of BAP-16769');
         $this->ticketProvider = $this->createMock(TicketProvider::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->listener = new AuthenticateEventListener($this->ticketProvider, $this->logger);
+        $this->authenticateEventListener = new AuthenticateEventListener($this->ticketProvider);
+
+        $this->setUpLoggerMock($this->authenticateEventListener);
 
         $this->query = new QueryString();
 
@@ -46,70 +54,57 @@ class AuthenticateEventListenerTest extends \PHPUnit_Framework_TestCase
         $request = new EntityEnclosingRequest('http', 'http://domain.com');
         $request->setUrl($url);
 
-        $webSocket = new \stdClass();
-        $webSocket->request = $request;
+        $conn = $this->createMock(ConnectionInterface::class);
+        $conn->WebSocket = new \StdClass();
+        $conn->WebSocket->request = $request;
+        $conn->WebSocket->established = false;
+        $conn->WebSocket->closing = false;
 
-        $connection = new WampConnection(new Connection($this->createMock(ConnectionInterface::class)));
-        $connection->WebSocket = $webSocket;
-        $connection->remoteAddress = 'localhost';
-        $connection->resourceId = 45654;
+        $connection = new WampConnection(new Connection($conn));
 
-        $this->event = new ClientEvent($connection, 1);
+        $this->clientEvent = new ClientEvent($connection, 1);
     }
 
     public function testOnClientConnectWithoutTicketInUrl()
     {
-        $this->logger->expects($this->once())
-            ->method('warning')
-            ->with(
-                'Sync ticket was not found in the request',
-                ['remoteAddress' => 'localhost', 'connectionId' => 45654]
-            );
+        $this->assertLoggerWarningMethodCalled();
 
-        $this->listener->onClientConnect($this->event);
+        $this->authenticateEventListener->onClientConnect($this->clientEvent);
 
-        $this->assertFalse($this->event->getConnection()->Authenticated);
+        self::assertFalse($this->clientEvent->getConnection()->Authenticated);
     }
 
     public function testOnClientConnectWithValidTicketInUrl()
     {
         $this->query->add('ticket', 'valid_ticket');
 
-        $this->ticketProvider->expects($this->once())
+        $this->ticketProvider
+            ->expects(self::once())
             ->method('isTicketValid')
             ->with('valid_ticket')
             ->willReturn(true);
 
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with(
-                'Sync ticket was found in the request',
-                ['remoteAddress' => 'localhost', 'connectionId' => 45654]
-            );
+        $this->assertLoggerDebugMethodCalled();
 
-        $this->listener->onClientConnect($this->event);
+        $this->authenticateEventListener->onClientConnect($this->clientEvent);
 
-        $this->assertTrue($this->event->getConnection()->Authenticated);
+        self::assertTrue($this->clientEvent->getConnection()->Authenticated);
     }
 
-    public function testOnClientConnectWithValidNotTicketInUrl()
+    public function testOnClientConnectWithInvalidTicketInUrl()
     {
         $this->query->add('ticket', 'not_valid_ticket');
 
-        $this->ticketProvider->expects($this->once())
+        $this->ticketProvider
+            ->expects(self::once())
             ->method('isTicketValid')
             ->with('not_valid_ticket')
             ->willReturn(false);
 
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with(
-                'Sync ticket was found in the request',
-                ['remoteAddress' => 'localhost', 'connectionId' => 45654]
-            );
+        $this->assertLoggerDebugMethodCalled();
 
-        $this->listener->onClientConnect($this->event);
+        $this->authenticateEventListener->onClientConnect($this->clientEvent);
 
-        $this->assertFalse($this->event->getConnection()->Authenticated);
+        self::assertFalse($this->clientEvent->getConnection()->Authenticated);
     }
 }

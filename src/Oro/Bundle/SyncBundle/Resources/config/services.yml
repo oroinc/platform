@@ -25,7 +25,7 @@ services:
 #    oro_wamp.client.ping:
 #        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
 #        arguments:
-#            - '@oro_sync.authentication.topic_handler'
+#            - '@oro_sync.authentication.ticket_authentication_aware_topic_dispatcher_decorator'
 #            - '@logger'
 
     oro_wamp.twig.sync_extension:
@@ -93,21 +93,22 @@ services:
             - '@logger'
             - '%secret%'
 
-    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
-#    oro_sync.authentication.topic_handler:
-#        class: Oro\Bundle\SyncBundle\Authentication\AuthenticationTopicHandler
-#        decorates: jdare_clank.clank_handler_topic
-#        arguments:
-#            - '@oro_sync.authentication.topic_handler.inner'
-#            - '@logger'
+    oro_sync.authentication.ticket_authentication_aware_topic_dispatcher_decorator:
+        class: 'Oro\Bundle\SyncBundle\Authentication\TicketAuthenticationAwareTopicDispatcherDecorator'
+        decorates: gos_web_socket.topic.dispatcher
+        arguments:
+            - '@oro_sync.authentication.ticket_authentication_aware_topic_dispatcher_decorator.inner'
+            - '@oro_sync.registry.subscribed_topics'
+        calls:
+            - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]
 
-#    oro_sync.authentication.listener:
-#        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
-#        arguments:
-#            - '@oro_sync.authentication.ticket_provider'
-#            - '@logger'
-#        tags:
-#            - { name: kernel.event_listener, event: clank.client.connected, method: onClientConnect }
+    oro_sync.authentication.listener:
+        class: Oro\Bundle\SyncBundle\EventListener\AuthenticateEventListener
+        arguments:
+            - '@oro_sync.authentication.ticket_provider'
+            - '@logger'
+        tags:
+            - { name: kernel.event_listener, event: gos_web_socket.client_connected, method: onClientConnect }
 
     oro_sync.authentication.ticket_storage_cache:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestStorage\CacheTicketDigestStorage
@@ -120,3 +121,7 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_sync_auth_tickets' ]]
+
+    oro_sync.registry.subscribed_topics:
+        class: 'Oro\Bundle\SyncBundle\Registry\SubscribedTopicsRegistry'
+        public: false

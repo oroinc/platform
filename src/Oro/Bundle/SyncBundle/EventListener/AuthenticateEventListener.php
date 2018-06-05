@@ -2,30 +2,32 @@
 
 namespace Oro\Bundle\SyncBundle\EventListener;
 
+use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
 use Guzzle\Http\Message\RequestInterface;
-use JDare\ClankBundle\Event\ClientEvent;
-use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Authenticate WAMP connection by Sync authentication ticket.
  */
-class AuthenticateEventListener
+class AuthenticateEventListener implements LoggerAwareInterface
 {
-    /** @var TicketProvider */
-    private $ticketProvider;
-
-    /** @var LoggerInterface */
-    private $logger;
+    use LoggerAwareTrait;
 
     /**
-     * @param TicketProvider $ticketProvider
-     * @param LoggerInterface $logger
+     * @var TicketProviderInterface
      */
-    public function __construct(TicketProvider $ticketProvider, LoggerInterface $logger)
+    private $ticketProvider;
+
+    /**
+     * @param TicketProviderInterface $ticketProvider
+     */
+    public function __construct(TicketProviderInterface $ticketProvider)
     {
         $this->ticketProvider = $ticketProvider;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -40,23 +42,18 @@ class AuthenticateEventListener
         $request = $conn->WebSocket->request;
         $ticket = '';
 
-        // try to find the ticket at requested URL
+        // Try to find the ticket at requested URL.
         $requestUrl = $request->getUrl(true);
         if ($requestUrl->getQuery()->get('ticket')) {
             $ticket = (string)$requestUrl->getQuery()->get('ticket');
         }
 
         if ($ticket) {
-            $this->logger->info(
-                'Sync ticket was found in the request',
-                ['remoteAddress' => $conn->remoteAddress, 'connectionId' => $conn->resourceId]
-            );
             $conn->Authenticated = $this->ticketProvider->isTicketValid($ticket);
+
+            $this->logger->debug('Sync ticket was found in the request', \func_get_args());
         } else {
-            $this->logger->warning(
-                'Sync ticket was not found in the request',
-                ['remoteAddress' => $conn->remoteAddress, 'connectionId' => $conn->resourceId]
-            );
+            $this->logger->warning('Sync ticket was not found in the request', \func_get_args());
         }
     }
 }
