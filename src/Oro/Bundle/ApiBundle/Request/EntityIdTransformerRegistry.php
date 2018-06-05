@@ -34,9 +34,9 @@ class EntityIdTransformerRegistry
      *
      * @param RequestType $requestType
      *
-     * @return EntityIdTransformerInterface|null
+     * @return EntityIdTransformerInterface
      */
-    public function getEntityIdTransformer(RequestType $requestType)
+    public function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         $cacheKey = (string)$requestType;
         if (\array_key_exists($cacheKey, $this->cache)) {
@@ -49,6 +49,9 @@ class EntityIdTransformerRegistry
                 $entityIdTransformer = $transformer;
                 break;
             }
+        }
+        if (null === $entityIdTransformer) {
+            $entityIdTransformer = NullEntityIdTransformer::getInstance();
         }
 
         $this->cache[$cacheKey] = $entityIdTransformer;

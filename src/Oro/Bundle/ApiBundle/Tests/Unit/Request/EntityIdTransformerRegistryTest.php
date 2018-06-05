@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
 class EntityIdTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $transformer1;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    private $transformer1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $transformer2;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    private $transformer2;
 
     /** @var EntityIdTransformerRegistry */
     protected $registry;
@@ -42,7 +43,8 @@ class EntityIdTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityIdTransformerForUnknownRequestType()
     {
-        self::assertNull(
+        self::assertSame(
+            NullEntityIdTransformer::getInstance(),
             $this->registry->getEntityIdTransformer(new RequestType(['another']))
         );
     }

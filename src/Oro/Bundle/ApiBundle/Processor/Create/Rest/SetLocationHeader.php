@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Create\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -27,25 +29,25 @@ class SetLocationHeader implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    private $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /**
-     * @param string                       $itemRouteName
-     * @param RouterInterface              $router
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param string                      $itemRouteName
+     * @param RouterInterface             $router
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
         string $itemRouteName,
         RouterInterface $router,
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
         $this->itemRouteName = $itemRouteName;
         $this->router = $router;
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -72,13 +74,13 @@ class SetLocationHeader implements ProcessorInterface
             return;
         }
 
+        $requestType = $context->getRequestType();
         $entityType = ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $context->getClassName(),
-            $context->getRequestType()
+            $requestType
         );
-
-        $entityId = $this->entityIdTransformer->transform($entityId, $metadata);
+        $entityId = $this->getEntityIdTransformer($requestType)->transform($entityId, $metadata);
 
         $location = $this->router->generate(
             $this->itemRouteName,
@@ -87,5 +89,15 @@ class SetLocationHeader implements ProcessorInterface
         );
 
         $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $location);
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }

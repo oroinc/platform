@@ -76,7 +76,8 @@ abstract class RestApiTestCase extends ApiTestCase
             $config->getDefinition()
         );
 
-        return self::getContainer()->get('oro_api.rest.entity_id_transformer')
+        return self::getContainer()->get('oro_api.entity_id_transformer_registry')
+            ->getEntityIdTransformer($this->getRequestType())
             ->transform($entityId, $metadata);
     }
 }
