@@ -74,11 +74,17 @@ define(function(require) {
         events: {
             'change select': 'onChange',
             'click [data-action]': 'rethrowAction',
-            'updatePosition': 'onUpdatePosition'
+            'updatePosition': 'onUpdatePosition',
+            'click [data-role="apply"]': 'onApplyChanges'
         },
 
         listen: {
             'change:visibility': 'onShow'
+        },
+
+        onApplyChanges: function() {
+            this.prestine = false;
+            this.multiselect.multiselect('close');
         },
 
         onShow: function() {
@@ -92,6 +98,7 @@ define(function(require) {
                     at: 'left top',
                     of: this.$el
                 },
+                outerTrigger: this.$('[data-role="apply"]'),
                 beforeclose: function() {
                     if (this.prestine) {
                         this.trigger('cancelAction');
