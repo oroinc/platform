@@ -31,7 +31,7 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
         $expectedOptions = [
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
             'entityClass' => 'TestEntityClass',
-            'choices' => [1 => 'First Segment', 5 => 'Second Segment'],
+            'choices' => ['First Segment' => 1, 'Second Segment' => 5],
         ];
 
         $repo = $this->getMockBuilder(ObjectRepository::class)
@@ -40,7 +40,7 @@ class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repo->expects($this->once())
             ->method('findByEntity')
-            ->willReturn([1 => 'First Segment', 5 => 'Second Segment']);
+            ->willReturn(['First Segment' => 1, 'Second Segment' => 5]);
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->once())
             ->method('getRepository')

@@ -5,9 +5,11 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\EventSubscriber;
 use Monolog\Logger;
 use Oro\Bundle\LoggerBundle\EventSubscriber\ConsoleCommandSubscriber;
 use Oro\Component\Testing\Unit\Command\Stub\InputStub;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +34,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 ConsoleEvents::COMMAND => [['onConsoleCommand', -1]],
-                ConsoleEvents::EXCEPTION => [['onConsoleException', -1]]
+                ConsoleEvents::ERROR => [['onConsoleError', -1]]
             ],
             ConsoleCommandSubscriber::getSubscribedEvents()
         );
@@ -100,27 +102,15 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
      * @param array $arguments
      * @param array $options
      */
-    public function testOnConsoleException(array $arguments, array $options)
+    public function testOnConsoleError(array $arguments, array $options)
     {
         $input = new InputStub('test:command', $arguments, $options);
 
-        /** @var ConsoleExceptionEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(ConsoleExceptionEvent::class);
+        $exception = new \Exception('exception message', 3);
 
-        $event->expects($this->once())
-            ->method('getInput')
-            ->will($this->returnValue($input));
+        $event  = new ConsoleErrorEvent($input, new OutputStub(), $exception, new Command('test:command'));
 
-        $event->expects($this->once())
-            ->method('getExitCode')
-            ->will($this->returnValue(0));
-
-        $exception = new \Exception('exception message');
-        $event->expects($this->exactly(2))
-            ->method('getException')
-            ->will($this->returnValue($exception));
-
-        $context = ['exit_code' => 0, 'exception' => $exception];
+        $context = ['exit_code' => 3, 'exception' => $exception];
 
         if ($arguments) {
             $context['arguments'] = $arguments;
@@ -142,7 +132,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
                 $context
             );
 
-        $this->subscriber->onConsoleException($event);
+        $this->subscriber->onConsoleError($event);
     }
 
     /**

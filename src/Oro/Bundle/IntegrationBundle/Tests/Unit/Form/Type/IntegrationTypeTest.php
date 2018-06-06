@@ -44,11 +44,6 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($this->builder, []);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_integration_channel_form', $this->type->getName());
-    }
-
     public function testConfigureOptions()
     {
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');

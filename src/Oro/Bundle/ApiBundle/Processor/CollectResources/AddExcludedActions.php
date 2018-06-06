@@ -16,7 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddExcludedActions implements ProcessorInterface
 {
-    /** the name of the Context item to store the configuration of "actions" section */
+    /** the name of the context item to store the configuration of "actions" section */
     const ACTIONS_CONFIG_KEY = 'actions_config';
 
     /** @var ConfigLoaderFactory */

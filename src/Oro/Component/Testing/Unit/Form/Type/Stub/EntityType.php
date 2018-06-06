@@ -4,6 +4,7 @@ namespace Oro\Component\Testing\Unit\Form\Type\Stub;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -43,7 +44,6 @@ class EntityType extends AbstractType
             'query_builder' => null,
             'create_enabled' => false,
             'class' => null,
-            'property' => null
         ];
 
         if ($this->options) {
@@ -74,7 +74,7 @@ class EntityType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

@@ -4,7 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber as IntegrationFormSubscriber;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
+use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -42,23 +45,24 @@ class ChannelType extends AbstractType
 
         $builder->add(
             self::TYPE_FIELD_NAME,
-            'oro_integration_type_select',
+            IntegrationTypeSelectType::class,
             [
                 'required' => true,
-                'label'    => 'oro.integration.integration.type.label',
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'label'    => 'oro.integration.integration.type.label'
             ]
         );
-        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
+        $builder->add('name', TextType::class, [
+            'required' => true,
+            'label' => 'oro.integration.integration.name.label'
+        ]);
 
         $builder->add(
             'enabled',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'  => [
-                    true    => 'oro.integration.integration.enabled.active.label',
-                    false   => 'oro.integration.integration.enabled.inactive.label'
+                    'oro.integration.integration.enabled.active.label' => true,
+                    'oro.integration.integration.enabled.inactive.label' => false,
                 ],
                 'required' => true,
                 'label'    => 'oro.integration.integration.enabled.label',
@@ -68,36 +72,32 @@ class ChannelType extends AbstractType
         // add transport type selector
         $builder->add(
             'transportType',
-            'choice',
+            ChoiceType::class,
             [
                 'label'       => 'oro.integration.integration.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
-                'constraints' => new NotBlank(),
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'constraints' => new NotBlank()
             ]
         );
 
         // add connectors
         $builder->add(
             'connectors',
-            'choice',
+            ChoiceType::class,
             [
                 'label'    => 'oro.integration.integration.connectors.label',
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
-                'required' => false,
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values' => true
+                'required' => false
             ]
         );
 
         // add default owner
         $builder->add(
             'defaultUserOwner',
-            'oro_user_organization_acl_select',
+            OrganizationUserAclSelectType::class,
             [
                 'required'    => true,
                 'label'       => 'oro.integration.integration.default_user_owner.label',

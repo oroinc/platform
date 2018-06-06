@@ -2,10 +2,10 @@ knp_gaufrette:
     adapters:
         attachments:
             local:
-                directory: '%kernel.root_dir%/%oro_attachment.attachments_dir%'
+                directory: '%kernel.project_dir%/var/%oro_attachment.attachments_dir%'
         mediacache:
             local:
-                directory: '%kernel.root_dir%/../web/%oro_attachment.media_cache_dir%'
+                directory: '%kernel.project_dir%/public/%oro_attachment.media_cache_dir%'
     filesystems:
         attachments:
             adapter:    attachments

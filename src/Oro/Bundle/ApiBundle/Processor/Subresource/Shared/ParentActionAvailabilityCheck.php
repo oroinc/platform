@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Validates whether an access to the requested action of entity specified
- * in the "parentClass" property of the Context is granted.
+ * in the "parentClass" property of the context is granted.
  */
 class ParentActionAvailabilityCheck implements ProcessorInterface
 {

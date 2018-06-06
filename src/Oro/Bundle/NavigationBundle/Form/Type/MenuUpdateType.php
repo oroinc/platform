@@ -3,9 +3,12 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -41,7 +44,7 @@ class MenuUpdateType extends AbstractType
                 $menuUpdate = $event->getData();
                 $form->add(
                     'uri',
-                    'text',
+                    TextType::class,
                     [
                         'disabled' => false === $menuUpdate->isCustom(),
                         'required' => false !== $menuUpdate->isCustom(),
@@ -51,7 +54,7 @@ class MenuUpdateType extends AbstractType
                 if (null !== $options['menu_item'] && !empty($menuItem->getExtra('acl_resource_id'))) {
                     $form->add(
                         'aclResourceId',
-                        'text',
+                        TextType::class,
                         [
                             'label' => 'oro.navigation.menuupdate.acl_resource_id.label',
                             'mapped' => false,
@@ -65,7 +68,7 @@ class MenuUpdateType extends AbstractType
 
         $builder->add(
             'icon',
-            'oro_icon_select',
+            OroIconType::class,
             [
                 'required' => false,
             ]
@@ -77,7 +80,7 @@ class MenuUpdateType extends AbstractType
             [
                 'required' => false,
                 'label' => 'oro.navigation.menuupdate.description.label',
-                'entry_type' => 'textarea',
+                'entry_type' => TextareaType::class,
                 'field' => 'text',
             ]
         );

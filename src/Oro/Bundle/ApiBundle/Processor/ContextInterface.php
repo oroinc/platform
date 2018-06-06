@@ -17,6 +17,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
+/**
+ * Provides an interface for base execution context for Data API processors.
+ */
 interface ContextInterface extends ComponentContextInterface
 {
     /**
@@ -54,6 +57,13 @@ interface ContextInterface extends ComponentContextInterface
      * @param string $className
      */
     public function setClassName($className);
+
+    /**
+     * Checks whether metadata of an entity has at least one identifier field.
+     *
+     * @return bool
+     */
+    public function hasIdentifierFields();
 
     /**
      * Gets request headers.

@@ -25,7 +25,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - oro_business_unit_form
-            - oro_business_unit
+            - Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType
 
     oro_organization.form.type.business_unit:
         class: '%oro_organization.form.type.business_unit.class%'
@@ -65,7 +65,7 @@ services:
     oro_organization.form.business_unit.api:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
-        arguments: ["business_unit", "business_unit", null]
+        arguments: ["business_unit", Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType, null]
 
     oro_organization.form.handler.business_unit.api:
         class: '%oro_organization.form.handler.business_unit.class%'
@@ -106,7 +106,7 @@ services:
         factory: ['@form.factory', createNamed]
         arguments:
             - 'oro_organization_form'
-            - 'oro_organization'
+            - Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
 
     oro_organization.form.handler.organization:
         class: '%oro_organization.form.handler.organization.class%'
@@ -198,4 +198,4 @@ services:
             - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         tags:
-            - { name: oro_dashboard.value.converter, alias: 'oro_type_widget_business_unit_select' }
+            - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType }

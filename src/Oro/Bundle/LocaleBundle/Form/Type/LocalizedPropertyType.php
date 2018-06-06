@@ -44,7 +44,7 @@ class LocalizedPropertyType extends AbstractType
                 $formType,
                 array_merge($formOptions, ['label' => 'oro.locale.fallback.value.default'])
             )
-            ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::NAME, [
+            ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::class, [
                 'entry_type' => $formType, 'entry_options' => $formOptions
             ]);
 

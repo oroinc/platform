@@ -9,10 +9,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMigrationExtension extends Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function load(array $config, ContainerBuilder $container)
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.yml');
+        $loader->load('commands.yml');
     }
 }

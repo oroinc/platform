@@ -9,6 +9,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
+/**
+ * Performs search indexation (save and delete) for ORM engine at standard search index
+ */
 class OrmIndexer extends AbstractIndexer
 {
     /** @var SearchIndexRepository */
@@ -93,10 +96,13 @@ class OrmIndexer extends AbstractIndexer
      */
     public function resetIndex($class = null, array $context = [])
     {
-        if (false == $class) {
+        if (null === $class) {
             $this->clearAllSearchIndexes();
         } else {
-            $this->clearSearchIndexForEntity($class);
+            $resetClasses = (array)$class;
+            foreach ($resetClasses as $resetClass) {
+                $this->clearSearchIndexForEntity($resetClass);
+            }
         }
     }
 

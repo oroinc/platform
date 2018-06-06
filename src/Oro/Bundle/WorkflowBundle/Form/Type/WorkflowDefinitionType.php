@@ -43,7 +43,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'related_entity',
-                ApplicableEntitiesType::NAME,
+                ApplicableEntitiesType::class,
                 [
                     'label' => 'oro.workflow.workflowdefinition.related_entity.label',
                     'required' => true,
@@ -62,7 +62,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'transition_prototype_icon',
-                OroIconType::NAME,
+                OroIconType::class,
                 [
                     'label' => 'oro.workflow.form.button_icon.label',
                     'mapped' => false,
@@ -72,7 +72,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'exclusive_active_groups',
-                OroChoiceType::NAME,
+                OroChoiceType::class,
                 [
                     'choices' => $this->provider->getActiveGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_active_groups.label',
@@ -83,7 +83,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'exclusive_record_groups',
-                OroChoiceType::NAME,
+                OroChoiceType::class,
                 [
                     'choices' => $this->provider->getRecordGroupsChoices(),
                     'label' => 'oro.workflow.workflowdefinition.exclusive_record_groups.label',

@@ -10,6 +10,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * ORM standard search engine
+ */
 class Orm extends AbstractEngine
 {
     const ENGINE_NAME = 'orm';

@@ -11,10 +11,11 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
@@ -88,7 +89,15 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
         $mockEntityType->expects($this->any())->method('getName')->willReturn('entity');
 
-        return [new PreloadedExtension([$mockEntityType->getName() => $mockEntityType], [])];
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type,
+                    EntityType::class => $mockEntityType
+                ],
+                []
+            )
+        ];
     }
 
     public function testGetName()
@@ -98,7 +107,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('entity', $this->type->getParent());
+        $this->assertEquals(EntityType::class, $this->type->getParent());
     }
 
     /**
@@ -111,7 +120,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
      */
     public function testNormalizersException(array $options)
     {
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
     public function testNormalizersByWorkflowName()
@@ -126,7 +135,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->assertQueryBuilderCalled();
 
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
     public function testNormalizersByEntityClass()
@@ -141,7 +150,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->assertQueryBuilderCalled();
 
-        $this->factory->create($this->type, null, $options);
+        $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
     public function testFinishViewWithOneWorkflow()
@@ -285,7 +294,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             [
                 [
                     'class' => 'OroWorkflowBundle:WorkflowStep',
-                    'property' => 'label'
+                    'choice_label' => 'label'
                 ]
             ]
         ];

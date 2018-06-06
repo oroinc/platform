@@ -34,7 +34,10 @@ class AddExcludedActionsForNotAccessibleResources implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             if (!isset($accessibleResources[$resource->getEntityClass()])) {
-                $resource->setExcludedActions($allActions);
+                $excludedActions = $resource->getExcludedActions();
+                if (empty($excludedActions)) {
+                    $resource->setExcludedActions($allActions);
+                }
             }
         }
     }

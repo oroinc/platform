@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+/**
+ * Represents Data API sub-resource.
+ */
 class ApiSubresource
 {
     /** @var string */
-    protected $targetClassName;
+    private $targetClassName;
 
     /** @var string[] */
-    protected $acceptableTargetClassNames;
+    private $acceptableTargetClassNames;
 
     /** @var bool */
-    protected $isCollection;
+    private $isCollection;
 
     /** @var string[] */
-    protected $excludedActions = [];
+    private $excludedActions = [];
 
     /**
      * Gets the target entity class name.
@@ -43,9 +46,7 @@ class ApiSubresource
      */
     public function getAcceptableTargetClassNames()
     {
-        return null !== $this->acceptableTargetClassNames
-            ? $this->acceptableTargetClassNames
-            : [];
+        return $this->acceptableTargetClassNames ?? [];
     }
 
     /**
@@ -107,7 +108,7 @@ class ApiSubresource
      */
     public function isExcludedAction($action)
     {
-        return in_array($action, $this->excludedActions, true);
+        return \in_array($action, $this->excludedActions, true);
     }
 
     /**
@@ -117,7 +118,7 @@ class ApiSubresource
      */
     public function addExcludedAction($action)
     {
-        if (!in_array($action, $this->excludedActions, true)) {
+        if (!\in_array($action, $this->excludedActions, true)) {
             $this->excludedActions[] = $action;
         }
     }
@@ -129,10 +130,10 @@ class ApiSubresource
      */
     public function removeExcludedAction($action)
     {
-        $key = array_search($action, $this->excludedActions, true);
+        $key = \array_search($action, $this->excludedActions, true);
         if (false !== $key) {
             unset($this->excludedActions[$key]);
-            $this->excludedActions = array_values($this->excludedActions);
+            $this->excludedActions = \array_values($this->excludedActions);
         }
     }
 }

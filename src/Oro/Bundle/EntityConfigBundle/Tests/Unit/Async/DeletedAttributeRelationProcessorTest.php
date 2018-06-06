@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Async;
 
 use Doctrine\DBAL\Driver\AbstractDriverException;
+use Doctrine\DBAL\Driver\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -109,9 +110,15 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit_Framework_TestCase
         $exception = $this->getMockBuilder(AbstractDriverException::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $driverException = $this->createMock(DriverException::class);
+        $this->databaseExceptionHelper->expects($this->once())
+            ->method('getDriverException')
+            ->with($exception)
+            ->willReturn($driverException);
         $this->databaseExceptionHelper->expects($this->once())
             ->method('isDeadlock')
-            ->with($exception)
+            ->with($driverException)
             ->willReturn(true);
 
         $this->deletedAttributeProvider->expects($this->once())

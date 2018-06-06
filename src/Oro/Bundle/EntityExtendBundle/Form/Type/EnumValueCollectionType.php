@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -34,7 +35,7 @@ class EnumValueCollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'handle_primary' => false,
-                'type'           => 'oro_entity_extend_enum_value'
+                'entry_type'     => EnumValueType::class
             ]
         );
 
@@ -45,7 +46,7 @@ class EnumValueCollectionType extends AbstractType
             }
         )
         ->setNormalizer(
-            'options',
+            'entry_options',
             function (Options $options, $value) {
                 return array_replace(
                     ['allow_multiple_selection' => ($this->isMultipleSelectEnable($options['config_id']))],
@@ -137,7 +138,7 @@ class EnumValueCollectionType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_collection';
+        return CollectionType::class;
     }
 
     /**

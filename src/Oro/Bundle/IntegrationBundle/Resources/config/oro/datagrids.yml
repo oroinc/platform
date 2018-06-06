@@ -27,8 +27,8 @@ datagrids:
                 label:          oro.integration.integration.enabled.label
                 frontend_type:  select
                 choices:
-                    enabled:  oro.integration.integration.enabled.active.label
-                    disabled: oro.integration.integration.enabled.inactive.label
+                    oro.integration.integration.enabled.active.label: enabled
+                    oro.integration.integration.enabled.inactive.label: disabled
         properties:
             id: ~
             update_link:
@@ -61,8 +61,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                - oro.integration.integration.enabled.inactive.label
-                                - oro.integration.integration.enabled.active.label
+                                oro.integration.integration.enabled.inactive.label: 0
+                                oro.integration.integration.enabled.active.label: 1
         actions:
             update:
                 type:         navigate
@@ -111,8 +111,8 @@ datagrids:
                 label:          oro.integration.integration_status.code.label
                 frontend_type:  select
                 choices:
-                    1:  oro.integration.integration_status.competed.label
-                    2:  oro.integration.integration_status.failed.label
+                    oro.integration.integration_status.competed.label: 1
+                    oro.integration.integration_status.failed.label: 2
             connector:
                 type:     callback
                 label:    oro.integration.integration_status.connector.label
@@ -143,8 +143,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                1:  oro.integration.integration_status.competed.label
-                                2:  oro.integration.integration_status.failed.label
+                                oro.integration.integration_status.competed.label: 1
+                                oro.integration.integration_status.failed.label: 2
                 connector:
                     type:      choice
                     data_name: s.connector

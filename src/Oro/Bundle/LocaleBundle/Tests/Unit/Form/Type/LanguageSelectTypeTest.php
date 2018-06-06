@@ -12,8 +12,9 @@ use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class LanguageSelectTypeTest extends FormIntegrationTestCase
 {
@@ -30,8 +31,6 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
 
         $metadata = $this->createMock(ClassMetadataInfo::class);
@@ -55,11 +54,12 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
             ->willReturn($manager);
 
         $this->formType = new LanguageSelectType($this->provider, $this->registry);
+        parent::setUp();
     }
 
     public function testGetParent()
     {
-        $this->assertEquals(OroChoiceType::NAME, $this->formType->getParent());
+        $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -69,11 +69,11 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $data =  ['1' => 'English', '2' => 'Spain'];
+        $data =  ['English' => '1', 'Spain' => '2'];
 
         $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(LanguageSelectType::class);
 
         $choices = $form->createView()->vars['choices'];
 
@@ -94,11 +94,11 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit($submittedData, $expectedData)
     {
-        $data =  ['42' => 'English', '2' => 'Spain'];
+        $data =  ['English' => 42, 'Spain' => 2];
 
         $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 
-        $form = $this->factory->create($this->formType);
+        $form = $this->factory->create(LanguageSelectType::class);
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid());
@@ -127,10 +127,16 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
             ->setMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
 
         return [
-            new PreloadedExtension([OroChoiceType::NAME => $choiceType], [])
+            new PreloadedExtension(
+                [
+                    LanguageSelectType::class => $this->formType,
+                    OroChoiceType::class => $choiceType
+                ],
+                []
+            )
         ];
     }
 }

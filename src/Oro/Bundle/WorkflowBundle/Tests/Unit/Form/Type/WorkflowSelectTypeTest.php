@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -30,13 +31,12 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
         $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->type = new WorkflowSelectType($this->registry, $this->translator);
+        parent::setUp();
     }
 
     protected function tearDown()
@@ -44,6 +44,21 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
         parent::tearDown();
 
         unset($this->registry, $this->type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [
+                    $this->type
+                ],
+                []
+            ),
+        ];
     }
 
     /**
@@ -70,7 +85,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->with(WorkflowDefinition::class)
             ->will($this->returnValue($repository));
 
-        $form = $this->factory->create($this->type, null, $inputOptions);
+        $form = $this->factory->create(WorkflowSelectType::class, null, $inputOptions);
 
         $actualOptions = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -106,7 +121,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                 ],
                 'expectedOptions' => [
                     'entity_class' => self::TEST_ENTITY_CLASS,
-                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                    'choices' => [self::TEST_WORKFLOW_LABEL => self::TEST_WORKFLOW_NAME],
                 ]
             ],
             'parent configuration id' => [
@@ -114,7 +129,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
                     'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
                 ],
                 'expectedOptions' => [
-                    'choices' => [self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL],
+                    'choices' => [self::TEST_WORKFLOW_LABEL => self::TEST_WORKFLOW_NAME],
                 ]
             ],
         ];

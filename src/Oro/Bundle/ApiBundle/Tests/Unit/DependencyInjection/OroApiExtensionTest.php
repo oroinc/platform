@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
@@ -56,7 +57,7 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
     private function getConfigExtensionRegistry()
     {
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
-        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
 
         return $configExtensionRegistry;

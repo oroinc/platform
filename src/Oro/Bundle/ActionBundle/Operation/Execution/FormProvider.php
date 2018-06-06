@@ -21,17 +21,17 @@ class FormProvider
     /** @var FormFactoryInterface */
     protected $formFactory;
 
-    /** @var OperationExecutionType */
-    protected $formType;
+    /** @var string */
+    protected $formTypeClass;
 
     /**
      * @param FormFactoryInterface   $formFactory
-     * @param OperationExecutionType $formType
+     * @param string $formTypeClass
      */
-    public function __construct(FormFactoryInterface $formFactory, OperationExecutionType $formType)
+    public function __construct(FormFactoryInterface $formFactory, string $formTypeClass)
     {
         $this->formFactory = $formFactory;
-        $this->formType    = $formType;
+        $this->formTypeClass = $formTypeClass;
     }
 
     /**
@@ -49,7 +49,7 @@ class FormProvider
         $options = ['csrf_token_id' => $tokenId];
 
         try {
-            return $this->formFactory->create($this->formType, $operation, $options);
+            return $this->formFactory->create($this->formTypeClass, $operation, $options);
         } catch (InvalidOptionsException $e) {
             throw new InvalidConfigurationException('Invalid execution form options', $e->getCode(), $e);
         }
@@ -69,7 +69,7 @@ class FormProvider
     {
         $tokenId  = $this->getTokenId($operation, $actionData->getOperationToken());
         $options  = ['csrf_token_id'   => $tokenId];
-        $form = $this->formFactory->create($this->formType, $operation, $options);
+        $form = $this->formFactory->create($this->formTypeClass, $operation, $options);
         $formView = $form->createView();
         $token    = $formView->children[self::CSRF_TOKEN_FIELD];
 

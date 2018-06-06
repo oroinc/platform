@@ -9,7 +9,8 @@ define([
 
     var config = module.config();
     config = _.extend({
-        showLoadingMaskOnStartup: true
+        showLoadingMaskOnStartup: true,
+        showLoadingBarOnStartup: false
     }, config);
 
     /**
@@ -21,9 +22,8 @@ define([
         regions: {
             mainContainer: '#container',
             mainMenu: '#main-menu',
-            userMenu: '#top-page .user-menu',
+            userMenu: '#oroplatform-header .user-menu',
             breadcrumb: '#breadcrumb',
-            leftPanel: '#left-panel',
             beforeContentAddition: '#before-content-addition',
             messages: '#flash-messages .flash-messages-holder'
         }
@@ -102,6 +102,30 @@ define([
     });
 
     /**
+     * Init PageLoadingBarView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/mediator',
+        'oroui/js/app/views/loading-bar-view'
+    ], function(mediator, LoadingBarView) {
+        BaseController.addToReuse('loadingBar', {
+            compose: function() {
+                this.view = new LoadingBarView({
+                    container: '#oroplatform-header',
+                    ajaxLoading: true
+                });
+                mediator.setHandler('showLoadingBar', this.view.showLoader, this.view);
+                mediator.setHandler('hideLoadingBar', this.view.hideLoader, this.view);
+                mediator.on('page:beforeChange', this.view.showLoader, this.view);
+                mediator.on('page:afterChange', this.view.hideLoader, this.view);
+                if (config.showLoadingBarOnStartup) {
+                    this.view.showLoader();
+                }
+            }
+        });
+    });
+
+    /**
      * Init PageMessagesView
      */
     BaseController.loadBeforeAction([
@@ -144,15 +168,22 @@ define([
     }
 
     if (!tools.isMobile()) {
-        /**
-         * Init SidePanelView
-         */
         BaseController.loadBeforeAction([
-            'oroui/js/app/views/side-panel-view'
-        ], function(SidePanelView) {
-            BaseController.addToReuse('leftPanel', SidePanelView, {
-                el: 'region:leftPanel'
-            });
+            'jquery',
+            'oroui/js/app/components/jquery-widget-component',
+            'ready!dom'
+        ], function($, JqueryWidgetComponent) {
+            var $sourceElement = $('#side-menu');
+            if ($sourceElement.length) {
+                BaseController.addToReuse('sideMenu', {
+                    compose: function() {
+                        var options = $sourceElement.data('pageComponentOptions');
+                        $sourceElement.removeAttr('data-page-component-options');
+                        options._sourceElement = $sourceElement;
+                        this.component = new JqueryWidgetComponent(options);
+                    }
+                });
+            }
         });
     }
 });

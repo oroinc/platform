@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -30,7 +31,7 @@ class WorkflowDefinitionNotificationSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-           'class' => WorkflowDefinition::class,
+            'class' => WorkflowDefinition::class,
             'translation_domain' => WorkflowTranslationHelper::TRANSLATION_DOMAIN,
         ]);
         $resolver->setDefined('entityClass');
@@ -77,6 +78,6 @@ class WorkflowDefinitionNotificationSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'oro_select2_entity';
+        return Select2EntityType::class;
     }
 }

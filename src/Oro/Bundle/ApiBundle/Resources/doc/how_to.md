@@ -2,6 +2,8 @@
 
  - [Turn on API for an Entity](#overview)
  - [Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"](#turn-on-api-for-an-entity-disabled-in-resourcesconfigoroentityyml)
+ - [Enable Advanced Operators for String Filter](#enable-advanced-operators-for-string-filter)
+ - [Enable Case-insensitive String Filter](#enable-case-insensitive-string-filter)
  - [Change an ACL Resource for an Action](#change-an-acl-resource-for-an-action)
  - [Disable Access Checks for an Action](#disable-access-checks-for-an-action)
  - [Disable an Entity Action](#disable-an-entity-action)
@@ -15,6 +17,7 @@
  - [Add a Custom Controller](#add-a-custom-controller)
  - [Add a Custom Route](#add-a-custom-route)
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
+ - [Enable API for an Entity Without Identifier](#enable-api-for-an-entity-without-identifier)
  - [Enable Custom API](#enable-custom-api)
 
 
@@ -53,6 +56,65 @@ api:
             fields:
                 field1:
                     exclude: false # override exclude rule from entity.yml
+```
+
+## Enable Advanced Operators for String Filter
+
+By performance reasons the following operators are disabled out of the box:
+
+- `~` (`contains`) - uses `LIKE %text%` to check that a field value contains the text
+- `!~` (`not_contains`) - uses `NOT LIKE %text%` to check that a field value does not contain the text
+- `^` (`starts_with`) - uses `LIKE text%` to check that a field value starts with the text
+- `!^` (`not_starts_with`) - uses `NOT LIKE text%` to check that a field value does not start with the text
+- `$` (`ends_with`) - uses `LIKE %text` to check that a field value ends with the text
+- `!$` (`not_ends_with`) - uses `NOT LIKE %text` to check that a field value does not end with the text
+
+To enable these operators use `operators` option for filters in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        operators: ['=', '!=', '*', '!*', '~', '!~', '^', '!^', '$', '!$']
+```
+
+## Enable Case-insensitive String Filter
+
+Depending on the [collation](https://en.wikipedia.org/wiki/Collation) settings of your database the case-insensitive
+filtering may be already enforced to be used on the database level. For example, if you are using MySQL database with
+`utf8_unicode_ci` collation you do not need to do anything to enable the case-insensitive filtering. But if the
+collation of your database or a particular field is not case-insensitive and you need to enable the case-insensitive
+filtering for this field, you can use `case_insensitive` option for a filter in `Resources/config/oro/api.yml`, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            case_insensitive: true
+```
+
+**Please note** that the `LOWER` function will be used in this case and it can impact performace
+if there is no [proper index](https://use-the-index-luke.com/sql/where-clause/functions/case-insensitive-search).
+
+Also sometimes data in the database are already converted to lowercase or uppercase, in this case you can use
+`value_transformer` option to convert the filter value to before it will be passed to the database query, e.g.:
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            filters:
+                fields:
+                    field1:
+                        options:
+                            value_transformer: strtoupper # convert the filter value to uppercase
 ```
 
 ## Change an ACL Resource for an Action
@@ -521,6 +583,118 @@ api:
                 id:
                     exclude: true
 ```
+
+## Enable API for an Entity Without Identifier
+
+Sometimes it is required to create API resource that does not have an identifier. An example of such API resources
+can be resources for registering a new account or logging in a user.
+
+The following steps describes how to create such API resources:
+
+- Create a PHP class that will represent API resource. Usualy such classes are named as models and located in
+  `Api/Model` directory. For example:
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Model;
+
+  class Account
+  {
+      /** @var string|null */
+      private $name;
+
+      /**
+       * @return string|null
+       */
+      public function getName()
+      {
+          return $this->name;
+      }
+
+      /**
+       * @param string|null $name
+       */
+      public function setName($name)
+      {
+          $this->name = $name;
+      }
+  }
+  ```
+
+- Desctibe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
+
+  ```yaml
+  api:
+      entity_aliases:
+          Acme\Bundle\AppBundle\Api\Model\Account:
+              alias: registeraccount
+              plural_alias: registeraccount
+      entities:
+          Acme\Bundle\AppBundle\Api\Model\Account:
+              fields:
+                  name:
+                      data_type: string
+                      description: The user name
+                      form_options:
+                          constraints:
+                              - NotBlank: ~
+              actions:
+                  create:
+                      description: Register a new account
+                  get: false
+                  update: false
+                  delete: false
+  ```
+
+- Register a route via `Resources/config/oro/routing.yml` configuration file in your bundle using
+ `OroApiBundle:RestApi:itemWithoutId` as a controller, e.g.:
+
+  ```yml
+  acme_rest_api_register_account:
+      path: /api/registeraccount
+      defaults:
+          _controller: OroApiBundle:RestApi:itemWithoutId
+          entity: registeraccount
+      options:
+          group: rest_api
+  ```
+
+- Create a processor to handle data, e.g.:
+
+  ```php
+  <?php
+
+  namespace Acme\Bundle\AppBundle\Api\Processor;
+
+  use Acme\Bundle\AppBundle\Api\Model\Account;
+  use Oro\Component\ChainProcessor\ContextInterface;
+  use Oro\Component\ChainProcessor\ProcessorInterface;
+
+  class RegisterAccount implements ProcessorInterface
+  {
+      /**
+       * {@inheritdoc}
+       */
+      public function process(ContextInterface $context)
+      {
+          /** @var Account $account */
+          $account = $context->getResult();
+
+          // implement registration of a new account
+      }
+  }
+  ```
+
+- Register a processor in the depencency injection container, e.g.:
+
+  ```yaml
+  services:
+      acme.api.register_account:
+          class: Acme\Bundle\AppBundle\Api\Processor\RegisterAccount
+          tags:
+              - { name: oro.api.processor, action: create, group: save_data, class: Acme\Bundle\AppBundle\Api\Model\Account }
+  ```
 
 ## Enable Custom API
 

@@ -146,22 +146,22 @@ define(function(require) {
 
                     self.trigger('cancel');
                 });
-
-                $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function(e) {
-                    if (e.which !== 27) {
-                        return;
-                    }
-                    if (self.options.handleClose) {
-                        self.trigger('close');
-                    } else {
-                        self.trigger('cancel');
-                    }
-
-                    if (self.options.content && self.options.content.trigger) {
-                        self.options.content.trigger('shown', self);
-                    }
-                });
             }
+
+            $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function(e) {
+                if (e.which !== 27) {
+                    return;
+                }
+                if (self.options.handleClose) {
+                    self.trigger('close');
+                } else {
+                    self.trigger('cancel');
+                }
+
+                if (self.options.content && self.options.content.trigger) {
+                    self.options.content.trigger('shown', self);
+                }
+            });
 
             this.once('cancel', function() {
                 self.close();

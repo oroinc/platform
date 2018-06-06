@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
@@ -1026,7 +1027,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     protected function createConfigObject(array $config)
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
-        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
 
         $loaderFactory = new ConfigLoaderFactory($configExtensionRegistry);

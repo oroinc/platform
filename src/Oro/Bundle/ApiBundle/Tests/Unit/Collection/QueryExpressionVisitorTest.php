@@ -22,7 +22,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $expressionVisitor = new QueryExpressionVisitor();
 
-        $this->assertSame([], $expressionVisitor->getParameters());
+        self::assertSame([], $expressionVisitor->getParameters());
     }
 
     public function testGetParameters()
@@ -32,7 +32,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         $parameter = new Parameter('prm1', 'val1');
         $expressionVisitor->addParameter($parameter);
 
-        $this->assertEquals([$parameter], $expressionVisitor->getParameters());
+        self::assertEquals([$parameter], $expressionVisitor->getParameters());
     }
 
     public function testAddParameterObject()
@@ -42,7 +42,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         $parameter = new Parameter('prm1', 'val1');
         $expressionVisitor->addParameter($parameter);
 
-        $this->assertEquals([$parameter], $expressionVisitor->getParameters());
+        self::assertEquals([$parameter], $expressionVisitor->getParameters());
     }
 
     public function testAddParameterWithoutType()
@@ -51,7 +51,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
         $expressionVisitor->addParameter('prm1', 'val1');
 
-        $this->assertEquals([new Parameter('prm1', 'val1')], $expressionVisitor->getParameters());
+        self::assertEquals([new Parameter('prm1', 'val1')], $expressionVisitor->getParameters());
     }
 
     public function testAddParameterWithType()
@@ -60,14 +60,14 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
         $expressionVisitor->addParameter('prm1', 'val1', 'string');
 
-        $this->assertEquals([new Parameter('prm1', 'val1', 'string')], $expressionVisitor->getParameters());
+        self::assertEquals([new Parameter('prm1', 'val1', 'string')], $expressionVisitor->getParameters());
     }
 
     public function testCreateParameter()
     {
         $expressionVisitor = new QueryExpressionVisitor();
 
-        $this->assertEquals(
+        self::assertEquals(
             new Parameter('prm1', 'val1', 'string'),
             $expressionVisitor->createParameter('prm1', 'val1', 'string')
         );
@@ -76,14 +76,14 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
     public function testBuildPlaceholder()
     {
         $expressionVisitor = new QueryExpressionVisitor();
-        $this->assertEquals(':test', $expressionVisitor->buildPlaceholder('test'));
+        self::assertEquals(':test', $expressionVisitor->buildPlaceholder('test'));
     }
 
     public function testGetExpressionBuilder()
     {
         $expressionVisitor = new QueryExpressionVisitor();
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             ExpressionBuilder::class,
             $expressionVisitor->getExpressionBuilder()
         );
@@ -93,7 +93,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
     {
         $expressionVisitor = new QueryExpressionVisitor();
         $value = 'test';
-        $this->assertSame($value, $expressionVisitor->walkValue(new Value($value)));
+        self::assertSame($value, $expressionVisitor->walkValue(new Value($value)));
     }
 
     /**
@@ -127,8 +127,8 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         /** @var Andx $result */
         $result = $expressionVisitor->walkCompositeExpression($expr);
 
-        $this->assertInstanceOf('Doctrine\ORM\Query\Expr\Andx', $result);
-        $this->assertEquals(
+        self::assertInstanceOf(Andx::class, $result);
+        self::assertEquals(
             [
                 new OrmComparison('e.test', '=', ':e_test'),
                 new OrmComparison('e.id', '=', ':e_id'),
@@ -136,7 +136,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
             ],
             $result->getParts()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new Parameter('e_test', 1, 'integer'),
                 new Parameter('e_id', 12, 'integer'),
@@ -169,11 +169,11 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
         $comparison = new Comparison('e.test', 'IN', [1, 2, 3]);
         $result = $expressionVisitor->walkComparison($comparison);
 
-        $this->assertEquals(
+        self::assertEquals(
             new Func('e.test IN', [':e_test']),
             $result
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new Parameter('e_test', [1, 2, 3], Connection::PARAM_INT_ARRAY)
             ],
@@ -183,7 +183,7 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown comparison operator: NOT SUPPORTED
+     * @expectedExceptionMessage Unknown comparison operator "NOT SUPPORTED".
      */
     public function testWalkComparisonWithUnknownOperator()
     {
@@ -194,6 +194,61 @@ class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
 
         $expressionVisitor->setQueryAliases(['e']);
         $comparison = new Comparison('e.test', 'NOT SUPPORTED', 21);
+        $expressionVisitor->walkComparison($comparison);
+    }
+
+    /**
+     * @expectedException \Doctrine\ORM\Query\QueryException
+     * @expectedExceptionMessage Unknown modifier "a" for comparison operator "=".
+     */
+    public function testWalkComparisonWithUnknownModifierOfOperator()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['=' => new EqComparisonExpression()]
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('e.test', '=/a', 21);
+        $expressionVisitor->walkComparison($comparison);
+    }
+
+    public function testWalkComparisonWithUnknownCaseInsensitiveModifierOfOperator()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['=' => new EqComparisonExpression()]
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('e.test', '=/i', 'test value');
+        $result = $expressionVisitor->walkComparison($comparison);
+
+        self::assertEquals(
+            new OrmComparison('LOWER(e.test)', '=', ':e_test'),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e_test', 'test value', \PDO::PARAM_STR)
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unsafe value passed 1=1 OR e.test
+     */
+    public function testWalkComparisonWithUnsafeFieldName()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['=' => new EqComparisonExpression()]
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+        $comparison = new Comparison('1=1 OR e.test', '=', 'test value');
         $expressionVisitor->walkComparison($comparison);
     }
 }

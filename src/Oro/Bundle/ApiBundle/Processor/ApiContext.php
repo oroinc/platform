@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\Context as BaseContext;
 
+/**
+ * The base execution context for Data API processors.
+ */
 abstract class ApiContext extends BaseContext
 {
     /** the request type */
@@ -22,7 +25,7 @@ abstract class ApiContext extends BaseContext
     }
 
     /**
-     * Sets default values into the Context.
+     * Sets default values into the context.
      */
     protected function initialize()
     {
@@ -63,8 +66,8 @@ abstract class ApiContext extends BaseContext
     /**
      * Marks a work as already done.
      * In the most cases this method is useless because it is easy to determine
-     * when a work is already done just checking a state of a context.
-     * But in case if a processor does a complex work, it might be required
+     * when a work is already done by checking a state of a context.
+     * However, a processor performs a complex work, it might be required
      * to mark a work as already done directly.
      *
      * @param string $operationName The name of an operation that represents some work
@@ -75,7 +78,7 @@ abstract class ApiContext extends BaseContext
     }
 
     /**
-     * Marks a work as not done yet.
+     * Marks a work as not yet done.
      *
      * @param string $operationName The name of an operation that represents some work
      */

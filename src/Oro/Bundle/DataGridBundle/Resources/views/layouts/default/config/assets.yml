@@ -1,3 +1,2 @@
 styles:
-    inputs:
-        - 'bundles/orodatagrid/default/scss/variables/datagrid-massaction-config.scss'
+    inputs: []

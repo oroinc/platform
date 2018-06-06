@@ -64,7 +64,6 @@ services:
         class: '%oro_form.type.duration.class%'
         tags:
             - { name: form.type, alias: oro_duration }
-            - { name: oro.api.form.type, alias: oro_duration }
 
     oro_form.type.money:
         class: '%oro_form.type.money.class%'
@@ -163,6 +162,7 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_form.provider.html_tag_provider'
+            - '@assets.context'
             - '%kernel.cache_dir%'
         calls:
             - [setAssetHelper, ['@assets.packages']]
@@ -193,26 +193,17 @@ services:
         abstract: true
 
     oro_form.type.select2_hidden:
-        parent: oro_form.type.select2
-        arguments:
-            - 'Symfony\Component\Form\Extension\Core\Type\HiddenType'
-            - 'oro_select2_hidden'
+        class: Oro\Bundle\FormBundle\Form\Type\Select2HiddenType
         tags:
             - { name: form.type, alias: oro_select2_hidden }
 
     oro_form.type.oro_select2_choice:
-        parent: oro_form.type.select2
-        arguments:
-            - 'Symfony\Component\Form\Extension\Core\Type\ChoiceType'
-            - 'oro_select2_choice'
+        class: Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType
         tags:
             - { name: form.type, alias: oro_select2_choice }
 
     oro_form.type.oro_select2_entity:
-        parent: oro_form.type.select2
-        arguments:
-            - 'Symfony\Bridge\Doctrine\Form\Type\EntityType'
-            - 'oro_select2_entity'
+        class: Oro\Bundle\FormBundle\Form\Type\Select2EntityType
         tags:
             - { name: form.type, alias: oro_select2_entity }
 
@@ -221,6 +212,11 @@ services:
         class: '%oro_form.extension.data_block.class%'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
+    oro_help.form.date_time_extension:
+         class: Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension
+         tags:
+             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
 
     oro_form.extension.client_validation:
         class: '%oro_form.extension.client_validation.class%'
@@ -262,7 +258,7 @@ services:
     oro_form.extension.js_validation.repeated:
         class: '%oro_form.extension.js_validation.repeated.class%'
         tags:
-            - { name: form.type_extension, alias: repeated }
+            - { name: form.type_extension, alias: repeated, extended_type: Symfony\Component\Form\Extension\Core\Type\RepeatedType }
 
     oro_form.extension.additional_attr:
         class: '%oro_form.extension.additional_attr.class%'

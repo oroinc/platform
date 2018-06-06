@@ -1,0 +1,14 @@
+/* @theme: admin.demo; */
+
+@import "../../../../css/scss/mixins";
+@import "variables";
+@import "footer";
+@import "dashboard";
+@import "buttons";
+@import "form-signin";
+
+// desktop resolution
+@import "desktop/main";
+
+// mobile resolution
+@import "mobile/main";

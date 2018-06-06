@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression;
 
 class NotCompositeExpressionTest extends \PHPUnit_Framework_TestCase
@@ -17,11 +18,8 @@ class NotCompositeExpressionTest extends \PHPUnit_Framework_TestCase
 
         $result = $expression->walkCompositeExpression($expressionList);
 
-        $this->assertInstanceOf('Doctrine\ORM\Query\Expr\Func', $result);
-        $this->assertEquals('NOT', $result->getName());
-        $this->assertEquals(
-            $expressionList,
-            $result->getArguments()
-        );
+        self::assertInstanceOf(Func::class, $result);
+        self::assertEquals('NOT', $result->getName());
+        self::assertEquals($expressionList, $result->getArguments());
     }
 }

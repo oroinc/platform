@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
+use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
 
 class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,15 +32,10 @@ class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
         );
         $builder->expects($this->at(1))->method('add')->with(
             'permissions',
-            'oro_acl_permission_collection',
+            PermissionCollectionType::class,
             $this->contains($options)
         );
         $this->formType->buildForm($builder, $options);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(AclPrivilegeType::NAME, $this->formType->getName());
     }
 
     public function testConfigureOptions()

@@ -75,6 +75,6 @@ class EntityTreeSelectType extends AbstractType
      */
     public function getParent()
     {
-        return EntityIdentifierType::NAME;
+        return EntityIdentifierType::class;
     }
 }

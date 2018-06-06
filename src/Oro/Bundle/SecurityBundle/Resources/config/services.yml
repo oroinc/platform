@@ -13,7 +13,6 @@ parameters:
     oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
     oro_security.acl.extension.action.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
     oro_security.acl.provider.class:                           Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
-    oro_security.acl.dbal.provider.class:                      Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider
     oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
     oro_security.acl.permission_map.class:                     Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap
     oro_security.acl.permission_manager.class:                 Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
@@ -637,7 +636,7 @@ services:
         arguments:
             - '@oro_security.acl_helper'
         tags:
-            - { name: form.type_extension, alias: entity }
+            - { name: form.type_extension, alias: entity, extended_type: Symfony\Bridge\Doctrine\Form\Type\EntityType }
 
     oro_security.listener.search_listener:
           class: '%oro_security.listener.search_listener.class%'

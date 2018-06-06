@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class FormGuesserCompilerPass implements CompilerPassInterface
 {
@@ -17,17 +19,20 @@ class FormGuesserCompilerPass implements CompilerPassInterface
         }
 
         // need to sort guessers according to priority
-        $guessers = array();
+        $guessers = [];
         foreach ($container->findTaggedServiceIds('form.type_guesser') as $id => $attributes) {
             foreach ($attributes as $eachTag) {
                 $priority = !empty($eachTag['priority']) ? $eachTag['priority'] : 0;
-                $guessers[$id] = $priority;
+
+                $guessers[$priority][] = new Reference($id);
             }
         }
 
-        arsort($guessers, SORT_NUMERIC);
+        // sort by priority and flatten
+        krsort($guessers);
+        $guessers = array_merge(...$guessers);
 
         $formExtension = $container->getDefinition('form.extension');
-        $formExtension->replaceArgument(3, array_keys($guessers));
+        $formExtension->replaceArgument(2, new IteratorArgument($guessers));
     }
 }

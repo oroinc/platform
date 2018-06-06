@@ -1,19 +1,17 @@
-OroCacheBundle
-===============
+# OroCacheBundle
 
 *Note:* This article is published in the Oro documentation library.
 
-The `OroCacheBundle` is responsible for operations with various kinds of caches.
+OroCacheBundle introduces the configuration of the application data cache storage used by application bundles for different cache types.
 
-Table of Contents
------------------
+## Table of Contents
+
  - [Abstract cache services](#abstract-cache-services)
  - [APC cache](#apc-cache)
  - [Warm up config cache](#warm-up-config-cache)
  - [Caching of Symfony Validation rules](#caching-of-symfony-validation-rules)
 
-Abstract cache services
------------------------
+## Abstract cache services
 
 There are two abstract services you can use as a parent for your cache services:
 
@@ -41,8 +39,7 @@ services:
 
 Read more about the [caching policy and default implementation](Resources/doc/caching_policy.md).
 
-APC cache
----------
+## APC cache
 
 There is a possibility to use APC cache and few steps should be completed for this.
 
@@ -65,8 +62,7 @@ services:
 
 On the last step of the configuration, production cache should be cleared.
 
-Warm up config cache
---------------------
+## Warm up config cache
 
 The purpose is to update only cache that will be needed by the application without updating the cache of those resources,
 that have not been changed. This gives a big performance over the approach when the all cache is updated. Cache warming 
@@ -135,7 +131,6 @@ class ConfigurationProvider implements ConfigCacheWarmerInterface
 }
 ```
 
-Caching of Symfony Validation rules
------------------------------------
+## Caching of Symfony Validation rules
 
 By default, rules for [Symfony Validation Component](http://symfony.com/doc/current/book/validation.html) are cached using `oro.cache.abstract` service, but you can change this to make validation caching suit some custom requirements. To do this, you need to redefine `oro_cache.provider.validation` service.

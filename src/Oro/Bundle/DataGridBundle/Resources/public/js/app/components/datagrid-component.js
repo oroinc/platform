@@ -10,7 +10,7 @@ define(function(require) {
     var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var Grid = require('orodatagrid/js/datagrid/grid');
+    var GridView = require('orodatagrid/js/datagrid/grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
@@ -55,7 +55,9 @@ define(function(require) {
         initialize: function(options) {
             this.pluginManager = new PluginManager(this);
             this.changeAppearanceEnabled = 'appearanceData' in options.metadata.state;
-            if (!options.enableFilters) {
+            if (!options.enableFilters ||
+                ('filters' in options.metadata && !options.metadata.filters.length)
+            ) {
                 options.builders = _.reject(options.builders, function(module) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
@@ -248,7 +250,7 @@ define(function(require) {
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
 
-            Grid = modules.GridView || Grid;
+            var Grid = modules.GridView || GridView;
             PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
@@ -430,8 +432,17 @@ define(function(require) {
             }
 
             if (!this.themeOptions.disableStickedScrollbar) {
-                if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
-                    plugins.push(StickedScrollbarPlugin);
+                if (this.metadata.responsiveGrids && this.metadata.responsiveGrids.enable) {
+                    plugins.push({
+                        constructor: StickedScrollbarPlugin,
+                        options: {
+                            viewport: this.metadata.responsiveGrids.viewport || {}
+                        }
+                    });
+                } else {
+                    if (tools.isMobile() || !this.metadata.enableFullScreenLayout) {
+                        plugins.push(StickedScrollbarPlugin);
+                    }
                 }
             }
 

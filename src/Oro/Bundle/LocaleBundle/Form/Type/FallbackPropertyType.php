@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -48,7 +49,7 @@ class FallbackPropertyType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
@@ -95,7 +96,7 @@ class FallbackPropertyType extends AbstractType
                     );
                 }
 
-                return $choices;
+                return array_flip($choices);
             }
         );
 

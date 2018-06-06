@@ -24,13 +24,13 @@ system_configuration:
                     - NotBlank: ~
         oro_ui.navbar_position:
             data_type: string
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.ui.system_configuration.fields.navbar_position.label
                 choices:
-                    top: oro.ui.system_configuration.fields.navbar_position.choices.top
-                    left: oro.ui.system_configuration.fields.navbar_position.choices.left
+                    oro.ui.system_configuration.fields.navbar_position.choices.top: top
+                    oro.ui.system_configuration.fields.navbar_position.choices.left: left
 
     tree:
         system_configuration:

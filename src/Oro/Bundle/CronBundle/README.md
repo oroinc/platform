@@ -1,14 +1,13 @@
-OroCronBundle
-=============
+# OroCronBundle
 
-An interface and scheduler for time-based commands execution.
+OroCronBundle introduces a command used in the crontab configuration and in the interface which allows to define the console commands execution schedule.
 
 ## Usage
 
 All you need is to add `oro:cron` command to a system cron (on *nix systems), for example:
 
 ``` bash
-*/1 * * * * /usr/local/bin/php /path/to/app/console --env=prod oro:cron >> /dev/null
+*/1 * * * * /usr/local/bin/php /path/to/bin/console --env=prod oro:cron >> /dev/null
 ```
 
 On Windows you can use Task Scheduler from Control Panel.

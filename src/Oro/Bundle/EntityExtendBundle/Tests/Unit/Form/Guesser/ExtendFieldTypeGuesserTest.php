@@ -11,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Validator\Constraints\Length;
 
@@ -31,6 +32,9 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     const PROPERTY_TYPE = 'bigint';
 
+    /**
+     * @var array
+     */
     private static $entityConfig = [
         'label' => self::SOME_LABEL
     ];
@@ -173,7 +177,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     private function assertIsDefaultTypeGuess($typeGuess)
     {
-        $defaultTypeGuess = new TypeGuess('text', [], TypeGuess::LOW_CONFIDENCE);
+        $defaultTypeGuess = new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE);
         $this->assertEquals($defaultTypeGuess, $typeGuess);
     }
 
@@ -289,9 +293,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
                     'choices' => [
                         'No' => false,
                         'Yes' => true
-                    ],
-                    // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                    'choices_as_values' => true
+                    ]
                 ]
             ],
             'string' => [

@@ -2,11 +2,11 @@ filters:
     'filter[id]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
-        operators: '=,!=,<,<=,>,>='
+        operators: 'eq,neq,lt,lte,gt,gte'
     'filter[owner]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'integer or array or range'
-        operators: '=,!='
+        operators: 'eq,neq,exists,neq_or_null'
     'fields[businessunits]':
         requirement: '.+'
     'include':

@@ -16,3 +16,9 @@ liip_imagine:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
 
+assetic:
+    filters:
+        scssphp:
+            file: '%kernel.project_dir%/vendor/leafo/scssphp/scss.inc.php'
+            apply_to: '\.scss$'
+            import_paths: ["%kernel.project_dir%/public/bundles"]

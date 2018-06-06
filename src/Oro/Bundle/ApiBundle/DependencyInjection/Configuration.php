@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 class Configuration implements ConfigurationInterface
 {
@@ -22,6 +24,7 @@ class Configuration implements ConfigurationInterface
         $this->appendApiDocViewsNode($node);
         $this->appendConfigExtensionsNode($node);
         $this->appendActionsNode($node);
+        $this->appendFilterOperatorsNode($node);
         $this->appendFiltersNode($node);
         $this->appendFormTypesNode($node);
         $this->appendFormTypeExtensionsNode($node);
@@ -261,6 +264,28 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
+    private function appendFilterOperatorsNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('filter_operators')
+                ->info(
+                    'A definition of operators for filters.'
+                    . ' The key is the name of an operator.'
+                    . ' The value is optional and it is a short name of an operator.'
+                )
+                ->example([
+                    'eq'     => '=',
+                    'regexp' => null
+                ])
+                ->useAttributeAsKey('name')
+                ->prototype('scalar')
+                ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
     private function appendFiltersNode(NodeBuilder $node)
     {
         $node
@@ -269,7 +294,7 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'integer' => [
-                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=']
+                            'supported_operators' => ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
                         ],
                         'primaryField' => [
                             'class' => 'Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter'
@@ -315,7 +340,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()
                             ->cannotBeEmpty()
-                            ->defaultValue(['=', '!='])
+                            ->defaultValue(['=', '!=', '*', '!*'])
                         ->end()
                     ->end()
                 ->end()
@@ -330,7 +355,10 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_types')
                 ->info('The form types that can be reused in Data API')
-                ->example(['form.type.form', 'form.type.integer', 'form.type.text'])
+                ->example([
+                    'Symfony\Component\Form\Extension\Core\Type\FormType',
+                    'oro_api.form.type.entity'
+                ])
                 ->prototype('scalar')
                 ->end()
             ->end();
@@ -344,7 +372,7 @@ class Configuration implements ConfigurationInterface
         $node
             ->arrayNode('form_type_extensions')
                 ->info('The form type extensions that can be reused in Data API')
-                ->example(['form.type_extension.form.http_foundation', 'form.type_extension.form.validator'])
+                ->example(['form.type_extension.form.http_foundation'])
                 ->prototype('scalar')
                 ->end()
             ->end();
@@ -375,10 +403,10 @@ class Configuration implements ConfigurationInterface
                 ->example(
                     [
                         'integer' => [
-                            'form_type' => 'integer'
+                            'form_type' => IntegerType::class,
                         ],
                         'datetime' => [
-                            'form_type' => 'datetime',
+                            'form_type' => DateTimeType::class,
                             'options'   => ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']
                         ],
                     ]

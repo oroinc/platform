@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -23,6 +24,12 @@ use Symfony\Component\Routing\Route;
 class RestDocHandler implements HandlerInterface
 {
     private const ID_PLACEHOLDER = '{id}';
+
+    private const SUCCESS_STATUS_CODES_WITH_CONTENT = [
+        Response::HTTP_OK,
+        Response::HTTP_CREATED,
+        Response::HTTP_ACCEPTED
+    ];
 
     /** @var string The group of routes that should be processed by this handler */
     private $routeGroup;
@@ -85,15 +92,25 @@ class RestDocHandler implements HandlerInterface
             return;
         }
 
+        $annotation->setSection($entityType);
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
         $context = $this->getContext($action, $entityClass, $associationName);
-        $config = $context->getConfig();
-        $metadata = $context->getMetadata();
 
-        $annotation->setSection($entityType);
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $this->setDescription($annotation, $config);
         $this->setDocumentation($annotation, $config);
+        $this->setStatusCodes($annotation, $config);
+
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            return;
+        }
+
         if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
             $this->identifierHandler->handle(
                 $annotation,
@@ -101,10 +118,10 @@ class RestDocHandler implements HandlerInterface
                 $associationName ? $context->getParentMetadata() : $metadata
             );
         }
+
+        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
         $this->setInputMetadata($annotation, $action, $config, $metadata);
         $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
-        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-        $this->setStatusCodes($annotation, $config);
     }
 
     /**
@@ -117,7 +134,7 @@ class RestDocHandler implements HandlerInterface
      */
     private function hasAttribute(Route $route, $placeholder)
     {
-        return false !== strpos($route->getPath(), $placeholder);
+        return false !== \strpos($route->getPath(), $placeholder);
     }
 
     /**
@@ -148,6 +165,7 @@ class RestDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
+        $context->setVersion($this->docViewDetector->getVersion());
         $context->setLastGroup('initialize');
         if ($associationName) {
             /** @var SubresourceContext $context */
@@ -163,6 +181,52 @@ class RestDocHandler implements HandlerInterface
         $processor->process($context);
 
         return $context;
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityDefinitionConfig
+     */
+    private function getConfig(Context $context): EntityDefinitionConfig
+    {
+        $config = $context->getConfig();
+        if (null === $config) {
+            $message = \sprintf(
+                'The configuration for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= \sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return EntityMetadata
+     */
+    private function getMetadata(Context $context): EntityMetadata
+    {
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            $message = \sprintf(
+                'The metadata for "%s" cannot be loaded. Action: %s',
+                $context->getClassName(),
+                $context->getAction()
+            );
+            if ($context instanceof SubresourceContext) {
+                $message .= \sprintf(' Association: %s.', $context->getAssociationName());
+            }
+            throw new \LogicException($message);
+        }
+
+        return $metadata;
     }
 
     /**
@@ -202,7 +266,11 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata
     ) {
         if ($this->isActionWithInput($action)) {
-            $this->setDirectionValue($annotation, 'input', $this->getDirectionValue($action, $config, $metadata));
+            $this->setDirectionValue(
+                $annotation,
+                'input',
+                $this->getDirectionValue($action, 'input', $config, $metadata)
+            );
         }
     }
 
@@ -222,33 +290,41 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata,
         $associationName = null
     ) {
-        if ($this->isActionWithOutput($action)) {
-            // check if output format should be taken from another action type. In this case
-            // entity metadata and config will be taken for the action, those format should be used
-            $substituteAction = $this->getOutputAction($action);
-            if ($action !== $substituteAction) {
-                $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
-                $config = $substituteContext->getConfig();
-                $metadata = $substituteContext->getMetadata();
+        if ($this->isActionWithOutput($annotation)) {
+            if ($metadata->hasIdentifierFields()) {
+                // check if output format should be taken from another action type. In this case
+                // entity metadata and config will be taken for the action, those format should be used
+                $substituteAction = $this->getOutputAction($action);
+                if ($action !== $substituteAction) {
+                    $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
+                    $config = $this->getConfig($substituteContext);
+                    $metadata = $this->getMetadata($substituteContext);
+                }
             }
 
-            $this->setDirectionValue($annotation, 'output', $this->getDirectionValue($action, $config, $metadata));
+            $this->setDirectionValue(
+                $annotation,
+                'output',
+                $this->getDirectionValue($action, 'output', $config, $metadata)
+            );
         }
     }
 
     /**
      * @param string                 $action
+     * @param string                 $direction
      * @param EntityDefinitionConfig $config
      * @param EntityMetadata         $metadata
      *
      * @return array
      */
-    private function getDirectionValue($action, EntityDefinitionConfig $config, EntityMetadata $metadata)
+    private function getDirectionValue($action, $direction, EntityDefinitionConfig $config, EntityMetadata $metadata)
     {
         return [
             'class'   => null,
             'options' => [
-                'metadata' => new ApiDocMetadata(
+                'direction' => $direction,
+                'metadata'  => new ApiDocMetadata(
                     $action,
                     $metadata,
                     $config,
@@ -273,6 +349,20 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
+     * @param ApiDoc $annotation
+     * @return array [status code => description, ...]
+     */
+    private function getStatusCodes(ApiDoc $annotation)
+    {
+        // unfortunately there is no other way to get "statusCodes" property
+        // except to use the reflection
+        $statusCodesProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'statusCodes');
+        $statusCodesProperty->setAccessible(true);
+
+        return $statusCodesProperty->getValue($annotation);
+    }
+
+    /**
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
@@ -281,7 +371,7 @@ class RestDocHandler implements HandlerInterface
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
             $codes = $statusCodes->getCodes();
-            ksort($codes);
+            \ksort($codes);
             foreach ($codes as $statusCode => $code) {
                 if (!$code->isExcluded()) {
                     $annotation->addStatusCode($statusCode, $code->getDescription());
@@ -299,27 +389,42 @@ class RestDocHandler implements HandlerInterface
      */
     private function isActionWithInput($action)
     {
-        return in_array(
+        return \in_array(
             $action,
-            [ApiActions::CREATE, ApiActions::UPDATE, ApiActions::UPDATE_RELATIONSHIP, ApiActions::ADD_RELATIONSHIP],
+            [
+                ApiActions::CREATE,
+                ApiActions::UPDATE,
+                ApiActions::UPDATE_SUBRESOURCE,
+                ApiActions::ADD_SUBRESOURCE,
+                ApiActions::DELETE_SUBRESOURCE,
+                ApiActions::UPDATE_RELATIONSHIP,
+                ApiActions::ADD_RELATIONSHIP,
+                ApiActions::DELETE_RELATIONSHIP
+            ],
             true
         );
     }
 
     /**
-     * Returns true in case if the given action returns resource data.
+     * Returns true in case if the given ApiDoc annotation has at least one sucsess status code
+     * indicates that the resource data should be returned in the response.
      *
-     * @param string $action
+     * @param ApiDoc $annotation
      *
      * @return bool
      */
-    private function isActionWithOutput($action)
+    private function isActionWithOutput(ApiDoc $annotation)
     {
-        return !in_array(
-            $action,
-            [ApiActions::DELETE, ApiActions::DELETE_LIST, ApiActions::DELETE_RELATIONSHIP],
-            true
-        );
+        $result = false;
+        $statusCodes = $this->getStatusCodes($annotation);
+        foreach ($statusCodes as $statusCode => $description) {
+            if (\in_array($statusCode, self::SUCCESS_STATUS_CODES_WITH_CONTENT, true)) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -331,7 +436,7 @@ class RestDocHandler implements HandlerInterface
      */
     private function getOutputAction($action)
     {
-        if (in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+        if (\in_array($action, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
             return ApiActions::GET;
         }
 

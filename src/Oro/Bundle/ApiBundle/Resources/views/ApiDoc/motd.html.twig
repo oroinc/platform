@@ -60,6 +60,7 @@
     $(function() {
         var userName = {{ userName|json_encode|raw }},
             apiKey = {{ apiKey|json_encode|raw }},
+            apiKeyGenerationHint = {{ apiKeyGenerationHint|default('')|json_encode|raw }},
             loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
             logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
             sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
@@ -71,8 +72,12 @@
             $apiDocLink = $('#header a').first(),
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
+            operatorMap = {'eq': '=', 'neq': '!=', 'gt': '>', 'lt': '<', 'gte': '>=', 'lte': '<='},
             escapeSelector = function (val) {
                 return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
+            },
+            escapeHtmlAttribute = function (val) {
+                return val.replace(/"/g,'&quot;');
             },
             addHeader = function ($headers, headerKey, headerValue) {
                 var needsHeader = true,
@@ -158,10 +163,8 @@
          * Add the authentication type selector
          */
         $('#sandbox_configuration').prepend(
-            (wsseAllowed ? '' : '<span class="authentication-warning"' +
-            ' title="To use WSSE authentication you need to generate API key for the current logged-in user.' +
-            ' To do this, go to the My User page and click Generate Key near to API Key.' +
-            ' After that reload this page."' +
+            (wsseAllowed || !apiKeyGenerationHint ? '' : '<span class="authentication-warning"' +
+            ' title="' + escapeHtmlAttribute(apiKeyGenerationHint) + '"' +
             '>{{ include('@OroApi/ApiDoc/warning.svg') }}</span>') +
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -312,6 +315,7 @@
                 var $el = $(el),
                     filterId = $el.closest('table').parent().prev().text(),
                     operators = $el.next().text(),
+                    operatorToShow,
                     options = '',
                     $operatorEl = null;
                 if (filterId) {
@@ -319,7 +323,11 @@
                     if ($operatorEl.length && $operatorEl.prop("tagName") == 'SPAN' && $operatorEl.text() == '=') {
                         operators = operators.split(',');
                         for (var i = 0; i < operators.length; i++) {
-                            options += '<option value="' + operators[i] + '">' + operators[i] + '</option>'
+                            operatorToShow = operators[i];
+                            if (operators[i] in operatorMap) {
+                                operatorToShow = operatorMap[operators[i]];
+                            }
+                            options += '<option value="' + operators[i] + '">' + operatorToShow + '</option>'
                         }
                         $operatorEl.replaceWith('<select class="operator">' + options + '</select>');
                     }
@@ -345,7 +353,9 @@
                     value = $('.value', $(this)).val(),
                     data, obj, keyPair;
                 if (value !== '' && operator !== undefined && operator !== '=' && !jQuery.isEmptyObject(options.data)) {
-                    if (options.data.lastIndexOf('{"', 0) === 0) {
+                    if (operator === 'eq') {
+                        operator = '=';
+                    } else if (options.data.lastIndexOf('{"', 0) === 0) {
                         // json
                         data = JSON.parse(options.data);
                         keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
@@ -363,7 +373,7 @@
                     } else {
                         // uri string
                         options.data = options.data.replace(
-                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2" + operator
+                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2[" + operator + ']='
                         );
                     }
                 }

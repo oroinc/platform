@@ -45,7 +45,7 @@ class LanguageFilterType extends AbstractType
      */
     public function getParent()
     {
-        return EntityFilterType::NAME;
+        return EntityFilterType::class;
     }
 
     /**

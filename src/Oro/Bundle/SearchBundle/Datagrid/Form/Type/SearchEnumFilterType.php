@@ -47,6 +47,6 @@ class SearchEnumFilterType extends AbstractType
      */
     public function getParent()
     {
-        return EnumFilterType::NAME;
+        return EnumFilterType::class;
     }
 }

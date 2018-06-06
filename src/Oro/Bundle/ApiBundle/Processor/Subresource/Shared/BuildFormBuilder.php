@@ -4,15 +4,17 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Builds the form builder based on the parent entity configuration
- * and sets it to the Context.
+ * and sets it to the context.
  */
 class BuildFormBuilder implements ProcessorInterface
 {
@@ -43,6 +45,13 @@ class BuildFormBuilder implements ProcessorInterface
             return;
         }
 
+        if (!$context->hasParentEntity()) {
+            // the entity is not defined
+            throw new RuntimeException(
+                'The parent entity object must be added to the context before creation of the form builder.'
+            );
+        }
+
         $context->setFormBuilder($this->getFormBuilder($context));
     }
 
@@ -56,14 +65,21 @@ class BuildFormBuilder implements ProcessorInterface
         $parentConfig = $context->getParentConfig();
         $associationName = $context->getAssociationName();
 
+        $formOptions = $parentConfig->getFormOptions();
+        if (null === $formOptions) {
+            $formOptions = [];
+        }
+        if (!\array_key_exists('data_class', $formOptions)) {
+            $formOptions['data_class'] = $this->getFormDataClass($context, $parentConfig);
+        }
         $formEventSubscribers = null;
         if (!$parentConfig->getFormType()) {
             $formEventSubscribers = $parentConfig->getFormEventSubscribers();
         }
         $formBuilder = $this->formHelper->createFormBuilder(
-            'form',
+            FormType::class,
             $context->getParentEntity(),
-            ['data_class' => $this->getFormDataClass($context, $parentConfig)],
+            $formOptions,
             $formEventSubscribers
         );
         $this->formHelper->addFormField(
@@ -84,14 +100,9 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormDataClass(ChangeRelationshipContext $context, EntityDefinitionConfig $parentConfig)
     {
-        $parentFormOptions = $parentConfig->getFormOptions();
-        if (null !== $parentFormOptions && array_key_exists('data_class', $parentFormOptions)) {
-            return $parentFormOptions['data_class'];
-        }
-
         $dataClass = $context->getParentClassName();
         $parentEntity = $context->getParentEntity();
-        if (is_object($parentEntity)) {
+        if (\is_object($parentEntity)) {
             $parentResourceClass = $parentConfig->getParentResourceClass();
             if ($parentResourceClass) {
                 $entityClass = ClassUtils::getClass($parentEntity);

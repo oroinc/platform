@@ -176,7 +176,6 @@ config:
         'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
-        'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
         'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
@@ -210,10 +209,15 @@ config:
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
 
+        'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
+
         #layouts only
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
         'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
+        'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/layout-module
@@ -223,6 +227,7 @@ config:
         - oroui/js/app/modules/input-widgets
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
+        - oroui/js/app/modules/swipe-actions-module
 
         #layouts only
         - oroui/blank/js/app/modules/views-module

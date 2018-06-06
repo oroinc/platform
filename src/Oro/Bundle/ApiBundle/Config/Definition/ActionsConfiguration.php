@@ -4,10 +4,14 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * The configuration of elements in "actions" section.
+ */
 class ActionsConfiguration extends AbstractConfigurationSection
 {
     /** @var string[] */
@@ -20,7 +24,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      * @param string[] $permissibleActions
      * @param string   $sectionName
      */
-    public function __construct($permissibleActions, $sectionName = 'actions.action')
+    public function __construct(array $permissibleActions, string $sectionName = 'actions.action')
     {
         $this->permissibleActions = $permissibleActions;
         $this->sectionName = $sectionName;
@@ -29,7 +33,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function configure(NodeBuilder $node)
+    public function configure(NodeBuilder $node): void
     {
         /** @var NodeBuilder $actionNode */
         $actionNode = $node->end()
@@ -37,20 +41,20 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->beforeNormalization()
                 ->always(function ($value) {
                     return false === $value
-                        ? array_fill_keys($this->permissibleActions, false)
+                        ? \array_fill_keys($this->permissibleActions, false)
                         : $value;
                 })
             ->end()
             ->validate()
                 ->always(function ($value) {
-                    $unknownActions = array_diff(array_keys($value), $this->permissibleActions);
+                    $unknownActions = \array_diff(\array_keys($value), $this->permissibleActions);
                     if (!empty($unknownActions)) {
                         throw new \InvalidArgumentException(
-                            sprintf(
+                            \sprintf(
                                 'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
                                 $this->sectionName,
-                                implode(', ', $unknownActions),
-                                implode(', ', $this->permissibleActions)
+                                \implode(', ', $unknownActions),
+                                \implode(', ', $this->permissibleActions)
                             )
                         );
                     }
@@ -71,15 +75,15 @@ class ActionsConfiguration extends AbstractConfigurationSection
     /**
      * {@inheritdoc}
      */
-    public function isApplicable($section)
+    public function isApplicable(string $section): bool
     {
-        return $section === 'entities.entity';
+        return 'entities.entity' === $section;
     }
 
     /**
      * @param NodeBuilder $node
      */
-    protected function configureActionNode(NodeBuilder $node)
+    protected function configureActionNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
 
@@ -119,10 +123,10 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->variableNode(ActionConfig::FORM_EVENT_SUBSCRIBER)
                 ->validate()
                     ->always(function ($v) {
-                        if (is_string($v)) {
+                        if (\is_string($v)) {
                             return [$v];
                         }
-                        if (is_array($v)) {
+                        if (\is_array($v)) {
                             return $v;
                         }
                         throw new \InvalidArgumentException(
@@ -148,11 +152,11 @@ class ActionsConfiguration extends AbstractConfigurationSection
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function postProcessActionConfig(array $config)
+    protected function postProcessActionConfig(array $config): array
     {
-        if (array_key_exists(ActionConfig::PAGE_SIZE, $config)
+        if (\array_key_exists(ActionConfig::PAGE_SIZE, $config)
             && -1 === $config[ActionConfig::PAGE_SIZE]
-            && !array_key_exists(ActionConfig::MAX_RESULTS, $config)
+            && !\array_key_exists(ActionConfig::MAX_RESULTS, $config)
         ) {
             $config[ActionConfig::MAX_RESULTS] = -1;
         }
@@ -181,7 +185,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    public function addStatusCodesNode(NodeBuilder $node)
+    public function addStatusCodesNode(NodeBuilder $node): void
     {
         /** @var ArrayNodeDefinition $parentNode */
         $codeNode = $node
@@ -207,7 +211,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureStatusCodeNode(NodeBuilder $node)
+    protected function configureStatusCodeNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.status_code';
 
@@ -221,7 +225,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
     /**
      * @param NodeBuilder $node
      */
-    protected function configureFieldNode(NodeBuilder $node)
+    protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
 
@@ -239,6 +243,13 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         $node
             ->booleanNode(ActionFieldConfig::EXCLUDE)->end()
+            ->enumNode(ActionFieldConfig::DIRECTION)
+                ->values([
+                    EntityDefinitionFieldConfig::DIRECTION_INPUT_ONLY,
+                    EntityDefinitionFieldConfig::DIRECTION_OUTPUT_ONLY,
+                    EntityDefinitionFieldConfig::DIRECTION_BIDIRECTIONAL
+                ])
+            ->end()
             ->scalarNode(ActionFieldConfig::FORM_TYPE)->end()
             ->arrayNode(ActionFieldConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')
@@ -252,7 +263,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
      *
      * @return array
      */
-    protected function postProcessFieldConfig(array $config)
+    protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ActionFieldConfig::FORM_TYPE])) {
             unset($config[ActionFieldConfig::FORM_TYPE]);

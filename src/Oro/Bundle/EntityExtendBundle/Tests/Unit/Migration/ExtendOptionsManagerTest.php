@@ -387,4 +387,26 @@ class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
 
         $prop->setValue($obj, $val);
     }
+
+    public function testHasColumnOptionsWhenNoOptionsExist()
+    {
+        $this->assertFalse($this->manager->hasColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testHasColumnOptionsWhenOptionsExist()
+    {
+        $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
+        $this->assertTrue($this->manager->hasColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testGetColumnOptionsWhenNoOptionsExist()
+    {
+        $this->assertEquals([], $this->manager->getColumnOptions('some_table', 'some_column'));
+    }
+
+    public function testGetColumnOptionsWhenOptionsExist()
+    {
+        $this->manager->setColumnOptions('some_table', 'some_column', ['some' => ['options']]);
+        $this->assertEquals(['some' => ['options']], $this->manager->getColumnOptions('some_table', 'some_column'));
+    }
 }

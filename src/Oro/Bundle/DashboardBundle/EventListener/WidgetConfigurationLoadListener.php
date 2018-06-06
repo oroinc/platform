@@ -50,7 +50,7 @@ class WidgetConfigurationLoadListener
         $choices = $metadata->offsetGetByPath('[gridViews][choices]', []);
         $viewChoices = [];
         foreach ($choices as $choice) {
-            $viewChoices[$choice['value']] = $choice['label'];
+            $viewChoices[$choice['label']] = $choice['value'];
         }
         if (!isset($configuration['fields'])) {
             $configuration['fields'] = [];

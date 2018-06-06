@@ -251,7 +251,7 @@ entity_config:
                             min:            1
                             max:            255
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.length
@@ -274,7 +274,7 @@ entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.precision
@@ -297,7 +297,7 @@ entity_config:
                         - Range:
                             min:            0
                     form:
-                        type:               oro_entity_extend_text
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
                             required:       false
                             label:          oro.entity_extend.entity_config.extend.field.items.scale
@@ -336,7 +336,7 @@ entity_config:
                             code:           is_extend
                             value:          true
                     form:
-                        type:               oro_entity_relation_type
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
                         options:
                             block:          general
                             subblock:       properties
@@ -487,7 +487,9 @@ entity_config:
                     #        block:          general
                     #        subblock:       properties
                     #        required:       false
-                    #        choices:        ['No', 'Yes']
+                    #        choices:
+                    #            No:         0
+                    #            Yes:        1
                     #        placeholder:    false
                     #        label:          oro.entity_extend.enum_public
                     #        tooltip:        oro.entity_extend.enum_public.tooltip
@@ -502,7 +504,7 @@ entity_config:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
-                        type:               oro_entity_extend_enum_value_collection
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType
                         options:
                             block:          general
                             subblock:       properties
@@ -522,9 +524,11 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -542,9 +546,11 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -560,9 +566,11 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               choice
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                No:         0
+                                Yes:        1
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field

@@ -54,8 +54,7 @@ disable_sorting:
 enable_sorting:
     config:
         disable_sorting: false
-    expected:
-        disable_sorting: false
+    expected: []
 
 disable_inclusion:
     config:
@@ -66,8 +65,7 @@ disable_inclusion:
 enable_inclusion:
     config:
         disable_inclusion: false
-    expected:
-        disable_inclusion: false
+    expected: []
 
 disable_fieldset:
     config:
@@ -78,8 +76,7 @@ disable_fieldset:
 enable_fieldset:
     config:
         disable_fieldset: false
-    expected:
-        disable_fieldset: false
+    expected: []
 
 disable_meta_properties:
     config:
@@ -90,8 +87,7 @@ disable_meta_properties:
 enable_meta_properties:
     config:
         disable_meta_properties: false
-    expected:
-        disable_meta_properties: false
+    expected: []
 
 empty_identifier_field_names:
     config:
@@ -436,9 +432,9 @@ entity_empty_form_type:
 
 entity_form_type:
     config:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
     expected:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
 
 entity_null_form_options:
     config:
@@ -463,11 +459,11 @@ entity_form_event_subscriber:
 
 entity_form:
     config:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         form_options:
             option1: value1
     expected:
-        form_type: integer
+        form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
         form_options:
             option1: value1
 
@@ -479,15 +475,15 @@ field_form:
             field2:
                 form_type: ""
             field3:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field4:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options: ~
             field5:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options: []
             field6:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1
     expected:
@@ -495,12 +491,12 @@ field_form:
             field1: ~
             field2: ~
             field3:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field4:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field5:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
             field6:
-                form_type: integer
+                form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1

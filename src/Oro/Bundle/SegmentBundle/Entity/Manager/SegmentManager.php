@@ -66,7 +66,7 @@ class SegmentManager
         $result = [];
         $types = $this->em->getRepository('OroSegmentBundle:SegmentType')->findAll();
         foreach ($types as $type) {
-            $result[$type->getName()] = $type->getLabel();
+            $result[$type->getLabel()] = $type->getName();
         }
 
         return $result;

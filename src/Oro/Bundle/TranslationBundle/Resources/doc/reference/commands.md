@@ -13,7 +13,7 @@ Table of contents
 Overview
 ----------
 
-These are console commands that allows to generate, download and update translations data in system with third-party translation provider service. They can be run with app/console command_name as usual.
+These are console commands that allows to generate, download and update translations data in system with third-party translation provider service. They can be run with bin/console command_name as usual.
 Supported translation service adapters:
 
 - Crowdin translation adapter
@@ -44,7 +44,7 @@ Command used to dump, upload, download and update translations data on third-par
 
 - `output-format` - output format for translation files, default is yml.
 
-- `path` - Dump destination (or upload source), relative to `%kernel.root_dir%`, default is `/Resources/language-pack/`
+- `path` - Dump destination (or upload source), relative to `%kernel.project_dir%`, default is `/var/language-pack/`
 
 - `dump` - action flag, used to scan project, find all translatable string and dump them in `path`
 
@@ -59,24 +59,24 @@ Examples
 
 **See command help:**
 ```bash
-app/console oro:translation:pack --help
+bin/console oro:translation:pack --help
 ```
 
 **Download and apply translation pack:**
 ```bash
-app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --download OroCRM
+bin/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --download OroCRM
 
 ```
 
 **Dump (generate) translation pack:**
 ```bash
-app/console oro:translation:pack --dump OroCRM
+bin/console oro:translation:pack --dump OroCRM
 ```
 
 **Upload translation pack:**
 Note: you must call dump command before using this one, otherwise system won't have anything to upload or will upload earlier generated files if there were left.
 ```bash
-app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM
+bin/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM
 ```
 
 oro:translation:load
@@ -90,7 +90,7 @@ Params are:
 
 **Load translations for English and Russian with rebuilding translation cache:**
 ```bash
-app/console oro:translation:load --languages=en --languages=ru --rebuild-cache
+bin/console oro:translation:load --languages=en --languages=ru --rebuild-cache
 ```
 
 oro:language:update
@@ -104,14 +104,14 @@ Params are:
 
 **Load translations for Russian:**
 ```bash
-app/console oro:language:update --language=ru_RU
+bin/console oro:language:update --language=ru_RU
 ```
 **Load translations for all installed languages:**
 ```bash
-app/console oro:language:update --all
+bin/console oro:language:update --all
 ```
 
 **List all installed languages:**
 ```bash
-app/console oro:language:update
+bin/console oro:language:update
 ```

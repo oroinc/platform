@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\KernelTerminateHandler;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -16,7 +16,14 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Yaml\Yaml;
 
+/**
+ * The base class for Data API functional tests.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class ApiTestCase extends WebTestCase
 {
     /** @var DoctrineHelper */
@@ -28,16 +35,71 @@ abstract class ApiTestCase extends WebTestCase
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
+    /** @var bool */
+    private $isKernelTerminateHandlerDisabled = false;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
         /** @var ContainerInterface $container */
-        $container = $this->getContainer();
+        $container = self::getContainer();
 
         $this->valueNormalizer = $container->get('oro_api.value_normalizer');
-        $this->doctrineHelper  = $container->get('oro_api.doctrine_helper');
+        $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
+    }
+
+    /**
+     * Disables clearing the security token and stopping sending messages
+     * during handling of "kernel.terminate" event.
+     * @see initClient
+     *
+     * @param bool $disable
+     */
+    protected function disableKernelTerminateHandler(bool $disable = true)
+    {
+        $this->isKernelTerminateHandlerDisabled = $disable;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initClient(array $options = [], array $server = [], $force = false)
+    {
+        $client = parent::initClient($options, $server, $force);
+
+        /**
+         * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
+         * This is needed to prevent unexpected exceptions in case if
+         * some database related exception occurrs during handling of API request
+         * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+         * As functional tests work inside a database transaction, any query to the database
+         * after such exception can raise "current transaction is aborted,
+         * commands ignored until end of transaction block" SQL exception
+         * in case if PostgreSQL is used in the tests.
+         */
+        if (!$this->isKernelTerminateHandlerDisabled) {
+            $container = $client->getKernel()->getContainer();
+            $handler = new KernelTerminateHandler($container, true);
+            $eventDispatcher = $container->get('event_dispatcher');
+            $eventDispatcher->addListener(
+                KernelEvents::TERMINATE,
+                function (PostResponseEvent $event) use ($handler) {
+                    $handler->onBeforeTerminate();
+                },
+                255
+            );
+            $eventDispatcher->addListener(
+                KernelEvents::TERMINATE,
+                function (PostResponseEvent $event) use ($handler) {
+                    $handler->onAfterTerminate();
+                },
+                -255
+            );
+        }
+
+        return $client;
     }
 
     /**
@@ -85,8 +147,8 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
-        $doctrineHelper = $this->getContainer()->get('oro_api.doctrine_helper');
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
+        $doctrineHelper = self::getContainer()->get('oro_api.doctrine_helper');
+        $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
@@ -107,8 +169,8 @@ abstract class ApiTestCase extends WebTestCase
         $this->initClient();
 
         $result = [];
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        $subresourcesProvider = $this->getContainer()->get('oro_api.subresources_provider');
+        $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
+        $subresourcesProvider = self::getContainer()->get('oro_api.subresources_provider');
         $resources = $resourcesProvider->getResources(Version::LATEST, $this->getRequestType());
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
@@ -135,7 +197,7 @@ abstract class ApiTestCase extends WebTestCase
     protected function findEntityId($entityClass)
     {
         /** @var EntityManager|null $em */
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
+        $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
         if (!$em) {
             return null;
         }
@@ -167,32 +229,120 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * Loads the response content.
      *
-     * @return string|null
+     * @param string $fileName
+     * @param string $folderName
+     *
+     * @return array
      */
-    protected function getRestApiEntityId($entityClass, $entityId)
+    protected function loadYamlData($fileName, $folderName = null)
     {
-        if (null === $entityId) {
-            return null;
+        if ($this->isRelativePath($fileName)) {
+            $fileName = $this->getTestResourcePath($folderName, $fileName);
+        }
+        $file = self::getContainer()->get('file_locator')->locate($fileName);
+        self::assertTrue(is_file($file), sprintf('File "%s" with expected content not found', $fileName));
+
+        return Yaml::parse(file_get_contents($file));
+    }
+
+    /**
+     * Loads the response content.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     *
+     * @return array
+     */
+    protected function loadResponseData($expectedContent)
+    {
+        if (is_string($expectedContent)) {
+            $expectedContent = $this->loadYamlData($expectedContent, 'responses');
         }
 
-        $config = $this->getContainer()->get('oro_api.config_provider')->getConfig(
-            $entityClass,
-            Version::LATEST,
-            $this->getRequestType(),
-            [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
-        );
-        $metadata = $this->getContainer()->get('oro_api.metadata_provider')->getMetadata(
-            $entityClass,
-            Version::LATEST,
-            $this->getRequestType(),
-            $config->getDefinition()
-        );
+        return self::processTemplateData($expectedContent);
+    }
 
-        return $this->getContainer()->get('oro_api.rest.entity_id_transformer')
-            ->transform($entityId, $metadata);
+    /**
+     * Converts the given request to an array that can be sent to the server.
+     *
+     * @param array|string $request
+     *
+     * @return array
+     */
+    protected function getRequestData($request)
+    {
+        if (is_string($request) && $this->isRelativePath($request)) {
+            $request = $this->getTestResourcePath('requests', $request);
+        }
+
+        return self::processTemplateData($request);
+    }
+
+    /**
+     * Replaces all values in the given expected response content
+     * with correxponding value from the actual response content
+     * when the key of an element is equal to the given key
+     * and the value of this element is equal to the given placeholder.
+     *
+     * @param array|string $expectedContent The file name or full file path to YAML template file or array
+     * @param Response     $response        The response object
+     * @param string       $key             The key for with a value shoul be updated
+     * @param string       $placeholder     The marker value
+     *
+     * @return array
+     */
+    protected function updateResponseContent(
+        $expectedContent,
+        Response $response,
+        string $key = 'id',
+        string $placeholder = 'new'
+    ): array {
+        $expectedContent = $this->loadResponseData($expectedContent);
+        $content = self::jsonToArray($response->getContent());
+        $this->walkResponseContent($expectedContent, $content, $key, $placeholder);
+
+        return $expectedContent;
+    }
+
+    /**
+     * @param array  $expectedContent
+     * @param array  $content
+     * @param string $key
+     * @param string $placeholder
+     * @param array  $path
+     */
+    private function walkResponseContent(
+        array &$expectedContent,
+        array $content,
+        string $key,
+        string $placeholder,
+        array $path = []
+    ): void {
+        foreach ($expectedContent as $k => &$v) {
+            if ($k === $key && $v === $placeholder) {
+                $contentItem = $content;
+                $i = 0;
+                foreach ($path as $p) {
+                    if (!is_array($contentItem) || !array_key_exists($p, $contentItem)) {
+                        break;
+                    }
+                    $contentItem = $contentItem[$p];
+                    $i++;
+                }
+                if (count($path) === $i && is_array($contentItem) && array_key_exists($k, $contentItem)) {
+                    $v = $contentItem[$k];
+                }
+            } elseif (is_array($v)) {
+                $this->walkResponseContent(
+                    $expectedContent[$k],
+                    $content,
+                    $key,
+                    $placeholder,
+                    array_merge($path, [$k])
+                );
+            }
+        }
     }
 
     /**
@@ -259,8 +409,8 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Asserts response status code equals.
      *
-     * @param Response  $response
-     * @param int|int[] $statusCode
+     * @param Response    $response
+     * @param int|int[]   $statusCode
      * @param string|null $message
      */
     public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
@@ -319,7 +469,32 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return self::getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * Clears the default entity manager.
+     */
+    protected function clearEntityManager()
+    {
+        try {
+            $this->getEntityManager()->clear();
+        } catch (DBALException $e) {
+            /**
+             * Suppress database related exceptions during the clearing of the entity manager,
+             * if it was requested for safe handling of "kernel.terminate" event.
+             * This is needed to prevent unexpected exceptions in case if
+             * some database related exception occurrs during handling of API request
+             * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
+             * As functional tests work inside a database transaction, any query to the database
+             * after such exception can raise "current transaction is aborted,
+             * commands ignored until end of transaction block" SQL exception
+             * in case if PostgreSQL is used in the tests.
+             */
+            if ($this->isKernelTerminateHandlerDisabled) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -327,7 +502,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function getConfigRegistry()
     {
-        return $this->getContainer()->get('oro_api.tests.config_registry');
+        return self::getContainer()->get('oro_api.tests.config_registry');
     }
 
     /**
@@ -338,7 +513,7 @@ abstract class ApiTestCase extends WebTestCase
      * Please note that the configuration is restored after each test and you do not need to do it manually.
      *
      * @param string $entityClass          The class name of API resource
-     * @param array $config                The config to append,
+     * @param array  $config               The config to append,
      *                                     e.g. ['fields' => ['renamedField' => ['property_path' => 'field']]]
      * @param bool   $affectResourcesCache Whether the appended config affects the API resources or sub-resources
      *                                     cache. E.g. this can happen when an association is renamed or excluded,

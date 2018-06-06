@@ -1,0 +1,3 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    test_department:
+        name: Test Department

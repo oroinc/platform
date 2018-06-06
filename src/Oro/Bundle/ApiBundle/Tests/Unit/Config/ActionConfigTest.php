@@ -221,13 +221,16 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
     public function testSortingFlag()
     {
         $config = new ActionConfig();
+        $this->assertFalse($config->hasDisableSorting());
         $this->assertTrue($config->isSortingEnabled());
 
         $config->disableSorting();
+        $this->assertTrue($config->hasDisableSorting());
         $this->assertFalse($config->isSortingEnabled());
         $this->assertEquals(['disable_sorting' => true], $config->toArray());
 
         $config->enableSorting();
+        $this->assertTrue($config->hasDisableSorting());
         $this->assertTrue($config->isSortingEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -235,13 +238,16 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
     public function testInclusionFlag()
     {
         $config = new ActionConfig();
+        $this->assertFalse($config->hasDisableInclusion());
         $this->assertTrue($config->isInclusionEnabled());
 
         $config->disableInclusion();
+        $this->assertTrue($config->hasDisableInclusion());
         $this->assertFalse($config->isInclusionEnabled());
         $this->assertEquals(['disable_inclusion' => true], $config->toArray());
 
         $config->enableInclusion();
+        $this->assertTrue($config->hasDisableInclusion());
         $this->assertTrue($config->isInclusionEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -249,13 +255,16 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
     public function testFieldsetFlag()
     {
         $config = new ActionConfig();
+        $this->assertFalse($config->hasDisableFieldset());
         $this->assertTrue($config->isFieldsetEnabled());
 
         $config->disableFieldset();
+        $this->assertTrue($config->hasDisableFieldset());
         $this->assertFalse($config->isFieldsetEnabled());
         $this->assertEquals(['disable_fieldset' => true], $config->toArray());
 
         $config->enableFieldset();
+        $this->assertTrue($config->hasDisableFieldset());
         $this->assertTrue($config->isFieldsetEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -263,13 +272,16 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
     public function testMetaPropertiesFlag()
     {
         $config = new ActionConfig();
+        $this->assertFalse($config->hasDisableMetaProperties());
         $this->assertTrue($config->isMetaPropertiesEnabled());
 
         $config->disableMetaProperties();
+        $this->assertTrue($config->hasDisableMetaProperties());
         $this->assertFalse($config->isMetaPropertiesEnabled());
         $this->assertEquals(['disable_meta_properties' => true], $config->toArray());
 
         $config->enableMetaProperties();
+        $this->assertTrue($config->hasDisableMetaProperties());
         $this->assertTrue($config->isMetaPropertiesEnabled());
         $this->assertEquals([], $config->toArray());
     }
@@ -320,15 +332,20 @@ class ActionConfigTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testAddFormConstraint()
+    public function testFormConstraints()
     {
         $config = new ActionConfig();
 
+        $this->assertNull($config->getFormOptions());
+        $this->assertNull($config->getFormConstraints());
+
         $config->addFormConstraint(new NotNull());
         $this->assertEquals(['constraints' => [new NotNull()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull()], $config->getFormConstraints());
 
         $config->addFormConstraint(new NotBlank());
         $this->assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
+        $this->assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
     public function testFormEventSubscribers()

@@ -42,11 +42,6 @@ class ConfigurableTypeTest extends ConfigurableBlockTestCase
         (new ConfigurableType())->getName();
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ConfigurableBlockTestCase::TYPE_NAME, $this->type->getName());
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Name of block type should be a string, array given

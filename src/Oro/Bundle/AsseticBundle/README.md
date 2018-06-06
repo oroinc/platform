@@ -1,13 +1,10 @@
 # OroAsseticBundle
 
-OroAsseticBundle is based on AsseticBundle and enables an expandable and optimized way to manage CSS assets that are
-distributed across many bundles.
-
-With OroAsseticBundle, a developer can define CSS file groups in the assets.yml configuration of the bundle. Defined files
-are automatically merged and optimized for web presentation. For development and debug purposes, some files can
-be excluded from the optimization process.
-
-Example of the assets.yml file:
+OroAsseticBundle introduces configuration of CSS files groups via the assets.yml file, which can be configured in any active bundle. Such files are automatically merged and optimized for a web presentation.
+ 
+## Overview
+ 
+Example of an assets.yml file:
 
 ```yaml
 assets:
@@ -28,7 +25,7 @@ The path to the file can be defined as bundles/bundle/path/to/file.ext. There is
 used for correct work.
 
 To turn off compression of the css files in the `css_group` group, the following configuration should be added
-to the app/config/config.yml (or app/config/config_{mode}.yml) file:
+to the config/config.yml (or config/config_{mode}.yml) file:
 
 ```yaml
 oro_assetic:
@@ -45,14 +42,14 @@ oro_assetic:
 After this configuration change, the cleanup and assets install is required:
 
 ```php
-php app/console cache:clear
-php app/console assets:install
+php bin/console cache:clear
+php bin/console assets:install
 ```
 
 To get the list of all available asset groups, the following command should be used:
 
 ```php
-php app/console oro:assetic:groups
+php bin/console oro:assetic:groups
 ```
 
 The following code must be added to the main template:

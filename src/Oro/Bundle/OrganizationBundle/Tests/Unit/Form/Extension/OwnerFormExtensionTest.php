@@ -10,6 +10,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension;
+use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
@@ -19,6 +20,8 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormError;
@@ -206,7 +209,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_user_acl_select'
+            UserAclSelectType::class
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }
@@ -230,7 +233,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_type_business_unit_select_autocomplete',
+            BusinessUnitSelectAutocomplete::class,
             array(
                 'placeholder' => 'oro.business_unit.form.choose_business_user',
                 'label' => 'oro.user.owner.label',
@@ -330,17 +333,18 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'entity',
-            array(
-                'class' => 'OroOrganizationBundle:BusinessUnit',
+            EntityType::class,
+            [
+                'class' => BusinessUnit::class,
                 'property' => 'name',
-                'choices' => $this->businessUnits,
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'oro.user.owner.label',
-                'translatable_options' => false
-            )
+                'translatable_options' => false,
+                'query_builder' => function () {
+                },
+            ]
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));
     }

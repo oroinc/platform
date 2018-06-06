@@ -4,6 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,20 +28,20 @@ class WidgetSortByType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('property', 'choice', [
+            ->add('property', ChoiceType::class, [
                 'label' => false,
                 'choices' => $this->createPropertyChoices($options['class_name']),
                 'required' => false,
                 'placeholder' => 'oro.dashboard.widget.sort_by.property.placeholder',
             ])
-            ->add('order', 'choice', [
+            ->add('order', ChoiceType::class, [
                 'label' => false,
                 'choices' => [
-                    'ASC' => 'oro.dashboard.widget.sort_by.order.asc.label',
-                    'DESC' => 'oro.dashboard.widget.sort_by.order.desc.label',
+                    'oro.dashboard.widget.sort_by.order.asc.label' => 'ASC',
+                    'oro.dashboard.widget.sort_by.order.desc.label' => 'DESC',
                 ],
             ])
-            ->add('className', 'hidden', ['data' => $options['class_name']]);
+            ->add('className', HiddenType::class, ['data' => $options['class_name']]);
     }
 
     /**
@@ -85,7 +87,7 @@ class WidgetSortByType extends AbstractType
         //@TODO change logic of grabbing choices. They should grab from datagrid config
         $fields = $this->fieldProvider->getFields($className);
         foreach ($fields as $field) {
-            $choices[$field['name']] = $field['label'];
+            $choices[$field['label']] = $field['name'];
         }
 
         return $choices;

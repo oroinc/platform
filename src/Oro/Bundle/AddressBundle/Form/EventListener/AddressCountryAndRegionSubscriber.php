@@ -5,6 +5,7 @@ namespace Oro\Bundle\AddressBundle\Form\EventListener;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
+use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -69,12 +70,11 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if ($form->has('region')) {
                 $regionTypeConfig = $form->get('region')->getConfig();
                 $config = $regionTypeConfig->getOptions();
-                unset($config['choice_list']);
                 unset($config['choices']);
-                $formType = $regionTypeConfig->getType()->getName();
+                $formType = get_class($regionTypeConfig->getType()->getInnerType());
             } else {
                 $config = array();
-                $formType = 'oro_region';
+                $formType = RegionType::class;
             }
 
             $config['country'] = $country;
@@ -83,9 +83,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             if (array_key_exists('auto_initialize', $config)) {
                 $config['auto_initialize'] = false;
             }
-
-            //@TODO Remove in scope BAP-16504
-            unset($config['cascade_validation']);
 
             $form->add(
                 $this->factory->createNamed(
@@ -115,11 +112,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form = $event->getForm();
 
             $config = $form->get('region')->getConfig()->getOptions();
-            unset($config['choice_list']);
             unset($config['choices']);
-
-            //@TODO Remove in scope BAP-16504
-            unset($config['cascade_validation']);
 
             $config['country'] = $country;
             $config['query_builder'] = $this->getRegionClosure($country);
@@ -128,13 +121,10 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 $config['auto_initialize'] = false;
             }
 
-            //@TODO Remove in scope BAP-15236
-            unset($config['csrf_provider']);
-
             $form->add(
                 $this->factory->createNamed(
                     'region',
-                    $form->get('region')->getConfig()->getType()->getName(),
+                    get_class($form->get('region')->getConfig()->getType()->getInnerType()),
                     null,
                     $config
                 )

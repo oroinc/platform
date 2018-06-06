@@ -1,7 +1,6 @@
-OroUIBundle
-===========
+# OroUIBundle
 
-User interface layouts and controls.
+OroUIBundle defines the architecture of the front-end part of Oro application and provides tools that ensure the coordinated work of the architecture parts.
 
 ## Table of Contents
 
@@ -58,7 +57,7 @@ placeholders:
           <one_more_item_name>: ~      # sort order will be set to 0
 ```
 
-Any configuration defined in bundle `placeholders.yml` file can be overridden in `app/config/config.yml` file.
+Any configuration defined in bundle `placeholders.yml` file can be overridden in `config/config.yml` file.
 
 ```yaml
 

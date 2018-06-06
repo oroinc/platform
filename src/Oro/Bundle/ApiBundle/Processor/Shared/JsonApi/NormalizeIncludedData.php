@@ -16,7 +16,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
@@ -26,7 +28,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Loads data from "included" section of the request data to the Context.
+ * Loads data from "included" section of the request data to the context.
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
@@ -44,8 +46,8 @@ class NormalizeIncludedData implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    protected $entityIdTransformerRegistry;
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -60,20 +62,20 @@ class NormalizeIncludedData implements ProcessorInterface
     private $entityMetadata;
 
     /**
-     * @param DoctrineHelper               $doctrineHelper
-     * @param EntityInstantiator           $entityInstantiator
-     * @param EntityLoader                 $entityLoader
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
-     * @param ConfigProvider               $configProvider
-     * @param MetadataProvider             $metadataProvider
+     * @param DoctrineHelper              $doctrineHelper
+     * @param EntityInstantiator          $entityInstantiator
+     * @param EntityLoader                $entityLoader
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
+     * @param ConfigProvider              $configProvider
+     * @param MetadataProvider            $metadataProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
         EntityLoader $entityLoader,
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer,
+        EntityIdTransformerRegistry $entityIdTransformerRegistry,
         ConfigProvider $configProvider,
         MetadataProvider $metadataProvider
     ) {
@@ -81,7 +83,7 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->entityInstantiator = $entityInstantiator;
         $this->entityLoader = $entityLoader;
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
@@ -286,13 +288,24 @@ class NormalizeIncludedData implements ProcessorInterface
         }
 
         try {
-            return $this->entityIdTransformer->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
+            return $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $this->getEntityMetadata($entityClass));
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
         }
 
         return null;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
     /**

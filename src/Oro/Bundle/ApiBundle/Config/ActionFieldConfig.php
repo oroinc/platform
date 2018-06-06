@@ -11,10 +11,14 @@ class ActionFieldConfig implements FieldConfigInterface
 {
     use Traits\ConfigTrait;
     use Traits\FieldConfigTrait;
+    use Traits\DirectionTrait;
     use Traits\FormTrait;
 
     /** a flag indicates whether the field should be excluded */
     const EXCLUDE = EntityDefinitionFieldConfig::EXCLUDE;
+
+    /** a value that indicates whether the field is input-only, output-only or bidirectional */
+    const DIRECTION = EntityDefinitionFieldConfig::DIRECTION;
 
     /** the form type that should be used for the field */
     const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;

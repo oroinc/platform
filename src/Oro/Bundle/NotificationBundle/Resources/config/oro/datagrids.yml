@@ -33,8 +33,8 @@ datagrids:
                 label: oro.notification.massnotification.status.label
                 frontend_type: select
                 choices:
-                   - oro.notification.massnotification.status.failed
-                   - oro.notification.massnotification.status.success
+                   oro.notification.massnotification.status.failed: 0
+                   oro.notification.massnotification.status.success: 1
 
         properties:
             id: ~
@@ -80,8 +80,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                0: oro.notification.massnotification.status.failed
-                                1: oro.notification.massnotification.status.success
+                                oro.notification.massnotification.status.failed: 0
+                                oro.notification.massnotification.status.success: 1
 
     email-notification-grid:
         options:

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType as ParentTextareaType;
+
 /**
  * This form type is just a wrapper around standard 'textarea' form type, but
  * this form type can handle 'immutable' behaviour. It means that you can use it
@@ -31,6 +33,6 @@ class TextareaType extends AbstractConfigType
      */
     public function getParent()
     {
-        return 'textarea';
+        return ParentTextareaType::class;
     }
 }

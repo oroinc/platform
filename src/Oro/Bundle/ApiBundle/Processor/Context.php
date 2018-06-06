@@ -26,6 +26,8 @@ use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
+ * The base execution context for Data API processors for public action.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
@@ -61,8 +63,8 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     const INCLUDE_HEADER = 'X-Include';
 
-    /** a list of filters is used to add additional restrictions to a query is used to get result data */
-    const FILTERS = 'filters';
+    /** @var FilterCollection */
+    private $filters;
 
     /** @var FilterValueAccessorInterface */
     private $filterValues;
@@ -107,6 +109,16 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setClassName($className)
     {
         $this->set(self::CLASS_NAME, $className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasIdentifierFields()
+    {
+        $metadata = $this->getMetadata();
+
+        return null !== $metadata && $metadata->hasIdentifierFields();
     }
 
     /**
@@ -196,11 +208,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getFilters()
     {
-        if (!$this->has(self::FILTERS)) {
-            $this->set(self::FILTERS, new FilterCollection());
+        if (null === $this->filters) {
+            $this->filters = new FilterCollection();
         }
 
-        return $this->get(self::FILTERS);
+        return $this->filters;
     }
 
     /**
@@ -274,9 +286,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     {
         $extras = $this->get(self::CONFIG_EXTRAS);
 
-        return null !== $extras
-            ? $extras
-            : [];
+        return $extras ?? [];
     }
 
     /**
@@ -622,7 +632,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function getMetadataExtras()
     {
         $extras = $this->get(self::METADATA_EXTRAS);
-        $extras = null !== $extras ? $extras : [];
+        $extras = $extras ?? [];
         $action = $this->getAction();
         if ($action && (empty($extras) || !$this->hasActionMetadataExtra($extras))) {
             $extras[] = new ActionMetadataExtra($action);

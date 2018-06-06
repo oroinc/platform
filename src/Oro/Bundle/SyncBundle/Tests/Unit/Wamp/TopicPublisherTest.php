@@ -17,6 +17,7 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
     protected $socket;
     protected function setUp()
     {
+        $this->markTestSkipped('TODO: should be unskipped in scope of BAP-16769');
         $this->socket = $this->createMock('Oro\Bundle\SyncBundle\Wamp\WebSocket');
 
         $this->wamp = new TopicPublisher('example.com', 1);

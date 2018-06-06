@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+.desktop-version {
+  .app-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
+    right: -7px;
+  }
+}
+
+.app-header .nav.pull-right {
+  li.email-notification-menu.dropdown .dropdown-menu li a {
+    padding: 0;
+  }
+}

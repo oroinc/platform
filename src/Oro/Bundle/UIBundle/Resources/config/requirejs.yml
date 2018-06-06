@@ -190,7 +190,6 @@ config:
         'oroui/js/app/modules/init-lightgallery': 'bundles/oroui/js/app/modules/init-lightgallery.js'
         'oroui/js/app/modules/component-shortcuts-module': 'bundles/oroui/js/app/modules/component-shortcuts-module.js'
         'oroui/js/app/modules/resizable-area-module': 'bundles/oroui/js/app/modules/resizable-area-module.js'
-        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/services/registry': 'bundles/oroui/js/app/services/registry.js'
@@ -211,7 +210,6 @@ config:
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
         'oroui/js/app/views/content-sidebar-view': 'bundles/oroui/js/app/views/content-sidebar-view.js'
         'oroui/js/app/views/highlight-text-view': 'bundles/oroui/js/app/views/highlight-text-view.js'
-        'oroui/js/app/views/side-panel-view': 'bundles/oroui/js/app/views/side-panel-view.js'
         'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
 
         'oroui/js/app/plugins/plugin-resizable-area': 'bundles/oroui/js/app/plugins/plugin-resizable-area.js'
@@ -221,7 +219,6 @@ config:
         'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
-        'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
         'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
@@ -256,6 +253,7 @@ config:
         'oroui/js/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
 
         'oroui/js/desktop/side-menu': 'bundles/oroui/js/desktop/side-menu.js'
+        'oroui/js/desktop/side-menu-overlay': 'bundles/oroui/js/desktop/side-menu-overlay.js'
 
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
@@ -289,8 +287,11 @@ config:
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
+        'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
 
         'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
+        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
+
     appmodules:
         - oroui/js/app/modules/init-layout
         - oroui/js/app/modules/init-lightgallery

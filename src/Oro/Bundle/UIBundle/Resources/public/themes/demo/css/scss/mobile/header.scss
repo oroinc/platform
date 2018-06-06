@@ -1,0 +1,36 @@
+/* @theme: admin.demo; */
+
+.app-header {
+    background-color: $app-header-bg-color;
+    color: $app-header-text-color;
+
+    .main-menu-toggler {
+        color: $app-header-logo-text-color;
+    }
+
+    .organization-logo-wrapper {
+        .logo {
+            color: $app-header-logo-text-color;
+        }
+
+        li.dropdown.open > .logo {
+            color: $app-header-logo-text-color;
+        }
+    }
+
+    .nav.top-search.shortcuts {
+        .dropdown{
+            > a {
+                color: $app-header-text-color;
+            }
+        }
+    }
+
+    .nav.user-menu {
+        .dropdown {
+            > a {
+                color: $app-header-text-color;
+            }
+        }
+    }
+}

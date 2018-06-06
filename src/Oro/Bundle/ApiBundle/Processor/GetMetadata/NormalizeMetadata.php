@@ -80,36 +80,43 @@ class NormalizeMetadata implements ProcessorInterface
         $processLinkedProperties,
         MetadataContext $context
     ) {
-        $linkedPropertyNames = [];
+        $resolvedPropertyNames = [];
         $withExcludedProperties = $context->getWithExcludedProperties();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if (!$withExcludedProperties && $field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
             } elseif ($processLinkedProperties) {
-                $propertyPath = $field->getPropertyPath();
-                if ($propertyPath && $fieldName !== $propertyPath) {
-                    $path = ConfigUtil::explodePropertyPath($field->getPropertyPath());
-                    if (count($path) > 0 && !$entityMetadata->hasProperty($fieldName)) {
-                        $addedPropertyName = $this->processLinkedProperty(
+                if ($entityMetadata->hasProperty($fieldName)) {
+                    $resolvedPropertyNames[] = $fieldName;
+                } else {
+                    $propertyPath = $field->getPropertyPath();
+                    if ($propertyPath && $fieldName !== $propertyPath) {
+                        $path = ConfigUtil::explodePropertyPath($propertyPath);
+                        $isPropertyAdded = $this->processLinkedProperty(
                             $entityMetadata,
                             $fieldName,
                             $path,
                             $config,
                             $context
                         );
-                        if ($addedPropertyName) {
-                            $linkedPropertyNames[] = $addedPropertyName;
+                        if ($isPropertyAdded) {
+                            $resolvedPropertyNames[] = $fieldName;
                         }
                     }
                 }
+            } else {
+                $resolvedPropertyNames[] = $fieldName;
             }
         }
 
         if ($config->isExcludeAll()) {
-            $toRemoveFieldNames = array_diff(
-                array_merge(array_keys($entityMetadata->getFields()), array_keys($entityMetadata->getAssociations())),
-                array_merge($linkedPropertyNames, array_keys($fields))
+            $toRemoveFieldNames = \array_diff(
+                \array_merge(
+                    \array_keys($entityMetadata->getFields()),
+                    \array_keys($entityMetadata->getAssociations())
+                ),
+                $resolvedPropertyNames
             );
             foreach ($toRemoveFieldNames as $fieldName) {
                 $entityMetadata->removeProperty($fieldName);
@@ -124,7 +131,7 @@ class NormalizeMetadata implements ProcessorInterface
      * @param EntityDefinitionConfig $config
      * @param MetadataContext        $context
      *
-     * @return string|null
+     * @return bool
      */
     protected function processLinkedProperty(
         EntityMetadata $entityMetadata,
@@ -133,12 +140,13 @@ class NormalizeMetadata implements ProcessorInterface
         EntityDefinitionConfig $config,
         MetadataContext $context
     ) {
-        $addedPropertyName = null;
+        $isPropertyAdded = false;
 
-        $linkedProperty = array_pop($propertyPath);
+        $associationPropertyPath = $propertyPath;
+        $linkedProperty = \array_pop($associationPropertyPath);
         $classMetadata = $this->doctrineHelper->findEntityMetadataByPath(
             $entityMetadata->getClassName(),
-            $propertyPath
+            $associationPropertyPath
         );
         if (null !== $classMetadata) {
             if ($classMetadata->hasAssociation($linkedProperty)) {
@@ -147,16 +155,15 @@ class NormalizeMetadata implements ProcessorInterface
                     $linkedProperty
                 );
                 $associationMetadata->setName($propertyName);
-                $associationMetadata->setPropertyPath($linkedProperty);
-                $linkedPropertyPath = array_merge($propertyPath, [$linkedProperty]);
+                $associationMetadata->setPropertyPath(\implode(ConfigUtil::PATH_DELIMITER, $propertyPath));
                 $associationMetadata->setTargetMetadata(
                     $this->getMetadata(
                         $associationMetadata->getTargetClassName(),
-                        $this->getTargetConfig($config, $propertyName, $linkedPropertyPath),
+                        $this->getTargetConfig($config, $propertyName, $propertyPath),
                         $context
                     )
                 );
-                $targetFieldConfig = $config->findFieldByPath($linkedPropertyPath, true);
+                $targetFieldConfig = $config->findFieldByPath($propertyPath, true);
                 if (null !== $targetFieldConfig) {
                     $associationMetadata->setCollapsed($targetFieldConfig->isCollapsed());
                     if ($targetFieldConfig->getDataType()) {
@@ -164,16 +171,16 @@ class NormalizeMetadata implements ProcessorInterface
                     }
                 }
                 $entityMetadata->addAssociation($associationMetadata);
-                $addedPropertyName = $linkedProperty;
+                $isPropertyAdded = true;
             } elseif ($classMetadata->hasField($linkedProperty)) {
                 $fieldMetadata = $this->entityMetadataFactory->createFieldMetadata(
                     $classMetadata,
                     $linkedProperty
                 );
                 $fieldMetadata->setName($propertyName);
-                $fieldMetadata->setPropertyPath($linkedProperty);
+                $fieldMetadata->setPropertyPath(\implode(ConfigUtil::PATH_DELIMITER, $propertyPath));
                 $entityMetadata->addField($fieldMetadata);
-                $addedPropertyName = $linkedProperty;
+                $isPropertyAdded = true;
             } else {
                 $targetEntityConfig = $config->getField($propertyPath[0])->getTargetEntity();
                 $targetEntityConfig->getField($linkedProperty)->setExcluded(false);
@@ -187,17 +194,17 @@ class NormalizeMetadata implements ProcessorInterface
                     $association = clone $targetEntityMetadata->getAssociation($linkedProperty);
                     $association->setName($propertyName);
                     $entityMetadata->addAssociation($association);
-                    $addedPropertyName = $propertyName;
+                    $isPropertyAdded = true;
                 } elseif ($targetEntityMetadata->hasField($linkedProperty)) {
                     $field = clone $targetEntityMetadata->getField($linkedProperty);
                     $field->setName($propertyName);
                     $entityMetadata->addField($field);
-                    $addedPropertyName = $propertyName;
+                    $isPropertyAdded = true;
                 }
             }
         }
 
-        return $addedPropertyName;
+        return $isPropertyAdded;
     }
 
     /**

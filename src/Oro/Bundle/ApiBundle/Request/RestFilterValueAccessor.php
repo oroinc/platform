@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
  * the filter from the query string will override the filter from the request body.
  *
  * Filter syntax for the query string:
- * * key=value, where "=" is an operator; see getOperators() method to find a list of supported operators
- * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see getOperatorNameMap() method
+ * * key=value, where "=" is an operator; see $this->operators to find a list of supported operators
+ * * key[operator name]=value, where "operator name" can be "eq", "neq", etc.; see $this->operatorNameMap
  *                             to find a map between operators and their names
  * Examples:
  * * /api/users?filter[name]!=John
@@ -37,24 +37,55 @@ use Symfony\Component\HttpFoundation\Request;
  *      'sort' => 'name'
  *  ]
  * </code>
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RestFilterValueAccessor implements FilterValueAccessorInterface
 {
     /** @var Request */
-    protected $request;
+    private $request;
+
+    /** @var string */
+    private $operatorPattern;
+
+    /** @var string[] [operator short name, ...] */
+    private $operators;
+
+    /** @var array [operator name => operator short name or NULL, ...] */
+    private $operatorNameMap;
+
+    /** @var array [operator short name => operator name, ...] */
+    private $operatorShortNameMap;
 
     /** @var FilterValue[] */
-    protected $parameters;
+    private $parameters;
 
     /** @var array */
-    protected $groups;
+    private $groups;
+
+    /** @var string|null */
+    private $defaultGroupName;
 
     /**
      * @param Request $request
+     * @param string  $operatorPattern
+     * @param array   $operatorNameMap
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, $operatorPattern, array $operatorNameMap)
     {
         $this->request = $request;
+        $this->operatorPattern = $operatorPattern;
+        $this->operatorNameMap = $operatorNameMap;
+        $this->operators = [];
+        $this->operatorShortNameMap = [];
+        foreach ($operatorNameMap as $name => $shortName) {
+            if ($shortName) {
+                $this->operators[] = $shortName;
+                $this->operatorShortNameMap[$shortName] = $name;
+            }
+        }
+        // "<>" is an alias for "!="
+        $this->operators[] = '<>';
     }
 
     /**
@@ -64,7 +95,22 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        return isset($this->parameters[$key]);
+        if (isset($this->parameters[$key])) {
+            return true;
+        }
+
+        $result = false;
+        if ($this->defaultGroupName && isset($this->groups[$this->defaultGroupName])) {
+            /** @var FilterValue $value */
+            foreach ($this->groups[$this->defaultGroupName] as $value) {
+                if ($value->getPath() === $key) {
+                    $result = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -74,11 +120,22 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        if (!isset($this->parameters[$key])) {
-            return null;
+        if (isset($this->parameters[$key])) {
+            return $this->parameters[$key];
         }
 
-        return $this->parameters[$key];
+        $result = null;
+        if ($this->defaultGroupName && isset($this->groups[$this->defaultGroupName])) {
+            /** @var FilterValue $value */
+            foreach ($this->groups[$this->defaultGroupName] as $value) {
+                if ($value->getPath() === $key) {
+                    $result = $value;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -98,7 +155,23 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll($group = null)
+    public function getDefaultGroupName()
+    {
+        return $this->defaultGroupName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultGroupName($group)
+    {
+        $this->defaultGroupName = $group;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll()
     {
         $this->ensureRequestParsed();
 
@@ -112,10 +185,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        $delimPos = strpos($key, '[');
-        $group = false !== $delimPos && substr($key, -1) === ']'
-            ? substr($key, 0, $delimPos)
-            : $key;
+        $group = $this->extractGroup($key);
         if (null !== $value) {
             $value->setOperator($this->normalizeOperator($value->getOperator()));
             $this->parameters[$key] = $value;
@@ -132,10 +202,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     {
         $this->ensureRequestParsed();
 
-        $delimPos = strpos($key, '[');
-        $group = false !== $delimPos && substr($key, -1) === ']'
-            ? substr($key, 0, $delimPos)
-            : $key;
+        $group = $this->extractGroup($key);
 
         unset($this->parameters[$key], $this->groups[$group][$key]);
     }
@@ -143,7 +210,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * Makes sure the Request parsed
      */
-    protected function ensureRequestParsed()
+    private function ensureRequestParsed()
     {
         if (null === $this->parameters) {
             $this->parseRequest();
@@ -153,7 +220,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * Extracts filters from the Request
      */
-    protected function parseRequest()
+    private function parseRequest()
     {
         $this->parameters = [];
         $this->groups = [];
@@ -171,7 +238,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return FilterValue
      */
-    protected function addParsed($group, $key, $path, $value, $operator)
+    private function addParsed($group, $key, $path, $value, $operator)
     {
         $filterValue = new FilterValue(
             $path,
@@ -184,16 +251,16 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         return $filterValue;
     }
 
-    protected function parseQueryString()
+    private function parseQueryString()
     {
         $queryString = $this->request->getQueryString();
         if (empty($queryString)) {
             return;
         }
 
-        $matchResult = preg_match_all(
+        $matchResult = \preg_match_all(
             '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]*\])|(%5B[\w\d-\.]*%5D))*)))'
-            . '(?P<operator>(' . $this->getOperatorPattern() . ')'
+            . '(?P<operator>' . $this->operatorPattern . ')'
             . '(?P<value>[^&]+)/',
             $queryString,
             $matches,
@@ -201,22 +268,21 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         );
 
         if (false !== $matchResult) {
-            $operatorNameMap = $this->getOperatorNameMap();
             foreach ($matches as $match) {
-                $key = rawurldecode($match['key']);
-                $group = rawurldecode($match['group']);
-                $path = rawurldecode($match['path']);
-                $operator = rawurldecode($match['operator']);
+                $key = \rawurldecode($match['key']);
+                $group = \rawurldecode($match['group']);
+                $path = \rawurldecode($match['path']);
+                $operator = \rawurldecode($match['operator']);
 
                 // check if a filter is provided as "key[operator name]=value"
-                if (substr($path, -1) === ']') {
-                    $pos = strrpos($path, '[');
+                if (\substr($path, -1) === ']') {
+                    $pos = \strrpos($path, '[');
                     if (false !== $pos) {
-                        $lastElement = substr($path, $pos + 1, -1);
-                        if (isset($operatorNameMap[$lastElement])) {
+                        $lastElement = \substr($path, $pos + 1, -1);
+                        if (\array_key_exists($lastElement, $this->operatorNameMap)) {
                             $operator = $lastElement;
-                            $key = substr($key, 0, -(strlen($path) - $pos));
-                            $path = substr($path, 0, $pos);
+                            $key = \substr($key, 0, -(\strlen($path) - $pos));
+                            $path = \substr($path, 0, $pos);
                         }
                     }
                 }
@@ -225,17 +291,17 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
                 if (empty($path)) {
                     $path = $key;
                 } else {
-                    $path = strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
+                    $path = \strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
                     $normalizedKey = $group . '[' . $path . ']';
                 }
 
-                $this->addParsed($group, $normalizedKey, $path, rawurldecode($match['value']), $operator)
+                $this->addParsed($group, $normalizedKey, $path, \rawurldecode($match['value']), $operator)
                     ->setSourceKey($key);
             }
         }
     }
 
-    protected function parseRequestBody()
+    private function parseRequestBody()
     {
         if (null === $this->request->request) {
             return;
@@ -243,16 +309,16 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
 
         $requestBody = $this->request->request->all();
         foreach ($requestBody as $group => $val) {
-            if (is_array($val)) {
+            if (\is_array($val)) {
                 if ($this->isValueWithOperator($val)) {
-                    $this->addParsed($group, $group, $group, current($val), key($val))->setSourceKey($group);
+                    $this->addParsed($group, $group, $group, \current($val), \key($val))->setSourceKey($group);
                 } elseif (!ArrayUtil::isAssoc($val)) {
                     $this->addParsed($group, $group, $group, $val, '=')->setSourceKey($group);
                 } else {
                     foreach ($val as $subKey => $subValue) {
                         $paramKey = $group . '[' . $subKey . ']';
-                        if (is_array($subValue) && $this->isValueWithOperator($subValue)) {
-                            $this->addParsed($group, $paramKey, $subKey, current($subValue), key($subValue))
+                        if (\is_array($subValue) && $this->isValueWithOperator($subValue)) {
+                            $this->addParsed($group, $paramKey, $subKey, \current($subValue), \key($subValue))
                                 ->setSourceKey($paramKey);
                         } else {
                             $this->addParsed($group, $paramKey, $subKey, $subValue, '=')->setSourceKey($paramKey);
@@ -270,19 +336,19 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return bool
      */
-    protected function isValueWithOperator(array $value)
+    private function isValueWithOperator(array $value)
     {
-        if (1 !== count($value)) {
+        if (1 !== \count($value)) {
             return false;
         }
 
-        $key = key($value);
+        $key = \key($value);
 
         return
-            is_string($key)
+            \is_string($key)
             && (
-                in_array($key, $this->getOperators(), true)
-                || array_key_exists($key, $this->getOperatorNameMap())
+                \in_array($key, $this->operators, true)
+                || \array_key_exists($key, $this->operatorNameMap)
             );
     }
 
@@ -291,40 +357,29 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
      *
      * @return string
      */
-    protected function normalizeOperator($operator)
+    private function normalizeOperator($operator)
     {
         if ('<>' === $operator) {
-            return '!=';
+            $operator = '!=';
         }
-        $operatorNameMap = $this->getOperatorNameMap();
-        if (isset($operatorNameMap[$operator])) {
-            $operator = $operatorNameMap[$operator];
+        if (isset($this->operatorShortNameMap[$operator])) {
+            $operator = $this->operatorShortNameMap[$operator];
         }
 
         return $operator;
     }
 
     /**
-     * @return string[]
-     */
-    protected function getOperators()
-    {
-        return ['=', '!=', '>', '<', '>=', '<=', '<>'];
-    }
-
-    /**
-     * @return array [operator name => operator, ...]
-     */
-    protected function getOperatorNameMap()
-    {
-        return ['eq' => '=', 'neq' => '!=', 'gt' => '>', 'lt' => '<', 'gte' => '>=', 'lte' => '<='];
-    }
-
-    /**
+     * @param string $key
+     *
      * @return string
      */
-    protected function getOperatorPattern()
+    private function extractGroup($key)
     {
-        return '!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E)';
+        $delimPos = \strpos($key, '[');
+
+        return false !== $delimPos && \substr($key, -1) === ']'
+            ? \substr($key, 0, $delimPos)
+            : $key;
     }
 }

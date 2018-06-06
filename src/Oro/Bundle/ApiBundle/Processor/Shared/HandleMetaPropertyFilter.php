@@ -11,8 +11,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether the "meta" filter exists and if so,
- * adds the corresponding configuration extra into the Context.
- * This filter can be used to specify which entity meta properties should be returned.
+ * adds the corresponding configuration extra into the context.
+ * This filter is used to specify which entity meta properties should be returned.
  */
 class HandleMetaPropertyFilter implements ProcessorInterface
 {
@@ -39,7 +39,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             // meta properties were not requested
             return;
         }
-        $names = (array)$this->valueNormalizer->normalizeValue(
+        $names = $this->valueNormalizer->normalizeValue(
             $filterValue->getValue(),
             DataType::STRING,
             $context->getRequestType(),
@@ -50,6 +50,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
+        $names = (array)$names;
         $configExtra = $context->getConfigExtra(MetaPropertiesConfigExtra::NAME);
         if (null === $configExtra) {
             $configExtra = new MetaPropertiesConfigExtra();

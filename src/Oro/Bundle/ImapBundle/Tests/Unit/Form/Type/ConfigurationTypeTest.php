@@ -18,7 +18,8 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 
@@ -74,16 +75,19 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
+        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
+
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        'oro_imap_configuration_check' => new CheckButtonType(),
-                        'oro_email_email_folder_tree' => new EmailFolderTreeType(),
+                        CheckButtonType::class => new CheckButtonType(),
+                        EmailFolderTreeType::class => new EmailFolderTreeType(),
+                        ConfigurationType::class => $type
                     ],
                     [
-                        'form' => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
                     ]
                 ),
                 $this->getValidatorExtension(true)
@@ -121,8 +125,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindValidData($formData, $expectedViewData, $expectedModelData)
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
         if ($expectedViewData) {
             $form->submit($formData);
             foreach ($expectedViewData as $name => $value) {
@@ -218,8 +221,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'password' => '',
             'folders' => $foldersForm
         ];
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new TestUserEmailOrigin(1);
         $rootFolder = new EmailFolder();
@@ -276,8 +278,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindEmptyPassword()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $entity->setPassword(self::TEST_PASSWORD);
@@ -305,8 +306,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testCreatingNewConfiguration()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $entity->setImapHost('someHost');
@@ -339,8 +339,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testNotCreatingNewConfigurationWhenImapInactive()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $entity->setImapHost('someHost');
@@ -372,8 +371,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitEmptyForm()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
 
         $entity = new UserEmailOrigin();
         $this->assertTrue($entity->isActive());
@@ -405,9 +403,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(array $submitData, $expectedValid)
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
-
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(ConfigurationType::class);
         $form->submit($submitData);
 
         $this->assertEquals($expectedValid, $form->isValid());

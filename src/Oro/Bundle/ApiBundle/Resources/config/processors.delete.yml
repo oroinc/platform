@@ -58,5 +58,9 @@ services:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
 
     #
+    # finalize
+    #
+
+    #
     # normalize_result
     #

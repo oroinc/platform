@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\ORM\Query\Expr\Comparison as OrmComparison;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\MemberOfComparisonExpression;
@@ -14,24 +13,23 @@ class MemberOfComparisonExpressionTest extends \PHPUnit_Framework_TestCase
     {
         $expression = new MemberOfComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'MEMBER OF', 54);
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $fieldName = 'e.test';
+        $parameterName = 'test_1';
+        $value = 123;
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
             $fieldName,
-            $parameterName
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            new OrmComparison(':test_2', 'MEMBER OF', 'a.test'),
+        self::assertEquals(
+            new Comparison(':' . $parameterName, 'MEMBER OF', $fieldName),
             $result
         );
-
-        $this->assertEquals(
-            [new Parameter('test_2', 54, 'integer')],
+        self::assertEquals(
+            [new Parameter($parameterName, $value, 'integer')],
             $expressionVisitor->getParameters()
         );
     }

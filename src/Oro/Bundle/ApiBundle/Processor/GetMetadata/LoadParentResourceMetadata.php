@@ -57,9 +57,6 @@ class LoadParentResourceMetadata implements ProcessorInterface
             );
             if (null !== $entityMetadata) {
                 $entityMetadata->setClassName($entityClass);
-                if ($entityMetadata->hasIdentifierGenerator()) {
-                    $entityMetadata->setHasIdentifierGenerator(false);
-                }
                 $context->setResult($entityMetadata);
             }
         }

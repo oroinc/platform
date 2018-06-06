@@ -15,7 +15,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Makes sure that the class name of the parent entity exists in the Context.
+ * Makes sure that the class name of the parent entity exists in the context.
  * Converts entity type to FQCN of an entity.
  */
 class NormalizeParentEntityClass implements ProcessorInterface

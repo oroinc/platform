@@ -105,7 +105,7 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
             $form,
             $fieldName,
             $options,
-            ['choice_list', 'choices']
+            ['choices']
         );
     }
 }

@@ -54,7 +54,7 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetAvailableChannelTypesChoiceList()
     {
         $this->assertEquals(
-            [self::CHANNEL_TYPE_ONE => "oro.type1.label", self::CHANNEL_TYPE_TWO => "oro.type2.label"],
+            ['oro.type1.label' => self::CHANNEL_TYPE_ONE, 'oro.type2.label' => self::CHANNEL_TYPE_TWO],
             $this->typesRegistry->getAvailableChannelTypesChoiceList()
         );
     }

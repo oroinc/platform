@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Request;
 
 use Symfony\Component\Validator;
 
+/**
+ * Provides an interface for classes that extracts information from a validation constraint object.
+ */
 interface ConstraintTextExtractorInterface
 {
     /**

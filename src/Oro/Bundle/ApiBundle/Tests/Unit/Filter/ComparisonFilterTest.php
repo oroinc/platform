@@ -13,61 +13,52 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 
 class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ComparisonFilter */
-    protected $comparisonFilter;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    public function testSetAndGetField()
     {
-        $this->comparisonFilter = new ComparisonFilter(DataType::INTEGER);
-        $this->comparisonFilter->setSupportedOperators(
-            [
-                ComparisonFilter::EQ,
-                ComparisonFilter::NEQ,
-                ComparisonFilter::LT,
-                ComparisonFilter::LTE,
-                ComparisonFilter::GT,
-                ComparisonFilter::GTE,
-            ]
-        );
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        self::assertNull($comparisonFilter->getField());
+
+        $fieldName = 'test';
+        $comparisonFilter->setField($fieldName);
+        self::assertSame($fieldName, $comparisonFilter->getField());
+    }
+
+    public function testSetAndGetSupportedOperators()
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        self::assertEquals([ComparisonFilter::EQ], $comparisonFilter->getSupportedOperators());
+
+        $supportedOperators = [ComparisonFilter::EQ, ComparisonFilter::NEQ];
+        $comparisonFilter->setSupportedOperators($supportedOperators);
+        self::assertEquals($supportedOperators, $comparisonFilter->getSupportedOperators());
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Field must not be empty.
+     * @expectedExceptionMessage The field must not be empty.
      */
-    public function testInvalidArgumentExceptionField()
+    public function testEmptyFieldName()
     {
-        $this->comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::EQ));
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::EQ));
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must not be NULL. Field: "fieldName".
+     * @expectedExceptionMessage The value must not be NULL. Field: "fieldName".
      */
-    public function testInvalidArgumentExceptionValue()
+    public function testNullValue()
     {
-        $this->comparisonFilter->setField('fieldName');
-        $this->comparisonFilter->apply(new Criteria(), new FilterValue('path', null, ComparisonFilter::EQ));
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->apply(new Criteria(), new FilterValue('path', null, ComparisonFilter::EQ));
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported operator: "operator". Field: "fieldName".
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException
+     * @expectedExceptionMessage The operator "neq" is not supported.
      */
-    public function testInvalidArgumentExceptionOperator()
-    {
-        $this->comparisonFilter->setField('fieldName');
-        $this->comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', 'operator'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported operator: "!=". Field: "fieldName".
-     */
-    public function testUnsupportedOperatorWhenOperatorsAreNotSpecified()
+    public function testUnsupportedOperator()
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField('fieldName');
@@ -79,12 +70,12 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
         $comparisonFilter->setField('fieldName');
 
-        $this->assertEquals(['='], $comparisonFilter->getSupportedOperators());
+        self::assertEquals([ComparisonFilter::EQ], $comparisonFilter->getSupportedOperators());
 
         $criteria = new Criteria();
         $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
 
-        $this->assertEquals(
+        self::assertEquals(
             new Comparison('fieldName', Comparison::EQ, 'value'),
             $criteria->getWhereExpression()
         );
@@ -96,12 +87,12 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         $comparisonFilter->setSupportedOperators([ComparisonFilter::EQ]);
         $comparisonFilter->setField('fieldName');
 
-        $this->assertEquals(['='], $comparisonFilter->getSupportedOperators());
+        self::assertEquals([ComparisonFilter::EQ], $comparisonFilter->getSupportedOperators());
 
         $criteria = new Criteria();
         $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
 
-        $this->assertEquals(
+        self::assertEquals(
             new Comparison('fieldName', Comparison::EQ, 'value'),
             $criteria->getWhereExpression()
         );
@@ -118,23 +109,38 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilter($fieldName, $isArrayAllowed, $isRangeAllowed, $filterValue, $expectation)
     {
-        $this->assertNull($this->comparisonFilter->getField());
-        $this->comparisonFilter->setField($fieldName);
-        $this->assertSame($fieldName, $this->comparisonFilter->getField());
+        $supportedOperators = [
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::LT,
+            ComparisonFilter::LTE,
+            ComparisonFilter::GT,
+            ComparisonFilter::GTE,
+            ComparisonFilter::EXISTS,
+            ComparisonFilter::NEQ_OR_NULL,
+            ComparisonFilter::CONTAINS,
+            ComparisonFilter::NOT_CONTAINS,
+            ComparisonFilter::STARTS_WITH,
+            ComparisonFilter::NOT_STARTS_WITH,
+            ComparisonFilter::ENDS_WITH,
+            ComparisonFilter::NOT_ENDS_WITH
+        ];
 
-        $this->comparisonFilter->setArrayAllowed(true); //setting to TRUE due parent should allow own check
-        $this->comparisonFilter->setRangeAllowed(true); //setting to TRUE due parent should allow own check
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setSupportedOperators($supportedOperators);
+        $comparisonFilter->setField($fieldName);
+
+        $comparisonFilter->setArrayAllowed(true); // set to TRUE due parent should allow own check
+        $comparisonFilter->setRangeAllowed(true); // set to TRUE due parent should allow own check
         if ($filterValue) {
-            $this->assertSame($isArrayAllowed, $this->comparisonFilter->isArrayAllowed($filterValue->getOperator()));
-            $this->assertSame($isRangeAllowed, $this->comparisonFilter->isRangeAllowed($filterValue->getOperator()));
+            self::assertSame($isArrayAllowed, $comparisonFilter->isArrayAllowed($filterValue->getOperator()));
+            self::assertSame($isRangeAllowed, $comparisonFilter->isRangeAllowed($filterValue->getOperator()));
         }
 
-        $this->assertEquals(['=', '!=', '<', '<=', '>', '>='], $this->comparisonFilter->getSupportedOperators());
-
         $criteria = new Criteria();
-        $this->comparisonFilter->apply($criteria, $filterValue);
+        $comparisonFilter->apply($criteria, $filterValue);
 
-        $this->assertEquals($expectation, $criteria->getWhereExpression());
+        self::assertEquals($expectation, $criteria->getWhereExpression());
     }
 
     /**
@@ -144,7 +150,7 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'empty filter'                 => [
-                'fieldName',  //fieldName
+                'fieldName', //fieldName
                 true, // isArrayAllowed
                 true, // isRangeAllowed
                 null, // filter
@@ -239,6 +245,69 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             ],
+            'EXISTS filter'                => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', true, ComparisonFilter::EXISTS),
+                new Comparison('fieldName', 'EXISTS', true)
+            ],
+            'NOT EXISTS filter'            => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', false, ComparisonFilter::EXISTS),
+                new Comparison('fieldName', 'EXISTS', false)
+            ],
+            'NEQ_OR_NULL filter'           => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::NEQ_OR_NULL),
+                new Comparison('fieldName', 'NEQ_OR_NULL', 'value')
+            ],
+            'CONTAINS filter'              => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::CONTAINS),
+                new Comparison('fieldName', 'CONTAINS', 'value')
+            ],
+            'NOT_CONTAINS filter'          => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::NOT_CONTAINS),
+                new Comparison('fieldName', 'NOT_CONTAINS', 'value')
+            ],
+            'STARTS_WITH filter'           => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::STARTS_WITH),
+                new Comparison('fieldName', 'STARTS_WITH', 'value')
+            ],
+            'NOT_STARTS_WITH filter'       => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::NOT_STARTS_WITH),
+                new Comparison('fieldName', 'NOT_STARTS_WITH', 'value')
+            ],
+            'ENDS_WITH filter'             => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::ENDS_WITH),
+                new Comparison('fieldName', 'ENDS_WITH', 'value')
+            ],
+            'NOT_ENDS_WITH filter'         => [
+                'fieldName',
+                false,
+                false,
+                new FilterValue('path', 'value', ComparisonFilter::NOT_ENDS_WITH),
+                new Comparison('fieldName', 'NOT_ENDS_WITH', 'value')
+            ]
         ];
     }
 }

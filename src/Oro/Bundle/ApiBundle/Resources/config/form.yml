@@ -11,33 +11,66 @@ services:
 
     oro_api.form.extension:
         public: false
-        class: '%form.extension.class%'
+        class: Oro\Bundle\ApiBundle\Form\FormExtension
         arguments:
             - '@service_container'
             - [] # All services with tag "oro.api.form.type" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - [] # All services with tag "oro.api.form.type_extension" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
             - [] # All services with tag "oro.api.form.type_guesser" are inserted here by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
 
+    oro_api.form.extension.validation:
+        class: Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+        arguments:
+            - '@validator'
+        tags:
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
     oro_api.form.extension.empty_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension
         arguments:
             - '@oro_api.entity_instantiator'
         tags:
-            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_api.form.extension.datetime:
+        class: Oro\Bundle\ApiBundle\Form\Extension\DateTimeExtension
+        tags:
+            - { name: oro.api.form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType }
 
     oro_api.form.extension.customize_form_data:
         class: Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension
         arguments:
             - '@oro_api.customize_form_data.processor'
+            - '@oro_api.customize_form_data_handler'
         tags:
-            - { name: oro.api.form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: oro.api.form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+
+    oro_api.customize_form_data_handler:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler
+        public: false
+        arguments:
+            - '@oro_api.customize_form_data.processor'
+
+    oro_api.form_property_accessor:
+        class: Oro\Bundle\ApiBundle\Form\FormPropertyAccessor
+        public: false
+        arguments:
+            - '@form.property_accessor'
 
     oro_api.form_helper:
         class: Oro\Bundle\ApiBundle\Form\FormHelper
         public: false
         arguments:
             - '@form.factory'
+            - '@oro_api.form_property_accessor'
             - '@service_container'
+
+    oro_api.form_validation_handler:
+        class: Oro\Bundle\ApiBundle\Form\FormValidationHandler
+        public: false
+        arguments:
+            - '@validator'
+            - '@oro_api.customize_form_data_handler'
 
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
@@ -47,59 +80,36 @@ services:
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
 
-    oro_api.form.type.boolean:
-        class: Oro\Bundle\ApiBundle\Form\Type\BooleanType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_boolean }
-
-    oro_api.form.type.number:
-        class: Oro\Bundle\ApiBundle\Form\Type\NumberType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_number }
-
     oro_api.form.type.entity:
         class: Oro\Bundle\ApiBundle\Form\Type\EntityType
         arguments:
-            - '@doctrine'
+            - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_entity }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\EntityType }
 
     oro_api.form.type.nested_association:
         class: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType
         arguments:
-            - '@property_accessor'
-            - '@doctrine'
+            - '@oro_api.form_property_accessor'
+            - '@oro_api.doctrine_helper'
             - '@oro_api.entity_loader'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_nested_association }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\NestedAssociationType }
 
-    oro_api.form.type.compound_entity:
+    oro_api.form.type.object:
+        class: Oro\Bundle\ApiBundle\Form\Type\ObjectType
+        arguments:
+            - '@oro_api.form_helper'
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\ObjectType }
+
+    oro_api.form.type.compound_object:
         class: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType
         arguments:
             - '@oro_api.form_helper'
         tags:
-            - { name: oro.api.form.type, alias: oro_api_compound_object }
-
-    oro_api.form.type.collection:
-        class: Oro\Bundle\ApiBundle\Form\Type\CollectionType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_collection }
-
-    oro_api.form.type.collection.entity:
-        class: Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_entity_collection }
-
-    oro_api.form.type.scalar_collection:
-        class: Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_scalar_collection }
-
-    oro_api.form.type.scalar_collection.entity:
-        class: Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
-        tags:
-            - { name: oro.api.form.type, alias: oro_api_entity_scalar_collection }
+            - { name: oro.api.form.type, alias: Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType }
 
     oro_api.validator.access_granted:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator

@@ -1,0 +1,12 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/mixins";
+@import "./header";
+@import "./email-notification-menu";
+@import "./short-emails-list";
+@import "./sidebar-widget";
+@import "./dashboard";
+@import "./style";
+
+// mobile
+@import "./mobile/main";

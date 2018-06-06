@@ -18,14 +18,14 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $processorBag;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    private $processorBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $errorCompleter;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ErrorCompleterInterface */
+    private $errorCompleter;
 
     /** @var ProcessIncludedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

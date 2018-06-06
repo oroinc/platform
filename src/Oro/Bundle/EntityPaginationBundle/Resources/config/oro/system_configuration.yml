@@ -2,7 +2,7 @@ system_configuration:
     fields:
         oro_entity_pagination.enabled:
             data_type: boolean
-            type: oro_config_checkbox
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             priority: 100
             options:
                 label: oro.entity_pagination.system_configuration.fields.enabled.label
@@ -10,7 +10,7 @@ system_configuration:
                 required: false
         oro_entity_pagination.limit:
             data_type: integer
-            type: text
+            type: Symfony\Component\Form\Extension\Core\Type\TextType
             search_type: text
             priority: 90
             options:

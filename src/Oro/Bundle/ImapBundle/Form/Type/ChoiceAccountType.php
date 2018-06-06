@@ -4,7 +4,10 @@ namespace Oro\Bundle\ImapBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -50,20 +53,20 @@ class ChoiceAccountType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('accountType', 'choice', [
+        $builder->add('accountType', ChoiceType::class, [
             'label' => $this->translator->trans('oro.imap.configuration.account_type.label'),
             'tooltip'  => 'oro.imap.configuration.tooltip',
             'required' => false,
             'choices' => [
-                '' => $this->translator->trans(
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_NO_SELECT
-                ),
-                AccountTypeModel::ACCOUNT_TYPE_GMAIL => $this->translator->trans(
+                ) => '',
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_GMAIL
-                ),
-                AccountTypeModel::ACCOUNT_TYPE_OTHER => $this->translator->trans(
+                ) => AccountTypeModel::ACCOUNT_TYPE_GMAIL,
+                $this->translator->trans(
                     'oro.imap.configuration.account_type.' . AccountTypeModel::ACCOUNT_TYPE_OTHER
-                )
+                ) => AccountTypeModel::ACCOUNT_TYPE_OTHER,
             ],
         ]);
 
@@ -137,11 +140,11 @@ class ChoiceAccountType extends AbstractType
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
             if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER) {
-                $form->add('userEmailOrigin', 'oro_imap_configuration');
+                $form->add('userEmailOrigin', ConfigurationType::class);
             }
 
             if ($accountTypeModel->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_GMAIL) {
-                $form->add('userEmailOrigin', 'oro_imap_configuration_gmail');
+                $form->add('userEmailOrigin', ConfigurationGmailType::class);
             }
         }
     }

@@ -6,6 +6,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ChoiceFilterTypeTest extends AbstractTypeTestCase
 {
@@ -17,10 +19,11 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $this->type = new ChoiceFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
+        $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
-        $this->type = new ChoiceFilterType($translator);
     }
 
     /**
@@ -31,11 +34,6 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(ChoiceFilterType::NAME, $this->type->getName());
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -44,11 +42,11 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
         return array(
             array(
                 'defaultOptions' => array(
-                    'field_type' => 'choice',
+                    'field_type' => ChoiceType::class,
                     'field_options' => array(),
                     'operator_choices' => array(
-                        ChoiceFilterType::TYPE_CONTAINS => 'oro.filter.form.label_type_contains',
-                        ChoiceFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
+                        'oro.filter.form.label_type_contains' => ChoiceFilterType::TYPE_CONTAINS,
+                        'oro.filter.form.label_type_not_contains' => ChoiceFilterType::TYPE_NOT_CONTAINS,
                     ),
                     'populate_default' => false,
                     'default_value' => null,
@@ -80,7 +78,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices' => array(1 => 'One', 2 => 'Two')
+                        'choices' => array('One' => 1, 'Two' => 2)
                     ),
                 )
             ),
@@ -92,7 +90,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'choices' => array(1 => 'One')
+                        'choices' => array('One' => 1)
                     ),
                 )
             ),
@@ -105,7 +103,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 'customOptions' => array(
                     'field_options' => array(
                         'multiple' => true,
-                        'choices' => array(1 => 'One', 2 => 'Two', 3 => 'Three')
+                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
                     ),
                 )
             ),
@@ -118,7 +116,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                 'customOptions' => array(
                     'field_options' => array(
                         'multiple' => true,
-                        'choices' => array(1 => 'One', 2 => 'Two', 3 => 'Three')
+                        'choices' => array('One' => 1, 'Two' => 2, 'Three' => 3)
                     ),
                 )
             ),

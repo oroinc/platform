@@ -9,12 +9,15 @@ use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * The document builder for REST API response conforms JSON.API specification.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JsonApiDocumentBuilder extends AbstractDocumentBuilder
 {
@@ -38,29 +41,47 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /** @var EntityIdAccessor */
     protected $entityIdAccessor;
 
     /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
         parent::__construct();
 
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
 
         $this->entityIdAccessor = new EntityIdAccessor(
             $this->objectAccessor,
-            $this->entityIdTransformer
+            $this->entityIdTransformerRegistry
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDocument()
+    {
+        $result = $this->result;
+        // check whether the result document data contains only a meta information
+        if (\array_key_exists(self::DATA, $result)) {
+            $data = $result[self::DATA];
+            if (\is_array($data) && \array_key_exists(self::META, $data) && \count($data) === 1) {
+                $result[self::META] = $data[self::META];
+                unset($result[self::DATA]);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -72,15 +93,21 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             throw new \InvalidArgumentException('The metadata should be provided.');
         }
 
-        $result = $this->getResourceIdObject(
-            $this->getEntityTypeForObject($object, $requestType, $metadata),
-            $this->entityIdAccessor->getEntityId($object, $metadata)
-        );
-
         $data = $this->objectAccessor->toArray($object);
-        $this->addMeta($result, $data, $metadata);
-        $this->addAttributes($result, $data, $metadata);
-        $this->addRelationships($result, $data, $requestType, $metadata);
+        if ($metadata->hasIdentifierFields()) {
+            $result = $this->getResourceIdObject(
+                $this->getEntityTypeForObject($object, $requestType, $metadata),
+                $this->entityIdAccessor->getEntityId($object, $metadata, $requestType)
+            );
+            $this->addMeta($result, $data, $metadata);
+            $this->addAttributes($result, $data, $metadata);
+            $this->addRelationships($result, $data, $requestType, $metadata);
+        } else {
+            $result = [];
+            $this->addMeta($result, $data, $metadata);
+            $this->addAttributesAsMeta($result, $data, $metadata);
+            $this->addRelationshipsAsMeta($result, $data, $requestType, $metadata);
+        }
 
         return $result;
     }
@@ -138,6 +165,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
+            if (!$property->isOutput()) {
+                continue;
+            }
             $resultName = $property->getResultName();
             if (array_key_exists($name, $data)) {
                 $result[self::META][$resultName] = $data[$name];
@@ -155,10 +185,11 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
             if (!in_array($name, $idFieldNames, true)) {
-                $result[self::ATTRIBUTES][$name] = array_key_exists($name, $data)
-                    ? $data[$name]
-                    : null;
+                $result[self::ATTRIBUTES][$name] = $data[$name] ?? null;
             }
         }
     }
@@ -177,12 +208,52 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     ) {
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
             $value = $this->getRelationshipValue($data, $requestType, $name, $association);
             if (DataType::isAssociationAsField($association->getDataType())) {
                 $result[self::ATTRIBUTES][$name] = $value;
             } else {
                 $result[self::RELATIONSHIPS][$name][self::DATA] = $value;
             }
+        }
+    }
+
+    /**
+     * @param array          $result
+     * @param array          $data
+     * @param EntityMetadata $metadata
+     */
+    protected function addAttributesAsMeta(array &$result, array $data, EntityMetadata $metadata)
+    {
+        $fields = $metadata->getFields();
+        foreach ($fields as $name => $field) {
+            if (!$field->isOutput()) {
+                continue;
+            }
+            $result[self::META][$name] = $data[$name] ?? null;
+        }
+    }
+
+    /**
+     * @param array          $result
+     * @param array          $data
+     * @param RequestType    $requestType
+     * @param EntityMetadata $metadata
+     */
+    protected function addRelationshipsAsMeta(
+        array &$result,
+        array $data,
+        RequestType $requestType,
+        EntityMetadata $metadata
+    ) {
+        $associations = $metadata->getAssociations();
+        foreach ($associations as $name => $association) {
+            if (!$association->isOutput()) {
+                continue;
+            }
+            $result[self::META][$name] = $this->getRelationshipValue($data, $requestType, $name, $association);
         }
     }
 
@@ -205,13 +276,13 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if ($preparedValue['idOnly']) {
             $resourceId = $this->getResourceIdObject(
                 $preparedValue['entityType'],
-                $this->entityIdTransformer->transform($preparedValue['value'], $targetMetadata)
+                $this->getEntityIdTransformer($requestType)->transform($preparedValue['value'], $targetMetadata)
             );
         } else {
             $targetObject = $preparedValue['value'];
             $resourceId = $this->getResourceIdObject(
                 $preparedValue['entityType'],
-                $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
+                $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata, $requestType)
             );
             $this->addRelatedObject($this->convertObjectToArray($targetObject, $requestType, $targetMetadata));
         }
@@ -304,5 +375,15 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             self::TYPE => $entityType,
             self::ID   => $entityId
         ];
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }

@@ -77,7 +77,7 @@ services:
     oro_entity_config.tools.command_executor:
         class: '%oro_entity_config.tools.command_executor.class%'
         arguments:
-            - '%kernel.root_dir%/console'
+            - '%kernel.project_dir%/bin/console'
             - '%kernel.environment%'
             - '@oro_cache.oro_data_cache_manager'
 
@@ -194,6 +194,8 @@ services:
             - '@session'
             - '@oro_ui.router'
             - '@oro_entity_config.config.config_helper'
+            - '@translator'
+            - '@router'
 
     oro_entity_config.manager.attribute_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeManager'
@@ -226,7 +228,7 @@ services:
         arguments:
             - '@oro_entity_config.provider.attribute'
         tags:
-            - { name: form.type_extension, alias: oro_entity_extend_field_type }
+            - { name: form.type_extension, alias: oro_entity_extend_field_type, extended_type: Oro\Bundle\EntityExtendBundle\Form\Type\FieldType }
 
     oro_entity_config.form.handler.create_update_config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler
@@ -244,6 +246,7 @@ services:
             - '@oro_entity_config.config.config_helper'
             - '@session'
             - '@event_dispatcher'
+            - '@doctrine'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
@@ -279,7 +282,6 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeFamilyExtension
         arguments:
             - '@oro_entity_config.provider.attribute'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

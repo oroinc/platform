@@ -1,0 +1,6 @@
+services:
+    Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand:
+        public: false
+        class: Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand
+        tags:
+            - { name: console.command }

@@ -2,40 +2,43 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NestedAssociationTransformer;
 use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * The form type for manageable entity nested associations.
+ */
 class NestedAssociationType extends AbstractType
 {
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var EntityLoader */
     protected $entityLoader;
 
     /**
      * @param PropertyAccessorInterface $propertyAccessor
-     * @param ManagerRegistry           $doctrine
+     * @param DoctrineHelper            $doctrineHelper
      * @param EntityLoader              $entityLoader
      */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader
     ) {
         $this->propertyAccessor = $propertyAccessor;
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
         $this->entityLoader = $entityLoader;
     }
 
@@ -47,7 +50,7 @@ class NestedAssociationType extends AbstractType
         $builder
             ->addEventSubscriber(new NestedAssociationListener($this->propertyAccessor, $options['config']))
             ->addViewTransformer(
-                new NestedAssociationTransformer($this->doctrine, $this->entityLoader, $options['metadata'])
+                new NestedAssociationTransformer($this->doctrineHelper, $this->entityLoader, $options['metadata'])
             );
     }
 
@@ -61,21 +64,5 @@ class NestedAssociationType extends AbstractType
             ->setRequired(['metadata', 'config'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('config', [EntityDefinitionFieldConfig::class]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_nested_association';
     }
 }

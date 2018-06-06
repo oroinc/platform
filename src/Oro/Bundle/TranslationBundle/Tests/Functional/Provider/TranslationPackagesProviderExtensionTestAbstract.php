@@ -61,9 +61,9 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
 
         $installer = new ComposerInstallerStub(
             sprintf(
-                '%s/../vendor/oro/%s',
+                '%s/vendor/oro/%s',
                 rtrim(
-                    $container->getParameter('kernel.root_dir'),
+                    $container->getParameter('kernel.project_dir'),
                     '/'
                 ),
                 $packageName

@@ -65,8 +65,8 @@ datagrids:
                     data_name: s.entity
                     options:
                         field_options:
-                            multiple:          true
-                            choices:           "@oro_entity.datagrid_helper->getEntityNames"
+                            multiple: true
+                            choices: "@oro_entity.datagrid_helper->getEntityNames"
                             translatable_options: false
                 segmentType:
                     type:               choice

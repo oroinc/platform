@@ -8,6 +8,8 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ExportTemplateType;
+use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
@@ -54,29 +56,25 @@ class ImportExportController extends Controller
 
         $importForm = $this->getImportForm($entityName);
 
-        if ($request->isMethod('POST')) {
-            $importForm->submit($request);
-
-            if ($importForm->isValid()) {
-                /** @var ImportData $data */
-                $data           = $importForm->getData();
-                $file           = $data->getFile();
-                $processorAlias = $data->getProcessorAlias();
-                if ($file->getClientOriginalExtension() === 'csv') {
-                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
-                }
-                $fileName = $this->getFileManager()->saveImportingFile($file);
-
-                return $this->forward(
-                    'OroImportExportBundle:ImportExport:importProcess',
-                    [
-                        'processorAlias' => $processorAlias,
-                        'fileName' => $fileName,
-                        'originFileName' => $file->getClientOriginalName()
-                    ],
-                    $request->query->all()
-                );
+        if ($this->handleRequest($request, $importForm)) {
+            /** @var ImportData $data */
+            $data           = $importForm->getData();
+            $file           = $data->getFile();
+            $processorAlias = $data->getProcessorAlias();
+            if ($file->getClientOriginalExtension() === 'csv') {
+                $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
             }
+            $fileName = $this->getFileManager()->saveImportingFile($file);
+
+            return $this->forward(
+                'OroImportExportBundle:ImportExport:importProcess',
+                [
+                    'processorAlias' => $processorAlias,
+                    'fileName' => $fileName,
+                    'originFileName' => $file->getClientOriginalName()
+                ],
+                $request->query->all()
+            );
         }
 
         return [
@@ -127,10 +125,8 @@ class ImportExportController extends Controller
             $configsWithForm[] = ['form' => $form, 'configuration' => $configuration];
         }
 
-        if ($entityName && null !== $importForm && $request->isMethod('POST')) {
-            $importForm->submit($request);
-
-            if ($importForm->isValid()) {
+        if ($entityName && null !== $importForm) {
+            if ($this->handleRequest($request, $importForm)) {
                 /** @var ImportData $data */
                 $data           = $importForm->getData();
                 $file           = $data->getFile();
@@ -184,27 +180,23 @@ class ImportExportController extends Controller
 
         $importForm = $this->getImportForm($entityName);
 
-        if ($request->isMethod('POST')) {
-            $importForm->submit($request);
+        if ($this->handleRequest($request, $importForm)) {
+            /** @var ImportData $data */
+            $data           = $importForm->getData();
+            $file           = $data->getFile();
+            $processorAlias = $data->getProcessorAlias();
 
-            if ($importForm->isValid()) {
-                /** @var ImportData $data */
-                $data           = $importForm->getData();
-                $file           = $data->getFile();
-                $processorAlias = $data->getProcessorAlias();
+            $fileName = $this->getFileManager()->saveImportingFile($file);
 
-                $fileName = $this->getFileManager()->saveImportingFile($file);
-
-                return $this->forward(
-                    'OroImportExportBundle:ImportExport:importValidate',
-                    [
-                        'processorAlias' => $processorAlias,
-                        'fileName' => $fileName,
-                        'originFileName' => $file->getClientOriginalName()
-                    ],
-                    $request->query->all()
-                );
-            }
+            return $this->forward(
+                'OroImportExportBundle:ImportExport:importValidate',
+                [
+                    'processorAlias' => $processorAlias,
+                    'fileName' => $fileName,
+                    'originFileName' => $file->getClientOriginalName()
+                ],
+                $request->query->all()
+            );
         }
 
         return [
@@ -222,7 +214,7 @@ class ImportExportController extends Controller
      */
     protected function getImportForm($entityName)
     {
-        return $this->createForm(ImportType::NAME, null, ['entityName' => $entityName]);
+        return $this->createForm(ImportType::class, null, ['entityName' => $entityName]);
     }
 
     /**
@@ -335,26 +327,22 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export', null, [
+        $exportForm = $this->createForm(ExportType::class, null, [
             'entityName' => $entityName,
             'processorAlias' => $request->get('processorAlias') ?? null
         ]);
 
-        if ($request->isMethod('POST')) {
-            $exportForm->submit($request);
+        if ($this->handleRequest($request, $exportForm)) {
+            /** @var ExportData $data */
+            $data = $exportForm->getData();
 
-            if ($exportForm->isValid()) {
-                /** @var ExportData $data */
-                $data = $exportForm->getData();
-
-                return $this->forward(
-                    'OroImportExportBundle:ImportExport:instantExport',
-                    [
-                        'processorAlias' => $data->getProcessorAlias(),
-                        'request' => $request
-                    ]
-                );
-            }
+            return $this->forward(
+                'OroImportExportBundle:ImportExport:instantExport',
+                [
+                    'processorAlias' => $data->getProcessorAlias(),
+                    'request' => $request
+                ]
+            );
         }
 
         return [
@@ -377,21 +365,17 @@ class ImportExportController extends Controller
     {
         $entityName = $request->get('entity');
 
-        $exportForm = $this->createForm('oro_importexport_export_template', null, ['entityName' => $entityName]);
+        $exportForm = $this->createForm(ExportTemplateType::class, null, ['entityName' => $entityName]);
 
-        if ($request->isMethod('POST')) {
-            $exportForm->submit($request);
+        if ($this->handleRequest($request, $exportForm)) {
+            $data = $exportForm->getData();
 
-            if ($exportForm->isValid()) {
-                $data = $exportForm->getData();
+            $exportTemplateResponse = $this->forward(
+                'OroImportExportBundle:ImportExport:templateExport',
+                ['processorAlias' => $data->getProcessorAlias()]
+            );
 
-                $exportTemplateResponse = $this->forward(
-                    'OroImportExportBundle:ImportExport:templateExport',
-                    ['processorAlias' => $data->getProcessorAlias()]
-                );
-
-                return new JsonResponse(['url' => $exportTemplateResponse->getTargetUrl()]);
-            }
+            return new JsonResponse(['url' => $exportTemplateResponse->getTargetUrl()]);
         }
 
         return [
@@ -571,5 +555,23 @@ class ImportExportController extends Controller
     protected function getSecurityToken()
     {
         return $this->get('security.token_storage');
+    }
+
+    /**
+     * @param Request       $request
+     * @param FormInterface $form
+     *
+     * @return bool
+     */
+    protected function handleRequest(Request $request, FormInterface $form)
+    {
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

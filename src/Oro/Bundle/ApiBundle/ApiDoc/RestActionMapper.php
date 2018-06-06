@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
+/**
+ * Provides information about mapping between API actions and HTTP methods and about general API route names.
+ */
 class RestActionMapper
 {
     /** @var string */
@@ -59,7 +62,10 @@ class RestActionMapper
                 ];
             case $this->subresourceRouteName:
                 return [
-                    ApiActions::GET_SUBRESOURCE
+                    ApiActions::GET_SUBRESOURCE,
+                    ApiActions::UPDATE_SUBRESOURCE,
+                    ApiActions::ADD_SUBRESOURCE,
+                    ApiActions::DELETE_SUBRESOURCE
                 ];
             case $this->relationshipRouteName:
                 return [
@@ -74,11 +80,26 @@ class RestActionMapper
     }
 
     /**
+     * @return string[]
+     */
+    public function getActionsForResourcesWithoutIdentifier(): array
+    {
+        return [
+            ApiActions::GET,
+            ApiActions::DELETE,
+            ApiActions::CREATE,
+            ApiActions::UPDATE
+        ];
+    }
+
+    /**
      * @param string $action
      *
      * @return string
      *
      * @throws \LogicException if the given API action cannot be mapped to any HTTP method
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getMethod(string $action): string
     {
@@ -90,17 +111,20 @@ class RestActionMapper
                 return 'GET';
             case ApiActions::DELETE:
             case ApiActions::DELETE_LIST:
+            case ApiActions::DELETE_SUBRESOURCE:
             case ApiActions::DELETE_RELATIONSHIP:
                 return 'DELETE';
             case ApiActions::UPDATE:
+            case ApiActions::UPDATE_SUBRESOURCE:
             case ApiActions::UPDATE_RELATIONSHIP:
                 return 'PATCH';
             case ApiActions::CREATE:
+            case ApiActions::ADD_SUBRESOURCE:
             case ApiActions::ADD_RELATIONSHIP:
                 return 'POST';
         }
 
-        throw new \LogicException(sprintf('Unsupported API action "%s".', $action));
+        throw new \LogicException(\sprintf('Unsupported API action "%s".', $action));
     }
 
     /**

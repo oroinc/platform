@@ -10,7 +10,7 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
  */
 class HtmlTagHelper
 {
-    const MAX_STRING_LENGTH = 500;
+    const MAX_STRING_LENGTH = 256;
 
     /** @var HtmlTagProvider */
     protected $htmlTagProvider;
@@ -123,5 +123,24 @@ class HtmlTagHelper
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($string);
+    }
+
+    /**
+     * @param string $string
+     * @param int $maxLength
+     * @return string
+     */
+    public function stripLongWords(string $string, int $maxLength = self::MAX_STRING_LENGTH): string
+    {
+        $words = preg_split('/\s+/', $string);
+
+        $words = array_filter(
+            $words,
+            function ($item) use ($maxLength) {
+                return \strlen($item) <= $maxLength;
+            }
+        );
+
+        return implode(' ', $words);
     }
 }

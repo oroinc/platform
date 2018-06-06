@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
@@ -21,6 +22,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class SetPasswordHandler
 {
+    use RequestHandlerTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -80,7 +83,7 @@ class SetPasswordHandler
     {
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->form->submit($request);
+            $this->submitPostPutRequest($this->form, $request);
             if ($this->form->isValid()) {
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());

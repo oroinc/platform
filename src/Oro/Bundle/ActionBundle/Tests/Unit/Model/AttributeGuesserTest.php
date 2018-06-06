@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 
@@ -132,7 +133,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             ),
             'regular entity guess' => array(
                 'expected' => new TypeGuess(
-                    'entity',
+                    EntityType::class,
                     array('class' => 'TestEntity', 'multiple' => false),
                     TypeGuess::VERY_HIGH_CONFIDENCE
                 ),

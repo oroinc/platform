@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\EntityExtendConfiguration;
+use Oro\Bundle\EntityExtendBundle\Validator\Validation;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Processor;
@@ -42,6 +43,7 @@ class EntityExtendPass implements CompilerPassInterface
 
         if ($container->hasDefinition('validator.builder')) {
             $validatorBuilder = $container->getDefinition('validator.builder');
+            $validatorBuilder->setFactory(sprintf('%s::createValidatorBuilder', Validation::class));
             $validatorBuilder->addMethodCall('addCustomLoader', [new Reference(self::EXTEND_VALIDATION_LOADER_ID)]);
         }
     }

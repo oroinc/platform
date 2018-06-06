@@ -34,7 +34,7 @@ class SearchEntityFilter extends EntityFilter
      */
     protected function getFormType()
     {
-        return SearchEntityFilterType::NAME;
+        return SearchEntityFilterType::class;
     }
 
     /**

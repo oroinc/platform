@@ -15,7 +15,7 @@ entity_config:
                         default_value:      false
                         require_schema_update: true
                     form:
-                        type:               oro_entity_extend_association_choice
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
                         options:
                             block:          attachments
                             required:       true
@@ -28,7 +28,7 @@ entity_config:
                         priority:           90
                         default_value:      1
                     form:
-                        type:               oro_entity_extend_association_property_integer
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType
                         options:
                             block:          attachments
                             required:       false
@@ -40,7 +40,7 @@ entity_config:
                     options:
                         priority:           80
                     form:
-                        type:               oro_entity_extend_association_property_textarea
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
                         options:
                             block:          attachments
                             required:       false
@@ -62,7 +62,7 @@ entity_config:
                         allowed_type:       [file, image]
                         auditable:          false
                     form:
-                        type:               oro_attachment_file_config
+                        type:               Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
                         options:
                             block:          general
                             subblock:       properties
@@ -78,7 +78,7 @@ entity_config:
                         - Range:
                             min:            1
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.file_size.label
@@ -96,7 +96,7 @@ entity_config:
                         - Type:
                             type:           int
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.thumb_width.label
@@ -114,7 +114,7 @@ entity_config:
                         - Type:
                             type:           int
                     form:
-                        type:               integer
+                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             required:       true
                             label:          oro.attachment.config.thumb_height.label
@@ -126,7 +126,7 @@ entity_config:
                 # the list of all allowed MIME types for attachments
                 mimetypes:
                     form:
-                        type:               oro_entity_extend_association_property_textarea
+                        type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
                         options:
                             block:          general
                             subblock:       properties

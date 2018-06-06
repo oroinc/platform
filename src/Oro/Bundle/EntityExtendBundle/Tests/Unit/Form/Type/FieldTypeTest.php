@@ -10,13 +10,14 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
-use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -73,8 +74,6 @@ class FieldTypeTest extends TypeTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -113,6 +112,7 @@ class FieldTypeTest extends TypeTestCase
             new ExtendDbIdentifierNameGenerator(),
             $this->fieldTypeProvider
         );
+        parent::setUp();
     }
 
     /**
@@ -162,22 +162,17 @@ class FieldTypeTest extends TypeTestCase
             new ConstraintValidatorFactory()
         );
 
-        $select2ChoiceType = new Select2Type(
-            'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-            'oro_select2_choice'
-        );
-
         return [
             new PreloadedExtension(
                 [
-                    $select2ChoiceType->getName() => $select2ChoiceType,
+                    FieldType::class => $this->type
                 ],
                 [
-                    'form'   => [
+                    FormType::class => [
                         new DataBlockExtension(),
                         new FormTypeValidatorExtension($validator)
                     ],
-                    'choice' => [
+                    ChoiceType::class => [
                         new TranslatableChoiceTypeExtension()
                     ]
                 ]
@@ -205,7 +200,7 @@ class FieldTypeTest extends TypeTestCase
 
         $extendConfigProvider->addEntityConfig('Test\SourceEntity');
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -220,7 +215,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -235,7 +230,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
 
@@ -429,7 +424,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -444,7 +439,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelations();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -656,7 +651,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertEquals(
             $this->expectedChoicesView,
@@ -671,7 +666,7 @@ class FieldTypeTest extends TypeTestCase
     {
         $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
 
-        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+        $form = $this->factory->create(FieldType::class, null, ['class_name' => 'Test\TargetEntity']);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
 

@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\AddRelationshipContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\DeleteRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetRelationship\GetRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
@@ -22,6 +23,9 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * The base class for handling Data API actions.
+ */
 abstract class RequestActionHandler
 {
     /** @var string[] */
@@ -185,6 +189,78 @@ abstract class RequestActionHandler
         $context = $processor->createContext();
         $this->prepareSubresourceContext($context, $request);
         $context->setFilterValues($this->getRequestFilters($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "PATCH /api/{entity}/{id}/{association}" request,
+     * that updates an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleUpdateSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::UPDATE_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "POST /api/{entity}/{id}/{association}" request,
+     * that adds an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleAddSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::ADD_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Handles "DELETE /api/{entity}/{id}/{association}" request,
+     * that deletes an entity (or entities, it depends on the association type) connected
+     * to the given entity by the given association.
+     * This type of the request is non-standard and do not have default implementation,
+     * additional processors should be added for each association requires it.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function handleDeleteSubresource(Request $request): Response
+    {
+        $processor = $this->getProcessor(ApiActions::DELETE_SUBRESOURCE);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setRequestData($this->getRequestData($request));
 
         $processor->process($context);
 

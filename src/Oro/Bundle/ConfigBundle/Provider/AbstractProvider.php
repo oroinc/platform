@@ -10,10 +10,13 @@ use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
+use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
+use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -52,25 +55,31 @@ abstract class AbstractProvider implements ProviderInterface
     /** @var  ChainSearchProvider */
     protected $searchProvider;
 
+    /** @var FormRegistryInterface  */
+    protected $formRegistry;
+
     /**
      * @param ConfigBag $configBag
      * @param TranslatorInterface $translator
      * @param FormFactoryInterface $factory
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param ChainSearchProvider $searchProvider
+     * @param FormRegistryInterface $formRegistry
      */
     public function __construct(
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $factory,
         AuthorizationCheckerInterface $authorizationChecker,
-        ChainSearchProvider $searchProvider
+        ChainSearchProvider $searchProvider,
+        FormRegistryInterface $formRegistry
     ) {
         $this->configBag = $configBag;
         $this->translator = $translator;
         $this->factory = $factory;
         $this->authorizationChecker = $authorizationChecker;
         $this->searchProvider = $searchProvider;
+        $this->formRegistry = $formRegistry;
     }
 
     /**
@@ -424,7 +433,7 @@ abstract class AbstractProvider implements ProviderInterface
             $bc[$block->getName()]['subblocks'] = $sbc;
         }
 
-        $fb = $this->factory->createNamedBuilder($group, 'oro_config_form_type', null, ['block_config' => $bc]);
+        $fb = $this->factory->createNamedBuilder($group, FormType::class, null, ['block_config' => $bc]);
         foreach ($toAdd as $field) {
             $this->addFieldToForm($fb, $field);
         }
@@ -494,17 +503,20 @@ abstract class AbstractProvider implements ProviderInterface
             array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'resettable'])
         );
         // pass only options needed to "value" form type
-        $configFieldOptions['target_field_type']    = $fieldDefinition->getType();
+        $fieldFormType = $fieldDefinition->getType();
+        $configFieldOptions['target_field_type'] = $fieldFormType;
+        $configFieldOptions['target_field_alias'] = $this->formRegistry->getType($fieldFormType)->getBlockPrefix();
         $configFieldOptions['target_field_options'] = array_diff_key(
             $fieldDefinition->getOptions(),
             $configFieldOptions
         );
+
         if ($fieldDefinition->needsPageReload()) {
             $configFieldOptions['target_field_options']['attr']['data-needs-page-reload'] = '';
             $configFieldOptions['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
         }
         $configFieldOptions['parent_checkbox_label'] = $this->getParentCheckboxLabel();
-        $form->add($name, 'oro_config_form_field_type', $configFieldOptions);
+        $form->add($name, FormFieldType::class, $configFieldOptions);
     }
 
     /**

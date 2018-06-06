@@ -2,32 +2,35 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for manageable entity associations.
+ */
 class EntityType extends AbstractType
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var EntityLoader */
     protected $entityLoader;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param EntityLoader    $entityLoader
+     * @param DoctrineHelper $doctrineHelper
+     * @param EntityLoader   $entityLoader
      */
-    public function __construct(ManagerRegistry $doctrine, EntityLoader $entityLoader)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
     {
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
         $this->entityLoader = $entityLoader;
     }
 
@@ -45,13 +48,23 @@ class EntityType extends AbstractType
                 ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
                     new CollectionToArrayTransformer(
-                        new EntityToIdTransformer($this->doctrine, $this->entityLoader, $metadata, $includedEntities)
+                        new EntityToIdTransformer(
+                            $this->doctrineHelper,
+                            $this->entityLoader,
+                            $metadata,
+                            $includedEntities
+                        )
                     ),
                     true
                 );
         } else {
             $builder->addViewTransformer(
-                new EntityToIdTransformer($this->doctrine, $this->entityLoader, $metadata, $includedEntities)
+                new EntityToIdTransformer(
+                    $this->doctrineHelper,
+                    $this->entityLoader,
+                    $metadata,
+                    $includedEntities
+                )
             );
         }
     }
@@ -66,21 +79,5 @@ class EntityType extends AbstractType
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('included_entities', ['null', IncludedEntityCollection::class]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_entity';
     }
 }

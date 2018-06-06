@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Form\EventListener;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -107,7 +108,13 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $children = array_keys($form->all());
 
         foreach ($children as $child) {
-            $form->add($child, 'choice', ['choices' => $choices]);
+            $form->add(
+                $child,
+                ChoiceType::class,
+                [
+                    'choices' => array_flip($choices),
+                ]
+            );
         }
     }
 }

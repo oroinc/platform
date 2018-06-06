@@ -488,6 +488,11 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($newFieldModel)
             ->willReturn($form);
 
+        $this->configHelperHandler
+            ->expects($this->once())
+            ->method('showClearCacheMessage')
+            ->willReturn($this->configHelperHandler);
+
         $redirectResponse = $this->expectsConfigSavingAndRedirect($newFieldModel, $extendEntityConfig);
 
         $response = $this->handler->handleFieldSave(

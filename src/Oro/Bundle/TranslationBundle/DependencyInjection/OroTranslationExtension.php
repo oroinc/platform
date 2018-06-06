@@ -21,6 +21,7 @@ class OroTranslationExtension extends Extension
         $loader->load('form_types.yml');
         $loader->load('services.yml');
         $loader->load('importexport.yml');
+        $loader->load('commands.yml');
 
         $container
             ->getDefinition('oro_translation.controller')
@@ -28,6 +29,11 @@ class OroTranslationExtension extends Extension
 
         $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
         $container->setParameter('oro_translation.js_translation.debug', $config['js_translation']['debug']);
+
+        $container->setParameter('oro_translation.locales', $config['locales']);
+        $container->setParameter('oro_translation.default_required', $config['default_required']);
+        $container->setAlias('oro_translation.manager_registry', $config['manager_registry']);
+        $container->setParameter('oro_translation.templating', $config['templating']);
 
         if (!empty($config['api'])) {
             foreach ($config['api'] as $serviceId => $params) {

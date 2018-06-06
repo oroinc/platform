@@ -1,8 +1,8 @@
-OroInstallerBundle
-==================
+# OroInstallerBundle
 
-Web installer for OroCRM. Inspired by [Sylius](https://github.com/Sylius/SyliusInstallerBundle).
+OroInstallerBundle enables developers to install Oro applications in a prepared environment using the CLI and to define activities for the installation process on a bundle level.
 
+## Forewords
 To run the installer on existing setup, you need to update parameters.yml file:
 ``` yaml
 # ...
@@ -19,15 +19,15 @@ $ git clone https://github.com/orocrm/crm-application.git
 $ cd crm-application
 $ wget http://getcomposer.org/composer.phar
 $ php composer.phar install
-$ php app/console oro:install
+$ php bin/console oro:install
 ```
 
-## Events ##
+## Events
 To add additional actions to the installation process you may use event listeners.
 Currently, there are three events dispatched:
 
-#### `installer.database_preparation.before`
-#### `installer.database_preparation.after`
+### `installer.database_preparation.before`
+### `installer.database_preparation.after`
 Dispatched right before and after all database manipulation (creating table structure, executing migrations, loading demo-data (if set), etc.).
 This events can be used to modify database or execute some some service commands to prepare database for usage.
 Use next sample code to subscribe on this events:
@@ -55,7 +55,7 @@ class MyListener
 }
 ```
 
-#### `installer.finish`
+### `installer.finish`
 Dispatched when the installation is finished.
 Example:
 
@@ -90,7 +90,7 @@ To provide demo fixtures for your bundle just place them in "YourBundle\Data\Dem
 To add additional install scripts during install process you can use install.php files in your bundles and packages.
 This install files will be run before last clear cache during installation.
 
-This file must be started with `@OroScript` annotation with script label which will be shown during web install process.
+This file must be started with `@OroScript` annotation with script label.
 
 Example:
 ``` php
@@ -136,4 +136,4 @@ by web server
 
  - Nginx: `fastcgi_param PHP_PATH /usr/bin/php;`
 
- - PHP Built-in server: `/usr/bin/php app/console...`
+ - PHP Built-in server: `/usr/bin/php bin/console...`

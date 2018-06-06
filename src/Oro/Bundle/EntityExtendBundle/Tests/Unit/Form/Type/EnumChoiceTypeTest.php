@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 
 class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
@@ -19,16 +20,8 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(
-            'translatable_entity',
+            TranslatableEntityType::class,
             $this->type->getParent()
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum_choice',
-            $this->type->getName()
         );
     }
 

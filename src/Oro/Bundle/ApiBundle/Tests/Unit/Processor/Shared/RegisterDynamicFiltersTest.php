@@ -7,8 +7,10 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
+use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\InvalidFilterValueKeyException;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\RegisterDynamicFilters;
@@ -18,14 +20,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\SelfIdentifiableFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var RegisterDynamicFilters */
-    protected $processor;
+    private $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $filterFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FilterFactoryInterface */
+    private $filterFactory;
 
     protected function setUp()
     {
@@ -33,12 +36,27 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->filterFactory = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $this->filterFactory = $this->createMock(FilterFactoryInterface::class);
 
         $this->processor = new RegisterDynamicFilters(
             $this->filterFactory,
             $this->doctrineHelper,
-            $this->configProvider
+            $this->configProvider,
+            'filter'
+        );
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return RestFilterValueAccessor
+     */
+    private function getRestFilterValueAccessor(Request $request)
+    {
+        return new RestFilterValueAccessor(
+            $request,
+            '!?=',
+            [ComparisonFilter::EQ => '=', ComparisonFilter::NEQ => '!=']
         );
     }
 
@@ -47,7 +65,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return ComparisonFilter
      */
-    protected function getComparisonFilter($dataType)
+    private function getComparisonFilter($dataType)
     {
         $filter = new ComparisonFilter($dataType);
         $filter->setSupportedOperators(['=', '!=']);
@@ -61,7 +79,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return Config
      */
-    protected function getConfig(array $fields = [], array $filterFields = [])
+    private function getConfig(array $fields = [], array $filterFields = [])
     {
         $config = new Config();
         $config->setDefinition($this->getEntityDefinitionConfig($fields));
@@ -75,7 +93,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return EntityDefinitionConfig
      */
-    protected function getEntityDefinitionConfig(array $fields = [])
+    private function getEntityDefinitionConfig(array $fields = [])
     {
         $config = new EntityDefinitionConfig();
         foreach ($fields as $field) {
@@ -90,7 +108,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return FiltersConfig
      */
-    protected function getFiltersConfig(array $filterFields = [])
+    private function getFiltersConfig(array $filterFields = [])
     {
         $config = new FiltersConfig();
         $config->setExcludeAll();
@@ -106,16 +124,65 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getRequest($queryString)
+    private function getRequest($queryString)
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $request->expects($this->once())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::any())
             ->method('getQueryString')
             ->willReturn($queryString);
 
         return $request;
+    }
+
+    public function testProcessWhenThisWorkAlreadyDone()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $request = $this->getRequest('filter[name]=val1');
+
+        $this->context->setProcessed(RegisterDynamicFilters::OPERATION_NAME);
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $this->context->getFilters());
+        self::assertNull($this->context->getFilterValues()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessWhenPrepareFiltersForDocumentation()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $filter = new ComparisonFilter('string');
+        $filter->setField('name');
+        $this->context->getFilters()->add('name', $filter);
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setLastGroup('initialize');
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($this->getRequest('')));
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setField('name');
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
     }
 
     public function testProcessForPrimaryEntityFields()
@@ -125,10 +192,10 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[name]=val1');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -136,16 +203,108 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[name]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals('filter', $this->context->getFilterValues()->getDefaultGroupName());
+        self::assertTrue($this->context->isProcessed(RegisterDynamicFilters::OPERATION_NAME));
+    }
+
+    public function testProcessForPrimaryEntityFieldsWhenFilterExistsInFilterCollection()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $filter = $this->getComparisonFilter('string');
+
+        $request = $this->getRequest('filter[name]=val1');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('name', $filter);
+        $this->processor->process($this->context);
+
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $filter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testShouldRemoveNotUsedFiltersForPrimaryEntityFieldsFromFilterCollection()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name', 'label']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $idFilter = $this->getComparisonFilter('integer');
+        $nameFilter = $this->getComparisonFilter('string');
+
+        $request = $this->getRequest('filter[name]=val1');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('id', $idFilter);
+        $this->context->getFilters()->add('name', $nameFilter);
+        $this->processor->process($this->context);
+
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $nameFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testShouldNotRemoveNotUsedFiltersWithDefaultValueForPrimaryEntityFieldsFromFilterCollection()
+    {
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['name']);
+        $primaryEntityFilters = $this->getFiltersConfig(['name' => 'string']);
+
+        $nameFilter = new StandaloneFilterWithDefaultValue('string');
+
+        $request = $this->getRequest('');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->filterFactory->expects(self::never())
+            ->method('createFilter');
+
+        $this->context->setClassName(Entity\Category::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('name', $nameFilter);
+        $this->processor->process($this->context);
+
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[name]', $nameFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForUnknownPrimaryEntityField()
@@ -155,26 +314,20 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[label1]=test');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
-        $this->assertCount(0, $this->context->getFilters());
-        $this->assertEquals(
-            [
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                    ->setSource(ErrorSource::createByParameter('filter[label1]'))
-            ],
-            $this->context->getErrors()
-        );
+        self::assertCount(0, $this->context->getFilters());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForPrimaryEntityFieldWhichCannotBeUsedForFiltering()
@@ -184,26 +337,20 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[label]=test');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
-        $this->assertCount(0, $this->context->getFilters());
-        $this->assertEquals(
-            [
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                    ->setSource(ErrorSource::createByParameter('filter[label]'))
-            ],
-            $this->context->getErrors()
-        );
+        self::assertCount(0, $this->context->getFilters());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForRelatedEntityField()
@@ -213,7 +360,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[category.name]=test');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(
                 $this->getConfig(
@@ -222,7 +369,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
                 )
             );
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -230,16 +377,57 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForRelatedEntityFieldForModelInheritedFromEntity()
+    {
+        $this->notManageableClassNames = [Entity\UserProfile::class];
+
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'category']);
+        $primaryEntityConfig->setParentResourceClass(Entity\User::class);
+        $primaryEntityFilters = $this->getFiltersConfig();
+
+        $request = $this->getRequest('filter[category.name]=test');
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn(
+                $this->getConfig(
+                    ['name'],
+                    ['name' => 'string']
+                )
+            );
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('string', [])
+            ->willReturn($this->getComparisonFilter('string'));
+
+        $this->context->setClassName(Entity\UserProfile::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $this->context->setConfigOfFilters($primaryEntityFilters);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('string');
+        $expectedFilter->setField('category.name');
+        $expectedFilter->setSupportedOperators(['=', '!=']);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
+        $expectedFilters->add('filter[category.name]', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRelatedEntityFieldWithNotEqualOperator()
@@ -249,7 +437,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[category.name]!=test');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(
                 $this->getConfig(
@@ -258,7 +446,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
                 )
             );
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -266,16 +454,17 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForToManyRelatedEntityFieldWithNotEqualOperator()
@@ -285,7 +474,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[groups.name]!=test');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(
                 $this->getConfig(
@@ -294,7 +483,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
                 )
             );
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -302,15 +491,16 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('groups.name');
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[groups.name]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRelatedEntityFieldWhenAssociationDoesNotExist()
@@ -320,26 +510,20 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[category1.name]=test');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
-        $this->assertCount(0, $this->context->getFilters());
-        $this->assertEquals(
-            [
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                    ->setSource(ErrorSource::createByParameter('filter[category1.name]'))
-            ],
-            $this->context->getErrors()
-        );
+        self::assertCount(0, $this->context->getFilters());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForRelatedEntityFieldWhenAssociationIsRenamed()
@@ -350,7 +534,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[category1.name]=test');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(
                 $this->getConfig(
@@ -359,7 +543,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
                 )
             );
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -367,16 +551,17 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category1.name]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRenamedRelatedEntityField()
@@ -393,11 +578,11 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $categoryConfig->getDefinition()->getField('name1')->setPropertyPath('name');
         $categoryConfig->getFilters()->getField('name1')->setPropertyPath('name');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn($categoryConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -405,16 +590,17 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category.name1]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRenamedAssociationAndRenamedRelatedEntityField()
@@ -432,11 +618,11 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $categoryConfig->getDefinition()->getField('name1')->setPropertyPath('name');
         $categoryConfig->getFilters()->getField('name1')->setPropertyPath('name');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn($categoryConfig);
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($this->getComparisonFilter('string'));
@@ -444,16 +630,17 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
         $expectedFilter = new ComparisonFilter('string');
         $expectedFilter->setField('category.name');
         $expectedFilter->setSupportedOperators(['=', '!=']);
         $expectedFilters = new FilterCollection();
+        $expectedFilters->setDefaultGroupName('filter');
         $expectedFilters->add('filter[category1.name1]', $expectedFilter);
 
-        $this->assertEquals($expectedFilters, $this->context->getFilters());
+        self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
     public function testProcessForRequestTypeAwareFilter()
@@ -463,7 +650,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $request = $this->getRequest('filter[category.name]=test');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(
                 $this->getConfig(
@@ -474,7 +661,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $filter = new RequestAwareFilterStub('string');
 
-        $this->filterFactory->expects($this->once())
+        $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('string', [])
             ->willReturn($filter);
@@ -482,10 +669,10 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
         $this->processor->process($this->context);
 
-        $this->assertSame($this->context->getRequestType(), $filter->getRequestType());
+        self::assertSame($this->context->getRequestType(), $filter->getRequestType());
     }
 
     public function testProcessForSelfIdentifiableFilter()
@@ -496,22 +683,22 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $request = $this->getRequest('filter[target][users]=123');
 
         $filter = new SelfIdentifiableFilterStub('integer');
-        $filter->setFoundFilterKey('filter[target.users]');
+        $filter->setFoundFilterKeys(['filter[target.users]']);
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->getFilters()->has('filter[target]'));
-        $this->assertSame($filter, $this->context->getFilters()->get('filter[target.users]'));
+        self::assertFalse($this->context->getFilters()->has('filter[target]'));
+        self::assertSame($filter, $this->context->getFilters()->get('filter[target.users]'));
 
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForSelfIdentifiableFilterWhenFilterValueWasNotFound()
@@ -522,27 +709,21 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $request = $this->getRequest('filter[target][users]=123');
 
         $filter = new SelfIdentifiableFilterStub('integer');
-        $filter->setFoundFilterKey(null);
+        $filter->setFoundFilterKeys(null);
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
-        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+        self::assertFalse($this->context->getFilters()->has('filter[target]'));
 
-        $this->assertEquals(
-            [
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                    ->setSource(ErrorSource::createByParameter('filter[target][users]'))
-            ],
-            $this->context->getErrors()
-        );
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForSelfIdentifiableFilterWhenInvalidFilterValueKeyExceptionOccurred()
@@ -556,26 +737,24 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filterValue = new FilterValue('target.users', '123');
         $filterValue->setSourceKey('filter[target][users]');
         $exception = new InvalidFilterValueKeyException('some error', $filterValue);
-        $filter->setFoundFilterKey($exception);
+        $filter->setFoundFilterKeys($exception);
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
-        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+        self::assertCount(0, $this->context->getFilters());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(Constraint::FILTER)
                     ->setInnerException($exception)
-                    ->setSource(ErrorSource::createByParameter('filter[target][users]')),
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
                     ->setSource(ErrorSource::createByParameter('filter[target][users]'))
             ],
             $this->context->getErrors()
@@ -592,27 +771,25 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         $filter = new SelfIdentifiableFilterStub('integer');
         $filterValue = new FilterValue('target.users', '123');
         $exception = new InvalidFilterValueKeyException('some error', $filterValue);
-        $filter->setFoundFilterKey($exception);
+        $filter->setFoundFilterKeys($exception);
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
 
-        $this->assertSame($filter, $this->context->getFilters()->get('filter[target]'));
+        self::assertCount(0, $this->context->getFilters());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 Error::createValidationError(Constraint::FILTER)
                     ->setInnerException($exception)
-                    ->setSource(ErrorSource::createByParameter('filter[target]')),
-                Error::createValidationError(Constraint::FILTER, 'The filter is not supported.')
-                    ->setSource(ErrorSource::createByParameter('filter[target][users]'))
+                    ->setSource(ErrorSource::createByParameter('filter[target]'))
             ],
             $this->context->getErrors()
         );
@@ -631,16 +808,16 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $filter = new SelfIdentifiableFilterStub('integer');
         $exception = new \Exception('some error');
-        $filter->setFoundFilterKey($exception);
+        $filter->setFoundFilterKeys($exception);
 
-        $this->filterFactory->expects($this->never())
+        $this->filterFactory->expects(self::never())
             ->method('createFilter');
 
         $this->context->setClassName(Entity\User::class);
         $this->context->setConfig($primaryEntityConfig);
         $this->context->setConfigOfFilters($primaryEntityFilters);
-        $this->context->setFilterValues(new RestFilterValueAccessor($request));
-        $this->context->getFilters()->add('filter[target]', $filter);
+        $this->context->setFilterValues($this->getRestFilterValueAccessor($request));
+        $this->context->getFilters()->add('target', $filter);
         $this->processor->process($this->context);
     }
 }

@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Checks whether entity identifier exists in the request data,
- * and if so, adds it to the Context.
+ * and if so, adds it to the context.
  * If the entity identifier does not exist in the request data
  * and the entity type does not have id generator then a validation error
  * is added to the context.
@@ -34,7 +34,7 @@ class ExtractEntityId implements ProcessorInterface
 
         $requestData = $context->getRequestData();
         if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // unexpected request data or they are already normalized
+            // unsupported request data or the data are already normalized
             return;
         }
 
@@ -43,7 +43,7 @@ class ExtractEntityId implements ProcessorInterface
             $context->setId($data[JsonApiDoc::ID]);
         } else {
             $metadata = $context->getMetadata();
-            if (!$metadata->hasIdentifierGenerator()) {
+            if (null !== $metadata && !$metadata->hasIdentifierGenerator()) {
                 $context->addError($this->createRequiredEntityIdError());
             }
         }

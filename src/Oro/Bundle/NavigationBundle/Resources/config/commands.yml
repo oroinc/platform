@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\NavigationBundle\Command\ClearNavigationHistoryCommand:
+        public: false
+        class: Oro\Bundle\NavigationBundle\Command\ClearNavigationHistoryCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NavigationBundle\Command\ResetMenuUpdatesCommand:
+        public: false
+        class: Oro\Bundle\NavigationBundle\Command\ResetMenuUpdatesCommand
+        tags:
+            - { name: console.command }

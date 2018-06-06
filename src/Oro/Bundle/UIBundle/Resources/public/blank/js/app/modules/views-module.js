@@ -8,7 +8,8 @@ define(function(require) {
 
     var config = module.config();
     config = _.extend({
-        showLoadingMaskOnStartup: false
+        showLoadingMaskOnStartup: false,
+        showLoadingBarOnStartup: false
     }, config);
 
     /**
@@ -64,6 +65,29 @@ define(function(require) {
                 mediator.on('page:afterChange', this.view.hide, this.view);
                 if (config.showLoadingMaskOnStartup) {
                     this.view.show();
+                }
+            }
+        });
+    });
+
+    /**
+     * Init PageLoadingBarView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/mediator',
+        'oroui/js/app/views/loading-bar-view'
+    ], function(mediator, LoadingBarView) {
+        BaseController.addToReuse('loadingBar', {
+            compose: function() {
+                this.view = new LoadingBarView({
+                    ajaxLoading: true
+                });
+                mediator.setHandler('showLoadingBar', this.view.showLoader, this.view);
+                mediator.setHandler('hideLoadingBar', this.view.hideLoader, this.view);
+                mediator.on('page:beforeChange', this.view.showLoader, this.view);
+                mediator.on('page:afterChange', this.view.hideLoader, this.view);
+                if (config.showLoadingBarOnStartup) {
+                    this.view.showLoader();
                 }
             }
         });

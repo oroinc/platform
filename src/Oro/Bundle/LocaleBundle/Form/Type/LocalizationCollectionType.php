@@ -73,10 +73,10 @@ class LocalizationCollectionType extends AbstractType
         ]);
 
         $resolver->setDefaults([
-            'entry_options'               => [],
-            'fallback_type'         => FallbackPropertyType::NAME,
+            'entry_options'         => [],
+            'fallback_type'         => FallbackPropertyType::class,
             'enabled_fallbacks'     => [],
-            'value_type'            => FallbackValueType::NAME,
+            'value_type'            => FallbackValueType::class,
             'group_fallback_fields' => null
         ]);
     }

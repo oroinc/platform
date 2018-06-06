@@ -5,22 +5,22 @@ system_configuration:
     fields:
         oro_sidebar.sidebar_left_active:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
                 choices:
-                    - No
-                    - Yes
+                    No: 0
+                    Yes: 1
         oro_sidebar.sidebar_right_active:
             data_type: boolean
-            type: choice
+            type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
                 choices:
-                    - No
-                    - Yes
+                    No: 0
+                    Yes: 1
     tree:
         system_configuration:
             platform:

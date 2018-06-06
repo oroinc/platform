@@ -18,11 +18,13 @@ security:
             provider:                       chain_provider
             anonymous:                      true
             context:                        main
+            logout_on_user_change: true
 
         reset_password:
             pattern:                        ^/user/reset/*
             provider:                       chain_provider
             anonymous:                      true
+            logout_on_user_change: true
 
         main:
             pattern:                        ^/
@@ -43,6 +45,7 @@ security:
             guard:
                 authenticators:
                     - oro_user.impersonation_authenticator
+            logout_on_user_change: true
 
 oro_user:
     privileges:
@@ -64,3 +67,6 @@ oro_user:
             fix_values: false
             default_value: 1
             show_default: false
+
+escape_wsse_authentication:
+    authentication_listener_class: Oro\Bundle\UserBundle\Security\Http\Firewall\Listener

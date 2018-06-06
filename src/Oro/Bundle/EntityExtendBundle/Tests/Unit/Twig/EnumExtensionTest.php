@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
@@ -12,59 +15,17 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrine;
+    /** @var EnumValueProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $enumValueProvider;
 
     /** @var EnumExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
 
-        $this->extension = new EnumExtension($this->doctrine);
-    }
-
-    public function testTransEnumLocalCache()
-    {
-        $enumCode1             = 'test_enum1';
-        $enumCode2             = 'test_enum2';
-        $enumValueEntityClass1 = ExtendHelper::buildEnumValueClassName($enumCode1);
-        $enumValueEntityClass2 = ExtendHelper::buildEnumValueClassName($enumCode2);
-
-        $repo1 = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo2 = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->exactly(2))
-            ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$enumValueEntityClass1, null, $repo1],
-                        [$enumValueEntityClass2, null, $repo2],
-                    ]
-                )
-            );
-        $repo1->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue([]));
-        $repo2->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue([]));
-
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass1]);
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass2]);
-        // call one more time to check local cache
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass1]);
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass2]);
-        // call with enum code to check local cache keys
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumCode1]);
-        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumCode2]);
+        $this->extension = new EnumExtension($this->enumValueProvider);
     }
 
     public function testTransEnum()
@@ -72,19 +33,13 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            new TestEnumValue('val1', 'Value 1')
+            'Value 1' => 'val1'
         ];
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
             ->with($enumValueEntityClass)
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         $this->assertEquals(
             'Value 1',
@@ -101,19 +56,13 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            new TestEnumValue('val1', '0')
+            '0' => 'val1'
         ];
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
             ->with($enumValueEntityClass)
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         $this->assertEquals(
             '0',
@@ -126,19 +75,13 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            new TestEnumValue('0', 'Value 1')
+           'Value 1' => '0',
         ];
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
             ->with($enumValueEntityClass)
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         $this->assertEquals(
             'Value 1',
@@ -151,22 +94,16 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         $enumValueEntityClass = 'Test\EnumValue';
 
         $values = [
-            new TestEnumValue('val1', 'Value 1', 2),
-            new TestEnumValue('val2', 'Value 2', 4),
-            new TestEnumValue('val3', 'Value 3', 1),
-            new TestEnumValue('val4', 'Value 4', 3),
+            'Value 3' => 'val3',
+            'Value 1' => 'val1',
+            'Value 4' => 'val4',
+            'Value 2' => 'val2',
         ];
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->once())
-            ->method('getRepository')
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
             ->with($enumValueEntityClass)
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('findAll')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         $this->assertEquals(
             ['val1', 'val4', 'val2'],

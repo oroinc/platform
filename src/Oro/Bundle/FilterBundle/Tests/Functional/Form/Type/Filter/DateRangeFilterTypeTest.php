@@ -20,7 +20,7 @@ class DateRangeFilterTypeTest extends WebTestCase
      */
     public function testFormSubmitValidData(array $submittedData, array $expectedData)
     {
-        $form = $this->getFormFactory()->create(DateRangeFilterType::NAME, null, [
+        $form = $this->getFormFactory()->create(DateRangeFilterType::class, null, [
             'csrf_protection' => false,
         ]);
 

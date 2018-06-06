@@ -9,9 +9,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType as EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -28,12 +29,11 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->type = new SearchEntityFilterType($this->entityNameResolver, $this->localizationHelper);
+        parent::setUp();
     }
 
     public function testConfigureOptions()
@@ -99,17 +99,12 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
             ->with($entity, null, $localization)
             ->willReturn('resolved-label');
 
-        $form = $this->factory->create($this->type, [], []);
+        $form = $this->factory->create(SearchEntityFilterType::class, [], []);
         $formOptions = $form->getConfig()->getOptions();
         $this->assertEquals(
             'resolved-label',
             $formOptions['field_options']['choice_label']($entity)
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(SearchEntityFilterType::NAME, $this->type->getName());
     }
 
     public function testGetBlockPrefix()
@@ -119,7 +114,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(EntityFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(EntityFilterType::class, $this->type->getParent());
     }
 
     /**
@@ -132,10 +127,11 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
+                    $this->type,
                     new EntityFilterType($translator),
                     new ChoiceFilterType($translator),
                     new FilterType($translator),
-                    new EntityType([]),
+                    EntityType::class => new EntityTypeStub([])
                 ],
                 []
             ),

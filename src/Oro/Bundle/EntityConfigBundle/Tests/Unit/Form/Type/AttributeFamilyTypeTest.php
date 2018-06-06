@@ -4,19 +4,16 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
-use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType;
-use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeFamilyStub;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\ImageTypeStub;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\FormBundle\Form\Type\CollectionType;
-use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\PreloadedExtension;
+use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 
 class AttributeFamilyTypeTest extends FormIntegrationTestCase
 {
@@ -27,9 +24,8 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->type = new AttributeFamilyType($this->getTranslator());
+        parent::setUp();
     }
 
     public function testSubmitForm()
@@ -43,7 +39,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
         ];
 
         $options = ['attributeEntityClass' => 'EnityClass'];
-        $form = $this->factory->create($this->type, new AttributeFamilyStub(), $options);
+        $form = $this->factory->create(AttributeFamilyType::class, new AttributeFamilyStub(), $options);
 
         $form->submit($submittedData);
         $this->assertTrue($form->isSynchronized());
@@ -71,19 +67,13 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    CollectionType::NAME => new CollectionType(),
-                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
-                    ImageType::NAME => new ImageTypeStub(),
-                    AttributeGroupCollectionType::NAME => new AttributeGroupCollectionType(),
-                    AttributeGroupType::NAME => new AttributeGroupType(),
-                    AttributeMultiSelectType::NAME => new AttributeMultiSelectType($attributeManagerMock),
-                    'oro_select2_choice' => new Select2Type(
-                        'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
-                        'oro_select2_choice'
-                    ),
+                    AttributeFamilyType::class => $this->type,
+                    LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionTypeStub(),
+                    ImageType::class => new ImageTypeStub(),
+                    AttributeMultiSelectType::class => new AttributeMultiSelectType($attributeManagerMock),
                 ],
                 [
-                    'form' => [
+                    FormType::class => [
                         new DataBlockExtension()
                     ]
                 ]
@@ -97,14 +87,6 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
         $this->assertEquals(
             'oro_attribute_family',
             $this->type->getBlockPrefix()
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_attribute_family',
-            $this->type->getName()
         );
     }
 }

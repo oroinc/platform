@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
-use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
@@ -15,24 +14,23 @@ class InComparisonExpressionTest extends \PHPUnit_Framework_TestCase
     {
         $expression = new InComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor();
-        $comparison = new Comparison('test', 'IN', [1, 2, 3]);
-        $fieldName = 'a.test';
-        $parameterName = 'test_2';
+        $fieldName = 'e.test';
+        $parameterName = 'test_1';
+        $value = [1, 2, 3];
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $comparison,
             $fieldName,
-            $parameterName
+            $parameterName,
+            $value
         );
 
-        $this->assertEquals(
-            new Func('a.test IN', [':test_2']),
+        self::assertEquals(
+            new Func($fieldName . ' IN', [':' . $parameterName]),
             $result
         );
-
-        $this->assertEquals(
-            [new Parameter('test_2', [1, 2, 3], Connection::PARAM_INT_ARRAY)],
+        self::assertEquals(
+            [new Parameter($parameterName, $value, Connection::PARAM_INT_ARRAY)],
             $expressionVisitor->getParameters()
         );
     }
