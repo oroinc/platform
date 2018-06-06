@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
+  @import "oroui/css/scss/mobile/variables";
   @import "./big-numbers";
   @import "./dashboard";
   @import "./launchpad";
