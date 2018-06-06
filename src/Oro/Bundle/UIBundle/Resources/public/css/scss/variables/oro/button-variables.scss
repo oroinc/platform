@@ -29,6 +29,25 @@ $btn-disabled-border-color: $btn-disabled-background !default;
 $btn-disabled-opacity: 1 !default;
 $btn-disabled-box-shadow: none !default;
 
+$btn-light-background: none !default;
+$btn-light-color: $primary-700 !default;
+$btn-light-text-shadow: none !default;
+$btn-light-border-color: transparent !default;
+
+$btn-light-hover-background: none !default;
+$btn-light-hover-border-color: transparent !default;
+$btn-light-hover-color: $primary-400 !default;
+
+$btn-light-active-background: none !default;
+$btn-light-active-color: $primary !default;
+$btn-light-active-border-color: transparent !default;
+$btn-light-active-box-shadow: none !default;
+
+$btn-light-disabled-background: none !default;
+$btn-light-disabled-color: $primary-800 !default;
+$btn-light-disabled-border-color: transparent !default;
+$btn-light-disabled-box-shadow: none !default;
+
 $btn-primary-background: $secondary !default;
 $btn-primary-color: $primary-inverse !default;
 $btn-primary-text-shadow: none !default;
@@ -95,7 +114,7 @@ $btn-warning-hover-background: $warning-dark !default;
 $btn-warning-hover-border-color: $btn-warning-hover-background !default;
 $btn-warning-hover-color: $primary-inverse !default;
 
-$btn-warning-active-background: $warning-light !default;
+$btn-warning-active-background: #f7e1be !default;
 $btn-warning-active-color: $warning-dark !default;
 $btn-warning-active-border-color: $warning-dark !default;
 $btn-warning-active-box-shadow: none !default;
@@ -162,9 +181,31 @@ $btn-group-btn-font-size: $btn-font-size !default;
 $btn-group-btn-line-height: $btn-line-height !default;
 $btn-group-btn-border-radius: $btn-border-radius !default;
 
+$btn-group-btn-dropdown-toggle-box-shadow: none !default;
+
 $btn-group-open-btn-background: $btn-active-background !default;
 $btn-group-open-btn-color: $btn-active-color !default;
 $btn-group-open-btn-border-color: $btn-active-border-color !default;
 $btn-group-open-btn-box-shadow: $btn-active-box-shadow !default;
 
+$btn-group-success-open-btn-background: $success-dark !default;
+$btn-group-success-open-btn-border-color: $success-dark !default;
+$btn-group-success-open-btn-box-shadow: none !default;
+
 $btn-caret-offset-top: 13px !default;
+
+$btn-fa-font-size: $base-font-size + 2 !default;
+$btn-fa-vertical-align: -1px !default;
+$btn-fa-offset: 0 6px 0 0 !default;
+
+$btn-icon-width: 32px !default;
+$btn-icon-position: relative !default;
+$btn-icon-inner-offset: 0 !default;
+$btn-icon-text-indent: -9999px !default;
+
+$btn-icon-fa-offset: 0 !default;
+$btn-icon-fa-text-indent: 0 !default;
+$btn-icon-fa-position: absolute !default;
+$btn-icon-fa-top: 50% !default;
+$btn-icon-fa-left: 50% !default;
+$btn-icon-fa-transform: translate(-50%, -50%) !default;

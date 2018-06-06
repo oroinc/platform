@@ -145,16 +145,6 @@ label.disabled {
     cursor: not-allowed;
 }
 
-// Bootstrap - Form
-label,
-input,
-button,
-select,
-textarea {
-    font-size: 13px;
-    color: #777;
-}
-
 .form-horizontal .control-label {
     font-size: 13px;
     text-align: left;
@@ -453,27 +443,6 @@ body .select2-container {
 }
 
 // Bootstrap - Nav
-.dropdown-menu > li > div {
-    padding: 3px 13px;
-}
-
-.dropdown-menu > li > a {
-    padding-left: 13px;
-    padding-right: 13px;
-    color: $menu-item-color;
-}
-
-.dropdown-menu > li > a:hover,
-.dropdown-menu > li > a:focus,
-.dropdown-submenu:hover > a,
-.dropdown-submenu:focus > a,
-.dropdown-menu > .active > a,
-.dropdown-menu > .active > a:hover,
-.dropdown-menu > .active > a:focus {
-    background: #f3f3f3;
-    color: $menu-item-color;
-}
-
 .navbar .nav li.dropdown.open > .dropdown-toggle,
 .navbar .nav li.dropdown.active > .dropdown-toggle,
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
@@ -1590,16 +1559,6 @@ a {
     padding: 0;
     margin-bottom: 5px;
 
-    .customer-info-top-actions a {
-        height: 24px;
-        line-height: 24px;
-    }
-
-    .icons-holder a {
-        height: 24px;
-        line-height: 24px;
-    }
-
     > .row > div {
         margin-top: 10px;
         margin-bottom: 5px;
@@ -1626,44 +1585,6 @@ a {
         padding: 3px 12px;
         background-color: #fff;
         float: right;
-    }
-
-    .icons-holder-text.btn {
-        [class^="fa-"].hide-text {
-            float: left;
-            margin: 0;
-
-            &:before {
-                display: inline-block;
-                margin: 4px 5px 0 0;
-                font-size: 16px;
-                color: #666;
-                line-height: 19px;
-            }
-        }
-
-        .fa-chevron-left.hide-text {
-            &:before {
-                font-size: 11px;
-                line-height: 19px;
-            }
-        }
-
-        &.btn-success,
-        &.btn-primary,
-        &.btn-danger {
-            [class^="fa-"].hide-text {
-                &:before {
-                    color: #fff;
-                }
-            }
-        }
-    }
-}
-
-.btn-primary {
-    .fa-plus {
-        font-size: 12px;
     }
 }
 
@@ -3322,8 +3243,6 @@ label .popover-content {
 
 .pinned-dropdown {
     > .btn-group > .btn {
-        padding: 0 11px;
-
         [class^="fa-"],
         [class*=" fa-"] {
             margin-left: 0;
@@ -3331,8 +3250,6 @@ label .popover-content {
     }
 
     .dropdown-menu > li > a {
-        padding: 0 11px;
-
         [class^="fa-"],
         [class*=" fa-"] {
             margin: 0;

@@ -45,6 +45,50 @@
         }
     }
 
+    [class^="fa-"],
+    [class*=" fa-"] {
+        vertical-align: $btn-fa-vertical-align;
+        margin: $btn-fa-offset;
+
+        &:before {
+            font-size: $btn-fa-font-size;
+        }
+    }
+
+    &-light {
+        background: $btn-light-background;
+        color: $btn-light-color;
+        text-shadow: $btn-light-text-shadow;
+        border-color: $btn-light-border-color;
+
+        &:hover,
+        &:focus {
+            background: $btn-light-hover-background;
+            border-color: $btn-light-hover-border-color;
+            color: $btn-light-hover-color;
+        }
+
+        &:active {
+            background: $btn-light-active-background;
+            color: $btn-light-active-color;
+            border-color: $btn-light-active-border-color;
+            box-shadow: $btn-light-active-box-shadow;
+        }
+
+        &[disabled],
+        &.disabled {
+            &,
+            &:hover,
+            &:active,
+            &:focus {
+                background: $btn-light-disabled-background;
+                color: $btn-light-disabled-color;
+                border-color: $btn-light-disabled-border-color;
+                box-shadow: $btn-light-disabled-box-shadow;
+            }
+        }
+    }
+
     &-primary {
         background: $btn-primary-background;
         color: $btn-primary-color;
@@ -255,6 +299,23 @@
         line-height: $btn-mini-line-height;
     }
 
+    &-icon {
+        width: $btn-icon-width;
+        padding: $btn-icon-inner-offset;
+        position: $btn-icon-position;
+        text-indent: $btn-icon-text-indent;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            margin: $btn-icon-fa-offset;
+            text-indent: $btn-icon-fa-text-indent;
+            position: $btn-icon-fa-position;
+            top: $btn-icon-fa-top;
+            left: $btn-icon-fa-left;
+            transform: $btn-icon-fa-transform;
+        }
+    }
+
     &.process {
         @include process();
     }
@@ -297,6 +358,10 @@
             border-top-right-radius: $btn-group-btn-border-radius;
             border-bottom-right-radius: $btn-group-btn-border-radius;
         }
+
+        + .dropdown-toggle {
+            box-shadow: $btn-group-btn-dropdown-toggle-box-shadow;
+        }
     }
 
     > .dropdown-toggle {
@@ -311,6 +376,25 @@
             color: $btn-group-open-btn-color;
             border-color: $btn-group-open-btn-border-color;
             box-shadow: $btn-group-open-btn-box-shadow;
+
+            &.btn-success {
+                background: $btn-group-success-open-btn-background;
+                border-color: $btn-group-success-open-btn-border-color;
+                box-shadow: $btn-group-success-open-btn-box-shadow;
+            }
         }
+    }
+}
+
+.dropdown-toggle-split {
+    &:after,
+    .dropup &:after,
+    .dropright &:after,
+    .caret {
+        margin-left: 0;
+    }
+
+    .dropleft &:before {
+        margin-right: 0;
     }
 }
