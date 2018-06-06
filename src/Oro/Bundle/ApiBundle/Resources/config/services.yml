@@ -492,7 +492,7 @@ services:
         shared: false
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.document_builder, requestType: json_api }
 

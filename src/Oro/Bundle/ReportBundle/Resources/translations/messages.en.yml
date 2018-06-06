@@ -108,7 +108,7 @@ oro:
                 report_settings.title: Reports settings
             fields:
                 display_sql_query.label: Display SQL in Reports and Segments
-                display_sql_query.tooltip: Displays SQL query of a report or segment on its View page
+                display_sql_query.tooltip: Displays SQL query of a report or segment on its view page
         filter:
             grouping.label: Grouping
             skip_empty_periods.label: Skip Empty Periods
@@ -125,4 +125,4 @@ oro:
 "Are you sure you want to delete this report?": Are you sure you want to delete this report?
 "Report deleted": Report deleted
 "Report saved": Report saved
-"Invalid report configuration": No data to show. Please go to the edit report page and make sure the report was configured properly.
+"Invalid report configuration": No data to show. Please navigate to the edit report page to make sure that the report was configured properly.

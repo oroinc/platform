@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
  * This decorator allows to use the embedded form even if third-party cookies
  * are blocked in a web browser.
  */
-class CsrfTokenStorageDecorator implements TokenStorageInterface
+class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableTokenStorageInterface
 {
     /** @var TokenStorageInterface */
     protected $mainTokenStorage;
@@ -86,7 +87,15 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface
     }
 
     /**
-     * @return TokenStorageInterface
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        return $this->getTokenStorage()->clear();
+    }
+
+    /**
+     * @return TokenStorageInterface|ClearableTokenStorageInterface
      */
     protected function getTokenStorage()
     {

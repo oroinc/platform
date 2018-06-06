@@ -318,19 +318,19 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 210 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, priority: 210 }
 
-    oro_api.subresource.rest.normalize_parent_entity_id:
+    oro_api.subresource.normalize_parent_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: get_subresource, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: get_relationship, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: rest, priority: 200 }
-            - { name: oro.api.processor, action: update_relationship, group: normalize_input, requestType: rest, priority: 200 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 200 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_input, priority: 200 }
 
     oro_api.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
@@ -348,7 +348,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: get_list, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 100 }
@@ -387,7 +387,7 @@ services:
             - '@oro_api.entity_instantiator'
             - '@oro_api.entity_loader'
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
         tags:
@@ -399,7 +399,7 @@ services:
     oro_api.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: rest&!json_api, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest&!json_api, priority: -50 }
@@ -408,7 +408,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
             - '@oro_api.config_provider'
             - '@oro_api.metadata_provider'
         tags:
@@ -418,7 +418,7 @@ services:
     oro_api.subresource.rest.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\Rest\NormalizeRequestData
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, requestType: rest&!json_api, priority: -50 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: rest&!json_api, priority: -50 }
@@ -428,7 +428,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\NormalizeRequestData
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, requestType: json_api, priority: -50 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: json_api, priority: -50 }
@@ -451,14 +451,14 @@ services:
             - { name: oro.api.processor, action: delete, group: normalize_input, priority: -100 }
             - { name: oro.api.processor, action: update, group: normalize_input, priority: -100 }
 
-    oro_api.rest.normalize_entity_id:
+    oro_api.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: get, group: normalize_input, requestType: rest, priority: -110 }
-            - { name: oro.api.processor, action: delete, group: normalize_input, requestType: rest, priority: -110 }
-            - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
+            - { name: oro.api.processor, action: get, group: normalize_input, priority: -110 }
+            - { name: oro.api.processor, action: delete, group: normalize_input, priority: -110 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
 
     #
     # security_check (primary resource)

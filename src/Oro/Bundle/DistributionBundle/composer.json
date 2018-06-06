@@ -7,7 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "7.1.*",
-        "symfony/symfony": "^3.4 <3.4.11",
+        "symfony/symfony": "^3.4",
         "oro/config": "dev-master",
         "components/jquery": "2.1.*",
         "bower-asset/jquery-cookie": "1.4.1",

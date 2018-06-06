@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -25,28 +26,22 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityInstantiator;
+    private $entityInstantiator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityLoader;
+    private $entityLoader;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    private $entityIdTransformer;
 
     /** @var NormalizeIncludedData */
-    protected $processor;
+    private $processor;
 
     public function setUp()
     {
@@ -60,12 +55,18 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
+
         $this->processor = new NormalizeIncludedData(
             $this->doctrineHelper,
             $this->entityInstantiator,
             $this->entityLoader,
             $this->valueNormalizer,
-            $this->entityIdTransformer,
+            $entityIdTransformerRegistry,
             $this->configProvider,
             $this->metadataProvider
         );
