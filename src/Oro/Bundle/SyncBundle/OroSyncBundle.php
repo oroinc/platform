@@ -4,6 +4,7 @@ namespace Oro\Bundle\SyncBundle;
 
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankClientPingConfigurationPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\ClankSessionHandlerConfigurationPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurationPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\TagGeneratorPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -23,5 +24,6 @@ class OroSyncBundle extends Bundle
         $container->addCompilerPass(new ClankClientPingConfigurationPass());
         $container->addCompilerPass(new TagGeneratorPass());
         $container->addCompilerPass(new SkipTagTrackingPass());
+        $container->addCompilerPass(new WebsocketRouterConfigurationPass());
     }
 }
