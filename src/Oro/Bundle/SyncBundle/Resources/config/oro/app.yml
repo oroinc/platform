@@ -1,7 +1,17 @@
-clank:
-    web_socket_server:
-        port:           "%websocket_bind_port%"      # The port the socket server will listen on
-        host:           "%websocket_bind_address%"   # (optional) The host ip to bind to
+gos_web_socket:
+    client:
+        firewall: ~
+    server:
+        port: "%websocket_bind_port%"      # The port the socket server will listen on
+        host: "%websocket_bind_address%"   # (optional) The host ip to bind to
+        router:
+            resources: ~
+
+    # We don`t need assets of GosWebSocketBundle
+    assetic: false
+    # We don`t need server connection parameters provided by GosWebSocketBundle in TWIG.
+    shared_config: false
+
 twig:
     globals:
         ws:
