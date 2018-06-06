@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\SyncBundle\Twig;
 
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Adds TWIG functions for interaction with websocket server
+ */
 class OroSyncExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -27,6 +31,14 @@ class OroSyncExtension extends \Twig_Extension
     }
 
     /**
+     * @return ConnectionChecker
+     */
+    protected function getConnectionChecker()
+    {
+        return $this->container->get('oro_sync.client.connection_checker');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
@@ -44,8 +56,7 @@ class OroSyncExtension extends \Twig_Extension
      */
     public function checkWsConnected()
     {
-        // TODO: MUST BE FIXED IN BAP-17006
-        return false;
+        return $this->getConnectionChecker()->checkConnection();
     }
 
     /**
