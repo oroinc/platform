@@ -458,7 +458,7 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
         lazy: true
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:

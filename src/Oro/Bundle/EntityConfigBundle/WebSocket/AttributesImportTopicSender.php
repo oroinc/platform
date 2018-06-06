@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\WebSocket;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
  * Serves to send import attributes finish message into user's topic.
@@ -13,9 +13,9 @@ class AttributesImportTopicSender
     const TOPIC = 'oro/attribute_import/user_%s_configmodel_%s';
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    private $publisher;
+    private $websocketClient;
 
     /**
      * @var TokenAccessorInterface
@@ -23,12 +23,12 @@ class AttributesImportTopicSender
     private $tokenAccessor;
 
     /**
-     * @param TopicPublisher $publisher
-     * @param TokenAccessorInterface $tokenAccessor
+     * @param WebsocketClientInterface $websocketClient
+     * @param TokenAccessorInterface   $tokenAccessor
      */
-    public function __construct(TopicPublisher $publisher, TokenAccessorInterface $tokenAccessor)
+    public function __construct(WebsocketClientInterface $websocketClient, TokenAccessorInterface $tokenAccessor)
     {
-        $this->publisher = $publisher;
+        $this->websocketClient = $websocketClient;
         $this->tokenAccessor = $tokenAccessor;
     }
 
@@ -62,6 +62,6 @@ class AttributesImportTopicSender
     {
         $messageData = ['finished' => true];
 
-        $this->publisher->send($this->getTopic((int)$configModel), json_encode($messageData));
+        $this->websocketClient->publish($this->getTopic((int)$configModel), $messageData);
     }
 }

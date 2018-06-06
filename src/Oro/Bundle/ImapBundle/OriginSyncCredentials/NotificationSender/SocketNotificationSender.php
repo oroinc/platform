@@ -4,22 +4,24 @@ namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
  *  Wrong credential sync email box notification sender channel that uses socket messaging as the channel.
  */
 class SocketNotificationSender implements NotificationSenderInterface
 {
-    /** @var TopicPublisher */
-    private $topicPublisher;
+    /**
+     * @var WebsocketClientInterface
+     */
+    private $websocketClient;
 
     /**
-     * @param TopicPublisher $topicPublisher
+     * @param WebsocketClientInterface $websocketClient
      */
-    public function __construct(TopicPublisher $topicPublisher)
+    public function __construct(WebsocketClientInterface $websocketClient)
     {
-        $this->topicPublisher = $topicPublisher;
+        $this->websocketClient = $websocketClient;
     }
 
     /**
@@ -30,12 +32,9 @@ class SocketNotificationSender implements NotificationSenderInterface
         $originOwner = $emailOrigin->getOwner();
         $topicName = $originOwner ? 'oro/imap_sync_fail_u_' . $originOwner->getId() : 'oro/imap_sync_fail_system';
 
-        $this->topicPublisher->send(
+        $this->websocketClient->publish(
             $topicName,
-            [
-                'username' => $emailOrigin->getUser(),
-                'host' => $emailOrigin->getImapHost()
-            ]
+            ['username' => $emailOrigin->getUser(), 'host' => $emailOrigin->getImapHost()]
         );
     }
 }

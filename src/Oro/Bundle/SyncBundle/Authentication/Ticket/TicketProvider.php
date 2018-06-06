@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Provider for getting and validating Sync authentication tickets.
  */
-class TicketProvider
+class TicketProvider implements TicketProviderInterface
 {
     /** @var MessageDigestPasswordEncoder */
     private $encoder;
@@ -56,11 +56,9 @@ class TicketProvider
     }
 
     /**
-     * @param bool $anonymousTicket
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function generateTicket($anonymousTicket = false)
+    public function generateTicket(bool $anonymousTicket = false): string
     {
         $created = date('c');
         $nonce = base64_encode(substr(md5(uniqid(gethostname() . '_', true)), 0, 16));
@@ -89,11 +87,9 @@ class TicketProvider
     }
 
     /**
-     * @param $ticket
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    public function isTicketValid($ticket)
+    public function isTicketValid(string $ticket): bool
     {
         list($ticketId, $userName, $nonce, $created) = explode(';', $ticket);
 

@@ -128,8 +128,8 @@ class RoleController extends Controller
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            $publisher = $this->get('oro_wamp.publisher');
-            $publisher->send('oro/outdated_user_page', ['role' => $role->getRole()]);
+            $publisher = $this->get('oro_sync.websocket_client');
+            $publisher->publish('oro/outdated_user_page', json_encode(['role' => $role->getRole()]));
 
             return $this->get('oro_ui.router')->redirect($role);
         }

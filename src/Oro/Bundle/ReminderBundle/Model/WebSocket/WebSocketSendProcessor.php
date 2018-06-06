@@ -4,8 +4,11 @@ namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
+/**
+ * Sends messages about reminders to websocket server.
+ */
 class WebSocketSendProcessor implements SendProcessorInterface
 {
     const NAME = 'web_socket';
@@ -16,9 +19,9 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $remindersByRecipient = array();
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    protected $topicPublisher;
+    protected $websocketClient;
 
     /**
      * @var MessageParamsProvider
@@ -26,12 +29,12 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $messageParamsProvider;
 
     /**
-     * @param TopicPublisher        $topicPublisher
-     * @param MessageParamsProvider $messageParamsProvider
+     * @param WebsocketClientInterface $websocketClient
+     * @param MessageParamsProvider    $messageParamsProvider
      */
-    public function __construct(TopicPublisher $topicPublisher, MessageParamsProvider $messageParamsProvider)
+    public function __construct(WebsocketClientInterface $websocketClient, MessageParamsProvider $messageParamsProvider)
     {
-        $this->topicPublisher        = $topicPublisher;
+        $this->websocketClient = $websocketClient;
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
@@ -98,9 +101,9 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected function sendMessage(array $messageData, $recipientId)
     {
-        return $this->topicPublisher->send(
+        return $this->websocketClient->publish(
             sprintf('oro/reminder/remind_user_%s', $recipientId),
-            json_encode($messageData)
+            $messageData
         );
     }
 

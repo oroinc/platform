@@ -256,7 +256,7 @@ services:
     oro_email.email_websocket.processor:
         class: '%oro_email.email_websocket.processor.class%'
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
 
     oro_email.event_listener.email_user_listener:
         class: '%oro_email.event_listener.email_user_listener.class%'

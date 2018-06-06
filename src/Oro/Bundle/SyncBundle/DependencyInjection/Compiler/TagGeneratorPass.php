@@ -8,28 +8,21 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TagGeneratorPass implements CompilerPassInterface
 {
-    const CHAIN_SERVICE_ID = 'oro_sync.content.tag_generator_chain';
-    const TAG_NAME         = 'oro_sync.tag_generator';
+    const TAG_GENERATOR_SERVICE_ID = 'oro_sync.content.tag_generator';
+    const TAG_NAME = 'oro_sync.tag_generator';
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        /**
-         * Find and add available generator to context
-         */
-        $context = $container->getDefinition(self::CHAIN_SERVICE_ID);
-        if ($context) {
-            $generators = $container->findTaggedServiceIds(self::TAG_NAME);
+        if (!$container->hasDefinition(self::TAG_GENERATOR_SERVICE_ID)) {
+            return;
+        }
 
-            $generators = array_map(
-                function ($serviceId) {
-                    return new Reference($serviceId);
-                },
-                array_keys($generators)
-            );
-            $context->replaceArgument(0, $generators);
+        $tagGeneratorDefinition = $container->getDefinition(self::TAG_GENERATOR_SERVICE_ID);
+        foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tags) {
+            $tagGeneratorDefinition->addMethodCall('addTransport', [new Reference($serviceId)]);
         }
     }
 }

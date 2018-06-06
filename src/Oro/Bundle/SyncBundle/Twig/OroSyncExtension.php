@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SyncBundle\Twig;
 
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class OroSyncExtension extends \Twig_Extension
@@ -20,19 +19,11 @@ class OroSyncExtension extends \Twig_Extension
     }
 
     /**
-     * @return TopicPublisher
-     */
-    protected function getTopicPublisher()
-    {
-        return $this->container->get('oro_wamp.publisher');
-    }
-
-    /**
      * @return TagGeneratorInterface
      */
     protected function getTagGenerator()
     {
-        return $this->container->get('oro_sync.content.tag_generator_chain');
+        return $this->container->get('oro_sync.content.tag_generator');
     }
 
     /**
@@ -53,7 +44,8 @@ class OroSyncExtension extends \Twig_Extension
      */
     public function checkWsConnected()
     {
-        return $this->getTopicPublisher()->check();
+        // TODO: MUST BE FIXED IN BAP-17006
+        return false;
     }
 
     /**

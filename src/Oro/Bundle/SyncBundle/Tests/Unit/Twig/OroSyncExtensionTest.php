@@ -22,12 +22,10 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->topicPublisher = $this->createMock(TopicPublisher::class);
         $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_wamp.publisher', $this->topicPublisher)
-            ->add('oro_sync.content.tag_generator_chain', $this->tagGenerator)
+            ->add('oro_sync.content.tag_generator', $this->tagGenerator)
             ->getContainer($this);
 
         $this->extension = new OroSyncExtension($container);

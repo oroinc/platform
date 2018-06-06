@@ -3,33 +3,28 @@
 namespace Oro\Bundle\SyncBundle\EventListener;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 class MaintenanceListener
 {
-    /** @var TopicPublisher */
-    protected $publisher;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    /**
+     * @var WebsocketClientInterface
+     */
+    private $client;
 
     /**
-     * @param TopicPublisher         $publisher
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param LoggerInterface        $logger
+     * @var TokenAccessorInterface
      */
-    public function __construct(
-        TopicPublisher $publisher,
-        TokenAccessorInterface $tokenAccessor,
-        LoggerInterface $logger
-    ) {
-        $this->publisher = $publisher;
+    private $tokenAccessor;
+
+    /**
+     * @param WebsocketClientInterface $client
+     * @param TokenAccessorInterface   $tokenAccessor
+     */
+    public function __construct(WebsocketClientInterface $client, TokenAccessorInterface $tokenAccessor)
+    {
+        $this->client = $client;
         $this->tokenAccessor = $tokenAccessor;
-        $this->logger = $logger;
     }
 
     public function onModeOn()
@@ -45,17 +40,10 @@ class MaintenanceListener
     /**
      * @param bool $isOn
      */
-    protected function onMode($isOn)
+    private function onMode($isOn)
     {
         $userId = $this->tokenAccessor->getUserId();
 
-        try {
-            $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));
-        } catch (\Exception $e) {
-            $this->logger->error(
-                'Failed to send a message to the topic "oro/maintenance"',
-                ['exception' => $e]
-            );
-        }
+        $this->client->publish('oro/maintenance', ['isOn' => (bool)$isOn, 'userId' => $userId]);
     }
 }

@@ -4,24 +4,27 @@ namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Sends messages about new emails to websocket server.
+ */
 class WebSocketSendProcessor
 {
     const TOPIC = 'oro/email_event/user_%s_org_%s';
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    protected $publisher;
+    protected $websocketClient;
 
     /**
-     * @param TopicPublisher $publisher
+     * @param WebsocketClientInterface $client
      */
-    public function __construct(TopicPublisher $publisher)
+    public function __construct(WebsocketClientInterface $client)
     {
-        $this->publisher = $publisher;
+        $this->websocketClient = $client;
     }
 
     /**
@@ -55,7 +58,7 @@ class WebSocketSendProcessor
                     'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : false
                 ];
 
-                $this->publisher->send($topic, json_encode($messageData));
+                $this->websocketClient->publish($topic, $messageData);
             }
         }
     }

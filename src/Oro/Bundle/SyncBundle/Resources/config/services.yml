@@ -9,18 +9,6 @@ parameters:
     oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
 
 services:
-    oro_wamp.publisher:
-        class: Oro\Bundle\SyncBundle\Wamp\TopicPublisher
-        arguments:
-            - "%websocket_backend_host%"
-            - "%websocket_backend_port%"
-            - "%websocket_backend_path%"
-        calls:
-            - ['setLogger', ['@logger']]
-            - ['setTicketProvider', ['@oro_sync.authentication.ticket_provider']]
-        tags:
-            - { name: monolog.logger, channel: oro_wamp }
-
     # this service is used as a workaround for "2006 MySQL server has gone away" error
     # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
     # is used by ClankSessionHandlerConfigurationPass to add it to a list of periodic services
@@ -51,7 +39,7 @@ services:
     kernel.listener.maintenance.event:
         class: '%oro_wamp.listener.maintenance.class%'
         arguments:
-            - "@oro_wamp.publisher"
+            - "@oro_sync.websocket_client"
             - "@oro_security.token_accessor"
             - "@logger"
         tags:
@@ -61,23 +49,22 @@ services:
     oro_sync.content.listener.datagrid_tag:
         class: Oro\Bundle\SyncBundle\Content\DataGridTagListener
         arguments:
-            - '@oro_sync.content.tag_generator_chain'
+            - '@oro_sync.content.tag_generator'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
 
     oro_sync.event_listener.doctrine_tag:
         class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
         arguments:
-            - '@oro_sync.content.topic_sender'
+            - '@oro_sync.content.data_update_topic_sender'
+            - '@oro_sync.content.tag_generator'
             - '%installed%'
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
 
-    oro_sync.content.tag_generator_chain:
+    oro_sync.content.tag_generator:
         class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
-        arguments:
-            - []
 
     oro_sync.content.tag_generator.doctrine:
         class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
@@ -91,17 +78,11 @@ services:
         tags:
             - { name: oro_sync.tag_generator }
 
-    oro_sync.content.tag_generator_chain.link:
-        tags:
-            - { name: oro_service_link, service: oro_sync.content.tag_generator_chain }
-
-    oro_sync.content.topic_sender:
-        class: Oro\Bundle\SyncBundle\Content\TopicSender
+    oro_sync.content.data_update_topic_sender:
+        class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
         arguments:
-            - '@oro_wamp.publisher'
-            - '@oro_sync.content.tag_generator_chain.link'
+            - '@oro_sync.websocket_client'
             - '@security.token_storage'
-            - '@logger'
 
     oro_sync.authentication.ticket_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider

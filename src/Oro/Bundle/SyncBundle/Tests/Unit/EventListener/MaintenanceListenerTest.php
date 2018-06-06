@@ -3,47 +3,45 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Psr\Log\LoggerInterface;
 
 class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $topicPublisher;
+    /**
+     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $websocketClient;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $logger;
-
-    /** @var MaintenanceListener */
+    /**
+     * @var MaintenanceListener
+     */
     private $publisher;
 
     protected function setUp()
     {
-        $this->topicPublisher = $this->createMock(TopicPublisher::class);
+        $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->publisher = new MaintenanceListener(
-            $this->topicPublisher,
-            $this->tokenAccessor,
-            $this->logger
-        );
+        $this->publisher = new MaintenanceListener($this->websocketClient, $this->tokenAccessor);
     }
 
     public function testOnModeOn()
     {
         $expectedUserId = 0;
-        $this->topicPublisher
-            ->expects($this->once())
-            ->method('send')
-            ->with('oro/maintenance', array('isOn' => true, 'userId' => $expectedUserId));
-        $this->tokenAccessor->expects($this->once())
+        $this->websocketClient
+            ->expects(self::once())
+            ->method('publish')
+            ->with('oro/maintenance', ['isOn' => true, 'userId' => $expectedUserId]);
+        $this->tokenAccessor
+            ->expects(self::once())
             ->method('getUserId')
-            ->will($this->returnValue($expectedUserId));
+            ->willReturn($expectedUserId);
 
         $this->publisher->onModeOn();
     }
@@ -51,13 +49,14 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnModeOff()
     {
         $expectedUserId = 42;
-        $this->topicPublisher
-            ->expects($this->once())
-            ->method('send')
-            ->with('oro/maintenance', array('isOn' => false, 'userId' => $expectedUserId));
-        $this->tokenAccessor->expects($this->once())
+        $this->websocketClient
+            ->expects(self::once())
+            ->method('publish')
+            ->with('oro/maintenance', ['isOn' => false, 'userId' => $expectedUserId]);
+        $this->tokenAccessor
+            ->expects(self::once())
             ->method('getUserId')
-            ->will($this->returnValue($expectedUserId));
+            ->willReturn($expectedUserId);
 
         $this->publisher->onModeOff();
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,9 +14,9 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $topicPublisher;
+    protected $websocketClient;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -29,16 +30,14 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
 
         $this->messageParamsProvider =
             $this->getMockBuilder('Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider')
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->processor = new WebSocketSendProcessor($this->topicPublisher, $this->messageParamsProvider);
+        $this->processor = new WebSocketSendProcessor($this->websocketClient, $this->messageParamsProvider);
     }
 
     public function testPush()
@@ -96,15 +95,15 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->topicPublisher
+        $this->websocketClient
             ->expects($this->at(0))
-            ->method('send')
-            ->with("oro/reminder/remind_user_{$fooUserId}", json_encode(array($fooMessage)));
+            ->method('publish')
+            ->with("oro/reminder/remind_user_{$fooUserId}", array($fooMessage));
 
-        $this->topicPublisher
+        $this->websocketClient
             ->expects($this->at(1))
-            ->method('send')
-            ->with("oro/reminder/remind_user_{$barUserId}", json_encode(array($barMessage, $bazMessage)));
+            ->method('publish')
+            ->with("oro/reminder/remind_user_{$barUserId}", array($barMessage, $bazMessage));
 
         $fooReminder->expects($this->once())
             ->method('setState')
@@ -147,10 +146,10 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception();
 
-        $this->topicPublisher
+        $this->websocketClient
             ->expects($this->once())
-            ->method('send')
-            ->with("oro/reminder/remind_user_{$fooUserId}", json_encode(array($fooMessage, $barMessage)))
+            ->method('publish')
+            ->with("oro/reminder/remind_user_{$fooUserId}", array($fooMessage, $barMessage))
             ->will($this->throwException($exception));
 
         $fooReminder->expects($this->once())

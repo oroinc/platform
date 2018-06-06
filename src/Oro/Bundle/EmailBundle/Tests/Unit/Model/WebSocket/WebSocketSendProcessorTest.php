@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\WebSocket;
 
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -12,9 +13,9 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $topicPublisher;
+    protected $websocketClient;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -28,9 +29,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
 
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
@@ -41,7 +40,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new WebSocketSendProcessor($this->topicPublisher);
+        $this->processor = new WebSocketSendProcessor($this->websocketClient);
     }
 
     public function testSendSuccess()
@@ -59,11 +58,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->topicPublisher->expects($this->once())
-            ->method('send')
+        $this->websocketClient->expects($this->once())
+            ->method('publish')
             ->with(
                 WebSocketSendProcessor::getUserTopic($this->emailUser->getOwner(), $this->emailUser->getOrganization()),
-                json_encode(['hasNewEmail' => true])
+                ['hasNewEmail' => true]
             );
 
         $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 1]]);
@@ -84,11 +83,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->topicPublisher->expects($this->once())
-            ->method('send')
+        $this->websocketClient->expects($this->once())
+            ->method('publish')
             ->with(
                 WebSocketSendProcessor::getUserTopic($this->emailUser->getOwner(), $this->emailUser->getOrganization()),
-                json_encode(['hasNewEmail' => false])
+                ['hasNewEmail' => false]
             );
 
         $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 0]]);
@@ -96,8 +95,8 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSendFailure()
     {
-        $this->topicPublisher->expects($this->never())
-            ->method('send');
+        $this->websocketClient->expects($this->never())
+            ->method('publish');
 
         $this->processor->send([]);
     }
