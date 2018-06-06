@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
+use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Gos\Component\WebSocketClient\Exception\WebsocketException;
-use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator;
-use Oro\Bundle\SyncBundle\Client\TicketAuthenticationAwareWebsocketClientDecorator;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
+use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
 class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCase
@@ -81,7 +81,12 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
         self::assertTrue($this->loggerAwareClientDecorator->publish($topicUri, $payload, $exclude, $eligible));
     }
 
-    public function testPublishWithException()
+    /**
+     * @dataProvider exceptionDataProvider
+     *
+     * @param \Exception $exception
+     */
+    public function testPublishWithException(\Exception $exception)
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -92,7 +97,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
             ->expects(self::once())
             ->method('publish')
             ->with($topicUri, $payload, $exclude, $eligible)
-            ->willThrowException(new WebsocketException());
+            ->willThrowException($exception);
 
         $this->assertLoggerErrorMethodCalled();
 
@@ -179,7 +184,12 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
         self::assertSame(true, $this->loggerAwareClientDecorator->event($topicUri, $payload));
     }
 
-    public function testEventWithException()
+    /**
+     * @dataProvider exceptionDataProvider
+     *
+     * @param \Exception $exception
+     */
+    public function testEventWithException(\Exception $exception)
     {
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
@@ -188,10 +198,22 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
             ->expects(self::once())
             ->method('event')
             ->with($topicUri, $payload)
-            ->willThrowException(new WebsocketException());
+            ->willThrowException($exception);
 
         $this->assertLoggerErrorMethodCalled();
 
         self::assertFalse($this->loggerAwareClientDecorator->event($topicUri, $payload));
+    }
+
+    /**
+     * @return array
+     */
+    public function exceptionDataProvider(): array
+    {
+        return [
+            'BadResponseException' => [new BadResponseException()],
+            'WebsocketException' => [new WebsocketException()],
+            'ValidationFailedException' => [new ValidationFailedException()],
+        ];
     }
 }

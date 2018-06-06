@@ -43,8 +43,8 @@ interface WebsocketClientInterface
     public function prefix(string $prefix, string $uri): bool;
 
     /**
-     * @param string      $procUri
-     * @param array $arguments
+     * @param string $procUri
+     * @param array  $arguments
      *
      * @return bool
      */
@@ -52,9 +52,9 @@ interface WebsocketClientInterface
 
     /**
      * @param string $topicUri
-     * @param string $payload
+     * @param mixed  $payload
      *
      * @return bool
      */
-    public function event(string $topicUri, string $payload): bool;
+    public function event(string $topicUri, $payload): bool;
 }

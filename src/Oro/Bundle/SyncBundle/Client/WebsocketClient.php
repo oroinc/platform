@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\SyncBundle\Client;
 
+use Gos\Component\WebSocketClient\Exception\BadResponseException;
+use Gos\Component\WebSocketClient\Exception\WebsocketException;
 use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
 use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 /**
  * Basic websocket client.
@@ -63,6 +66,9 @@ class WebsocketClient implements WebsocketClientInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws WebsocketException
+     * @throws BadResponseException
      */
     public function connect(string $target = '/'): ?string
     {
@@ -87,6 +93,10 @@ class WebsocketClient implements WebsocketClientInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws WebsocketException
+     * @throws BadResponseException
+     * @throws ValidationFailedException
      */
     public function publish(string $topicUri, $payload, array $exclude = [], array $eligible = []): bool
     {
@@ -99,6 +109,9 @@ class WebsocketClient implements WebsocketClientInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws WebsocketException
+     * @throws BadResponseException
      */
     public function prefix(string $prefix, string $uri): bool
     {
@@ -109,6 +122,9 @@ class WebsocketClient implements WebsocketClientInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws WebsocketException
+     * @throws BadResponseException
      */
     public function call(string $procUri, array $arguments = []): bool
     {
@@ -119,9 +135,15 @@ class WebsocketClient implements WebsocketClientInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws WebsocketException
+     * @throws BadResponseException
+     * @throws ValidationFailedException
      */
-    public function event(string $topicUri, string $payload): bool
+    public function event(string $topicUri, $payload): bool
     {
+        $this->validatePayload($payload);
+
         $this->getGosClient()->event($topicUri, $payload);
 
         return true;
@@ -145,14 +167,15 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * @param $payload
-     * @throws \InvalidArgumentException
+     * @param mixed $payload
+     *
+     * @throws ValidationFailedException
      */
-    protected function validatePayload($payload)
+    private function validatePayload($payload): void
     {
         $encodedJson = json_encode($payload);
         if ($encodedJson === false && json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException(json_last_error_msg());
+            throw new ValidationFailedException(json_last_error_msg());
         }
     }
 }

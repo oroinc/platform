@@ -71,7 +71,7 @@ abstract class AbstractWebsocketClientDecorator implements WebsocketClientInterf
     /**
      * {@inheritDoc}
      */
-    public function event(string $topicUri, string $payload): bool
+    public function event(string $topicUri, $payload): bool
     {
         return $this->decoratedClient->event($topicUri, $payload);
     }

@@ -9,11 +9,13 @@ class TagGeneratorChain implements TagGeneratorInterface
 
     /**
      * @param TagGeneratorInterface $generator
+     *
      * @return TagGeneratorChain
      */
     public function addGenerator(TagGeneratorInterface $generator)
     {
         $this->generators[] = $generator;
+
         return $this;
     }
 

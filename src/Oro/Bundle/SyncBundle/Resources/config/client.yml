@@ -6,7 +6,6 @@ services:
         class: 'Oro\Bundle\SyncBundle\Client\WebsocketClient'
         arguments:
             - '@oro_sync.websocket_client.factory.gos'
-            - '@serializer.encoder.json'
             - '%websocket_backend_host%'
             - '%websocket_backend_port%'
 

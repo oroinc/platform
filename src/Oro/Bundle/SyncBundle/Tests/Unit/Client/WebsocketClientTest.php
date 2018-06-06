@@ -5,6 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
 use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
+use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 class WebsocketClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,17 +41,14 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->gosClient = $this->createMock(GosClient::class);
-        $this->gosClientFactory
-            ->expects(self::any())
-            ->method('createGosClient')
-            ->with(self::WS_HOST, self::WS_PORT, self::WS_SECURED, self::WS_ORIGIN)
-            ->willReturn($this->gosClient);
     }
 
     public function testConnect()
     {
         $connectionSession = 'connectionSession';
         $target = 'sampleTarget';
+
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('connect')
@@ -62,6 +60,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
 
     public function testDisconnect()
     {
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('disconnect')
@@ -72,6 +71,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
 
     public function testIsConnected()
     {
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('isConnected')
@@ -87,6 +87,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         $exclude = ['sampleExclude'];
         $eligible = ['sampleEligible'];
 
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('publish')
@@ -96,13 +97,15 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         self::assertTrue($this->client->publish($topicUri, $payload, $exclude, $eligible));
     }
 
-    public function testPublichFail()
+    public function testPublishValidationFailure()
     {
-        $this->gosClient->expects($this->never())->method('publish');
-        $this->expectException(
-            \InvalidArgumentException::class,
-            'Malformed UTF-8 characters, possibly incorrectly encoded'
-        );
+        $this->gosClientFactory
+            ->expects(self::never())
+            ->method('createGosClient');
+
+        $this->expectException(ValidationFailedException::class);
+        $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
+
         $this->client->publish('sampleUrl', "\xB1\x31");
     }
 
@@ -111,6 +114,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
 
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('prefix')
@@ -125,6 +129,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
 
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('call')
@@ -139,6 +144,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
 
+        $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
             ->method('event')
@@ -146,5 +152,26 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         self::assertTrue($this->client->event($topicUri, $payload));
+    }
+
+    public function testEventValidationFailure()
+    {
+        $this->gosClientFactory
+            ->expects(self::never())
+            ->method('createGosClient');
+
+        $this->expectException(ValidationFailedException::class);
+        $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
+
+        $this->client->event('sampleUrl', "\xB1\x31");
+    }
+
+    private function mockGosClientFactory(): void
+    {
+        $this->gosClientFactory
+            ->expects(self::once())
+            ->method('createGosClient')
+            ->with(self::WS_HOST, self::WS_PORT, self::WS_SECURED, self::WS_ORIGIN)
+            ->willReturn($this->gosClient);
     }
 }

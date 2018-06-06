@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle\Client;
 
+use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Gos\Component\WebSocketClient\Exception\WebsocketException;
+use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -37,6 +39,8 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
             $this->logger->debug('Connected to websocket server');
         } catch (WebsocketException $e) {
             $this->logger->error('Could not connect to websocket server', [$e]);
+        } catch (BadResponseException $e) {
+            $this->logBadResponseException($e);
         }
 
         return $result;
@@ -68,7 +72,11 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
 
             $this->logger->debug(sprintf('PUBLISH in %s websocket server', $topicUri));
         } catch (WebsocketException $e) {
-            $this->logger->error('Could not send data to websocket server', [$e]);
+            $this->logWebsocketException($e);
+        } catch (BadResponseException $e) {
+            $this->logBadResponseException($e);
+        } catch (ValidationFailedException $e) {
+            $this->logValidationFailedException($e);
         }
 
         return $result;
@@ -86,7 +94,9 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
 
             $this->logger->debug(sprintf('PREFIX %s in %s websocket server', $prefix, $uri));
         } catch (WebsocketException $e) {
-            $this->logger->error('Could not send data to websocket server', [$e]);
+            $this->logWebsocketException($e);
+        } catch (BadResponseException $e) {
+            $this->logBadResponseException($e);
         }
 
         return $result;
@@ -104,7 +114,9 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
 
             $this->logger->debug(sprintf('CALL in %s websocket server', $procUri));
         } catch (WebsocketException $e) {
-            $this->logger->error('Could not send data to websocket server', [$e]);
+            $this->logWebsocketException($e);
+        } catch (BadResponseException $e) {
+            $this->logBadResponseException($e);
         }
 
         return $result;
@@ -113,7 +125,7 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
     /**
      * {@inheritDoc}
      */
-    public function event(string $topicUri, string $payload): bool
+    public function event(string $topicUri, $payload): bool
     {
         $result = false;
 
@@ -122,9 +134,37 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
 
             $this->logger->debug(sprintf('EVENT in %s websocket server', $topicUri));
         } catch (WebsocketException $e) {
-            $this->logger->error('Could not send data to websocket server', [$e]);
+            $this->logWebsocketException($e);
+        } catch (BadResponseException $e) {
+            $this->logBadResponseException($e);
+        } catch (ValidationFailedException $e) {
+            $this->logValidationFailedException($e);
         }
 
         return $result;
+    }
+
+    /**
+     * @param BadResponseException $e
+     */
+    private function logBadResponseException(BadResponseException $e): void
+    {
+        $this->logger->error('Error occured while communicating with websocket server', [$e]);
+    }
+
+    /**
+     * @param WebsocketException $e
+     */
+    private function logWebsocketException(WebsocketException $e): void
+    {
+        $this->logger->error('Could not send data to websocket server', [$e]);
+    }
+
+    /**
+     * @param ValidationFailedException $e
+     */
+    private function logValidationFailedException(ValidationFailedException $e): void
+    {
+        $this->logger->error('Validation failed while trying to send payload to websocket server', [$e]);
     }
 }
