@@ -23,6 +23,7 @@
         {% endif %}
         {% set availableWidgets = availableWidgets|merge([{
             'dialogIcon': icon,
+            'iconClass': widget.icon_class|default(null),
             'title': title,
             'widgetName': widgetName,
             'description': description,

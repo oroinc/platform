@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 @import "variables";
+@import "extends";
 @import "form";
 @import "loading-mask";
 @import "loading-dots";
@@ -27,3 +28,4 @@
 @import "content-sidebar";
 @import "highlight-text";
 @import "loading-bar";
+@import "widget-picker";
