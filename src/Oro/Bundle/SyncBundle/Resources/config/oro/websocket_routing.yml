@@ -1,0 +1,4 @@
+oro_sync.ping:
+    channel: 'oro/ping'
+    handler:
+        callback: 'oro_sync.ping'

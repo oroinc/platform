@@ -1,34 +1,31 @@
 parameters:
-    # the time in milliseconds determines how often a ping service being called
-    # set 0 or false to disable pinging
-    oro_wamp.ping.interval: 60000 # 1 minute
-    # the time in milliseconds determines how often a ping service being called
-    # set 0 or false to disable pinging
-    oro_wamp.client_ping.interval: null #45000 # 45 seconds
+    # the time in seconds determines how often a database ping service being called
+    oro_sync.db_ping.interval: 20
+    # the time in seconds determines how often a websocket ping service being called
+    oro_sync.websocket_ping.interval: 50
 
     oro_wamp.listener.maintenance.class:  Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
 
 services:
-    # this service is used as a workaround for "2006 MySQL server has gone away" error
-    # do not rename it because "oro_wamp.ping.{session_handler_type}" naming convention
-    # is used by ClankSessionHandlerConfigurationPass to add it to a list of periodic services
-    # in case if PdoSessionHandler is configured as a session storage handler
-#    oro_wamp.ping.pdo:
-#        class: Oro\Bundle\SyncBundle\Wamp\DbPing
-#        arguments:
-#            - "@?doctrine.dbal.session_connection.wrapped"
+    oro_sync.periodic.db_ping:
+        class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
+        arguments:
+            - '@doctrine'
+            - '@logger'
+            - '%oro_sync.db_ping.interval%'
+        tags:
+            - { name: gos_web_socket.periodic }
 
-    # this service is used to broadcast messages to clients to prevent connection loose
-    # by default, the connection could be closed if no data were transmitted between client and server
-    # for more details see http://nginx.org/en/docs/http/websocket.html
-    # TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
-#    oro_wamp.client.ping:
-#        class: Oro\Bundle\SyncBundle\Wamp\ClientPing
-#        arguments:
-#            - '@oro_sync.authentication.ticket_authentication_aware_topic_dispatcher_decorator'
-#            - '@logger'
+    oro_sync.topic.websocket_ping:
+        class: Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic
+        arguments:
+            - 'oro_sync.ping'
+            - '@logger'
+            - '%oro_sync.websocket_ping.interval%'
+        tags:
+            - { name: gos_web_socket.topic }
 
-    oro_wamp.twig.sync_extension:
+    oro_sync.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
         public: false
         arguments:
