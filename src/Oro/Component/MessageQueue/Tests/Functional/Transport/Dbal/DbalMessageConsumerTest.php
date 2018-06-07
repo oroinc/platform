@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
