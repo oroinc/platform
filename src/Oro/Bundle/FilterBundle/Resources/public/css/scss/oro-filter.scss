@@ -104,7 +104,6 @@
     font-size: 12px;
     background-color: #fff;
     padding: 8px 8px 2px 8px;
-    border: 1px solid #d3d3d3;
     display: block;
     visibility: hidden;
     z-index: $oro-zindex-dropdown;
@@ -308,16 +307,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover {
 
 .date-visual-element {
     width: 95px;
-}
-
-.filter-criteria .dropdown-menu a {
-    color: #444;
-}
-
-.filter-criteria .dropdown-menu li a:hover {
-    background: #3875d7;
-    color: #fff;
-    outline: none !important;
 }
 
 .filter-criteria .nav-tabs-oro a:hover,

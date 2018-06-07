@@ -8,8 +8,9 @@
 
 <<%= tagName %>
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
-    class="action
+    class="action btn btn-light
         <%= className ? " " + className : "" %>
+        <%= launcherMode == 'icon-only' || launcherMode == 'text-only' ? 'btn-icon' : "" %>
         <%= !enabled ? " disabled" : "" %>
         <%= launcherMode != '' ? 'mode-' +  launcherMode : "" %>
         <% if (links) { %> dropdown-toggle<% } %>

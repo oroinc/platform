@@ -4,7 +4,8 @@ _.each(attributes, function(attribute, name) { %>
 <% });
 } %>
 <div class="<%= wrapperClassName %> dropdown">
-    <a href="#" class="action btn
+    <a href="#" class="action btn btn-light
+            <%= launcherMode == 'icon-only' ? 'btn-icon' : "" %>
             <%= className ? " " + className : "" %>
             <%= !enabled ? " disabled" : "" %>
             <%= launcherMode != '' ? 'mode-' +  launcherMode : "" %>
