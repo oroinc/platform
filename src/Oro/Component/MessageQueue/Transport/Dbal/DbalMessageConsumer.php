@@ -310,7 +310,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 PostgreSqlPlatform::class => 'UPDATE %1$s SET consumer_id=:consumerId'
                     . ' WHERE id = (SELECT id FROM %1$s WHERE consumer_id IS NULL AND queue=:queue'
                     . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
-                    . ' ORDER BY priority DESC, id ASC LIMIT 1) AND consumer_id IS NULL'
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE SKIP LOCKED)'
             ]);
         }
 
@@ -341,7 +341,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function preparePlatformDependentQuery(array $queryVariants)
     {
         $statement = null;
-        $databasePlatform = $this->connection->getDBALConnection()->getDatabasePlatform();
+        $databasePlatform = $this->dbal->getDatabasePlatform();
         foreach ($queryVariants as $variantPlatform => $query) {
             if (is_a($databasePlatform, $variantPlatform)) {
                 $statement = $this->dbal->prepare(sprintf($query, $this->connection->getTableName()));
