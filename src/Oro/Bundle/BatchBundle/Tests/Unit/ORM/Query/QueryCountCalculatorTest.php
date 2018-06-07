@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
@@ -249,7 +251,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(['getConfiguration', 'getClassMetadata', 'getConnection', 'getUnitOfWork'])
+            ->setMethods(['getConfiguration', 'getClassMetadata', 'getConnection', 'getUnitOfWork', 'getEventManager'])
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())
@@ -264,6 +266,14 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
+
+        $eventManager = $this->createMock(EventManager::class);
+        $eventManager->expects($this->any())
+            ->method('addEventListener');
+
+        $entityManager->expects($this->any())
+            ->method('getEventManager')
+            ->will($this->returnValue($eventManager));
 
         return [$entityManager, $connection, $statement];
     }

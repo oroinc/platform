@@ -44,9 +44,16 @@ class EntityRepositoryCompilerPass implements CompilerPassInterface
         $repositoryFactory = $container->getDefinition(static::REPOSITORY_FACTORY);
         $repositoryFactory->replaceArgument(1, $definitionIdsByClass);
 
+        // get all orm configuration services
+        $doctrineConfigurationDefinitions = $this->getChildDefinitions($container, static::ORM_CONFIGURATION);
+
         // use entity repository factory instead of default one
-        $doctrineConfiguration = $container->getDefinition(static::ORM_CONFIGURATION);
-        $doctrineConfiguration->addMethodCall('setRepositoryFactory', [new Reference(static::REPOSITORY_FACTORY)]);
+        foreach ($doctrineConfigurationDefinitions as $doctrineConfigurationDefinition) {
+            $doctrineConfigurationDefinition->addMethodCall(
+                'setRepositoryFactory',
+                [new Reference(static::REPOSITORY_FACTORY)]
+            );
+        }
     }
 
     /**
