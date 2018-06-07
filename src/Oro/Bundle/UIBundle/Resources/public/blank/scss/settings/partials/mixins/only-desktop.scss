@@ -1,0 +1,10 @@
+/* @theme: blank; */
+
+// Check devices on server, if device is desktop added class to body (.desktop-version)
+@mixin only-desktop {
+    @include breakpoint('desktop') {
+        .desktop-version {
+            @content;
+        }
+    }
+}
