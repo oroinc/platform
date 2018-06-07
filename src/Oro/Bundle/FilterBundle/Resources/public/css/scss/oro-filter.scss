@@ -1,6 +1,39 @@
 @import "oroui/css/scss/variables";
 @import "oroui/css/scss/mixins";
 
+.filter-box {
+    .filter-criteria {
+        .btn-group {
+            .btn {
+                border-radius: 2px 0 0 2px;
+                background-color: $primary-inverse;
+                border: 2px solid $primary-750;
+                font-weight: normal;
+            }
+
+            + .value-field-frame {
+                margin-left: -2px;
+            }
+        }
+
+        input {
+            margin-bottom: 0;
+        }
+
+        .choice-filter,
+        .value-field-frame,
+        .filter-value,
+        .product-price-filter {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .filter-item {
+
+    }
+}
+
 .ui-multiselect-checkboxes {
     overflow-x: visible;
 }
@@ -77,26 +110,6 @@
     z-index: $oro-zindex-dropdown;
     margin-top: 7px;
     top: auto;
-}
-
-.filter-box .filter-item .filter-criteria select,
-.filter-box .filter-item .filter-criteria textarea,
-.filter-box .filter-item .filter-criteria input[type="text"],
-.filter-box .filter-item .filter-criteria input[type="password"],
-.filter-box .filter-item .filter-criteria input[type="datetime"],
-.filter-box .filter-item .filter-criteria input[type="datetime-local"],
-.filter-box .filter-item .filter-criteria input[type="date"],
-.filter-box .filter-item .filter-criteria input[type="month"],
-.filter-box .filter-item .filter-criteria input[type="time"],
-.filter-box .filter-item .filter-criteria input[type="week"],
-.filter-box .filter-item .filter-criteria input[type="number"],
-.filter-box .filter-item .filter-criteria input[type="email"],
-.filter-box .filter-item .filter-criteria input[type="url"],
-.filter-box .filter-item .filter-criteria input[type="search"],
-.filter-box .filter-item .filter-criteria input[type="tel"],
-.filter-box .filter-item .filter-criteria input[type="color"],
-.filter-box .filter-item .filter-criteria .uneditable-input {
-    margin-bottom: 10px;
 }
 
 .filter-box {
@@ -379,10 +392,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover {
         .btn-group.btn-block {
             width: auto;
             float: left;
-
-            .dropdown-toggle {
-                border-radius: 3px 0 0 3px;
-            }
         }
 
         .value-field-frame {
@@ -393,11 +402,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover {
             input[type='text'] {
                 max-width: 100%;
                 width: 280px;
-                height: 29px;
-                box-sizing: border-box;
-                border-left-width: 0;
-                border-right-width: 0;
-                margin-bottom: 0;
             }
 
             .select2-container {
@@ -414,12 +418,6 @@ button.ui-multiselect.select-filter-widget.ui-state-hover {
                 .select2-search-choice {
                     line-height: 15px;
                 }
-            }
-
-            .filter-update {
-                position: absolute;
-                right: 0;
-                top: 0;
             }
         }
     }

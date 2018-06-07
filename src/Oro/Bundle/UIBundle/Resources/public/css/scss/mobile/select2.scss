@@ -22,4 +22,23 @@
   .input-append & {
     height: 40px;
   }
+
+  &.select2-allowclear{
+    .select2-arrow{
+      right: 45px;
+    }
+
+    .select2-search-choice-close{
+      height: 36px;
+      width: 40px;
+      top: 0;
+      right: 0;
+      color: $primary-200;
+
+      @include fa-icon($icon: "\f00d", $size: 16px) {
+        top: 9px;
+        right: 12px;
+      }
+    }
+  }
 }

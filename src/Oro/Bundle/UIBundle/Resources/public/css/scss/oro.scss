@@ -236,6 +236,8 @@ textarea {
             label.control-label {
                 width: auto;
             }
+
+
         }
 
         &.attribute-row label.control-label {
@@ -2971,28 +2973,6 @@ label.radio.error {
     }
 }
 
-.choice-filter {
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="color"],
-    .uneditable-input {
-        height: 19px;
-    }
-}
-
 .choice-filter .input-append,
 .choice-filter .input-prepend {
     margin-bottom: 0;
@@ -3062,7 +3042,7 @@ label.radio.error {
 .oro-address-collection.oro-item-collection {
     & > div {
         position: relative;
-        padding: 10px 15px 0 0;
+        padding: 16px;
         margin: 0 0 20px;
         border: 1px solid #e6e6e6;
         background: #f8f8f8;

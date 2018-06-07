@@ -55,33 +55,10 @@
   .filter-item {
     margin-bottom: 0;
     padding-bottom: 7px;
-    .filter-criteria-selector,
-    .dropdown-toggle.btn {
-      height: 29px;
-      font-weight: normal;
-      padding-top: 1px;
-      button {
-        color: #666;
-        font-size: 14px;
-        vertical-align: baseline;
-      }
-    }
     .select-filter-widget .caret {
       margin-top: 8px;
     }
-    .choice-filter {
-      input[type='text'] {
-        margin-right: -3px;
-        border-radius: 0;
-      }
-      .filter-update {
-        border-radius: 0 3px 3px 0;
-        position: relative;
-        font-size: 14px;
-        height: 29px;
-        line-height: 28px;
-      }
-    }
+
     .disable-filter {
       line-height: 18px !important;
     }
@@ -123,7 +100,6 @@
     }
   }
   .btn-group {
-    margin-bottom: 7px;
     & + .btn-group {
       margin-left: 0;
     }
@@ -163,14 +139,12 @@
     display: inline-block;
     input[type=text]  {
       width: 100px !important;
-      border-right-width: 1px !important;
     }
   }
   .filter-end {
     display: inline-block;
     input[type=text]  {
       width: 100px !important;
-      border-left-width: 1px !important;
     }
   }
   .filter-separator {

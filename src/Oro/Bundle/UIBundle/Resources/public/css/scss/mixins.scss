@@ -292,3 +292,17 @@ $enable-safe-area: true;
         }
     }
 }
+
+@mixin fa-icon($icon: null, $state: before, $size: 12px, $color: inherit) {
+    @if ($icon) {
+        &:#{$state} {
+            content: '#{$icon}';
+
+            color: $color;
+            font-size: $size;
+            font-family: FontAwesome;
+
+            @content;
+        }
+    }
+}

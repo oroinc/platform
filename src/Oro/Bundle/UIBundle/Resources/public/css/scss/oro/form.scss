@@ -1,28 +1,8 @@
 @import "../variables/oro/inputs-variables";
 
-input,
-textarea,
+.input,
+.selector,
 .uneditable-input {
-  width: $field-width;
-}
-
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
-.uneditable-input,
-.selector {
   border-radius: $input-border-radius;
   background-color: $input-background-color;
   border: $input-border;
@@ -31,6 +11,7 @@ input[type="color"],
   box-shadow: $input-box-shadow;
   color: $input-color;
   height: $field-size;
+  box-sizing: border-box;
 
   &:focus {
     box-shadow: $input-focus-box-shadow;
@@ -55,6 +36,32 @@ input[type="color"],
     border-color: $input-error-border-color;
     box-shadow: $input-error-box-shadow;
   }
+}
+
+input,
+textarea,
+.uneditable-input {
+  width: $field-width;
+}
+
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input,
+.selector {
+  @extend .input;
 }
 
 /* Select */
@@ -275,6 +282,12 @@ input[type="color"],
 
     &:empty {
       display: $checkbox-text-empty-display;
+    }
+  }
+
+  &.empty-label {
+    .controls & {
+      margin-top: 7px;
     }
   }
 }
