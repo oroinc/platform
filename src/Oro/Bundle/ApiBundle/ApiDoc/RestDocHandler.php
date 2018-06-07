@@ -112,10 +112,17 @@ class RestDocHandler implements HandlerInterface
         }
 
         if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+            $entityConfig = $config;
+            $entityMetadata = $metadata;
+            if ($associationName) {
+                $entityConfig = $context->getParentConfig();
+                $entityMetadata = $context->getParentMetadata();
+            }
             $this->identifierHandler->handle(
                 $annotation,
                 $route,
-                $associationName ? $context->getParentMetadata() : $metadata
+                $entityMetadata,
+                $entityConfig->getIdentifierDescription()
             );
         }
 

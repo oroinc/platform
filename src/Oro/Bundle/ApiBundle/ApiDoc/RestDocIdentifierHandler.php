@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDescriptions;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Symfony\Component\Routing\Route;
@@ -41,23 +40,22 @@ class RestDocIdentifierHandler
      * @param ApiDoc         $annotation
      * @param Route          $route
      * @param EntityMetadata $metadata
+     * @param string|null    $description
      */
-    public function handle(ApiDoc $annotation, Route $route, EntityMetadata $metadata)
+    public function handle(ApiDoc $annotation, Route $route, EntityMetadata $metadata, ?string $description)
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = DataType::STRING;
-        if (count($idFields) === 1) {
-            $field = $metadata->getField(reset($idFields));
+        if (\count($idFields) === 1) {
+            $field = $metadata->getField(\reset($idFields));
             if (!$field) {
-                throw new \RuntimeException(
-                    sprintf(
-                        'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
-                        $metadata->getClassName(),
-                        reset($idFields),
-                        implode(' ', $route->getMethods()),
-                        $route->getPath()
-                    )
-                );
+                throw new \RuntimeException(\sprintf(
+                    'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
+                    $metadata->getClassName(),
+                    \reset($idFields),
+                    \implode(' ', $route->getMethods()),
+                    $route->getPath()
+                ));
             }
             $dataType = $field->getDataType();
         }
@@ -67,7 +65,7 @@ class RestDocIdentifierHandler
             [
                 'dataType'    => $this->dataTypeConverter->convertDataType($dataType),
                 'requirement' => $this->getIdRequirement($metadata),
-                'description' => CompleteDescriptions::ID_DESCRIPTION
+                'description' => $description
             ]
         );
     }
@@ -80,10 +78,10 @@ class RestDocIdentifierHandler
     private function getIdRequirement(EntityMetadata $metadata)
     {
         $idFields = $metadata->getIdentifierFieldNames();
-        $idFieldCount = count($idFields);
+        $idFieldCount = \count($idFields);
         if ($idFieldCount === 1) {
             // single identifier
-            return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
+            return $this->getIdFieldRequirement($metadata->getField(\reset($idFields))->getDataType());
         }
 
         // composite identifier
@@ -92,7 +90,7 @@ class RestDocIdentifierHandler
             $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getField($field)->getDataType());
         }
 
-        return implode(',', $requirements);
+        return \implode(',', $requirements);
     }
 
     /**

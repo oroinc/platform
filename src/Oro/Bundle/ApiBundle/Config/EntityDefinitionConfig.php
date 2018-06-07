@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
@@ -11,6 +12,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
  *
  * @method EntityDefinitionFieldConfig[] getFields()
  * @method EntityDefinitionFieldConfig|null getField($fieldName)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterface
 {
@@ -70,6 +72,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** the names of identifier fields of the entity */
     const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
+
+    /** a human-readable description of the API resource identifier */
+    const IDENTIFIER_DESCRIPTION = 'identifier_description';
 
     /** response status codes */
     const STATUS_CODES = 'status_codes';
@@ -430,6 +435,44 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             $this->items[self::DOCUMENTATION_RESOURCE] = (array)$resource;
         } else {
             unset($this->items[self::DOCUMENTATION_RESOURCE]);
+        }
+    }
+
+    /**
+     * Indicates whether a human-readable description of the API resource identifier exists.
+     *
+     * @return bool
+     */
+    public function hasIdentifierDescription()
+    {
+        return array_key_exists(self::IDENTIFIER_DESCRIPTION, $this->items);
+    }
+
+    /**
+     * Gets a human-readable description of the API resource identifier.
+     *
+     * @return string|Label|null
+     */
+    public function getIdentifierDescription()
+    {
+        if (!array_key_exists(self::IDENTIFIER_DESCRIPTION, $this->items)) {
+            return null;
+        }
+
+        return $this->items[self::IDENTIFIER_DESCRIPTION];
+    }
+
+    /**
+     * Sets a human-readable description of the API resource identifier.
+     *
+     * @param string|Label|null $description
+     */
+    public function setIdentifierDescription($description)
+    {
+        if ($description) {
+            $this->items[self::IDENTIFIER_DESCRIPTION] = $description;
+        } else {
+            unset($this->items[self::IDENTIFIER_DESCRIPTION]);
         }
     }
 }

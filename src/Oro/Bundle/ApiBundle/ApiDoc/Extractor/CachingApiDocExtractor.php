@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 
 use Doctrine\Common\Annotations\Reader;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor as BaseExtractor;
 use Nelmio\ApiDocBundle\Util\DocCommentExtractor;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
