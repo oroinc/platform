@@ -693,6 +693,19 @@ disabled look for disabled choices in the results dropdown
     }
 }
 
+<<<<<<< HEAD
+=======
+.input-append .select2-container {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-prepend .select2-container {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+>>>>>>> b52c02909a3a79fbfae532ecdef25f8a40700c6b
 .select2-container {
     .select2-choice {
         .separated-img {
