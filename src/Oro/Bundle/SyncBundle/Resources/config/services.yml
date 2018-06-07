@@ -122,3 +122,10 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_sync_auth_tickets' ]]
+
+    oro_sync.topic.data_update:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_sync.data_update'
+        tags:
+            - { name: gos_web_socket.topic }

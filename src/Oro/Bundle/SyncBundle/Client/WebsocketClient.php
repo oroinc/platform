@@ -101,6 +101,7 @@ class WebsocketClient implements WebsocketClientInterface
     public function publish(string $topicUri, $payload, array $exclude = [], array $eligible = []): bool
     {
         $this->validatePayload($payload);
+        $this->ensureClientConnected();
 
         $this->getGosClient()->publish($topicUri, $payload, $exclude, $eligible);
 
@@ -115,6 +116,7 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function prefix(string $prefix, string $uri): bool
     {
+        $this->ensureClientConnected();
         $this->getGosClient()->prefix($prefix, $uri);
 
         return true;
@@ -128,6 +130,7 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function call(string $procUri, array $arguments = []): bool
     {
+        $this->ensureClientConnected();
         $this->getGosClient()->call($procUri, $arguments);
 
         return true;
@@ -143,6 +146,7 @@ class WebsocketClient implements WebsocketClientInterface
     public function event(string $topicUri, $payload): bool
     {
         $this->validatePayload($payload);
+        $this->ensureClientConnected();
 
         $this->getGosClient()->event($topicUri, $payload);
 
@@ -164,6 +168,19 @@ class WebsocketClient implements WebsocketClientInterface
         }
 
         return $this->gosClient;
+    }
+
+    /**
+     * @param string $target
+     * @throws BadResponseException
+     * @throws WebsocketException
+     */
+    private function ensureClientConnected(string $target = '/')
+    {
+        $client = $this->getGosClient();
+        if (!$client->isConnected()) {
+            $client->connect($target);
+        }
     }
 
     /**

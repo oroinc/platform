@@ -2,3 +2,8 @@ oro_sync.ping:
     channel: 'oro/ping'
     handler:
         callback: 'oro_sync.ping'
+
+oro_sync.data_update:
+    channel: 'oro/data/update'
+    handler:
+        callback: 'oro_sync.data_update'
