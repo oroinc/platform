@@ -310,7 +310,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 PostgreSqlPlatform::class => 'UPDATE %1$s SET consumer_id=:consumerId'
                     . ' WHERE id = (SELECT id FROM %1$s WHERE consumer_id IS NULL AND queue=:queue'
                     . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
-                    . ' ORDER BY priority DESC, id ASC LIMIT 1)'
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1) AND consumer_id IS NULL'
             ]);
         }
 
@@ -356,7 +356,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @param MessageInterface $message
+     * @param DbalMessage|MessageInterface $message
      * @return int
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -372,7 +372,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
      * Try to delete message from queue
      * retry once with delay of 1 second if DB query failed
      *
-     * @param MessageInterface $message
+     * @param DbalMessage|MessageInterface $message
      * @throws \Doctrine\DBAL\DBALException|\LogicException
      */
     private function deleteMessageWithRetry(MessageInterface $message)
