@@ -269,14 +269,6 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->consumerId;
-    }
-
-    /**
      * @return Statement
      * @throws \Doctrine\DBAL\DBALException
      */
