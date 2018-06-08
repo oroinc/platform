@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -31,8 +32,13 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
 
-        $this->processor = new NormalizeRequestData($this->valueNormalizer, $this->entityIdTransformer);
+        $this->processor = new NormalizeRequestData($this->valueNormalizer, $entityIdTransformerRegistry);
     }
 
     /**

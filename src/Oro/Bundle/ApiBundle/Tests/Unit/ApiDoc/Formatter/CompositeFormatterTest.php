@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Formatter;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
-use Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\Formatter\CompositeFormatter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 
 class CompositeFormatterTest extends \PHPUnit_Framework_TestCase

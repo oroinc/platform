@@ -1,63 +1,4 @@
-@mixin link() {
-    color: $link-color;
-
-    &--current {
-        color: $link-color-current;
-    }
-
-    &:hover {
-        color: $link-color-hover;
-    }
-}
-
-
-// Mixin for include font-awesome icons to custom elements
-// List of icons https://github.com/FortAwesome/Font-Awesome/blob/v4.7.0/scss/_variables.scss
-// @param $icon-name (Font Awesome icon)
-// @param $state {CSS pseudo-element}
-
-@mixin fa-icon($icon: null, $state: before) {
-    @if ($icon) {
-        &:#{$state} {
-            content: '#{$icon}';
-
-            font-family: $icon-font;
-        }
-    }
-}
-
-// Mixin for include caret triangle anywhere
-// @param $size set caret size
-// @param $color set caret color
-@mixin caret($size: 4px, $color: null) {
-    &:after {
-        content: '';
-        display: inline-block;
-        width: 0;
-        height: 0;
-        border-top: $size solid $color;
-        border-right: $size solid transparent;
-        border-left: $size solid transparent;
-        vertical-align: middle;
-    }
-}
-
-// Mixin for border, if need to use shorthand property, set $use-shorthand to true
-// Null property doesn't render
-@mixin border(
-    $width: null,
-    $style: null,
-    $color: null,
-    $use-shorthand: false
-) {
-    @if ($use-shorthand) {
-        border: $width $style $color;
-    } @else {
-        border-width: $width;
-        border-style: $style;
-        border-color: $color;
-    }
-}
+/* @theme: blank; */
 
 // Mixin for tabs
 @mixin nav-tabs(
@@ -168,27 +109,4 @@
     }
 
     @content;
-}
-
-// Mixin for inject vertical separators in list
-// parent block should has position: relative
-@mixin list-separator($enabled: true, $top: 1px, $bottom: 1px, $left: 0, $border: 1px solid) {
-    @if ($enabled) {
-        &:not(:first-child) {
-            &:before {
-                top: $top;
-                left: $left;
-                bottom: $bottom;
-
-                border-left: $border;
-
-                @include after();
-            }
-        }
-    }
-}
-
-
-%base-transition {
-    transition: all linear 100ms;
 }

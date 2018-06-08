@@ -215,8 +215,12 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                 );
         } else {
             $queryBuilder
-                ->leftJoin('OroSegmentBundle:SegmentSnapshot', 'snp')
-                ->where($queryBuilder->expr()->isNull('snp.integerEntityId'));
+                ->leftJoin(
+                    'OroSegmentBundle:SegmentSnapshot',
+                    'snp',
+                    Join::WITH,
+                    $queryBuilder->expr()->isNull('snp.integerEntityId')
+                );
         }
 
         return $queryBuilder->setMaxResults($count)->getQuery()->getResult();

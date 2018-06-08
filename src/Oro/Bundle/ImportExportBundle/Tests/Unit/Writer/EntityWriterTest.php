@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\AbstractDriverException;
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -189,7 +189,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->writer->setStepExecution($stepExecution);
 
-        $driverException = $this->createMock(DriverException::class);
+        $driverException = $this->createMock(AbstractDriverException::class);
         $this->databaseExceptionHelper->expects($this->once())
             ->method('getDriverException')
             ->with($exception)
@@ -238,7 +238,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->writer->setStepExecution($stepExecution);
 
-        $driverException = $this->createMock(DriverException::class);
+        $driverException = $this->createMock(AbstractDriverException::class);
         $this->databaseExceptionHelper->expects($this->once())
             ->method('getDriverException')
             ->with($exception)

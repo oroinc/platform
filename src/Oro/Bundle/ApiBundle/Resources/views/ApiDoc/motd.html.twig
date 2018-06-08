@@ -8,6 +8,8 @@
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
     div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
+    div.motd div.documentation p { padding: 10px 0; }
+    div.motd div.documentation ul { padding-left: 10px; list-style-type: disc; list-style-position: inside; }
     #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
     #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
     #sandbox_configuration .account-info em { padding-left: 1em; color: #2c4300; }
@@ -143,19 +145,25 @@
         {% endif %}
 
         /**
-         * Add the documentation link
+         * Add the documentation link and the documentation block
          */
         {% if views is defined and views -%}
-        var documentationUrl = null;
+        var documentationUrl = null, documentation = '';
         {% for name, view in views -%}
         {% if view.sandbox and view.documentation_path -%}
-            if (apiType === '{{ name }}') { documentationUrl = '{{ asset(view.documentation_path) }}'; }
+            if (apiType === '{{ name }}') {
+                documentationUrl = '{{ asset(view.documentation_path) }}';
+                {% if view.documentation is defined and view.documentation -%}
+                    documentation = {{ view.documentation|extra_markdown|json_encode|raw }};
+                {%- endif -%}
+            }
         {% endif -%}
         {%- endfor -%}
         if (documentationUrl) {
-            $motd.append('<div class="documentation">' +
-                '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' +
-                '</div>');
+            documentation = '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' + documentation;
+        }
+        if (documentation) {
+            $motd.append('<div class="documentation">' + documentation + '</div>');
         }
         {% endif %}
 

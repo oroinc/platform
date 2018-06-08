@@ -9,7 +9,9 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -25,20 +27,22 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    protected $entityIdTransformerRegistry;
 
     /** @var FormContext */
     protected $context;
 
     /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
-    public function __construct(ValueNormalizer $valueNormalizer, EntityIdTransformerInterface $entityIdTransformer)
-    {
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
+    ) {
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -221,13 +225,24 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         }
 
         try {
-            return $this->entityIdTransformer->reverseTransform($entityId, $metadata);
+            return $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $metadata);
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
         }
 
         return $entityId;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
     /**

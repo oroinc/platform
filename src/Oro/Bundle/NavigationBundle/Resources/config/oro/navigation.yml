@@ -7,6 +7,7 @@ navigation:
                 ancestor_class: 'active'
                 allow_safe_labels: true
                 root_class: 'nav-multilevel main-menu'
+                compressed: true
             dots_menu:
                 template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
             shortcuts:

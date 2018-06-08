@@ -1,0 +1,83 @@
+/* @theme: blank; */
+
+// Set inner offset from the edges to include the safe-area
+// iPhone X
+// Use like native padding
+// Ex. @include safe-area-offset(padding, 10px 15px);
+// Ex. @include safe-area-offset(margin, 10px 15px 20px);
+@mixin safe-area-offset($property, $values) {
+    @if ($property != null and $values != null and length($values) <= 4) {
+        $safe-area-offset-left: 0;
+        $safe-area-offset-right: 0;
+
+        #{$property}: #{$values};
+
+        @if ($enable-safe-area) {
+            @if (length($values) == 1) {
+                $safe-area-offset-left: nth($values, 1);
+                $safe-area-offset-right: nth($values, 1);
+            } @else if (length($values) == 2 or length($values) == 3) {
+                $safe-area-offset-left: nth($values, 2);
+                $safe-area-offset-right: nth($values, 2);
+            } @else if (length($values) == 4) {
+                $safe-area-offset-left: nth($values, 4);
+                $safe-area-offset-right: nth($values, 2);
+            }
+
+            @include safe-area-property-left(#{$property}-left, $safe-area-offset-left, false);
+            @include safe-area-property-right(#{$property}-right, $safe-area-offset-right, false);
+        }
+    } @else if (length($values) > 4) {
+        @warn 'Incorrect arguments of mixin';
+    }
+}
+
+// Set any property with left safe-area zone
+@mixin safe-area-property-left($property, $value: 0px, $default: true) {
+    @if ($property != null or $value != null) {
+        @if ($default) {
+            #{$property}: #{$value};
+        }
+
+        @if ($enable-safe-area) {
+            @if (strip-units($value) == 0) {
+                /* iOS 11 */
+                #{$property}: constant(safe-area-inset-left);
+
+                /* iOS 11.2+ */
+                #{$property}: env(safe-area-inset-left);
+            } @else {
+                /* iOS 11 */
+                #{$property}: calc(constant(safe-area-inset-left) + #{$value});
+
+                /* iOS 11.2+ */
+                #{$property}: calc(env(safe-area-inset-left) + #{$value});
+            }
+        }
+    }
+}
+
+// Set any property with right safe-area zone
+@mixin safe-area-property-right($property, $value: 0px, $default: true) {
+    @if ($property != null or $value != null) {
+        @if ($default) {
+            #{$property}: #{$value};
+        }
+
+        @if ($enable-safe-area) {
+            @if (strip-units($value) == 0) {
+                /* iOS 11 */
+                #{$property}: constant(safe-area-inset-right);
+
+                /* iOS 11.2+ */
+                #{$property}: env(safe-area-inset-right);
+            } @else {
+                /* iOS 11 */
+                #{$property}: calc(constant(safe-area-inset-right) + #{$value});
+
+                /* iOS 11.2+ */
+                #{$property}: calc(env(safe-area-inset-right) + #{$value});
+            }
+        }
+    }
+}

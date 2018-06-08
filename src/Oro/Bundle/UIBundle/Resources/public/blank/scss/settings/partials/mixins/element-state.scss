@@ -1,0 +1,58 @@
+/* @theme: blank; */
+
+@mixin element-state($state) {
+    @if $state == 'active' {
+        &:active {
+            @content;
+        }
+    }
+
+    @else if $state == 'hover' {
+        &:hover {
+            @content;
+        }
+    }
+
+    @else if $state == 'visited' {
+        &--visited,
+        &:visited {
+            @content;
+        }
+    }
+
+    @else if $state == 'focus' {
+        &--focus,
+        &:focus {
+            @content;
+        }
+    }
+
+    @else if $state == 'warning' {
+        &--warning,
+        &.warning {
+            @content;
+        }
+    }
+
+    @else if $state == 'success' {
+        &--success,
+        &.success {
+            @content;
+        }
+    }
+
+    @else if $state == 'error' {
+        &--error,
+        &.error {
+            @content;
+        }
+    }
+
+    @else if $state == 'disabled' {
+        &--disabled,
+        &.disabled,
+        &:disabled {
+            @content;
+        }
+    }
+}

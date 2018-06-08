@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -40,28 +41,28 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /** @var EntityIdAccessor */
     protected $entityIdAccessor;
 
     /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
         parent::__construct();
 
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
 
         $this->entityIdAccessor = new EntityIdAccessor(
             $this->objectAccessor,
-            $this->entityIdTransformer
+            $this->entityIdTransformerRegistry
         );
     }
 
@@ -96,7 +97,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if ($metadata->hasIdentifierFields()) {
             $result = $this->getResourceIdObject(
                 $this->getEntityTypeForObject($object, $requestType, $metadata),
-                $this->entityIdAccessor->getEntityId($object, $metadata)
+                $this->entityIdAccessor->getEntityId($object, $metadata, $requestType)
             );
             $this->addMeta($result, $data, $metadata);
             $this->addAttributes($result, $data, $metadata);
@@ -275,13 +276,13 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         if ($preparedValue['idOnly']) {
             $resourceId = $this->getResourceIdObject(
                 $preparedValue['entityType'],
-                $this->entityIdTransformer->transform($preparedValue['value'], $targetMetadata)
+                $this->getEntityIdTransformer($requestType)->transform($preparedValue['value'], $targetMetadata)
             );
         } else {
             $targetObject = $preparedValue['value'];
             $resourceId = $this->getResourceIdObject(
                 $preparedValue['entityType'],
-                $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
+                $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata, $requestType)
             );
             $this->addRelatedObject($this->convertObjectToArray($targetObject, $requestType, $targetMetadata));
         }
@@ -374,5 +375,15 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             self::TYPE => $entityType,
             self::ID   => $entityId
         ];
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }
