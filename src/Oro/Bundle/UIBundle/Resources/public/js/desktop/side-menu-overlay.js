@@ -173,7 +173,7 @@ define(function(require) {
             if (value.length) {
                 this.search(value);
             } else {
-                this.searchContent.show();
+                this.clearSearchContent();
             }
 
             this.toggleNoResult();
@@ -182,6 +182,16 @@ define(function(require) {
         clearSearch: function() {
             this.$('[data-role="search"]').val('').trigger('keyup');
             this.toggleClearButton(false);
+        },
+
+        clearSearchContent: function() {
+            $.each(this.searchContent, function() {
+                var $this = $(this);
+                var $title = $this.find('.title');
+
+                $title.html($this.data('original-text'));
+                $this.show();
+            });
         },
 
         /**

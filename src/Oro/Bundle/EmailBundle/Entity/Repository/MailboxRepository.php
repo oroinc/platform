@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 class MailboxRepository extends EntityRepository
 {
@@ -176,6 +177,8 @@ class MailboxRepository extends EntityRepository
             ->getDQL();
 
         $qb = $this->createQueryBuilder('m');
+
+        QueryBuilderUtil::checkParameter($emailUsersDql);
 
         return $qb
             ->select('m')

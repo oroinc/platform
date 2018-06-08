@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\Extractor;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor as BaseExtractor;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetectorAwareInterface;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverAwareInterface;
 
 /**

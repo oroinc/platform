@@ -38,7 +38,7 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
      */
     public function getMigrationVersion()
     {
-        return 'v2_3';
+        return 'v2_4';
     }
 
     /**

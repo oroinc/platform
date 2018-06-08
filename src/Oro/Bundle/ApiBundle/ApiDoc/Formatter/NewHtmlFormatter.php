@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 
 use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
 

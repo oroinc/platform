@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompile
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 class EntityIdTransformerCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,9 +57,9 @@ class EntityIdTransformerCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals(
             [
-                [new Reference('transformer2'), 'json_api'],
-                [new Reference('transformer1'), 'rest'],
-                [new Reference('transformer2'), null]
+                ['transformer2', 'json_api'],
+                ['transformer1', 'rest'],
+                ['transformer2', null]
             ],
             $this->registry->getArgument(0)
         );

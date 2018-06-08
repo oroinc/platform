@@ -9,6 +9,7 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
+use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -59,7 +60,11 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function postSetDataProvider()
     {
+        $uow = new UnitOfWork();
         $em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
         $meta = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
         $existing = (object)['$existing' => true];
