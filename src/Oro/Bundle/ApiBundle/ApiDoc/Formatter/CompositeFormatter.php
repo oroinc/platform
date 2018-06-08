@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 
 /**
  * This formatter can be used to select appropriate formatter depending on a current view.

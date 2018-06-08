@@ -24,7 +24,7 @@ class OroEntityManagerTest extends WebTestCase
         $cache = $this->createMock(Cache::class);
         $em->getConfiguration()->setQueryCacheImpl($cache);
 
-        $query = $em->createQuery('SELECT 1 FROM Oro\Bundle\UserBundle\Entity\User');
+        $query = $em->createQuery('SELECT 1 FROM Oro\Bundle\UserBundle\Entity\User u');
         $this->assertNull($query->getQueryCacheLifetime());
 
         $cache->expects($this->atLeastOnce())->method('save')->with($this->anything(), $this->anything(), null);
@@ -34,7 +34,7 @@ class OroEntityManagerTest extends WebTestCase
         $cache = $this->createMock(Cache::class);
         $em->getConfiguration()->setQueryCacheImpl($cache);
 
-        $query = $em->createQuery('SELECT 1 FROM Oro\Bundle\UserBundle\Entity\User');
+        $query = $em->createQuery('SELECT 1 FROM Oro\Bundle\UserBundle\Entity\User u');
         $this->assertEquals(3600, $query->getQueryCacheLifetime());
 
         $cache->expects($this->atLeastOnce())->method('save')->with($this->anything(), $this->anything(), 3600);

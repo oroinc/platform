@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
+use Oro\Bundle\ApiBundle\Request\CombinedEntityIdTransformer;
+use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EntityIdTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,36 +20,59 @@ class EntityIdTransformerRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
     private $transformer2;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    private $container;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverRegistry */
+    private $entityIdResolverRegistry;
+
     /** @var EntityIdTransformerRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp()
     {
         $this->transformer1 = $this->createMock(EntityIdTransformerInterface::class);
         $this->transformer2 = $this->createMock(EntityIdTransformerInterface::class);
+        $this->entityIdResolverRegistry = $this->createMock(EntityIdResolverRegistry::class);
+        $this->container = TestContainerBuilder::create()
+            ->add('transformer1', $this->transformer1)
+            ->add('transformer2', $this->transformer2)
+            ->getContainer($this);
 
         $this->registry = new EntityIdTransformerRegistry(
             [
-                [$this->transformer1, 'rest&!json_api'],
-                [$this->transformer2, 'json_api'],
+                ['transformer1', 'rest&!json_api'],
+                ['transformer2', 'json_api']
             ],
-            new RequestExpressionMatcher()
+            $this->container,
+            new RequestExpressionMatcher(),
+            $this->entityIdResolverRegistry
         );
     }
 
     public function testGetEntityIdTransformerForKnownRequestType()
     {
-        self::assertSame(
-            $this->transformer2,
-            $this->registry->getEntityIdTransformer(new RequestType(['rest', 'json_api']))
+        $requestType = new RequestType(['rest', 'json_api']);
+        self::assertEquals(
+            new CombinedEntityIdTransformer(
+                $this->transformer2,
+                $this->entityIdResolverRegistry,
+                $requestType
+            ),
+            $this->registry->getEntityIdTransformer($requestType)
         );
     }
 
     public function testGetEntityIdTransformerForUnknownRequestType()
     {
-        self::assertSame(
-            NullEntityIdTransformer::getInstance(),
-            $this->registry->getEntityIdTransformer(new RequestType(['another']))
+        $requestType = new RequestType(['another']);
+        self::assertEquals(
+            new CombinedEntityIdTransformer(
+                NullEntityIdTransformer::getInstance(),
+                $this->entityIdResolverRegistry,
+                $requestType
+            ),
+            $this->registry->getEntityIdTransformer($requestType)
         );
     }
 }
