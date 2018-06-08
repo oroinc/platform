@@ -165,15 +165,22 @@ class DirectMailer extends \Swift_Mailer
                 }
             }
 
-            if ($transport instanceof \Swift_Transport_EsmtpTransport) {
-                $this->addXOAuth2Authenticator($transport);
-            }
-
-            if ($transport instanceof \Swift_Transport_AbstractSmtpTransport) {
-                $this->configureTransportLocalDomain($transport);
-            }
-
             $this->transport = $transport;
+
+            // replacing the original transport with SMTP transport
+            // which configured with parameters from the System Configuration -> SMTP Settings
+            $this->prepareSmtpTransport(null);
+            if ($this->smtpTransport) {
+                $this->transport = $this->smtpTransport;
+            }
+
+            if ($this->transport instanceof \Swift_Transport_EsmtpTransport) {
+                $this->addXOAuth2Authenticator($this->transport);
+            }
+
+            if ($this->transport instanceof \Swift_Transport_AbstractSmtpTransport) {
+                $this->configureTransportLocalDomain($this->transport);
+            }
         }
 
         return $this->transport;
@@ -267,13 +274,7 @@ class DirectMailer extends \Swift_Mailer
             }
             $mailer = $this->container->get(sprintf('swiftmailer.mailer.%s', $name));
             if ($mailer === $this->baseMailer) {
-                if ($name === 'default') {
-                    $realTransport = $this->container->get('oro_email.util.configurable_transport')
-                        ->getDefaultTransport();
-                } else {
-                    $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
-                }
-
+                $realTransport = $this->container->get(sprintf('swiftmailer.mailer.%s.transport.real', $name));
                 break;
             }
         }

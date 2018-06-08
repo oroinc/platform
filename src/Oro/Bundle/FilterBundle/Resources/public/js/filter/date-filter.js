@@ -469,6 +469,14 @@ define(function(require) {
                     case this.typeValues.lessThan.toString():
                         hint += [__('less than'), end].join(' ');
                         break;
+                    case this.typeValues.equal.toString():
+                        option = this._getChoiceOption(this.typeValues.equal);
+                        hint += [option.label, start].join(' ');
+                        break;
+                    case this.typeValues.notEqual.toString():
+                        option = this._getChoiceOption(this.typeValues.notEqual);
+                        hint += [option.label, end].join(' ');
+                        break;
                     case this.typeValues.notBetween.toString():
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.notBetween);

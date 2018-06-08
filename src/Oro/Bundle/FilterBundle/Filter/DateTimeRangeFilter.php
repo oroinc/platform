@@ -49,10 +49,10 @@ class DateTimeRangeFilter extends AbstractDateFilter
 
         if ($isEqual) {
             $expressions[] = $ds->expr()->gte($fieldName, $dateParameterName, true);
-            $expressions[] = $ds->expr()->lte($fieldName, $endDateParameterName, true);
+            $expressions[] = $ds->expr()->lt($fieldName, $endDateParameterName, true);
             $conditionType = 'andX';
         } else {
-            $expressions[] = $ds->expr()->lte($fieldName, $dateParameterName, true);
+            $expressions[] = $ds->expr()->lt($fieldName, $dateParameterName, true);
             $expressions[] = $ds->expr()->gte($fieldName, $endDateParameterName, true);
             $conditionType = 'orX';
         }
