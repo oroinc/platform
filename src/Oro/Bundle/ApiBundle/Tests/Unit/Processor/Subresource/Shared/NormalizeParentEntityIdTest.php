@@ -5,23 +5,30 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityId;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 
 class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    private $entityIdTransformer;
 
     /** @var NormalizeParentEntityId */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
 
-        $this->processor = new NormalizeParentEntityId($this->entityIdTransformer);
+        $this->processor = new NormalizeParentEntityId($entityIdTransformerRegistry);
     }
 
     public function testProcessWhenParentIdAlreadyNormalized()

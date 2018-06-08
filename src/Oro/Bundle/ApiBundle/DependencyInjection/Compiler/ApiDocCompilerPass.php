@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Nelmio\ApiDocBundle\Extractor as NelmioExtractor;
+use Nelmio\ApiDocBundle\Formatter as NelmioFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\Extractor;
+use Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -15,10 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 class ApiDocCompilerPass implements CompilerPassInterface
 {
     private const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
-    private const EXPECTED_API_DOC_EXTRACTOR_CLASS          = 'Nelmio\ApiDocBundle\Extractor\ApiDocExtractor';
-    private const EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS  = 'Nelmio\ApiDocBundle\Extractor\CachingApiDocExtractor';
-    private const NEW_API_DOC_EXTRACTOR_CLASS               = 'Oro\Bundle\ApiBundle\ApiDoc\ApiDocExtractor';
-    private const NEW_CACHING_API_DOC_EXTRACTOR_CLASS       = 'Oro\Bundle\ApiBundle\ApiDoc\CachingApiDocExtractor';
     private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE     = 'oro_api.rest.request_type_provider';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.chain_routing_options_resolver';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro.api.routing_options_resolver';
@@ -27,12 +27,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
     private const REQUEST_TYPE_PROVIDER_TAG                 = 'oro.api.request_type_provider';
     private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
-    private const EXPECTED_API_DOC_HTML_FORMATTER_CLASS     = 'Nelmio\ApiDocBundle\Formatter\HtmlFormatter';
     private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
     private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
-    private const DEFAULT_API_DOC_HTML_FORMATTER_CLASS      = 'Oro\Bundle\ApiBundle\ApiDoc\HtmlFormatter';
     private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
+    private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
 
     /**
      * {@inheritdoc}
@@ -84,7 +83,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
             return false;
         }
         $htmlFormatterDef = $container->getDefinition(self::API_DOC_HTML_FORMATTER_SERVICE);
-        if (self::EXPECTED_API_DOC_HTML_FORMATTER_CLASS !== $htmlFormatterDef->getClass()) {
+        if (NelmioFormatter\HtmlFormatter::class !== $htmlFormatterDef->getClass()) {
             return false;
         }
 
@@ -156,7 +155,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $container->setDefinition(self::RENAMED_API_DOC_HTML_FORMATTER_SERVICE, $defaultHtmlFormatterDef);
         $isPublicService = $defaultHtmlFormatterDef->isPublic();
         $defaultHtmlFormatterDef->setPublic(false);
-        $defaultHtmlFormatterDef->setClass(self::DEFAULT_API_DOC_HTML_FORMATTER_CLASS);
+        $defaultHtmlFormatterDef->setClass(Formatter\HtmlFormatter::class);
         $defaultHtmlFormatterDef->addMethodCall(
             'setSecurityContext',
             [new Reference(self::API_DOC_SECURITY_CONTEXT_SERVICE)]
@@ -164,6 +163,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $defaultHtmlFormatterDef->addMethodCall(
             'setFileLocator',
             [new Reference(self::FILE_LOCATOR_SERVICE)]
+        );
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setDocumentationProvider',
+            [new Reference(self::DOCUMENTATION_PROVIDER_SERVICE)]
         );
 
         // configure composite HTML formatter and set it as default one
@@ -259,10 +262,10 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private function getNewApiDocExtractorClass($currentClass)
     {
         switch ($currentClass) {
-            case self::EXPECTED_CACHING_API_DOC_EXTRACTOR_CLASS:
-                return self::NEW_CACHING_API_DOC_EXTRACTOR_CLASS;
-            case self::EXPECTED_API_DOC_EXTRACTOR_CLASS:
-                return self::NEW_API_DOC_EXTRACTOR_CLASS;
+            case NelmioExtractor\CachingApiDocExtractor::class:
+                return Extractor\CachingApiDocExtractor::class;
+            case NelmioExtractor\ApiDocExtractor::class:
+                return Extractor\ApiDocExtractor::class;
             default:
                 return null;
         }

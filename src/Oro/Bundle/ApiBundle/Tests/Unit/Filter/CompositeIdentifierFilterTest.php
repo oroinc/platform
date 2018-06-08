@@ -17,10 +17,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
+    private $entityIdTransformerRegistry;
 
     /** @var CompositeIdentifierFilter */
-    protected $filter;
+    private $filter;
 
     protected function setUp()
     {
@@ -42,7 +42,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
         $criteria = new Criteria();
         $this->filter->apply($criteria, null);
 
-        $this->assertNull($criteria->getWhereExpression());
+        self::assertNull($criteria->getWhereExpression());
     }
 
     /**
@@ -104,12 +104,12 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 CompositeExpression::TYPE_AND,
                 [
                     new Comparison('id1', Comparison::EQ, 1),
-                    new Comparison('id2', Comparison::EQ, 2),
+                    new Comparison('id2', Comparison::EQ, 2)
                 ]
             ),
             $criteria->getWhereExpression()
@@ -141,12 +141,12 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 CompositeExpression::TYPE_OR,
                 [
                     new Comparison('id1', Comparison::NEQ, 1),
-                    new Comparison('id2', Comparison::NEQ, 2),
+                    new Comparison('id2', Comparison::NEQ, 2)
                 ]
             ),
             $criteria->getWhereExpression()
@@ -174,13 +174,13 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
             ->method('reverseTransform')
             ->willReturnMap([
                 ['id1=1;renamedId2=2', $metadata, ['id1' => 1, 'renamedId2' => 2]],
-                ['id1=3;renamedId2=4', $metadata, ['id1' => 3, 'renamedId2' => 4]],
+                ['id1=3;renamedId2=4', $metadata, ['id1' => 3, 'renamedId2' => 4]]
             ]);
 
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 CompositeExpression::TYPE_OR,
                 [
@@ -188,16 +188,16 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
                         CompositeExpression::TYPE_AND,
                         [
                             new Comparison('id1', Comparison::EQ, 1),
-                            new Comparison('id2', Comparison::EQ, 2),
+                            new Comparison('id2', Comparison::EQ, 2)
                         ]
                     ),
                     new CompositeExpression(
                         CompositeExpression::TYPE_AND,
                         [
                             new Comparison('id1', Comparison::EQ, 3),
-                            new Comparison('id2', Comparison::EQ, 4),
+                            new Comparison('id2', Comparison::EQ, 4)
                         ]
-                    ),
+                    )
                 ]
             ),
             $criteria->getWhereExpression()
@@ -225,13 +225,13 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
             ->method('reverseTransform')
             ->willReturnMap([
                 ['id1=1;renamedId2=2', $metadata, ['id1' => 1, 'renamedId2' => 2]],
-                ['id1=3;renamedId2=4', $metadata, ['id1' => 3, 'renamedId2' => 4]],
+                ['id1=3;renamedId2=4', $metadata, ['id1' => 3, 'renamedId2' => 4]]
             ]);
 
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 CompositeExpression::TYPE_AND,
                 [
@@ -239,92 +239,16 @@ class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
                         CompositeExpression::TYPE_OR,
                         [
                             new Comparison('id1', Comparison::NEQ, 1),
-                            new Comparison('id2', Comparison::NEQ, 2),
+                            new Comparison('id2', Comparison::NEQ, 2)
                         ]
                     ),
                     new CompositeExpression(
                         CompositeExpression::TYPE_OR,
                         [
                             new Comparison('id1', Comparison::NEQ, 3),
-                            new Comparison('id2', Comparison::NEQ, 4),
+                            new Comparison('id2', Comparison::NEQ, 4)
                         ]
-                    ),
-                ]
-            ),
-            $criteria->getWhereExpression()
-        );
-    }
-
-    public function testApplyFilterForOneIdThatDoesNotRequireTransformation()
-    {
-        $filterValue = new FilterValue('id', ['id1' => 1, 'renamedId2' => 2]);
-        $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
-        $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
-        $metadata->addField(new FieldMetadata('id1'));
-        $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
-
-        $this->filter->setRequestType($requestType);
-        $this->filter->setMetadata($metadata);
-
-        $this->entityIdTransformerRegistry->expects(self::once())
-            ->method('getEntityIdTransformer')
-            ->with(self::identicalTo($requestType))
-            ->willReturn(null);
-
-        $criteria = new Criteria();
-        $this->filter->apply($criteria, $filterValue);
-
-        $this->assertEquals(
-            new CompositeExpression(
-                CompositeExpression::TYPE_AND,
-                [
-                    new Comparison('id1', Comparison::EQ, 1),
-                    new Comparison('id2', Comparison::EQ, 2),
-                ]
-            ),
-            $criteria->getWhereExpression()
-        );
-    }
-
-    public function testApplyFilterForSeveralIdsThatDoNotRequireTransformation()
-    {
-        $filterValue = new FilterValue('id', [['id1' => 1, 'renamedId2' => 2], ['id1' => 3, 'renamedId2' => 4]]);
-        $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
-        $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
-        $metadata->addField(new FieldMetadata('id1'));
-        $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
-
-        $this->filter->setRequestType($requestType);
-        $this->filter->setMetadata($metadata);
-
-        $this->entityIdTransformerRegistry->expects(self::once())
-            ->method('getEntityIdTransformer')
-            ->with(self::identicalTo($requestType))
-            ->willReturn(null);
-
-        $criteria = new Criteria();
-        $this->filter->apply($criteria, $filterValue);
-
-        $this->assertEquals(
-            new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [
-                    new CompositeExpression(
-                        CompositeExpression::TYPE_AND,
-                        [
-                            new Comparison('id1', Comparison::EQ, 1),
-                            new Comparison('id2', Comparison::EQ, 2),
-                        ]
-                    ),
-                    new CompositeExpression(
-                        CompositeExpression::TYPE_AND,
-                        [
-                            new Comparison('id1', Comparison::EQ, 3),
-                            new Comparison('id2', Comparison::EQ, 4),
-                        ]
-                    ),
+                    )
                 ]
             ),
             $criteria->getWhereExpression()

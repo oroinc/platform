@@ -605,4 +605,27 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->getHints());
         $this->assertEquals([], $config->toArray());
     }
+
+    public function testIdentifierDescription()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
+
+        $config->setIdentifierDescription('text');
+        $this->assertTrue($config->hasIdentifierDescription());
+        $this->assertEquals('text', $config->getIdentifierDescription());
+        $this->assertEquals(['identifier_description' => 'text'], $config->toArray());
+
+        $config->setIdentifierDescription(null);
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setIdentifierDescription('text');
+        $config->setIdentifierDescription('');
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
+        $this->assertEquals([], $config->toArray());
+    }
 }

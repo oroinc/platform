@@ -42,7 +42,7 @@ class CompoundObjectListener implements EventSubscriberInterface
                 }
             }
             $event->setData($submittedData);
-        } else {
+        } elseif (\is_array($submittedData)) {
             /** @var FormInterface $child */
             foreach ($form as $name => $child) {
                 if (!\array_key_exists($name, $submittedData) && $child->isRequired()) {

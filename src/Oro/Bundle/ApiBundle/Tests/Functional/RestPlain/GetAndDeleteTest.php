@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestPlain;
 
-use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestPlainApiTestCase;
 
@@ -146,7 +145,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
                 $requirements[$field] = $content[0][$field];
             }
 
-            return http_build_query($requirements, '', EntityIdTransformer::COMPOSITE_ID_SEPARATOR);
+            return http_build_query($requirements, '', ';');
         }
     }
 }

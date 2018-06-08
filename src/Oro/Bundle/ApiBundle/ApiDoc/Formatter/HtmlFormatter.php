@@ -1,8 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\ApiDoc;
+namespace Oro\Bundle\ApiBundle\ApiDoc\Formatter;
 
 use Nelmio\ApiDocBundle\Formatter\AbstractFormatter;
+use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
+use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
+use Oro\Bundle\ApiBundle\ApiDoc\SecurityContextInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\EngineInterface;
 
@@ -64,6 +68,9 @@ class HtmlFormatter extends AbstractFormatter
 
     /** @var array */
     protected $views;
+
+    /** @var DocumentationProviderInterface|null */
+    protected $documentationProvider;
 
     /**
      * @param SecurityContextInterface $securityContext
@@ -210,6 +217,14 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
+     * @param DocumentationProviderInterface $documentationProvider
+     */
+    public function setDocumentationProvider(DocumentationProviderInterface $documentationProvider)
+    {
+        $this->documentationProvider = $documentationProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function renderOne(array $data)
@@ -259,7 +274,7 @@ class HtmlFormatter extends AbstractFormatter
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
             'enableFormatParameter' => $this->enableFormatParameter,
             'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
-            'views'                 => $this->views,
+            'views'                 => $this->getViews(),
             'defaultView'           => $this->getDefaultView(),
             'hasSecurityToken'      => $this->securityContext->hasSecurityToken(),
             'userName'              => $this->securityContext->getUserName(),
@@ -300,6 +315,31 @@ class HtmlFormatter extends AbstractFormatter
     protected function getFileContent($path)
     {
         return file_get_contents($this->fileLocator->locate($path));
+    }
+
+    /**
+     * @return array
+     */
+    protected function getViews()
+    {
+        if (null === $this->documentationProvider) {
+            return $this->views;
+        }
+
+        $views = [];
+        foreach ($this->views as $key => $view) {
+            if (!empty($view['request_type'])) {
+                $documentation = $this->documentationProvider->getDocumentation(
+                    new RequestType($view['request_type'])
+                );
+                if ($documentation) {
+                    $view['documentation'] = $documentation;
+                }
+            }
+            $views[$key] = $view;
+        }
+
+        return $views;
     }
 
     /**

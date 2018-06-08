@@ -169,7 +169,14 @@ define(function(require) {
             }
 
             this.toggleClearButton(value.length);
-            this.search(value);
+
+            if (value.length) {
+                this.search(value);
+            } else {
+                this.clearSearchContent();
+            }
+
+            this.toggleNoResult();
         },
 
         clearSearch: function() {
@@ -177,14 +184,20 @@ define(function(require) {
             this.toggleClearButton(false);
         },
 
+        clearSearchContent: function() {
+            $.each(this.searchContent, function() {
+                var $this = $(this);
+                var $title = $this.find('.title');
+
+                $title.html($this.data('original-text'));
+                $this.show();
+            });
+        },
+
         /**
          * @param {String} value
          */
         search: function(value) {
-            if (!value.length) {
-                return;
-            }
-
             var regex = tools.safeRegExp(value, 'ig');
             var highlight = '<span class="highlight">$&</span>';
             var testValue = function(string) {
@@ -214,8 +227,6 @@ define(function(require) {
                     }
                 }
             });
-
-            this.toggleNoResult();
         },
 
         /**

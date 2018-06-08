@@ -410,7 +410,16 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $collection = $this->fieldHelper->getObjectValue($object, $fieldName);
                 if ($collection->contains($entity)) {
                     // remove entity from related entity's updated collections
-                    $collection->removeElement($entity);
+                    if ($collection instanceof PersistentCollection) {
+                        // fix `orphanRemoval` association
+                        $tmpAssociation = $association = $collection->getMapping();
+                        $tmpAssociation['orphanRemoval'] = false;
+                        $collection->setOwner($collection->getOwner(), $tmpAssociation);
+                        $collection->removeElement($entity);
+                        $collection->setOwner($collection->getOwner(), $association);
+                    } else {
+                        $collection->removeElement($entity);
+                    }
                 }
             }
         }
