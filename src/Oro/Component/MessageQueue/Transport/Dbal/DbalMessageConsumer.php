@@ -293,17 +293,26 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function getUpdateStatement()
     {
         if (!$this->updateStatement) {
-            $this->updateStatement = $this->preparePlatformDependentQuery([
-                MySqlPlatform::class =>  'UPDATE %s SET consumer_id=:consumerId'
+            $databasePlatform = $this->dbal->getDatabasePlatform();
+            if (is_a($databasePlatform, MySqlPlatform::class)) {
+                $this->updateStatement = $this->dbal->prepare(sprintf(
+                    'UPDATE %s SET consumer_id=:consumerId'
                     . ' WHERE consumer_id IS NULL AND queue=:queue'
                     . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
                     . ' ORDER BY priority DESC, id ASC LIMIT 1',
-
-                PostgreSqlPlatform::class => 'UPDATE %1$s SET consumer_id=:consumerId'
+                    $this->connection->getTableName()
+                ));
+            } elseif (is_a($databasePlatform, PostgreSqlPlatform::class)) {
+                $this->updateStatement = $this->dbal->prepare(sprintf(
+                    'UPDATE %1$s SET consumer_id=:consumerId'
                     . ' WHERE id = (SELECT id FROM %1$s WHERE consumer_id IS NULL AND queue=:queue'
                     . ' AND (delayed_until IS NULL OR delayed_until<=:delayedUntil)'
-                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE SKIP LOCKED)'
-            ]);
+                    . ' ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE SKIP LOCKED)',
+                    $this->connection->getTableName()
+                ));
+            } else {
+                throw new \LogicException('Unsupported database driver');
+            }
         }
 
         return $this->updateStatement;
@@ -316,35 +325,21 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private function getDeleteStatement()
     {
         if (!$this->deleteStatement) {
-            $this->deleteStatement = $this->preparePlatformDependentQuery([
-                MySqlPlatform::class => 'DELETE FROM %s WHERE id=:messageId LIMIT 1',
-                PostgreSqlPlatform::class => 'DELETE FROM %s WHERE id=:messageId'
-            ]);
+            $databasePlatform = $this->dbal->getDatabasePlatform();
+            if (is_a($databasePlatform, MySqlPlatform::class)) {
+                $this->deleteStatement = $this->dbal->prepare(
+                    sprintf('DELETE FROM %s WHERE id=:messageId LIMIT 1', $this->connection->getTableName())
+                );
+            } elseif (is_a($databasePlatform, PostgreSqlPlatform::class)) {
+                $this->deleteStatement = $this->dbal->prepare(
+                    sprintf('DELETE FROM %s WHERE id=:messageId', $this->connection->getTableName())
+                );
+            } else {
+                throw new \LogicException('Unsupported database driver');
+            }
         }
 
         return $this->deleteStatement;
-    }
-
-    /**
-     * @param array $queryVariants
-     * @return Statement
-     * @throws \Doctrine\DBAL\DBALException|\LogicException
-     */
-    private function preparePlatformDependentQuery(array $queryVariants)
-    {
-        $statement = null;
-        $databasePlatform = $this->dbal->getDatabasePlatform();
-        foreach ($queryVariants as $variantPlatform => $query) {
-            if (is_a($databasePlatform, $variantPlatform)) {
-                $statement = $this->dbal->prepare(sprintf($query, $this->connection->getTableName()));
-                break;
-            }
-        }
-        if (!$statement) {
-            throw new \LogicException('Unsupported database driver');
-        }
-
-        return $statement;
     }
 
     /**
