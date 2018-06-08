@@ -11,6 +11,8 @@ $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
 $input-font-family: $base-font-family !default;
 $input-color: $primary-200 !default;
+$input-outer-offset-bottom: 0 !default;
+$input-box-sizing: border-box !default;
 
 $input-focus-box-shadow: none !default;
 $input-focus-border-color: $secondary !default;

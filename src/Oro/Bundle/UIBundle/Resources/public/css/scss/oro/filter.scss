@@ -120,8 +120,6 @@
     }
 
     .btn-group {
-        margin-bottom: 7px;
-
         & + .btn-group {
             margin-left: 0;
         }
@@ -138,28 +136,28 @@
     }
 }
 
-.filter-item div.selector {
-    height: 20px;
-    line-height: 20px;
-    margin: 0 0 7px;
-    float: right;
+.filter-date-range {
+    .filter-start-date {
 
-    span {
-        line-height: 20px;
-        height: 20px;
     }
-}
 
-.filter-separator {
-    font-size: 16px;
-    padding: 0 3px;
-    position: relative;
-    top: -3px;
-}
+    .filter-end-date {
 
-.filter-start-date,
-.filter-end-date {
-    display: inline-block;
+    }
+
+    .datetime-visual-element {
+        width: 113px;
+        margin-bottom: 8px;
+    }
+
+    .timepicker-input {
+        width: 79px;
+        margin: 0 0 8px 8px;
+    }
+
+    .filter-separator {
+        display: none;
+    }
 }
 
 .number-range-filter {
@@ -170,7 +168,6 @@
 
         input[type='text'] {
             width: 100px !important;
-            border-right-width: 1px !important;
         }
     }
 
@@ -179,7 +176,6 @@
 
         input[type='text'] {
             width: 100px !important;
-            border-left-width: 1px !important;
         }
     }
 

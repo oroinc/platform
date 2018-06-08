@@ -152,11 +152,6 @@
     }
 
     &__input {
-        width: 100%;
-        height: 32px !important;
-        box-sizing: border-box !important;
-        padding-right: 50px !important;
-
         &::-ms-clear {
             display: none;
         }

@@ -11,7 +11,8 @@
   box-shadow: $input-box-shadow;
   color: $input-color;
   height: $field-size;
-  box-sizing: border-box;
+  margin-bottom: $input-outer-offset-bottom;
+  box-sizing: $input-box-sizing;
 
   &:focus {
     box-shadow: $input-focus-box-shadow;
@@ -339,6 +340,16 @@ input[type="color"],
 
     &:not(:last-of-type) {
       margin-right: $add-on-append-outer-offset-left;
+    }
+  }
+}
+
+.add-on {
+  &.btn {
+    [class^="fa-"],
+    [class*=" fa-"] {
+      margin: 0;
+      vertical-align: 0;
     }
   }
 }

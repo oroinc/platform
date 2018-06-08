@@ -16,6 +16,11 @@
       }
     }
     .pagination {
+      ul {
+        box-shadow: none;
+        border-radius: 0;
+      }
+
       .fa-chevron-left:before, .fa-chevron-right:before {
         line-height: 18px;
       }

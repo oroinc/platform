@@ -1,0 +1,31 @@
+.filter-box {
+  .filter-criteria {
+    .btn-group {
+      > .btn {
+        height: 40px;
+        line-height: 36px;
+      }
+
+
+    }
+
+    .btn {
+      .caret {
+        margin-top: 16px;
+      }
+    }
+
+    .choice-filter,
+    .value-field-frame,
+    .filter-value,
+    .product-price-filter {
+      display: block;
+    }
+
+    .choice-filter {
+      .btn-group.btn-block {
+        float: none;
+      }
+    }
+  }
+}
