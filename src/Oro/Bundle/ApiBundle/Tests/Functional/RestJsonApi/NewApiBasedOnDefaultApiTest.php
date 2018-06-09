@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Functional;
+namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Extend\Entity\EV_Api_Enum1 as TestEnum;
 use Extend\Entity\TestApiE1 as TestCustomEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
+use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
