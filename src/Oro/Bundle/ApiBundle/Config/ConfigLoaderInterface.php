@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for configuration section loaders.
+ */
 interface ConfigLoaderInterface
 {
     /**

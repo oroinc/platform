@@ -4,13 +4,15 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The loader for "filters" configuration section.
+ */
 class FiltersConfigLoader extends AbstractConfigLoader
 {
-    /** @var array */
-    protected $fieldMethodMap = [
-        FilterFieldConfig::EXCLUDE     => 'setExcluded',
-        FilterFieldConfig::ALLOW_ARRAY => 'setArrayAllowed',
-        FilterFieldConfig::ALLOW_RANGE => 'setRangeAllowed',
+    private const FIELD_METHOD_MAP = [
+        ConfigUtil::EXCLUDE     => 'setExcluded',
+        ConfigUtil::ALLOW_ARRAY => 'setArrayAllowed',
+        ConfigUtil::ALLOW_RANGE => 'setRangeAllowed'
     ];
 
     /**
@@ -53,7 +55,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
         $filter = new FilterFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                $this->loadConfigValue($filter, $key, $value, $this->fieldMethodMap);
+                $this->loadConfigValue($filter, $key, $value, self::FIELD_METHOD_MAP);
             }
         }
 

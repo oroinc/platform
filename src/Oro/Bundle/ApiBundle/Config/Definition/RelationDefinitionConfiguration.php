@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
@@ -17,6 +18,6 @@ class RelationDefinitionConfiguration extends TargetEntityDefinitionConfiguratio
     {
         parent::configureEntityNode($node);
         $node
-            ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end();
+            ->booleanNode(ConfigUtil::COLLAPSE)->end();
     }
 }

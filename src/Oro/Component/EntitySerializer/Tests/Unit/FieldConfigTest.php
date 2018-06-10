@@ -36,6 +36,9 @@ class FieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($fieldConfig->isEmpty());
 
         $fieldConfig->setExcluded(false);
+        $this->assertFalse($fieldConfig->isEmpty());
+
+        $fieldConfig->setExcluded(null);
         $this->assertTrue($fieldConfig->isEmpty());
 
         $targetEntity = new EntityConfig();

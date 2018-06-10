@@ -47,8 +47,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     public function testProcessForNotCompletedConfig()
     {
         $config = [
-            'exclusion_policy' => 'none',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ];
