@@ -1,30 +1,28 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Config\Traits;
+namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Adds methods to find a field to a configuration class.
- *
- * @property FieldConfigInterface[] $fields
+ * A set of reusable static methods to find a field in a configuration section.
  */
-trait FindFieldTrait
+class FindFieldUtil
 {
     /**
      * Finds a field by its name or property path.
      * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
      *
-     * @param string $fieldName
-     * @param bool   $findByPropertyPath
+     * @param FieldConfigInterface[] $fields
+     * @param string                 $fieldName
+     * @param bool                   $findByPropertyPath
      *
      * @return FieldConfigInterface|null
      */
-    protected function doFindField($fieldName, $findByPropertyPath = false)
+    public static function doFindField(array $fields, $fieldName, $findByPropertyPath = false)
     {
-        if (isset($this->fields[$fieldName])) {
-            $field = $this->fields[$fieldName];
+        if (isset($fields[$fieldName])) {
+            $field = $fields[$fieldName];
             if (!$findByPropertyPath) {
                 return $field;
             }
@@ -37,7 +35,7 @@ trait FindFieldTrait
             }
         }
         if ($findByPropertyPath) {
-            foreach ($this->fields as $field) {
+            foreach ($fields as $field) {
                 $fieldPropertyPath = $field->getPropertyPath();
                 if ($fieldPropertyPath
                     && $fieldPropertyPath === $fieldName
@@ -54,14 +52,15 @@ trait FindFieldTrait
     /**
      * Finds the name of a field by its property path.
      *
-     * @param string $propertyPath
+     * @param FieldConfigInterface[] $fields
+     * @param string                 $propertyPath
      *
      * @return string|null
      */
-    protected function doFindFieldNameByPropertyPath($propertyPath)
+    public static function doFindFieldNameByPropertyPath(array $fields, $propertyPath)
     {
-        if (isset($this->fields[$propertyPath])) {
-            $fieldPropertyPath = $this->fields[$propertyPath]->getPropertyPath();
+        if (isset($fields[$propertyPath])) {
+            $fieldPropertyPath = $fields[$propertyPath]->getPropertyPath();
             if (!$fieldPropertyPath
                 || $fieldPropertyPath === $propertyPath
                 || ConfigUtil::IGNORE_PROPERTY_PATH === $fieldPropertyPath
@@ -69,7 +68,7 @@ trait FindFieldTrait
                 return $propertyPath;
             }
         }
-        foreach ($this->fields as $fieldName => $field) {
+        foreach ($fields as $fieldName => $field) {
             $fieldPropertyPath = $field->getPropertyPath();
             if ($fieldPropertyPath
                 && $fieldPropertyPath === $propertyPath

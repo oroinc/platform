@@ -43,9 +43,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function setUp()
     {
-        /** @var ContainerInterface $container */
         $container = self::getContainer();
-
         $this->valueNormalizer = $container->get('oro_api.value_normalizer');
         $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
     }
@@ -443,13 +441,30 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * Asserts response status code equals to 405 (Method Not Allowed)
+     * and "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    public static function assertMethodNotAllowedResponse(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ) {
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_METHOD_NOT_ALLOWED, $message);
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
+    }
+
+    /**
      * Asserts an array contains the expected array.
      *
      * @param array  $expected
      * @param mixed  $actual
      * @param string $message
      */
-    protected static function assertArrayContains(array $expected, $actual, $message = '')
+    protected static function assertArrayContains(array $expected, $actual, string $message = '')
     {
         self::assertThat($actual, new ArrayContainsConstraint($expected, false), $message);
     }

@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
+/**
+ * The loader for "actions" configuration section.
+ */
 class ActionsConfigLoader extends AbstractConfigLoader
 {
-    /** @var array */
-    protected $methodMap = [
-        ActionConfig::EXCLUDE               => 'setExcluded',
-        ActionConfig::DISABLE_SORTING       => ['disableSorting', 'enableSorting'],
-        ActionConfig::DISABLE_INCLUSION     => ['disableInclusion', 'enableInclusion'],
-        ActionConfig::DISABLE_FIELDSET      => ['disableFieldset', 'enableFieldset'],
-        ActionConfig::FORM_EVENT_SUBSCRIBER => 'setFormEventSubscribers',
+    private const METHOD_MAP = [
+        ConfigUtil::EXCLUDE               => 'setExcluded',
+        ConfigUtil::DISABLE_SORTING       => ['disableSorting', 'enableSorting'],
+        ConfigUtil::DISABLE_INCLUSION     => ['disableInclusion', 'enableInclusion'],
+        ConfigUtil::DISABLE_FIELDSET      => ['disableFieldset', 'enableFieldset'],
+        ConfigUtil::FORM_EVENT_SUBSCRIBER => 'setFormEventSubscribers'
     ];
 
-    /** @var array */
-    protected $fieldMethodMap = [
-        ActionFieldConfig::EXCLUDE => 'setExcluded',
+    private const FIELD_METHOD_MAP = [
+        ConfigUtil::EXCLUDE => 'setExcluded'
     ];
 
     /** @var StatusCodesConfigLoader */
@@ -45,12 +48,12 @@ class ActionsConfigLoader extends AbstractConfigLoader
     {
         $action = new ActionConfig();
         foreach ($config as $key => $value) {
-            if (ActionConfig::STATUS_CODES === $key) {
+            if (ConfigUtil::STATUS_CODES === $key) {
                 $this->loadStatusCodes($action, $value);
-            } elseif (ActionConfig::FIELDS === $key) {
+            } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($action, $value);
             } else {
-                $this->loadConfigValue($action, $key, $value, $this->methodMap);
+                $this->loadConfigValue($action, $key, $value, self::METHOD_MAP);
             }
         }
 
@@ -94,7 +97,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
         $field = new ActionFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                $this->loadConfigValue($field, $key, $value, $this->fieldMethodMap);
+                $this->loadConfigValue($field, $key, $value, self::FIELD_METHOD_MAP);
             }
         }
 
