@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email_event/user_%s_org_%s';
+    const TOPIC = 'oro/email_event/%s/%s';
 
     /**
      * @var WebsocketClientInterface
@@ -36,9 +36,11 @@ class WebSocketSendProcessor
      */
     public static function getUserTopic($user, Organization $organization = null)
     {
-        $userId = $user instanceof User ? $user->getId() : $user;
-
-        return sprintf(self::TOPIC, $userId, $organization ? $organization->getId() : '');
+        return sprintf(
+            self::TOPIC,
+            $user instanceof User ? $user->getId() : $user,
+            $organization ? $organization->getId() : '*'
+        );
     }
 
     /**

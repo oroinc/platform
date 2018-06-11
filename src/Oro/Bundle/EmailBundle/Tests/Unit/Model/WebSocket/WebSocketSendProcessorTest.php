@@ -125,17 +125,17 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             'user is object' => [
                 'user' => $user,
                 'organization' => $organization,
-                'expected' => 'oro/email_event/user_123_org_321',
+                'expected' => 'oro/email_event/123/321',
             ],
             'user is string' => [
                 'user' => 'TEST',
                 'organization' => $organization,
-                'expected' => 'oro/email_event/user_TEST_org_321',
+                'expected' => 'oro/email_event/TEST/321',
             ],
             'no organization' => [
                 'user' => 'TEST',
                 'organization' => null,
-                'expected' => 'oro/email_event/user_TEST_org_',
+                'expected' => 'oro/email_event/TEST/*',
             ],
         ];
     }

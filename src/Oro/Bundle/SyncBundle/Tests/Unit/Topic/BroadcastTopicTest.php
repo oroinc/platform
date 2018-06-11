@@ -35,13 +35,13 @@ class BroadcastTopicTest extends \PHPUnit_Framework_TestCase
         $topic = $this->createMock(Topic::class);
         $topic->expects($this->once())
             ->method('broadcast')
-            ->with($event);
+            ->with($event, ['data1'], ['data2']);
 
         /** @var WampRequest|\PHPUnit_Framework_MockObject_MockObject $wampRequest */
         $wampRequest = $this->createMock(WampRequest::class);
         $wampRequest->expects($this->never())
             ->method($this->anything());
 
-        $this->broadcast->onPublish($connection, $topic, $wampRequest, $event, [], []);
+        $this->broadcast->onPublish($connection, $topic, $wampRequest, $event, ['data1'], ['data2']);
     }
 }

@@ -19,6 +19,6 @@ class BroadcastTopic extends AbstractTopic
         array $exclude,
         array $eligible
     ) {
-        $topic->broadcast($event);
+        $topic->broadcast($event, $exclude, $eligible);
     }
 }

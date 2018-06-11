@@ -1268,3 +1268,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_email.topic.event:
+        class: Oro\Bundle\EmailBundle\Topic\EmailEventTopic
+        arguments:
+            - 'oro_email.event'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

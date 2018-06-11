@@ -1,0 +1,10 @@
+oro_email.event:
+    channel: 'oro/email_event/{user_id}/{organization_id}'
+    handler:
+        callback: 'oro_email.event'
+    requirements:
+        user_id:
+            pattern: '\d+'
+        organization_id:
+            pattern: '\d+'
+            wildcard: true
