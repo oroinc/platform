@@ -1,0 +1,8 @@
+oro_imap.sync_fail:
+    channel: oro/imap_sync_fail/{user_id}
+    handler:
+        callback: 'oro_imap.sync_fail'
+    requirements:
+        user_id:
+            pattern: '\d+'
+            wildcard: true

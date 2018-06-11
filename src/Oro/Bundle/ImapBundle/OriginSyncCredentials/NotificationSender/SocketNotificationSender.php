@@ -11,6 +11,8 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
  */
 class SocketNotificationSender implements NotificationSenderInterface
 {
+    private const TOPIC_IMAP_SYNC_FAIL = 'oro/imap_sync_fail/%s';
+
     /**
      * @var WebsocketClientInterface
      */
@@ -30,11 +32,11 @@ class SocketNotificationSender implements NotificationSenderInterface
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         $originOwner = $emailOrigin->getOwner();
-        $topicName = $originOwner ? 'oro/imap_sync_fail_u_' . $originOwner->getId() : 'oro/imap_sync_fail_system';
+        $topicUrl = sprintf(self::TOPIC_IMAP_SYNC_FAIL, $originOwner ? $originOwner->getId() : '*');
 
-        $this->websocketClient->publish(
-            $topicName,
-            ['username' => $emailOrigin->getUser(), 'host' => $emailOrigin->getImapHost()]
-        );
+        $this->websocketClient->publish($topicUrl, [
+            'username' => $emailOrigin->getUser(),
+            'host' => $emailOrigin->getImapHost(),
+        ]);
     }
 }

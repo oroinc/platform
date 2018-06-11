@@ -33,7 +33,7 @@ class SocketNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->websocketClient->expects($this->once())
             ->method('publish')
             ->with(
-                'oro/imap_sync_fail_system',
+                'oro/imap_sync_fail/*',
                 ['username' => 'test@example.com', 'host' => 'example.com']
             );
 
@@ -53,7 +53,7 @@ class SocketNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $this->websocketClient->expects($this->once())
             ->method('publish')
             ->with(
-                'oro/imap_sync_fail_u_456',
+                'oro/imap_sync_fail/456',
                 ['username' => 'test@example.com', 'host' => 'example.com']
             );
 
