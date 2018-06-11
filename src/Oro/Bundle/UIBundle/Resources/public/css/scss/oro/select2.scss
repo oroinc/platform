@@ -1,67 +1,53 @@
-/*
-Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
-*/
+/* @theme: admin; */
 
 .select2-container {
-    margin: 0;
-    position: relative;
-    display: inline-block;
-    border: 2px solid $primary-750;
-    background: $primary-inverse;
-    border-radius: 2px;
-    outline: none;
-    width: 100%;
+    margin: $select2-container-offset;
+    position: $select2-container-position;
+    display: $select2-container-display;
+    border: $select2-container-border;
+    background: $select2-container-background;
+    border-radius: $select2-container-border-radius;
+    outline: $select2-container-outline;
+    width: $select2-container-width;
+    height: $select2-container-height;
+    vertical-align: $select2-container-vertical-align;
+    box-sizing: $select2-container-box-sizing;
+    font-size: $select2-container-font-size;
     /* inline-block for ie7 */
     zoom: 1;
     *display: inline;
-    vertical-align: middle;
-    box-sizing: border-box;
-    font-size: $base-font-size;
-    height: 32px;
 
     .select2-choice {
-        display: block;
-        height: 28px;
-        padding: 0;
-        overflow: hidden;
-        position: relative;
-        white-space: nowrap;
-        line-height: 1em;
-        color: #444;
-        text-decoration: none;
-        -webkit-background-clip: padding-box;
-        -moz-background-clip: padding;
-        background-clip: padding-box;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+        display: $select2-choice-display;
+        height: $select2-choice-height;
+        padding: $select2-choice-padding;
+        overflow: $select2-choice-overflow;
+        position: $select2-choice-position;
+        white-space: $select2-choice-white-space;
+        line-height: $select2-choice-line-height;
+        color: $select2-choice-color;
+        text-decoration: $select2-choice-text-decoration;
+        background-clip: $select2-choice-background-clip;
+        -webkit-touch-callout: $select2-choice-touch-callout;
+        user-select: $select2-choice-user-select;
 
         &.select2-default .select2-chosen {
             color: $primary-200;
         }
 
         img {
-            max-width: 16px;
-            margin-top: -2px;
-            display: block;
-            float: left;
-            margin-right: 2px;
-        }
-
-        &:focus {
-            border: none !important;
+            max-width: $select2-choice-image-max-width;
+            margin-top: $select2-choice-image-offset-left;
+            margin-right: $select2-choice-image-offset-right;
+            display: $select2-choice-image-display;
+            float: $select2-choice-image-float;
         }
 
         span {
-            display: block;
-            overflow: hidden;
-            white-space: nowrap;
-            -ms-text-overflow: ellipsis;
-            -o-text-overflow: ellipsis;
-            text-overflow: ellipsis;
+            display: $select2-choice-span-display;
+            overflow: $select2-choice-span-overflow;
+            white-space: $select2-choice-span-white-space;
+            text-overflow: $select2-choice-span-text-overflow;
         }
 
         abbr {
@@ -92,6 +78,15 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
                 cursor: pointer;
             }
         }
+
+        &:focus {
+            border: none !important;
+        }
+    }
+
+    .error & {
+        border-color: $input-error-border-color;
+        color: $input-error-border-color;
     }
 
     &.select2-container-active {
@@ -111,27 +106,27 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
 }
 
 .select2-container-multi {
-    height: auto;
-    min-height: 32px;
+    height: $select2-container-multi-height;
+    min-height: $select2-container-min-height;
 
     .select2-choices {
         .select2-search-choice {
-            background: $primary-830;
-            font-size: $base-font-size--s;
-            line-height: 1;
-            color: $primary-400;
-            padding: 4px 20px 4px 8px;
-            margin: 4px;
-            position: relative;
-            box-sizing: border-box;
+            background: $select2-search-choice-background;
+            font-size: $select2-search-choice-font-size;
+            line-height: $select2-search-choice-line-height;
+            color: $select2-search-choice-color;
+            padding: $select2-search-choice-inner-offset;
+            margin: $select2-search-choice-offset;
+            position: $select2-search-choice-position;
+            box-sizing: $select2-search-choice-box-sizing;
         }
 
         .select2-search-field {
             input {
-                padding: 4px 6px;
-                height: 28px;
-                line-height: 28px;
-                border: none;
+                padding: $select2-search-field-inner-offset;
+                height: $select2-search-field-height;
+                line-height: $select2-search-field-line-height;
+                border: $select2-search-field-border;
             }
         }
     }

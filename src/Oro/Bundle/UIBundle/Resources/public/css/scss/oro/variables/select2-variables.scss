@@ -1,0 +1,55 @@
+/* @theme: admin; */
+
+$select2-container-offset: 0 !default;
+$select2-container-position: relative !default;
+$select2-container-display: inline-block !default;
+$select2-container-border: 2px solid $primary-750 !default;
+$select2-container-background: $primary-inverse !default;
+$select2-container-border-radius: 2px !default;
+$select2-container-outline: none !default;
+$select2-container-width: 100% !default;
+$select2-container-vertical-align: middle !default;
+$select2-container-box-sizing: border-box !default;
+$select2-container-font-size: $base-font-size !default;
+$select2-container-height: 32px !default;
+
+$select2-choice-display: block !default;
+$select2-choice-height: 28px !default;
+$select2-choice-padding: 0 !default;
+$select2-choice-overflow: hidden !default;
+$select2-choice-position: relative !default;
+$select2-choice-white-space: nowrap !default;
+$select2-choice-line-height: 1em !default;
+$select2-choice-color: $primary-200 !default;
+$select2-choice-text-decoration: none !default;
+$select2-choice-background-clip: padding-box !default;
+$select2-choice-touch-callout: none !default;
+$select2-choice-user-select: none !default;
+
+$select2-choice-image-max-width: 16px !default;
+$select2-choice-image-offset-left: -2px !default;
+$select2-choice-image-offset-right: 2px !default;
+$select2-choice-image-display: block !default;
+$select2-choice-image-float: left !default;
+
+$select2-choice-span-display: block !default;
+$select2-choice-span-overflow: hidden !default;
+$select2-choice-span-white-space: nowrap !default;
+$select2-choice-span-text-overflow: ellipsis !default;
+
+$select2-container-multi-height: auto !default;
+$select2-container-min-height: 32px !default;
+
+$select2-search-choice-background: $primary-830 !default;
+$select2-search-choice-font-size: $base-font-size--s !default;
+$select2-search-choice-line-height: 1 !default;
+$select2-search-choice-color: $primary-400 !default;
+$select2-search-choice-inner-offset: 4px 20px 4px 8px !default;
+$select2-search-choice-offset: 4px !default;
+$select2-search-choice-position: relative !default;
+$select2-search-choice-box-sizing: border-box !default;
+
+$select2-search-field-inner-offset: 4px 6px !default;
+$select2-search-field-height: 28px !default;
+$select2-search-field-line-height: 28px !default;
+$select2-search-field-border: none !default;

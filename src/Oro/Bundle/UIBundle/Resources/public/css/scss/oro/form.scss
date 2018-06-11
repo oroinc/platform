@@ -1,4 +1,4 @@
-@import "../variables/oro/inputs-variables";
+/* @theme: admin; */
 
 .input,
 .selector,
@@ -287,7 +287,7 @@ input[type="color"],
   }
 
   &.empty-label {
-    .controls & {
+    .controls > & {
       margin-top: 7px;
     }
   }
@@ -325,6 +325,11 @@ input[type="color"],
     }
   }
 
+  .error & {
+    border-color: $input-error-border-color;
+    color: $input-error-border-color;
+  }
+
   .input-append & {
     border-radius: $add-on-append-border-radius;
     margin-left: -2px;
@@ -344,7 +349,9 @@ input[type="color"],
   }
 }
 
-.add-on {
+.add-on,
+.entity-select-btn,
+.entity-create-btn {
   &.btn {
     [class^="fa-"],
     [class*=" fa-"] {

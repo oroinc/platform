@@ -1,3 +1,14 @@
+/* @theme: admin; */
+
+.input,
+.selector,
+.uneditable-input {
+  height: $field-size;
+  width: 100%;
+  font-size: $field-font-size;
+  padding: $input-inner-offset;
+}
+
 textarea,
 input[type="text"],
 input[type="password"],
@@ -15,10 +26,7 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input,
 .selector {
-  height: $field-size;
-  width: 100%;
-  font-size: $field-font-size;
-  padding: $input-inner-offset;
+  @extend .input;
 }
 
 .selector {
