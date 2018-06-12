@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle;
 
-use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurationPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\TagGeneratorPass;
+use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

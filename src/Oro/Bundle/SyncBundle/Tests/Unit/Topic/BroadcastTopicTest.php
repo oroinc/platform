@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
-use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
+use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
