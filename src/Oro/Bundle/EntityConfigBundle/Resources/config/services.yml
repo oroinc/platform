@@ -467,3 +467,11 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@form.factory'
+
+    oro_entity_config.topic.attribute_import:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_entity_config.attribute_import'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

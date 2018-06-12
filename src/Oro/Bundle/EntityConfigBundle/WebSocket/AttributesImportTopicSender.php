@@ -10,7 +10,7 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
  */
 class AttributesImportTopicSender
 {
-    const TOPIC = 'oro/attribute_import/user_%s_configmodel_%s';
+    const TOPIC = 'oro/attribute_import/%s/%s';
 
     /**
      * @var WebsocketClientInterface
