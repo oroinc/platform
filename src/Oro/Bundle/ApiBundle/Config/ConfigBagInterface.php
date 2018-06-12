@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for configuration sections that can have custom options (options without own getter and setter).
+ */
 interface ConfigBagInterface
 {
     /**
@@ -17,10 +20,11 @@ interface ConfigBagInterface
      * Gets the configuration value.
      *
      * @param string $key
+     * @param mixed  $defaultValue
      *
      * @return mixed
      */
-    public function get($key);
+    public function get($key, $defaultValue = null);
 
     /**
      * Sets the configuration value.

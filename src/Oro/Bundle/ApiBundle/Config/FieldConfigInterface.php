@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * An interface for configuration sections that represent a field.
+ */
 interface FieldConfigInterface extends ConfigBagInterface
 {
     /**
