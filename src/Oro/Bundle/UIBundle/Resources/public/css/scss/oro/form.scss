@@ -3,7 +3,7 @@
 .input,
 .selector,
 .uneditable-input {
-  border-radius: $input-border-radius;
+  border-radius: $input-field-border-radius;
   background-color: $input-background-color;
   border: $input-border;
   font-family: $input-font-family;
@@ -126,6 +126,7 @@ input[type="color"],
 
   &.disabled {
     span {
+      cursor: $input-disabled-cursor;
       border-color: $input-disabled-border-color;
       background-color: $input-disabled-background-color;
       color: $input-disabled-color;
@@ -133,6 +134,14 @@ input[type="color"],
       &:after {
         color: $input-disabled-border-color;
       }
+    }
+
+    &.focus,
+    &.hover,
+    &:hover {
+      border-color: $input-disabled-border-color;
+      background-color: $input-disabled-background-color;
+      color: $input-disabled-color;
     }
   }
 

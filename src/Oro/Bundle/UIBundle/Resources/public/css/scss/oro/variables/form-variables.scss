@@ -2,9 +2,8 @@
 
 $field-size: 32px !default;
 $field-width: 294px !default;
-$field-border-radius: 2px !default;
 
-$input-border-radius: $field-border-radius !default;
+$input-field-border-radius: 2px !default;
 $input-border: 2px solid $primary-750 !default;
 $input-background-color: $primary-inverse !default;
 $input-inner-offset: 4px 6px !default;
@@ -20,6 +19,7 @@ $input-focus-border-color: $secondary !default;
 $input-invalid-focus-box-shadow: none !default;
 $input-invalid-focus-border-color: $secondary !default;
 
+$input-disabled-cursor: not-allowed !default;
 $input-disabled-border-color: $primary-800 !default;
 $input-disabled-background-color: $primary-900 !default;
 $input-disabled-color: $primary-700 !default;
@@ -33,7 +33,7 @@ $selector-height: $field-size !default;
 $selector-width: 235px !default;
 $selector-border: 2px solid $primary-750 !default;
 $selector-background-color: $primary-inverse !default;
-$selector-border-radius: $field-border-radius !default;
+$selector-border-radius: 2px !default;
 
 $selector-option-inner-offset-left: 6px !default;
 

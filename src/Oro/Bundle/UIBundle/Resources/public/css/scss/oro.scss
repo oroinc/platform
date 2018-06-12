@@ -1721,24 +1721,6 @@ a {
         padding: 4px 6px;
         border: none;
         color: $body-color;
-
-        .select2-search-choice-close {
-            position: relative;
-            display: inline-block;
-            right: -2px;
-            top: 0;
-
-            &:before {
-                width: 20px;
-                content: '\f00d';
-                font: 11px FontAwesome;
-                color: #ccc;
-            }
-
-            &:hover:before {
-                color: #999;
-            }
-        }
     }
 }
 
