@@ -1,11 +1,13 @@
+/* @theme: admin.oro; */
+
 .form-description {
-    margin-bottom: 16px;
+    margin-bottom: $form-description-mobile-offset-bottom;
 
     &__logo {
-        margin-bottom: 16px;
+        margin-bottom: $form-description-logo-mobile-offset-bottom;
     }
 
     &__main {
-        margin-bottom: 8px;
+        margin-bottom: $form-description-main-mobile-offset-bottom;
     }
 }

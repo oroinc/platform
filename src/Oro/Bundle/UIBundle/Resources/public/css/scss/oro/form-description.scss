@@ -1,32 +1,34 @@
+/* @theme: admin.oro; */
+
 .form-description {
-    margin-bottom: 50px;
+    margin-bottom: $form-description-offset-bottom;
 
     &--signin-help {
-        margin-bottom: 30px;
+        margin-bottom: $form-description-signin-help-offset-bottom;
     }
 
     &__logo {
-        margin-bottom: 40px;
+        margin-bottom: $form-description-logo-offset-bottom;
     }
 
     &__logo-img {
-        display: block;
-        margin: 0 auto;
-        max-height: 40px;
+        display: $form-description-logo-img-display;
+        margin: $form-description-logo-img-offset;
+        max-height: $form-description-logo-img-max-height;
     }
 
     &__main {
-        font-size: 22px;
-        font-weight: 300;
-        line-height: 1.2;
-        text-align: center;
-        color: #565656;
-        margin-bottom: 16px;
+        font-size: $form-description-main-font-size;
+        font-weight: $form-description-main-font-weight;
+        line-height: $form-description-main-line-height;
+        text-align: $form-description-main-text-align;
+        color: $form-description-main-color;
+        margin-bottom: $form-description-main-offset-bottom;
     }
 
     &__text {
-        font-size: 14px;
-        text-align: center;
-        color: #878789;
+        font-size: $form-description-text-font-size;
+        text-align: $form-description-text-align;
+        color: $form-description-color;
     }
 }

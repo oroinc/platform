@@ -48,11 +48,7 @@
         <div class="nav organization-switcher dropdown">
             <h1 class="logo dropdown-toggle" data-toggle="dropdown">
                 <a href="javascript: void(0);">
-                    {% if oro_theme_logo() %}
-                        <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                    {% else %}
-                        {{- organization_name -}}
-                    {% endif %}
+                    {{- organization_name -}}
                 </a>
                 <i class="fa-caret-down btn-organization-switcher"></i>
             </h1>
@@ -72,11 +68,7 @@
     {% else %}{# if organizations|length == 1 #}
         <h1 class="logo">
             <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
-                {% if oro_theme_logo() %}
-                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
-                {% else %}
-                    {{- organization_name -}}
-                {% endif %}
+                {{- organization_name -}}
             </a>
         </h1>
     {% endif %}
@@ -85,13 +77,9 @@
 {% macro organization_name_and_logo(organization_name) %}
     {% if organization_name|length %}
         {% set logo = oro_theme_logo() %}
-        <h1 class="logo logo-{{ logo ? 'image' : 'text' }}">
+        <h1 class="logo logo-text">
             <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
-                {% if logo %}
-                    <img src="{{ asset(logo) }}" alt="{{- organization_name -}}">
-                {% else %}
-                    {{- organization_name -}}
-                {% endif %}
+                {{- organization_name -}}
             </a>
         </h1>
     {% else %}

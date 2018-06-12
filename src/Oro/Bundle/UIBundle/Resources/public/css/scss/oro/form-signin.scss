@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 /* Login + Forgot Password */
 .login-page {
     background: url("../../img/background.jpg") no-repeat 50% 50% #fff;
@@ -6,16 +8,111 @@
     min-height: 280px;
     overflow: visible;
 
-    #page,
-    #top-page {
-        overflow: visible;
-    }
-
-    #page {
-        #top-page {
+    .app-page {
+        &__central-panel {
             > .container {
                 width: auto;
             }
+        }
+    }
+
+    .btn {
+        background: #eee;
+        height: 32px;
+        font-size: 12px;
+        line-height: 30px;
+        letter-spacing: .01rem;
+        font-weight: bold;
+        color: #68686a;
+        text-transform: uppercase;
+        text-shadow: none;
+        padding: 0 16px;
+        box-shadow: none;
+        border-radius: 16px;
+        border-color:  transparent;
+        outline: none;
+
+        &:hover,
+        &:focus {
+            color: #68686a;
+            background: #dbdbdb;
+            border-color: #dbdbdb;
+        }
+
+        &:active {
+          box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21);
+          background: #dbdbdb;
+          border-color: #dbdbdb;
+          color: #68686a;
+        }
+    }
+
+    .btn-large {
+        height: 40px;
+        line-height: 38px;
+        border-radius: 20px;
+
+        &.btn-success {
+            font-size: 15px;
+        }
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            font-size: 14px;
+        }
+    }
+
+    .btn-primary {
+        color: #fff;
+
+        &, &:focus {
+            background: #0c84a3;
+            border: 2px solid #0c84a3;
+            color: #fff;
+        }
+
+        &:hover {
+            background: #096d87;
+            border-color: #096d87;
+            color: #fff;
+        }
+
+        &:active {
+            background: #ebf6f9;
+            border-color: #096d87;
+            color: #096d87;
+        }
+
+        &[disabled] {
+            &,
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: #86c2d1;
+                border-color: #86c2d1;
+                color: #e8f5f9;
+                padding: 0 16px;
+            }
+        }
+    }
+
+    .btn-success {
+        background: #457d0c;
+        border-color: #457d0c;
+        color: #fff;
+
+        &:focus,
+        &:hover {
+            background: #457d0c;
+            border-color: #457d0c;
+            color: #fff;
+        }
+
+        &:active {
+            background: #e3efd6;
+            border-color: #457d0c;
+            color: #457d0c;
+            box-shadow: none;
         }
     }
 }

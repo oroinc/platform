@@ -1,15 +1,27 @@
 /* @theme: admin.oro; */
 
 &.login-page {
-  height: 100%;
-  position: absolute;
-  .app-page {
     height: 100%;
-    &__central-panel {
-      padding-top: 0;
-      height: 100%;
+    overflow: visible;
+
+    .app-page {
+        &__central-panel {
+            padding-top: 0;
+            height: 100%;
+        }
     }
-  }
+
+    .btn,
+    .btn.disabled,
+    .btn[disabled],
+    .btn.disabled:active,
+    .btn[disabled]:active,
+    .ui-datepicker .ui-datepicker-buttonpane button {
+      font-size: 14px;
+      line-height: 38px;
+      height: 40px;
+      border-radius: 20px;
+    }
 }
 
 .form-wrapper {
@@ -30,6 +42,7 @@
     }
 
     &__inner {
+        margin-top: 0;
         padding: 25px 15px;
         max-width: 575px;
         min-width: inherit;
@@ -64,10 +77,6 @@
         .title {
             font-size: 20px;
             line-height: 1.5;
-
-            &--crm-demo {
-                text-align: ce;
-            }
         }
     }
     .add-on {
