@@ -23,13 +23,16 @@ class WebsocketClient implements WebsocketClientInterface
     /** @var string */
     private $host;
 
-    /** @var string */
+    /** @var int */
     private $port;
+
+    /** @var string */
+    private $path;
 
     /** @var bool */
     private $secured;
 
-    /** @var bool */
+    /** @var string|null */
     private $origin;
 
     /** @var GosClient */
@@ -39,7 +42,8 @@ class WebsocketClient implements WebsocketClientInterface
      * @param GosClientFactoryInterface $gosClientFactory
      * @param TicketProviderInterface $ticketProvider
      * @param string $host
-     * @param string $port
+     * @param string|int $port
+     * @param string $path
      * @param bool $secured
      * @param null|string $origin
      */
@@ -47,14 +51,21 @@ class WebsocketClient implements WebsocketClientInterface
         GosClientFactoryInterface $gosClientFactory,
         TicketProviderInterface $ticketProvider,
         string $host,
-        string $port,
+        $port,
+        string $path = '',
         bool $secured = false,
         ?string $origin = null
     ) {
         $this->gosClientFactory = $gosClientFactory;
         $this->ticketProvider = $ticketProvider;
+
+        if ('*' === $host) {
+            $host = '127.0.0.1';
+        }
+
         $this->host = $host;
-        $this->port = $port;
+        $this->port = (int)$port;
+        $this->path = '/' . ltrim($path, '/');
         $this->secured = $secured;
         $this->origin = $origin;
     }
@@ -65,14 +76,14 @@ class WebsocketClient implements WebsocketClientInterface
      * @throws WebsocketException
      * @throws BadResponseException
      */
-    public function connect(string $target = '/'): ?string
+    public function connect(): ?string
     {
-        $urlInfo = parse_url($target) + ['path' => '', 'query' => ''];
+        $urlInfo = parse_url($this->path) + ['path' => '', 'query' => ''];
         parse_str($urlInfo['query'], $query);
         $query['ticket'] = $this->ticketProvider->generateTicket();
-        $targetWithTicket = sprintf('%s?%s', $urlInfo['path'], http_build_query($query));
+        $pathWithTicket = sprintf('%s?%s', $urlInfo['path'], http_build_query($query));
 
-        return $this->getGosClient()->connect($targetWithTicket);
+        return $this->getGosClient()->connect($pathWithTicket);
     }
 
     /**
@@ -171,14 +182,13 @@ class WebsocketClient implements WebsocketClientInterface
     }
 
     /**
-     * @param string $target
      * @throws BadResponseException
      * @throws WebsocketException
      */
-    private function ensureClientConnected(string $target = '/')
+    private function ensureClientConnected(): void
     {
         if (!$this->isConnected()) {
-            $this->connect($target);
+            $this->connect();
         }
     }
 

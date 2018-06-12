@@ -8,11 +8,9 @@ namespace Oro\Bundle\SyncBundle\Client;
 interface WebsocketClientInterface
 {
     /**
-     * @param string $target
-     *
      * @return string
      */
-    public function connect(string $target = '/'): ?string;
+    public function connect(): ?string;
 
     /**
      * @return bool

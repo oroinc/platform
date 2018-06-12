@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
-use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\WebsocketClient;
-use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
 use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
+use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 class WebsocketClientTest extends \PHPUnit_Framework_TestCase
 {
     private const WS_HOST = 'testHost';
-    private const WS_PORT = 'testPort';
+    private const WS_PORT = '8080';
+    private const WS_PATH = '/';
     private const WS_SECURED = true;
     private const WS_ORIGIN = 'testOrigin';
     private const TICKET = 'sampleTicket';
@@ -38,6 +39,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
             $this->ticketProvider,
             self::WS_HOST,
             self::WS_PORT,
+            self::WS_PATH,
             self::WS_SECURED,
             self::WS_ORIGIN
         );
@@ -55,6 +57,16 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
     {
         $connectionSession = 'sampleSession';
 
+        $client = new WebsocketClient(
+            $this->gosClientFactory,
+            $this->ticketProvider,
+            self::WS_HOST,
+            self::WS_PORT,
+            $target,
+            self::WS_SECURED,
+            self::WS_ORIGIN
+        );
+
         $this->mockGosClientFactory();
         $this->gosClient
             ->expects(self::once())
@@ -67,7 +79,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
             ->method('generateTicket')
             ->willReturn(self::TICKET);
 
-        self::assertSame($connectionSession, $this->client->connect($target));
+        self::assertSame($connectionSession, $client->connect());
     }
 
     /**
@@ -78,7 +90,7 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
         return [
             'empty path in target' => [
                 'target' => '',
-                'expectedTarget' => '?ticket=' . self::TICKET,
+                'expectedTarget' => '/?ticket=' . self::TICKET,
             ],
 
             'root target' => [
@@ -88,6 +100,11 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
 
             'normal path' => [
                 'target' => '/sample-path',
+                'expectedTarget' => '/sample-path?ticket=' . self::TICKET,
+            ],
+
+            'path without slash' => [
+                'target' => 'sample-path',
                 'expectedTarget' => '/sample-path?ticket=' . self::TICKET,
             ],
 

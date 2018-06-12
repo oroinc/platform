@@ -34,33 +34,62 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
 
     public function testConnect()
     {
-        $target = 'sampleTarget';
         $connectionSession = 'sampleSession';
 
         $this->decoratedClient
             ->expects(self::once())
             ->method('connect')
-            ->with($target)
             ->willReturn($connectionSession);
 
         $this->assertLoggerDebugMethodCalled();
 
-        self::assertSame($connectionSession, $this->loggerAwareClientDecorator->connect($target));
+        self::assertSame($connectionSession, $this->loggerAwareClientDecorator->connect());
     }
 
     public function testConnectWithException()
     {
-        $target = 'sampleTarget';
-
         $this->decoratedClient
             ->expects(self::once())
             ->method('connect')
-            ->with($target)
             ->willThrowException(new WebsocketException());
 
         $this->assertLoggerErrorMethodCalled();
 
-        self::assertNull($this->loggerAwareClientDecorator->connect($target));
+        self::assertNull($this->loggerAwareClientDecorator->connect());
+    }
+
+    public function testDisconnect()
+    {
+        $this->decoratedClient
+            ->expects(self::once())
+            ->method('disconnect')
+            ->willReturn(true);
+
+        $this->assertLoggerDebugMethodCalled();
+
+        self::assertTrue($this->loggerAwareClientDecorator->disconnect());
+    }
+
+    public function testDisconnectFailed()
+    {
+        $this->decoratedClient
+            ->expects(self::once())
+            ->method('disconnect')
+            ->willReturn(false);
+
+        $this->assertLoggerNotCalled();
+
+        self::assertFalse($this->loggerAwareClientDecorator->disconnect());
+    }
+
+    public function testIsConnected()
+    {
+        $this->decoratedClient
+            ->expects(self::once())
+            ->method('isConnected')
+            ->willReturn(true);
+
+        self::assertTrue($this->loggerAwareClientDecorator->isConnected());
     }
 
     public function testPublish()
@@ -197,7 +226,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
 
         $this->assertLoggerDebugMethodCalled();
 
-        self::assertSame(true, $this->loggerAwareClientDecorator->event($topicUri, $payload));
+        self::assertTrue($this->loggerAwareClientDecorator->event($topicUri, $payload));
     }
 
     /**

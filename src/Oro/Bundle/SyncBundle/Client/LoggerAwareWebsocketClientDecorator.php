@@ -12,16 +12,19 @@ use Psr\Log\NullLogger;
 /**
  * Adds logging facilities to websocket client.
  */
-class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorator implements LoggerAwareInterface
+class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    /** @var WebsocketClientInterface */
+    private $decoratedClient;
 
     /**
      * @param WebsocketClientInterface $decoratedClient
      */
     public function __construct(WebsocketClientInterface $decoratedClient)
     {
-        parent::__construct($decoratedClient);
+        $this->decoratedClient = $decoratedClient;
 
         $this->setLogger(new NullLogger());
     }
@@ -29,12 +32,12 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
     /**
      * {@inheritDoc}
      */
-    public function connect(string $target = '/'): ?string
+    public function connect(): ?string
     {
         $result = null;
 
         try {
-            $result = $this->decoratedClient->connect($target);
+            $result = $this->decoratedClient->connect();
 
             $this->logger->debug('Connected to websocket server');
         } catch (BadResponseException $e) {
@@ -58,6 +61,14 @@ class LoggerAwareWebsocketClientDecorator extends AbstractWebsocketClientDecorat
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isConnected(): bool
+    {
+        return $this->decoratedClient->isConnected();
     }
 
     /**
