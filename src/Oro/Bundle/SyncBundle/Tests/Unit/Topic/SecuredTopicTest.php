@@ -1,26 +1,25 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Topic;
+namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
-use ArrayIterator;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
-use Oro\Bundle\EmailBundle\Topic\EmailEventTopic;
+use Oro\Bundle\SyncBundle\Topic\SecuredTopic;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
+class SecuredTopicTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
     /** @var ClientManipulatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $clientManipulator;
 
-    /** @var EmailEventTopic */
-    protected $emailEventTopic;
+    /** @var SecuredTopic */
+    protected $securedTopic;
 
     /** @var ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $connection;
@@ -38,7 +37,7 @@ class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
     {
         $this->clientManipulator = $this->createMock(ClientManipulatorInterface::class);
 
-        $this->emailEventTopic = new EmailEventTopic('test_topic', $this->clientManipulator);
+        $this->securedTopic = new SecuredTopic('test_topic', $this->clientManipulator);
 
         $this->connection = $this->createMock(ConnectionInterface::class);
         $this->connection->WAMP = (object)['sessionId' => '12345'];
@@ -49,7 +48,7 @@ class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
             ->willReturn('test_subscription');
         $this->topic->expects($this->any())
             ->method('getIterator')
-            ->willReturn(new ArrayIterator([$this->connection]));
+            ->willReturn(new \ArrayIterator([$this->connection]));
 
         $this->parameterBag = $this->createMock(ParameterBag::class);
 
@@ -77,7 +76,7 @@ class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with('You are not allowed to subscribe on topic "test_subscription".');
 
-        $this->emailEventTopic->onSubscribe($this->connection, $this->topic, $this->request);
+        $this->securedTopic->onSubscribe($this->connection, $this->topic, $this->request);
     }
 
     public function testOnSubscribeIncorrectUserId()
@@ -100,7 +99,7 @@ class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with('You are not allowed to subscribe on topic "test_subscription".');
 
-        $this->emailEventTopic->onSubscribe($this->connection, $this->topic, $this->request);
+        $this->securedTopic->onSubscribe($this->connection, $this->topic, $this->request);
     }
 
     public function testOnSubscribe()
@@ -121,6 +120,6 @@ class EmailEventTopicTest extends \PHPUnit_Framework_TestCase
         $this->connection->expects($this->never())
             ->method($this->anything());
 
-        $this->emailEventTopic->onSubscribe($this->connection, $this->topic, $this->request);
+        $this->securedTopic->onSubscribe($this->connection, $this->topic, $this->request);
     }
 }

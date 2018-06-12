@@ -1270,7 +1270,7 @@ services:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
 
     oro_email.topic.event:
-        class: Oro\Bundle\EmailBundle\Topic\EmailEventTopic
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
         arguments:
             - 'oro_email.event'
             - '@gos_web_socket.websocket.client_manipulator'

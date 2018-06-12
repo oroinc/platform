@@ -2,30 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Topic;
 
-use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
-use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
-use Oro\Bundle\SyncBundle\Topic\UserAwareTopicTrait;
+use Oro\Bundle\SyncBundle\Topic\SecuredTopic;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
 /**
  * This topic is required for broadcasting notifications about problems with imap email synchronizations
  */
-class SyncFailTopic extends BroadcastTopic
+class SyncFailTopic extends SecuredTopic
 {
-    use UserAwareTopicTrait;
-
-    /**
-     * @param string $topicName
-     * @param ClientManipulator $clientManipulator
-     */
-    public function __construct(string $topicName, ClientManipulator $clientManipulator)
-    {
-        parent::__construct($topicName);
-        $this->clientManipulator = $clientManipulator;
-    }
-
     /**
      * {@inheritdoc}
      */

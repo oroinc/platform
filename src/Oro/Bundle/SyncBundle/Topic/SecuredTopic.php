@@ -1,15 +1,16 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Topic;
+namespace Oro\Bundle\SyncBundle\Topic;
 
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
-use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
-use Oro\Bundle\SyncBundle\Topic\UserAwareTopicTrait;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
-class EmailEventTopic extends BroadcastTopic
+/**
+ * Allows to subscribe user to message which secured via his identifier.
+ */
+class SecuredTopic extends BroadcastTopic
 {
     use UserAwareTopicTrait;
 

@@ -39,8 +39,7 @@ define(
              */
             initWamp: function(id) {
                 var self = this;
-                sync.subscribe('oro/reminder/remind_user_' + id, function(data) {
-                    var reminders = JSON.parse(data);
+                sync.subscribe('oro/reminder_remind/' + id, function(reminders) {
                     self.addReminders(reminders);
                     self.showReminders();
                 });

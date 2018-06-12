@@ -101,10 +101,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected function sendMessage(array $messageData, $recipientId)
     {
-        return $this->websocketClient->publish(
-            sprintf('oro/reminder/remind_user_%s', $recipientId),
-            $messageData
-        );
+        return $this->websocketClient->publish(sprintf('oro/reminder_remind/%s', $recipientId), $messageData);
     }
 
     /**

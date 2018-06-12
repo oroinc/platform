@@ -81,3 +81,11 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_reminder.topic.remind:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_reminder.remind'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }
