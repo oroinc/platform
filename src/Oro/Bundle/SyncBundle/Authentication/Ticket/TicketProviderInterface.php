@@ -2,22 +2,17 @@
 
 namespace Oro\Bundle\SyncBundle\Authentication\Ticket;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 /**
- * Interface for ticket providers.
+ * Interface for Sync authenticaton ticket providers.
  */
 interface TicketProviderInterface
 {
     /**
-     * @param bool $anonymousTicket
+     * @param null|UserInterface $user
      *
      * @return string
      */
-    public function generateTicket(bool $anonymousTicket = false): string;
-
-    /**
-     * @param $ticket
-     *
-     * @return bool
-     */
-    public function isTicketValid(string $ticket): bool;
+    public function generateTicket(?UserInterface $user = null): string;
 }

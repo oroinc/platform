@@ -10,9 +10,9 @@ use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
 interface GosClientFactoryInterface
 {
     /**
-     * @param string      $host
-     * @param string      $port
-     * @param bool        $secured
+     * @param string $host
+     * @param string $port
+     * @param bool $secured
      * @param null|string $origin
      *
      * @return GosClient

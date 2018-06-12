@@ -1,29 +1,32 @@
 services:
     oro_sync.websocket_client:
-        alias: oro_sync.websocket_client.basic
-
-    oro_sync.websocket_client.basic:
         class: 'Oro\Bundle\SyncBundle\Client\WebsocketClient'
+        public: false
         arguments:
-            - '@oro_sync.websocket_client.factory.gos'
+            - '@oro_sync.client.factory.gos'
+            - '@oro_sync.authentication.ticket_provider'
             - '%websocket_backend_host%'
             - '%websocket_backend_port%'
 
-    oro_sync.websocket_client.factory.gos:
+    oro_sync.client.factory.gos:
         class: 'Oro\Bundle\SyncBundle\Client\Factory\GosClientFactory'
         public: false
 
-    oro_sync.websocket_client.ticket_authentication_aware_decorator:
-        decorates: oro_sync.websocket_client
-        class: 'Oro\Bundle\SyncBundle\Client\TicketAuthenticationAwareWebsocketClientDecorator'
-        arguments:
-            - '@oro_sync.websocket_client.ticket_authentication_aware_decorator.inner'
-            - '@oro_sync.authentication.ticket_provider'
-
-    oro_sync.websocket_client.logger_aware_decorator:
-        decorates: oro_sync.websocket_client
+    oro_sync.client.logger_aware_decorator:
         class: 'Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator'
+        decorates: oro_sync.websocket_client
+        public: false
         arguments:
-            - '@oro_sync.websocket_client.logger_aware_decorator.inner'
+            - '@oro_sync.client.logger_aware_decorator.inner'
+        calls:
+            - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]
+
+    oro_sync.client.manipulator:
+        class: 'Oro\Bundle\SyncBundle\Client\ClientManipulator'
+        decorates: gos_web_socket.websocket.client_manipulator
+        arguments:
+            - '@oro_sync.client.manipulator.inner'
+            - '@gos_web_socket.client_storage'
+            - '@oro_user.security.provider'
         calls:
             - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]

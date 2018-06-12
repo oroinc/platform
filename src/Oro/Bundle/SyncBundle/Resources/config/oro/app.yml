@@ -21,4 +21,16 @@ twig:
 
 monolog:
     channels:
-        - 'oro_websocket'
+        - oro_websocket
+    handlers:
+        websocket:
+            type: console
+            verbosity_levels:
+                VERBOSITY_NORMAL:       WARNING
+                VERBOSITY_VERBOSE:      NOTICE
+                VERBOSITY_VERY_VERBOSE: INFO
+                VERBOSITY_DEBUG:        DEBUG
+            channels:
+                type: inclusive
+                elements:
+                    - oro_websocket

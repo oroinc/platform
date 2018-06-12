@@ -5,63 +5,58 @@ namespace Oro\Bundle\SyncBundle\Client;
 use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Gos\Component\WebSocketClient\Exception\WebsocketException;
 use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 /**
- * Basic websocket client.
+ * Websocket client with ticket-authentication.
  */
 class WebsocketClient implements WebsocketClientInterface
 {
-    /**
-     * @var GosClient
-     */
+    /** @var GosClientFactoryInterface */
+    private $gosClientFactory;
+
+    /** @var TicketProviderInterface */
+    private $ticketProvider;
+
+    /** @var string */
+    private $host;
+
+    /** @var string */
+    private $port;
+
+    /** @var bool */
+    private $secured;
+
+    /** @var bool */
+    private $origin;
+
+    /** @var GosClient */
     private $gosClient;
 
     /**
-     * @var string
-     */
-    private $host;
-
-    /**
-     * @var string
-     */
-    private $port;
-
-    /**
-     * @var bool
-     */
-    private $secured;
-
-    /**
-     * @var bool
-     */
-    private $origin;
-
-    /**
-     * @var GosClientFactoryInterface
-     */
-    private $gosClientFactory;
-
-    /**
      * @param GosClientFactoryInterface $gosClientFactory
-     * @param string                    $host
-     * @param string                    $port
-     * @param bool                      $secured
-     * @param null|string               $origin
+     * @param TicketProviderInterface $ticketProvider
+     * @param string $host
+     * @param string $port
+     * @param bool $secured
+     * @param null|string $origin
      */
     public function __construct(
         GosClientFactoryInterface $gosClientFactory,
+        TicketProviderInterface $ticketProvider,
         string $host,
         string $port,
         bool $secured = false,
         ?string $origin = null
     ) {
+        $this->gosClientFactory = $gosClientFactory;
+        $this->ticketProvider = $ticketProvider;
         $this->host = $host;
         $this->port = $port;
         $this->secured = $secured;
         $this->origin = $origin;
-        $this->gosClientFactory = $gosClientFactory;
     }
 
     /**
@@ -72,7 +67,12 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function connect(string $target = '/'): ?string
     {
-        return $this->getGosClient()->connect($target);
+        $urlInfo = parse_url($target) + ['path' => '', 'query' => ''];
+        parse_str($urlInfo['query'], $query);
+        $query['ticket'] = $this->ticketProvider->generateTicket();
+        $targetWithTicket = sprintf('%s?%s', $urlInfo['path'], http_build_query($query));
+
+        return $this->getGosClient()->connect($targetWithTicket);
     }
 
     /**
@@ -177,9 +177,8 @@ class WebsocketClient implements WebsocketClientInterface
      */
     private function ensureClientConnected(string $target = '/')
     {
-        $client = $this->getGosClient();
-        if (!$client->isConnected()) {
-            $client->connect($target);
+        if (!$this->isConnected()) {
+            $this->connect($target);
         }
     }
 
