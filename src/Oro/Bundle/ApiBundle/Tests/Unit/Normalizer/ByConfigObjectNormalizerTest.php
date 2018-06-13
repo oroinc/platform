@@ -965,7 +965,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "exclusion_policy" must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
+     * @expectedExceptionMessage The exclusion policy must be "all". Object type: "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category".
      */
     // @codingStandardsIgnoreEnd
     public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()

@@ -316,30 +316,43 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
+        $this->assertEquals([], $config->toArray());
+        $this->assertTrue($config->isEmpty());
 
         $config->setExclusionPolicy('all');
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('all', $config->getExclusionPolicy());
         $this->assertTrue($config->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExclusionPolicy('none');
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
         $this->assertEquals([], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExcludeAll();
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('all', $config->getExclusionPolicy());
         $this->assertTrue($config->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExcludeNone();
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
         $this->assertEquals([], $config->toArray());
+        $this->assertFalse($config->isEmpty());
+
+        $config->setExclusionPolicy(null);
+        $this->assertFalse($config->hasExclusionPolicy());
+        $this->assertEquals('none', $config->getExclusionPolicy());
+        $this->assertFalse($config->isExcludeAll());
+        $this->assertEquals([], $config->toArray());
+        $this->assertTrue($config->isEmpty());
     }
 
     public function testCollapsed()
@@ -603,6 +616,29 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $config->setHints(['hint1']);
         $config->setHints([]);
         $this->assertEquals([], $config->getHints());
+        $this->assertEquals([], $config->toArray());
+    }
+
+    public function testIdentifierDescription()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
+
+        $config->setIdentifierDescription('text');
+        $this->assertTrue($config->hasIdentifierDescription());
+        $this->assertEquals('text', $config->getIdentifierDescription());
+        $this->assertEquals(['identifier_description' => 'text'], $config->toArray());
+
+        $config->setIdentifierDescription(null);
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setIdentifierDescription('text');
+        $config->setIdentifierDescription('');
+        $this->assertFalse($config->hasIdentifierDescription());
+        $this->assertNull($config->getIdentifierDescription());
         $this->assertEquals([], $config->toArray());
     }
 }

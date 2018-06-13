@@ -19,7 +19,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_15';
+        return 'v1_16';
     }
 
     /**
@@ -97,7 +97,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('connector', 'string', ['length' => 255]);
         $table->addColumn('message', 'text', []);
         $table->addColumn('date', 'datetime', []);
-        $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false]);
+        $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
         $table->addIndex(['date'], 'oro_intch_date_idx', []);

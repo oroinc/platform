@@ -36,7 +36,7 @@ $side-menu-overlay-header-height: 100px;
     &__header {
         position: relative;
 
-        width: 232px;
+        width: 240px;
 
         height: $side-menu-overlay-header-height;
         padding: 24px 0 14px 14px;
@@ -163,7 +163,7 @@ $side-menu-overlay-header-height: 100px;
     }
 
     .menu-item {
-        width: 232px;
+        width: 240px;
 
         padding: 0;
 
@@ -188,7 +188,10 @@ $side-menu-overlay-header-height: 100px;
         @include fa-icon($fa-var-angle-right, after);
 
         &::after {
-            padding-left: 2px;
+            position: absolute;
+
+            display: inline-block;
+            padding-left: 6px;
 
             font-size: $menu-font-size;
 

@@ -146,6 +146,10 @@ class CompleteDescriptions implements ProcessorInterface
         $associationName,
         $parentEntityClass
     ) {
+        if (!$definition->hasIdentifierDescription()) {
+            $definition->setIdentifierDescription(self::ID_DESCRIPTION);
+        }
+
         $entityDescription = false;
         if ($definition->hasDescription()) {
             $description = $definition->getDescription();
@@ -540,14 +544,17 @@ class CompleteDescriptions implements ProcessorInterface
             if (!$field->hasDescription()) {
                 $description = $resourceDocParser->getFilterDocumentation($entityClass, $fieldName);
                 if ($description) {
+                    if (InheritDocUtil::hasInheritDoc($description)) {
+                        $description = InheritDocUtil::replaceInheritDoc(
+                            $description,
+                            $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
+                        );
+                    }
                     $field->setDescription($description);
                 } else {
-                    $fieldConfig = $definition->getField($fieldName);
-                    if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
-                        $field->setDescription(\sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName));
-                    } else {
-                        $field->setDescription(\sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName));
-                    }
+                    $field->setDescription(
+                        $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
+                    );
                 }
             } else {
                 $description = $field->getDescription();
@@ -561,6 +568,21 @@ class CompleteDescriptions implements ProcessorInterface
                 $field->setDescription($this->processRequestDependedContent($description, $requestType));
             }
         }
+    }
+
+    /**
+     * @param string                           $fieldName
+     * @param EntityDefinitionFieldConfig|null $fieldConfig
+     *
+     * @return string
+     */
+    private function getFilterDefaultDescription(string $fieldName, ?EntityDefinitionFieldConfig $fieldConfig): string
+    {
+        if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
+            return \sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName);
+        }
+
+        return \sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName);
     }
 
     /**

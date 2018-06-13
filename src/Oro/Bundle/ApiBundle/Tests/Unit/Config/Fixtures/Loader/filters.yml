@@ -43,8 +43,6 @@ full:
                 data_type: integer
             field8:
                 data_type: ~
-            field9:
-                data_type: ""
             field10:
                 allow_array: true
             field11:
@@ -84,7 +82,6 @@ full:
             field7:
                 data_type: integer
             field8: ~
-            field9: ~
             field10:
                 allow_array: true
             field11: ~

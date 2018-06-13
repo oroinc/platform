@@ -166,7 +166,7 @@ api:
             plural_alias: acmeentities
 ```
 
-## entities" Configuration Section
+## entities Configuration Section
 
 The `entities` section describes a configuration of entities.
 
@@ -376,7 +376,7 @@ api:
                         exclude: true
 ```
 
-## actions" Configuration Section
+## actions Configuration Section
 
 The `actions` configuration section serves to specify action-specific options. The options from this section are added to the entity configuration. If an option exists in both the entity and action configurations, the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration.
 

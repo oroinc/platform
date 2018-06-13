@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Provides a method to merge entity configuration with configuration of subresource section.
+ */
 class MergeSubresourceConfigHelper
 {
     /** @var MergeActionConfigHelper */

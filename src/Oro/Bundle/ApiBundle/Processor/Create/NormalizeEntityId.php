@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Create;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -14,15 +16,15 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeEntityId implements ProcessorInterface
 {
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /**
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
-    public function __construct(EntityIdTransformerInterface $entityIdTransformer)
+    public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -51,12 +53,22 @@ class NormalizeEntityId implements ProcessorInterface
 
         try {
             $context->setId(
-                $this->entityIdTransformer->reverseTransform($entityId, $metadata)
+                $this->getEntityIdTransformer($context->getRequestType())->reverseTransform($entityId, $metadata)
             );
         } catch (\Exception $e) {
             $context->addError(
                 Error::createValidationError(Constraint::ENTITY_ID)->setInnerException($e)
             );
         }
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }

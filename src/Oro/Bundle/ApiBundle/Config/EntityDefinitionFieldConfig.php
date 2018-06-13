@@ -2,65 +2,28 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Model\Label;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\FieldConfig;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents the configuration of an entity field.
  *
  * @method EntityDefinitionConfig|null getTargetEntity()
  * @method EntityDefinitionConfig|null setTargetEntity(EntityDefinitionConfig $targetEntity = null)
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInterface
 {
-    use Traits\ConfigTrait;
-    use Traits\ExcludeTrait;
-    use Traits\DescriptionTrait;
-    use Traits\DataTypeTrait;
-    use Traits\DirectionTrait;
-    use Traits\AssociationTargetTrait;
-    use Traits\FormTrait;
+    /** @var bool|null */
+    protected $exclude;
 
-    /** a human-readable description of the field */
-    const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
-
-    /** the data type of the field value */
-    const DATA_TYPE = 'data_type';
-
-    /** a value that indicates whether the field is input-only, output-only or bidirectional */
-    const DIRECTION = 'direction';
-
-    /** a value for the direction option that indicates whether the field is input-only */
-    const DIRECTION_INPUT_ONLY = 'input-only';
-
-    /** a value for the direction option that indicates whether the field is output-only */
-    const DIRECTION_OUTPUT_ONLY = 'output-only';
-
-    /** a value for the direction option that indicates whether the field is bidirectional */
-    const DIRECTION_BIDIRECTIONAL = 'bidirectional';
-
-    /** a flag indicates whether the field represents a meta information */
-    const META_PROPERTY = 'meta_property';
-
-    /** the name by which the meta property should be returned in the response */
-    const META_PROPERTY_RESULT_NAME = 'meta_property_result_name';
-
-    /** the class name of a target entity */
-    const TARGET_CLASS = 'target_class';
-
-    /**
-     * the type of a target association, can be "to-one" or "to-many",
-     * also "collection" can be used in Resources/config/oro/api.yml file as an alias for "to-many"
-     */
-    const TARGET_TYPE = 'target_type';
-
-    /** the form type that should be used for the field */
-    const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;
-
-    /** the form options that should be used for the field */
-    const FORM_OPTIONS = EntityDefinitionConfig::FORM_OPTIONS;
-
-    /** a list of fields on which this field depends on */
-    const DEPENDS_ON = 'depends_on';
+    /** @var string|null */
+    protected $dataType;
 
     /**
      * {@inheritdoc}
@@ -68,10 +31,230 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function toArray($excludeTargetEntity = false)
     {
         $result = parent::toArray($excludeTargetEntity);
-        $this->removeItemWithDefaultValue($result, self::EXCLUDE);
-        $this->removeItemWithDefaultValue($result, self::COLLAPSE);
+        if (true === $this->exclude) {
+            $result[ConfigUtil::EXCLUDE] = $this->exclude;
+        }
+        if (null !== $this->dataType) {
+            $result[ConfigUtil::DATA_TYPE] = $this->dataType;
+        }
+        if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
+            unset($result[ConfigUtil::COLLAPSE]);
+        }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return
+            null === $this->dataType
+            && parent::isEmpty();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has($key)
+    {
+        return \array_key_exists($key, $this->items);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key, $defaultValue = null)
+    {
+        if (!\array_key_exists($key, $this->items)) {
+            return $defaultValue;
+        }
+
+        return $this->items[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value)
+    {
+        if (null !== $value) {
+            $this->items[$key] = $value;
+        } else {
+            unset($this->items[$key]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        unset($this->items[$key]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keys()
+    {
+        return \array_keys($this->items);
+    }
+
+    /**
+     * Indicates whether the exclusion flag is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasExcluded()
+    {
+        return null !== $this->exclude;
+    }
+
+    /**
+     * Indicates whether the description attribute exists.
+     *
+     * @return bool
+     */
+    public function hasDescription()
+    {
+        return $this->has(ConfigUtil::DESCRIPTION);
+    }
+
+    /**
+     * Gets the value of the description attribute.
+     *
+     * @return string|Label|null
+     */
+    public function getDescription()
+    {
+        return $this->get(ConfigUtil::DESCRIPTION);
+    }
+
+    /**
+     * Sets the value of the description attribute.
+     *
+     * @param string|Label|null $description
+     */
+    public function setDescription($description)
+    {
+        if ($description) {
+            $this->items[ConfigUtil::DESCRIPTION] = $description;
+        } else {
+            unset($this->items[ConfigUtil::DESCRIPTION]);
+        }
+    }
+
+    /**
+     * Indicates whether the data type is set.
+     *
+     * @return bool
+     */
+    public function hasDataType()
+    {
+        return null !== $this->dataType;
+    }
+
+    /**
+     * Gets expected data type of the filter value.
+     *
+     * @return string|null
+     */
+    public function getDataType()
+    {
+        return $this->dataType;
+    }
+
+    /**
+     * Sets expected data type of the filter value.
+     *
+     * @param string|null $dataType
+     */
+    public function setDataType($dataType)
+    {
+        $this->dataType = $dataType;
+    }
+
+    /**
+     * Indicates whether the direction option is set explicitly.
+     * If this option is not set, both the request and the response can contain this field.
+     *
+     * @return bool
+     */
+    public function hasDirection()
+    {
+        return $this->has(ConfigUtil::DIRECTION);
+    }
+
+    /**
+     * Sets a value that indicates whether the field is input-only, output-only or bidirectional.
+     *
+     * * The "input-only" means that the request data can contain this field,
+     *   but the response data cannot.
+     * * The "output-only" means that the response data can contain this field,
+     *   but the request data cannot.
+     * * The "bidirectional" means that both the request data and the response data can contain this field.
+     *
+     * The "bidirectional" is the default behaviour.
+     *
+     * @param string|null $direction Can be "input-only", "output-only", "bidirectional"
+     *                               or NULL to remove this option and use default behaviour for it
+     */
+    public function setDirection($direction)
+    {
+        if ($direction) {
+            if (ConfigUtil::DIRECTION_INPUT_ONLY !== $direction
+                && ConfigUtil::DIRECTION_OUTPUT_ONLY !== $direction
+                && ConfigUtil::DIRECTION_BIDIRECTIONAL !== $direction
+            ) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'The possible values for the direction are "%s", "%s" or "%s".',
+                    ConfigUtil::DIRECTION_INPUT_ONLY,
+                    ConfigUtil::DIRECTION_OUTPUT_ONLY,
+                    ConfigUtil::DIRECTION_BIDIRECTIONAL
+                ));
+            }
+            $this->items[ConfigUtil::DIRECTION] = $direction;
+        } else {
+            unset($this->items[ConfigUtil::DIRECTION]);
+        }
+    }
+
+    /**
+     * Indicates whetner the request data can contain this field.
+     *
+     * @return bool
+     */
+    public function isInput()
+    {
+        if (!\array_key_exists(ConfigUtil::DIRECTION, $this->items)) {
+            return true;
+        }
+
+        $direction = $this->items[ConfigUtil::DIRECTION];
+
+        return
+            ConfigUtil::DIRECTION_INPUT_ONLY === $direction
+            || ConfigUtil::DIRECTION_BIDIRECTIONAL === $direction;
+    }
+
+    /**
+     * Indicates whetner the response data can contain this field.
+     *
+     * @return bool
+     */
+    public function isOutput()
+    {
+        if (!\array_key_exists(ConfigUtil::DIRECTION, $this->items)) {
+            return true;
+        }
+
+        $direction = $this->items[ConfigUtil::DIRECTION];
+
+        return
+            ConfigUtil::DIRECTION_OUTPUT_ONLY === $direction
+            || ConfigUtil::DIRECTION_BIDIRECTIONAL === $direction;
     }
 
     /**
@@ -81,11 +264,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function isMetaProperty()
     {
-        if (!array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY, $this->items)) {
-            return false;
-        }
-
-        return $this->items[EntityDefinitionFieldConfig::META_PROPERTY];
+        return $this->get(ConfigUtil::META_PROPERTY, false);
     }
 
     /**
@@ -96,9 +275,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function setMetaProperty($isMetaProperty)
     {
         if ($isMetaProperty) {
-            $this->items[EntityDefinitionFieldConfig::META_PROPERTY] = $isMetaProperty;
+            $this->items[ConfigUtil::META_PROPERTY] = $isMetaProperty;
         } else {
-            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY]);
+            unset($this->items[ConfigUtil::META_PROPERTY]);
         }
     }
 
@@ -111,11 +290,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function getMetaPropertyResultName($defaultValue = null)
     {
-        if (!array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME, $this->items)) {
-            return $defaultValue;
-        }
-
-        return $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME];
+        return $this->get(ConfigUtil::META_PROPERTY_RESULT_NAME, $defaultValue);
     }
 
     /**
@@ -126,10 +301,177 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function setMetaPropertyResultName($name)
     {
         if ($name) {
-            $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME] = $name;
+            $this->items[ConfigUtil::META_PROPERTY_RESULT_NAME] = $name;
         } else {
-            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME]);
+            unset($this->items[ConfigUtil::META_PROPERTY_RESULT_NAME]);
         }
+    }
+
+    /**
+     * Indicates whether the path of the field value exists.
+     *
+     * @return string
+     */
+    public function hasPropertyPath()
+    {
+        return $this->has(ConfigUtil::PROPERTY_PATH);
+    }
+
+    /**
+     * Gets the form type.
+     *
+     * @return string|null
+     */
+    public function getFormType()
+    {
+        return $this->get(ConfigUtil::FORM_TYPE);
+    }
+
+    /**
+     * Sets the form type.
+     *
+     * @param string|null $formType
+     */
+    public function setFormType($formType)
+    {
+        if ($formType) {
+            $this->items[ConfigUtil::FORM_TYPE] = $formType;
+        } else {
+            unset($this->items[ConfigUtil::FORM_TYPE]);
+        }
+    }
+
+    /**
+     * Gets the form options.
+     *
+     * @return array|null
+     */
+    public function getFormOptions()
+    {
+        return $this->get(ConfigUtil::FORM_OPTIONS);
+    }
+
+    /**
+     * Sets the form options.
+     *
+     * @param array|null $formOptions
+     */
+    public function setFormOptions($formOptions)
+    {
+        if ($formOptions) {
+            $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
+        } else {
+            unset($this->items[ConfigUtil::FORM_OPTIONS]);
+        }
+    }
+
+    /**
+     * Sets a form option. If an option is already exist its value will be replaced with new value.
+     *
+     * @param string $name  The name of an option
+     * @param mixed  $value The value of an option
+     */
+    public function setFormOption($name, $value)
+    {
+        $formOptions = $this->getFormOptions();
+        $formOptions[$name] = $value;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Gets existing validation constraints from the form options.
+     *
+     * @return Constraint[]|null
+     */
+    public function getFormConstraints()
+    {
+        $formOptions = $this->getFormOptions();
+        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
+            return null;
+        }
+
+        return $formOptions['constraints'];
+    }
+
+    /**
+     * Adds a validation constraint to the form options.
+     *
+     * @param Constraint $constraint
+     */
+    public function addFormConstraint(Constraint $constraint)
+    {
+        $formOptions = $this->getFormOptions();
+        $formOptions['constraints'][] = $constraint;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Whether at least one data transformer exists.
+     *
+     * @return bool
+     */
+    public function hasDataTransformers()
+    {
+        return !empty($this->items[ConfigUtil::DATA_TRANSFORMER]);
+    }
+
+    /**
+     * Sets the data transformers to be applies to the field value.
+     *
+     * @param string|array|null $dataTransformers
+     */
+    public function setDataTransformers($dataTransformers)
+    {
+        if ($dataTransformers) {
+            if (\is_string($dataTransformers)) {
+                $dataTransformers = [$dataTransformers];
+            }
+            $this->items[ConfigUtil::DATA_TRANSFORMER] = $dataTransformers;
+        } else {
+            unset($this->items[ConfigUtil::DATA_TRANSFORMER]);
+        }
+    }
+
+    /**
+     * Gets a list of fields on which this field depends on.
+     *
+     * @return string[]|null
+     */
+    public function getDependsOn()
+    {
+        return $this->get(ConfigUtil::DEPENDS_ON);
+    }
+
+    /**
+     * Sets a list of fields on which this field depends on.
+     *
+     * @param string[] $fieldNames
+     */
+    public function setDependsOn(array $fieldNames)
+    {
+        if ($fieldNames) {
+            $this->items[ConfigUtil::DEPENDS_ON] = $fieldNames;
+        } else {
+            unset($this->items[ConfigUtil::DEPENDS_ON]);
+        }
+    }
+
+    /**
+     * Indicates whether the collapse target entity flag is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasCollapsed()
+    {
+        return $this->has(ConfigUtil::COLLAPSE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCollapsed($collapse = true)
+    {
+        $this->items[ConfigUtil::COLLAPSE] = $collapse;
     }
 
     /**
@@ -173,85 +515,74 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Indicates whether the collapse target entity flag is set explicitly.
+     * Gets the class name of a target entity.
      *
-     * @return bool
+     * @return string|null
      */
-    public function hasCollapsed()
+    public function getTargetClass()
     {
-        return array_key_exists(self::COLLAPSE, $this->items);
+        return $this->get(ConfigUtil::TARGET_CLASS);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setCollapsed($collapse = true)
-    {
-        $this->items[self::COLLAPSE] = $collapse;
-    }
-
-    /**
-     * Indicates whether the path of the field value exists.
+     * Sets the class name of a target entity.
      *
-     * @return string
+     * @param string|null $className
      */
-    public function hasPropertyPath()
+    public function setTargetClass($className)
     {
-        return array_key_exists(self::PROPERTY_PATH, $this->items);
-    }
-
-    /**
-     * Whether at least one data transformer exists.
-     *
-     * @return bool
-     */
-    public function hasDataTransformers()
-    {
-        return !empty($this->items[self::DATA_TRANSFORMER]);
-    }
-
-    /**
-     * Sets the data transformers to be applies to the field value.
-     *
-     * @param string|array|null $dataTransformers
-     */
-    public function setDataTransformers($dataTransformers)
-    {
-        if (empty($dataTransformers)) {
-            unset($this->items[self::DATA_TRANSFORMER]);
+        if ($className) {
+            $this->items[ConfigUtil::TARGET_CLASS] = $className;
         } else {
-            if (is_string($dataTransformers)) {
-                $dataTransformers = [$dataTransformers];
-            }
-            $this->items[self::DATA_TRANSFORMER] = $dataTransformers;
+            unset($this->items[ConfigUtil::TARGET_CLASS]);
         }
     }
 
     /**
-     * Gets a list of fields on which this field depends on.
+     * Indicates whether a target association represents "to-many" or "to-one" relationship.
      *
-     * @return string[]|null
+     * @return bool|null TRUE if a target association represents "to-many" relationship
      */
-    public function getDependsOn()
+    public function isCollectionValuedAssociation()
     {
-        if (!array_key_exists(self::DEPENDS_ON, $this->items)) {
+        if (!\array_key_exists(ConfigUtil::TARGET_TYPE, $this->items)) {
             return null;
         }
 
-        return $this->items[self::DEPENDS_ON];
+        return 'to-many' === $this->items[ConfigUtil::TARGET_TYPE];
     }
 
     /**
-     * Sets a list of fields on which this field depends on.
+     * Indicates whether the type of a target association is set explicitly.
      *
-     * @param string[] $fieldNames
+     * @return bool
      */
-    public function setDependsOn(array $fieldNames)
+    public function hasTargetType()
     {
-        if (!empty($fieldNames)) {
-            $this->items[self::DEPENDS_ON] = $fieldNames;
+        return $this->has(ConfigUtil::TARGET_TYPE);
+    }
+
+    /**
+     * Gets the type of a target association.
+     *
+     * @return string|null Can be "to-one" or "to-many"
+     */
+    public function getTargetType()
+    {
+        return $this->get(ConfigUtil::TARGET_TYPE);
+    }
+
+    /**
+     * Sets the type of a target association.
+     *
+     * @param string|null $targetType Can be "to-one" or "to-many"
+     */
+    public function setTargetType($targetType)
+    {
+        if ($targetType) {
+            $this->items[ConfigUtil::TARGET_TYPE] = $targetType;
         } else {
-            unset($this->items[self::DEPENDS_ON]);
+            unset($this->items[ConfigUtil::TARGET_TYPE]);
         }
     }
 }
