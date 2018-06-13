@@ -106,23 +106,24 @@ class ClientEventListener implements LoggerAwareInterface
     public function onClientError(ClientErrorEvent $event)
     {
         $exception = $event->getException();
+        $connection = $event->getConnection();
+
+        $loggerContext = [
+            'connection_id' => $connection->resourceId,
+            'session_id' => $connection->WAMP->sessionId,
+        ];
 
         if ($exception instanceof BadCredentialsException) {
             $event->stopPropagation();
 
-            $connection = $event->getConnection();
             $this->closeConnection($connection, 403);
 
             $this->logger->info(
                 'Authentication failed: {reason}',
-                [
-                    'reason' => $exception->getMessage(),
-                    'connection_id' => $connection->resourceId,
-                    'session_id' => $connection->WAMP->sessionId,
-                ]
+                $loggerContext + ['reason' => $exception->getMessage()]
             );
         } else {
-            $this->decoratedClientEventListener->onClientError($event);
+            $this->logger->error('Connection error occurred', $loggerContext + ['exception' => $exception]);
         }
     }
 

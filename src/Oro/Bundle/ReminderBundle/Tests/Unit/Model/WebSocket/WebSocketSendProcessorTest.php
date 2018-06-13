@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -21,6 +22,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected $websocketClient;
 
     /**
+     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $connectionChecker;
+
+    /**
      * @var MessageParamsProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $messageParamsProvider;
@@ -33,9 +39,14 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
+        $this->connectionChecker = $this->createMock(ConnectionChecker::class);
         $this->messageParamsProvider = $this->createMock(MessageParamsProvider::class);
 
-        $this->processor = new WebSocketSendProcessor($this->websocketClient, $this->messageParamsProvider);
+        $this->processor = new WebSocketSendProcessor(
+            $this->websocketClient,
+            $this->connectionChecker,
+            $this->messageParamsProvider
+        );
     }
 
     public function testPush()
@@ -91,6 +102,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
+        $this->connectionChecker
+            ->expects($this->exactly(2))
+            ->method('checkConnection')
+            ->willReturn(true);
+
         $this->websocketClient
             ->expects($this->at(0))
             ->method('publish')
@@ -142,6 +158,11 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception();
 
+        $this->connectionChecker
+            ->expects($this->once())
+            ->method('checkConnection')
+            ->willReturn(true);
+
         $this->websocketClient
             ->expects($this->once())
             ->method('publish')
@@ -163,6 +184,37 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
         $barReminder->expects($this->once())
             ->method('setFailureException')
             ->with($exception);
+
+        $this->processor->process();
+    }
+
+    public function testProcessNoConnection()
+    {
+        $fooUserId = 100;
+        $fooUser = $this->createUser($fooUserId);
+
+        $fooReminder = $this->createReminder($fooUser);
+        $fooMessage = ['data' => 'foo'];
+
+        $this->processor->push($fooReminder);
+
+        $this->messageParamsProvider->expects($this->once())
+            ->method('getMessageParams')
+            ->with($fooReminder)
+            ->willReturn($fooMessage);
+
+        $this->connectionChecker
+            ->expects($this->once())
+            ->method('checkConnection')
+            ->willReturn(false);
+
+        $this->websocketClient
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $fooReminder->expects($this->once())
+            ->method('setState')
+            ->with(Reminder::STATE_REQUESTED);
 
         $this->processor->process();
     }

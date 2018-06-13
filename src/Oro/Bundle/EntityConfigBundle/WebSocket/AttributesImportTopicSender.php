@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\WebSocket;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
@@ -18,17 +19,27 @@ class AttributesImportTopicSender
     private $websocketClient;
 
     /**
+     * @var ConnectionChecker
+     */
+    protected $connectionChecker;
+
+    /**
      * @var TokenAccessorInterface
      */
     private $tokenAccessor;
 
     /**
      * @param WebsocketClientInterface $websocketClient
-     * @param TokenAccessorInterface   $tokenAccessor
+     * @param ConnectionChecker $connectionChecker
+     * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(WebsocketClientInterface $websocketClient, TokenAccessorInterface $tokenAccessor)
-    {
+    public function __construct(
+        WebsocketClientInterface $websocketClient,
+        ConnectionChecker $connectionChecker,
+        TokenAccessorInterface $tokenAccessor
+    ) {
         $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
         $this->tokenAccessor = $tokenAccessor;
     }
 
@@ -60,8 +71,8 @@ class AttributesImportTopicSender
      */
     public function send($configModel)
     {
-        $messageData = ['finished' => true];
-
-        $this->websocketClient->publish($this->getTopic((int)$configModel), $messageData);
+        if ($this->connectionChecker->checkConnection()) {
+            $this->websocketClient->publish($this->getTopic((int)$configModel), ['finished' => true]);
+        }
     }
 }

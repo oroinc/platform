@@ -28,7 +28,9 @@ services:
             - '@oro_sync.authentication.websocket_authentication_by_ticket_provider'
             - '@gos_web_socket.client_storage'
         calls:
-            - [ setLogger, ['@?monolog.logger.oro_websocket'] ]
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.authentication.encoder:
         class:  'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder'

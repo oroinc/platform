@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
@@ -19,11 +20,18 @@ class SocketNotificationSender implements NotificationSenderInterface
     private $websocketClient;
 
     /**
-     * @param WebsocketClientInterface $websocketClient
+     * @var ConnectionChecker
      */
-    public function __construct(WebsocketClientInterface $websocketClient)
+    private $connectionChecker;
+
+    /**
+     * @param WebsocketClientInterface $websocketClient
+     * @param ConnectionChecker $connectionChecker
+     */
+    public function __construct(WebsocketClientInterface $websocketClient, ConnectionChecker $connectionChecker)
     {
         $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
     }
 
     /**
@@ -31,6 +39,10 @@ class SocketNotificationSender implements NotificationSenderInterface
      */
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
+        if (!$this->connectionChecker->checkConnection()) {
+            return;
+        }
+
         $originOwner = $emailOrigin->getOwner();
         $topicUrl = sprintf(self::TOPIC_IMAP_SYNC_FAIL, $originOwner ? $originOwner->getId() : '*');
 

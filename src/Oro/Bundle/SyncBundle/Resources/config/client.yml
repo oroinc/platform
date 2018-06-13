@@ -1,5 +1,8 @@
 services:
     oro_sync.websocket_client:
+        alias: oro_sync.websocket_client.basic
+
+    oro_sync.websocket_client.basic:
         class: 'Oro\Bundle\SyncBundle\Client\WebsocketClient'
         public: false
         arguments:
@@ -16,11 +19,12 @@ services:
     oro_sync.client.logger_aware_decorator:
         class: 'Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator'
         decorates: oro_sync.websocket_client
-        public: false
         arguments:
             - '@oro_sync.client.logger_aware_decorator.inner'
         calls:
-            - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.client.manipulator:
         class: 'Oro\Bundle\SyncBundle\Client\ClientManipulator'
@@ -30,4 +34,6 @@ services:
             - '@gos_web_socket.client_storage'
             - '@oro_user.security.provider'
         calls:
-            - [ setLogger, ['@?monolog.logger.oro_websocket' ] ]
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -19,17 +20,27 @@ class DataUpdateTopicSender
     private $client;
 
     /**
+     * @var ConnectionChecker
+     */
+    private $connectionChecker;
+
+    /**
      * TokenStorageInterface
      */
     private $tokenStorage;
 
     /**
      * @param WebsocketClientInterface $client
-     * @param TokenStorageInterface    $tokenStorage
+     * @param ConnectionChecker $connectionChecker
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(WebsocketClientInterface $client, TokenStorageInterface $tokenStorage)
-    {
+    public function __construct(
+        WebsocketClientInterface $client,
+        ConnectionChecker $connectionChecker,
+        TokenStorageInterface $tokenStorage
+    ) {
         $this->client = $client;
+        $this->connectionChecker = $connectionChecker;
         $this->tokenStorage = $tokenStorage;
     }
 
@@ -40,7 +51,7 @@ class DataUpdateTopicSender
      */
     public function send(array $tags): bool
     {
-        if (!empty($tags)) {
+        if (!empty($tags) && $this->connectionChecker->checkConnection()) {
             $userName = $this->getUserName();
             $tags = array_map(
                 function ($tag) use ($userName) {

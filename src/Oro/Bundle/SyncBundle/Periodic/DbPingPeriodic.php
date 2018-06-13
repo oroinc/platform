@@ -42,7 +42,8 @@ class DbPingPeriodic implements PeriodicInterface
         /** @var Connection $connection */
         foreach ($this->doctrine->getConnections() as $connection) {
             try {
-                $connection->exec('SELECT 1');
+                $stmt = $connection->prepare('SELECT 1');
+                $stmt->execute();
             } catch (DBALException $e) {
                 $this->logger->error('Can\'t ping database connection', ['exception' => $e]);
             }

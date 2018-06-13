@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,6 +21,11 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
     private $websocketClient;
 
     /**
+     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $connectionChecker;
+
+    /**
      * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $tokenStorage;
@@ -32,9 +38,14 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
+        $this->connectionChecker = $this->createMock(ConnectionChecker::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->dataUpdateTopicSender = new DataUpdateTopicSender($this->websocketClient, $this->tokenStorage);
+        $this->dataUpdateTopicSender = new DataUpdateTopicSender(
+            $this->websocketClient,
+            $this->connectionChecker,
+            $this->tokenStorage
+        );
     }
 
     public function testSendWithLoggedInUser()
@@ -55,6 +66,11 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
             ->method('getUserName')
             ->willReturn(self::TEST_USERNAME);
 
+        $this->connectionChecker
+            ->expects(self::once())
+            ->method('checkConnection')
+            ->willReturn(true);
+
         $expectedMessage = [
             ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG1],
             ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG2],
@@ -74,6 +90,11 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
+
+        $this->connectionChecker
+            ->expects(self::once())
+            ->method('checkConnection')
+            ->willReturn(true);
 
         $expectedMessage = [
             ['username' => null, 'tagname' => self::TEST_TAG1],
@@ -101,6 +122,11 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->willReturn(self::TEST_USERNAME);
 
+        $this->connectionChecker
+            ->expects(self::once())
+            ->method('checkConnection')
+            ->willReturn(true);
+
         $expectedMessage = [
             ['username' => null, 'tagname' => self::TEST_TAG1],
             ['username' => null, 'tagname' => self::TEST_TAG2]
@@ -119,10 +145,33 @@ class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
         $this->tokenStorage
             ->expects(self::never())
             ->method('getToken');
+
+        $this->connectionChecker
+            ->expects(self::never())
+            ->method('checkConnection');
+
         $this->websocketClient
             ->expects(self::never())
             ->method('publish');
 
         $this->dataUpdateTopicSender->send([]);
+    }
+
+    public function testSendNoConnection()
+    {
+        $this->tokenStorage
+            ->expects(self::never())
+            ->method('getToken');
+
+        $this->connectionChecker
+            ->expects(self::once())
+            ->method('checkConnection')
+            ->willReturn(false);
+
+        $this->websocketClient
+            ->expects(self::never())
+            ->method('publish');
+
+        $this->dataUpdateTopicSender->send([self::TEST_TAG1, self::TEST_TAG2]);
     }
 }

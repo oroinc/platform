@@ -176,7 +176,7 @@ class LoggerAwareWebsocketClientDecoratorTest extends \PHPUnit_Framework_TestCas
 
         $this->loggerMock->expects($this->once())
             ->method('error')
-            ->with('Error occured while communicating with websocket server', [$exception]);
+            ->with('Error occurred while communicating with websocket server', [$exception]);
 
         self::assertFalse($this->loggerAwareClientDecorator->prefix('samplePrefix', 'sampleUrl'));
     }

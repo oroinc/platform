@@ -55,6 +55,7 @@ services:
         class: '%oro_reminder.send_processor.web_socket.class%'
         arguments:
             - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_reminder.web_socket.message_params_provider'
         tags:
             - { name: oro_reminder.send_processor }

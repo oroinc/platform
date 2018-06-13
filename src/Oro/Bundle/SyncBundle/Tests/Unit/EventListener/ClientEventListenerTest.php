@@ -174,10 +174,7 @@ class ClientEventListenerTest extends \PHPUnit_Framework_TestCase
         $clientErrorEvent = new ClientErrorEvent($this->connection, ClientEvent::ERROR);
         $clientErrorEvent->setException(new \Exception());
 
-        $this->decoratedClientEventListener
-            ->expects(self::once())
-            ->method('onClientError')
-            ->with($clientErrorEvent);
+        $this->assertLoggerErrorMethodCalled();
 
         $this->clientEventListener->onClientError($clientErrorEvent);
     }

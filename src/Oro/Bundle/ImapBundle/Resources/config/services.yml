@@ -245,6 +245,7 @@ services:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\SocketNotificationSender
         arguments:
             - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 

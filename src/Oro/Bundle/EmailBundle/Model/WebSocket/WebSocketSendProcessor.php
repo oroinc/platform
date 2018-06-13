@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -20,11 +21,18 @@ class WebSocketSendProcessor
     protected $websocketClient;
 
     /**
-     * @param WebsocketClientInterface $client
+     * @var ConnectionChecker
      */
-    public function __construct(WebsocketClientInterface $client)
+    protected $connectionChecker;
+
+    /**
+     * @param WebsocketClientInterface $websocketClient
+     * @param ConnectionChecker $connectionChecker
+     */
+    public function __construct(WebsocketClientInterface $websocketClient, ConnectionChecker $connectionChecker)
     {
-        $this->websocketClient = $client;
+        $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
     }
 
     /**
@@ -50,7 +58,7 @@ class WebSocketSendProcessor
      */
     public function send($usersWithNewEmails)
     {
-        if ($usersWithNewEmails) {
+        if ($usersWithNewEmails && $this->connectionChecker->checkConnection()) {
             foreach ($usersWithNewEmails as $ownerId => $item) {
                 /** @var EmailUser $emailUser */
                 $emailUser = $item['entity'];

@@ -160,7 +160,7 @@ class LoggerAwareWebsocketClientDecorator implements WebsocketClientInterface, L
      */
     private function logBadResponseException(BadResponseException $e): void
     {
-        $this->logger->error('Error occured while communicating with websocket server', [$e]);
+        $this->logger->error('Error occurred while communicating with websocket server', [$e]);
     }
 
     /**

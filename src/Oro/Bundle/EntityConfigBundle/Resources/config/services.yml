@@ -459,6 +459,7 @@ services:
         lazy: true
         arguments:
             - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:

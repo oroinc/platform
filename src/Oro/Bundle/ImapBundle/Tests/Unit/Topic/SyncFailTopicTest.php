@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Topic;
 
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
-use Oro\Bundle\ImapBundle\Topic\SyncFailTopic;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
-use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
+use Oro\Bundle\ImapBundle\Topic\SyncFailTopic;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Ratchet\ConnectionInterface;

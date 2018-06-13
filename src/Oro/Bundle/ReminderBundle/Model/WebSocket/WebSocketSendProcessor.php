@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
@@ -24,17 +25,27 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $websocketClient;
 
     /**
+     * @var ConnectionChecker
+     */
+    protected $connectionChecker;
+
+    /**
      * @var MessageParamsProvider
      */
     protected $messageParamsProvider;
 
     /**
      * @param WebsocketClientInterface $websocketClient
-     * @param MessageParamsProvider    $messageParamsProvider
+     * @param ConnectionChecker $connectionChecker
+     * @param MessageParamsProvider $messageParamsProvider
      */
-    public function __construct(WebsocketClientInterface $websocketClient, MessageParamsProvider $messageParamsProvider)
-    {
+    public function __construct(
+        WebsocketClientInterface $websocketClient,
+        ConnectionChecker $connectionChecker,
+        MessageParamsProvider $messageParamsProvider
+    ) {
         $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
         $this->messageParamsProvider = $messageParamsProvider;
     }
 
@@ -101,6 +112,10 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected function sendMessage(array $messageData, $recipientId)
     {
+        if (!$this->connectionChecker->checkConnection()) {
+            return false;
+        }
+
         return $this->websocketClient->publish(sprintf('oro/reminder_remind/%s', $recipientId), $messageData);
     }
 

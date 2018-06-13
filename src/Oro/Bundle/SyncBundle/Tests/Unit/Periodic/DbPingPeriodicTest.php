@@ -5,6 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Statement;
 use Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic;
 use Psr\Log\LoggerInterface;
 
@@ -35,15 +36,25 @@ class DbPingPeriodicTest extends \PHPUnit_Framework_TestCase
 
     public function testTick()
     {
+        $statement1 = $this->createMock(Statement::class);
+        $statement1->expects($this->once())
+            ->method('execute');
+
         $connection1 = $this->createMock(Connection::class);
         $connection1->expects($this->once())
-            ->method('exec')
-            ->with('SELECT 1');
+            ->method('prepare')
+            ->with('SELECT 1')
+            ->willReturn($statement1);
+
+        $statement2 = $this->createMock(Statement::class);
+        $statement2->expects($this->once())
+            ->method('execute');
 
         $connection2 = $this->createMock(Connection::class);
         $connection2->expects($this->once())
-            ->method('exec')
-            ->with('SELECT 1');
+            ->method('prepare')
+            ->with('SELECT 1')
+            ->willReturn($statement2);
 
         $this->doctrine->expects($this->once())
             ->method('getConnections')
@@ -54,10 +65,16 @@ class DbPingPeriodicTest extends \PHPUnit_Framework_TestCase
 
     public function testTickException()
     {
+        $statement1 = $this->createMock(Statement::class);
+        $statement1->expects($this->once())
+            ->method('execute')
+            ->willThrowException(new DBALException());
+
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())
-            ->method('exec')
-            ->willThrowException(new DBALException());
+            ->method('prepare')
+            ->with('SELECT 1')
+            ->willReturn($statement1);
 
         $this->doctrine->expects($this->once())
             ->method('getConnections')
