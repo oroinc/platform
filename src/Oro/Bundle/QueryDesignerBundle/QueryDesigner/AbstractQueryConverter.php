@@ -1670,12 +1670,13 @@ abstract class AbstractQueryConverter
         $parentJoinId = $this->getParentJoinIdentifier(
             $this->joinIdHelper->buildColumnJoinIdentifier($columnName)
         );
+        $alisKey = $this->replaceJoinsForVirtualRelation($parentJoinId);
 
-        if (empty($this->tableAliases[$parentJoinId])) {
+        if (empty($this->tableAliases[$alisKey])) {
             return $this->tableAliases[self::ROOT_ALIAS_KEY];
         }
 
-        return $this->tableAliases[$parentJoinId];
+        return $this->tableAliases[$alisKey];
     }
 
     /**
