@@ -13,37 +13,37 @@ class TicketControllerTest extends WebTestCase
 {
     public function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
     }
 
-    public function testSyncTicketAction()
+    public function testSyncTicketAction(): void
     {
         $url = $this->getUrl('oro_sync_ticket');
         $this->client->request('POST', $url);
 
-        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($response['ticket']);
+        $response = self::getJsonResponseContent($this->client->getResponse(), 200);
+        self::assertNotEmpty($response['ticket']);
 
         $connection = $this->prepareConnection($response);
 
         $event = new ClientEvent($connection, ClientEvent::CONNECTED);
-        $this->getContainer()
+        self::getContainer()
             ->get('event_dispatcher')
             ->dispatch('gos_web_socket.client_connected', $event);
 
-        $user = $this->getContainer()
+        $user = self::getContainer()
             ->get('gos_web_socket.websocket.client_manipulator')
             ->getClient($connection);
 
-        $this->assertInstanceOf(UserInterface::class, $user);
-        $this->assertSame('admin', $user->getUsername());
+        self::assertInstanceOf(UserInterface::class, $user);
+        self::assertSame('admin', $user->getUsername());
     }
 
     /**
      * @param array $response
      * @return ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function prepareConnection(array $response)
+    private function prepareConnection(array $response): ConnectionInterface
     {
         $url = new Url('http', 'test.local');
         $url->setQuery($response);

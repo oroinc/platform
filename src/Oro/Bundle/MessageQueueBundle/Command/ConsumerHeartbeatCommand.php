@@ -52,6 +52,7 @@ class ConsumerHeartbeatCommand extends ContainerAwareCommand implements
         if (!$container->get('oro_message_queue.consumption.consumer_heartbeat')->isAlive() &&
             $container->get('oro_sync.client.connection_checker')->checkConnection()
         ) {
+            // Notify frontend that there are no alive consumers.
             $container->get('oro_sync.websocket_client')->publish('oro/message_queue_heartbeat', '');
         }
     }

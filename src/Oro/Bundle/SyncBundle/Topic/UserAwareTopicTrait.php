@@ -51,7 +51,7 @@ trait UserAwareTopicTrait
      * @param ConnectionInterface $connection
      * @param Topic $topic
      */
-    protected function disallowSubscribe(ConnectionInterface $connection, Topic $topic)
+    protected function disallowSubscribe(ConnectionInterface $connection, Topic $topic): void
     {
         $topic->remove($connection);
 

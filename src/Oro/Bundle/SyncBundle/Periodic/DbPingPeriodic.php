@@ -6,38 +6,39 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Gos\Bundle\WebSocketBundle\Periodic\PeriodicInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Used as a workaround for "2006 MySQL server has gone away" error
  */
-class DbPingPeriodic implements PeriodicInterface
+class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var int */
-    protected $timeout;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    private $timeout;
 
     /**
      * @param ManagerRegistry $doctrine
-     * @param LoggerInterface $logger
      * @param int $timeout
      */
-    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger, int $timeout = 20)
+    public function __construct(ManagerRegistry $doctrine, int $timeout = 20)
     {
         $this->doctrine = $doctrine;
-        $this->logger = $logger;
         $this->timeout = $timeout;
+
+        $this->setLogger(new NullLogger());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function tick()
+    public function tick(): void
     {
         /** @var Connection $connection */
         foreach ($this->doctrine->getConnections() as $connection) {

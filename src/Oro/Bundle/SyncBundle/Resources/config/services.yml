@@ -9,19 +9,23 @@ services:
         class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
         arguments:
             - '@doctrine'
-            - '@logger'
             - '%oro_sync.db_ping.interval%'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: gos_web_socket.periodic }
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.topic.websocket_ping:
         class: Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic
         arguments:
             - 'oro_sync.ping'
-            - '@logger'
             - '%oro_sync.websocket_ping.interval%'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: gos_web_socket.topic }
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
@@ -30,6 +34,11 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_sync.client.connection_checker:
+        class: Oro\Bundle\SyncBundle\Client\ConnectionChecker
+        arguments:
+            - '@oro_sync.websocket_client.basic'
 
     oro_sync.event_listener.maintenance:
         class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
@@ -40,66 +49,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }
-
-    oro_sync.content.listener.datagrid_tag:
-        class: Oro\Bundle\SyncBundle\Content\DataGridTagListener
-        arguments:
-            - '@oro_sync.content.tag_generator'
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
-
-    oro_sync.event_listener.doctrine_tag:
-        class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
-        arguments:
-            - '@oro_sync.content.data_update_topic_sender'
-            - '@oro_sync.content.tag_generator'
-            - '%installed%'
-        tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
-
-    oro_sync.content.tag_generator:
-        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
-
-    oro_sync.content.tag_generator.doctrine:
-        class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: oro_sync.tag_generator }
-
-    oro_sync.content.tag_generator.simple:
-        class: Oro\Bundle\SyncBundle\Content\SimpleTagGenerator
-        tags:
-            - { name: oro_sync.tag_generator }
-
-    oro_sync.content.data_update_topic_sender:
-        class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
-        arguments:
-            - '@oro_sync.websocket_client'
-            - '@oro_sync.client.connection_checker'
-            - '@security.token_storage'
-
-    oro_sync.client.connection_checker:
-        class: Oro\Bundle\SyncBundle\Client\ConnectionChecker
-        arguments:
-            - '@oro_sync.websocket_client.basic'
-
-    # Decorates gos_web_socket.client_event.listener to disable onClientConnect event handling.
-    oro_sync.event_listener.client:
-        parent: gos_web_socket.client_event.listener
-        decorates: gos_web_socket.client_event.listener
-        tags:
-            - { name: kernel.event_listener, event: 'gos_web_socket.client_disconnected', method: onClientDisconnect }
-            - { name: kernel.event_listener, event: 'gos_web_socket.client_error', method: onClientError }
-            - { name: kernel.event_listener, event: 'gos_web_socket.client_rejected', method: onClientRejected }
-
-    oro_sync.topic.data_update:
-        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
-        arguments:
-            - 'oro_sync.data_update'
-        tags:
-            - { name: gos_web_socket.topic }
 
     oro_sync.topic.maintenance:
         class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic

@@ -28,15 +28,16 @@ class OroSyncExtension extends Extension
     const CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH = 'websocket_frontend_path';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $loader->load('services.yml');
-        $loader->load('client.yml');
         $loader->load('security.yml');
+        $loader->load('client.yml');
+        $loader->load('data_update.yml');
 
         $this->cloneParameters(
             $container,
@@ -73,10 +74,10 @@ class OroSyncExtension extends Extension
 
     /**
      * @param ContainerBuilder $container
-     * @param string           $source
-     * @param array            $targets
+     * @param string $source
+     * @param array $targets
      */
-    protected function cloneParameters(ContainerBuilder $container, $source, $targets)
+    private function cloneParameters(ContainerBuilder $container, $source, $targets): void
     {
         if ($container->hasParameter($source)) {
             $value = $container->getParameter($source);

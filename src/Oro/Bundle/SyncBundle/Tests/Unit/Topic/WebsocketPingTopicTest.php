@@ -4,46 +4,45 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
 
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimer;
 use Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Ratchet\Wamp\Topic;
 
 class WebsocketPingTopicTest extends \PHPUnit_Framework_TestCase
 {
-    const TIMEOUT = 333;
+    use LoggerAwareTraitTestTrait;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $logger;
+    private const TIMEOUT = 333;
 
     /** @var TopicPeriodicTimer|\PHPUnit_Framework_MockObject_MockObject */
-    protected $periodicTimer;
+    private $periodicTimer;
 
     /** @var WebsocketPingTopic */
-    protected $websocketPing;
+    private $websocketPing;
 
     public function setUp()
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->periodicTimer = $this->createMock(TopicPeriodicTimer::class);
 
-        $this->websocketPing = new WebsocketPingTopic('oro_sync.ping', $this->logger, self::TIMEOUT);
+        $this->websocketPing = new WebsocketPingTopic('oro_sync.ping', self::TIMEOUT);
         $this->websocketPing->setPeriodicTimer($this->periodicTimer);
+
+        $this->setUpLoggerMock($this->websocketPing);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertSame('oro_sync.ping', $this->websocketPing->getName());
     }
 
-    public function testRegisterPeriodicTimer()
+    public function testRegisterPeriodicTimer(): void
     {
         $topic = $this->createMock(Topic::class);
-        $topic->expects($this->once())
+        $topic->expects(self::once())
             ->method('broadcast');
 
-        $this->logger->expects($this->never())
-            ->method('error');
+        $this->assertLoggerNotCalled();
 
-        $this->periodicTimer->expects($this->once())
+        $this->periodicTimer->expects(self::once())
             ->method('addPeriodicTimer')
             ->with(
                 $this->websocketPing,
@@ -63,17 +62,16 @@ class WebsocketPingTopicTest extends \PHPUnit_Framework_TestCase
         $this->websocketPing->registerPeriodicTimer($topic);
     }
 
-    public function testRegisterPeriodicTimerException()
+    public function testRegisterPeriodicTimerException(): void
     {
         $topic = $this->createMock(Topic::class);
-        $topic->expects($this->once())
+        $topic->expects(self::once())
             ->method('broadcast')
             ->willThrowException(new \Exception());
 
-        $this->logger->expects($this->once())
-            ->method('error');
+        $this->assertLoggerErrorMethodCalled();
 
-        $this->periodicTimer->expects($this->once())
+        $this->periodicTimer->expects(self::once())
             ->method('addPeriodicTimer')
             ->with(
                 $this->websocketPing,
@@ -81,7 +79,7 @@ class WebsocketPingTopicTest extends \PHPUnit_Framework_TestCase
                 self::TIMEOUT,
                 $this->callback(
                     function ($callable) {
-                        if (!is_callable($callable)) {
+                        if (!\is_callable($callable)) {
                             return false;
                         }
                         $callable();

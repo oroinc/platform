@@ -5,7 +5,9 @@ namespace Oro\Bundle\SyncBundle\Topic;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimerInterface;
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimerTrait;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
@@ -14,27 +16,24 @@ use Ratchet\Wamp\Topic;
  * by default, the connection could be closed if no data were transmitted between client and server
  * @link http://nginx.org/en/docs/http/websocket.html
  */
-class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInterface
+class WebsocketPingTopic extends AbstractTopic implements TopicPeriodicTimerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
     use TopicPeriodicTimerTrait;
 
     /** @var int */
-    protected $timeout;
-
-    /** @var LoggerInterface  */
-    protected $logger;
+    private $timeout;
 
     /**
      * @param string $topicName
-     * @param LoggerInterface $logger
      * @param int $timeout
      */
-    public function __construct(string $topicName, LoggerInterface $logger, int $timeout = 50)
+    public function __construct(string $topicName, int $timeout = 50)
     {
         parent::__construct($topicName);
 
-        $this->logger = $logger;
         $this->timeout = $timeout;
+        $this->setLogger(new NullLogger());
     }
 
     /**

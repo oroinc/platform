@@ -20,6 +20,7 @@ services:
             - '@oro_sync.security.ticket_authentication_provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
 
+    # Decorates gos_web_socket.client_event.listener to disable onClientConnect event handling.
     oro_sync.event_listener.client:
         class: 'Oro\Bundle\SyncBundle\EventListener\ClientEventListener'
         decorates: gos_web_socket.client_event.listener
