@@ -1,0 +1,9 @@
+.loading-bar {
+    background: $loading-bar-background;
+    box-shadow: $loading-bar-box-shadow;
+
+    &:before {
+        background: $loading-bar-point-background;
+        box-shadow: $loading-bar-point-box-shadow;
+    }
+}
