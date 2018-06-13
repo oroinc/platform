@@ -824,6 +824,33 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
+     * Filter grid by choice filter
+     * Example: When I filter Status as Is Any Of "Option 1"
+     * Example: And filter Step as Is not Any Of "Option 2"
+     *
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )choose filter for (?P<filterName>[\w\s]+) as (?P<type>(?:|Is Any Of|Is not Any Of)) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $value
+     * @param string $filterGridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function applyChoiceFilter($filterName, $type, $value = null, $filterGridName = 'Grid')
+    {
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('GridFilterChoice', $filterName);
+
+        $filterItem->open();
+        $filterItem->selectType($type);
+        $filterItem->setFilterValue($value);
+        $filterItem->submit();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
      * Filter grid by to dates between or not between
      * Date must be valid format for DateTime php class e.g. 2015-12-24, 2015-12-26 8:30:00, 30 Jun 2015
      * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
