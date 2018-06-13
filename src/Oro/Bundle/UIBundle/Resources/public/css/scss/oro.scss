@@ -3236,11 +3236,6 @@ label .popover-content {
     }
 }
 
-[class^="fa-"].hide-text:after,
-[class^="fa-"].hide-text:before {
-    color: #666;
-}
-
 .pinned-dropdown {
     > .btn-group > .btn {
         [class^="fa-"],

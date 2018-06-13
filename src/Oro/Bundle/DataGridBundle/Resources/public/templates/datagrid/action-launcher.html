@@ -8,7 +8,7 @@
 
 <<%= tagName %>
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
-    class="action btn btn-light
+    class="action
         <%= className ? " " + className : "" %>
         <%= launcherMode == 'icon-only' || launcherMode == 'text-only' ? 'btn-icon' : "" %>
         <%= !enabled ? " disabled" : "" %>

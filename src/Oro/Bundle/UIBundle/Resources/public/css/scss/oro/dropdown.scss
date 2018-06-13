@@ -8,6 +8,26 @@
     padding: $dropdown-menu-inner-offset;
     border: $dropdown-menu-border;
     box-shadow: $dropdown-menu-box-shadow;
+
+    &__select-all-header-cell,
+    &__action-column {
+        min-width: 60px;
+        padding: 5px 0;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            font-size: 13px;
+            margin: 0 2px 0 0;
+        }
+    }
+
+    &__action-cell {
+        padding: 0;
+
+        > li {
+            display: table-cell;
+        }
+    }
 }
 
 .dropdown-item,

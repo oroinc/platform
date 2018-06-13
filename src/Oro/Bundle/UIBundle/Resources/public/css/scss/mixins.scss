@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 $enable-safe-area: true;
 
 @mixin clearfix {
@@ -60,6 +62,27 @@ $enable-safe-area: true;
     border-radius: 0;
     margin-bottom: 0;
     border: none;
+}
+
+@mixin header-cell-dropdown() {
+    > .dropdown {
+        margin-left: -5px;
+
+        > .dropdown-toggle {
+            padding: 4px;
+            line-height: 12px;
+            height: 22px;
+        }
+
+        .dropdown-menu {
+            min-width: 60px;
+            padding-bottom: 5px;
+        }
+    }
+
+    .btn .caret {
+        margin-top: 5px;
+    }
 }
 
 @mixin horizontal-icon-menu() {
