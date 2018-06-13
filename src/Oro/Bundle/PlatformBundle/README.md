@@ -52,6 +52,8 @@ In maintenance mode all cron jobs disabled for execution.
 
 Other documentation could be found [here](https://github.com/lexik/LexikMaintenanceBundle/blob/master/Resources/doc/index.md).
 
+**Note**: Ensure that you have read bundle documentation to understand how the installed OroHealthCheckBundle affects
+the default behavior of the maintenance mode.
 
 ## Lazy services ##
 
