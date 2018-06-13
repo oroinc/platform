@@ -52,6 +52,10 @@ oro_behat_extension:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem
 
+    GridFilterChoice:
+      selector: 'div.filter-item'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterChoice
+
     GridFilterItem:
       selector: 'div.filter-item'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterItem
