@@ -36,21 +36,29 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
     private $secret;
 
     /**
-     * @param UserProvider $userProvider
+     * @var int
+     */
+    private $ticketTtl;
+
+    /**
      * @param TicketDigestGeneratorInterface $ticketDigestGenerator
+     * @param UserProvider $userProvider
      * @param string $providerKey
      * @param string $secret
+     * @param string|int $ticketTtl
      */
     public function __construct(
         TicketDigestGeneratorInterface $ticketDigestGenerator,
         UserProvider $userProvider,
         string $providerKey,
-        string $secret
+        string $secret,
+        $ticketTtl
     ) {
         $this->userProvider = $userProvider;
         $this->ticketDigestGenerator = $ticketDigestGenerator;
         $this->providerKey = $providerKey;
         $this->secret = $secret;
+        $this->ticketTtl = (int)$ticketTtl;
     }
 
     /**
@@ -119,12 +127,22 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
     {
         $created = $token->getAttribute('created');
 
-        if (strtotime($created) > strtotime(date('c'))) {
+        $createdTime = strtotime($created);
+        $now = strtotime(date('c'));
+        if ($createdTime > $now) {
             throw new BadCredentialsException(sprintf(
                 'Ticket "%s" for "%s" is not valid, because token creation date "%s" is in future',
                 $token->getCredentials(),
                 $token->getUsername(),
                 $created
+            ));
+        }
+
+        if ($now - $createdTime > $this->ticketTtl) {
+            throw new BadCredentialsException(sprintf(
+                'Ticket "%s" for "%s" is expired',
+                $token->getCredentials(),
+                $token->getUsername()
             ));
         }
     }

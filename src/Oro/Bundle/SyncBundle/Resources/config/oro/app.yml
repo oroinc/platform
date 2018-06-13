@@ -18,19 +18,3 @@ twig:
             port:       "%websocket_frontend_port%"  # Websocket port used in JS
             host:       "%websocket_frontend_host%"  # Websocket host used in JS
             path:       "%websocket_frontend_path%"  # Websocket request path used in JS
-
-monolog:
-    channels:
-        - oro_websocket
-    handlers:
-        websocket:
-            type: console
-            verbosity_levels:
-                VERBOSITY_NORMAL:       WARNING
-                VERBOSITY_VERBOSE:      NOTICE
-                VERBOSITY_VERY_VERBOSE: INFO
-                VERBOSITY_DEBUG:        DEBUG
-            channels:
-                type: inclusive
-                elements:
-                    - oro_websocket

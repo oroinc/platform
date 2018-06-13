@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\DependencyInjection;
 
+use Monolog\Logger;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -64,6 +65,10 @@ class OroSyncExtension extends Extension
                 self::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH
             ]
         );
+
+        if (isset($bundles['MonologBundle'])) {
+            $this->configureLogger($container);
+        }
     }
 
     /**
@@ -81,5 +86,41 @@ class OroSyncExtension extends Extension
                 }
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function configureLogger(ContainerBuilder $container): void
+    {
+        if (true === $container->getParameter('kernel.debug')) {
+            $verbosityLevels = [
+                'VERBOSITY_NORMAL' => Logger::INFO,
+                'VERBOSITY_VERBOSE' => Logger::DEBUG,
+            ];
+        } else {
+            $verbosityLevels = [
+                'VERBOSITY_NORMAL' => Logger::WARNING,
+                'VERBOSITY_VERBOSE' => Logger::NOTICE,
+                'VERBOSITY_VERY_VERBOSE' => Logger::INFO,
+                'VERBOSITY_DEBUG' => Logger::DEBUG,
+            ];
+        }
+
+        $monologConfig = [
+            'channels' => ['oro_websocket'],
+            'handlers' => [
+                'websocket' => [
+                    'type' => 'console',
+                    'verbosity_levels' => $verbosityLevels,
+                    'channels' => [
+                        'type' => 'inclusive',
+                        'elements' => ['oro_websocket'],
+                    ],
+                ],
+            ],
+        ];
+
+        $container->prependExtensionConfig('monolog', $monologConfig);
     }
 }

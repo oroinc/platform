@@ -19,7 +19,6 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     private const USERNAME = 'sampleUsername';
     private const NONCE = 'sampleNonce';
     private const TICKET_DIGEST = 'sampleTicketDigest';
-
     /**
      * @var UserProvider|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -41,6 +40,11 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     private $secret;
 
     /**
+     * @var int
+     */
+    private $ticketTtl;
+
+    /**
      * @var TicketAuthenticationProvider
      */
     private $ticketAuthenticationProvider;
@@ -51,12 +55,14 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);
         $this->providerKey = 'sampleProdiverKey';
         $this->secret = 'sampleSecret';
+        $this->ticketTtl = 300;
 
         $this->ticketAuthenticationProvider = new TicketAuthenticationProvider(
             $this->ticketDigestGenerator,
             $this->userProvider,
             $this->providerKey,
-            $this->secret
+            $this->secret,
+            $this->ticketTtl
         );
     }
 
@@ -112,7 +118,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testAuthenticateTokenCreatedDateInvalid(): void
+    public function testAuthenticateTokenCreatedDateInFuture(): void
     {
         $created = $this->getDateInFuture();
         $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, $this->providerKey);
@@ -124,6 +130,22 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
             $token->getCredentials(),
             $token->getUsername(),
             $created
+        ));
+
+        $this->ticketAuthenticationProvider->authenticate($token);
+    }
+
+    public function testAuthenticateTokenExpired(): void
+    {
+        $created = $this->getDateInPast();
+        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, $this->providerKey);
+        $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Ticket "%s" for "%s" is expired',
+            $token->getCredentials(),
+            $token->getUsername()
         ));
 
         $this->ticketAuthenticationProvider->authenticate($token);
@@ -253,6 +275,14 @@ class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getDateInFuture(): string
     {
-        return (new \DateTime('today +1 day'))->format('c');
+        return (new \DateTime('now +1 day'))->format('c');
+    }
+
+    /**
+     * @return string
+     */
+    private function getDateInPast(): string
+    {
+        return (new \DateTime('now -301 seconds'))->format('c');
     }
 }

@@ -1,5 +1,6 @@
 parameters:
     oro_sync.security.ticket_authentication_provider.key: 'oro_sync_ticket'
+    oro_sync.security.ticket_authentication_provider.ticket_ttl: 300
 
 services:
     oro_sync.security.ticket_authentication_provider:
@@ -10,6 +11,7 @@ services:
             - '@oro_user.security.provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
             - '%secret%'
+            - '%oro_sync.security.ticket_authentication_provider.ticket_ttl%'
 
     oro_sync.authentication.websocket_authentication_by_ticket_provider:
         class: 'Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider'
