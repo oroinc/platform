@@ -23,28 +23,6 @@ body {
     background: #fff;
 }
 
-body.error-page {
-    background-color: #eee;
-
-    #container {
-        position: relative;
-
-        .popup-frame {
-            position: relative;
-            top: 50%;
-        }
-
-        .popup-holder {
-            position: relative;
-            margin: -97px 0 0;
-        }
-    }
-
-    .app-page__main {
-        background: none;
-    }
-}
-
 a {
     color: $linkColor;
 
@@ -2192,32 +2170,6 @@ textarea {
 
 .oro-action .btn-group {
     margin-right: 0;
-}
-
-.popup-box-errors {
-    width: 480px;
-    margin: 0 auto;
-    border: 1px solid #bbb;
-    padding: 40px 0;
-    background-color: #fff;
-    border-radius: 6px;
-    box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, .5);
-}
-
-.popup-box-errors .popup-content {
-    background-color: #fff;
-    font: 14px/20px $baseFontFamily;
-    margin: 0 30px;
-}
-
-.popup-box-errors h1 {
-    font: bold 20px/46px $baseFontFamily;
-    margin: 0 0 10px;
-}
-
-.popup-box-errors h1 span {
-    font-size: 45px;
-    margin: 0 12px 0 0;
 }
 
 .top-messages {
