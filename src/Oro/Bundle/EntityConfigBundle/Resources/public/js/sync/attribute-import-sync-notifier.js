@@ -14,15 +14,13 @@ define(function(require) {
         }
     };
 
-    var onPageChange = function () {
+    var onPageChange = function() {
         sync.unsubscribe(topic, showNotification);
         mediator.off('page:request', onPageChange);
     };
 
-    var subscribe = function () {
+    return function() {
         sync.subscribe(topic, showNotification);
         mediator.on('page:request', onPageChange);
     };
-
-    return subscribe;
 });

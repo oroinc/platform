@@ -2,7 +2,7 @@ Content outdating
 =================
 
 Table of content
------------------
+----------------
 - [Overview](#overview)
 - [Frontend implementation](#frontend-implementation)
 - [Backend implementation](#backend-implementation)
@@ -10,7 +10,7 @@ Table of content
 Overview
 ---------
 
-As user I want to know if opened page or page that comes from local cache(JS when page is pinned) was changed.
+As user I want to know if opened page or page that comes from local cache (JS when page is pinned) was changed.
 To achieve this goal we should notify client application when content is changed ASAP. To improve timings decided to use websocket pub/sub protocol for pushing notifications to client.
 
 Frontend implementation
@@ -47,4 +47,4 @@ Backend implementation
 ----------------------
 
 For doctrine entities tag generation are covered in onFlush event listener. For each entity modified into UnitOfWork `TagGeneratorChain#generate` method will be invoked.
- To add your own generator into chain you should develop a class that implements `TagGeneratorInterface` and register it as service with `oro_sync.tag_generator` tag.
+To add your own generator into chain you should develop a class that implements `TagGeneratorInterface` and register it as service with `oro_sync.tag_generator` tag.
