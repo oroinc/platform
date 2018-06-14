@@ -1,10 +1,11 @@
-// Bootstrap - Buttons
+/* @theme: admin.oro; */
+
 .btn-group {
   & > .btn,
-    .btn.disabled,
-    .btn[disabled],
-    .btn.disabled:active,
-    .btn[disabled]:active {
+  .btn.disabled,
+  .btn[disabled],
+  .btn.disabled:active,
+  .btn[disabled]:active {
     font-size:$baseFontSize;
   }
   & > .btn-small {
@@ -256,6 +257,14 @@
 .btn.process{
   @include process();
 }
+
+.btn-login-roles {
+  width: 100%;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+}
+
 /* button inside dropdown-menu */
 .title-buttons-container {
   .dropdown-menu {

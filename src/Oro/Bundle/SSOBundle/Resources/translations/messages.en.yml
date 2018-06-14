@@ -4,7 +4,7 @@ oro:
         google_id.label: Google ID
     sso:
         login:
-            alternative.label: Or login using
+            alternative.label: Log in with
         system_configuration:
                 groups:
                     google_sso_settings.title: Google Single Sign-On
