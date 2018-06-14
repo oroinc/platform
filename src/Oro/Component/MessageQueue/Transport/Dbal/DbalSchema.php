@@ -66,9 +66,5 @@ class DbalSchema extends BaseSchema
         $table->addColumn('delayed_until', 'integer', ['notnull' => false, ]);
 
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['consumer_id']);
-        $table->addIndex(['queue']);
-        $table->addIndex(['priority']);
-        $table->addIndex(['delayed_until']);
     }
 }

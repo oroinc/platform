@@ -1,0 +1,12 @@
+/* @theme: blank; */
+
+// Helper to clear inner floats
+@mixin clearfix() {
+    &::after {
+        content: '';
+
+        display: block;
+
+        clear: both;
+    }
+}

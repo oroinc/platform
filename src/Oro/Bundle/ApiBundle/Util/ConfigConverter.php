@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Component\EntitySerializer\ConfigConverter as BaseConfigConverter;
 use Oro\Component\EntitySerializer\EntityConfig;
 
+/**
+ * Provides a method to convert normalized configuration of the EntityConfig object.
+ */
 class ConfigConverter extends BaseConfigConverter
 {
     /**
@@ -15,7 +17,7 @@ class ConfigConverter extends BaseConfigConverter
     {
         parent::buildEntityConfig($result, $config);
 
-        if (!empty($config[EntityDefinitionConfig::PARENT_RESOURCE_CLASS])) {
+        if (!empty($config[ConfigUtil::PARENT_RESOURCE_CLASS])) {
             $result->set(AclProtectedQueryFactory::SKIP_ACL_FOR_ROOT_ENTITY, true);
         }
     }

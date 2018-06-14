@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomCompositeIdentifier as TestEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
@@ -31,7 +30,7 @@ class CustomCompositeIdentifierTest extends RestJsonApiTestCase
      */
     private function getEntityId($key1, $key2)
     {
-        return http_build_query(['key1' => $key1, 'key2' => $key2], '', EntityIdTransformer::COMPOSITE_ID_SEPARATOR);
+        return http_build_query(['key1' => $key1, 'key2' => $key2], '', ';');
     }
 
     public function testGetList()

@@ -20,7 +20,7 @@ class LocationHeaderTest extends RestJsonApiTestCase
         );
         self::assertTrue($response->headers->has('Location'));
         $locationUrl = $this->getUrl(
-            'oro_rest_api_item',
+            $this->getItemRouteName(),
             ['entity' => $entityType, 'id' => $this->getResourceId($response)],
             UrlGeneratorInterface::ABSOLUTE_URL
         );

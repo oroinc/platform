@@ -411,7 +411,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         ]);
     }
 
-    public function testShouldNotSendEntityAddedToInverseSideOfManyToManyAssociation()
+    public function testShouldSendEntityAddedToInverseSideOfManyToManyAssociation()
     {
         $em = $this->getEntityManager();
 
@@ -425,10 +425,38 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $child->getOwners()->add($toBeAddedOwner);
         $em->flush();
 
-        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [],
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($child),
+                    'entity_id'    => $child->getId(),
+                    'change_set'   => [
+                        'owners' => [
+                            null,
+                            [
+                                'inserted' => [
+                                    [
+                                        'entity_class' => get_class($toBeAddedOwner),
+                                        'entity_id'    => $toBeAddedOwner->getId(),
+                                        'change_set'   => [],
+                                        'additional_fields' => [],
+                                    ]
+                                ],
+                                'deleted'  => [],
+                                'changed'  => []
+                            ]
+                        ]
+                    ],
+                    'additional_fields' => [],
+                ]
+            ]
+        ]);
     }
 
-    public function testShouldNotSendEntityRemovedFromInverseSideOfManyToManyAssociation()
+    public function testShouldSendEntityRemovedFromInverseSideOfManyToManyAssociation()
     {
         $em = $this->getEntityManager();
 
@@ -443,7 +471,35 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $child->getOwners()->removeElement($toBeRemovedOwner);
         $em->flush();
 
-        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+        self::assertSentChanges([
+            'entities_inserted'   => [],
+            'entities_deleted'    => [],
+            'entities_updated'    => [],
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($child),
+                    'entity_id'    => $child->getId(),
+                    'change_set'   => [
+                        'owners' => [
+                            null,
+                            [
+                                'inserted' => [],
+                                'deleted'  => [
+                                    [
+                                        'entity_class' => get_class($toBeRemovedOwner),
+                                        'entity_id'    => $toBeRemovedOwner->getId(),
+                                        'change_set'   => [],
+                                        'additional_fields' => [],
+                                    ]
+                                ],
+                                'changed'  => []
+                            ]
+                        ]
+                    ],
+                    'additional_fields' => [],
+                ]
+            ]
+        ]);
     }
 
     public function testShouldSendEntitySetToOneToOneAssociation()
@@ -621,7 +677,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         ]);
     }
 
-    public function testShouldSendOnlyOwnerSideEntityWhenEntityAddedToInverseSideOfManyToOneAssociation()
+    public function testShouldSendEntityWhenEntityAddedToInverseSideOfManyToOneAssociation()
     {
         $em = $this->getEntityManager();
 
@@ -656,11 +712,34 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'additional_fields' => [],
                 ]
             ],
-            'collections_updated' => []
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($child),
+                    'entity_id'    => $child->getId(),
+                    'change_set'   => [
+                        'childrenOneToMany' => [
+                            null,
+                            [
+                                'inserted' => [
+                                    [
+                                        'entity_class' => get_class($owner),
+                                        'entity_id'    => $owner->getId(),
+                                        'change_set'   => [],
+                                        'additional_fields' => [],
+                                    ]
+                                ],
+                                'deleted'  => [],
+                                'changed'  => []
+                            ]
+                        ]
+                    ],
+                    'additional_fields' => [],
+                ]
+            ]
         ]);
     }
 
-    public function testShouldSendOnlyOwnerSideEntityWhenEntityRemovedFromInverseSideOfManyToOneAssociation()
+    public function testShouldSendEntityWhenEntityRemovedFromInverseSideOfManyToOneAssociation()
     {
         $em = $this->getEntityManager();
 
@@ -696,7 +775,30 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                     'additional_fields' => [],
                 ]
             ],
-            'collections_updated' => []
+            'collections_updated' => [
+                [
+                    'entity_class' => get_class($child),
+                    'entity_id'    => $child->getId(),
+                    'change_set'   => [
+                        'childrenOneToMany' => [
+                            null,
+                            [
+                                'inserted' => [],
+                                'deleted'  => [
+                                    [
+                                        'entity_class' => get_class($owner),
+                                        'entity_id'    => $owner->getId(),
+                                        'change_set'   => [],
+                                        'additional_fields' => [],
+                                    ]
+                                ],
+                                'changed'  => []
+                            ]
+                        ]
+                    ],
+                    'additional_fields' => [],
+                ]
+            ]
         ]);
     }
 

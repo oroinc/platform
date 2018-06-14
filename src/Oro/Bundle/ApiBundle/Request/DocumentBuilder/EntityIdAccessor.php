@@ -5,25 +5,30 @@ namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
+/**
+ * Provides a string representation of an entity identifier.
+ */
 class EntityIdAccessor
 {
     /** @var ObjectPropertyAccessorInterface */
-    protected $propertyAccessor;
+    private $propertyAccessor;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    private $entityIdTransformerRegistry;
 
     /**
      * @param ObjectPropertyAccessorInterface $propertyAccessor
-     * @param EntityIdTransformerInterface    $entityIdTransformer
+     * @param EntityIdTransformerRegistry     $entityIdTransformerRegistry
      */
     public function __construct(
         ObjectPropertyAccessorInterface $propertyAccessor,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
         $this->propertyAccessor = $propertyAccessor;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -31,27 +36,28 @@ class EntityIdAccessor
      *
      * @param mixed          $entity
      * @param EntityMetadata $metadata
+     * @param RequestType    $requestType
      *
      * @return string
      */
-    public function getEntityId($entity, EntityMetadata $metadata)
+    public function getEntityId($entity, EntityMetadata $metadata, RequestType $requestType): string
     {
         $result = null;
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
-        $idFieldNamesCount = count($idFieldNames);
+        $idFieldNamesCount = \count($idFieldNames);
         if ($idFieldNamesCount === 1) {
-            $fieldName = reset($idFieldNames);
+            $fieldName = \reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
                 throw new RuntimeException(
-                    sprintf(
+                    \sprintf(
                         'An object of the type "%s" does not have the identifier property "%s".',
                         $metadata->getClassName(),
                         $fieldName
                     )
                 );
             }
-            $result = $this->entityIdTransformer->transform(
+            $result = $this->getEntityIdTransformer($requestType)->transform(
                 $this->propertyAccessor->getValue($entity, $fieldName),
                 $metadata
             );
@@ -60,7 +66,7 @@ class EntityIdAccessor
             foreach ($idFieldNames as $fieldName) {
                 if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
                     throw new RuntimeException(
-                        sprintf(
+                        \sprintf(
                             'An object of the type "%s" does not have the identifier property "%s".',
                             $metadata->getClassName(),
                             $fieldName
@@ -69,10 +75,10 @@ class EntityIdAccessor
                 }
                 $id[$fieldName] = $this->propertyAccessor->getValue($entity, $fieldName);
             }
-            $result = $this->entityIdTransformer->transform($id, $metadata);
+            $result = $this->getEntityIdTransformer($requestType)->transform($id, $metadata);
         } else {
             throw new RuntimeException(
-                sprintf(
+                \sprintf(
                     'The "%s" entity does not have an identifier.',
                     $metadata->getClassName()
                 )
@@ -81,7 +87,7 @@ class EntityIdAccessor
 
         if (empty($result)) {
             throw new RuntimeException(
-                sprintf(
+                \sprintf(
                     'The identifier value for "%s" entity must not be empty.',
                     $metadata->getClassName()
                 )
@@ -89,5 +95,15 @@ class EntityIdAccessor
         }
 
         return $result;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 }

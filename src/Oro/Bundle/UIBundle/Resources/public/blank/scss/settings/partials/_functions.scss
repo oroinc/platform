@@ -1,4 +1,4 @@
-// @theme: blank;
+/* @theme: blank; */
 
 // @return the value with a nested map;
 // $map: (
@@ -45,18 +45,17 @@
 
 @function z($layer: 'base') {
     $layers: (
-            'base': 1,
-            'dropdown': 50,
-            'fixed': 100,
-            'popup': 150,
-            'hidden': -1
+        'base': 1,
+        'dropdown': 50,
+        'fixed': 100,
+        'popup': 150,
+        'hidden': -1
     ) !default;
 
     $z-index: map-get($layers, $layer);
 
     @return $z-index;
 }
-
 
 // Remove the unit of a length
 // @return number
@@ -66,19 +65,16 @@
     @return $value / ($value * 0 + 1);
 }
 
-
 // In SASS we can only once set a value to variable with flag !default, all others values will be ignored.
 // The variable must be declared.
 // @return new value with flag !default;
 // Use: $component-var: reset-var($component-var, 10);
 
 @function update-default($var, $value: null) {
-    @if ($var) {
-        $var: null;
-        $var: $value !default;
+    $var: null;
+    $var: $value !default;
 
-        @return $var;
-    }
+    @return $var;
 }
 
 // Extended default map-merge
@@ -114,5 +110,5 @@
 // Use: merge-breakpoints($old-breakpoints, $new-breakpoints);
 
 @function merge-breakpoints($breakpoints1, $news-breakpoint2) {
-    @return  map-merge-wo-null($breakpoints1, $news-breakpoint2);
+    @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
 }

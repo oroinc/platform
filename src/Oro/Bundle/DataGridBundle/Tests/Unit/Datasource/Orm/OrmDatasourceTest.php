@@ -105,6 +105,9 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->will($this->returnValue(new MySqlPlatform()));
+        $connection->expects($this->any())
+            ->method('getParams')
+            ->will($this->returnValue([]));
         $this->em->expects($this->any())
             ->method('getConnection')
             ->will($this->returnValue($connection));

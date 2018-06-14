@@ -51,7 +51,7 @@
     {% endif %}
 
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>
-        <span class="title {{ 'title-level-' ~ item.level}}">{{ block('label') }}</span>
+        <span class="title {{ 'title-level-' ~ item.level}}">{{ block('label')|trim|raw }}</span>
     </a>
 {% endblock %}
 

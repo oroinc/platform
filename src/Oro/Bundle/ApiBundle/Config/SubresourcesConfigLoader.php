@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
+/**
+ * The loader for "subresources" configuration section.
+ */
 class SubresourcesConfigLoader extends AbstractConfigLoader
 {
-    /** @var array */
-    protected $methodMap = [
-        SubresourceConfig::EXCLUDE => 'setExcluded',
-    ];
-
-    /** @var array */
-    protected $actionMethodMap = [
-        ActionConfig::EXCLUDE => 'setExcluded',
+    private const METHOD_MAP = [
+        ConfigUtil::EXCLUDE => 'setExcluded'
     ];
 
     /** @var ActionsConfigLoader */
-    protected $actionsConfigLoader;
+    private $actionsConfigLoader;
 
     /**
      * {@inheritdoc}
@@ -41,10 +40,10 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
     {
         $subresource = new SubresourceConfig();
         foreach ($config as $key => $value) {
-            if (SubresourceConfig::ACTIONS === $key) {
+            if (ConfigUtil::ACTIONS === $key) {
                 $this->loadActions($subresource, $value);
             } else {
-                $this->loadConfigValue($subresource, $key, $value, $this->methodMap);
+                $this->loadConfigValue($subresource, $key, $value, self::METHOD_MAP);
             }
         }
 

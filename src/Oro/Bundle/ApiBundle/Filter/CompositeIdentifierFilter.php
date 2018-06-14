@@ -98,7 +98,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
                 $expressions = [];
                 foreach ($value as $val) {
                     $expressions[] = $this->buildNotEqualExpression(
-                        $this->normalizeEntityId($val, $entityIdTransformer)
+                        $entityIdTransformer->reverseTransform($val, $this->metadata)
                     );
                 }
                 $expr = new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
@@ -107,14 +107,14 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
                 $expressions = [];
                 foreach ($value as $val) {
                     $expressions[] = $this->buildEqualExpression(
-                        $this->normalizeEntityId($val, $entityIdTransformer)
+                        $entityIdTransformer->reverseTransform($val, $this->metadata)
                     );
                 }
                 $expr = new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
             }
         } else {
             // single identifier
-            $value = $this->normalizeEntityId($value, $entityIdTransformer);
+            $value = $entityIdTransformer->reverseTransform($value, $this->metadata);
             if (ComparisonFilter::NEQ === $operator) {
                 // expression: field1 != value1 OR field2 != value2 OR ...
                 // this expression equals to NOT (field1 = value1 AND field2 = value2 AND ...),
@@ -167,24 +167,9 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     }
 
     /**
-     * @param mixed                             $value
-     * @param EntityIdTransformerInterface|null $transformer
-     *
-     * @return mixed
+     * @return EntityIdTransformerInterface
      */
-    private function normalizeEntityId($value, EntityIdTransformerInterface $transformer = null)
-    {
-        if (null !== $transformer) {
-            $value = $transformer->reverseTransform($value, $this->metadata);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @return EntityIdTransformerInterface|null
-     */
-    private function getEntityIdTransformer()
+    private function getEntityIdTransformer(): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($this->requestType);
     }

@@ -88,16 +88,16 @@ class TopicPublisher implements LoggerAwareInterface
             return false;
         }
 
-    //@TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files for details
-       /* $ws->sendData(
-            json_encode(
-                [
-                    ServerProtocol::MSG_PUBLISH,
-                    $topic,
-                    $msg,
-                ]
-            )
-        );*/
+        //@TODO: should be uncommented in scope of BAP-16769, see https://github.com/laboro/dev/pull/16599/files
+        /* $ws->sendData(
+             json_encode(
+                 [
+                     ServerProtocol::MSG_PUBLISH,
+                     $topic,
+                     $msg,
+                 ]
+             )
+         );*/
 
         return true;
     }

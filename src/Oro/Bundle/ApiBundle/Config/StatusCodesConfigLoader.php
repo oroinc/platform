@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+
+/**
+ * The loader for "status_codes" configuration section.
+ */
 class StatusCodesConfigLoader extends AbstractConfigLoader
 {
-    /** @var array */
-    protected $codeMethodMap = [
-        StatusCodeConfig::EXCLUDE => 'setExcluded',
+    private const METHOD_MAP = [
+        ConfigUtil::EXCLUDE => 'setExcluded'
     ];
 
     /**
@@ -32,7 +36,7 @@ class StatusCodesConfigLoader extends AbstractConfigLoader
         $code = new StatusCodeConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                $this->loadConfigValue($code, $key, $value, $this->codeMethodMap);
+                $this->loadConfigValue($code, $key, $value, self::METHOD_MAP);
             }
         }
 

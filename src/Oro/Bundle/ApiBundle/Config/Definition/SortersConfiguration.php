@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
-use Oro\Bundle\ApiBundle\Config\SortersConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -27,8 +26,8 @@ class SortersConfiguration extends AbstractConfigurationSection
             $parentNode,
             $sectionName,
             function ($value) {
-                if (empty($value[SortersConfig::FIELDS])) {
-                    unset($value[SortersConfig::FIELDS]);
+                if (empty($value[ConfigUtil::FIELDS])) {
+                    unset($value[ConfigUtil::FIELDS]);
                 }
 
                 return $value;
@@ -36,10 +35,10 @@ class SortersConfiguration extends AbstractConfigurationSection
         );
 
         $fieldNode = $node
-            ->enumNode(SortersConfig::EXCLUSION_POLICY)
-                ->values([SortersConfig::EXCLUSION_POLICY_ALL, SortersConfig::EXCLUSION_POLICY_NONE])
+            ->enumNode(ConfigUtil::EXCLUSION_POLICY)
+                ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
             ->end()
-            ->arrayNode(SortersConfig::FIELDS)
+            ->arrayNode(ConfigUtil::FIELDS)
                 ->useAttributeAsKey('name')
                 ->normalizeKeys(false)
                 ->prototype('array')
@@ -61,7 +60,7 @@ class SortersConfiguration extends AbstractConfigurationSection
         $this->addPostProcessCallbacks($parentNode, $sectionName);
 
         $node
-            ->booleanNode(SorterFieldConfig::EXCLUDE)->end()
-            ->scalarNode(SorterFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end();
+            ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end();
     }
 }

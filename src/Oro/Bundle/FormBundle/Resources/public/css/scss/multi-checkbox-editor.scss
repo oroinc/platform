@@ -1,5 +1,5 @@
 .inline-editor-wrapper.multi-checkbox-editor {
-    z-index: 10002 !important; // to show over .ui-multiselect-menu
+    z-index: auto !important;
     min-width: 190px;
 
     .inline-editor__fields {

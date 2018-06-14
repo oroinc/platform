@@ -38,6 +38,7 @@ To simplify creation of the functional test for REST API resources that conform 
 | assertResponseNotEmpty | Asserts that the response data are not empty. |
 | assertResponseValidationError | Asserts that the response content contains the given validation error. |
 | assertResponseValidationErrors | Asserts that the response content contains the given validation errors. |
+| assertMethodNotAllowedResponse | Asserts response status code equals to 405 (Method Not Allowed) and "Allow" response header equals to the expected value. |
 | dumpYmlTemplate | Saves a response content to a YAML file. If the first parameter is a file name, the file is saved into the `responses` directory next to the PHP file that contains the test. |
 | getResourceId | Extracts the JSON.API resource identifier from the response. For details, see [JSON.API Specification](http://jsonapi.org/format/#document-resource-objects). |
 | getRequestData | Converts the given request to an array that can be sent to the server. The given request can be a path to a file that contains the request data or an array with the request data. If the request is a file name, the file should be located in the `requests` directory next to the PHP file that contains the test. |
