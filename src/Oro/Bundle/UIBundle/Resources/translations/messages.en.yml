@@ -31,6 +31,13 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Additional Information": "Additional Information"
 
 oro:
+    auth:
+        description:
+            logo: OroPlatform
+            main: OroPlatform
+            text: The Rapid Application Development Platform for Web Applications
+        copy: © 2018 Oro, Inc. All Rights Reserved
+
     ui:
         actions:          "%entityName% Actions"
         actions.activity: More actions
