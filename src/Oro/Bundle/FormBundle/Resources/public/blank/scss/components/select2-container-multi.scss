@@ -88,7 +88,6 @@
 
     &.select2-container-disabled {
         .select2-choices {
-            background: get-color('additional', 'light');
             background: get-color('additional', 'middle');
             cursor: default;
         }
