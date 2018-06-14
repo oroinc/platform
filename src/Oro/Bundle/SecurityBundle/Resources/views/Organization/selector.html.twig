@@ -76,7 +76,6 @@
 
 {% macro organization_name_and_logo(organization_name) %}
     {% if organization_name|length %}
-        {% set logo = oro_theme_logo() %}
         <h1 class="logo logo-text">
             <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
                 {{- organization_name -}}
