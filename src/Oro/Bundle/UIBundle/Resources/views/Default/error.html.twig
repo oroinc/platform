@@ -27,10 +27,10 @@
     <div class="error-page-wrapper">
         <div class="error-page-main">
             <div class="error-page-content">
-                {% if logo_src is defined %}
-                <a href="{{ path('oro_default') }}">
-                    <img class="error-page-img" alt="logo" src="{{ asset(logo_src) }}"/>
-                </a>
+                {% if oro_theme_logo() %}
+                    <a href="{{ path('oro_default') }}">
+                        <img class="error-page-img" alt="logo" src="{{ asset(oro_theme_logo()) }}"/>
+                    </a>
                 {% endif %}
                 <h1 class="error-page-title">{{ status_code }}. {{ status_text }}</h1>
                 <p class="error-page-description">
