@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-class CsrfTokenStorage implements TokenStorageInterface
+/**
+ * Stores CSRF tokens for embedded forms.
+ */
+class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageInterface
 {
-    /** @var Cache */
+    /** @var CacheProvider */
     protected $tokenCache;
 
     /** @var int */
@@ -17,12 +21,12 @@ class CsrfTokenStorage implements TokenStorageInterface
     protected $sessionIdProvider;
 
     /**
-     * @param Cache                      $tokenCache
+     * @param CacheProvider              $tokenCache
      * @param int                        $tokenLifetime
      * @param SessionIdProviderInterface $sessionIdProvider
      */
     public function __construct(
-        Cache $tokenCache,
+        CacheProvider $tokenCache,
         $tokenLifetime,
         SessionIdProviderInterface $sessionIdProvider
     ) {
@@ -66,6 +70,14 @@ class CsrfTokenStorage implements TokenStorageInterface
     public function removeToken($tokenId)
     {
         $this->tokenCache->delete($this->getCacheKey($tokenId));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $this->tokenCache->deleteAll();
     }
 
     /**

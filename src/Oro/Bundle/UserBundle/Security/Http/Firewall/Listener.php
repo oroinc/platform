@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Security\Http\Firewall;
 
-use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
+use Oro\Bundle\UserBundle\Security\WsseTokenFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use UnexpectedValueException;
@@ -22,11 +22,17 @@ class Listener implements ListenerInterface
 {
     private $wsseHeader;
 
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var AuthenticationManagerInterface */
     protected $authenticationManager;
+
+    /** @var WsseTokenFactoryInterface */
+    protected $wsseTokenFactory;
+
+    /** @var string */
+    protected $providerKey;
 
     /** @var AuthenticationEntryPointInterface */
     protected $authenticationEntryPoint;
@@ -37,17 +43,23 @@ class Listener implements ListenerInterface
     private $firewallName;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @param TokenStorageInterface $tokenStorage
      * @param AuthenticationManagerInterface $authenticationManager
+     * @param WsseTokenFactoryInterface $wsseTokenFactory
+     * @param string $providerKey
      * @param AuthenticationEntryPointInterface $authenticationEntryPoint
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
+        TokenStorageInterface $tokenStorage,
         AuthenticationManagerInterface $authenticationManager,
+        WsseTokenFactoryInterface $wsseTokenFactory,
+        string $providerKey,
         AuthenticationEntryPointInterface $authenticationEntryPoint
     ) {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
+        $this->wsseTokenFactory = $wsseTokenFactory;
+        $this->providerKey = $providerKey;
         $this->authenticationEntryPoint = $authenticationEntryPoint;
     }
 
@@ -78,10 +90,12 @@ class Listener implements ListenerInterface
         $wsseHeaderInfo = $this->parseHeader();
 
         if ($wsseHeaderInfo !== false) {
-            $token = new Token();
-            $token->setUser($wsseHeaderInfo['Username']);
+            $token = $this->wsseTokenFactory->create(
+                $wsseHeaderInfo['Username'],
+                $wsseHeaderInfo['PasswordDigest'],
+                $this->providerKey
+            );
 
-            $token->setAttribute('digest', $wsseHeaderInfo['PasswordDigest']);
             $token->setAttribute('nonce', $wsseHeaderInfo['Nonce']);
             $token->setAttribute('created', $wsseHeaderInfo['Created']);
             $token->setAttribute('firewallName', $this->firewallName);
@@ -90,7 +104,7 @@ class Listener implements ListenerInterface
                 $returnValue = $this->authenticationManager->authenticate($token);
 
                 if ($returnValue instanceof TokenInterface) {
-                    return $this->securityContext->setToken($returnValue);
+                    return $this->tokenStorage->setToken($returnValue);
                 } elseif ($returnValue instanceof Response) {
                     return $event->setResponse($returnValue);
                 }

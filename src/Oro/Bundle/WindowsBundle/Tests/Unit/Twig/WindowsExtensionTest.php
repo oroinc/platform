@@ -8,8 +8,8 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
@@ -31,6 +31,9 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager */
     protected $requestStateManager;
 
+    /** @var  FragmentHandler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $fragmentHandler;
+
     protected function setUp()
     {
         $this->environment = $this->getMockBuilder(\Twig_Environment::class)
@@ -50,9 +53,12 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->fragmentHandler = $this->createMock(FragmentHandler::class);
+
         $container = self::getContainerBuilder()
             ->add('oro_windows.manager.windows_state_registry', $this->stateManagerRegistry)
             ->add('oro_windows.manager.windows_state_request', $this->requestStateManager)
+            ->add('fragment.handler', $this->fragmentHandler)
             ->getContainer($this);
 
         $this->extension = new WindowsExtension($container);
@@ -116,16 +122,9 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl, 'type' => $type]);
 
-        $httpKernelExtension = $this->getHttpKernelExtensionMock();
-
-        $this->environment->expects($this->once())
-            ->method('getExtension')
-            ->with('http_kernel')
-            ->will($this->returnValue($httpKernelExtension));
-
         $expectedOutput = 'RENDERED';
-        $httpKernelExtension->expects($this->once())
-            ->method('renderFragment')
+        $this->fragmentHandler->expects($this->once())
+            ->method('render')
             ->with(
                 $this->callback(
                     function ($url) use ($expectedUrl) {
@@ -174,15 +173,8 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $cleanUrl = '/foo/bar';
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
 
-        $httpKernelExtension = $this->getHttpKernelExtensionMock();
-
-        $this->environment->expects($this->once())
-            ->method('getExtension')
-            ->with('http_kernel')
-            ->will($this->returnValue($httpKernelExtension));
-
-        $httpKernelExtension->expects($this->once())
-            ->method('renderFragment')
+        $this->fragmentHandler->expects($this->once())
+            ->method('render')
             ->with($cleanUrl)
             ->will($this->throwException(new NotFoundHttpException()));
 
@@ -206,15 +198,8 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $cleanUrl = '/foo/bar';
         $windowState = $this->createWindowState(['cleanUrl' => $cleanUrl]);
 
-        $httpKernelExtension = $this->getHttpKernelExtensionMock();
-
-        $this->environment->expects($this->once())
-            ->method('getExtension')
-            ->with('http_kernel')
-            ->will($this->returnValue($httpKernelExtension));
-
-        $httpKernelExtension->expects($this->once())
-            ->method('renderFragment')
+        $this->fragmentHandler->expects($this->once())
+            ->method('render')
             ->with($cleanUrl)
             ->will($this->throwException(new \Exception('This is exception was not caught.')));
 
@@ -262,15 +247,5 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $state->setData($data);
 
         return $state;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|HttpKernelExtension
-     */
-    protected function getHttpKernelExtensionMock()
-    {
-        return $this->getMockBuilder(HttpKernelExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

@@ -82,9 +82,6 @@ class ContextsExtension extends AbstractTypeExtension
                     'activity' => $alias,
                     'name'     => $alias
                 ],
-            ],
-            'attr' => [
-                'readonly' => false
             ]
         ];
 

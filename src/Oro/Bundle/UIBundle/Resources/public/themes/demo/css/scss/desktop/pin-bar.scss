@@ -1,28 +1,55 @@
+/* @theme: admin.demo; */
+
 .list-bar-wrapper {
-  background-color: $logo-background-color;
-}
-.list-bar{
-  li {
-    color: $header-text-color;
-    .pin-holder {
-      border-right-color: $base-gradient-color-border;
-      a {
-        color: $header-text-color;
-        &.fa-close {
-          &:before {
-            color:$header-text-color;
-          }
-        }
-      }
-      &:hover {
-        a {
-          color: lighten($header-text-color, 10%);
-        }
+  .pin-holder {
+    &.outdated a {
+      color: $pin-item-outdated-color;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: $pin-item-outdated-hover-color;
       }
     }
+  }
+
+  .btn-close {
+    &:before {
+      color: $pin-item-close-color;
+    }
+
+    &:hover:before {
+      color: $pin-item-close-hover-color;
+    }
+  }
+}
+
+.show-more {
+  &:before {
+    background-image: linear-gradient(to left, $app-header-bg-color, transparent);
+  }
+
+  a.dropdown-toggle {
+    background-color: $app-header-bg-color;
+    color: $pin-item-close-color;
+
+    &:hover {
+      color: $pin-item-close-hover-color;
+    }
+  }
+}
+
+.list-bar {
+  .pin-holder {
     &.active {
-      .pin-holder {
-        background-color: darken($logo-background-color, 5%);
+      background-color: $pin-item-active-bg-color;
+    }
+
+    a {
+      &:hover,
+      &:active,
+      &:focus {
+        color: $app-header-text-hover-color;
       }
     }
   }

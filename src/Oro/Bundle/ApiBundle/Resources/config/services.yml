@@ -328,7 +328,7 @@ services:
             - ['setIsIdFieldProtected', [false]]
 
     oro_api.entity_serializer:
-        class: Oro\Component\EntitySerializer\EntitySerializer
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedEntitySerializer
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
@@ -362,13 +362,32 @@ services:
             - '@oro_entity.query_hint_resolver'
         calls:
             - [setAclHelper, ['@oro_security.acl_helper']]
+            - [setQueryModifier, ['@oro_api.entity_serializer.query_modifier_registry']]
+
+    oro_api.entity_serializer.query_modifier_registry:
+        class: Oro\Bundle\ApiBundle\Util\QueryModifierRegistry
+        public: false
+        arguments:
+            - [] # query modifiers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryModifierCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.field_accessor:
-        class: Oro\Component\EntitySerializer\FieldAccessor
+        class: Oro\Bundle\ApiBundle\Util\FieldAccessor
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
             - '@oro_api.entity_accessor'
+        calls:
+            - [setMandatoryFieldProvider, ['@oro_api.entity_serializer.mandatory_field_provider_registry']]
+
+    oro_api.entity_serializer.mandatory_field_provider_registry:
+        class: Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry
+        public: false
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\MandatoryFieldProviderCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
@@ -407,11 +426,20 @@ services:
         public: false
         arguments:
             - [] # transformers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdTransformerCompilerPass
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
+            - '@oro_api.entity_id_resolver_registry'
+
+    oro_api.entity_id_resolver_registry:
+        class: Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry
+        public: false
+        arguments:
+            - [] # resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
+            - '@service_container'
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.entity_id_transformer:
         class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
-        public: false
         arguments:
             - '@oro_api.value_normalizer'
         tags:
@@ -473,7 +501,7 @@ services:
         shared: false
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.document_builder, requestType: json_api }
 
@@ -576,7 +604,7 @@ services:
             - '@security.token_storage'
 
     oro_api.api_doc.formatter.html_formatter:
-        class: Oro\Bundle\ApiBundle\ApiDoc\NewHtmlFormatter
+        class: Oro\Bundle\ApiBundle\ApiDoc\Formatter\NewHtmlFormatter
         public: false
         parent: nelmio_api_doc.formatter.abstract_formatter
         calls:
@@ -596,12 +624,27 @@ services:
             - [setEnableFormatParameter, [false]]
             - [setSecurityContext, ['@oro_api.api_doc.security_context']]
             - [setFileLocator, ['@file_locator']]
+            - [setDocumentationProvider, ['@oro_api.api_doc.documentation_provider']]
 
     oro_api.api_doc.formatter.html_formatter.composite:
-        class: Oro\Bundle\ApiBundle\ApiDoc\CompositeFormatter
+        class: Oro\Bundle\ApiBundle\ApiDoc\Formatter\CompositeFormatter
         public: false
         arguments:
             - '@oro_api.rest.doc_view_detector'
+
+    oro_api.api_doc.documentation_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider
+        public: false
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentationProviderCompilerPass
+
+    oro_api.api_doc.documentation_provider.predefined_ids:
+        class: Oro\Bundle\ApiBundle\ApiDoc\PredefinedIdDocumentationProvider
+        public: false
+        arguments:
+            - '@oro_api.entity_id_resolver_registry'
+        tags:
+            - { name: oro.api.documentation_provider }
 
     oro_api.api_doc.annotation_parser:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocAnnotationParser

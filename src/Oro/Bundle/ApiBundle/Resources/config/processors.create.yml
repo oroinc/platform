@@ -37,12 +37,12 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -40 }
 
-    oro_api.create.rest.normalize_entity_id:
+    oro_api.create.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Create\NormalizeEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, requestType: rest, priority: -110 }
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: -110 }
 
     #
     # security_check
@@ -119,7 +119,7 @@ services:
             - 'oro_rest_api_item'
             - '@router'
             - '@oro_api.value_normalizer'
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
             - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
 

@@ -74,7 +74,6 @@ services:
             - '@oro_integration.manager.types_registry'
             - '@assets.packages'
             - '@oro_security.acl_helper'
-            - '@form.choice_list_factory.default'
         tags:
             - { name: form.type, alias: oro_integration_select }
 

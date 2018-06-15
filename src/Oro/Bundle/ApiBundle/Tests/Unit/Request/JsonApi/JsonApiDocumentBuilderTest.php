@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -55,10 +56,15 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             );
 
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->requestType)
+            ->willReturn($entityIdTransformer);
 
         $this->documentBuilder = new JsonApiDocumentBuilder(
             $valueNormalizer,
-            $entityIdTransformer
+            $entityIdTransformerRegistry
         );
     }
 

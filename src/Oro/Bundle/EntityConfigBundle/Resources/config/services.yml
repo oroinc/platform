@@ -77,7 +77,7 @@ services:
     oro_entity_config.tools.command_executor:
         class: '%oro_entity_config.tools.command_executor.class%'
         arguments:
-            - '%kernel.root_dir%/../bin/console'
+            - '%kernel.project_dir%/bin/console'
             - '%kernel.environment%'
             - '@oro_cache.oro_data_cache_manager'
 
@@ -246,6 +246,7 @@ services:
             - '@oro_entity_config.config.config_helper'
             - '@session'
             - '@event_dispatcher'
+            - '@doctrine'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
@@ -457,7 +458,8 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
         lazy: true
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:
@@ -466,3 +468,11 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@form.factory'
+
+    oro_entity_config.topic.attribute_import:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_entity_config.attribute_import'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

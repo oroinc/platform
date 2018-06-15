@@ -1,7 +1,9 @@
 /* @theme: admin.oro; */
 
-@import "colors";
+@import "bowerassets/font-awesome/scss/_variables";
 @import "bootstrap/variables";
+
+@import "colors";
 
 // Oro variables
 $enable-safe-area:                      true;
@@ -14,7 +16,7 @@ $margin-bottom-box:                     $content-padding;
 $general-border-color:                  #ddd;
 $width-page:                            960px;
 $width-body-page:                       980px;
-$width-popup:                           $width-page/2;
+$width-popup:                           480px;
 $width-close-panel:                     25px;
 $width-left-panel:                      230px;
 $width-left-panel2:                     210;

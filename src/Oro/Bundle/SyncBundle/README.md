@@ -1,6 +1,6 @@
 # OroSyncBundle
 
-OroSyncBundle uses [JDareClankBundle](https://github.com/JDare/ClankBundle) to enable real-time WebSocket notifications between an Oro application server and users' browsers.
+OroSyncBundle uses [GosWebSocketBundle](https://github.com/GeniusesOfSymfony/WebSocketBundle) to enable real-time websocket notifications between an Oro application server and users' browsers.
 
 Out-of-the-box, OroSyncBundle triggers flash notifications about the outdated content if several users try to edit the same entity record simultaneously. It also sends flash notifications to all application site visitors once a developer turns on the system maintenance mode by a console's CLI tool.
 
@@ -18,8 +18,8 @@ Set host, port and path (optional) for websocket server in parameters.yml
     websocket_backend_path:  ""
 ```
 
-Since Clank server is running as a service, there are three host:port pairs for configuration:
-- `websocket_bind_port` and `websocket_bind_address` specify port and address to which the Clank server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
+Since websocket server is running as a service, there are three host:port pairs for configuration:
+- `websocket_bind_port` and `websocket_bind_address` specify port and address to which websocket server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
 - `websocket_backend_port` and `websocket_backend_host`, `websocket_backend_path` specify port and address (`websocket_backend_host` plus `websocket_backend_path` URI) to which the application should connect (PHP). By default ("*"), it connects to 127.0.0.1 address.
 - `websocket_frontend_port` and `websocket_frontend_host`, `websocket_backend_path` specify port and address (`websocket_frontend_host` plus `websocket_backend_path` URI) to which the browser should connect (JS). By default ("*"), it connects to host specified in the browser.
 
@@ -27,9 +27,9 @@ Instead of specifying all 3 sets of host:port parameters, it is possible to use 
 
 ## Configuration of secure (SSL/WSS) connection ##
 
-Currently direct backend WebSocket SSL/WSS connections are not supported.
+Currently direct backend websocket SSL/WSS connections are not supported.
 
-To achieve WSS connection for your websocket communication on frontend you should configure additional reverse proxy before Clank server.
+To achieve WSS connection for your websocket communication on frontend you should configure additional reverse proxy before websocket server.
 Example configuration provided below.
 
 Set websocket settings in parameters.yml
@@ -99,20 +99,34 @@ server {
 You should be able to run this from the root of your symfony installation:
 
 ``` bash
-php bin/console clank:server
+php bin/console gos:websocket:server
 ```
 
-If everything is successful, you will see something similar to the following:
+If everything is successful, you will see no output in prod mode, and something similar to the following in dev mode:
 
 ``` bash
-Starting Clank
-Launching Ratchet WS Server on: 127.0.0.1:8080
+INFO      [websocket] Starting web socket
+INFO      [websocket] Launching Ratchet on 127.0.0.1:8080 PID: 4675
 ```
 
 This means the websocket server is now up and running!
 
+## Logging levels
+Logging levels are different in dev and prod modes by default.
+Prod mode:
+* Normal: WARNING and higher
+* Verbose (-v): NOTICE and higher
+* Very verbose (-vv): INFO and higher
+* Debug (-vvv): DEBUG and higher
+
+Dev mode:
+* Normal: INFO and higher
+* Verbose (-v): DEBUG and higher
+
 ## Content Outdating
 
-* [Content Outdating Notifications](./Resources/doc/content_outdating.md)
-* [Mediator Handlers](./Resources/doc/mediator-handlers.md)
+* [Client](./Resources/doc/client.md)
+* [Topics and handlers](./Resources/doc/topics-handlers.md)
 * [Authentication](./Resources/doc/authentication.md)
+* [Content Outdating Notifications](./Resources/doc/content-outdating.md)
+* [Mediator Handlers](./Resources/doc/mediator-handlers.md)

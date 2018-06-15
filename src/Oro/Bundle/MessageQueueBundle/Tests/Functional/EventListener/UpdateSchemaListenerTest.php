@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\EventListener;
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
 use Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
@@ -99,7 +99,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     }
 
     /**
-     * @return ContainerAwareEventDispatcher
+     * @return EventDispatcherInterface
      */
     protected function getEventDispatcher()
     {

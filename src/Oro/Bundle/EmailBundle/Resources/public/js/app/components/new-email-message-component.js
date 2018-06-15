@@ -34,8 +34,10 @@ define(function(require) {
             sync.subscribe(channel, _.bind(this.onMessage, this));
         },
 
-        onMessage: function(response) {
-            var message = JSON.parse(response);
+        /**
+         * @param {Array} message
+         */
+        onMessage: function(message) {
             if (_.result(message, 'hasNewEmail') === true) {
                 this.debouncedHandler();
             }

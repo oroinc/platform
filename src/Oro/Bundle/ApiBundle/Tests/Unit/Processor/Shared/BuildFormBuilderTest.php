@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\EventListener\EnableFullValidationListener;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -15,10 +14,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class BuildFormBuilderTest extends FormProcessorTestCase
 {
@@ -38,7 +39,13 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container));
+        $this->processor = new BuildFormBuilder(
+            new FormHelper(
+                $this->formFactory,
+                $this->createMock(PropertyAccessorInterface::class),
+                $this->container
+            )
+        );
     }
 
     /**
@@ -119,13 +126,18 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 $formType,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api', 'my_group'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api', 'my_group'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -136,9 +148,6 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function testProcess()
     {
         $entityClass = 'Test\Entity';
@@ -178,55 +187,28 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::at(0))
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::exactly(6))
             ->method('add')
-            ->with(
-                'field1',
-                null,
-                []
-            );
-        $formBuilder->expects(self::at(1))
-            ->method('add')
-            ->with(
-                'field2',
-                null,
-                ['property_path' => 'realField2']
-            );
-        $formBuilder->expects(self::at(2))
-            ->method('add')
-            ->with(
-                'field3',
-                'text',
-                ['property_path' => 'realField3', 'trim' => false]
-            );
-        $formBuilder->expects(self::at(3))
-            ->method('add')
-            ->with(
-                'association1',
-                null,
-                []
-            );
-        $formBuilder->expects(self::at(4))
-            ->method('add')
-            ->with(
-                'association2',
-                null,
-                ['property_path' => 'realAssociation2']
-            );
-        $formBuilder->expects(self::at(5))
-            ->method('add')
-            ->with(
-                'association3',
-                'text',
-                ['property_path' => 'realAssociation3', 'trim' => false]
+            ->withConsecutive(
+                ['field1', null, []],
+                ['field2', null, ['property_path' => 'realField2']],
+                ['field3', 'text', ['property_path' => 'realField3', 'trim' => false]],
+                ['association1', null, []],
+                ['association2', null, ['property_path' => 'realAssociation2']],
+                ['association3', 'text', ['property_path' => 'realAssociation3', 'trim' => false]]
             );
 
         $this->context->setClassName($entityClass);
@@ -258,21 +240,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $parentEntityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $parentEntityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::at(0))
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'field1',
-                null,
-                []
-            );
+            ->with('field1', null, []);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -303,21 +286,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
-        $formBuilder->expects(self::at(0))
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'field1',
-                null,
-                []
-            );
+            ->with('field1', null, []);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -348,21 +332,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
         $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'field1',
-                null,
-                ['mapped' => false]
-            );
+            ->with('field1', null, ['mapped' => false]);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -392,21 +377,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
         $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'field1',
-                null,
-                []
-            );
+            ->with('field1', null, []);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -437,21 +423,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
         $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'association1',
-                null,
-                ['mapped' => false]
-            );
+            ->with('association1', null, ['mapped' => false]);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -481,21 +468,22 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
         $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::once())
             ->method('add')
-            ->with(
-                'association1',
-                null,
-                []
-            );
+            ->with('association1', null, []);
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
@@ -524,10 +512,12 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -567,10 +557,12 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -608,14 +600,19 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -648,14 +645,19 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
 
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
         $formBuilder->expects(self::never())
             ->method('add');
 
@@ -680,23 +682,28 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => true,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);
-
-        $formBuilder->expects(self::once())
-            ->method('addEventSubscriber')
-            ->with(self::isInstanceOf(EnableFullValidationListener::class));
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setMetadata(new EntityMetadata());
         $this->context->setResult($data);
-        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container), true);
+        $this->processor = new BuildFormBuilder(
+            new FormHelper(
+                $this->formFactory,
+                $this->createMock(PropertyAccessorInterface::class),
+                $this->container
+            ),
+            true
+        );
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
@@ -714,10 +721,12 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 FormType::class,
                 $data,
                 [
-                    'data_class'           => $entityClass,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'api_context'          => $this->context
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => false,
+                    'api_context'            => $this->context
                 ]
             )
             ->willReturn($formBuilder);

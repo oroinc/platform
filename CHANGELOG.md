@@ -1,4 +1,5 @@
-## 3.0.0-rc
+## 3.0.0-rc (2018-05-31)
+[Show detailed list of changes](incompatibilities-3-0-rc.md)
 
 ### Added
 #### ApiBundle

@@ -66,7 +66,7 @@ class ConfigEntityGridController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $entityConfig->set('unique_key', $form->getData());
                 $configManager = $entityProvider->getConfigManager();
                 $configManager->persist($entityConfig);
@@ -146,7 +146,7 @@ class ConfigEntityGridController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
                 $this->get('session')->getFlashBag()->add(
                     'success',

@@ -1,3 +1,4 @@
 bundles:
-    - JDare\ClankBundle\JDareClankBundle
+    - Gos\Bundle\WebSocketBundle\GosWebSocketBundle
+    - { name: Gos\Bundle\PubSubRouterBundle\GosPubSubRouterBundle, priority: -250 }
     - { name: Oro\Bundle\SyncBundle\OroSyncBundle, priority: -246 }

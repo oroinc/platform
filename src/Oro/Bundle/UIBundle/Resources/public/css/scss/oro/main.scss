@@ -1,6 +1,8 @@
+/* @theme: admin.oro; */
+
+@import "variables";
 @import "form";
 @import "loading-mask";
-@import "loading-mask-url";
 @import "loading-dots";
 @import "dropdown-mask";
 @import "zoomable-area";
@@ -13,6 +15,7 @@
 @import "modal";
 
 @import "header";
+@import "form-description";
 @import "form-signin";
 @import "datagrid";
 @import "footer";
@@ -21,6 +24,7 @@
 @import "alert";
 @import "inline-actions";
 @import "dropdown-menu-collection";
+@import "error-page";
 @import "nav";
 @import "oro-tabs";
 @import "tab-collection";

@@ -315,3 +315,27 @@ $enable-safe-area: true;
         }
     }
 }
+
+// Mixin for include font-awesome icons to custom elements
+// List of icons https://github.com/FortAwesome/Font-Awesome/blob/v4.7.0/scss/_variables.scss
+// @param $icon (Font Awesome icon)
+// @param $state {CSS pseudo-element}
+@mixin fa-icon($icon: null, $state: before) {
+    @if ($icon) {
+        &:#{$state} {
+            content: '#{$icon}';
+            font-family: 'FontAwesome', $baseFontFamily;
+        }
+    }
+}
+
+// Creates set of keyframes with vendor prefixes
+@mixin keyframe($animation-name) {
+    @-webkit-keyframes $animation-name {
+        @content;
+    }
+
+    @keyframes $animation-name {
+        @content;
+    }
+}

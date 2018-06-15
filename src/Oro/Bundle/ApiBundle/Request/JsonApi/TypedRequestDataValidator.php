@@ -111,7 +111,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                         }
                     }
                 } else {
-                    $this->addError($pointer, 'The primary data object collection should not be an array');
+                    $this->addError($pointer, 'The primary data object collection should be an array');
                 }
                 if ($allowIncludedResources) {
                     $this->validateIncludedResources($requestData);

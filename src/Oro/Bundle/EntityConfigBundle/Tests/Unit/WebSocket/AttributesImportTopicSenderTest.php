@@ -4,7 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\WebSocket;
 
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -16,9 +17,14 @@ class AttributesImportTopicSenderTest extends \PHPUnit_Framework_TestCase
     const USER_ID = 44;
 
     /**
-     * @var TopicPublisher|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $publisher;
+    protected $websocketClient;
+
+    /**
+     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $connectionChecker;
 
     /**
      * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -32,9 +38,15 @@ class AttributesImportTopicSenderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->publisher = $this->createMock(TopicPublisher::class);
+        $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
+        $this->connectionChecker = $this->createMock(ConnectionChecker::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->attributesImportTopicSender = new AttributesImportTopicSender($this->publisher, $this->tokenAccessor);
+
+        $this->attributesImportTopicSender = new AttributesImportTopicSender(
+            $this->websocketClient,
+            $this->connectionChecker,
+            $this->tokenAccessor
+        );
     }
 
     public function testGetTopicWhenNoUser()
@@ -85,13 +97,36 @@ class AttributesImportTopicSenderTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->willReturn($user);
 
-        $this->publisher
+        $this->connectionChecker
             ->expects($this->once())
-            ->method('send')
+            ->method('checkConnection')
+            ->willReturn(true);
+
+        $this->websocketClient
+            ->expects($this->once())
+            ->method('publish')
             ->with(
                 sprintf(AttributesImportTopicSender::TOPIC, self::USER_ID, self::CONFIG_MODEL_ID),
-                json_encode(['finished' => true])
+                ['finished' => true]
             );
+
+        $this->attributesImportTopicSender->send(self::CONFIG_MODEL_ID);
+    }
+
+    public function testSendNoConnection()
+    {
+        $this->tokenAccessor
+            ->expects($this->never())
+            ->method($this->anything());
+
+        $this->connectionChecker
+            ->expects($this->once())
+            ->method('checkConnection')
+            ->willReturn(false);
+
+        $this->websocketClient
+            ->expects($this->never())
+            ->method($this->anything());
 
         $this->attributesImportTopicSender->send(self::CONFIG_MODEL_ID);
     }

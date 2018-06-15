@@ -1,4 +1,4 @@
-/* @theme: admin.oro */
+/* @theme: admin.oro; */
 
 .grid-toolbar {
     position: relative;
@@ -151,12 +151,6 @@
                 }
             }
         }
-    }
-
-    > .loader-mask {
-        left: $vertical-padding;
-        right: $vertical-padding;
-        top: $top-padding/2;
     }
 }
 

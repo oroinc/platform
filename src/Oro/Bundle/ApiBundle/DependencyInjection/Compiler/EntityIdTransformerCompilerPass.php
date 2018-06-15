@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all entity identifir transformers.
+ * Registers all entity identifier transformers.
  */
 class EntityIdTransformerCompilerPass implements CompilerPassInterface
 {
@@ -26,7 +25,7 @@ class EntityIdTransformerCompilerPass implements CompilerPassInterface
         foreach ($taggedServices as $id => $attributes) {
             foreach ($attributes as $tagAttributes) {
                 $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
-                    new Reference($id),
+                    $id,
                     DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
                 ];
             }

@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * This is the class that validates and merges configuration from your app/config files
+ * This is the class that validates and merges configuration from your config files
  */
 class Configuration implements ConfigurationInterface
 {
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('oro_entity_extend')
             ->children()
-                ->scalarNode('backup')->cannotBeEmpty()->defaultValue('%kernel.root_dir%/backup')->end()
+                ->scalarNode('backup')->cannotBeEmpty()->defaultValue('%kernel.project_dir%/var/backup')->end()
             ->end();
 
         return $treeBuilder;

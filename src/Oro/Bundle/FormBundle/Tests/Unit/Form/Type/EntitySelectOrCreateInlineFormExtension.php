@@ -8,6 +8,7 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
 {
@@ -49,7 +50,7 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
         return [
             new OroJquerySelect2HiddenType($this->em, $this->searchRegistry, $this->configProvider),
             new Select2Type(
-                'Symfony\Component\Form\Extension\Core\Type\HiddenType',
+                HiddenType::class,
                 'oro_select2_hidden'
             )
         ];

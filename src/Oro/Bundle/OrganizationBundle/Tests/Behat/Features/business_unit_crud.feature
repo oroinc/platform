@@ -21,7 +21,7 @@ Feature: Business Unit crud
       | Email       | acme@example.com   |
       | Fax         | 45-96-24           |
       | Description | Important guy      |
-    And I check first one record in 1 column
+    And I check first one record in 0 column
     When I save and close form
     Then I should see "Business unit saved" flash message
     And I should see Business Unit with:

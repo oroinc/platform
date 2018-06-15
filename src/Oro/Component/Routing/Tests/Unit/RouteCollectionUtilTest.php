@@ -15,16 +15,27 @@ class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
         $src->add('route1', new Route('/route1'));
         $src->add('route2', new Route('/route2', [], [], ['hidden' => true]));
         $src->add('route3', new Route('/route3', [], [], ['hidden' => false]));
-        $src->addResource(new DirectoryResource('resource1'));
-        $src->addResource(new DirectoryResource('resource2'));
+
+        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource1 */
+        $resource1 = $this->createMock(DirectoryResource::class);
+        $resource1->expects($this->any())
+            ->method('getResource')
+            ->willReturn('resource1');
+
+        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource2 */
+        $resource2 = $this->createMock(DirectoryResource::class);
+        $resource2->expects($this->any())
+            ->method('getResource')
+            ->willReturn('resource2');
+
+        $src->addResource($resource1);
+        $src->addResource($resource2);
 
         $result = RouteCollectionUtil::cloneWithoutHidden($src);
 
         $this->assertCount(2, $result);
         $this->assertNotNull($result->get('route1'));
         $this->assertNotNull($result->get('route3'));
-
-        $this->assertCount(2, $result->getResources());
     }
 
     public function testCloneWithoutHiddenWithExistingDestination()
@@ -33,8 +44,21 @@ class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
         $src->add('route1', new Route('/route1'));
         $src->add('route2', new Route('/route2', [], [], ['hidden' => true]));
         $src->add('route3', new Route('/route3', [], [], ['hidden' => false]));
-        $src->addResource(new DirectoryResource('resource1'));
-        $src->addResource(new DirectoryResource('resource2'));
+
+        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource1 */
+        $resource1 = $this->createMock(DirectoryResource::class);
+        $resource1->expects($this->any())
+            ->method('getResource')
+            ->willReturn('resource1');
+
+        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource2 */
+        $resource2 = $this->createMock(DirectoryResource::class);
+        $resource2->expects($this->any())
+            ->method('getResource')
+            ->willReturn('resource2');
+
+        $src->addResource($resource1);
+        $src->addResource($resource2);
 
         $dest = new RouteCollection();
 
@@ -45,8 +69,6 @@ class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $result);
         $this->assertNotNull($result->get('route1'));
         $this->assertNotNull($result->get('route3'));
-
-        $this->assertCount(2, $result->getResources());
     }
 
     public function testFilterHidden()

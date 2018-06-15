@@ -2,7 +2,7 @@ knp_gaufrette:
     adapters:
         importexport:
             local:
-                directory: '%kernel.root_dir%/import_export'
+                directory: '%kernel.project_dir%/var/%oro_importexport.importexport_dir%'
     filesystems:
         importexport:
             adapter:    importexport

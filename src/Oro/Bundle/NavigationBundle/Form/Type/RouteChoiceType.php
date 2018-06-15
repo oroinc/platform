@@ -68,8 +68,6 @@ class RouteChoiceType extends AbstractType
     {
         $resolver->setRequired('menu_name');
 
-        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-        $resolver->setDefault('choices_as_values', true);
         $resolver->setDefault('path_filter', null);
         $resolver->setDefault('name_filter', '/^oro_\w+$/');
         $resolver->setDefault('options_filter', []);

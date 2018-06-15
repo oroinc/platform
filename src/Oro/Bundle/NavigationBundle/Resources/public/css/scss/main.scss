@@ -1,4 +1,6 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
+
+@import "variables";
 @import "oroui/css/scss/mixins";
 
 .dot-menu {
@@ -7,23 +9,23 @@
 
         .fa-bars {
             position: relative;
+
             padding-top: 3px;
         }
     }
 
     .dropdown-menu {
-        border-radius: 3px;
-        right: -1px !important;
-        margin: 1px 0 0 !important;
         padding: 0;
-        width: 415px !important;
+        width: 425px !important;
+
         outline: none;
 
         .tabs-left {
             > .nav-tabs {
-                border: 0;
                 margin: 0;
-                width: 120px;
+                width: 132px;
+
+                border: 0;
 
                 li {
                     width: auto;
@@ -31,69 +33,37 @@
                     float: none;
 
                     > a {
-                        border: none;
-                        border-bottom: 1px solid darken(#dbe2ea, 2%);
-                        border-radius: 0;
-                        padding: 7px 8px !important;
-                        line-height: 14px;
                         margin-right: 0;
                         margin-bottom: 0;
-                        color: #2f2f2f !important;
+                        padding: 12px 6px 12px 16px !important;
+
+                        line-height: 14px;
                         font-weight: normal !important;
-                        text-shadow: 0 1px 0 #f7fafc;
+
+                        border: none;
+                        border-radius: 0;
+                        color: $dot-menu-nav-tabs-color !important;
+                        text-shadow: none;
 
                         &:hover {
-                            border-bottom: 1px solid darken(#dbe2ea, 2%);
-                            color: #2f2f2f !important;
                             cursor: pointer;
                         }
 
-                        [class^='fa-'] {
-                            color: #8ba1b6;
+                        .menu-icon {
+                            font-size: 16px;
+
+                            color: $dot-menu-nav-tabs-icon-color;
                         }
                     }
 
                     &:hover,
                     &:active,
                     &:focus {
-                        background-color: darken(#ecf1f9, 2%);
+                        background-color: $dot-menu-item-active-background;
                     }
 
                     &.active {
-                        position: relative;
-                        background-color: darken(#ecf1f9, 5%);
-
-                        > a {
-                            font-weight: bold !important;
-                        }
-
-                        &:before {
-                            width: 0;
-                            height: 0;
-                            border-style: solid;
-                            border-width: 7.5px 8px 7.5px 0;
-                            border-color: transparent darken(#ecf1f9, 8%) transparent transparent;
-                            content: '';
-                            display: inline-block;
-                            position: absolute;
-                            right: 0;
-                            top: 7px;
-                            bottom: 0;
-                        }
-
-                        &:after {
-                            width: 0;
-                            height: 0;
-                            border-style: solid;
-                            border-width: 7.5px 8px 7.5px 0;
-                            border-color: transparent #fff transparent transparent;
-                            content: '';
-                            display: inline-block;
-                            position: absolute;
-                            right: -1px;
-                            top: 7px;
-                            bottom: 0;
-                        }
+                        background-color: $dot-menu-item-active-background;
                     }
 
                     &.active a,
@@ -101,7 +71,7 @@
                     a:active,
                     a:focus {
                         background: none;
-                        text-shadow: 0 1px 0 #e6eff8;
+                        text-shadow: none;
                     }
 
                     &:last-child > a {
@@ -111,28 +81,31 @@
             }
 
             &.tabbable {
-                background-color: transparent;
-                border-radius: 3px;
+                padding: 16px;
+
                 overflow: hidden;
             }
 
             > .tab-content {
-                clear: none;
-                border-left: 1px solid darken(#ecf1f9, 8%);
-                background-color: #fff;
+                z-index: 99;
+
+                padding-left: 16px;
                 min-height: $dot-menu-dropdown-min-height;
                 max-height: $dot-menu-dropdown-max-height;
+
+                border: none;
+
                 overflow: auto;
-                z-index: 99;
+                clear: none;
 
                 .tab-pane {
                     .extra-list {
                         li {
                             a {
-                                padding-right: 0 !important;
-                                padding-left: 0 !important;
-                                line-height: 16px;
+                                padding: 0 !important;
                                 display: inline-block;
+
+                                line-height: 16px;
                             }
                         }
                     }
@@ -142,12 +115,12 @@
     }
 
     .extra-list {
-        padding: 6px 0;
-
         li {
-            border-bottom: 1px solid #f2f2f2;
-            padding: 3px 27px 3px 15px;
-            font-size: 12px;
+            position: relative;
+
+            padding: 4px 16px 4px 16px;
+
+            border-bottom: 1px solid $dot-menu-tab-content-item-border-color;
 
             &:last-child {
                 border-bottom: none;
@@ -161,19 +134,32 @@
 
             .close {
                 position: absolute;
-                right: 13px;
-            }
-        }
+                right: 0;
 
-        > li:hover {
-            background-color: #f4f4f4;
+                font-size: 0;
+
+                color: $dot-menu-close-color;
+
+                opacity: 1;
+
+                &:hover {
+                    opacity: .6;
+                }
+
+                @include fa-icon($fa-var-times);
+
+                &:before {
+                    font-size: 15px;
+                }
+            }
         }
     }
 
     .dot-menu-empty-message {
         padding: ($dot-menu-dropdown-min-height / 2 - 10px) 15px 15px;
+
         text-align: center;
-        color: lighten($body-color, 30%);
-        font-style: italic;
+
+        color: $dot-menu-empty-message-color;
     }
 }

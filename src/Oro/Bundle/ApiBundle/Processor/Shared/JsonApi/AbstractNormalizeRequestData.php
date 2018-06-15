@@ -9,7 +9,9 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -20,35 +22,40 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {
+    protected const ROOT_POINTER = '';
+
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    protected $entityIdTransformerRegistry;
 
     /** @var FormContext */
     protected $context;
 
     /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
-    public function __construct(ValueNormalizer $valueNormalizer, EntityIdTransformerInterface $entityIdTransformer)
-    {
+    public function __construct(
+        ValueNormalizer $valueNormalizer,
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
+    ) {
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
+     * @param string              $pointer
      * @param array               $data
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    protected function normalizeData(array $data, EntityMetadata $metadata = null): array
+    protected function normalizeData(string $pointer, array $data, ?EntityMetadata $metadata): array
     {
         $relations = \array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
-            ? $this->normalizeRelationships($data[JsonApiDoc::RELATIONSHIPS], $metadata)
+            ? $this->normalizeRelationships($pointer, $data[JsonApiDoc::RELATIONSHIPS], $metadata)
             : [];
 
         return !empty($data[JsonApiDoc::ATTRIBUTES])
@@ -57,18 +64,16 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
+     * @param string              $pointer
      * @param array               $relationships
      * @param EntityMetadata|null $metadata
      *
      * @return array
      */
-    protected function normalizeRelationships(array $relationships, EntityMetadata $metadata = null): array
+    protected function normalizeRelationships(string $pointer, array $relationships, ?EntityMetadata $metadata): array
     {
         $relations = [];
-        $relationshipsPointer = $this->buildPointer(
-            $this->buildPointer('', JsonApiDoc::DATA),
-            JsonApiDoc::RELATIONSHIPS
-        );
+        $relationshipsPointer = $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS);
         foreach ($relationships as $name => $value) {
             $relationshipsDataItemPointer = $this->buildPointer(
                 $this->buildPointer($relationshipsPointer, $name),
@@ -116,7 +121,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     protected function normalizeRelationshipItem(
         string $pointer,
         array $data,
-        AssociationMetadata $associationMetadata = null
+        ?AssociationMetadata $associationMetadata
     ): array {
         $entityClass = $this->normalizeEntityClass(
             $this->buildPointer($pointer, JsonApiDoc::TYPE),
@@ -124,12 +129,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         );
         $entityId = $data[JsonApiDoc::ID];
         if (false !== \strpos($entityClass, '\\')) {
-            if (null !== $associationMetadata
-                && !$this->isAcceptableTargetClass($entityClass, $associationMetadata)
-            ) {
-                $this->addValidationError(Constraint::ENTITY_TYPE, $this->buildPointer($pointer, JsonApiDoc::TYPE))
-                    ->setDetail('Not acceptable entity type.');
-            } else {
+            if ($this->isAcceptableTargetClass($entityClass, $associationMetadata)) {
                 $targetMetadata = null;
                 if (null !== $associationMetadata) {
                     $targetMetadata = $associationMetadata->getTargetMetadata();
@@ -140,6 +140,9 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
                     $entityId,
                     $targetMetadata
                 );
+            } else {
+                $this->addValidationError(Constraint::ENTITY_TYPE, $this->buildPointer($pointer, JsonApiDoc::TYPE))
+                    ->setDetail('Not acceptable entity type.');
             }
         }
 
@@ -150,13 +153,17 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string              $entityClass
-     * @param AssociationMetadata $associationMetadata
+     * @param string                   $entityClass
+     * @param AssociationMetadata|null $associationMetadata
      *
      * @return bool
      */
-    protected function isAcceptableTargetClass(string $entityClass, AssociationMetadata $associationMetadata): bool
+    protected function isAcceptableTargetClass(string $entityClass, ?AssociationMetadata $associationMetadata): bool
     {
+        if (null === $associationMetadata) {
+            return true;
+        }
+
         $acceptableClassNames = $associationMetadata->getAcceptableTargetClassNames();
         if (empty($acceptableClassNames)) {
             return $associationMetadata->isEmptyAcceptableTargetsAllowed();
@@ -199,7 +206,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         string $pointer,
         string $entityClass,
         $entityId,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata
     ) {
         // keep the id of the primary and an included entity as is
         $includedEntities = $this->context->getIncludedEntities();
@@ -218,13 +225,24 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         }
 
         try {
-            return $this->entityIdTransformer->reverseTransform($entityId, $metadata);
+            return $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $metadata);
         } catch (\Exception $e) {
             $this->addValidationError(Constraint::ENTITY_ID, $pointer)
                 ->setInnerException($e);
         }
 
         return $entityId;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
     /**

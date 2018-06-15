@@ -164,7 +164,7 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
         $elementPath = $path;
         $elementErrorCount = count($this->errors);
         $elementErrors = array_slice($this->errors, $initialErrorCount, $elementErrorCount - $initialErrorCount);
-        $this->errors = array_slice($this->errors, 0, -$initialErrorCount);
+        $this->errors = array_slice($this->errors, 0, $initialErrorCount);
         $lastPathIndex = count($path);
         foreach ($actual as $key => $value) {
             if ($key === $expectedKey || in_array($key, $processedKeys, true)) {

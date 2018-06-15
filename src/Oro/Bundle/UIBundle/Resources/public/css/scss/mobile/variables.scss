@@ -1,14 +1,20 @@
-$accordion-heading-background-color:          #eaeaea;
+/* @theme: admin.oro; */
+
+@import "../colors";
+@import "variables/app-header";
+@import "variables/form-description";
+
+$accordion-heading-background-color:        #eaeaea;
 $content-padding:                           10px;
 $horizontal-padding:                        $content-padding;
 $vertical-padding:                          $content-padding;
 $top-padding:                               $content-padding;
 $bottom-padding:                            $content-padding;
-$margin-bottom-box:                          $content-padding;
-$base-font-size:                             14px;
+$margin-bottom-box:                         $content-padding;
+$base-font-size:                            14px;
 
-$base-font-size--l:                            $base-font-size * 1.25; // ~18px
-$base-font-size--s:                            $base-font-size * 0.85; // ~12px
-$base-font-size--m:                             $base-font-size * 0.75; // ~11px
+$base-font-size--l:                         $base-font-size * 1.25; // ~18px
+$base-font-size--s:                         $base-font-size * 0.85; // ~12px
+$base-font-size--m:                         $base-font-size * 0.75; // ~11px
 
 $headerHeight:                             54px;

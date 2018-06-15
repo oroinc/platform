@@ -53,6 +53,8 @@ In maintenance mode all cron jobs disabled for execution.
 
 Other documentation could be found [here](https://github.com/lexik/LexikMaintenanceBundle/blob/master/Resources/doc/index.md).
 
+**Note**: Ensure that you have read bundle documentation to understand how the installed OroHealthCheckBundle affects
+the default behavior of the maintenance mode.
 
 ## Lazy services
 
@@ -86,7 +88,7 @@ lazy_services:
 
 ## Add application configuration settings from any bundle
 
-Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _app/config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _app/config.yml_.
+Sometime you need to add some settings to the application configuration from your bundle. For instance a bundle can implement new data type for Doctrine. The more native way to register it is to change _config.yml_. But it is the better way to achieve the same result if your bundle is used in ORO Platform. In this case you just need to add _app.yml_ in _Resources/config/oro_ directory of your bundle and the platform will add all setting from this file to the application configuration. The format of _app.yml_ is the same as _config.yml_.
 The following example shows how `money` data type can be registered:
 
 ``` yaml
@@ -96,7 +98,7 @@ doctrine:
             money: Oro\Bundle\EntityBundle\Entity\Type\MoneyType
 ```
 
-Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
+Please note that setting added through _app.yml_ can be overwrote in _config.yml_. So, you can consider settings in _app.yml_ as default ones.
 
 
 ## Optional listeners

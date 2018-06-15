@@ -31,6 +31,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $loader->load('layouts.yml');
         $loader->load('ownership.yml');
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');

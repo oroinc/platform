@@ -124,7 +124,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
         $errors = array_merge(
-            (array)$this->strategyHelper->validateEntity($entity, ['FieldConfigModel']),
+            (array)$this->strategyHelper->validateEntity($entity, null, ['FieldConfigModel']),
             $this->validateEntityFields($entity)
         );
 

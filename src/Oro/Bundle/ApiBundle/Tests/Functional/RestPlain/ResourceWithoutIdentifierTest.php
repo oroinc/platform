@@ -13,7 +13,7 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             'GET',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
@@ -35,7 +35,7 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType]),
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
             $data
         );
 
@@ -58,7 +58,7 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType]),
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
             $data
         );
 
@@ -77,7 +77,7 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             'DELETE',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
@@ -92,7 +92,7 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             'POST',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType]),
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
             $data
         );
 
@@ -169,10 +169,9 @@ class ResourceWithoutIdentifierTest extends RestPlainApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(
             $method,
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405, $method);
+        self::assertMethodNotAllowedResponse($response, $expectedAllowedMethods, $method);
         self::assertResponseContentTypeEquals($response, self::JSON_CONTENT_TYPE, $method);
-        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $method);
     }
 }

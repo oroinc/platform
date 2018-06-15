@@ -30,16 +30,12 @@ class WidgetSortByType extends AbstractType
         $builder
             ->add('property', ChoiceType::class, [
                 'label' => false,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => $this->createPropertyChoices($options['class_name']),
                 'required' => false,
                 'placeholder' => 'oro.dashboard.widget.sort_by.property.placeholder',
             ])
             ->add('order', ChoiceType::class, [
                 'label' => false,
-                // TODO: remove 'choices_as_values' option and 'array_flip' function below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => [
                     'oro.dashboard.widget.sort_by.order.asc.label' => 'ASC',
                     'oro.dashboard.widget.sort_by.order.desc.label' => 'DESC',

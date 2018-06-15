@@ -15,7 +15,7 @@
                     <h1 class="user-name">
                         {% if recordUrl is defined %}<a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>{% endif %}
                             {{ title }}
-                            {% if recordUrl is defined %}</a>{% endif %}
+                        {% if recordUrl is defined %}</a>{% endif %}
                     </h1>
                 </div>
                 {% block additional_info %}

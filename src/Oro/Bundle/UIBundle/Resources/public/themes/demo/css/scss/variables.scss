@@ -1,15 +1,14 @@
-/** Demo Theme */
-$base-gradient-color-start:          #4580ea;
-$base-gradient-color-end:            #3167c9;
-$base-gradient-color-border:         darken($base-gradient-color-end, 20%);
-$logo-background-color:             darken($base-gradient-color-end, 15%);
-$title-background-start:            #4580ea;
-$title-background-end:              #3167c9;
-$header-icon-button-color-start:      #578df0;
-$headerIconButtonColorEnd:        #578df0;
-$link-color:                       #005db4;
+/* @theme: admin.demo; */
 
-$header-icon-button-color-start:      #5c93f2;
+$primary:     #233e67;
+$secondary:   #0C9ea3;
+$extra:       #f9e500;
+
+@import "../../../../css/scss/variables";
+@import "../../../../css/scss/oro/variables";
+
+/** Demo Theme */
+$titleBackgroundStart:            #4580ea;
+$titleBackgroundEnd:              #3167c9;
+$headerIconButtonColorStart:      #5c93f2;
 $headerIconButtonColorEnd:        #4c7ac9;
-$headerIconButtonTextColor:       #eee;
-$headerTextColor:                 #ebeef4;

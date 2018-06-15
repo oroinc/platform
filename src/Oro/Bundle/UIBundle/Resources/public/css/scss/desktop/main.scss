@@ -1,10 +1,14 @@
+/* @theme: admin.oro; */
+
 .desktop-version {
-  @import "header";
-  @import "main-menu";
+  @import "variables";
+  @import "app-header";
+  @import "main-menu/main";
   @import "page-header";
   @import "scrollspy";
   @import "pin-bar";
   @import "form";
   @import "filter";
   @import "layout";
+  @import "login";
 }

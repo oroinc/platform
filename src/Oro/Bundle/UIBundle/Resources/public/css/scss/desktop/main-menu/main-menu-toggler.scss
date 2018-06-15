@@ -1,0 +1,44 @@
+/* @theme: admin.oro; */
+
+.main-menu-toggler {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    width: 48px;
+
+    padding-top: 14px;
+    padding-bottom: 14px;
+
+    font-size: 16px;
+    line-height: 1;
+
+    background-color: transparent;
+    border: 0;
+    color: $menu-toggler-color;
+
+    cursor: pointer;
+
+    &__icon {
+        transition: $menu-animation;
+    }
+
+    &:hover,
+    &:focus {
+        outline: none;
+
+        background-color: $menu-dropdown-background-color-active;
+
+        color: $menu-item-first-level-text-color-active;
+    }
+}
+
+.minimized {
+    .main-menu-toggler {
+        width: 100%;
+
+        &__icon {
+            transform: rotate(180deg);
+        }
+    }
+}

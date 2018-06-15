@@ -1,5 +1,9 @@
 # Documenting API Resources
 
+ - [Overview](.md#overview)
+ - [Documentation File Format](#documentation-file-format)
+
+
 ## Overview
 
 Documentation is an important part of API and helps developers to use your API. Therefore, it is necessary to provide detailed documentation for your API resources.
@@ -91,7 +95,9 @@ The fourth level `####` (h4) header can be used only for the **FIELDS** and **SU
 Use it for the **FIELDS** section when you need to specify a description for a field in a particular action. 
 Use it for the **SUBRESOURCES** section when you need to specify a sub-resource action name.
 
-The action names in **FIELDS** section can be combined using comma, e.g. "Create, Update". It helps avoid copy-pasting when you need the same description for several actions.
+The action names in **FIELDS** section can be combined using comma, e.g. "create, update". It helps avoid copy-pasting when you need the same description for several actions.
+
+The description of filters should be a plain text, the markdown markup language is not supported there.
 
 **Example:**
 
@@ -139,7 +145,7 @@ The documentation for a sub-resource action. It is a "get_subresource" action fo
 May contain any formatting e.g.: ordered or unordered lists, request or response examples, links, text in bold or italic, etc.
 ```
 
-Use the `{@inheritdoc}` placeholder to get the common documentation for an action or a field. This placeholder works only for the **ACTIONS** and **FIELDS** sections.
+Use the `{@inheritdoc}` placeholder to get the common documentation for an action, a field or a filter. This placeholder works only for the **ACTIONS**, **FIELDS** and **FILTERS** sections.
 
 **Example:**
 
@@ -151,6 +157,7 @@ Use the `{@inheritdoc}` placeholder to get the common documentation for an actio
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
@@ -184,14 +191,13 @@ For example, to add a text for the JSON API request type for all requests exclud
 ### create
 
 Create a new Acme entity record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/entities>`
 
 ` ` `JSON
 {

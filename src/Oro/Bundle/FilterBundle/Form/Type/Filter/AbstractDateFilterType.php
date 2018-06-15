@@ -180,8 +180,6 @@ abstract class AbstractDateFilterType extends AbstractType
             'part',
             ChoiceType::class,
             [
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => array_flip($options['date_parts']),
             ]
         );

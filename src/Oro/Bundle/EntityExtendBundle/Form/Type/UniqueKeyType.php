@@ -32,8 +32,6 @@ class UniqueKeyType extends AbstractType
             array(
                 'label' => 'oro.entity_extend.form.key.label',
                 'multiple' => true,
-                // TODO: remove 'choices_as_values' option and array_flip function below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices'  => $options['key_choices'],
                 'required' => true,
                 'constraints' => [new Assert\NotBlank()]

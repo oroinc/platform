@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\CronBundle\Command\CronCommand:
+        public: false
+        class: Oro\Bundle\CronBundle\Command\CronCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand:
+        public: false
+        class: Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand
+        tags:
+            - { name: console.command }

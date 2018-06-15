@@ -10,10 +10,6 @@ oro_ui_1column_menu:
     path:  /ui/1column-menu
     defaults: { _controller: FrameworkBundle:Template:template, template: "OroUIBundle:Default:oneColumnMenu.html.twig" }
 
-oro_ui_1column_toolbar:
-    path:  /ui/1column-toolbar
-    defaults: { _controller: FrameworkBundle:Template:template, template: "OroUIBundle:Default:oneColumnWithToolbar.html.twig" }
-
 oro_ui_2columns_left:
     path:  /ui/2columns-left
     defaults: { _controller: FrameworkBundle:Template:template, template: "OroUIBundle:Default:twoColumnLeft.html.twig" }

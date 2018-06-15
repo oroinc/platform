@@ -24,6 +24,7 @@ class OroActionExtension extends Extension
         $loader->load('actions.yml');
         $loader->load('services.yml');
         $loader->load('duplicator.yml');
+        $loader->load('commands.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');

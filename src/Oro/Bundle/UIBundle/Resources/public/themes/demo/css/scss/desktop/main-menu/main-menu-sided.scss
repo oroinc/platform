@@ -1,0 +1,71 @@
+/* @theme: admin.demo; */
+
+.main-menu-sided {
+    background-color: $menu-background-color;
+
+    .accordion-group {
+        .menu {
+            .title,
+            .accordion-toggle {
+                color: $menu-item-text-color;
+
+                &::before {
+                    color: $menu-accordion-icon-color;
+                }
+            }
+
+            .title {
+                &:hover {
+                    background-color: $menu-background-color-active;
+                }
+            }
+        }
+    }
+
+    .accordion-body {
+        background-color: $menu-dropdown-background-color;
+
+        .active {
+            background-color: $menu-background-color-active;
+        }
+    }
+
+    // First level
+    .accordion-toggle.title-level-1 {
+        background-color: $menu-dropdown-background-color-active;
+        color: $menu-item-first-level-text-color;
+
+        &.collapsed {
+            background-color: $menu-background-color;
+        }
+
+        &:hover {
+            background-color: $menu-dropdown-background-color-active;
+        }
+    }
+
+    &.minimized {
+        // First level
+        .dropdown-level-1 {
+            &:hover {
+                background-color: $menu-dropdown-background-color-active;
+
+                .unclickable {
+                    color: $menu-item-first-level-text-color-active;
+                }
+            }
+
+            &.active {
+                background-color: $menu-dropdown-background-color;
+
+                > .unclickable .title {
+                    color: $menu-minimized-item-first-level-text-color-active;
+                }
+            }
+        }
+
+        .title-level-1 {
+            color: $menu-item-first-level-text-color;
+        }
+    }
+}

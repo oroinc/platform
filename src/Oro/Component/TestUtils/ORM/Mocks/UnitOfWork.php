@@ -2,6 +2,7 @@
 
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork as BaseUnitOfWork;
 
 class UnitOfWork extends BaseUnitOfWork
@@ -82,7 +83,7 @@ class UnitOfWork extends BaseUnitOfWork
     /**
      * {@inheritdoc}
      */
-    public function getEntityChangeSet($entity)
+    public function & getEntityChangeSet($entity)
     {
         return $this->changeSets[spl_object_hash($entity)];
     }

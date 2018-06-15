@@ -1,4 +1,4 @@
-// @theme: admin;
+/* @theme: admin.oro; */
 @import '../variables/oro/button-variables';
 
 // Bootstrap - Buttons
@@ -314,6 +314,13 @@
             left: $btn-icon-fa-left;
             transform: $btn-icon-fa-transform;
         }
+    }
+
+    &-login-roles {
+        width: 100%;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: block;
     }
 
     &.process {

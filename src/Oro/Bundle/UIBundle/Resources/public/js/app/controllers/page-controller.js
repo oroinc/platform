@@ -216,10 +216,16 @@ define([
          */
         onPageInvalid: function(model, error, options) {
             var pathDesc;
+            var redirectOptions;
             if (error.redirect) {
                 pathDesc = {url: error.location};
-                _.extend(options.actionArgs.options, _.pick(error, ['redirect', 'fullRedirect']));
-                this._processRedirect(pathDesc, options.actionArgs.options);
+                redirectOptions = _.extend(
+                    {replace: true},
+                    options.actionArgs.options,
+                    _.pick(error, ['redirect', 'fullRedirect'])
+                );
+
+                this._processRedirect(pathDesc, redirectOptions);
             }
         },
 

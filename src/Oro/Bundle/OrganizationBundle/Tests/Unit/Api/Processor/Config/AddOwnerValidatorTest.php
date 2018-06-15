@@ -78,7 +78,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['constraints' => [new Owner()]],
+            ['constraints' => [new Owner(['groups' => ['api']])]],
             $configObject->getFormOptions()
         );
     }
@@ -134,7 +134,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['constraints' => [new Owner()]],
+            ['constraints' => [new Owner(['groups' => ['api']])]],
             $configObject->getFormOptions()
         );
     }

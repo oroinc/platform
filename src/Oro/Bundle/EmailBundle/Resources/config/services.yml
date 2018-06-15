@@ -256,7 +256,8 @@ services:
     oro_email.email_websocket.processor:
         class: '%oro_email.email_websocket.processor.class%'
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
 
     oro_email.event_listener.email_user_listener:
         class: '%oro_email.event_listener.email_user_listener.class%'
@@ -440,12 +441,6 @@ services:
         arguments:
             - '%oro_email.email_origin.entity.class%'
             - '@doctrine.orm.entity_manager'
-
-    oro_email.util.configurable_transport:
-        class: Oro\Bundle\EmailBundle\Util\ConfigurableTransport
-        arguments:
-            - '@oro_email.provider.smtp_settings'
-            - '@swiftmailer.mailer.default.transport.real'
 
     oro_email.direct_mailer:
         class: '%oro_email.direct_mailer.class%'
@@ -1239,11 +1234,6 @@ services:
         arguments:
             - '@oro_email.direct_mailer'
 
-    oro_email.command.email_body_sync:
-        class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
-        tags:
-            - { name: console.command }
-
     oro_email.listener.datagrid.user_email_grid_listener:
         class: Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener
         arguments:
@@ -1279,3 +1269,11 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_email.topic.event:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_email.event'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

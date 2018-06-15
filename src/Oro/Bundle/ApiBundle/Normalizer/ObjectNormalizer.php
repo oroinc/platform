@@ -12,6 +12,14 @@ use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 
+/**
+ * Converts an object to an array.
+ * This class should be synchronized with EntitySerializer, the difference between this class
+ * and EntitySerializer is that this class does not load data from the database.
+ * @see \Oro\Component\EntitySerializer\EntitySerializer
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ObjectNormalizer
 {
     const MAX_NESTING_LEVEL = 1;
@@ -150,14 +158,11 @@ class ObjectNormalizer
     protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config, $context)
     {
         if (!$config->isExcludeAll()) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" must be "%s". Object type: "%s".',
-                    EntityDefinitionConfig::EXCLUSION_POLICY,
-                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL,
-                    ClassUtils::getClass($object)
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The exclusion policy must be "%s". Object type: "%s".',
+                ConfigUtil::EXCLUSION_POLICY_ALL,
+                ClassUtils::getClass($object)
+            ));
         }
 
         $result = [];
@@ -204,6 +209,7 @@ class ObjectNormalizer
                 $context,
                 $referenceFields
             );
+            $result = $this->handleFieldsReferencedToChildFields($result, $object, $referenceFields);
         }
 
         $postSerializeHandler = $config->getPostSerializeHandler();
@@ -282,6 +288,43 @@ class ObjectNormalizer
         }
 
         return $value;
+    }
+
+    /**
+     * @param array  $serializedData
+     * @param object $object
+     * @param array  $fields
+     *
+     * @return array
+     */
+    protected function handleFieldsReferencedToChildFields(array $serializedData, $object, array $fields)
+    {
+        foreach ($fields as $fieldName => $propertyPath) {
+            if (\array_key_exists($fieldName, $serializedData)) {
+                continue;
+            }
+            $lastFieldName = \array_pop($propertyPath);
+            $currentObject = $object;
+            foreach ($propertyPath as $currentFieldName) {
+                $value = null;
+                if ($this->dataAccessor->tryGetValue($currentObject, $currentFieldName, $value)) {
+                    $currentObject = $value;
+                } else {
+                    $currentObject = null;
+                }
+                if (null === $currentObject) {
+                    break;
+                }
+            }
+            if (null !== $currentObject) {
+                $value = null;
+                if ($this->dataAccessor->tryGetValue($currentObject, $lastFieldName, $value)) {
+                    $serializedData[$fieldName] = $value;
+                }
+            }
+        }
+
+        return $serializedData;
     }
 
     /**
