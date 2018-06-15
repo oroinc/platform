@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\SyncBundle\Twig;
 
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Adds TWIG functions for interaction with websocket server
+ */
 class OroSyncExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -20,19 +23,19 @@ class OroSyncExtension extends \Twig_Extension
     }
 
     /**
-     * @return TopicPublisher
-     */
-    protected function getTopicPublisher()
-    {
-        return $this->container->get('oro_wamp.publisher');
-    }
-
-    /**
      * @return TagGeneratorInterface
      */
     protected function getTagGenerator()
     {
-        return $this->container->get('oro_sync.content.tag_generator_chain');
+        return $this->container->get('oro_sync.content.tag_generator');
+    }
+
+    /**
+     * @return ConnectionChecker
+     */
+    protected function getConnectionChecker()
+    {
+        return $this->container->get('oro_sync.client.connection_checker');
     }
 
     /**
@@ -53,7 +56,7 @@ class OroSyncExtension extends \Twig_Extension
      */
     public function checkWsConnected()
     {
-        return $this->getTopicPublisher()->check();
+        return $this->getConnectionChecker()->checkConnection();
     }
 
     /**

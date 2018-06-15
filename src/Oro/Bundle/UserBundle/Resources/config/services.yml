@@ -120,6 +120,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_user.topic.outdated_user_page:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_user.outdated_user_page'
+        tags:
+            - { name: gos_web_socket.topic }
+
     oro_user.status_manager:
         class:                        '%oro_user.status.manager.class%'
         arguments:                    ["@doctrine.orm.entity_manager", "@oro_user.manager"]

@@ -1,0 +1,46 @@
+services:
+    oro_sync.content.listener.datagrid_tag:
+        class: Oro\Bundle\SyncBundle\Content\DataGridTagListener
+        arguments:
+            - '@oro_sync.content.tag_generator'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_sync.event_listener.doctrine_tag:
+        class: Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener
+        arguments:
+            - '@oro_sync.content.data_update_topic_sender'
+            - '@oro_sync.content.tag_generator'
+            - '%installed%'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: postFlush, connection: default }
+
+    oro_sync.content.tag_generator:
+        class: Oro\Bundle\SyncBundle\Content\TagGeneratorChain
+
+    oro_sync.content.tag_generator.doctrine:
+        class: Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_sync.tag_generator }
+
+    oro_sync.content.tag_generator.simple:
+        class: Oro\Bundle\SyncBundle\Content\SimpleTagGenerator
+        tags:
+            - { name: oro_sync.tag_generator }
+
+    oro_sync.content.data_update_topic_sender:
+        class: 'Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender'
+        arguments:
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
+            - '@security.token_storage'
+
+    oro_sync.topic.data_update:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_sync.data_update'
+        tags:
+            - { name: gos_web_socket.topic }

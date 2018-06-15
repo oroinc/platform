@@ -25,10 +25,7 @@
 
     &:hover,
     &:focus {
-        outline: none;
-
         background-color: $menu-dropdown-background-color-active;
-
         color: $menu-item-first-level-text-color-active;
     }
 }

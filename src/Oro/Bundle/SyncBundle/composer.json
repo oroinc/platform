@@ -13,7 +13,8 @@
         "oro/ui-bundle": "dev-master",
         "bower-asset/autobahnjs": "0.8.0",
         "bower-asset/when": "2.4.0",
-        "bower-asset/crypto-js": "3.1.7"
+        "bower-asset/crypto-js": "3.1.7",
+        "gos/web-socket-bundle": "1.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\SyncBundle": "" }

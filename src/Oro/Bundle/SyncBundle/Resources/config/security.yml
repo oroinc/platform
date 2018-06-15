@@ -1,0 +1,52 @@
+parameters:
+    oro_sync.security.ticket_authentication_provider.key: 'oro_sync_ticket'
+    oro_sync.security.ticket_authentication_provider.ticket_ttl: 300
+
+services:
+    oro_sync.security.ticket_authentication_provider:
+        class: 'Oro\Bundle\SyncBundle\Security\TicketAuthenticationProvider'
+        public: false
+        arguments:
+            - '@oro_sync.authentication.ticket_digest_generator'
+            - '@oro_user.security.provider'
+            - '%oro_sync.security.ticket_authentication_provider.key%'
+            - '%secret%'
+            - '%oro_sync.security.ticket_authentication_provider.ticket_ttl%'
+
+    oro_sync.authentication.websocket_authentication_by_ticket_provider:
+        class: 'Oro\Bundle\SyncBundle\Authentication\Provider\WebsocketAuthenticationByTicketProvider'
+        public: false
+        arguments:
+            - '@oro_sync.security.ticket_authentication_provider'
+            - '%oro_sync.security.ticket_authentication_provider.key%'
+
+    # Decorates gos_web_socket.client_event.listener to disable onClientConnect event handling.
+    oro_sync.event_listener.client:
+        class: 'Oro\Bundle\SyncBundle\EventListener\ClientEventListener'
+        decorates: gos_web_socket.client_event.listener
+        arguments:
+            - '@oro_sync.event_listener.client.inner'
+            - '@oro_sync.authentication.websocket_authentication_by_ticket_provider'
+            - '@gos_web_socket.client_storage'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
+
+    oro_sync.authentication.encoder:
+        class:  'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder'
+        public: false
+        arguments: ['sha512', true, 5000]
+
+    oro_sync.authentication.ticket_digest_generator:
+        class:  'Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGenerator'
+        public: false
+        arguments:
+            - '@oro_sync.authentication.encoder'
+            - '%secret%'
+
+    oro_sync.authentication.ticket_provider:
+        class: 'Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider'
+        arguments:
+            - '@oro_sync.authentication.ticket_digest_generator'
+            - '%secret%'

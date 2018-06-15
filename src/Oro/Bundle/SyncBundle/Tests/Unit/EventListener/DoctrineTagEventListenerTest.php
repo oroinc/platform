@@ -8,35 +8,50 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
-use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
-use Oro\Bundle\SyncBundle\Content\TopicSender;
+use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
 use Oro\Bundle\TestFrameworkBundle\Entity;
 
 class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /**
+     * @var TagGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $tagGenerator;
+
+    /**
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UnitOfWork */
+    /**
+     * @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $uow;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TopicSender */
-    private $sender;
+    /**
+     * @var DataUpdateTopicSender|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $dataUpdateTopicSender;
 
-    /** @var DoctrineTagEventListener */
+    /**
+     * @var DoctrineTagEventListener
+     */
     private $eventListener;
 
     public function setUp()
     {
+        $this->tagGenerator = $this->createMock(TagGeneratorInterface::class);
         $this->em = $this->createMock(EntityManager::class);
         $this->uow = $this->createMock(UnitOfWork::class);
-        $this->em->expects(self::any())
+        $this->em
+            ->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->sender = $this->createMock(TopicSender::class);
-        $this->eventListener = new DoctrineTagEventListener($this->sender, true);
+        $this->dataUpdateTopicSender = $this->createMock(DataUpdateTopicSender::class);
+        $this->eventListener = new DoctrineTagEventListener($this->dataUpdateTopicSender, $this->tagGenerator, true);
     }
 
     /**
@@ -89,15 +104,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $generator = $this->createMock(TagGeneratorChain::class);
-        $this->sender->expects(self::any())
-            ->method('getGenerator')
-            ->willReturn($generator);
-        $generator->expects(self::at(0))
+        $this->tagGenerator->expects(self::at(0))
             ->method('generate')
             ->with(self::isInstanceOf($entity1), true)
             ->willReturn(['entity1Tag']);
-        $generator->expects(self::at(1))
+        $this->tagGenerator->expects(self::at(1))
             ->method('generate')
             ->with(self::isInstanceOf($entity2), true)
             ->willReturn(['entity2Tag']);
@@ -141,15 +152,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $generator = $this->createMock(TagGeneratorChain::class);
-        $this->sender->expects(self::any())
-            ->method('getGenerator')
-            ->willReturn($generator);
-        $generator->expects(self::at(0))
+        $this->tagGenerator->expects(self::at(0))
             ->method('generate')
             ->with(self::isInstanceOf($entity1), true)
             ->willReturn(['entity1Tag']);
-        $generator->expects(self::at(1))
+        $this->tagGenerator->expects(self::at(1))
             ->method('generate')
             ->with(self::isInstanceOf($entity2), true)
             ->willReturn(['entity2Tag']);
@@ -193,15 +200,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $generator = $this->createMock(TagGeneratorChain::class);
-        $this->sender->expects(self::any())
-            ->method('getGenerator')
-            ->willReturn($generator);
-        $generator->expects(self::at(0))
+        $this->tagGenerator->expects(self::at(0))
             ->method('generate')
             ->with(self::isInstanceOf($entity1), false)
             ->willReturn(['entity1Tag']);
-        $generator->expects(self::at(1))
+        $this->tagGenerator->expects(self::at(1))
             ->method('generate')
             ->with(self::isInstanceOf($entity2), false)
             ->willReturn(['entity2Tag']);
@@ -248,15 +251,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([]);
 
-        $generator = $this->createMock(TagGeneratorChain::class);
-        $this->sender->expects(self::any())
-            ->method('getGenerator')
-            ->willReturn($generator);
-        $generator->expects(self::at(0))
+        $this->tagGenerator->expects(self::at(0))
             ->method('generate')
             ->with(self::isInstanceOf($entity1), false)
             ->willReturn(['entity1Tag']);
-        $generator->expects(self::at(1))
+        $this->tagGenerator->expects(self::at(1))
             ->method('generate')
             ->with(self::isInstanceOf($entity2), false)
             ->willReturn(['entity2Tag']);
@@ -303,15 +302,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledCollectionUpdates')
             ->willReturn([$coll1, $coll2, $coll3]);
 
-        $generator = $this->createMock(TagGeneratorChain::class);
-        $this->sender->expects(self::any())
-            ->method('getGenerator')
-            ->willReturn($generator);
-        $generator->expects(self::at(0))
+        $this->tagGenerator->expects(self::at(0))
             ->method('generate')
             ->with(self::isInstanceOf($entity1), false)
             ->willReturn(['entity1Tag']);
-        $generator->expects(self::at(1))
+        $this->tagGenerator->expects(self::at(1))
             ->method('generate')
             ->with(self::isInstanceOf($entity2), false)
             ->willReturn(['entity2Tag']);
@@ -344,7 +339,7 @@ class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
             ['entity1' => true, 'entity2' => true]
         );
 
-        $this->sender->expects(self::once())
+        $this->dataUpdateTopicSender->expects(self::once())
             ->method('send')
             ->with(['duplicatedTag', 'anotherTag']);
 

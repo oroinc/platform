@@ -49,9 +49,10 @@ class ConfigurationController extends Controller
 
                 // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
                 $taggableData = ['name' => 'system_configuration', 'params' => [$activeGroup, $activeSubGroup]];
-                $sender       = $this->get('oro_sync.content.topic_sender');
+                $tagGenerator = $this->get('oro_sync.content.tag_generator');
+                $dataUpdateTopicSender = $this->get('oro_sync.content.data_update_topic_sender');
 
-                $sender->send($sender->getGenerator()->generate($taggableData));
+                $dataUpdateTopicSender->send($tagGenerator->generate($taggableData));
 
                 // recreate form to drop values for fields with use_parent_scope_value
                 $form = $provider->getForm($activeSubGroup);
