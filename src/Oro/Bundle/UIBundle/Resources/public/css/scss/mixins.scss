@@ -324,7 +324,7 @@ $enable-safe-area: true;
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
-            font-family: 'FontAwesome', $baseFontFamily;
+            font-family: 'FontAwesome', $base-font-family;
         }
     }
 }

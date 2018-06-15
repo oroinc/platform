@@ -152,7 +152,7 @@
             }
         }
         .title {
-            font: bold 18px/1 $baseFontFamily;
+            font: bold 18px/1 $base-font-family;
             color: #565656;
             margin: 0;
         }
@@ -172,7 +172,7 @@
         background: none;
         width: 93px;
         height: 32px;
-        font: 14px/32px $baseFontFamily;
+        font: 14px/32px $base-font-family;
         text-align: right;
         color: #565656;
         padding: 0 25px 0 0;
@@ -183,7 +183,7 @@
     input[type="password"],
     select {
         height: 16px;
-        font: 14px/16px $baseFontFamily;
+        font: 14px/16px $base-font-family;
         color: #000;
         padding: 7px 10px;
         width: 300px;

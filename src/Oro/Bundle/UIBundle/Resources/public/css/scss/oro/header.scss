@@ -58,12 +58,12 @@
                 .nav-header { /* Dropdown smaller section title */
                     padding: 2px 14px 5px;
                     color: #444;
-                    font-size: $fontSizeSmall;
+                    font-size: $base-font-size--s;
                 }
 
                 .nav-header-title { /* Dropdown main title */
                     display: block;
-                    font-size: $baseFontSize;
+                    font-size: $base-font-size--s;
                     line-height: 1.2em;
                     text-transform: none;
                 }
@@ -158,7 +158,7 @@
                             z-index: 105;
                             color: #777;
                             border-radius: 0 0 3px 3px;
-                            font: 12px/14px $baseFontFamily;
+                            font: 12px/14px $base-font-family;
                             display: none;
 
                             ul {

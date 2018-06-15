@@ -5,7 +5,7 @@ $main-menu-mobile-width: 320px;
 .main-menu-top {
     display: none;
     position: fixed;
-    z-index: $oroMobileHeaderZindex;
+    z-index: $oro-mobile-header-zindex;
 
     width: 100%;
     top: $app-header-height;
