@@ -60,6 +60,11 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        if (null === $config) {
+            // only configured API resources are supported
+            return;
+        }
+
         $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(self::TITLE_META_PROPERTY_NAME, $config);
         if (!$titlePropertyPath) {
             // the "title" meta property was not requested

@@ -16,11 +16,10 @@ class BuildListResultDocument extends BuildResultDocument
      */
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
     {
-        $result = $context->getResult();
-        if (empty($result)) {
-            $documentBuilder->setDataCollection($result, $context->getRequestType());
-        } else {
-            $documentBuilder->setDataCollection($result, $context->getRequestType(), $context->getMetadata());
-        }
+        $documentBuilder->setDataCollection(
+            $context->getResult(),
+            $context->getRequestType(),
+            $context->getMetadata()
+        );
     }
 }

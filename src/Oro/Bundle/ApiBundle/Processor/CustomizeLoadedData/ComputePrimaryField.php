@@ -54,6 +54,9 @@ class ComputePrimaryField implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
 
         $primaryFieldName = $config->findFieldNameByPropertyPath($this->primaryFieldName);
         if (!$primaryFieldName

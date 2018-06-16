@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
@@ -91,6 +92,38 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
 
         self::assertEquals(
             new EntityIdentifier($entity->getId(), get_class($entity)),
+            $transformer->reverseTransform($value)
+        );
+    }
+
+    public function testReverseTransformForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [UserProfile::class];
+
+        $metadata = $this->getAssociationMetadata([UserProfile::class]);
+        $transformer = $this->getNestedAssociationTransformer($metadata);
+
+        $value = ['class' => UserProfile::class, 'id' => 123];
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2,'
+            . ' t0.category_name AS category_name_3, t0.owner_id AS owner_id_4'
+            . ' FROM user_table t0 WHERE t0.id = ?',
+            [
+                [
+                    'id_1'            => $value['id'],
+                    'name_2'          => null,
+                    'category_name_3' => null,
+                    'owner_id_4'      => null
+                ]
+            ],
+            [1 => $value['id']],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        self::assertEquals(
+            new EntityIdentifier($value['id'], UserProfile::class),
             $transformer->reverseTransform($value)
         );
     }

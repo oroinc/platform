@@ -138,7 +138,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals(
             [
                 'id'                   => 1,
-                ConfigUtil::CLASS_NAME => Entity\User::class,
+                ConfigUtil::CLASS_NAME => Entity\User::class
             ],
             $this->context->getResult()
         );

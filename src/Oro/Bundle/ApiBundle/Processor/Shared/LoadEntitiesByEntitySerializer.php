@@ -46,7 +46,7 @@ class LoadEntitiesByEntitySerializer implements ProcessorInterface
 
         $config = $context->getConfig();
         if (null === $config) {
-            // an entity configuration does not exist
+            // only configured API resources are supported
             return;
         }
 
