@@ -16,6 +16,7 @@ use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 use Oro\Component\EntitySerializer\FieldAccessor;
 use Oro\Component\EntitySerializer\QueryFactory;
+use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\EntitySerializer\ValueTransformer;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -84,7 +85,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
                 new EntityDataTransformer($this->container, new ValueTransformer())
             ),
             $dataAccessor,
-            new QueryFactory($doctrineHelper, $queryHintResolver),
+            new QueryFactory($doctrineHelper, new QueryResolver($queryHintResolver)),
             $fieldAccessor,
             new ConfigNormalizer(),
             new ConfigConverter(),
