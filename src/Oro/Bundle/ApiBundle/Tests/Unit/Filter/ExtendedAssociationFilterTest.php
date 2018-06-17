@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -21,6 +23,9 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
     private $associationManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    private $entityOverrideProvider;
+
     /** @var ExtendedAssociationFilter */
     private $filter;
 
@@ -28,10 +33,17 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+
+        $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
+        $entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->willReturn($this->entityOverrideProvider);
 
         $this->filter = new ExtendedAssociationFilter('integer');
         $this->filter->setValueNormalizer($this->valueNormalizer);
         $this->filter->setAssociationManager($this->associationManager);
+        $this->filter->setEntityOverrideProviderRegistry($entityOverrideProviderRegistry);
     }
 
     public function testGetFilterValueName()
@@ -122,6 +134,42 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargets')
             ->with($associationOwnerClass, null, $associationType, $associationKind)
             ->willReturn(['Test\User' => 'userField', 'Test\Another' => 'anotherField']);
+
+        $criteria = new Criteria();
+        $this->filter->apply($criteria, $filterValue);
+
+        self::assertEquals(
+            new Comparison('userField', Comparison::EQ, '123'),
+            $criteria->getWhereExpression()
+        );
+    }
+
+    public function testApplyFilterWhenAssociationTargetIsOverridden()
+    {
+        $filterValue = new FilterValue('target.users', '123');
+        $requestType = new RequestType([RequestType::REST]);
+        $associationOwnerClass = 'Test\OwnerClass';
+        $associationType = 'manyToOne';
+        $associationKind = 'test';
+
+        $this->filter->setField('target');
+        $this->filter->setRequestType($requestType);
+        $this->filter->setAssociationOwnerClass($associationOwnerClass);
+        $this->filter->setAssociationType($associationType);
+        $this->filter->setAssociationKind($associationKind);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('users', DataType::ENTITY_CLASS, self::identicalTo($requestType))
+            ->willReturn('Test\UserModel');
+        $this->associationManager->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with($associationOwnerClass, null, $associationType, $associationKind)
+            ->willReturn(['Test\User' => 'userField', 'Test\Another' => 'anotherField']);
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\User')
+            ->willReturn('Test\UserModel');
 
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);

@@ -54,17 +54,20 @@ class LoadExtendedAssociation extends BaseLoadExtendedAssociation
 
         if (!$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
             if (!empty($data)) {
-                $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
-                    LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
-                    $context->getConfig()
-                );
-                if ($titlePropertyPath) {
-                    if (!$isCollection) {
-                        $data = [$data];
-                    }
-                    $data = $this->addTitles($data, $titlePropertyPath);
-                    if (!$isCollection) {
-                        $data = reset($data);
+                $config = $context->getConfig();
+                if (null !== $config) {
+                    $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
+                        LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
+                        $config
+                    );
+                    if ($titlePropertyPath) {
+                        if (!$isCollection) {
+                            $data = [$data];
+                        }
+                        $data = $this->addTitles($data, $titlePropertyPath);
+                        if (!$isCollection) {
+                            $data = reset($data);
+                        }
                     }
                 }
             }

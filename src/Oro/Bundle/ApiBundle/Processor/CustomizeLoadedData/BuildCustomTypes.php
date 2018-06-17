@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -23,12 +24,17 @@ class BuildCustomTypes implements ProcessorInterface
     /** @var AssociationManager */
     protected $associationManager;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
      * @param AssociationManager $associationManager
+     * @param DoctrineHelper     $doctrineHelper
      */
-    public function __construct(AssociationManager $associationManager)
+    public function __construct(AssociationManager $associationManager, DoctrineHelper $doctrineHelper)
     {
         $this->associationManager = $associationManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -39,7 +45,7 @@ class BuildCustomTypes implements ProcessorInterface
         /** @var CustomizeLoadedDataContext $context */
 
         $data = $context->getResult();
-        if (!is_array($data)) {
+        if (!\is_array($data)) {
             return;
         }
 
@@ -62,7 +68,7 @@ class BuildCustomTypes implements ProcessorInterface
     {
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (array_key_exists($fieldName, $data)) {
+            if (\array_key_exists($fieldName, $data)) {
                 continue;
             }
             $dataType = $field->getDataType();
@@ -111,28 +117,24 @@ class BuildCustomTypes implements ProcessorInterface
             return null;
         }
 
-        $lastDelimiter = strrpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+        $lastDelimiter = \strrpos($propertyPath, ConfigUtil::PATH_DELIMITER);
         if (false === $lastDelimiter) {
             return null;
         }
 
-        return explode(ConfigUtil::PATH_DELIMITER, substr($propertyPath, 0, $lastDelimiter));
+        return \explode(ConfigUtil::PATH_DELIMITER, \substr($propertyPath, 0, $lastDelimiter));
     }
 
     /**
-     * @param array  $data
-     * @param string $entityClass
-     * @param string $associationType
-     * @param string $associationKind
+     * @param array       $data
+     * @param string      $entityClass
+     * @param string      $associationType
+     * @param string|null $associationKind
      *
      * @return array|null
      */
-    protected function buildExtendedAssociation(
-        array $data,
-        $entityClass,
-        $associationType,
-        $associationKind
-    ) {
+    protected function buildExtendedAssociation(array $data, $entityClass, $associationType, $associationKind)
+    {
         switch ($associationType) {
             case RelationType::MANY_TO_ONE:
                 return $this->buildManyToOneExtendedAssociation(
@@ -157,14 +159,19 @@ class BuildCustomTypes implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $associationType
-     * @param string $associationKind
+     * @param string      $entityClass
+     * @param string      $associationType
+     * @param string|null $associationKind
      *
-     * @return array [target entity class => target field name]
+     * @return array [target entity class => target field name, ...]
      */
     protected function getAssociationTargets($entityClass, $associationType, $associationKind)
     {
+        $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+        if ($resolvedEntityClass) {
+            $entityClass = $resolvedEntityClass;
+        }
+
         return $this->associationManager->getAssociationTargets(
             $entityClass,
             null,
@@ -266,13 +273,13 @@ class BuildCustomTypes implements ProcessorInterface
 
             $value = null;
             $targetPropertyPath = $field->getPropertyPath($fieldName);
-            if (false !== strpos($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
+            if (false !== \strpos($targetPropertyPath, ConfigUtil::PATH_DELIMITER)) {
                 throw new RuntimeException(
-                    sprintf('The "%s" property path is not supported.', $targetPropertyPath)
+                    \sprintf('The "%s" property path is not supported.', $targetPropertyPath)
                 );
             }
             $targetFieldName = $parentConfig->findFieldNameByPropertyPath($targetPropertyPath);
-            if ($targetFieldName && array_key_exists($targetFieldName, $data)) {
+            if ($targetFieldName && \array_key_exists($targetFieldName, $data)) {
                 $value = $data[$targetFieldName];
             }
             if (null !== $value) {
@@ -295,7 +302,7 @@ class BuildCustomTypes implements ProcessorInterface
         $result = $data;
         $path = ConfigUtil::explodePropertyPath($propertyPath);
         foreach ($path as $fieldName) {
-            if (is_array($result) && array_key_exists($fieldName, $result)) {
+            if (\is_array($result) && \array_key_exists($fieldName, $result)) {
                 $result = $result[$fieldName];
             } else {
                 $result = null;

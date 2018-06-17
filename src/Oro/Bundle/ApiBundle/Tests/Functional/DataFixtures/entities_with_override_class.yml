@@ -1,0 +1,31 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTarget:
+    target_1:
+        name: 'Target 1'
+    target_2:
+        name: 'Target 2'
+    target_3:
+        name: 'Target 3'
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassOwner:
+    owner_1:
+        name: 'Owner 1'
+        target: '@target_1'
+        targets: ['@target_1', '@target_2']
+    owner_2:
+        name: 'Owner 2'
+        target: '@target_2'
+        targets: ['@target_2']
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassActivity:
+    activity_1:
+        name: 'Activity 1'
+        test_override_class_owner_9ccd505c: ['@owner_1']
+        test_override_class_target_7d52a282: ['@target_1']
+    activity_2:
+        name: 'Activity 2'
+        test_override_class_owner_9ccd505c: ['@owner_2']
+        test_override_class_target_7d52a282: ['@target_2']
+    activity_3:
+        name: 'Activity 3'
+        test_override_class_owner_9ccd505c: ['@owner_1']
+    activity_4:
+        name: 'Activity 4'
+        test_override_class_owner_9ccd505c: ['@owner_2']

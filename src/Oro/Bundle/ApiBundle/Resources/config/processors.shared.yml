@@ -518,7 +518,7 @@ services:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
 
-    oro_api.subresource.parent_entity_type_security_check:
+    oro_api.subresource.parent_entity_type_security_check.edit:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
         arguments:
             - '@oro_api.doctrine_helper'
@@ -614,6 +614,27 @@ services:
     # load_data
     #
 
+    oro_api.initialize_entity_mapper:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeEntityMapper
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_instantiator'
+            - '@oro_api.entity_override_provider_registry'
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, priority: 250 }
+            - { name: oro.api.processor, action: update, group: load_data, priority: 250 }
+
+    oro_api.subresource.initialize_entity_mapper:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\InitializeEntityMapper
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_instantiator'
+            - '@oro_api.entity_override_provider_registry'
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: 250 }
+            - { name: oro.api.processor, action: add_relationship, group: load_data, priority: 250 }
+            - { name: oro.api.processor, action: update_relationship, group: load_data, priority: 250 }
+
     oro_api.load_entity_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
@@ -650,6 +671,19 @@ services:
             - { name: oro.api.processor, action: delete_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update_subresource, group: load_data, priority: -10 }
+            - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -10 }
+            - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -10 }
+            - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -10 }
+
+    oro_api.convert_entity_to_model:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ConvertEntityToModel
+        tags:
+            - { name: oro.api.processor, action: create, group: load_data, priority: -25 }
+            - { name: oro.api.processor, action: update, group: load_data, priority: -25 }
+
+    oro_api.subresource.convert_parent_entity_to_model:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ConvertParentEntityToModel
+        tags:
             - { name: oro.api.processor, action: delete_relationship, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: add_relationship, group: load_data, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: load_data, priority: -10 }
@@ -900,9 +934,38 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: 250 }
 
+    oro_api.remove_entity_mapper:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveEntityMapper
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -250 }
+            - { name: oro.api.processor, action: update, group: save_data, priority: -250 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: -250 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -250 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -250 }
+            # add this processor to the begin of "normalize_result" group to make sure that
+            # the entity mapper is removed from the Context even if an error occurred
+            - { name: oro.api.processor, action: create, group: normalize_result, priority: 250 }
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: 250 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: 250 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: 250 }
+
     #
     # save_data
     #
+
+    oro_api.convert_model_to_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ConvertModelToEntity
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: 150 }
+            - { name: oro.api.processor, action: update, group: save_data, priority: 150 }
+
+    oro_api.subresource.convert_parent_model_to_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ConvertParentModelToEntity
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: save_data, priority: 150 }
+            - { name: oro.api.processor, action: add_relationship, group: save_data, priority: 150 }
+            - { name: oro.api.processor, action: update_relationship, group: save_data, priority: 150 }
 
     oro_api.persist_included_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\PersistIncludedEntities

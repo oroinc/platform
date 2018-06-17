@@ -18,29 +18,30 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_CLASS    = 'Test\Entity';
-    const TEST_PROPERTY = 'testField';
+    private const TEST_CLASS    = 'Test\Entity';
+    private const TEST_PROPERTY = 'testField';
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var MetadataTypeGuesser */
-    protected $typeGuesser;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    private $typeGuesser;
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->typeGuesser = new MetadataTypeGuesser(
             [
                 'integer'  => ['integer', []],
-                'datetime' => ['test_datetime', ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']],
+                'datetime' => ['test_datetime', ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']]
             ],
             $this->doctrineHelper
         );
@@ -53,13 +54,13 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMetadataAccessor(EntityMetadata $metadata = null)
     {
-        $metadataAccessor = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         if (null === $metadata) {
-            $metadataAccessor->expects($this->once())
+            $metadataAccessor->expects(self::once())
                 ->method('getMetadata')
                 ->willReturn(null);
         } else {
-            $metadataAccessor->expects($this->once())
+            $metadataAccessor->expects(self::once())
                 ->method('getMetadata')
                 ->with($metadata->getClassName())
                 ->willReturn($metadata);
@@ -76,13 +77,13 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfigAccessor($className, EntityDefinitionConfig $config = null)
     {
-        $configAccessor = $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $configAccessor = $this->createMock(ConfigAccessorInterface::class);
         if (null === $config) {
-            $configAccessor->expects($this->once())
+            $configAccessor->expects(self::once())
                 ->method('getConfig')
                 ->willReturn(null);
         } else {
-            $configAccessor->expects($this->once())
+            $configAccessor->expects(self::once())
                 ->method('getConfig')
                 ->with($className)
                 ->willReturn($config);
@@ -127,36 +128,36 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldGetPreviouslySetMetadataAccessor()
     {
-        $metadataAccessor = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         $this->typeGuesser->setMetadataAccessor($metadataAccessor);
         self::assertSame($metadataAccessor, $this->typeGuesser->getMetadataAccessor());
     }
 
     public function testShouldGetPreviouslySetConfigAccessor()
     {
-        $configAccessor = $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $configAccessor = $this->createMock(ConfigAccessorInterface::class);
         $this->typeGuesser->setConfigAccessor($configAccessor);
         self::assertSame($configAccessor, $this->typeGuesser->getConfigAccessor());
     }
 
     public function testGuessRequired()
     {
-        $this->assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
+        self::assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
     public function testGuessMaxLength()
     {
-        $this->assertNull($this->typeGuesser->guessMaxLength(self::TEST_CLASS, self::TEST_PROPERTY));
+        self::assertNull($this->typeGuesser->guessMaxLength(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
     public function testGuessPattern()
     {
-        $this->assertNull($this->typeGuesser->guessPattern(self::TEST_CLASS, self::TEST_PROPERTY));
+        self::assertNull($this->typeGuesser->guessPattern(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
     public function testGuessTypeWithoutMetadataAccessor()
     {
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
@@ -165,7 +166,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
     public function testGuessTypeWithoutMetadata()
     {
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor(null));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
@@ -177,7 +178,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->setClassName(self::TEST_CLASS);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
@@ -190,7 +191,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'integer'));
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess('integer', [], TypeGuess::HIGH_CONFIDENCE),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
@@ -203,7 +204,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'datetime'));
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 'test_datetime',
                 ['model_timezone' => 'UTC', 'view_timezone' => 'UTC'],
@@ -226,10 +227,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityType::class,
-                ['metadata' => $associationMetadata, 'included_entities' => null],
+                [
+                    'metadata'          => $associationMetadata,
+                    'entity_mapper'     => null,
+                    'included_entities' => null
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -251,10 +256,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setIncludedEntities($includedEntities);
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityType::class,
-                ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
+                [
+                    'metadata'          => $associationMetadata,
+                    'entity_mapper'     => null,
+                    'included_entities' => $includedEntities
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -274,10 +283,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityType::class,
-                ['metadata' => $associationMetadata, 'included_entities' => null],
+                [
+                    'metadata'          => $associationMetadata,
+                    'entity_mapper'     => null,
+                    'included_entities' => null
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -295,14 +308,20 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             'integer'
         );
         $metadata->addAssociation($associationMetadata);
+        $entityMapper = $this->createMock(EntityMapper::class);
         $includedEntities = $this->createMock(IncludedEntityCollection::class);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setEntityMapper($entityMapper);
         $this->typeGuesser->setIncludedEntities($includedEntities);
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityType::class,
-                ['metadata' => $associationMetadata, 'included_entities' => $includedEntities],
+                [
+                    'metadata'          => $associationMetadata,
+                    'entity_mapper'     => $entityMapper,
+                    'included_entities' => $includedEntities
+                ],
                 TypeGuess::HIGH_CONFIDENCE
             ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
@@ -326,7 +345,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
-        $this->assertNull(
+        self::assertNull(
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -348,7 +367,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $associationMetadata->setTargetMetadata($targetMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertNull(
+        self::assertNull(
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -373,14 +392,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $associationConfig = $config->addField(self::TEST_PROPERTY)->getOrCreateTargetEntity();
         $associationConfig->addField('childField');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(false);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 CollectionType::class,
                 [
@@ -417,14 +436,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $associationConfig = $config->addField(self::TEST_PROPERTY)->getOrCreateTargetEntity();
         $associationConfig->addField('childField');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(true);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityCollectionType::class,
                 [
@@ -455,7 +474,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertNull(
+        self::assertNull(
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -478,7 +497,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $associationMetadata->setTargetMetadata($targetMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertNull(
+        self::assertNull(
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -501,13 +520,13 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $targetMetadata->addField($this->createFieldMetadata('name', 'string'));
         $associationMetadata->setTargetMetadata($targetMetadata);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(false);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 ScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'name'],
@@ -535,13 +554,13 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $targetMetadata->addField($this->createFieldMetadata('name', 'string'));
         $associationMetadata->setTargetMetadata($targetMetadata);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(true);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'name'],
@@ -571,13 +590,13 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         );
         $associationMetadata->setTargetMetadata($targetMetadata);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with('Test\TargetEntity')
             ->willReturn(true);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 EntityScalarCollectionType::class,
                 ['entry_data_class' => 'Test\TargetEntity', 'entry_data_property' => 'association1'],
@@ -613,7 +632,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 CompoundObjectType::class,
                 [
@@ -652,7 +671,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
-        $this->assertEquals(
+        self::assertEquals(
             new TypeGuess(
                 NestedAssociationType::class,
                 [

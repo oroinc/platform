@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 
 /**
@@ -15,10 +14,10 @@ class NestedAssociationTransformer extends AbstractEntityAssociationTransformer
      */
     protected function getEntity($entityClass, $entityId)
     {
-        $entity = $this->loadEntity($entityClass, $entityId);
-        $entityClass = ClassUtils::getClass($entity);
+        $resolvedEntityClass = $this->resolveEntityClass($entityClass);
+        $entity = $this->loadEntity($resolvedEntityClass, $entityId);
         $entityId = $this->doctrineHelper
-            ->getEntityMetadataForClass($entityClass)
+            ->getEntityMetadataForClass($resolvedEntityClass)
             ->getIdentifierValues($entity);
         if (\count($entityId) === 1) {
             $entityId = reset($entityId);

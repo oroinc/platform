@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -46,6 +47,19 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setIncludedEntities();
         self::assertNull($this->context->getIncludedEntities());
+    }
+
+    public function testEntityMapper()
+    {
+        $entityMapper = $this->createMock(EntityMapper::class);
+
+        self::assertNull($this->context->getEntityMapper());
+
+        $this->context->setEntityMapper($entityMapper);
+        self::assertSame($entityMapper, $this->context->getEntityMapper());
+
+        $this->context->setEntityMapper();
+        self::assertNull($this->context->getEntityMapper());
     }
 
     public function testFormBuilder()

@@ -3,6 +3,14 @@ api:
         Test\Entity5:
             alias: entity5
             plural_alias: entity5_plural
+        Test\Entity30:
+            alias: entity30
+            plural_alias: entity30_plural
+            override_class: Test\Entity3
+        Test\Entity31:
+            alias: entity31
+            plural_alias: entity31_plural
+            override_class: Test\Entity3Undefined
 
     entities:
         Test\Entity1:
@@ -31,3 +39,5 @@ api:
             fields:
                 field1:
                     exclude: false
+        Test\Entity30: ~
+        Test\Entity31: ~

@@ -16,11 +16,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 
 class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var RegisterConfiguredFilters */
-    private $processor;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|FilterFactoryInterface */
     private $filterFactory;
+
+    /** @var RegisterConfiguredFilters */
+    private $processor;
 
     protected function setUp()
     {
@@ -52,22 +52,6 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessWithEmptyFiltersConfig()
     {
         $filtersConfig = new FiltersConfig();
-
-        $this->filterFactory->expects(self::never())
-            ->method('createFilter');
-
-        $this->context->setConfigOfFilters($filtersConfig);
-        $this->processor->process($this->context);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Expected "all" exclusion policy for filters. Got: none.
-     */
-    public function testProcessWithNotNormalizedFiltersConfig()
-    {
-        $filtersConfig = new FiltersConfig();
-        $filtersConfig->setExcludeNone();
 
         $this->filterFactory->expects(self::never())
             ->method('createFilter');
@@ -288,6 +272,53 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $expectedFilter->setSupportedOperators([ComparisonFilter::EQ]);
         $expectedFilters = new FilterCollection();
         $expectedFilters->add('filter', $expectedFilter);
+
+        self::assertEquals($expectedFilters, $this->context->getFilters());
+    }
+
+    public function testProcessForComparisonFilterForToOneAssociationFieldForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [Entity\UserProfile::class];
+
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass(Entity\User::class);
+
+        $filtersConfig = new FiltersConfig();
+        $filtersConfig->setExcludeAll();
+
+        $filterConfig = new FilterFieldConfig();
+        $filterConfig->setDataType('integer');
+        $filterConfig->setOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::GT,
+            ComparisonFilter::LT
+        ]);
+        $filtersConfig->addField('owner', $filterConfig);
+
+        $existinAssociationFilter = new ComparisonFilter('string');
+        $existinAssociationFilter->setDataType('integer');
+
+        $this->filterFactory->expects(self::once())
+            ->method('createFilter')
+            ->with('integer', [])
+            ->willReturn($this->getComparisonFilter('integer'));
+
+        $this->context->setClassName(Entity\UserProfile::class);
+        $this->context->setConfigOfFilters($filtersConfig);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        $expectedFilter = new ComparisonFilter('integer');
+        $expectedFilter->setField('owner');
+        $expectedFilter->setSupportedOperators([
+            ComparisonFilter::EQ,
+            ComparisonFilter::NEQ,
+            ComparisonFilter::EXISTS,
+            ComparisonFilter::NEQ_OR_NULL
+        ]);
+        $expectedFilters = new FilterCollection();
+        $expectedFilters->add('owner', $expectedFilter);
 
         self::assertEquals($expectedFilters, $this->context->getFilters());
     }

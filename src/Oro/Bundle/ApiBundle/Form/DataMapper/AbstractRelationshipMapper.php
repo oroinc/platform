@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form\DataMapper;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormConfigInterface;
@@ -12,17 +13,25 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * A base class for data mappers that are used in "add_relationship" and "delete_relationship" Data API actions.
+ */
 abstract class AbstractRelationshipMapper implements DataMapperInterface
 {
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
+    /** @var EntityMapper|null */
+    protected $entityMapper;
+
     /**
      * @param PropertyAccessorInterface $propertyAccessor
+     * @param EntityMapper              $entityMapper
      */
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, EntityMapper $entityMapper = null)
     {
         $this->propertyAccessor = $propertyAccessor;
+        $this->entityMapper = $entityMapper;
     }
 
     /**
@@ -198,5 +207,19 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     protected function findAdderAndRemover($object, $property)
     {
         return ReflectionUtil::findAdderAndRemover($object, $property);
+    }
+
+    /**
+     * @param mixed $object
+     *
+     * @return mixed
+     */
+    protected function resolveEntity($object)
+    {
+        if (null === $this->entityMapper || !is_object($object)) {
+            return $object;
+        }
+
+        return $this->entityMapper->getEntity($object);
     }
 }

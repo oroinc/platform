@@ -390,7 +390,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
-    public function testProcessForRelatedEntityFieldForModelInheritedFromEntity()
+    public function testProcessForRelatedEntityFieldForModelInheritedFromManageableEntity()
     {
         $this->notManageableClassNames = [Entity\UserProfile::class];
 

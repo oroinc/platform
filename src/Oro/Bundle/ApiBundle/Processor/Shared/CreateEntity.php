@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -11,7 +12,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Creates new instance of the entity.
+ * Creates new instance of the entity and adds it to the context.
  * If the entity type does not have id generator and an entity
  * with the specified identifier already exists then a validation error
  * is added to the context.
@@ -55,18 +56,40 @@ class CreateEntity implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        $entityId = $context->getId();
-        if ($entityId && $this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $metadata = $context->getMetadata();
-            if (null !== $metadata
-                && !$metadata->hasIdentifierGenerator()
-                && null !== $this->entityLoader->findEntity($entityClass, $entityId, $metadata)
-            ) {
-                $context->addError(Error::createConflictValidationError('The entity already exists'));
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // for resource based on manageable entity the entity should be created, not a model
+            $config = $context->getConfig();
+            if (null !== $config) {
+                $parentResourceClass = $config->getParentResourceClass();
+                if ($parentResourceClass && $this->doctrineHelper->isManageableEntityClass($parentResourceClass)) {
+                    $entityClass = $parentResourceClass;
+                }
             }
         }
-        if (!$context->hasErrors()) {
+
+        $entityId = $context->getId();
+        if ($entityId
+            && $this->doctrineHelper->isManageableEntityClass($entityClass)
+            && $this->isEntityExist($entityClass, $entityId, $context->getMetadata())
+        ) {
+            $context->addError(Error::createConflictValidationError('The entity already exists'));
+        } else {
             $context->setResult($this->entityInstantiator->instantiate($entityClass));
         }
+    }
+
+    /**
+     * @param string              $entityClass
+     * @param mixed               $entityId
+     * @param EntityMetadata|null $metadata
+     *
+     * @return bool
+     */
+    private function isEntityExist($entityClass, $entityId, ?EntityMetadata $metadata)
+    {
+        return
+            null !== $metadata
+            && !$metadata->hasIdentifierGenerator()
+            && null !== $this->entityLoader->findEntity($entityClass, $entityId, $metadata);
     }
 }
