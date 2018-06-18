@@ -1,0 +1,48 @@
+/* theme: oro.admin */
+
+$jstree-wrapper-position: relative !default;
+$jstree-wrapper-min-height: 200px !default;
+$jstree-wrapper-inner-offset: 10px 0 !default;
+
+$jstree-wrapper-title-display: flex !default;
+$jstree-wrapper-title-justify-content: space-between !default;
+
+$jstree-wrapper-label-display: flex !default;
+$jstree-wrapper-label-offset-bottom: 10px !default;
+
+$jstree-wrapper-label-before-display: inline-block !default;
+$jstree-wrapper-label-before-width: 9px !default;
+$jstree-wrapper-label-before-offset-right: 5px !default;
+$jstree-wrapper-label-before-font-family: FontAwesome !default;
+$jstree-wrapper-label-before-font-size: 9px !default;
+$jstree-wrapper-label-before-font-weight: normal !default;
+$jstree-wrapper-label-before-font-style: normal !default;
+$jstree-wrapper-label-before-content: '\f078' !default;
+$jstree-wrapper-label-before-color: #969696 !default;
+
+$jstree-wrapper-text-font-weight: bold !default;
+$jstree-wrapper-text-cursor: pointer !default;
+$jstree-wrapper-text-text-transform: uppercase !default;
+$jstree-wrapper-text-color: #565656 !default;
+
+$jstree-wrapper-control-group-max-width: 294px !default;
+$jstree-wrapper-control-group-min-height: 100% !default;
+$jstree-wrapper-control-group-inner-offset: 2px 0 !default;
+
+$jstree-wrapper-control-group-wholerow-ul-inner-offset-left: 0 !default;
+
+$jstree-wrapper-sidebar-inner-offset: 0 $contentPadding !default;
+
+$jstree-wrapper-checkbox-display: none !default;
+
+$jstree-offset: 0 -#{$contentPadding} -#{$contentPadding} !default;
+$jstree-outline: none !default;
+
+$jstree-search-no-results-width: auto !default;
+$jstree-search-no-results-offset-top: -15px !default;
+
+$jstree-control-group-offset: 12px 0 0 !default;
+
+$jstree-wrapper-label-expanded-before-content: '\f054' !default;
+
+$jstree-actions-expanded-display: inline-block !default;
