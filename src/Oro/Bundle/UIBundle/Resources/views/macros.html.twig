@@ -1296,7 +1296,7 @@
                         {% for child in widget.children %}
                             {{ _self.sortable_list_view_collection_prototype(child, options) }}
                         {% endfor %}
-                    {% elseif show_form_when_empty and prototype_html is defined %}
+                    {% elseif options.show_form_when_empty and prototype_html is defined %}
                         {{ prototype_html|replace({(prototype_name): '0'})|raw }}
                     {% endif %}
                     </tbody>
