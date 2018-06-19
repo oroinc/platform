@@ -72,8 +72,8 @@ services:
     oro_api.tests.load_test_resource_without_identifier_entity:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierEntity
         tags:
-            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
-            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
 
     oro_api.tests.delete_test_resource_without_identifier_entity:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DeleteTestResourceWithoutIdentifierEntity
@@ -119,3 +119,14 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddOrderLineItemToOrder
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem, priority: -55 }
+
+    oro_api.tests.update_loaded_data_for_overridden_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataForOverriddenEntity
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTarget }
+
+    oro_api.tests.update_loaded_data_for_resource_inherited_from_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataForResourceInheritedFromEntity
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel }
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget }

@@ -6,19 +6,21 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
     var __ = require('orotranslation/js/translator');
 
-    var config = require('module').config();
+    var topic = require('module').config().topic;
 
-    var unsubscribe = function() {
-        mediator.off('page:request', unsubscribe);
-        sync.unsubscribe(config.topic);
-    };
-
-    mediator.on('page:request', unsubscribe);
-
-    sync.subscribe(config.topic, function(response) {
-        var message = JSON.parse(response);
+    var showNotification = function(message) {
         if (message.finished) {
             messenger.notificationMessage('warning', __('oro.attribute.attributes_import_has_finished'));
         }
-    });
+    };
+
+    var onPageChange = function() {
+        sync.unsubscribe(topic, showNotification);
+        mediator.off('page:request', onPageChange);
+    };
+
+    return function() {
+        sync.subscribe(topic, showNotification);
+        mediator.on('page:request', onPageChange);
+    };
 });

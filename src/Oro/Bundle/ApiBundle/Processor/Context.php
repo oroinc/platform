@@ -198,7 +198,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null)
+    public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder)
     {
         $this->responseDocumentBuilder = $documentBuilder;
     }
@@ -409,17 +409,13 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setConfig(EntityDefinitionConfig $definition = null)
+    public function setConfig(?EntityDefinitionConfig $definition)
     {
-        if ($definition) {
-            $this->set($this->getConfigKey(), $definition);
-            // make sure that all config sections are added to the context
-            $this->ensureAllConfigSectionsSet();
-        } else {
-            $this->remove($this->getConfigKey());
-            // make sure that all config sections are removed from the context
-            $this->ensureAllConfigSectionsSet(true);
+        $this->set($this->getConfigKey(), $definition);
+        if (null === $definition) {
+            $this->removeAllConfigSections();
         }
+        $this->ensureAllConfigSectionsSet();
     }
 
     /**
@@ -441,7 +437,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfFilters(FiltersConfig $config = null)
+    public function setConfigOfFilters(?FiltersConfig $config)
     {
         $this->setConfigOf(FiltersConfigExtra::NAME, $config);
     }
@@ -465,7 +461,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setConfigOfSorters(SortersConfig $config = null)
+    public function setConfigOfSorters(?SortersConfig $config)
     {
         $this->setConfigOf(SortersConfigExtra::NAME, $config);
     }
@@ -564,7 +560,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * @param Config|null $config
      */
-    protected function processLoadedConfig(Config $config = null)
+    protected function processLoadedConfig(?Config $config)
     {
         // add loaded config sections to the context
         if ($config && !$config->isEmpty()) {
@@ -583,24 +579,32 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * Makes sure that all config sections are added to (or removed from) the context.
-     *
-     * @param bool $remove
+     * Makes sure that all config sections are added to the context.
      */
-    protected function ensureAllConfigSectionsSet($remove = false)
+    protected function ensureAllConfigSectionsSet()
     {
         $configExtras = $this->getConfigExtras();
         foreach ($configExtras as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface) {
                 $key = self::CONFIG_PREFIX . $configExtra->getName();
-                if ($remove) {
-                    if ($this->has($key)) {
-                        $this->remove($key);
-                    }
-                } else {
-                    if (!$this->has($key)) {
-                        $this->set($key, null);
-                    }
+                if (!$this->has($key)) {
+                    $this->set($key, null);
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes all config sections from the context.
+     */
+    protected function removeAllConfigSections()
+    {
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $key = self::CONFIG_PREFIX . $configExtra->getName();
+                if ($this->has($key)) {
+                    $this->remove($key);
                 }
             }
         }
@@ -730,7 +734,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function setMetadata(EntityMetadata $metadata = null)
+    public function setMetadata(?EntityMetadata $metadata)
     {
         if ($metadata) {
             $this->set(self::METADATA, $metadata);
@@ -790,7 +794,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     /**
      * @param EntityMetadata|null $metadata
      */
-    protected function processLoadedMetadata(EntityMetadata $metadata = null)
+    protected function processLoadedMetadata(?EntityMetadata $metadata)
     {
         // add loaded metadata to the context
         $this->set(self::METADATA, $metadata);

@@ -54,9 +54,11 @@
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">
-        <div class="app-page__content-side">
-            {% include 'OroUIBundle:Default/navbar:sided.html.twig' %}
-        </div>
+        {% block content_side %}
+            <div class="app-page__content-side">
+                {% include 'OroUIBundle:Default/navbar:sided.html.twig' %}
+            </div>
+        {% endblock content_side %}
         <div class="app-page__content">
             {% block header %}
                 <header class="navbar app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">

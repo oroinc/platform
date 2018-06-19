@@ -165,10 +165,9 @@ define([
      *  ...
      * ]
      *
-     * @param {string} tagsJson
+     * @param {Array} tags
      */
-    function onUpdate(tagsJson) {
-        var tags = JSON.parse(tagsJson);
+    function onUpdate(tags) {
         var userTags = _.pluck(_.filter(tags, function(tag) {
             return (tag.username || null) === currentUser;
         }), 'tagname');

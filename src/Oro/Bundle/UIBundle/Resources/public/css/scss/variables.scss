@@ -3,6 +3,8 @@
 @import "bowerassets/font-awesome/scss/_variables";
 @import "bootstrap/variables";
 
+@import "colors";
+
 // Oro variables
 $enable-safe-area:                true;
 $contentPadding:                  12px;
@@ -96,7 +98,7 @@ $tagMyItemBackground:             #ccc;
 $errorMessageBalloonBackground:   lighten($errorText, 20%);
 
 // Links
-$linkColor:                       #006acc;
+$linkColor:                       #0d729b;
 $linkColorHover:                  darken($linkColor, 10%);
 $menuItemColor:                   #444;
 

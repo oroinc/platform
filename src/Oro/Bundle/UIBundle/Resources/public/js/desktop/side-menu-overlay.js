@@ -94,7 +94,7 @@ define(function(require) {
             this.searchContent = $menu.children();
 
             var $menuItem = $('<li/>', {
-                'class': $menu.children().last().attr('class')
+                'class': $menu.children().last().attr('class') + ' ui-helper'
             }).append(this.$('[data-role="overlay-design-helper"]'));
 
             $menu.append($menuItem);

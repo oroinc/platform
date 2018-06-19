@@ -126,7 +126,7 @@ interface ContextInterface extends ComponentContextInterface
      *
      * @param DocumentBuilderInterface|null $documentBuilder
      */
-    public function setResponseDocumentBuilder(DocumentBuilderInterface $documentBuilder = null);
+    public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder);
 
     /**
      * Gets a list of filters is used to add additional restrictions to a query is used to get result data.
@@ -329,7 +329,7 @@ interface ContextInterface extends ComponentContextInterface
      *
      * @param EntityDefinitionConfig|null $definition
      */
-    public function setConfig(EntityDefinitionConfig $definition = null);
+    public function setConfig(?EntityDefinitionConfig $definition);
 
     /**
      * Checks whether a configuration of filters for an entity exists.
@@ -350,7 +350,7 @@ interface ContextInterface extends ComponentContextInterface
      *
      * @param FiltersConfig|null $config
      */
-    public function setConfigOfFilters(FiltersConfig $config = null);
+    public function setConfigOfFilters(?FiltersConfig $config);
 
     /**
      * Checks whether a configuration of sorters for an entity exists.
@@ -371,7 +371,7 @@ interface ContextInterface extends ComponentContextInterface
      *
      * @param SortersConfig|null $config
      */
-    public function setConfigOfSorters(SortersConfig $config = null);
+    public function setConfigOfSorters(?SortersConfig $config);
 
     /**
      * Checks whether a configuration of the given section exists.
@@ -465,5 +465,5 @@ interface ContextInterface extends ComponentContextInterface
      *
      * @param EntityMetadata|null $metadata
      */
-    public function setMetadata(EntityMetadata $metadata = null);
+    public function setMetadata(?EntityMetadata $metadata);
 }

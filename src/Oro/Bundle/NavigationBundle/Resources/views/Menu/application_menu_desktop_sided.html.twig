@@ -48,6 +48,12 @@
         {% set linkAttributes = linkAttributes|merge({
             'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
         }) %}
+
+        {% if item.level > 1 %}
+            {% set linkAttributes = linkAttributes|merge({
+                'tabindex': -1
+            }) %}
+        {% endif %}
     {% endif %}
 
     <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>

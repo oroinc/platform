@@ -52,6 +52,34 @@ class EntityAliasesConfiguration
                         . 'lower case letters, numbers and underscores ("_").'
                     )
                 ->end()
+            ->end()
+            ->scalarNode('override_class')
+                ->info('The class name of an entity to be replaced with this class')
+                ->cannotBeEmpty()
+            ->end();
+
+        $node->end()->end()
+            ->validate()
+                ->always(function (array $v) {
+                    $entitySubstitutions = [];
+                    foreach ($v as $entityClass => $aliases) {
+                        if (\array_key_exists('override_class', $aliases)) {
+                            $substitutedEntityClass = $aliases['override_class'];
+                            if (isset($entitySubstitutions[$substitutedEntityClass])) {
+                                throw new \InvalidArgumentException(sprintf(
+                                    'The entity class "%s" can be overridden only once,'
+                                    . ' but this class is used in "override_class" option for "%s" and "%s".',
+                                    $substitutedEntityClass,
+                                    $entitySubstitutions[$substitutedEntityClass],
+                                    $entityClass
+                                ));
+                            }
+                            $entitySubstitutions[$substitutedEntityClass] = $entityClass;
+                        }
+                    }
+
+                    return $v;
+                })
             ->end();
     }
 }

@@ -3,19 +3,25 @@
 namespace Oro\Bundle\EntityConfigBundle\WebSocket;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
 /**
  * Serves to send import attributes finish message into user's topic.
  */
 class AttributesImportTopicSender
 {
-    const TOPIC = 'oro/attribute_import/user_%s_configmodel_%s';
+    const TOPIC = 'oro/attribute_import/%s/%s';
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    private $publisher;
+    private $websocketClient;
+
+    /**
+     * @var ConnectionChecker
+     */
+    protected $connectionChecker;
 
     /**
      * @var TokenAccessorInterface
@@ -23,12 +29,17 @@ class AttributesImportTopicSender
     private $tokenAccessor;
 
     /**
-     * @param TopicPublisher $publisher
+     * @param WebsocketClientInterface $websocketClient
+     * @param ConnectionChecker $connectionChecker
      * @param TokenAccessorInterface $tokenAccessor
      */
-    public function __construct(TopicPublisher $publisher, TokenAccessorInterface $tokenAccessor)
-    {
-        $this->publisher = $publisher;
+    public function __construct(
+        WebsocketClientInterface $websocketClient,
+        ConnectionChecker $connectionChecker,
+        TokenAccessorInterface $tokenAccessor
+    ) {
+        $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
         $this->tokenAccessor = $tokenAccessor;
     }
 
@@ -60,8 +71,8 @@ class AttributesImportTopicSender
      */
     public function send($configModel)
     {
-        $messageData = ['finished' => true];
-
-        $this->publisher->send($this->getTopic((int)$configModel), json_encode($messageData));
+        if ($this->connectionChecker->checkConnection()) {
+            $this->websocketClient->publish($this->getTopic((int)$configModel), ['finished' => true]);
+        }
     }
 }

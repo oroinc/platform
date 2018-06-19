@@ -54,7 +54,8 @@ services:
     oro_reminder.send_processor.web_socket:
         class: '%oro_reminder.send_processor.web_socket.class%'
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_reminder.web_socket.message_params_provider'
         tags:
             - { name: oro_reminder.send_processor }
@@ -81,3 +82,11 @@ services:
             - '@service_container'
         tags:
             - { name: twig.extension }
+
+    oro_reminder.topic.remind:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_reminder.remind'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }

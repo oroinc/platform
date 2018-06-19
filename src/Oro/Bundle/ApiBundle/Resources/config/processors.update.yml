@@ -62,7 +62,7 @@ services:
     #
 
     oro_api.update.entity_object_security_check:
-        class: \Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
             - '@security.authorization_checker'
             - EDIT

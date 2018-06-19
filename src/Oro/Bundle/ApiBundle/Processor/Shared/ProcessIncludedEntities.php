@@ -54,6 +54,12 @@ class ProcessIncludedEntities implements ProcessorInterface
             return;
         }
 
+        $entityMapper = $context->getEntityMapper();
+        if (null !== $entityMapper) {
+            foreach ($includedEntities as $entity) {
+                $entityMapper->registerEntity($entity);
+            }
+        }
         foreach ($includedEntities as $entity) {
             $entityData = $includedEntities->getData($entity);
             $this->processIncludedEntity(
@@ -92,6 +98,7 @@ class ProcessIncludedEntities implements ProcessorInterface
         $actionContext->setVersion($context->getVersion());
         $actionContext->getRequestType()->set($context->getRequestType());
         $actionContext->setRequestHeaders($context->getRequestHeaders());
+        $actionContext->setEntityMapper($context->getEntityMapper());
         $actionContext->setIncludedEntities($context->getIncludedEntities());
 
         $actionContext->setClassName($entityClass);

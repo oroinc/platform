@@ -82,14 +82,7 @@ define([
         _extendOptions: function(options) {
             var headerId;
             options = options || {};
-            _.extend(options, {
-                accepts: {
-                    // @TODO refactor server side action point to accept 'application/json'
-                    json: '*/*'
-                }
-            });
 
-            // @TODO discuss if 'x-oro-hash-navigation' header is still necessary
             headerId = mediator.execute('retrieveOption', 'headerId');
             if (headerId) {
                 options.headers = options.headers || {};

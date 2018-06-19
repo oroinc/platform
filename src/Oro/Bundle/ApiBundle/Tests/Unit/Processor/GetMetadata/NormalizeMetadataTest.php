@@ -7,7 +7,10 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeMetadata;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -19,6 +22,9 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
     private $metadataProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    private $entityOverrideProvider;
+
     /** @var NormalizeMetadata */
     private $processor;
 
@@ -28,11 +34,18 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+
+        $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
+        $entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->willReturn($this->entityOverrideProvider);
 
         $this->processor = new NormalizeMetadata(
             $this->doctrineHelper,
             new EntityMetadataFactory($this->doctrineHelper),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $entityOverrideProviderRegistry
         );
     }
 
@@ -762,5 +775,92 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $expectedMetadata->addAssociation($expectedLinkedAssociation1);
 
         self::assertEquals($expectedMetadata, $this->context->getResult());
+    }
+
+    public function testNormalizeAcceptableTargetClassNames()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'fields' => [
+                        'association11' => [
+                            'fields' => [
+                                'name' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'association2' => [
+                    'fields' => [
+                        'name' => null
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association1',
+                'Test\Association1Target',
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association1Target2', 'Test\Association1Target2']
+            )
+        );
+        $association1Metadata = new EntityMetadata();
+        $association1Metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association11',
+                EntityIdentifier::class,
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association11Target1', 'Test\Association11Target2']
+            )
+        );
+        $metadata->getAssociation('association1')->setTargetMetadata($association1Metadata);
+        $metadata->addAssociation(
+            $this->createAssociationMetadata(
+                'association2',
+                EntityIdentifier::class,
+                'manyToOne',
+                false,
+                'integer',
+                ['Test\Association2Target1', 'Test\Association2Target2']
+            )
+        );
+
+        $this->entityOverrideProvider->expects(self::exactly(4))
+            ->method('getSubstituteEntityClass')
+            ->willReturnMap([
+                ['Test\Association11Target1', null],
+                ['Test\Association11Target2', 'Test\Association11SubstituteTarget2'],
+                ['Test\Association2Target1', 'Test\Association2SubstituteTarget1'],
+                ['Test\Association2Target2', null]
+            ]);
+
+        $this->context->setConfig($configObject);
+        $this->context->setResult($metadata);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            ['Test\Association11Target1', 'Test\Association11SubstituteTarget2'],
+            $metadata
+                ->getAssociation('association1')
+                ->getTargetMetadata()
+                ->getAssociation('association11')
+                ->getAcceptableTargetClassNames()
+        );
+        self::assertEquals(
+            ['Test\Association2SubstituteTarget1', 'Test\Association2Target2'],
+            $metadata
+                ->getAssociation('association2')
+                ->getAcceptableTargetClassNames()
+        );
     }
 }
