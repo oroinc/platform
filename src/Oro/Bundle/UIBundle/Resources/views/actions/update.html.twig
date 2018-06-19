@@ -182,6 +182,7 @@
                     {% if activitiesData is not empty %}
                         {% set dataBlocks = dataBlocks|merge([{
                             'title': 'oro.activity.sections.activities'|trans,
+                            'class': 'nav-item',
                             'subblocks': [
                                 {
                                     'spanClass': 'empty',
@@ -198,6 +199,7 @@
                     {% if communicationsData is not empty %}
                         {% set dataBlocks = dataBlocks|merge([{
                             'title': 'Communications'|trans,
+                            'class': 'nav-item',
                             'subblocks': [
                                 {
                                     'spanClass': 'empty',
@@ -214,6 +216,7 @@
                     {% if additionalInformationData is not empty %}
                         {% set dataBlocks = dataBlocks|merge([{
                             'title': 'Additional Information'|trans,
+                            'class': 'nav-item',
                             'subblocks': [
                                 {
                                     'spanClass': 'empty',
@@ -230,6 +233,7 @@
                     {% if commentsData is not empty %}
                         {% set dataBlocks = dataBlocks|merge([{
                             'title': 'oro.comment.entity_plural_label'|trans,
+                            'class': 'nav-item',
                             'subblocks': [
                                 {
                                     'spanClass': 'responsive-cell activity-list-widget',

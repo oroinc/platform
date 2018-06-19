@@ -1,7 +1,34 @@
-// @theme: admin;
-@import '../variables/oro/nav-variables';
+/* @theme: admin.oro; */
 
 // Override default bootstrap styles
+.navbar {
+    .nav {
+        > li {
+            > a {
+                color: $navbar-li-a-color;
+                text-shadow: $navbar-li-a-text-shadow;
+
+                &:hover,
+                &:focus {
+                    color: $navbar-li-a-hover-color;
+                }
+            }
+        }
+
+        > .active {
+            > a {
+                font-weight: $navbar-active-a-font-weight;
+                color: $navbar-active-a-color;
+
+                &:hover,
+                &:focus {
+                    color: $navbar-active-a-hover-color;
+                }
+            }
+        }
+    }
+}
+
 .nav-tabs {
     > li > a,
     > .active > a {

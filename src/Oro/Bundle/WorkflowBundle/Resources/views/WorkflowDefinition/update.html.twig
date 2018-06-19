@@ -539,7 +539,7 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'active',
+        'class': 'nav-item active',
         'subblocks': [
             {
                 'data': [
@@ -592,6 +592,7 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'Designer'|trans,
+        'class': 'nav-item',
         'subblocks': [
             {
                 'data': [stepsListWidget]
