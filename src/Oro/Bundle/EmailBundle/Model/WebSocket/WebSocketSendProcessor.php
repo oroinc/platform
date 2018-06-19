@@ -4,24 +4,35 @@ namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Sends messages about new emails to websocket server.
+ */
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email_event/user_%s_org_%s';
+    const TOPIC = 'oro/email_event/%s/%s';
 
     /**
-     * @var TopicPublisher
+     * @var WebsocketClientInterface
      */
-    protected $publisher;
+    protected $websocketClient;
 
     /**
-     * @param TopicPublisher $publisher
+     * @var ConnectionChecker
      */
-    public function __construct(TopicPublisher $publisher)
+    protected $connectionChecker;
+
+    /**
+     * @param WebsocketClientInterface $websocketClient
+     * @param ConnectionChecker $connectionChecker
+     */
+    public function __construct(WebsocketClientInterface $websocketClient, ConnectionChecker $connectionChecker)
     {
-        $this->publisher = $publisher;
+        $this->websocketClient = $websocketClient;
+        $this->connectionChecker = $connectionChecker;
     }
 
     /**
@@ -33,9 +44,11 @@ class WebSocketSendProcessor
      */
     public static function getUserTopic($user, Organization $organization = null)
     {
-        $userId = $user instanceof User ? $user->getId() : $user;
-
-        return sprintf(self::TOPIC, $userId, $organization ? $organization->getId() : '');
+        return sprintf(
+            self::TOPIC,
+            $user instanceof User ? $user->getId() : $user,
+            $organization ? $organization->getId() : '*'
+        );
     }
 
     /**
@@ -45,7 +58,7 @@ class WebSocketSendProcessor
      */
     public function send($usersWithNewEmails)
     {
-        if ($usersWithNewEmails) {
+        if ($usersWithNewEmails && $this->connectionChecker->checkConnection()) {
             foreach ($usersWithNewEmails as $ownerId => $item) {
                 /** @var EmailUser $emailUser */
                 $emailUser = $item['entity'];
@@ -55,7 +68,7 @@ class WebSocketSendProcessor
                     'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : false
                 ];
 
-                $this->publisher->send($topic, json_encode($messageData));
+                $this->websocketClient->publish($topic, $messageData);
             }
         }
     }

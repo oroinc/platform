@@ -72,6 +72,7 @@ class CompleteAssociationHelper
                 $targetEntity = $field->createAndSetTargetEntity();
             }
 
+            $targetEntity->setParentResourceClass($targetDefinition->getParentResourceClass());
             $targetEntity->setIdentifierFieldNames($targetDefinition->getIdentifierFieldNames());
 
             if (!$isExcludeAll) {

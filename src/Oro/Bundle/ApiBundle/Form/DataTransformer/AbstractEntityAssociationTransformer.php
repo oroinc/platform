@@ -140,6 +140,18 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
     }
 
     /**
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    protected function resolveEntityClass($entityClass)
+    {
+        $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+
+        return $resolvedEntityClass ?? $entityClass;
+    }
+
+    /**
      * @param mixed $entityId
      *
      * @return string

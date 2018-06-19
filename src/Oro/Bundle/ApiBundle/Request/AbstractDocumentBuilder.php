@@ -163,9 +163,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     abstract protected function convertToEntityType($entityClass, RequestType $requestType, $throwException = true);
 
     /**
-     * @param mixed               $object
-     * @param RequestType         $requestType
-     * @param EntityMetadata|null $metadata
+     * @param mixed          $object
+     * @param RequestType    $requestType
+     * @param EntityMetadata $metadata
      *
      * @return string
      */

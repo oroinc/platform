@@ -5,33 +5,57 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\SyncBundle\Content\TopicSender;
+use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 
+/**
+ * Collects changes in entities and sends tags to websocket server using DataUpdateTopicSender.
+ */
 class DoctrineTagEventListener
 {
-    /** @var bool */
-    protected $isApplicationInstalled;
+    /**
+     * @var bool
+     */
+    private $isApplicationInstalled;
 
-    /** @var array */
-    protected $skipTrackingFor = [];
+    /**
+     * @var array
+     */
+    private $skipTrackingFor = [];
 
-    /** @var TopicSender */
-    protected $sender;
+    /**
+     * @var DataUpdateTopicSender
+     */
+    private $dataUpdateTopicSender;
 
-    /** @var array */
-    protected $collectedTags = [];
+    /**
+     * @var array
+     */
+    private $collectedTags = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $processedEntities = [];
 
     /**
-     * @param TopicSender      $sender
-     * @param bool|string|null $isApplicationInstalled
+     * @var TagGeneratorInterface
      */
-    public function __construct(TopicSender $sender, $isApplicationInstalled)
-    {
-        $this->sender = $sender;
+    private $tagGenerator;
+
+    /**
+     * @param DataUpdateTopicSender $dataUpdateTopicSender
+     * @param TagGeneratorInterface $tagGenerator
+     * @param bool|string|null      $isApplicationInstalled
+     */
+    public function __construct(
+        DataUpdateTopicSender $dataUpdateTopicSender,
+        TagGeneratorInterface $tagGenerator,
+        $isApplicationInstalled
+    ) {
+        $this->dataUpdateTopicSender = $dataUpdateTopicSender;
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
+        $this->tagGenerator = $tagGenerator;
     }
 
     /**
@@ -72,7 +96,7 @@ class DoctrineTagEventListener
      */
     public function postFlush(PostFlushEventArgs $event)
     {
-        $this->sender->send(array_unique($this->collectedTags));
+        $this->dataUpdateTopicSender->send(array_unique($this->collectedTags));
         $this->collectedTags = [];
         $this->processedEntities = [];
     }
@@ -108,7 +132,7 @@ class DoctrineTagEventListener
         ) {
             $this->collectedTags = array_merge(
                 $this->collectedTags,
-                $this->sender->getGenerator()->generate($entity, $includeCollectionTag)
+                $this->tagGenerator->generate($entity, $includeCollectionTag)
             );
             $this->processedEntities[$hash] = true;
         }

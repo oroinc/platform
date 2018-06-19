@@ -76,7 +76,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         }
 
         $this->context->setClassName($className);
-        $this->context->set('config_definition', null);
+        $this->context->setConfig(null);
         $this->processor->process($this->context);
 
         $this->assertFilters($filters, $this->context->getFilters());

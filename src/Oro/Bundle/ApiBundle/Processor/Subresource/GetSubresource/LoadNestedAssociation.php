@@ -45,16 +45,20 @@ class LoadNestedAssociation extends BaseLoadNestedAssociation
     {
         $data = parent::loadData($context, $associationName, $isCollection);
 
-        if (!empty($data) && !$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
-            $config = $context->getConfig();
-            $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
-                LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
-                $config
-            );
-            if ($titlePropertyPath) {
-                $data = $this->addTitle($data, $titlePropertyPath, $config);
-                $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
+        if (!$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
+            if (!empty($data)) {
+                $config = $context->getConfig();
+                if (null !== $config) {
+                    $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
+                        LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
+                        $config
+                    );
+                    if ($titlePropertyPath) {
+                        $data = $this->addTitle($data, $titlePropertyPath, $config);
+                    }
+                }
             }
+            $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
         }
 
         return $data;

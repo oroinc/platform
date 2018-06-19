@@ -1,0 +1,9 @@
+oro_entity_config.attribute_import:
+    channel: oro/attribute_import/{user_id}/{config_model_id}
+    handler:
+        callback: 'oro_entity_config.attribute_import'
+    requirements:
+        user_id:
+            pattern: '\d+'
+        config_model_id:
+            pattern: '\d+'

@@ -33,7 +33,9 @@ class BuildFormBuilder extends BaseBuildFormBuilder
     protected function getFormBuilder(ChangeRelationshipContext $context)
     {
         $formBuilder = parent::getFormBuilder($context);
-        $formBuilder->setDataMapper(new AppendRelationshipMapper($this->propertyAccessor));
+        $formBuilder->setDataMapper(
+            new AppendRelationshipMapper($this->propertyAccessor, $context->getEntityMapper())
+        );
 
         return $formBuilder;
     }
