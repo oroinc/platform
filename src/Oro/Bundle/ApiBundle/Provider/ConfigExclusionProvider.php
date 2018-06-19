@@ -38,7 +38,7 @@ class ConfigExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredEntity($className)
     {
-        if ($this->includeMatcher->isMatched($this->getEntityProperties($className))) {
+        if ($this->includeMatcher->isEntityMatched($className)) {
             return false;
         }
 
@@ -55,7 +55,7 @@ class ConfigExclusionProvider extends BaseExclusionProvider
         }
 
         $result = false;
-        if (!$this->includeMatcher->isMatched($this->getIncludeFieldProperties($metadata, $fieldName))) {
+        if (!$this->includeMatcher->isFieldMatched($metadata->name, $fieldName)) {
             $result = parent::isIgnoredField($metadata, $fieldName);
         }
 
@@ -74,28 +74,12 @@ class ConfigExclusionProvider extends BaseExclusionProvider
         }
 
         $result = false;
-        if (!$this->includeMatcher->isMatched($this->getIncludeFieldProperties($metadata, $associationName))) {
+        if (!$this->includeMatcher->isFieldMatched($metadata->name, $associationName)) {
             $result = parent::isIgnoredRelation($metadata, $associationName);
         }
 
         $this->cache[$metadata->name][$associationName] = $result;
 
         return $result;
-    }
-
-    /**
-     * Returns properties for entity field object for matching include rules
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return array
-     */
-    private function getIncludeFieldProperties(ClassMetadata $metadata, string $fieldName): array
-    {
-        return [
-            'entity' => $metadata->name,
-            'field'  => $fieldName
-        ];
     }
 }
