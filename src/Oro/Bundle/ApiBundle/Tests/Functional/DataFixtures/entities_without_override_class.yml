@@ -1,0 +1,31 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget:
+    target_1:
+        name: 'Target 1'
+    target_2:
+        name: 'Target 2'
+    target_3:
+        name: 'Target 3'
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+    owner_1:
+        name: 'Owner 1'
+        target: '@target_1'
+        targets: ['@target_1', '@target_2']
+    owner_2:
+        name: 'Owner 2'
+        target: '@target_2'
+        targets: ['@target_2']
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
+    activity_1:
+        name: 'Activity 1'
+        test_owner_655b996: ['@owner_1']
+        test_target_67911c5: ['@target_1']
+    activity_2:
+        name: 'Activity 2'
+        test_owner_655b996: ['@owner_2']
+        test_target_67911c5: ['@target_2']
+    activity_3:
+        name: 'Activity 3'
+        test_owner_655b996: ['@owner_1']
+    activity_4:
+        name: 'Activity 4'
+        test_owner_655b996: ['@owner_2']

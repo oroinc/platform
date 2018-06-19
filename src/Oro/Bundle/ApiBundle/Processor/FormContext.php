@@ -3,9 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * An interface for form related execution contexts,
+ * like contexts for such actions as "create", "update" and modify relationships.
+ */
 interface FormContext extends ContextInterface
 {
     /**
@@ -49,6 +54,20 @@ interface FormContext extends ContextInterface
      * @param IncludedEntityCollection|null $includedEntities
      */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null);
+
+    /**
+     * Gets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @return EntityMapper|null
+     */
+    public function getEntityMapper();
+
+    /**
+     * Sets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @param EntityMapper|null $entityMapper
+     */
+    public function setEntityMapper(EntityMapper $entityMapper = null);
 
     /**
      * Checks whether the form builder exists.

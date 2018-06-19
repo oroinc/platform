@@ -272,6 +272,41 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
+    public function testProcessWhenSortByAllowedAssociationFieldRequestedForModelInheritedFromManageableEntity()
+    {
+        $this->notManageableClassNames = [UserProfile::class];
+
+        $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);
+        $categoryConfig = $this->getConfig(['name'], ['name']);
+
+        $this->prepareFilters('category.name');
+
+        $this->context->setClassName(UserProfile::class);
+        $this->context->setConfig($primaryEntityConfig);
+        $primaryEntityConfig->setParentResourceClass(User::class);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                Category::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [
+                    new EntityDefinitionConfigExtra($this->context->getAction()),
+                    new SortersConfigExtra()
+                ]
+            )
+            ->willReturn($categoryConfig);
+
+        $this->processor->process($this->context);
+
+        self::assertEmpty($this->context->getErrors());
+        self::assertEquals(
+            ['category.name' => 'ASC'],
+            $this->context->getFilterValues()->get('sort')->getValue()
+        );
+    }
+
     public function testProcessWhenSortByNotAllowedAssociationFieldRequested()
     {
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['category']);

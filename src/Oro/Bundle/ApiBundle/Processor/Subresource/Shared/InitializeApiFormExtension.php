@@ -29,6 +29,7 @@ class InitializeApiFormExtension extends SwitchFormExtension implements Processo
 
         $this->switchToApiFormExtension($context);
         $this->rememberContext($context);
+        $this->metadataTypeGuesser->setEntityMapper($context->getEntityMapper());
         $this->metadataTypeGuesser->setIncludedEntities($context->getIncludedEntities());
         $this->metadataTypeGuesser->setMetadataAccessor(new ContextParentMetadataAccessor($context));
         $this->metadataTypeGuesser->setConfigAccessor(new ContextParentConfigAccessor($context));

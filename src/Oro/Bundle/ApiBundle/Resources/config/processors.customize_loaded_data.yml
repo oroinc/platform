@@ -3,5 +3,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes
         arguments:
             - '@oro_entity_extend.association_manager'
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: customize_loaded_data }

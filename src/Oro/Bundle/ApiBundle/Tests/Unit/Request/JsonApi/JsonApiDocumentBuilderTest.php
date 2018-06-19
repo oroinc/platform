@@ -68,32 +68,48 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The metadata should be provided.
-     */
     public function testSetDataObjectWithoutMetadata()
     {
         $object = [
             'id'   => 123,
-            'name' => 'Name',
+            'name' => 'Name'
         ];
 
         $this->documentBuilder->setDataObject($object, $this->requestType);
+
+        self::assertEquals(
+            [
+                'meta' => [
+                    'id'   => 123,
+                    'name' => 'Name'
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The metadata should be provided.
-     */
     public function testSetDataCollectionWithoutMetadata()
     {
         $object = [
             'id'   => 123,
-            'name' => 'Name',
+            'name' => 'Name'
         ];
 
         $this->documentBuilder->setDataCollection([$object], $this->requestType);
+
+        self::assertEquals(
+            [
+                'meta' => [
+                    'data' => [
+                        [
+                            'id'   => 123,
+                            'name' => 'Name'
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
     }
 
     /**
@@ -151,7 +167,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'type'          => 'test_entity',
                     'id'            => 'Test\Entity::123',
                     'meta'          => [
-                        'meta1' => 'Meta1',
+                        'meta1' => 'Meta1'
                     ],
                     'attributes'    => [
                         'name'         => 'Name',
@@ -294,7 +310,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'type'          => 'test_entity',
                         'id'            => 'Test\Entity::123',
                         'meta'          => [
-                            'meta1' => 'Meta1',
+                            'meta1' => 'Meta1'
                         ],
                         'attributes'    => [
                             'name'         => 'Name',
@@ -501,7 +517,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     public function testMissingAssociationsAsFields()
     {
         $object = [
-            'id' => 123,
+            'id' => 123
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -522,7 +538,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'missingToOne'  => null,
                         'missingToMany' => []
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -535,7 +551,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -555,7 +571,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'category' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -568,16 +584,16 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [123, 123],
             [
                 ['id' => 123],
-                ['id' => 123, 'name' => null],
+                ['id' => 123, 'name' => null]
             ],
             [
                 ['id' => 123, 'name' => 'name1'],
-                ['id' => 123, 'name' => 'name1'],
+                ['id' => 123, 'name' => 'name1']
             ],
             [
                 ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
-                ['id' => 123, 'name' => 'name1'],
-            ],
+                ['id' => 123, 'name' => 'name1']
+            ]
         ];
     }
 
@@ -588,7 +604,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -608,7 +624,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'categories' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -622,19 +638,19 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [[123, 124], [123, 124]],
             [
                 [['id' => 123], ['id' => 124]],
-                [['id' => 123, 'name' => null], ['id' => 124, 'name' => null]],
+                [['id' => 123, 'name' => null], ['id' => 124, 'name' => null]]
             ],
             [
                 [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
-                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']]
             ],
             [
                 [
                     ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
                     ['id' => 124, 'name' => 'name2', 'other' => 'val1']
                 ],
-                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
-            ],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']]
+            ]
         ];
     }
 
@@ -645,7 +661,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -664,7 +680,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'category' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -676,7 +692,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [null, null],
             [123, 123],
             [['id' => 123], 123],
-            [['id' => 123, 'name' => 'name1'], 123],
+            [['id' => 123, 'name' => 'name1'], 123]
         ];
     }
 
@@ -687,7 +703,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -706,7 +722,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'categories' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -725,7 +741,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
                 [123, 124]
-            ],
+            ]
         ];
     }
 
@@ -736,7 +752,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -745,7 +761,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('category', 'Test\Category')
         );
         $association->setDataType('scalar');
-        $association->setCollapsed(true);
+        $association->setCollapsed();
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -758,7 +774,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'category' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -771,12 +787,12 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             ['name1', 'name1'],
             [
                 ['name' => 'name1'],
-                'name1',
+                'name1'
             ],
             [
                 ['name' => 'name1', 'other' => 'val1'],
-                'name1',
-            ],
+                'name1'
+            ]
         ];
     }
 
@@ -787,7 +803,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -796,7 +812,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             $this->createAssociationMetadata('categories', 'Test\Category', true)
         );
         $association->setDataType('array');
-        $association->setCollapsed(true);
+        $association->setCollapsed();
         $association->getTargetMetadata()->removeField('id');
         $association->getTargetMetadata()->addField($this->createFieldMetadata('name'));
 
@@ -809,7 +825,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'attributes' => [
                         'categories' => $expected
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -823,15 +839,15 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
             [['name1', 'name2'], ['name1', 'name2']],
             [
                 [['name' => 'name1'], ['name' => 'name2']],
-                ['name1', 'name2'],
+                ['name1', 'name2']
             ],
             [
                 [
                     ['name' => 'name1', 'other' => 'val1'],
                     ['name' => 'name2', 'other' => 'val1']
                 ],
-                ['name1', 'name2'],
-            ],
+                ['name1', 'name2']
+            ]
         ];
     }
 
@@ -858,7 +874,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     ['id' => 780, 'name' => 'Role2']
                 ],
                 'unknown'    => 'test'
-            ],
+            ]
         ];
 
         $targetMetadata = $this->getEntityMetadata('Test\Target', ['id']);
@@ -915,7 +931,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                             'missingToMany' => []
                         ]
                     ]
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -973,7 +989,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'    => 123,
-            'meta1' => 'Meta1',
+            'meta1' => 'Meta1'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -988,9 +1004,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     'type' => 'test_entity',
                     'id'   => 'Test\Entity::123',
                     'meta' => [
-                        'resultMeta1' => 'Meta1',
-                    ],
-                ],
+                        'resultMeta1' => 'Meta1'
+                    ]
+                ]
             ],
             $this->documentBuilder->getDocument()
         );

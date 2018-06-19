@@ -1,0 +1,7 @@
+oro_reminder.remind:
+    channel: oro/reminder_remind/{user_id}
+    handler:
+        callback: 'oro_reminder.remind'
+    requirements:
+        user_id:
+            pattern: '\d+'

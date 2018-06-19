@@ -123,6 +123,13 @@ services:
         arguments:
             - '@oro_api.normalize_value.processor'
 
+    oro_api.query_resolver:
+        class: Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver
+        public: false
+        arguments:
+            - '@oro_entity.query_hint_resolver'
+            - '@oro_security.acl_helper'
+
     oro_api.object_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer
         public: false
@@ -318,6 +325,14 @@ services:
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
 
+    oro_api.entity_override_provider_registry:
+        class: Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry
+        public: false
+        arguments:
+            - [] # entity override providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@service_container'
+            - '@oro_api.request_expression_matcher'
+
     oro_api.entity_serializer.acl_filter:
         class: Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
         arguments:
@@ -359,10 +374,8 @@ services:
         public: false
         arguments:
             - '@oro_api.entity_serializer.doctrine_helper'
-            - '@oro_entity.query_hint_resolver'
-        calls:
-            - [setAclHelper, ['@oro_security.acl_helper']]
-            - [setQueryModifier, ['@oro_api.entity_serializer.query_modifier_registry']]
+            - '@oro_api.query_resolver'
+            - '@oro_api.entity_serializer.query_modifier_registry'
 
     oro_api.entity_serializer.query_modifier_registry:
         class: Oro\Bundle\ApiBundle\Util\QueryModifierRegistry

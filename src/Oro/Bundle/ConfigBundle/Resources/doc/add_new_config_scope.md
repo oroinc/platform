@@ -159,9 +159,10 @@ add new action to manipulate data:
 
                 // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
                 $taggableData = ['name' => 'organization_configuration', 'params' => [$activeGroup, $activeSubGroup]];
-                $sender       = $this->get('oro_sync.content.topic_sender');
+                $tagGenerator = $this->get('oro_sync.content.tag_generator');
+                $sender       = $this->get('oro_sync.content.data_update_topic_sender');
 
-                $sender->send($sender->getGenerator()->generate($taggableData));
+                $sender->send($tagGenerator->generate($taggableData));
             }
         }
 

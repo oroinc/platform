@@ -28,6 +28,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     public const GROUP_OPTION            = 'group';
     public const OVERRIDE_PATH_OPTION    = 'override_path';
 
+    private const HIDDEN_OPTION = 'hidden';
+
     /** @var string The group of routes that should be processed by this resolver */
     private $routeGroup;
 
@@ -99,7 +101,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             } else {
                 $entityType = $route->getDefault(self::ENTITY_ATTRIBUTE);
                 if ($entityType && $this->isResourceWithoutIdentifier($entityType)) {
-                    $route->setOption('hidden', true);
+                    $route->setOption(self::HIDDEN_OPTION, true);
                 }
             }
         }
@@ -127,7 +129,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             }
         }
         $route->setRequirement(self::ENTITY_ATTRIBUTE, '\w+');
-        $route->setOption('hidden', true);
+        $route->setOption(self::HIDDEN_OPTION, true);
     }
 
     /**
@@ -191,7 +193,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         $this->adjustRoutes($routes->getName($route), $route, $routes, [$entityType => $resource], $actions);
-        $route->setOption('hidden', true);
+        $route->setOption(self::HIDDEN_OPTION, true);
     }
 
     /**
@@ -485,7 +487,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                     \str_replace(
                         self::ASSOCIATION_PLACEHOLDER,
                         $associationName,
-                        str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath())
+                        \str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath())
                     )
                 );
                 $strictRoute->setMethods($methods);

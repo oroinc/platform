@@ -31,8 +31,8 @@ class SaveEntity implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $entity = $context->getResult();
-        if (!is_object($entity)) {
-            // entity does not exist
+        if (!\is_object($entity)) {
+            // an entity does not exist
             return;
         }
 

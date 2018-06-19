@@ -50,7 +50,7 @@ define(function(require) {
             this.$mainiMenu.after(this.overlay.$el);
 
             $(document).on('focusout.side-menu-focusout', _.debounce(function() {
-                if (!$.contains(this.$mainiMenu[0], document.activeElement)) {
+                if (!$.contains(this.$mainiMenu.parent()[0], document.activeElement)) {
                     this.overlay.trigger('leave-focus');
                 }
             }.bind(this), this.timeout));

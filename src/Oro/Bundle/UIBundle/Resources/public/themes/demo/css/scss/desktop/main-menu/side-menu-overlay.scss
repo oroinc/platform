@@ -33,6 +33,14 @@
         background-color: rgba($primary-inverse, .5);
     }
 
+    .menu-item {
+        &:not(.ui-helper) {
+            &:after {
+                background-color: $menu-item-first-level-text-color;
+            }
+        }
+    }
+
     .title {
         color: $menu-full-screen-title-color;
 

@@ -71,7 +71,7 @@ class ProtectQueryByAcl implements ProcessorInterface
         $config = $context->getConfig();
 
         $permission = null;
-        if ($config && $config->hasAclResource()) {
+        if (null !== $config && $config->hasAclResource()) {
             $aclResource = $config->getAclResource();
             if ($aclResource) {
                 $permission = $this->getEntityPermissionByAclResource($aclResource, $entityClass);
