@@ -11,7 +11,7 @@ Overview
 --------
 Websocket server works under Web Application Messaging Protocol (WAMP) which is intended to provide developers with
 the facilities they need to handle messaging between components, i.e. backend and frontend. Websocket server in Oro
-application utilizes Publish & Subscribe (PubSub) where one component subscribes to a topic, and another component
+application utilizes Publish & Subscribe (PubSub) pattern, where one component subscribes to a topic, and another component
 publishes to this topic. Websocket server router, by calling topic handlers, distributes events to all subscribers.
 
 Hence, if one wants to define a topic, he should declare a route for it and create a topic handler.
