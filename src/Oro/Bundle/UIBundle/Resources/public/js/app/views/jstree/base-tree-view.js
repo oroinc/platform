@@ -680,6 +680,7 @@ define(function(require) {
          * @private
          */
         _updateTreeFromData: function(data) {
+            data = data.tree;
             this.updateTreeConfig('core', {
                 data: _.isString(data) ? JSON.parse(data) : data
             });
