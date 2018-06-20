@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * Registers all providers of mandatory fields.
@@ -20,15 +19,10 @@ class MandatoryFieldProviderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find providers
         $providers = [];
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            if (!$container->getDefinition($id)->isPublic()) {
-                throw new LogicException(
-                    \sprintf('The mandatory field provider service "%s" should be public.', $id)
-                );
-            }
+            $container->getDefinition($id)->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $providers[] = [
                     $id,
@@ -40,7 +34,6 @@ class MandatoryFieldProviderCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // register
         $container->getDefinition(self::PROVIDER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $providers);
     }

@@ -219,10 +219,6 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The resource documentation parser service "parser1" should be public.
-     */
     public function testProcessWhenResourceDocParserIsNotPublic()
     {
         $config = ['api_doc_views' => []];
@@ -236,5 +232,13 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                ['parser1', 'rest']
+            ],
+            $this->registry->getArgument(0)
+        );
+        self::assertTrue($parser1->isPublic());
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 /**
- * Compares an entity or an entity field with on a set of rules this matcher contains.
+ * Compares an entity or an entity field with a set of rules this matcher contains.
  */
 class EntityRuleMatcher
 {

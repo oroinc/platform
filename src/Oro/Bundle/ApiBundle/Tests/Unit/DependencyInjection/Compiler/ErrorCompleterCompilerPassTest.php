@@ -65,10 +65,6 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage The error completer service "error_completer1" should be public.
-     */
     public function testProcessWhenErrorCompleterIsNotPublic()
     {
         $errorCompleter1 = $this->container->setDefinition('error_completer1', new Definition());
@@ -79,5 +75,13 @@ class ErrorCompleterCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                ['error_completer1', 'rest']
+            ],
+            $this->registry->getArgument(0)
+        );
+        self::assertTrue($errorCompleter1->isPublic());
     }
 }
