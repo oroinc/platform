@@ -20,7 +20,6 @@ class DataTransformerCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find data transformers
         $transformers = [];
         $taggedServices = $container->findTaggedServiceIds(self::DATA_TRANSFORMER_TAG);
         foreach ($taggedServices as $id => $attributes) {
@@ -36,10 +35,8 @@ class DataTransformerCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
         $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
 
-        // register
         $groupedTransformers = [];
         foreach ($transformers as list($transformer, $dataType, $requestType)) {
             $groupedTransformers[$dataType][] = [$transformer, $requestType];

@@ -5,13 +5,18 @@ namespace Oro\Component\ChainProcessor\DependencyInjection;
 use Oro\Component\ChainProcessor\ExpressionParser;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Provides a static method to load processors from DIC.
+ */
 class ProcessorsLoader
 {
     /**
+     * Loads load processors from DIC by the given tag.
+     *
      * @param ContainerBuilder $container
      * @param string           $processorTagName
      *
-     * @return array
+     * @return array [action => [priority => [[processor service id, processor attributes], ...], ...], ...]
      */
     public static function loadProcessors(ContainerBuilder $container, $processorTagName)
     {
@@ -34,14 +39,14 @@ class ProcessorsLoader
                 }
 
                 if (!$action && $group) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'Tag attribute "group" can be used only if '
-                            . 'the attribute "action" is specified. Service: "%s".',
-                            $id
-                        )
-                    );
+                    throw new \InvalidArgumentException(sprintf(
+                        'Tag attribute "group" can be used only if '
+                        . 'the attribute "action" is specified. Service: "%s".',
+                        $id
+                    ));
                 }
+
+                $container->getDefinition($id)->setPublic(true);
 
                 $priority = 0;
                 if (isset($attributes['priority'])) {

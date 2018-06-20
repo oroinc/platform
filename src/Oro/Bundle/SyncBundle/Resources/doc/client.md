@@ -1,5 +1,5 @@
-Topics and handlers
-===================
+Client
+======
 
 Table of content
 ----------------

@@ -32,7 +32,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
-        $processor1 = new Definition('Test\Processor2');
+        $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor');
 
         $container->addDefinitions([
@@ -196,7 +196,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [[], []]);
 
-        $processor1 = new Definition('Test\Processor2');
+        $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor', ['group' => 'group1']);
 
         $container->addDefinitions([
@@ -216,7 +216,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, []);
 
-        $processor1 = new Definition('Test\Processor2');
+        $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor');
 
         $container->addDefinitions([
@@ -246,7 +246,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $groups = ['action1' => ['group1' => 1]];
         $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [$groups]);
 
-        $processor1 = new Definition('Test\Processor2');
+        $processor1 = new Definition('Test\Processor1');
         $processor1->addTag('processor');
 
         $container->addDefinitions([
@@ -266,5 +266,37 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ['' => [0 => [['processor1', []]]]],
             $processorBagConfigBuilder->getArgument(1)
         );
+    }
+
+    public function testProcessForNotPublicProcessor()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $groups = ['action1' => ['group1' => 1]];
+        $processorBagConfigBuilder = new Definition(ProcessorBagConfigBuilder::class, [$groups]);
+
+        $processor1 = new Definition('Test\Processor1');
+        $processor1->setPublic(false);
+        $processor1->addTag('processor');
+
+        $container->addDefinitions([
+            'processor_bag_config_builder' => $processorBagConfigBuilder,
+            'processor1'                   => $processor1
+        ]);
+
+        $compilerPass = new LoadProcessorsCompilerPass('processor_bag_config_builder', 'processor');
+
+        $compilerPass->process($container);
+
+        self::assertEquals(
+            $groups,
+            $processorBagConfigBuilder->getArgument(0)
+        );
+        self::assertEquals(
+            ['' => [0 => [['processor1', []]]]],
+            $processorBagConfigBuilder->getArgument(1)
+        );
+        self::assertTrue($processor1->isPublic());
     }
 }

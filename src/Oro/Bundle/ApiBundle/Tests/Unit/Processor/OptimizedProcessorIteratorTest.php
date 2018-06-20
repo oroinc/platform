@@ -46,7 +46,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
     protected function getProcessorFactory()
     {
         $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects($this->any())
+        $factory->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -69,7 +69,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             $processorIds[] = $processor->getProcessorId();
         }
 
-        $this->assertEquals($expectedProcessorIds, $processorIds);
+        self::assertEquals($expectedProcessorIds, $processorIds);
     }
 
     public function testNoApplicableRules()
@@ -79,7 +79,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $processors = [
             ['processor1', []],
             ['processor2', ['group' => 'group1']],
-            ['processor3', []],
+            ['processor3', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
@@ -88,7 +88,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor2',
-                'processor3',
+                'processor3'
             ],
             $iterator
         );
@@ -102,7 +102,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor1', []],
             ['processor2', ['group' => 'group1']],
             ['processor3', ['group' => 'group1', 'disabled' => true]],
-            ['processor4', []],
+            ['processor4', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -116,7 +116,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor2',
-                'processor4',
+                'processor4'
             ],
             $iterator
         );
@@ -136,7 +136,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -146,7 +146,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor1',
                 'processor4',
                 'processor5',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -164,7 +164,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor3', ['group' => 'group2']],
             ['processor4', ['group' => 'group2']],
             ['processor5', ['group' => 'group3']],
-            ['processor6', ['group' => 'group3']],
+            ['processor6', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -172,7 +172,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertProcessors(
             [
                 'processor3',
-                'processor4',
+                'processor4'
             ],
             $iterator
         );
@@ -191,7 +191,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -203,7 +203,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor3',
                 'processor4',
                 'processor5',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -217,7 +217,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $processors = [
             ['processor1', []],
             ['processor2', ['group' => 'group1']],
-            ['processor3', []],
+            ['processor3', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
@@ -226,7 +226,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor2',
-                'processor3',
+                'processor3'
             ],
             $iterator
         );
@@ -243,7 +243,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor3', ['group' => 'group2']],
             ['processor4', ['group' => 'group2']],
             ['processor5', ['group' => 'group3']],
-            ['processor6', ['group' => 'group3']],
+            ['processor6', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -253,7 +253,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor1',
                 'processor2',
                 'processor3',
-                'processor4',
+                'processor4'
             ],
             $iterator
         );
@@ -273,7 +273,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -283,7 +283,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor1',
                 'processor4',
                 'processor5',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -304,7 +304,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -312,7 +312,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertProcessors(
             [
                 'processor1',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -331,7 +331,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -343,7 +343,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor5',
                 'processor6',
                 'processor7',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -357,7 +357,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $processors = [
             ['processor1', []],
             ['processor2', ['group' => 'group1']],
-            ['processor3', []],
+            ['processor3', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1'], $context);
@@ -366,7 +366,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor2',
-                'processor3',
+                'processor3'
             ],
             $iterator
         );
@@ -383,7 +383,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor3', ['group' => 'group2']],
             ['processor4', ['group' => 'group2']],
             ['processor5', ['group' => 'group3']],
-            ['processor6', ['group' => 'group3']],
+            ['processor6', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -393,7 +393,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor3',
                 'processor4',
                 'processor5',
-                'processor6',
+                'processor6'
             ],
             $iterator
         );
@@ -413,7 +413,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor5', ['group' => 'group2']],
             ['processor6', ['group' => 'group3']],
             ['processor7', ['group' => 'group3']],
-            ['processor8', []],
+            ['processor8', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -423,7 +423,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
                 'processor1',
                 'processor4',
                 'processor5',
-                'processor8',
+                'processor8'
             ],
             $iterator
         );
@@ -439,7 +439,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor2', ['group' => 'group1', 'disabled' => true]],
             ['processor3', ['group' => 'group1', 'disabled' => true]],
             ['processor4', ['group' => 'group2']],
-            ['processor5', []],
+            ['processor5', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -452,7 +452,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertProcessors(
             [
                 'processor1',
-                'processor5',
+                'processor5'
             ],
             $iterator
         );
@@ -468,7 +468,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor2', ['group' => 'group1', 'disabled' => true]],
             ['processor3', ['group' => 'group1']],
             ['processor4', ['group' => 'group2']],
-            ['processor5', []],
+            ['processor5', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -482,7 +482,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor3',
-                'processor5',
+                'processor5'
             ],
             $iterator
         );
@@ -498,7 +498,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor2', ['group' => 'group1']],
             ['processor3', ['group' => 'group1', 'disabled' => true]],
             ['processor4', ['group' => 'group2']],
-            ['processor5', []],
+            ['processor5', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -512,7 +512,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor2',
-                'processor5',
+                'processor5'
             ],
             $iterator
         );
@@ -531,7 +531,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor4', ['group' => 'group3']],
             ['processor5', ['group' => 'group4']],
             ['processor6', ['group' => 'group5']],
-            ['processor7', []],
+            ['processor7', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -543,7 +543,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $this->assertProcessors(
             [
                 'processor1',
-                'processor7',
+                'processor7'
             ],
             $iterator
         );
@@ -560,7 +560,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor2', ['group' => 'group2']],
             ['processor3', ['group' => 'group3']],
             ['processor4', ['group' => 'group4']],
-            ['processor5', ['group' => 'group5']],
+            ['processor5', ['group' => 'group5']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator(
@@ -586,7 +586,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor2', ['group' => 'group1']],
             ['processor3', ['group' => 'group2']],
             ['processor4', ['group' => 'group3']],
-            ['processor5', []],
+            ['processor5', []]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -595,7 +595,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             [
                 'processor1',
                 'processor3',
-                'processor5',
+                'processor5'
             ],
             $iterator
         );
@@ -610,7 +610,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
         $processors = [
             ['processor1', ['group' => 'group1']],
             ['processor2', ['group' => 'group2']],
-            ['processor3', ['group' => 'group3']],
+            ['processor3', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -629,7 +629,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             ['processor1', ['group' => 'group1']],
-            ['processor3', ['group' => 'group3']],
+            ['processor3', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -648,7 +648,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             ['processor1', ['group' => 'group1']],
-            ['processor3', ['group' => 'group3']],
+            ['processor3', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);
@@ -667,7 +667,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
 
         $processors = [
             ['processor1', ['group' => 'group1']],
-            ['processor3', ['group' => 'group3']],
+            ['processor3', ['group' => 'group3']]
         ];
 
         $iterator = $this->getOptimizedProcessorIterator($processors, ['group1', 'group2', 'group3'], $context);

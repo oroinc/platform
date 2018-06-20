@@ -20,7 +20,6 @@ class DocumentationProviderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find documentation providers
         $providers = [];
         $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
@@ -32,10 +31,8 @@ class DocumentationProviderCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
         $providers = DependencyInjectionUtil::sortByPriorityAndFlatten($providers);
 
-        // register
         $container->getDefinition(self::CHAIN_PROVIDER_SERVICE_ID)
             ->replaceArgument(0, $providers);
     }
