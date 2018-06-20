@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -151,7 +152,12 @@ class SegmentFilterTest extends OrmTestCase
         $segmentQueryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
         $this->subqueryLimitHelper = $this->createMock(SubQueryLimitHelper::class);
 
-        $segmentManager = new SegmentManager($this->em, $segmentQueryBuilderRegistry, $this->subqueryLimitHelper);
+        $segmentManager = new SegmentManager(
+            $this->em,
+            $segmentQueryBuilderRegistry,
+            $this->subqueryLimitHelper
+        );
+        $segmentManager->setCache(new ArrayCache());
 
         $this->filter = new SegmentFilter(
             $this->formFactory,

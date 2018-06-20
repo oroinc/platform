@@ -34,7 +34,13 @@ class SegmentManagerTest extends WebTestCase
             LoadUserData::class
         ]);
 
-        $this->manager = $this->getContainer()->get('oro_segment.segment_manager');
+        $this->manager = self::getContainer()->get('oro_segment.segment_manager');
+    }
+
+    protected function tearDown()
+    {
+        self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
+        parent::tearDown();
     }
 
     public function testGetSegmentTypeChoices()
