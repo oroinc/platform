@@ -1273,7 +1273,7 @@
 
     {% set id = widget.vars.id ~ '_collection' %}
     <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" data-page-component-module="oropricing/js/app/components/price-lists-errors-handler">
-        <div class="drag-n-drop-sorting-view__wrapper" {{ _self.renderPageComponentAttributes({
+        <div class="drag-n-drop-sorting-view__wrapper row-oro" {{ _self.renderPageComponentAttributes({
             module: 'oroui/js/app/components/view-component',
             options: {
                 view: 'oroui/js/drag-n-drop-sorting',
