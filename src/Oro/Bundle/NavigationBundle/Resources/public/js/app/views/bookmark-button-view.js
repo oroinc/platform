@@ -1,10 +1,9 @@
-define([
-    'oroui/js/mediator',
-    'oroui/js/app/views/base/page-region-view'
-], function(mediator, PageRegionView) {
+define(function(require) {
     'use strict';
 
     var BookmarkButtonView;
+    var mediator = require('oroui/js/mediator');
+    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
     var document = window.document;
     var titleRendered = null;
 

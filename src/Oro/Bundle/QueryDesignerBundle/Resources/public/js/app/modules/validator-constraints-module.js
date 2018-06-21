@@ -1,11 +1,7 @@
-define([
-    'oroui/js/app/controllers/base/controller'
-], function(BaseController) {
+define(function(require) {
     'use strict';
 
-    BaseController.loadBeforeAction([
-        'jquery', 'jquery.validate'
-    ], function($) {
-        $.validator.loadMethod('oroquerydesigner/js/validator/not-blank-filters');
-    });
+    var $ = require('jquery.validate');
+
+    $.validator.loadMethod('oroquerydesigner/js/validator/not-blank-filters');
 });

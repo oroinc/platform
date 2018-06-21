@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var tools = require('oroui/js/tools');
@@ -9,7 +8,7 @@ define(function(require) {
     var validationHandler = require('oroform/js/optional-validation-groups-handler');
     var validateTopmostLabelMixin = require('oroform/js/validate-topmost-label-mixin');
     var error = require('oroui/js/error');
-    require('jquery.validate');
+    var $ = require('jquery.validate');
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -571,4 +570,6 @@ define(function(require) {
         }
         return validationRulesCopy;
     };
+
+    return $;
 });

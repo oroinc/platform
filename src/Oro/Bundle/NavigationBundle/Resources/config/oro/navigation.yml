@@ -42,6 +42,8 @@ navigation:
                 extras:
                     icon: 'fa-clock-o'
                     active_if_first_is_empty: true
+                    component_options:
+                        view: 'oronavigation/js/app/views/history-view'
                 uri: '#'
             favorite:
                 label: 'oro.navigation.menu.favorite.label'
@@ -52,6 +54,8 @@ navigation:
                 label: 'oro.navigation.menu.mostviewed.label'
                 extras:
                     icon: 'fa-flag'
+                    component_options:
+                        view: 'oronavigation/js/app/views/most-viewed-view'
                 uri: '#'
             menu_list_default:
                 label:    'oro.navigation.menu.menu_list_default.label'

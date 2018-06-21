@@ -2,15 +2,17 @@
 
 {% block root %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div class="tab-content">
         {% set items = item %}
         {% for item in items %}
             {% set showNonAuthorized = item.extras.show_non_authorized is defined and item.extras.show_non_authorized %}
             {% set displayable = item.extras.isAllowed or showNonAuthorized %}
+            {% set componentAttrs = item.extras.component_options is defined ? UI.renderPageComponentAttributes(item.extras.component_options) : '' %}
             {% if displayable %}
                 <div class="tab-pane{% if item.extras.active_if_first_is_empty|default(false) %} active{% endif %}"
-                     id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-content">
+                     id="{{- item.name|replace({' ': '_', '#': '_'})|lower|trim -}}-content" {{ componentAttrs }}>
                     {% set options = {'tabTitle': item.label} %}
                     {% set options = {'defaultUrl': path("oro_default")} %}
                     {% set options = options|merge(item.extras) %}

@@ -17,19 +17,22 @@
 {% endif %}
 
 {% if isDesktopVersion() and oro_config_value('oro_sidebar.sidebar_' ~ placement ~ '_active') == true %}
-    {% set pageComponent = {
+    {% set pageComponentOptions = {
         sidebarData: render(sidebarsGetURL),
         widgetsData: render(widgetsGetURL),
         availableWidgets: oro_sidebar_get_available_widgets(placement),
         urlRoot: sidebarPostURL,
         url: widgetPostURL
     } %}
-    {% if pageComponent.sidebarData is empty %}
-        {% set pageComponent = pageComponent|merge({
+    {% if pageComponentOptions.sidebarData is empty %}
+        {% set pageComponentOptions = pageComponentOptions|merge({
             sidebarData: {position: 'SIDEBAR_' ~ placement|upper}|json_encode
         }) %}
     {% endif %}
 
 <div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"
-     data-page-component-options="{{ pageComponent|json_encode }}"></div>
+    {{  UI.renderPageComponentAttributes({
+        module: 'orosidebar/js/app/components/sidebar-component',
+        options: pageComponentOptions
+    }) }}></div>
 {% endif %}

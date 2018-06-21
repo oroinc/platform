@@ -121,7 +121,7 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
             new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
             new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
-            new \Twig_SimpleFunction('oro_get_email_clank_event', [$this, 'getEmailClankEvent']),
+            new \Twig_SimpleFunction('oro_get_email_ws_event', [$this, 'getEmailWSChannel']),
             new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
         ];
     }
@@ -225,12 +225,12 @@ class EmailExtension extends \Twig_Extension
     }
 
     /**
-     * Return unique identificator for clank event. This identification
+     * Return unique identificator for websocket event. This identification
      * is used in notification widget to show message about new emails
      *
      * @return string
      */
-    public function getEmailClankEvent()
+    public function getEmailWSChannel()
     {
         $tokenAccessor = $this->getTokenAccessor();
         $currentUser = $tokenAccessor->getUser();
