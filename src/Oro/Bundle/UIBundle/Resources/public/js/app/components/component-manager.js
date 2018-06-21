@@ -522,7 +522,7 @@ define([
          * @returns {BaseComponent}
          */
         findComponent: function(el) {
-            var item =  _.find(this.components, function(item) {
+            var item = _.find(this.components, function(item) {
                 return item.el === el;
             });
             if (item) {
