@@ -2,14 +2,6 @@
 
 OroImapBundle enables the data synchronization between local user mailboxes provided by OroEmailBundle and remote email servers using the capabilities of the IMAP protocol.
 
-## Dependencies
-
-"zendframework/zend-mail": "2.1.5"
-
-Notes:
-- We have to use version 2.1.5 due an issue with *binary* content transfer encoding in version 2.1.6.
-
-
 ## Usage
 
 ``` php

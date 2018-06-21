@@ -10,8 +10,8 @@ use \Zend\Mail\Storage\Exception\RuntimeException;
 use \Zend\Mail\Storage\Part;
 use \Zend\Mime\Mime as BaseMime;
 use \Zend\Stdlib\ErrorHandler;
-use Oro\Bundle\EmailBundle\Mail\Headers;
-use Oro\Bundle\EmailBundle\Mime\Decode;
+use Oro\Bundle\ImapBundle\Mail\Headers;
+use Oro\Bundle\ImapBundle\Mime\Decode;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

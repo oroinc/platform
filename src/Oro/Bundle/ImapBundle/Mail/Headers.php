@@ -3,32 +3,29 @@
 /**
  * This file is a copy of {@see Zend\Mail\Headers}
  *
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
-namespace Oro\Bundle\EmailBundle\Mail;
+
+namespace Oro\Bundle\ImapBundle\Mail;
 
 use \Zend\Mail\Exception\RuntimeException;
 use \Zend\Mail\Header\HeaderInterface;
 use \Zend\Mail\Headers as BaseHeaders;
-use Oro\Bundle\EmailBundle\Mail\Header\HeaderLoader;
+use Oro\Bundle\ImapBundle\Mail\Header\HeaderLoader;
 
+/**
+ * The Zend Framework zend-mail package provides more strictly rules for email headers.
+ * To simplify checks they need to be overridden as the zend-mail is used only for import emails, and it is assumed
+ * that if email exists on the mail server it has passed all checks and can be safety imported.
+ */
 class Headers extends BaseHeaders
 {
     /**
-     * Populates headers from string representation
-     *
-     * Parses a string for headers, and aggregates them, in order, in the
-     * current instance, primarily as strings until they are needed (they
-     * will be lazy loaded)
-     *
-     * @param  string $string
-     * @param  string $EOL EOL string; defaults to {@link EOL}
-     * @throws RuntimeException
-     * @return Headers
+     * {@inheritdoc}
      */
     public static function fromString($string, $EOL = self::EOL)
     {
-        $headers     = new static();
+        $headers = new static();
         $currentLine = '';
 
         // iterate the header lines, some might be continuations
@@ -57,6 +54,7 @@ class Headers extends BaseHeaders
         if ($currentLine) {
             $headers->addHeaderLine($currentLine);
         }
+
         return $headers;
     }
 
@@ -74,6 +72,7 @@ class Headers extends BaseHeaders
         if ($this->getEncoding() !== 'ASCII') {
             $header->setEncoding($this->getEncoding());
         }
+
         return $this;
     }
 

@@ -7,6 +7,7 @@ use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Zend\Mail\Exception\ExceptionInterface as ZendMailException;
 use Zend\Mail\Storage\Exception as BaseException;
 
 /**
@@ -74,6 +75,9 @@ class Imap extends \Zend\Mail\Storage\Imap
      * @var array
      */
     private $uniqueIds = [];
+
+    /** @var \Closure */
+    private $onConvertError;
 
     /**
      * {@inheritdoc}
@@ -267,6 +271,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      * @param int[] $ids int numbers of messages
      *
      * @return Message[] key = message id
+     * @throws \Exception
      */
     public function getMessages($ids)
     {
@@ -274,7 +279,15 @@ class Imap extends \Zend\Mail\Storage\Imap
 
         $items = $this->protocol->fetch($this->getMessageItems, $ids);
         foreach ($items as $id => $data) {
-            $messages[$id] = $this->createMessageObject($id, $data);
+            try {
+                $messages[$id] = $this->createMessageObject($id, $data);
+            } catch (ZendMailException $e) {
+                if (null !== $this->onConvertError) {
+                    call_user_func($this->onConvertError, $e);
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         return $messages;
@@ -439,7 +452,7 @@ class Imap extends \Zend\Mail\Storage\Imap
             $flags[] = isset(static::$knownFlags[$flag]) ? static::$knownFlags[$flag] : $flag;
         }
 
-        /** @var \Zend\Mail\Storage\Message $message */
+        /** @var \Oro\Bundle\ImapBundle\Mail\Storage\Message $message */
         $message = new $this->messageClass(
             [
                 'handler' => $this,
@@ -466,6 +479,18 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
+    }
+
+    /**
+     * Sets a callback function that will handle message convert error.
+     * If this callback set then iterator will work in fail safe mode invalid messages will just skipped.
+     *
+     * @param \Closure|null $callback The callback function.
+     *                                function (\Exception)
+     */
+    public function setConvertErrorCallback(\Closure $callback = null)
+    {
+        $this->onConvertError = $callback;
     }
 
     /**

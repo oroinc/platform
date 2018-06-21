@@ -3,19 +3,23 @@
 /**
  * This file is a copy of {@see Zend\Mail\Header\ContentType}
  *
- * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2005-2018 Zend Technologies USA Inc. (https://www.zend.com)
  */
-namespace Oro\Bundle\EmailBundle\Mail\Header;
+
+namespace Oro\Bundle\ImapBundle\Mail\Header;
 
 use \Zend\Mail\Header\ContentType as BaseContentType;
 use \Zend\Mail\Header\Exception\InvalidArgumentException;
-use Oro\Bundle\EmailBundle\Mail\Headers;
+use Oro\Bundle\ImapBundle\Mail\Headers;
 
+/**
+ * The Zend Framework zend-mail package provides more strictly rules for email headers.
+ * To simplify checks they need to be overridden as the zend-mail is used only for import emails, and it is assumed
+ * that if email exists on the mail server it has passed all checks and can be safety imported.
+ */
 class ContentType extends BaseContentType
 {
-    /**
-     * @var Headers
-     */
+    /** @var Headers */
     protected static $headers;
 
     /**
@@ -31,9 +35,9 @@ class ContentType extends BaseContentType
             throw new InvalidArgumentException('Invalid header line for Content-Type string');
         }
 
-        $value  = str_replace(Headers::FOLDING, " ", $value);
+        $value = str_replace(Headers::FOLDING, " ", $value);
         $values = preg_split('#\s*;\s*#', $value);
-        $type   = array_shift($values);
+        $type = array_shift($values);
 
         $header = new static();
         $header->setType($type);

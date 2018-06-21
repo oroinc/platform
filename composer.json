@@ -47,7 +47,7 @@
         "escapestudios/wsse-authentication-bundle": "2.3.*",
         "liip/imagine-bundle": "1.9.*",
         "leafo/scssphp": "0.6.*",
-        "zendframework/zend-mail": "2.4.0",
+        "zendframework/zend-mail": "2.10.0",
         "mtdowling/cron-expression": "1.2.*",
         "gos/web-socket-bundle": "1.8.11",
         "guzzle/guzzle": "3.7.*",

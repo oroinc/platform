@@ -5,12 +5,12 @@
  *
  * @copyright Copyright (c) 2005-2013 Zend Technologies USA Inc. (http://www.zend.com)
  */
-namespace Oro\Bundle\EmailBundle\Mime;
+namespace Oro\Bundle\ImapBundle\Mime;
 
 use \Zend\Mime\Decode as BaseDecode;
 use \Zend\Mime\Mime;
 use \Zend\Stdlib\ErrorHandler;
-use Oro\Bundle\EmailBundle\Mail\Headers;
+use Oro\Bundle\ImapBundle\Mail\Headers;
 
 class Decode extends BaseDecode
 {
