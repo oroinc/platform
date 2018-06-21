@@ -1,64 +1,48 @@
 define(function(require) {
     'use strict';
 
-    var SwipeActionsManager;
-    var $ = require('jquery');
+    var SwipeableView;
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
-    var error = require('oroui/js/error');
+    var BaseView = require('oroui/js/app/views/base/view');
 
-    var DEFAULT_OPTIONS = {
+    SwipeableView = BaseView.extend({
+        optionNames: BaseView.prototype.optionNames.concat(['minDistanceXAxis', 'maxDistanceYAxis', 'maxAllowedTime']),
+
+        /** @type {string} */
+        direction: void 0,
+
+        /** @type {{x: Number, y: Number}|null} */
+        touchStartCoords: null,
+
+        /** @type {{x: Number, y: Number}|null} */
+        touchEndCoords: null,
+
+        /** @type {Number} */
+        elapsedTime: 0,
+
+        /** @type {Number} */
+        startTime: 0,
+
         minDistanceXAxis: 30,
+
         maxDistanceYAxis: 30,
-        maxAllowedTime: 1000
-    };
 
-    /**
-     * Swipe actions on mobile devices
-     *
-     * @param {String} elementSelector
-     * @param {Object} options
-     * @returns {*}
-     * @constructor
-     */
-    SwipeActionsManager = function(elementSelector, options) {
-        if (!elementSelector) {
-            return error.showErrorInConsole('"elementSelector" should be defined');
-        }
+        maxAllowedTime: 1000,
 
-        this.direction = null;
-        this.touchStartCoords = null;
-        this.touchEndCoords = null;
-        this.elapsedTime = 0;
-        this.startTime = 0;
-
-        this.$el = $(elementSelector);
-
-        this.swipeInitialize(options);
-    };
-
-    SwipeActionsManager.prototype = {
-        /**
-         * Initialize, merge options
-         *
-         * @param {Object} options
-         */
-        swipeInitialize: function(options) {
-            _.extend(this, _.defaults(_.pick(options,
-                ['minDistanceXAxis', 'maxDistanceYAxis', 'maxAllowedTime']
-            ), DEFAULT_OPTIONS));
-
-            this._bindEvents();
+        events: {
+            touchstart: '_swipeStart',
+            touchmove: '_swipeMove',
+            touchend: '_swipeEnd'
         },
 
         /**
-         * Bind touch events
-         * @private
+         * Swipe actions on mobile devices
+         *
+         * @inheritDoc
          */
-        _bindEvents: function() {
-            this.$el.on('touchstart', _.bind(this._swipeStart, this));
-            this.$el.on('touchmove', _.bind(this._swipeMove, this));
-            this.$el.on('touchend', _.bind(this._swipeEnd, this));
+        constructor: function SwipeableView(options) {
+            SwipeableView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -134,7 +118,7 @@ define(function(require) {
                 direction: this._getDirection(options.x)
             });
         }
-    };
+    });
 
-    return SwipeActionsManager;
+    return SwipeableView;
 });

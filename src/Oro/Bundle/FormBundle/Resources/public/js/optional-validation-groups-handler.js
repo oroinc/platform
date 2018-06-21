@@ -83,7 +83,7 @@ define(function(require) {
          */
         getHandler: function($group) {
             /**
-             * Handlers should be preloaded using Controller::loadBeforeAction
+             * Handlers should be preloaded using app-module
              */
             var handler = $group.data('validation-optional-group-handler');
 

@@ -15,3 +15,9 @@
 {% block label %}
     {{ oro_title_render(item.label) }}
 {% endblock %}
+
+{% block list_wrapper %}
+    {% if item.hasChildren and item.parent is null %}
+        {{ block('list') }}
+    {% endif %}
+{% endblock %}

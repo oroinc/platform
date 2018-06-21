@@ -1,13 +1,9 @@
-define([
-    'oroui/js/app/controllers/base/controller'
-], function(BaseController) {
+define(function(require) {
     'use strict';
 
-    BaseController.loadBeforeAction([
-        'oroui/js/mediator',
-        'oroentity/js/app/models/entity-relationship-collection'
-    ], function(mediator, EntityRelationshipCollection) {
-        mediator.setHandler('getEntityRelationshipCollection',
-            EntityRelationshipCollection.getEntityRelationshipCollection);
-    });
+    var mediator = require('oroui/js/mediator');
+    var EntityRelationshipCollection = require('oroentity/js/app/models/entity-relationship-collection');
+
+    mediator.setHandler('getEntityRelationshipCollection',
+        EntityRelationshipCollection.getEntityRelationshipCollection);
 });
