@@ -1,50 +1,16 @@
-.force-grabbed-cursor *{
-  cursor: move !important;
-  cursor: -moz-grabbing !important;
-  cursor: -webkit-grabbing !important;
+/* @theme: admin.oro; */
+
+.force-grabbed-cursor * {
+    cursor: move !important;
+    cursor: -moz-grabbing !important;
+    cursor: -webkit-grabbing !important;
 }
 
 .force-grabbed-cursor {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.drag-n-drop-sorting-view {
-  width: 400px;
-
-  &__wrapper {
-    &.disabled {
-      .removeRow {
-        pointer-events: none;
-      }
-    }
-  }
-
-  &__column {
-    width: 315px;
-  }
-
-  &__column_options {
-    min-width: 70px;
-  }
-
-  .table-bordered {
-    display: block;
-  }
-
-  .grid-container {
-    margin-bottom: 12px;
-  }
-
-  .sortable-wrapper .removeRow {
-    margin-left: -45px;
-  }
-
-  .ui-sortable-helper .removeRow {
-    margin: 0 8px 0 -13px;
-  }
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

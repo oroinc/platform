@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .jstree-wrapper {
     position: $jstree-wrapper-position;
 
@@ -53,8 +55,8 @@
     }
 
     .jstree {
-        margin: $jstree-offset;
-        outline: $jstree-outline;
+        margin: $jstree-wrapper-jstree-offset;
+        outline: $jstree-wrapper-jstree-outline;
 
         .search-no-results {
             width: $jstree-search-no-results-width;
