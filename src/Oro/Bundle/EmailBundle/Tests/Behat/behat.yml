@@ -50,6 +50,10 @@ oro_behat_extension:
     RemoveEmail:
       selector: '.select2-search-choice-close'
 
+    Email Templates Grid:
+      selector: '[id^="grid-email-templates"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
   pages:
     User Emails:
       class: Oro\Bundle\EmailBundle\Tests\Behat\Page\UserEmails

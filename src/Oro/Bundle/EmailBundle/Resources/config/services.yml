@@ -1283,3 +1283,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.pre_load, method: onPreLoad }
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad }
+
+    oro_email.acl.voter.email_template_voter:
+        class: Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setClassName, ['%oro_email.emailtemplate.entity.class%']]
+        tags:
+            - { name: security.voter }
