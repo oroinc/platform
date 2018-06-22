@@ -200,6 +200,7 @@ config:
         'oroui/js/app/views/page/breadcrumb-view': 'bundles/oroui/js/app/views/page/breadcrumb-view.js'
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
         'oroui/js/app/views/page/main-menu-view': 'bundles/oroui/js/app/views/page/main-menu-view.js'
+        'oroui/js/app/views/page/organization-switch-view': 'bundles/oroui/js/app/views/page/organization-switch-view.js'
         'oroui/js/app/views/page/user-menu-view': 'bundles/oroui/js/app/views/page/user-menu-view.js'
         'oroui/js/app/views/page/messages-view': 'bundles/oroui/js/app/views/page/messages-view.js'
         'oroui/js/app/views/page/debug-toolbar-view': 'bundles/oroui/js/app/views/page/debug-toolbar-view.js'
