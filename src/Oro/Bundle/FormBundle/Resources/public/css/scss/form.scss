@@ -1,6 +1,11 @@
-/* @theme: admin; */
+/* @theme: admin.oro; */
 
 .mce-tinymce {
+    .mce-panel {
+        background: $primary-900;
+        border: none;
+    }
+
     &.mce-panel {
         border: 2px solid $primary-750 !important;
         border-radius: 2px;

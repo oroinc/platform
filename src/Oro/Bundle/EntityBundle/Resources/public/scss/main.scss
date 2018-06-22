@@ -1,0 +1,19 @@
+.entity-fallback-container {
+
+    .selector {
+        width: auto !important;
+        span {
+            width: auto !important;
+            padding-right: 30px;
+        }
+    }
+
+    .use-fallback-checkbox {
+        margin-top: -2px;
+    }
+
+    .fallback-item-use-fallback {
+        padding: 0 6px;
+    }
+}
+

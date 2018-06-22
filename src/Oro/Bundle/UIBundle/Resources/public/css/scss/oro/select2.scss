@@ -1,4 +1,4 @@
-/* @theme: admin; */
+/* @theme: admin.oro; */
 .select2 {
     &-container {
         margin: $select2-container-offset;
@@ -14,13 +14,19 @@
         box-sizing: $select2-container-box-sizing;
         font-size: $select2-container-font-size;
 
-        .error & {
+        .error &,
+        .validation-error & {
             border-color: $input-error-border-color;
             color: $input-error-border-color;
         }
 
         &.select2-container-active {
             border-color: $secondary;
+
+            .error &,
+            .validation-error & {
+                border-color: $input-error-border-color;
+            }
         }
 
         .form-horizontal & {
@@ -192,6 +198,7 @@
                     line-height: $select2-search-field-line-height;
                     border: $select2-search-field-border;
                     background-color: $select2-search-field-background-color;
+                    margin-bottom: $select2-search-field-offset-bottom;
                 }
             }
         }
@@ -224,6 +231,10 @@
         z-index: $select2-search-z-index;
 
         white-space: $select2-search-white-space;
+    }
+
+    &-input {
+        width: $select2-search-input-width;
     }
 
     &-drop {

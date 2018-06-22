@@ -302,6 +302,7 @@ $enable-safe-area: true;
             font-size: $size;
             font-family: FontAwesome;
 
+
             @content;
         }
     }

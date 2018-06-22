@@ -1,4 +1,4 @@
-/* @theme: admin; */
+/* @theme: admin.oro; */
 
 $select2-container-offset: 0 !default;
 $select2-container-position: relative !default;
@@ -33,7 +33,7 @@ $select2-choice-touch-callout: none !default;
 $select2-choice-user-select: none !default;
 $select2-choice-cursor: default !default;
 
-$select2-chosen-inner-offset: 8px 30px 7px 8px !default;
+$select2-chosen-inner-offset: 8px 45px 7px 8px !default;
 $select2-chosen-height: 28px !default;
 
 $select2-chosen-icon-height: 16px !default;
@@ -95,6 +95,7 @@ $select2-search-field-height: 28px !default;
 $select2-search-field-line-height: 28px !default;
 $select2-search-field-border: none !default;
 $select2-search-field-background-color: transparent !default;
+$select2-search-field-offset-bottom: 0 !default;
 
 $select2-search-field-offset: 0 !default;
 $select2-search-field-inner-offset: 0 !default;
@@ -124,7 +125,7 @@ $select2-search-multi-choice-close-right: 3px !default;
 $select2-search-multi-choice-close-top: 4px !default;
 
 $select2-search-choice-close-icon: "\f00d" !default;
-$select2-search-choice-close-icon-font-size: $base-font-size--lx !default;
+$select2-search-choice-close-icon-font-size: $base-font-size--m !default;
 $select2-search-choice-close-icon-right: 3px !default;
 $select2-search-choice-close-icon-top: 2px !default;
 $select2-search-choice-close-icon-color: $primary-200 !default;
@@ -154,6 +155,8 @@ $select2-search-inner-offset: 8px 8px 0 8px !default;
 $select2-search-position: relative !default;
 $select2-search-z-index: 10000 !default;
 $select2-search-white-space: nowrap !default;
+
+$select2-search-input-width: 100% !default;
 
 $select2-results-max-height: 300px !default;
 $select2-results-inner-offset: 8px !default;
@@ -256,5 +259,3 @@ $select2-drop-mask-position: absolute !default;
 $select2-drop-mask-left: 0 !default;
 $select2-drop-mask-top: 0 !default;
 $select2-drop-mask-z-index: 9998 !default;
-
-

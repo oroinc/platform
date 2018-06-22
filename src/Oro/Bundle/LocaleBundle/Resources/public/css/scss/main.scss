@@ -1,9 +1,7 @@
 /* @theme: admin.oro; */
 
 @import "variables/main";
+@import "fallback";
 
-@import "filter-button";
-@import "oro-filter";
-
-// mobile resolution
+// Mobile
 @import "mobile/main";

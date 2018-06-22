@@ -8,11 +8,14 @@
         display: flex;
 
         justify-content: space-between;
+
+        margin-bottom: 10px;
     }
 
     &__label {
         display: flex;
-        margin-bottom: 10px;
+        margin-top: 6px;
+        margin-bottom: 6px;
 
         &:before {
             display: inline-block;

@@ -1,12 +1,12 @@
-/* @theme: admin; */
+/* @theme: admin.oro; */
 
-$mobile-select2-container-font-size: $field-font-size !default;
+$mobile-select2-container-font-size: 16px !default;
 $mobile-select2-container-height: 40px !default;
 
 $mobile-select2-choice-height: 36px !default;
 
 $mobile-select2-chosen-height: 36px !default;
-$mobile-select2-chosen-inner-offset: 11px 30px 7px 10px !default;
+$mobile-select2-chosen-inner-offset: 11px 45px 7px 10px !default;
 
 $mobile-select2-arrow-font-size: 18px !default;
 $mobile-select2-arrow-top: 10px !default;
@@ -23,7 +23,7 @@ $mobile-select2-search-choice-close-right: 0 !default;
 $mobile-select2-search-choice-close-icon-top: 50% !default;
 $mobile-select2-search-choice-close-icon-right: 50% !default;
 $mobile-select2-search-choice-close-icon-position: absolute !default;
-$mobile-select2-search-choice-close-icon-transform: translate(-50%, 50%) !default;
+$mobile-select2-search-choice-close-icon-transform: translate(50%, -50%) !default;
 
 $mobile-select2-container-multi-top-min-height: 40px !default;
 $mobile-select2-container-multi-top-height: auto !default;

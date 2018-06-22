@@ -64,7 +64,6 @@
   }
   .btn-group {
     .btn {
-      height:27px;
       padding-left:7px;
       padding-right:9px;
       [class^="fa-"] {
@@ -89,7 +88,6 @@
   .extra-actions-panel {
     display: inline-block;
   }
-  .caret { margin-top:11px; }
 }
 .other-scroll-container {
   margin: $content-padding;

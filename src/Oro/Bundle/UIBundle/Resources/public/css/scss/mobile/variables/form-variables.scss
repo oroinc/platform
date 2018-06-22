@@ -1,5 +1,49 @@
-/* @theme: admin; */
+/* @theme: admin.oro; */
 
-$field-size: 40px;
-$field-font-size: 16px;
+$input-size: 40px;
+$input-width: 100%;
+$input-font-size: 16px;
 $input-inner-offset: 11px 12px 10px 12px;
+$input-appearance: none;
+
+$selector-inner-offset: 0;
+$selector-span-inner-offset: $input-inner-offset;
+$selector-span-line-height: 1;
+$selector-span-icon-top: 5px;
+$selector-span-icon-font-size: $base-font-size--l;
+
+$input-append-add-on-height: 40px;
+$input-append-add-on-width: 40px;
+$input-append-add-on-font-size: $base-font-size--m;
+
+$controls-fields-row-input-small-width: 140px;
+
+$form-horizontal-max-width: 100%;
+$form-horizontal-control-group-max-width: initial;
+$form-horizontal-control-group-offset: 0 0 7px;
+$form-horizontal-control-label-float: none;
+$form-horizontal-control-label-width: auto;
+$form-horizontal-control-label-inner-offset-left: 0;
+$form-horizontal-control-label-text-align: left;
+
+$form-horizontal-controls-offset-left: 0;
+$form-horizontal-controls-label-inner-offset-top: 6px;
+
+$control-group-checkbox-position: relative;
+$control-group-checkbox-display: inline-block;
+$control-group-checkbox-inner-offset-right: 16px;
+
+$control-group-checkbox-label-width: auto;
+$control-group-checkbox-label-offset-right: 2px;
+$control-group-checkbox-label-line-height: 18px;
+
+$control-group-checkbox-controls-position: absolute;
+$control-group-checkbox-controls-top: 0;
+$control-group-checkbox-controls-right: 0;
+
+$control-select2-container-width: 100%;
+$control-select2-container-max-width: 100%;
+
+$user-fieldset-offset: 7px 0;
+$well-offset-bottom: 7px;
+$well-tags-overlay-offset-bottom: 0;

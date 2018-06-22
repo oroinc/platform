@@ -184,6 +184,7 @@ label.disabled {
 
             .tooltip-icon {
                 margin-right: 5px;
+                color: $primary-700;
             }
 
             label {
@@ -1981,8 +1982,8 @@ ul.inline-extra {
 
 label.required em,
 .form-horizontal label.required em {
-    color: #c30b25;
-    font-size: 15px;
+    color: $danger-dark;
+    font-size: 21px;
     line-height: 1px;
 }
 
@@ -2107,52 +2108,6 @@ textarea {
 .uploader * {
     margin: 0;
     padding: 0;
-}
-
-/* Uploader */
-
-div.uploader {
-    height: 28px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    float: left;
-    line-height: 28px;
-    border-radius: 3px;
-    white-space: nowrap;
-}
-
-div.uploader span.action {
-    display: inline-block;
-    height: 28px;
-    border-left: 1px solid #ccc;
-    padding: 0 10px;
-    overflow: hidden;
-    cursor: pointer;
-    background: linear-gradient(#fff, #e6e6e6);
-}
-
-div.uploader.active span.action {
-    background: linear-gradient(#e6e6e6, #fff);
-}
-
-div.uploader span.filename {
-    padding: 0 10px;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: default;
-    width: 202px;
-
-    @media (max-width: 400px) {
-        width: 183px;
-    }
-}
-
-div.uploader input {
-    float: right;
-    height: 25px;
-    font-size: 40px; /* to expand real file input through whole ui substrate */
 }
 
 .ui-slider {
@@ -2351,6 +2306,7 @@ label.radio.error {
     input[type='email'],
     input[type='text'] {
         float: left;
+        margin-bottom: 0;
     }
 
     select,
@@ -2397,13 +2353,8 @@ label.radio.error {
         &:after {
             display: inline-block;
             font: 14px/1em FontAwesome;
-            color: #ddd;
             content: '\f00d';
             text-indent: 0;
-        }
-
-        &:hover:after {
-            color: #888;
         }
     }
 
@@ -2456,15 +2407,6 @@ label.radio.error {
             color: #bbb;
         }
     }
-}
-
-.form-horizontal .control-group {
-    margin: 0;
-    max-width: 800px;
-}
-
-.form-container .control-group {
-    margin: 0 0 10px;
 }
 
 

@@ -10,7 +10,8 @@ $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
 $input-font-family: $base-font-family !default;
 $input-color: $primary-200 !default;
-$input-outer-offset-bottom: 0 !default;
+$input-outer-offset-bottom: 10px !default;
+$input-control-group-outer-offset-bottom: 0 !default;
 $input-box-sizing: border-box !default;
 
 $input-focus-box-shadow: none !default;
@@ -27,6 +28,35 @@ $input-disabled-resize: none !default;
 
 $input-error-border-color: $danger-dark !default;
 $input-error-box-shadow: none !default;
+$input-error-color: $danger-dark !default;
+
+$uploader-border-radius: $input-field-border-radius !default;
+$uploader-background-color: $input-background-color !default;
+$uploader-border: $input-border !default;
+$uploader-height: $field-size !default;
+$uploader-line-height: $field-size !default;
+$uploader-float: left !default;
+$uploader-white-space: nowrap !default;
+$uploader-color: $input-color !default;
+$uploader-font-family: $input-font-family !default;
+
+$uploader-action-height: $field-size - 4px !default;
+$uploader-action-line-height: $field-size - 4px !default;
+$uploader-action-display: inline-block !default;
+$uploader-action-vertical-align: top !default;
+$uploader-action-inner-offset: 0 6px !default;
+$uploader-action-box-sizing: $input-box-sizing !default;
+$uploader-action-border-left: $input-border !default;
+
+$uploader-filename-width: 202px !default;
+
+$uploader-hover-border-color: $input-focus-border-color !default;
+$uploader-hover-cursor: pointer !default;
+$uploader-hover-action-border-left-color: $input-focus-border-color !default;
+
+$uploader-action-active-background: $additional-extra-light !default;
+$uploader-action-active-color: $primary-400 !default;
+$uploader-action-active-border-color: $additional-extra-light !default;
 
 $selector-line-height: $field-size !default;
 $selector-height: $field-size !default;
@@ -34,6 +64,7 @@ $selector-width: 235px !default;
 $selector-border: 2px solid $primary-750 !default;
 $selector-background-color: $primary-inverse !default;
 $selector-border-radius: 2px !default;
+$selector-inner-offset: 0 !default;
 
 $selector-option-inner-offset-left: 6px !default;
 
@@ -70,6 +101,8 @@ $checkbox-line-height: inherit !default;
 $checkbox-display: inline-block !default;
 $checkbox-vertical-align: middle !default;
 
+$checkbox-controls-offset-top: 12px !default;
+
 $checkbox-sibling-outer-offset-left: 5px !default;
 
 $checkbox-icon-display: inline-block !default;
@@ -104,6 +137,20 @@ $checkbox-input-position: absolute !default;
 $checkbox-input-z-index: absolute !default;
 $checkbox-input-display: none !default;
 
+$checkbox-icon-border-color: $secondary !default;
+$checkbox-icon-checked-background-color: $secondary !default;
+$checkbox-icon-checked-border-color: $secondary !default;
+
+$checkbox-icon-circle-checked-background-color: transparent !default;
+$checkbox-icon-circle-checked-border-color: $secondary !default;
+
+$checkbox-icon-circle-point-checked-background-color: $secondary !default;
+
+$checkbox-icon-disabled-background-color: $secondary !default;
+
+$checkbox-icon-indeterminate-background-color: $secondary !default;
+$checkbox-icon-indeterminate-border-color: $secondary !default;
+
 $checkbox-checked-icon: "\f00c" !default;
 $checkbox-indeterminate-icon: "\f068" !default;
 $checkbox-circle-checked-icon: "" !default;
@@ -115,13 +162,15 @@ $checkbox-disabled-pointer-events: none !default;
 $checkbox-text-outer-offset-left: 4px !default;
 $checkbox-text-vertical-align: middle !default;
 $checkbox-text-empty-display: none !default;
+$checkbox-label-empty-offset-top: 7px !default;
 
 // Add-on field button
+$add-on-vertical-align: middle !default;
 $add-on-float: none !default;
 $add-on-border: 2px solid $primary-750 !default;
 $add-on-background-color: $primary-inverse !default;
 $add-on-height: $field-size !default;
-$add-on-line-height: $field-size - 2px !default;
+$add-on-line-height: $field-size - 4px !default;
 $add-on-inner-offset: 0 5px !default;
 
 $add-on-input-outer-offset-top: -1px !default;
@@ -133,7 +182,18 @@ $add-on-disabled-background-color: $primary-900 !default;
 $add-on-disabled-color: $primary-700 !default;
 
 $add-on-append-border-radius: 0 2px 2px 0 !default;
+$add-on-append-offset-left: -2px !default;
 $add-on-append-outer-offset-left: 4px !default;
 
-$add-on-append-border-radius: 2px 0 0 2px !default;
-$add-on-append-outer-offset-right: 4px !default;
+$add-on-prepend-border-radius: 2px 0 0 2px !default;
+$add-on-prepend-offset-right: -2px !default;
+$add-on-prepend-outer-offset-right: 4px !default;
+
+$entity-create-btn-icon-offset: 0 !default;
+$entity-create-btn-icon-vertical-align: middle !default;
+
+$entity-create-btn-dropdown-toggle-width: 45px !default;
+$entity-create-btn-dropdown-toggle-border-radius: 0 2px 2px 0 !default;
+
+$controls-width: 279px !default;
+$controls-selector-width: 100% !default;
