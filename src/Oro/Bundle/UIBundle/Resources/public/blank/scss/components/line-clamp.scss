@@ -15,7 +15,7 @@
         overflow: $line-clamp-polyfill-overflow;
 
         &:after {
-            bottom: $line-clamp-polyfill-after-bottom;
+            top: $line-clamp-polyfill-after-top;
             right: $line-clamp-polyfill-after-right;
 
             width: $line-clamp-polyfill-after-width;
