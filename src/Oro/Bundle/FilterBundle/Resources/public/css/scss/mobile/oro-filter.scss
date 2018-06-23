@@ -4,14 +4,14 @@
   .filter-criteria {
     .btn-group {
       > .btn {
-        height: 40px;
-        line-height: 36px;
+        height: $mobile-filter-box-height;
+        line-height: $mobile-filter-box-line-height;
       }
     }
 
     .btn {
       .caret {
-        margin-top: 16px;
+        margin-top: $mobile-filter-box-caret-margin-top;
       }
     }
 
@@ -19,12 +19,12 @@
     .value-field-frame,
     .filter-value,
     .product-price-filter {
-      display: block;
+      display: $mobile-filter-box-product-price-filter-display;
     }
 
     .choice-filter {
       .btn-group.btn-block {
-        float: none;
+        float: $mobile-filter-box-choice-filter-float;
       }
     }
   }
