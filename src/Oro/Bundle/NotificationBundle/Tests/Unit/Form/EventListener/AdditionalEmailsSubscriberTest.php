@@ -96,8 +96,8 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
      * @param \PHPUnit_Framework_MockObject_MockObject $notification
      */
     protected function assertInitAdditionalRecipientChoicesCalls(
-        \PHPUnit_Framework_MockObject_MockObject $form,
-        \PHPUnit_Framework_MockObject_MockObject $notification
+        \PHPUnit\Framework\MockObject\MockObject $form,
+        \PHPUnit\Framework\MockObject\MockObject $notification
     ) {
         $recipientListClass = RecipientList::class;
         $groupClass = Group::class;

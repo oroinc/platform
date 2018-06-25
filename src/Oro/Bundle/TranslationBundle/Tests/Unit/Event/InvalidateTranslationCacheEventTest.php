@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 
-class InvalidateTranslationCacheEventTest extends \PHPUnit_Framework_TestCase
+class InvalidateTranslationCacheEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

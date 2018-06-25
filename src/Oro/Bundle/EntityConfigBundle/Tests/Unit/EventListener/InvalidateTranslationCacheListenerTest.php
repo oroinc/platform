@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListen
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class InvalidateTranslationCacheListenerTest extends \PHPUnit_Framework_TestCase
+class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject
