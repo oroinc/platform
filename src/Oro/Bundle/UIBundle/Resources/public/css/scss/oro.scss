@@ -2410,8 +2410,6 @@ span.validation-failed {
 
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {
-    .btn,
-    .btn-group a,
     .app-page__main label,
     .oro-subtitle,
     .title,
@@ -2422,7 +2420,7 @@ span.validation-failed {
 }
 
 .pull-left-extra {
-    margin-left: 20px;
+    margin-left: $content-padding * 3;
 }
 
 .tooltip-icon {

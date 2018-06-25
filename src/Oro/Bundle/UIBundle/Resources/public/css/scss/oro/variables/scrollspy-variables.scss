@@ -2,9 +2,10 @@
 
 $scrollspy-position: relative !default;
 $scrollspy-overflow: auto !default;
+$scrollspy-outline-data-scroll-focus: 0 none !default;
 
 $scrollspy-nav-background: $primary-900 !default;
-$scrollspy-nav-offset-bottom: 0 !default;
+$scrollspy-nav-offset: 0 $content-padding !default;
 $scrollspy-nav-border-radius: 16px !default;
 
 $scrollspy-nav-target-height: 20px !default;
@@ -12,11 +13,13 @@ $scrollspy-nav-target-height: 20px !default;
 $scrollspy-nav-navbar-inner-inner-offset: 0 !default;
 $scrollspy-nav-navbar-inner-border: none !default;
 $scrollspy-nav-navbar-inner-background: none !default;
+$scrollspy-nav-navbar-inner-box-shadow: none !default;
 
 $scrollspy-nav-navbar-inner-container-fluid-inner-offset: 0 !default;
 
 $scrollspy-nav-navbar-inner-nav-link-border-radius: 16px !default;
 $scrollspy-nav-navbar-inner-nav-link-active-background: $primary-830 !default;
+$scrollspy-nav-navbar-inner-nav-link-active-font-weight: normal !default;
 
 $scrollspy-title-background: $primary-900 !default;
 $scrollspy-title-font-size: $base-font-size !default;

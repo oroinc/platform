@@ -4,9 +4,13 @@
     position: $scrollspy-position;
     overflow: $scrollspy-overflow;
 
+    &[data-scroll-focus] {
+      outline: $scrollspy-outline-data-scroll-focus;
+    }
+
     &-nav {
         background: $scrollspy-nav-background;
-        margin-bottom: $scrollspy-nav-offset-bottom;
+        margin: $scrollspy-nav-offset;
         border-radius: $scrollspy-nav-border-radius;
 
         &-target {
@@ -17,6 +21,7 @@
             padding: $scrollspy-nav-navbar-inner-inner-offset;
             border: $scrollspy-nav-navbar-inner-border;
             background: $scrollspy-nav-navbar-inner-background;
+            box-shadow: $scrollspy-nav-navbar-inner-box-shadow;
 
             .container-fluid {
                 padding: $scrollspy-nav-navbar-inner-container-fluid-inner-offset;
@@ -28,6 +33,7 @@
                     &.active {
                         a {
                             background: $scrollspy-nav-navbar-inner-nav-link-active-background;
+                            font-weight: $scrollspy-nav-navbar-inner-nav-link-active-font-weight;
                         }
                     }
 
