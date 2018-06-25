@@ -18,6 +18,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 
+/**
+ * Add additional recipient choices
+ */
 class AdditionalEmailsSubscriber implements EventSubscriberInterface
 {
     const MAX_NESTING_LEVEL = 2;
@@ -176,7 +179,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
      */
     private function getFieldLabel($entityName, $fieldName)
     {
-        if (!$this->configManager->hasConfigEntityModel($entityName)) {
+        if (!$this->configManager->hasConfig($entityName, $fieldName)) {
             return $this->prettifyFieldName($fieldName);
         }
 
