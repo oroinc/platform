@@ -11,9 +11,14 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Manager that provides basic use of translations that are stored in the database
+ */
 class TranslationManager
 {
     const DEFAULT_DOMAIN = 'messages';
@@ -39,6 +44,9 @@ class TranslationManager
     /** @var Translation[] */
     protected $translations = [];
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param ManagerRegistry $registry
      * @param TranslationDomainProvider $domainProvider
@@ -52,6 +60,14 @@ class TranslationManager
         $this->registry = $registry;
         $this->domainProvider = $domainProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -255,6 +271,10 @@ class TranslationManager
      */
     public function invalidateCache($locale = null)
     {
+        $this->eventDispatcher->dispatch(
+            InvalidateTranslationCacheEvent::NAME,
+            new InvalidateTranslationCacheEvent($locale)
+        );
         $this->dbTranslationMetadataCache->updateTimestamp($locale);
     }
 

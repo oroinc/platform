@@ -477,3 +477,10 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@form.factory'
+
+    oro_entity_config.event_listener.invalidate_translation_cache:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }

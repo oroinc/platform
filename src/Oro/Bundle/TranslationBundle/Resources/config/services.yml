@@ -284,6 +284,8 @@ services:
             - '@doctrine'
             - '@oro_translation.provider.translation_domain'
             - '@oro_translation.database_translation.metadata.cache'
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_translation.cache.provider.domains:
         parent: oro.cache.abstract
