@@ -41,12 +41,10 @@ $enable-safe-area: true;
     font-weight: bold;
     padding-left: 15px;
     background: $accordion-heading-background-color;
-    border-bottom: 1px solid darken($accordion-heading-background-color, 5%);
-    border-top: 1px solid lighten($accordion-heading-background-color, 5%);
 }
 
 @mixin accordion-toggle-before() {
-    content: "\f0d7";
+    content: "\f107";
     font-family: FontAwesome;
     margin: 0 7px 0 -7px;
     width: 10px;
@@ -54,7 +52,7 @@ $enable-safe-area: true;
 }
 
 @mixin accordion-toggle-collapsed-before() {
-    content: "\f0da";
+    content: "\f105";
     margin: 0 5px 0 -5px;
 }
 

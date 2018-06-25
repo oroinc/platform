@@ -1399,47 +1399,6 @@ ul.inline-extra {
     }
 }
 
-.scrollspy-nav {
-    background-color: #f6f6f6;
-    border-bottom: 1px solid #c4c4c4;
-    margin-bottom: 0;
-    box-shadow: 0 2px 0 rgba(0, 0, 0, .03);
-
-    .navbar-inner {
-        padding: 0;
-        border: 0;
-        background: 0;
-
-        .container-fluid {
-            padding: 0 15px;
-
-            .nav {
-                > li a {
-                    padding: 5px 15px;
-                    color: #666;
-                    font-size: $base-font-size;
-
-                    &:hover {
-                        border-bottom: 3px solid #ddd;
-                        background: none;
-                        padding-bottom: 2px;
-                        color: #444 !important;
-                    }
-                }
-
-                .active a,
-                .active a:hover {
-                    border-bottom: 3px solid #555;
-                    background: none;
-                    padding-bottom: 2px;
-                    color: #111;
-                    font-weight: bold;
-                }
-            }
-        }
-    }
-}
-
 .customer-info-actions {
     background-color: #f6f6f6;
     border-bottom: 1px solid #ebebeb;
@@ -1462,12 +1421,6 @@ ul.inline-extra {
 .cb {
     display: block;
     clear: both;
-}
-
-.scrollspy {
-    /* height: 500px; */
-    position: relative;
-    overflow: auto;
 }
 
 .btn-action {
@@ -1553,23 +1506,6 @@ textarea {
     resize: vertical;
     text-align: left;
     vertical-align: top;
-}
-
-.scrollspy-title {
-    border: 1px solid #e5e5e5;
-    border-width: 1px 0;
-    margin: 0 -12px 0 -12px;
-    background: #fafafa;
-
-    /* background: linear-gradient(#fafafa, #f7f7f7); */
-    padding: 4px 20px;
-    color: lighten($body-color, 20%);
-    text-shadow: 0 1px 0 #fff;
-    line-height: 18px;
-}
-
-.scrollspy-nav-target {
-    height: 20px;
 }
 
 .oro-clearfix-width:after,
@@ -2474,8 +2410,6 @@ span.validation-failed {
 
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {
-    .btn,
-    .btn-group a,
     .app-page__main label,
     .oro-subtitle,
     .title,
@@ -2486,7 +2420,7 @@ span.validation-failed {
 }
 
 .pull-left-extra {
-    margin-left: 20px;
+    margin-left: $content-padding * 3;
 }
 
 .tooltip-icon {

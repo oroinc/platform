@@ -3,8 +3,9 @@
 @import "../colors";
 @import "variables/app-header";
 @import "variables/form-description";
+@import "variables/accordion-variables";
 
-$accordion-heading-background-color:        #eaeaea;
+$accordion-heading-background-color:        $primary-900;
 $content-padding:                           10px;
 $horizontal-padding:                        $content-padding;
 $vertical-padding:                          $content-padding;
