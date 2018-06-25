@@ -4,10 +4,6 @@
     position: $scrollspy-position;
     overflow: $scrollspy-overflow;
 
-    &[data-scroll-focus] {
-      outline: $scrollspy-outline-data-scroll-focus;
-    }
-
     &-nav {
         background: $scrollspy-nav-background;
         margin: $scrollspy-nav-offset;
@@ -58,4 +54,8 @@
         padding: $scrollspy-title-inner-offset;
         border-radius: $scrollspy-title-border-radius;
     }
+}
+
+[data-scroll-focus] {
+    outline: $scrollspy-data-scroll-focus-outline;
 }

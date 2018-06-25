@@ -2,7 +2,6 @@
 
 $scrollspy-position: relative !default;
 $scrollspy-overflow: auto !default;
-$scrollspy-outline-data-scroll-focus: 0 none !default;
 
 $scrollspy-nav-background: $primary-900 !default;
 $scrollspy-nav-offset: 0 $content-padding !default;
@@ -28,3 +27,5 @@ $scrollspy-title-color: $primary-200 !default;
 $scrollspy-title-offset: 0 !default;
 $scrollspy-title-inner-offset: 6px 16px !default;
 $scrollspy-title-border-radius: 4px !default;
+
+$scrollspy-data-scroll-focus-outline: 0 none !default;
