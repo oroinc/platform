@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 
-class EmailAddressTest extends \PHPUnit_Framework_TestCase
+class EmailAddressTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

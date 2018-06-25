@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -24,14 +24,14 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
     const TRANSITION_NAME = 'test_transition';
 
     /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $featureChecker;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $objectManager;
 
     /** @var TransitionEventTriggerHandler */
@@ -46,7 +46,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->objectManager = $this->createMock(ObjectManager::class);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
         $registry->expects($this->any())
             ->method('getManagerForClass')

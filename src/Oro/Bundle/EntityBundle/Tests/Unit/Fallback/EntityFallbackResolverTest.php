@@ -18,26 +18,26 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
+class EntityFallbackResolverTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_FALLBACK = 'testFallback';
 
-    /** @var ConfigBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $configBag;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var SystemConfigurationFormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SystemConfigurationFormProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $formProvider;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $configInterface;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var EntityFallbackResolver */
@@ -155,7 +155,7 @@ class EntityFallbackResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFallbackSupported()
     {
-        /** @var SystemConfigFallbackProvider|\PHPUnit_Framework_MockObject_MockObject $provider */
+        /** @var SystemConfigFallbackProvider|\PHPUnit\Framework\MockObject\MockObject $provider */
         $provider = $this->createMock(SystemConfigFallbackProvider::class);
         $provider->expects($this->once())
             ->method('isFallbackSupported')

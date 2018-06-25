@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IndexerTest extends \PHPUnit_Framework_TestCase
+class IndexerTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
@@ -294,7 +294,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     protected function createDoctrineHelperMock()
     {

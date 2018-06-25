@@ -6,10 +6,10 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeysValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class UniqueKeysValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueKeysValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

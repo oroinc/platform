@@ -3,10 +3,10 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AsseticBundle\Event\LoadCssEvent;
 
-class LoadCssEventTest extends \PHPUnit_Framework_TestCase
+class LoadCssEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $assetsConfiguration;
 

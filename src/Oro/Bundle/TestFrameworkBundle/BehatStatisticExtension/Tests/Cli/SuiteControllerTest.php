@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\InputStub;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class SuiteControllerTest extends \PHPUnit_Framework_TestCase
+class SuiteControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $suites = [
         'AcmeDemo1',

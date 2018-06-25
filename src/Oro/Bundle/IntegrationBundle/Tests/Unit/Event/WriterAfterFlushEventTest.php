@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 
-class WriterAfterFlushEventTest extends \PHPUnit_Framework_TestCase
+class WriterAfterFlushEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

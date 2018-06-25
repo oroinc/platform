@@ -25,18 +25,18 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 
-class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
+class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
     const TEST_ROUTE = 'test_route';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonProvider */
     protected $buttonProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
 
     /** @var DatagridActionButtonProvider */
@@ -50,7 +50,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
         $this->buttonProvider = $this->createMock(ButtonProvider::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper $contextHelper */
         $contextHelper = $this->createMock(ContextHelper::class);
         $contextHelper->expects($this->any())
             ->method('getContext')
@@ -77,7 +77,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
             ->with(self::PROVIDER_ALIAS)
             ->willReturn($massActionProvider);
 
-        /* @var $optionsHelper OptionsHelper|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $optionsHelper OptionsHelper|\PHPUnit\Framework\MockObject\MockObject */
         $optionsHelper = $this->getMockBuilder(OptionsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -529,7 +529,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
      * @param bool $isAvailable
      * @param array $extraData
      *
-     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createButton($name, $isAvailable = true, array $extraData = [])
     {
@@ -553,7 +553,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
      * @param bool $isAvailable
      * @param array $datagridOptions
      * @param string $label
-     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createOperationButton($name, $isAvailable, array $datagridOptions = [], $label = null)
     {
@@ -574,7 +574,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function createButtonsCollection(array $buttons)
     {
-        /** @var ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var ButtonProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())->method('find')->willReturn($buttons);
         $extension->expects($this->any())
@@ -594,7 +594,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $datagridOptions
      * @param string $label
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createOperation(array $datagridOptions, $label = null)
     {

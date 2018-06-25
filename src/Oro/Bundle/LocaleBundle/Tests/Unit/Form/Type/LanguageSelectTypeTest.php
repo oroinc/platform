@@ -20,10 +20,10 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocalizationChoicesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $registry;
 
     /** @var LanguageSelectType */

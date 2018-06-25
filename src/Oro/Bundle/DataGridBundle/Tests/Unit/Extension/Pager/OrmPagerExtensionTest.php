@@ -12,10 +12,10 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
-class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
+class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Pager
+     * @var \PHPUnit\Framework\MockObject\MockObject|Pager
      */
     protected $pager;
 
@@ -137,7 +137,7 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setMaxPerPage')
             ->with($maxPerPage);
 
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->getMockBuilder(OrmDatasource::class)
             ->disableOriginalConstructor()->getMock();
 
@@ -172,7 +172,7 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
                 ->with($count);
         }
 
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->getMockBuilder(OrmDatasource::class)
             ->disableOriginalConstructor()->getMock();
 
@@ -198,7 +198,7 @@ class OrmPagerExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('setCountQueryHints')
             ->with($hints);
 
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->getMockBuilder(OrmDatasource::class)
             ->disableOriginalConstructor()->getMock();
 

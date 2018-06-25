@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Request\Version;
 
-class ConfigBagTest extends \PHPUnit_Framework_TestCase
+class ConfigBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigBag */
     private $configBag;

@@ -11,12 +11,12 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class InterruptionDetailConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
+class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProcessorClassProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProcessorClassProvider */
     protected $messageProcessorClassProvider;
 
     /** @var InterruptionDetailConsumptionExtension */

@@ -9,7 +9,7 @@ use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
+class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ApiEventListener */
     protected $listener;
@@ -17,10 +17,10 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
     /** @var Request */
     protected $request;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestAuthorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
     /** @var RequestStack */

@@ -32,13 +32,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $configBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
     /** @var LoadFromConfigBag */

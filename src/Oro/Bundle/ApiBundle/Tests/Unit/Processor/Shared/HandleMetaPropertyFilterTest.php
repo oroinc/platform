@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $valueNormalizer;
 
     /** @var HandleMetaPropertyFilter */

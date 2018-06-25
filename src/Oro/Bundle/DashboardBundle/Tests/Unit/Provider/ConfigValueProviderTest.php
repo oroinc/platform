@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Provider\TestConverter;
 
-class ConfigValueProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigValueProvider */
     protected $provider;

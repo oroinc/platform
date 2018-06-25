@@ -16,19 +16,19 @@ use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
 {
-    /** @var Query|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
     private $query;
 
-    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $classMetadata;
 
-    /** @var ObjectRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     protected function setUp()

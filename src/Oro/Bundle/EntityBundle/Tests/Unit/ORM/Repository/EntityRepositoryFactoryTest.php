@@ -13,9 +13,9 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\TestEntityRepository;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 
-class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
+class EntityRepositoryFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()
@@ -127,7 +127,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -155,7 +155,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -187,7 +187,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -220,7 +220,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $classMetadata = new ClassMetadata($entityName);
         $classMetadata->customRepositoryClassName = TestEntityRepository::class;
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -8,9 +8,9 @@ use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class LanguageFilterTest extends \PHPUnit_Framework_TestCase
+class LanguageFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
     /** @var LanguageFilter */

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 
-class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
+class RecipientListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'OroUserBundle:User';
 
@@ -17,7 +17,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\EntityManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 
@@ -52,7 +52,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
         $users = new ArrayCollection([$userMock]);
         $groups = new ArrayCollection([$groupMock]);
 
-        /** @var RecipientList|\PHPUnit_Framework_MockObject_MockObject $recipientList */
+        /** @var RecipientList|\PHPUnit\Framework\MockObject\MockObject $recipientList */
         $recipientList = $this->createMock(RecipientList::class);
         $recipientList->expects($this->once())
             ->method('getUsers')

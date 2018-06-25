@@ -6,7 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class OrganizationRememberMeTokenFactoryTest extends \PHPUnit_Framework_TestCase
+class OrganizationRememberMeTokenFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

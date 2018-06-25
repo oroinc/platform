@@ -4,7 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\Region;
 
-class RegionTest extends \PHPUnit_Framework_TestCase
+class RegionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetRegionCombinedCode()
     {

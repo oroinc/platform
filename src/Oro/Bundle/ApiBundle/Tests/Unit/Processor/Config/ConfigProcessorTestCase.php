@@ -17,7 +17,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
+class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
     protected const TEST_CLASS_NAME   = 'Test\Class';
     protected const TEST_VERSION      = '1.1';
@@ -109,7 +109,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {

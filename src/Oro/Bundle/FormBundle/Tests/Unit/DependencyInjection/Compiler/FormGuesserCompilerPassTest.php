@@ -7,11 +7,11 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase
+class FormGuesserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessNoDefinition()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('hasDefinition')
@@ -45,7 +45,7 @@ class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->method('replaceArgument')
             ->with(2, $expectedGuessers);
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerBuilder::class);
         $container->expects($this->once())
             ->method('hasDefinition')

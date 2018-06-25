@@ -13,25 +13,25 @@ use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 
-class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
+class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeNormalizer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflow;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeManager;
 
@@ -222,7 +222,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * Test variable denormalization
      *
-     * @dataProvider testDenormalizeExceptionsProvider
+     * @dataProvider denormalizeExceptionsProvider
      *
      * @param string $exception
      * @param string $message
@@ -269,7 +269,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function testDenormalizeExceptionsProvider()
+    public function denormalizeExceptionsProvider()
     {
         return [
             'entity_no_manager' => [
@@ -409,7 +409,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
      * @param Variable|null $expected
      * @param array $options
      *
-     * @return WorkflowVariableNormalizer|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getMockNormalizer(Variable $expected = null, array $options = [])
     {

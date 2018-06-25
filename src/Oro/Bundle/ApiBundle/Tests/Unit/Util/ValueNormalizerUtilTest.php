@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
-class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
+class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider humanizeClassNameDataProvider

@@ -13,12 +13,12 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
-class AddConsumerStateProcessorTest extends \PHPUnit_Framework_TestCase
+class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumerState */
     private $consumerState;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProcessorClassProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProcessorClassProvider */
     private $messageProcessorClassProvider;
 
     /** @var AddConsumerStateProcessor */
@@ -48,7 +48,7 @@ class AddConsumerStateProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $messageId
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     private function getMessageMock($messageId)
     {

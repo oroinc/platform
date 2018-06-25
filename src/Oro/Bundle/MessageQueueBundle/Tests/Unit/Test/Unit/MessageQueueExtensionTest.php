@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Unit;
 
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 
-class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
+class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 

@@ -21,39 +21,39 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
-class EntityListenerTest extends \PHPUnit_Framework_TestCase
+class EntityListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityListener */
     private $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailOwnerManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailActivityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailThreadManager;
 
     /** @var EmailOwnerProviderStorage */
     private $emailOwnerStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $userEmailOwnerProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailActivityUpdates;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface */
     private $producer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailAddressManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailAddressManager */
     private $emailAddressManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     private $entityRepository;
 
     protected function setUp()
@@ -328,7 +328,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     private function createClassMetadataMock()
     {
@@ -336,7 +336,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadataInfo
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadataInfo
      */
     private function createClassMetadataInfoMock()
     {
@@ -344,7 +344,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
      */
     private function createEntityManagerMock()
     {
@@ -352,7 +352,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OnFlushEventArgs
+     * @return \PHPUnit\Framework\MockObject\MockObject|OnFlushEventArgs
      */
     private function createOnFlushEventArgsMock()
     {
@@ -360,7 +360,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PostFlushEventArgs
+     * @return \PHPUnit\Framework\MockObject\MockObject|PostFlushEventArgs
      */
     private function createPostFlushEventArgsMock()
     {

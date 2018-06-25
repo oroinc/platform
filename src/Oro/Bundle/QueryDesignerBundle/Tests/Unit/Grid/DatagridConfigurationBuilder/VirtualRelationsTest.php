@@ -38,7 +38,7 @@ class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
         $model->setDefinition(json_encode(['columns' => $columns]));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|VirtualRelationProviderInterface $virtualRelationProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|VirtualRelationProviderInterface $virtualRelationProvider */
         $virtualRelationProvider = $this
             ->createMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
 

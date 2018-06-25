@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class ItemTest extends \PHPUnit_Framework_TestCase
+class ItemTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\Item

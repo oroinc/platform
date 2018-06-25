@@ -10,20 +10,20 @@ use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 
-class InvalidateCacheTimeProviderTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheTimeProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var InvalidateCacheScheduleArgumentsBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $scheduleArgsBuilder;
 
     /**
-     * @var ScheduleManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $scheduleManager;
 
     /**
-     * @var DateTimeToStringTransformerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DateTimeToStringTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $cronFormatTransformer;
 

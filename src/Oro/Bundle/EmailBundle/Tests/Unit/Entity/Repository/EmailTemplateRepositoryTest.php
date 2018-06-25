@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailTemplateRepository
@@ -13,7 +13,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

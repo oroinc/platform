@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class EmailAttachmentsTypeTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailAttachmentsType

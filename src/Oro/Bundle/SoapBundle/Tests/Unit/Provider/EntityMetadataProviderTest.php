@@ -8,12 +8,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EntityMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class EntityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cm;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var EntityMetadataProvider */

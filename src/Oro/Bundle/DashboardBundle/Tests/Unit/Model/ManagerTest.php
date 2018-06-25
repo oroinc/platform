@@ -6,35 +6,35 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ManagerTest extends \PHPUnit_Framework_TestCase
+class ManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $factory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $aclHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dashboardRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $widgetRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $activeDashboardRepository;
 
@@ -44,7 +44,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenStorage;
 
@@ -445,7 +445,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
         $index = 0;
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $widgetMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $widgetMock */
         foreach ($startDashboardWidgets as $index => $widgetMock) {
             $expectedData = $expectedCopyWidgetsData[$index];
 

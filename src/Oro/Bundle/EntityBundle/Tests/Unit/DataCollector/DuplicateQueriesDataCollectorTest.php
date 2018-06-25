@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DuplicateQueriesDataCollectorTest extends \PHPUnit_Framework_TestCase
+class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DuplicateQueriesDataCollector

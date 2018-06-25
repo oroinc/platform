@@ -20,17 +20,17 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|CurrencyProviderInterface
      */
     protected $currencyProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Model\LocaleSettings
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\LocaleBundle\Model\LocaleSettings
      */
     protected $localeSettings;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
      */
     protected $currencyNameHelper;
 
@@ -58,7 +58,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
             ->method('getLocale')
             ->willReturn(\Locale::getDefault());
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
         $this->currencyNameHelper = new CurrencyNameHelperStub();
 
         $this->formType = new CurrencySelectionType(

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Doctrine\ORM\ORMException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
+class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityClassResolver
@@ -13,7 +13,7 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
     private $resolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrine;
 

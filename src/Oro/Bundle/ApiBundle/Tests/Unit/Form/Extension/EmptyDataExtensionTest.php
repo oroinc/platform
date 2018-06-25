@@ -9,9 +9,9 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
+class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityInstantiator;
 
     /** @var EmptyDataExtension */

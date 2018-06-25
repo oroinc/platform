@@ -7,7 +7,7 @@ use Oro\Bundle\RequireJSBundle\Config\Config;
 use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
-class ConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigProvider
@@ -15,12 +15,12 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $engineInterface;
 
     /**
-     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 

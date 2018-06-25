@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class OriginTransformerTest extends \PHPUnit_Framework_TestCase
+class OriginTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OriginTransformer */
     private $transformer;

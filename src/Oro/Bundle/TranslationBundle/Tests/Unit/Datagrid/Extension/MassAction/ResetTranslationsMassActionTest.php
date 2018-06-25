@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction;
 use Oro\Component\Config\Common\ConfigObject;
 
-class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
+class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResetTranslationsMassAction */
     protected $action;

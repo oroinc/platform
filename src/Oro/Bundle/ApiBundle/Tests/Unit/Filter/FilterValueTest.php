@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 
-class FilterValueTest extends \PHPUnit_Framework_TestCase
+class FilterValueTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSetPath()
     {

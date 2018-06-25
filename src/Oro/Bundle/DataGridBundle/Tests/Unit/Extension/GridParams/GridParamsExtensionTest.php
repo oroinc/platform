@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension;
 
-class GridParamsExtensionTest extends \PHPUnit_Framework_TestCase
+class GridParamsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GridParamsExtension

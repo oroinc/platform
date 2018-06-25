@@ -12,7 +12,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
-class DriverFactoryTest extends \PHPUnit_Framework_TestCase
+class DriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldCreateNullSessionInstance()
     {
@@ -52,7 +52,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|NullSession
      */
     protected function createNullSessionMock()
     {
@@ -60,7 +60,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NullConnection
+     * @return \PHPUnit\Framework\MockObject\MockObject|NullConnection
      */
     protected function createNullConnectionMock()
     {

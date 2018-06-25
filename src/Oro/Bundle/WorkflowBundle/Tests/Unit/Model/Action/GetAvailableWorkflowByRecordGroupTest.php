@@ -10,9 +10,9 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit_Framework_TestCase
+class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var GetAvailableWorkflowByRecordGroup */
@@ -118,7 +118,7 @@ class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $recordGroups
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createWorkflow(array $recordGroups)
     {

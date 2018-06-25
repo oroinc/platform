@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\ContextItemInterface;
 use Oro\Component\Layout\LayoutContext;
 
-class LayoutContextTest extends \PHPUnit_Framework_TestCase
+class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContext */
     protected $context;

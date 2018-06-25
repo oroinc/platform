@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedExcep
 use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class ConsumptionInterruptedExceptionTest extends \PHPUnit_Framework_TestCase
+class ConsumptionInterruptedExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
     

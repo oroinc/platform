@@ -7,12 +7,12 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\EventListener\ReportCacheCleanerListener;
 use Oro\Bundle\ReportBundle\Tests\Unit\Stub\ReportStub;
 
-class ReportCacheCleanerListenerTest extends \PHPUnit_Framework_TestCase
+class ReportCacheCleanerListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject | LifecycleEventArgs */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject | LifecycleEventArgs */
     protected $lifecycleEventArgs;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject | Cache */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject | Cache */
     protected $reportCacheManager;
 
     /** @var  ReportCacheCleanerListener */

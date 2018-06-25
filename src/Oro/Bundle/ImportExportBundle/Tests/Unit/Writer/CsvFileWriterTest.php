@@ -6,7 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
 
-class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
+class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CsvFileWriter */
     protected $writer;
@@ -17,7 +17,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     private $tmpDir;
 
-    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
     protected function setUp()
@@ -216,7 +216,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $jobInstanceRawConfiguration
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
     {

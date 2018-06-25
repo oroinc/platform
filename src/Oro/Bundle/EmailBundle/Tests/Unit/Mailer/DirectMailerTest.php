@@ -8,15 +8,15 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DirectMailerTest extends \PHPUnit_Framework_TestCase
+class DirectMailerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Swift_Mailer */
     protected $baseMailer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOrigin */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOrigin */
     protected $emailOrigin;
 
     protected function setUp()
@@ -336,7 +336,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMailerMock()
     {
@@ -348,7 +348,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAfterPrepareSmtpTransportForEsmtpTransport()
     {
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword'])
@@ -409,7 +409,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAfterPrepareSmtpTransportForNonEsmtpTransport()
     {
-        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();

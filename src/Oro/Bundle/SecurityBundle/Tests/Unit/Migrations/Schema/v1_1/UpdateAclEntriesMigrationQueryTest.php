@@ -12,19 +12,19 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
-class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTRIES_TABLE_NAME = 'acl_entries';
     const OBJECT_IDENTITIES_TABLE_NAME = 'acl_object_identities';
     const ACL_CLASSES_TABLE_NAME = 'acl_classes';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Connection */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
     protected $connection;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclManager */
     protected $aclManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclCacheInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclCacheInterface */
     protected $aclCache;
 
     /** @var UpdateAclEntriesMigrationQuery */
@@ -105,7 +105,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function assertEntityAclExtensionCalled()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAclExtension $extension */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAclExtension $extension */
         $extension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension')
             ->disableOriginalConstructor()
             ->getMock();
@@ -113,7 +113,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
             ->method('getAllMaskBuilders')
             ->willReturn($this->getMaskBuilders());
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionSelector $extensionSelector */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionSelector $extensionSelector */
         $extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
             ->disableOriginalConstructor()
             ->getMock();

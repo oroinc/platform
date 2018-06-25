@@ -29,7 +29,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseAdder()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -69,7 +69,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseRemover()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -111,7 +111,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUpdateExistingEntity()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -150,7 +150,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldUseRemoverWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();
@@ -188,7 +188,7 @@ class CollectionTypeTest extends TypeTestCase
 
     public function testShouldValidateEntryEntity()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|User $entity */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->setMethods(['addGroup', 'removeGroup'])
             ->getMock();

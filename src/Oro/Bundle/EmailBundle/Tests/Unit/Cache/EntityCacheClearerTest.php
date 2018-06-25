@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
-class EntityCacheClearerTest extends \PHPUnit_Framework_TestCase
+class EntityCacheClearerTest extends \PHPUnit\Framework\TestCase
 {
     public function testClear()
     {

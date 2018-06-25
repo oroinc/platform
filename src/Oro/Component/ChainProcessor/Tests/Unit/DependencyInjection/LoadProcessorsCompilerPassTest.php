@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class LoadProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
+class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessWithoutProcessorBagConfigBuilder()
     {

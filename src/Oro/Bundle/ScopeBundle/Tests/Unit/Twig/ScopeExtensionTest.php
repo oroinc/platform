@@ -7,10 +7,10 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Twig\ScopeExtension;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class ScopeExtensionTest extends \PHPUnit_Framework_TestCase
+class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PropertyAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var PropertyAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $propertyAccessor;
 
@@ -35,7 +35,7 @@ class ScopeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testIsScopesEmptyWithMoreThanOneScope()
     {
         $scopeEntities = [];
-        /** @var Collection|\PHPUnit_Framework_MockObject_MockObject $scopes **/
+        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes **/
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())
@@ -52,7 +52,7 @@ class ScopeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testIsScopesEmptyWithOneNotEmptyScope()
     {
         $scopeEntities = ['firstField' => 'FirstClass', 'secondField' => 'SecondClass'];
-        /** @var Collection|\PHPUnit_Framework_MockObject_MockObject $scopes **/
+        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes **/
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())
@@ -77,7 +77,7 @@ class ScopeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testIsScopesEmptyWithOneEmptyScope()
     {
         $scopeEntities = ['firstField' => 'FirstClass', 'secondField' => 'SecondClass'];
-        /** @var Collection|\PHPUnit_Framework_MockObject_MockObject $scopes * */
+        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes * */
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())

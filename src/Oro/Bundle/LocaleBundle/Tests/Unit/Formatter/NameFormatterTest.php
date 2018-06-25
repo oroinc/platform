@@ -7,10 +7,10 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\PersonAllNamePartsStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\PersonFullNameStub;
 
-class NameFormatterTest extends \PHPUnit_Framework_TestCase
+class NameFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $localeSettings;
 

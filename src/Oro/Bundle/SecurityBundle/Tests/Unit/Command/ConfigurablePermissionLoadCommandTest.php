@@ -8,15 +8,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ConfigurablePermissionLoadCommandTest extends \PHPUnit_Framework_TestCase
+class ConfigurablePermissionLoadCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurablePermissionProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurablePermissionProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $output;
 
     /** @var LoadConfigurablePermissionCommand */

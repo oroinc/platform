@@ -15,7 +15,7 @@ class OrmRelatedTestCase extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $doctrine;
 
     /** @var DoctrineHelper */
@@ -68,7 +68,7 @@ class OrmRelatedTestCase extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getQueryBuilderMock()
     {

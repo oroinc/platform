@@ -274,7 +274,7 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|PackageInterface
      */
     protected function createPackageMock()
     {
@@ -285,7 +285,7 @@ class RunnerTest extends WebTestCase
      * @param \Composer\Package\PackageInterface $package
      * @param string $targetDir
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|InstallationManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|InstallationManager
      */
     protected function createInstallationManagerMock(PackageInterface $package = null, $targetDir = null)
     {
@@ -316,7 +316,7 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {

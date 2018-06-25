@@ -11,15 +11,15 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
+class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var BuildCustomTypes */

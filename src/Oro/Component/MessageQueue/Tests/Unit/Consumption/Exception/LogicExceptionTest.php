@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Consumption\Exception\ExceptionInterface;
 use Oro\Component\MessageQueue\Consumption\Exception\LogicException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class LogicExceptionTest extends \PHPUnit_Framework_TestCase
+class LogicExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
     

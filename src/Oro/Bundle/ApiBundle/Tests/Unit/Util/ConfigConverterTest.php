@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\ConfigConverter;
 
-class ConfigConverterTest extends \PHPUnit_Framework_TestCase
+class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 {
     public function testConvertConfigWithoutParentResourceClass()
     {

@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartHandleProcessor;
 
-class StartHandleProcessorTest extends \PHPUnit_Framework_TestCase
+class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var StartHandleProcessor */
@@ -26,15 +26,15 @@ class StartHandleProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $entity = (object)['id' => 42];
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $initialWorkflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $initialWorkflowItem */
         $initialWorkflowItem = $this->createMock(WorkflowItem::class);
         $initialWorkflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $initialWorkflowItem->expects($this->once())->method('getEntity')->willReturn($entity);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $initialWorkflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $initialWorkflowItem */
         $newWorkflowItem = $this->createMock(WorkflowItem::class);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
         $initData = ['initial data'];
@@ -58,12 +58,12 @@ class StartHandleProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $entity = (object)['id' => 42];
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $initialWorkflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $initialWorkflowItem */
         $initialWorkflowItem = $this->createMock(WorkflowItem::class);
         $initialWorkflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $initialWorkflowItem->expects($this->once())->method('getEntity')->willReturn($entity);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $initData = ['initial data'];
 

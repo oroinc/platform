@@ -24,8 +24,8 @@ interface FixtureInterface
     /**
      * Checks that created data are expected
      *
-     * @param \PHPUnit_Framework_Assert $assertions
+     * @param \PHPUnit\Framework\Assert $assertions
      * @param array $actualData
      */
-    public function assert(\PHPUnit_Framework_Assert $assertions, array $actualData);
+    public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData);
 }

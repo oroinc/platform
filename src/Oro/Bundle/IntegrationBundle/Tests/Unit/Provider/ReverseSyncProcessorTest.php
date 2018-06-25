@@ -9,24 +9,24 @@ use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector as TestConnector;
 
-class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
+class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Integration|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
     protected $integration;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $processorRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $jobExecutor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $log;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     public function setUp()
@@ -125,7 +125,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $mockedMethods
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ReverseSyncProcessor
+     * @return \PHPUnit\Framework\MockObject\MockObject|ReverseSyncProcessor
      */
     protected function getReverseSyncProcessor($mockedMethods = null)
     {

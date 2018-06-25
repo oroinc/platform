@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class SortFilterTest extends \PHPUnit_Framework_TestCase
+class SortFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {

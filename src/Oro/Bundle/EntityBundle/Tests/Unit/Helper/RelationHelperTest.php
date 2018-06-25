@@ -7,9 +7,9 @@ use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub;
 
-class RelationHelperTest extends \PHPUnit_Framework_TestCase
+class RelationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var VirtualRelationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $relationProvider;
 
     /** @var RelationHelper */

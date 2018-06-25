@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
-class AbstractTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
+class AbstractTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
 
@@ -16,7 +16,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @var TemplateManager */
     protected $templateManager;
 
-    /** @var AbstractTemplateRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AbstractTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $templateRepository;
 
     protected function setUp()

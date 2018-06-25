@@ -20,13 +20,13 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     const TEST_WORKFLOW_NAME  = 'test_workflow_name';
     const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $registry;
 
     /** @var WorkflowSelectType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()

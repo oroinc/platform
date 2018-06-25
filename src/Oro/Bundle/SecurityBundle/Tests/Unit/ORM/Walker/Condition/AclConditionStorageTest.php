@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 
-class AclConditionStorageTest extends \PHPUnit_Framework_TestCase
+class AclConditionStorageTest extends \PHPUnit\Framework\TestCase
 {
     public function testStorage()
     {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\SegmentWidget;
 
 use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 
-class ContextCheckerTest extends \PHPUnit_Framework_TestCase
+class ContextCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextChecker */
     protected $contextChecker;

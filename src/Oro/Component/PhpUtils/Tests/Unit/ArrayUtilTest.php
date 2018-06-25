@@ -4,7 +4,7 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
-class ArrayUtilTest extends \PHPUnit_Framework_TestCase
+class ArrayUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider interposeDataProvider

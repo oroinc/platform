@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class ConsumerStateTest extends \PHPUnit_Framework_TestCase
+class ConsumerStateTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitialState()
     {

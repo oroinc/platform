@@ -7,14 +7,14 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\HintExtension;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
-class HintExtensionTest extends \PHPUnit_Framework_TestCase
+class HintExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HintExtension */
     protected $extension;
 
     public function setUp()
     {
-        /** @var QueryHintResolver|\PHPUnit_Framework_MockObject_MockObject $queryHintResolver */
+        /** @var QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject $queryHintResolver */
         $queryHintResolver = $this->createMock(QueryHintResolver::class);
         $queryHintResolver->expects(self::any())
             ->method('resolveHintName')

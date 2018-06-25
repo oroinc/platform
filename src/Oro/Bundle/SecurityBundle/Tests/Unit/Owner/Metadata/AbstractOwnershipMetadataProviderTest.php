@@ -10,15 +10,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
-class AbstractOwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     const SOME_CLASS = \stdClass::class;
     const UNDEFINED_CLASS = 'UndefinedClass';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
     protected $cache;
 
     /** @var OwnershipMetadataProviderStub */

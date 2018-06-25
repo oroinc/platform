@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityObjectSecurityCheckTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
     /** @var EntityObjectSecurityCheck */

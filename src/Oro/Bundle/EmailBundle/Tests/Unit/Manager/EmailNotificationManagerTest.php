@@ -17,24 +17,24 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
  * @package Oro\Bundle\EmailBundle\Tests\Unit\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     /** @var EmailNotificationManager */
     protected $emailNotificationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
     protected function setUp()

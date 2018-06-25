@@ -10,7 +10,7 @@ use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
-class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
+class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PrepareResultItemListener
@@ -18,37 +18,37 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 
     /**
-     * @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $mapper;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var PrepareResultItemEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @var PrepareResultItemEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $item;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entity;
 
     /**
-     * @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 

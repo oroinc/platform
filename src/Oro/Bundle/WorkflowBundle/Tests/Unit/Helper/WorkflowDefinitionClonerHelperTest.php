@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper;
 
-class WorkflowDefinitionClonerHelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider variableDefinitionsProvider

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Symfony\Component\HttpFoundation\Request;
 
-class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
+class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param Request $request

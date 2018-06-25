@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Columns;
 
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 
-class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
+class ColumnsHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var   ColumnsHelper*/
     protected $columnsHelper;

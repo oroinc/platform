@@ -5,10 +5,10 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Authentication\Ticket\TicketDigestGen
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGenerator;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-class TicketDigestGeneratorTest extends \PHPUnit_Framework_TestCase
+class TicketDigestGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PasswordEncoderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $passwordEncoder;
 

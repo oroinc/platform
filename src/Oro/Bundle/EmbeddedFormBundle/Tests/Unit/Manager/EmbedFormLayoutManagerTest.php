@@ -12,17 +12,17 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 use Symfony\Component\Form\Test\FormInterface;
 
-class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
+class EmbedFormLayoutManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $sessionIdProvider;
 
     /** @var EmbedFormLayoutManager */

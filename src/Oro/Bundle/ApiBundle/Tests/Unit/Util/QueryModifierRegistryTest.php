@@ -10,15 +10,15 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class QueryModifierRegistryTest extends \PHPUnit_Framework_TestCase
+class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryModifierInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierInterface */
     private $queryModifier1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryModifierInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierInterface */
     private $queryModifier2;
 
     /** @var QueryModifierRegistry */

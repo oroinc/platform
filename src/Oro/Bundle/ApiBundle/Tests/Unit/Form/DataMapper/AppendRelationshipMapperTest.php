@@ -13,15 +13,15 @@ use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
+class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AppendRelationshipMapper */
     protected $mapper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $propertyAccessor;
 
     protected function setUp()
@@ -36,7 +36,7 @@ class AppendRelationshipMapperTest extends \PHPUnit_Framework_TestCase
      * @param bool                $synchronized
      * @param bool                $submitted
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
     {

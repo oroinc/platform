@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-class EntityClassNameHelperTest extends \PHPUnit_Framework_TestCase
+class EntityClassNameHelperTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_ALIAS = 'alias';
     const TEST_ENTITY_PLURAL_ALIAS = 'plural_alias';

@@ -6,18 +6,18 @@ use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
+class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'FooBar';
     const LOCALE = 'en';
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     private $enumTranslationCache;
 
     public function setUp()

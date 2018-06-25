@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank;
 
-class ConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
+class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConstraintTextExtractor */
     protected $constraintTextExtractor;

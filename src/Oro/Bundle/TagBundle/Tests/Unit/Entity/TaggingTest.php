@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\TagBundle\Entity\Tagging;
 
-class TaggingTest extends \PHPUnit_Framework_TestCase
+class TaggingTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Tagging

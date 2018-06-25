@@ -7,15 +7,15 @@ use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
+class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  IntegrationTypeSelectType */
     protected $type;
 
-    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp()

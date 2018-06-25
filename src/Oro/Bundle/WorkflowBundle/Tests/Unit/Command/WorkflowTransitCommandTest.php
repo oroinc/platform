@@ -12,26 +12,26 @@ use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'OroWorkflowBundle:WorkflowItem';
 
     /** @var WorkflowTransitCommand */
     private $command;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowManager */
     private $workflowManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Input */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Input */
     private $input;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     private $repo;
 
     /** @var OutputStub */

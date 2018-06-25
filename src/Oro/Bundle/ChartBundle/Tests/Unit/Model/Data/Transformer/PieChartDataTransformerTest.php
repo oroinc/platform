@@ -6,7 +6,7 @@ use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer;
 
-class PieChartDataTransformerTest extends \PHPUnit_Framework_TestCase
+class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PieChartDataTransformer

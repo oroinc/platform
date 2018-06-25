@@ -6,15 +6,15 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SecurityProviderTest extends \PHPUnit_Framework_TestCase
+class SecurityProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SecurityProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entitySecurityMetadataProvider;
 
     protected function setUp()

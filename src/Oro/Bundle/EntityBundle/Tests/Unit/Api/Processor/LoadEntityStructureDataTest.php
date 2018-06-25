@@ -9,12 +9,12 @@ use Oro\Bundle\EntityBundle\Api\Processor\LoadEntityStructureData;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider;
 
-class LoadEntityStructureDataTest extends \PHPUnit_Framework_TestCase
+class LoadEntityStructureDataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoadEntityStructureData */
     protected $processor;
 
-    /** @var EntityStructureDataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityStructureDataProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
     /**

@@ -13,25 +13,25 @@ use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\EventListener\DoctrineTagEventListener;
 use Oro\Bundle\TestFrameworkBundle\Entity;
 
-class DoctrineTagEventListenerTest extends \PHPUnit_Framework_TestCase
+class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TagGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tagGenerator;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $em;
 
     /**
-     * @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject
+     * @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject
      */
     private $uow;
 
     /**
-     * @var DataUpdateTopicSender|\PHPUnit_Framework_MockObject_MockObject
+     * @var DataUpdateTopicSender|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dataUpdateTopicSender;
 

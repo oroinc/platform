@@ -8,7 +8,7 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PhpDriverTest extends \PHPUnit_Framework_TestCase
+class PhpDriverTest extends \PHPUnit\Framework\TestCase
 {
     protected $cacheDir;
 
@@ -129,7 +129,7 @@ CLASS;
     }
 
     /**
-     * @param null|LayoutUpdateGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject $generator
+     * @param null|LayoutUpdateGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $generator
      * @param bool                                                                         $debug
      * @param bool                                                                         $cache
      *

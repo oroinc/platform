@@ -4,12 +4,12 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class OroYamlParserTest extends \PHPUnit_Framework_TestCase
+class OroYamlParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OroYamlParser */
     protected $parser;
 
-    /** @var KernelInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $kernel;
 
     /**

@@ -5,7 +5,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntity;
 
-class EntityDataAccessorTest extends \PHPUnit_Framework_TestCase
+class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityDataAccessor */
     protected $entityDataAccessor;

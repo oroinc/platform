@@ -20,10 +20,10 @@ class GetListProcessorOrmRelatedTestCase extends OrmRelatedTestCase
     /** @var GetListContext */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
     protected function setUp()

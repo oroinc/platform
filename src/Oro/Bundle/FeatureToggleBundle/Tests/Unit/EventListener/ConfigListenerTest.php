@@ -11,20 +11,20 @@ use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 use Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConfigListenerTest extends \PHPUnit_Framework_TestCase
+class ConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 
     /**
-     * @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $featureConfigManager;
 
     /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $featureChecker;
 
@@ -66,7 +66,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->with($feature1)
             ->willReturn([$feature2, $feature3]);
 
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();

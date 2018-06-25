@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TypedRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
+class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var RequestType */

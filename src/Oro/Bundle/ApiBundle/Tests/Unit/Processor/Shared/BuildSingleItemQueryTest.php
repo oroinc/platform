@@ -17,7 +17,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CriteriaConnector */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CriteriaConnector */
     private $criteriaConnector;
 
     /** @var BuildSingleItemQuery */

@@ -5,19 +5,19 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 
-class AttachmentProviderTest extends \PHPUnit_Framework_TestCase
+class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentManager;
 
     /**
-     * @var AttachmentProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttachmentProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $attachmentProvider;
 

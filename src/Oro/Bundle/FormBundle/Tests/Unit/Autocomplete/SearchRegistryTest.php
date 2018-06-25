@@ -5,10 +5,10 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 
-class SearchRegistryTest extends \PHPUnit_Framework_TestCase
+class SearchRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchHandler;
 

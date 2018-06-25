@@ -6,7 +6,7 @@ use Oro\Component\Layout\CallbackLayoutUpdate;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 
-class CallbackLayoutUpdateTest extends \PHPUnit_Framework_TestCase
+class CallbackLayoutUpdateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException

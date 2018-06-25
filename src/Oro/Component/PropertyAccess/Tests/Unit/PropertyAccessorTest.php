@@ -15,7 +15,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
+class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PropertyAccessor

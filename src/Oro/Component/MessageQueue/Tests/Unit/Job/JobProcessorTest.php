@@ -16,12 +16,12 @@ use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class JobProcessorTest extends \PHPUnit_Framework_TestCase
+class JobProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|JobStorage */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
     private $jobStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProducer */
     private $messageProducer;
 
     /** @var JobProcessor */
@@ -680,7 +680,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
      * @param int      $timeForStale
      * @param Job|null $rootJobFoundByStorage
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobConfigurationProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobConfigurationProviderInterface
      */
     private function configureBaseMocksForStaleJobsCases(
         Job $job,

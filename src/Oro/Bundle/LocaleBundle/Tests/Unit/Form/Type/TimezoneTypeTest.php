@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\LocaleBundle\Form\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
+class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormTypeWithoutCache()
     {

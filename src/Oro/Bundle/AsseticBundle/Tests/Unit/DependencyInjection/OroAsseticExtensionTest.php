@@ -7,7 +7,7 @@ use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
+class OroAsseticExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadDataProvider

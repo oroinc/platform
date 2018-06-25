@@ -11,12 +11,12 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener;
 use Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints\AttributeGroupStub;
 
-class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
+class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttributeGroupListener */
     private $listener;
 
-    /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /**

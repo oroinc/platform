@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 
-class SortersConfigTest extends \PHPUnit_Framework_TestCase
+class SortersConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {

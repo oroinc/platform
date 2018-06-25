@@ -34,13 +34,13 @@ class FieldTypeTest extends TypeTestCase
     /** @var FieldType $type */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Translator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldTypeProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
     protected $fieldTypeProvider;
 
     /** @var array */

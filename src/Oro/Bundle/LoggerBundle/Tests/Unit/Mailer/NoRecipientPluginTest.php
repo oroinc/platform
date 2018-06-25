@@ -4,7 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Oro\Bundle\LoggerBundle\Mailer\NoRecipientPlugin;
 
-class NoRecipientPluginTest extends \PHPUnit_Framework_TestCase
+class NoRecipientPluginTest extends \PHPUnit\Framework\TestCase
 {
     public function testBeforeSendPerformedWithoutRecipient()
     {

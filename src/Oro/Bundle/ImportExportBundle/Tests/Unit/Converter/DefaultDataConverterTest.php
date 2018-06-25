@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter;
 
-class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
+class DefaultDataConverterTest extends \PHPUnit\Framework\TestCase
 {
 
     /**

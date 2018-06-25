@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigHelperTest extends \PHPUnit_Framework_TestCase
+class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     const FIELD_NAME = 'someExtendFieldName';
     const ENTITY_CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
@@ -26,10 +26,10 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         'state' => ExtendScope::STATE_NEW
     ];
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldConfigModel;
 
     /** @var ConfigHelper */
@@ -465,7 +465,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $scope
      * @param ConfigInterface $returnedConfig
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetProviderByScope($scope, ConfigInterface $returnedConfig)
     {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 
-class StatusCodesConfigTest extends \PHPUnit_Framework_TestCase
+class StatusCodesConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArrayAndClone()
     {

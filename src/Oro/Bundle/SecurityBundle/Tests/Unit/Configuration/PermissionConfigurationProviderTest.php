@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBund
 use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class PermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     const PERMISSION1 = 'PERMISSION1';
     const PERMISSION2 = 'PERMISSION2';

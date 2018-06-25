@@ -4,12 +4,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Placeholder;
 
 use Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter;
 
-class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
+class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var PlaceholderFilter */

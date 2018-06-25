@@ -4,9 +4,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
-class ImapEmailFolderManagerTest extends \PHPUnit_Framework_TestCase
+class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connector;
 
     protected function setUp()

@@ -10,17 +10,17 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
-class DatagridTest extends \PHPUnit_Framework_TestCase
+class DatagridTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'testName';
 
     /** @var Datagrid */
     protected $grid;
 
-    /** @var Acceptor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Acceptor|\PHPUnit\Framework\MockObject\MockObject */
     protected $acceptor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $parameters;
 
     protected function setUp()
@@ -53,7 +53,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDatasource()
     {
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockBuilder $dataSource */
         $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
 
         $this->assertNull($this->grid->getDatasource());
@@ -83,7 +83,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetData()
     {
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockBuilder $dataSource */
         $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
 
@@ -105,7 +105,7 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAcceptedDataSource()
     {
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockBuilder $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockBuilder $dataSource */
         $dataSource = $this->getMockForAbstractClass(DatasourceInterface::class);
         $this->grid->setDatasource($dataSource);
 

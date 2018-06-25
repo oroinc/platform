@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor;
 
-class ChainExceptionTextExtractorTest extends \PHPUnit_Framework_TestCase
+class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainExceptionTextExtractor */
     protected $chainExtractor;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
     protected $extractors = [];
 
     protected function setUp()

@@ -18,24 +18,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
+class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $contextHelper;
 
-    /** @var OperationRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $operationRegistry;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var OperationFormHandler */
     private $handler;
 
-    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $flashBag;
 
     protected function setUp()
@@ -307,7 +307,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
      * @param ActionData $actionData
      * @param array $formOptions
      * @param bool $pageReload
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
      */
     private function operationRetrieval($formType, ActionData $actionData, array $formOptions, bool $pageReload = true)
     {
@@ -332,7 +332,7 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
      * @param Request $request
      * @param ActionData $actionData
      * @param Operation $operation
-     * @return  FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return  FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function formProcessing($request, $actionData, $operation)
     {
@@ -358,8 +358,8 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param FormInterface|\PHPUnit_Framework_MockObject_MockObject $form
-     * @return FormView|\PHPUnit_Framework_MockObject_MockObject
+     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
+     * @return FormView|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function formViewRetrieval($form)
     {

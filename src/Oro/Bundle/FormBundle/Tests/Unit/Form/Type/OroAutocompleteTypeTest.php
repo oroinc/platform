@@ -17,12 +17,12 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     protected $formType;
 
     /**
-     * @var SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchRegistry;
 
     /**
-     * @var SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchHandler;
 
@@ -55,7 +55,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchRegistry()
     {
@@ -68,7 +68,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchHandler()
     {

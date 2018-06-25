@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 
-class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
+class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityMetadataHelper
@@ -13,7 +13,7 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
     private $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrine;
 

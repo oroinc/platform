@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
-class FormTest extends \PHPUnit_Framework_TestCase
+class FormTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider normalizeValueProvider

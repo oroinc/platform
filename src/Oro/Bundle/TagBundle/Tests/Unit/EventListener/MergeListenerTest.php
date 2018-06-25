@@ -13,21 +13,21 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
 
-class MergeListenerTest extends \PHPUnit_Framework_TestCase
+class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityMetadata */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
     protected $entityMetadata;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TagManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TagManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityData */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityData */
     protected $entityData;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $helper;
 
     protected function setUp()

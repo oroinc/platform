@@ -6,7 +6,7 @@ use Oro\Component\PhpUtils\ReflectionUtil;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject1;
 use Oro\Component\PhpUtils\Tests\Unit\Stubs\TestObject2;
 
-class ReflectionUtilTest extends \PHPUnit_Framework_TestCase
+class ReflectionUtilTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAMESPACE = 'Oro\Component\PhpUtils\Tests\Unit\Stubs\\';
 

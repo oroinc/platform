@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\NotDisabledApplicableChecker;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
-class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
+class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array                           $processors
@@ -41,7 +41,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ProcessorFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ProcessorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getProcessorFactory()
     {

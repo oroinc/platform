@@ -4,7 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
 use Oro\Bundle\InstallerBundle\Composer\AssetsVersionHandler;
 
-class AssetsVersionHandlerTest extends \PHPUnit_Framework_TestCase
+class AssetsVersionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider setAssetsVersionProvider

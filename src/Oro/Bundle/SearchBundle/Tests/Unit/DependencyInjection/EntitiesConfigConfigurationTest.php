@@ -7,7 +7,7 @@ use Oro\Component\Testing\Unit\LoadTestCaseDataTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
-class EntitiesConfigConfigurationTest extends \PHPUnit_Framework_TestCase
+class EntitiesConfigConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     use LoadTestCaseDataTrait;
 

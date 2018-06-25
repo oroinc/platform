@@ -7,9 +7,9 @@ use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 
-class MaintenanceExtensionTest extends \PHPUnit_Framework_TestCase
+class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Mode */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Mode */
     private $maintenance;
 
     /** @var MaintenanceExtension */

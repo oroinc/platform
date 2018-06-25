@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class AutocompleteRequestTest extends \PHPUnit_Framework_TestCase
+class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param Request $request

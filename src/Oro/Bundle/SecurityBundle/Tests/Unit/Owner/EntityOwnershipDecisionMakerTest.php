@@ -26,7 +26,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
     /** @var EntityOwnershipDecisionMaker */
     private $decisionMaker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
     protected function setUp()
@@ -47,7 +47,7 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider $treeProvider */
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();

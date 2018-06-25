@@ -16,7 +16,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     /** @var UserScopeManager */
     protected $manager;
 
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $securityContext;
 
     protected function setUp()

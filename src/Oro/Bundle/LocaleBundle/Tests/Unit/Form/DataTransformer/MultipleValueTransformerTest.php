@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-class MultipleValueTransformerTest extends \PHPUnit_Framework_TestCase
+class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     const FIELD_DEFAULT = 'default';
     const FIELD_VALUES  = 'values';

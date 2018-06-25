@@ -8,18 +8,18 @@ use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 use Psr\Log\LoggerInterface;
 
-class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationStatisticProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
-    /** @var OroTranslationAdapter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OroTranslationAdapter|\PHPUnit\Framework\MockObject\MockObject */
     protected $adapter;
 
-    /** @var PackagesProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PackagesProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $packagesProvider;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var TranslationStatisticProvider */

@@ -15,7 +15,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PostExportMessageProcessor
@@ -23,32 +23,32 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private $postExportMessageProcessor;
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var ImportExportResultSummarizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $importExportResultSummarizer;
 
     /**
-     * @var JobStorage|\PHPUnit_Framework_MockObject_MockObject
+     * @var JobStorage|\PHPUnit\Framework\MockObject\MockObject
      */
     private $jobStorage;
 
     /**
-     * @var MessageProducer|\PHPUnit_Framework_MockObject_MockObject
+     * @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $messageProducer;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var ExportHandler|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $exportHandler;
 

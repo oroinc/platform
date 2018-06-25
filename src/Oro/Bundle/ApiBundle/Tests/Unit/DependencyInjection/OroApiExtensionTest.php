@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
+class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {

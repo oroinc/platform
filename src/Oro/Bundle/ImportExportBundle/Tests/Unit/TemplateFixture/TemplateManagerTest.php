@@ -5,9 +5,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestTemplateEntityRepository;
 
-class TemplateManagerTest extends \PHPUnit_Framework_TestCase
+class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityRegistry;
 
     /** @var TemplateManager */

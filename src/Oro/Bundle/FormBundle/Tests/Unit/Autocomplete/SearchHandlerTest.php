@@ -20,7 +20,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchHandlerTest extends \PHPUnit_Framework_TestCase
+class SearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ID_FIELD = 'id';
     const TEST_ENTITY_CLASS = 'FooEntityClass';
@@ -40,42 +40,42 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     protected $testSearchConfig = [self::TEST_ENTITY_CLASS => ['alias' => self::TEST_ENTITY_SEARCH_ALIAS]];
 
     /**
-     * @var Indexer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Indexer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $indexer;
 
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $managerRegistry;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 
     /**
-     * @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityRepository;
 
     /**
-     * @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $queryBuilder;
 
     /**
-     * @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $query;
 
     /**
-     * @var Expr|\PHPUnit_Framework_MockObject_MockObject
+     * @var Expr|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $expr;
 
     /**
-     * @var Result|\PHPUnit_Framework_MockObject_MockObject
+     * @var Result|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchResult;
 
@@ -85,7 +85,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     protected $searchHandler;
 
     /**
-     * @var AclHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $aclHelper;
 
@@ -378,7 +378,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Result|\PHPUnit_Framework_MockObject_MockObject
+     * @return Result|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchResult()
     {
@@ -386,7 +386,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockQueryBuilder()
     {
@@ -394,7 +394,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Expr|\PHPUnit_Framework_MockObject_MockObject
+     * @return Expr|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockExpr()
     {
@@ -402,7 +402,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return AbstractQuery|\PHPUnit_Framework_MockObject_MockObject
+     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockQuery()
     {
@@ -456,7 +456,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $data
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     public function createMockEntity(array $data)
     {

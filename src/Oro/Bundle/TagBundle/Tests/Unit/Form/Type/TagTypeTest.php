@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\TagBundle\Form\Type\TagType;
 
-class TagTypeTest extends \PHPUnit_Framework_TestCase
+class TagTypeTest extends \PHPUnit\Framework\TestCase
 {
 
     /**

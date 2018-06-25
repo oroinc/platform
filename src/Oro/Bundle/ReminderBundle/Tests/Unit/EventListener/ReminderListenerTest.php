@@ -10,7 +10,7 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\EventListener\ReminderListener;
 use Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity;
 
-class ReminderListenerTest extends \PHPUnit_Framework_TestCase
+class ReminderListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReminderListener
@@ -18,12 +18,12 @@ class ReminderListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ReminderManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ReminderManager
      */
     protected $reminderManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager
      */
     protected $entityManager;
 

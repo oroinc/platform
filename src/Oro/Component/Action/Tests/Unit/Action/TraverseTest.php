@@ -9,10 +9,10 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class TraverseTest extends \PHPUnit_Framework_TestCase
+class TraverseTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Configurable
+     * @var \PHPUnit\Framework\MockObject\MockObject|Configurable
      */
     protected $configurableAction;
 

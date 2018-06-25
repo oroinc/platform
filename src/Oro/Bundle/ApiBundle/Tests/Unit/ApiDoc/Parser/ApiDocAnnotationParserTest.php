@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocAnnotationParser;
 
-class ApiDocAnnotationParserTest extends \PHPUnit_Framework_TestCase
+class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ApiDocAnnotationParser */
     protected $parser;

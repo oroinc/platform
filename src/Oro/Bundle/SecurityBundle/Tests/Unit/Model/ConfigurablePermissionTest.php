@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
-class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
+class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
 {
     const CAPABILITY = 'test_capability';
     const ENTITY_CLASS = 'test_entity';

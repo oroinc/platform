@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Model;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
-class ThemeImageTypeTest extends \PHPUnit_Framework_TestCase
+class ThemeImageTypeTest extends \PHPUnit\Framework\TestCase
 {
     const NAME = 'main';
     const LABEL = 'Main';

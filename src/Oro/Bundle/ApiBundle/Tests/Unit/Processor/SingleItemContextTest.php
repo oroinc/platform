@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 
-class SingleItemContextTest extends \PHPUnit_Framework_TestCase
+class SingleItemContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
     /** @var SingleItemContext */

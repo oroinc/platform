@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 
-class EnumValueTest extends \PHPUnit_Framework_TestCase
+class EnumValueTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetterAndSetter()
     {

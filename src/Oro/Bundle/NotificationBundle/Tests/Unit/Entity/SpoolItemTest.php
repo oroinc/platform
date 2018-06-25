@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 
-class SpoolItemTest extends \PHPUnit_Framework_TestCase
+class SpoolItemTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SpoolItem

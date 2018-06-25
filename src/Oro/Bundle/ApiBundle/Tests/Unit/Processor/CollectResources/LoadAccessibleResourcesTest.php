@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class LoadAccessibleResourcesTest extends \PHPUnit_Framework_TestCase
+class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
     /** @var LoadAccessibleResources */

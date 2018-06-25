@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Symfony\Component\HttpFoundation\Response;
 
-class AccessGrantedTest extends \PHPUnit_Framework_TestCase
+class AccessGrantedTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetStatusCode()
     {

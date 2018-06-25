@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlPersisterTest extends \PHPUnit_Framework_TestCase
+class YamlPersisterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $temporaryDir;

@@ -3,7 +3,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Console;
 
 use Oro\Bundle\DistributionBundle\Console\Grid;
 
-class GridTest extends \PHPUnit_Framework_TestCase
+class GridTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

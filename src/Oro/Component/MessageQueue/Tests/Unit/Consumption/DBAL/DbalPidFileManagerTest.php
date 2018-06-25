@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Symfony\Component\Filesystem\Filesystem;
 
-class DbalPidFileManagerTest extends \PHPUnit_Framework_TestCase
+class DbalPidFileManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string
@@ -36,7 +36,8 @@ class DbalPidFileManagerTest extends \PHPUnit_Framework_TestCase
     {
         $processManager = new DbalPidFileManager($this->pidDir);
 
-        $this->setExpectedException(\LogicException::class, 'The pid file already exists');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The pid file already exists');
 
         $processManager->createPidFile('CONSUMER.ID');
         $processManager->createPidFile('CONSUMER.ID');
@@ -73,7 +74,8 @@ class DbalPidFileManagerTest extends \PHPUnit_Framework_TestCase
 
         $processManager = new DbalPidFileManager($this->pidDir);
 
-        $this->setExpectedException(\LogicException::class, 'Expected numeric content. content:"non numeric value"');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Expected numeric content. content:"non numeric value"');
 
         $processManager->getListOfPidsFileInfo();
     }

@@ -15,7 +15,7 @@ use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

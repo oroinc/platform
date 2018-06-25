@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Utils\NonPrintableCharsStringSanitizer;
 
-class NonPrintableCharsStringSanitizerTest extends \PHPUnit_Framework_TestCase
+class NonPrintableCharsStringSanitizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NonPrintableCharsStringSanitizer

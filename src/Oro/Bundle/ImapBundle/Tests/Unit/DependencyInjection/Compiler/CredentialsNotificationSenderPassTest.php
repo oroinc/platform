@@ -7,11 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
+class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessNoMainService()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $containerBuilder->expects($this->once())
@@ -32,7 +32,7 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
     {
         $definition = new Definition();
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $containerBuilder->expects($this->once())

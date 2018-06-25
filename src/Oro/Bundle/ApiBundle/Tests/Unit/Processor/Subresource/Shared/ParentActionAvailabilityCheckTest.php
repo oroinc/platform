@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 
 class ParentActionAvailabilityCheckTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $resourcesProvider;
 
     /** @var ParentActionAvailabilityCheck */

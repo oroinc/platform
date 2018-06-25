@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
-class ResultRecordTest extends \PHPUnit_Framework_TestCase
+class ResultRecordTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddData()
     {

@@ -6,12 +6,12 @@ use Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ChainDocumentationProviderTest extends \PHPUnit_Framework_TestCase
+class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DocumentationProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
     private $provider1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DocumentationProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
     private $provider2;
 
     /** @var ChainDocumentationProvider */

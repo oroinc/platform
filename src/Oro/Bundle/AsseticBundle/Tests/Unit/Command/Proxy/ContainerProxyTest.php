@@ -5,10 +5,10 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\Command\Proxy;
 use Oro\Bundle\AsseticBundle\Command\Proxy\ContainerProxy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ContainerProxyTest extends \PHPUnit_Framework_TestCase
+class ContainerProxyTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $target;
 

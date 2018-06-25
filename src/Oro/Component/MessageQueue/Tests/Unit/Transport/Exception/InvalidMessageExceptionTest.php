@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\Exception\Exception as ExceptionInterfa
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class InvalidMessageExceptionTest extends \PHPUnit_Framework_TestCase
+class InvalidMessageExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

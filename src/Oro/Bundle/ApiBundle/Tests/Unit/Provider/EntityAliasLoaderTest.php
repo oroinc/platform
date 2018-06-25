@@ -9,9 +9,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
-class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
+class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
     /** @var EntityAliasLoader */

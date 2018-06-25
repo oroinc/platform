@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityRepositoryCompilerPass */
     protected $compilerPass;
@@ -258,7 +258,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
      * ]
      *
      * @param array $services
-     * @return ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */

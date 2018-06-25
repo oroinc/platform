@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 
-class ActionProcessorBagTest extends \PHPUnit_Framework_TestCase
+class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetProcessor()
     {

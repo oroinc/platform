@@ -5,18 +5,18 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 use Symfony\Component\Translation\Reader\TranslationReader;
 
-class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationServiceProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $adapter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dumper;
 
     /** @var TranslationServiceProvider */
     protected $service;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $databasePersister;
 
     /** @var string */
@@ -359,7 +359,7 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
      * @param array $methods
      * @param array $args
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslationServiceProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|TranslationServiceProvider
      */
     protected function getServiceMock($methods = [], $args = [])
     {

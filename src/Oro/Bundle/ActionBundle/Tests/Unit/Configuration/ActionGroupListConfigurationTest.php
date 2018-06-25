@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionGroupListConfiguration;
 
-class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
+class ActionGroupListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ActionGroupListConfiguration

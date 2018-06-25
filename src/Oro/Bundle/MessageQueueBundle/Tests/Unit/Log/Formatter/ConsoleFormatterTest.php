@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Client\Config;
 
-class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
+class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultDataMap()
     {

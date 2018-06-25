@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormOptionsProcessor;
 
-class DefaultFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultFormOptionsProcessor */
     protected $processor;
@@ -19,11 +19,11 @@ class DefaultFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipCustomForm()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
 
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('getTransition')->willReturn($transition);
         $context->expects($this->never())->method('getWorkflowItem');
@@ -35,10 +35,10 @@ class DefaultFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $formData = (object)['id' => 42];
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getData')->willReturn($formData);

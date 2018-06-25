@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var RoleMultiSelectType */
@@ -54,7 +54,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -75,7 +75,7 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
 
     public function testBuildView()
     {
-        /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')
@@ -126,14 +126,14 @@ class RoleMultiSelectTypeTest extends FormIntegrationTestCase
             ->method('getProperties')
             ->willReturn(['label']);
 
-        /** @var SearchRegistry|\PHPUnit_Framework_MockObject_MockObject $searchRegistry */
+        /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject $searchRegistry */
         $searchRegistry = $this->createMock(SearchRegistry::class);
         $searchRegistry->expects($this->any())
             ->method('getSearchHandler')
             ->with('roles')
             ->willReturn($searchHandler);
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject $configProvider */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
 
         return [

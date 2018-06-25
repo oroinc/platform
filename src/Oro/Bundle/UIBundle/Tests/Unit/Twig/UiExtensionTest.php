@@ -16,23 +16,23 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class UiExtensionTest extends \PHPUnit_Framework_TestCase
+class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $environment;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $contentProviderManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userAgentProvider;
 
     /** @var UiExtension */
@@ -601,18 +601,18 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($template, $options) use ($expectedOptions, $username) {
-                        \PHPUnit_Framework_TestCase::assertArrayHasKey('name', $options['options']);
-                        \PHPUnit_Framework_TestCase::assertEquals(
+                        \PHPUnit\Framework\TestCase::assertArrayHasKey('name', $options['options']);
+                        \PHPUnit\Framework\TestCase::assertEquals(
                             $expectedOptions['name'],
                             $options['options']['name']
                         );
-                        \PHPUnit_Framework_TestCase::assertArrayHasKey('participants', $options['options']);
-                        \PHPUnit_Framework_TestCase::assertEquals(
+                        \PHPUnit\Framework\TestCase::assertArrayHasKey('participants', $options['options']);
+                        \PHPUnit\Framework\TestCase::assertEquals(
                             $expectedOptions['participants'],
                             $options['options']['participants']
                         );
-                        \PHPUnit_Framework_TestCase::assertArrayHasKey('element', $options['options']);
-                        \PHPUnit_Framework_TestCase::assertContains(
+                        \PHPUnit\Framework\TestCase::assertArrayHasKey('element', $options['options']);
+                        \PHPUnit\Framework\TestCase::assertContains(
                             'skype_button_' . md5($username),
                             $options['options']['element']
                         );

@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -127,7 +127,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -135,7 +135,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AssociationManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|AssociationManager
      */
     private function createAssociationManagerMock()
     {
@@ -143,7 +143,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -151,7 +151,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {

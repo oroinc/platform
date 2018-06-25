@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 
-class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
+class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
     protected $emailRecipientsHelper;
 
@@ -147,7 +147,7 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
      * @param array     $provided
      * @param int       $recipientExactly
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createProvider($section, array $provided, $recipientExactly = 1)
     {

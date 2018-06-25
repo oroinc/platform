@@ -10,12 +10,12 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ImportStrategyListenerTest extends \PHPUnit_Framework_TestCase
+class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ImportStrategyHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
     private $strategyHelper;
 
     /** @var ImportStrategyListener */
@@ -32,10 +32,10 @@ class ImportStrategyListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnProcessAfter()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|StrategyInterface $strategy */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|StrategyInterface $strategy */
         $strategy = $this->createMock(StrategyInterface::class);
         $entity = new FieldConfigModel();
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ContextInterface $context */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface $context */
         $context = $this->createMock(ContextInterface::class);
         $event = new StrategyEvent($strategy, $entity, $context);
 

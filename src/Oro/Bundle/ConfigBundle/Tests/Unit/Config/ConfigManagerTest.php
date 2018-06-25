@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ConfigManagerTest extends \PHPUnit_Framework_TestCase
+class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager */
     protected $manager;
@@ -22,16 +22,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigDefinitionImmutableBag */
     protected $bag;
 
-    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $globalScopeManager;
 
-    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userScopeManager;
 
-    /** @var ValueProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultValueProvider;
 
     /**

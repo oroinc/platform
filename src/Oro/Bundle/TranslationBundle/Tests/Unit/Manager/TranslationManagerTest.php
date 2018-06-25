@@ -15,29 +15,29 @@ use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TranslationManagerTest extends \PHPUnit_Framework_TestCase
+class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationDomainProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationDomainProvider */
     protected $domainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager */
     protected $objectManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationKeyRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationKeyRepository */
     protected $translationKeyRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationRepository */
     protected $translationRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
     protected $languageRepository;
 
     protected function setUp()

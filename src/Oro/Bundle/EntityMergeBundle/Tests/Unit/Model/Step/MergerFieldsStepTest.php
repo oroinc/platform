@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
 
-class MergerFieldsStepTest extends \PHPUnit_Framework_TestCase
+class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MergeFieldsStep
@@ -14,12 +14,12 @@ class MergerFieldsStepTest extends \PHPUnit_Framework_TestCase
     protected $step;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $strategy;
 

@@ -16,21 +16,21 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Autocomplete\AssignedToOrganizationUsersHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class AssignedToOrganizationUsersHandlerTest extends \PHPUnit_Framework_TestCase
+class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AssignedToOrganizationUsersHandler */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $searchIndexer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     public function setUp()

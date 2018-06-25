@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression;
 
-class NotCompositeExpressionTest extends \PHPUnit_Framework_TestCase
+class NotCompositeExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkCompositeExpression()
     {

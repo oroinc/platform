@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer as BaseTransformer;
 
-class DateTimeToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class DateTimeToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|BaseTransformer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BaseTransformer */
     private $innerTransformer;
 
     /** @var DateTimeToLocalizedStringTransformer */

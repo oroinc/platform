@@ -10,25 +10,25 @@ use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\DataAuditBundle\Service\ChangeSetToAuditFieldsConverter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ChangeSetToAuditFieldsConverterTest extends \PHPUnit_Framework_TestCase
+class ChangeSetToAuditFieldsConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var AuditEntityMapper|\PHPUnit_Framework_MockObject_MockObject
+     * @var AuditEntityMapper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $auditEntityMapper;
 
     /**
-     * @var AuditConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var AuditConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $auditConfigProvider;
 
     /**
-     * @var EntityNameProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityNameProvider;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 

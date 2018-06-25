@@ -12,9 +12,9 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Tests\Unit\Mock\JobEntity;
 
-class JobStorageTest extends \PHPUnit_Framework_TestCase
+class JobStorageTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;
 
     /** @var JobStorage */
@@ -343,7 +343,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private function createConnectionMock()
     {
@@ -351,7 +351,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
      */
     private function createEntityManagerMock()
     {
@@ -359,7 +359,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UniqueConstraintViolationException
+     * @return \PHPUnit\Framework\MockObject\MockObject|UniqueConstraintViolationException
      */
     private function createUniqueConstraintViolationExceptionMock()
     {

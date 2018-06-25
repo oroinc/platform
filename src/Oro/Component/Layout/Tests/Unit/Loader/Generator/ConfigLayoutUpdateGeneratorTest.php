@@ -6,7 +6,7 @@ use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 
-class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
+class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigLayoutUpdateGenerator */
     protected $generator;
@@ -25,7 +25,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $source = ['actions' => []];
 
-        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(
             'Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
         );

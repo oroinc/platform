@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\EntityExtendBundle\DBAL\Types\HTMLEscapedType;
 
-class HTMLEscapedTypeTest extends \PHPUnit_Framework_TestCase
+class HTMLEscapedTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HTMLEscapedType */
     protected $type;

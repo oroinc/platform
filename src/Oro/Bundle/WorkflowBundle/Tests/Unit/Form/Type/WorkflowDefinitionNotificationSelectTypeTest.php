@@ -20,7 +20,7 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
 
     const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
     /** @var WorkflowDefinitionNotificationSelectType */

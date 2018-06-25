@@ -7,7 +7,7 @@ use Oro\Bundle\SoapBundle\EventListener\LocaleListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class LocaleListenerTest extends \PHPUnit_Framework_TestCase
+class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LocaleListener */
     protected $listener;

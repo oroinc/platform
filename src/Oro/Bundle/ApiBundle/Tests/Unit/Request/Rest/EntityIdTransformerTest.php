@@ -7,9 +7,9 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
-class EntityIdTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var EntityIdTransformer */

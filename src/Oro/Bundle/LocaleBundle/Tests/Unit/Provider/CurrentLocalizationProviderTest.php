@@ -6,7 +6,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
-class CurrentLocalizationProviderTest extends \PHPUnit_Framework_TestCase
+class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CurrentLocalizationProvider */
     protected $provider;

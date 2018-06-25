@@ -12,9 +12,9 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
 {
     /**
      * @param QueryDesignerModel                            $model
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $doctrine
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $functionProvider
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $virtualFieldProvider
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $doctrine
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $functionProvider
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $virtualFieldProvider
      * @param array                                         $guessers
      *
      * @return DatagridConfigurationBuilder

@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Converter;
 use Oro\Bundle\MessageQueueBundle\Log\Converter\DbalMessageToArrayConverter;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 
-class DbalMessageToArrayConverterTest extends \PHPUnit_Framework_TestCase
+class DbalMessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DbalMessageToArrayConverter */
     private $converter;

@@ -6,10 +6,10 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
+class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldHelper;
 

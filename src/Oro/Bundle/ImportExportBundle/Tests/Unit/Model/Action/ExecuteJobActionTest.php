@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
+class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor
@@ -15,7 +15,7 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutor
+     * @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor
      */
     protected $jobExecutor;
 
@@ -33,7 +33,7 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
 
         $this->action = new ExecuteJobAction($this->contextAccessor, $this->jobExecutor);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher $dispatcher */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

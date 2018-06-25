@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class InvalidateCacheScheduleCommandTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheScheduleCommandTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {
@@ -68,7 +68,7 @@ class InvalidateCacheScheduleCommandTest extends \PHPUnit_Framework_TestCase
      * @param string $serviceDefinition
      * @param object $service
      *
-     * @return Application|\PHPUnit_Framework_MockObject_MockObject
+     * @return Application|\PHPUnit\Framework\MockObject\MockObject
      */
     private function buildApplicationWithService($serviceDefinition, $service)
     {

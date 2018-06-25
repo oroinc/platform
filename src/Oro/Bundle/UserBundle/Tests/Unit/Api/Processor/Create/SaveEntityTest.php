@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class SaveEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userManager;
 
     /** @var SaveEntity */

@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Symfony\Component\Form\FormView;
 
-class AdditionalAttrExtensionTest extends \PHPUnit_Framework_TestCase
+class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
 {
     const ID = 'test_id';
     /**

@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Expression;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\CronExpressionVerifier;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 
-class CronExpressionVerifierTest extends \PHPUnit_Framework_TestCase
+class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CronExpressionVerifier */
     protected $verifier;

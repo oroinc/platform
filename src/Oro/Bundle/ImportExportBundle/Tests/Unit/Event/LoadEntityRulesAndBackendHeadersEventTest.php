@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 
-class LoadEntityRulesAndBackendHeadersEventTest extends \PHPUnit_Framework_TestCase
+class LoadEntityRulesAndBackendHeadersEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

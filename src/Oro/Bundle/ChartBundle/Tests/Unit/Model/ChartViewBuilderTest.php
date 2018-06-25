@@ -7,22 +7,22 @@ use Oro\Bundle\ChartBundle\Model\Data\ArrayData;
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
-class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
+class ChartViewBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const TEMPLATE = 'template.twig.html';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $transformerFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $twig;
 

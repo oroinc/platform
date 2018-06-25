@@ -10,11 +10,11 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
+class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var WorkflowExtension */

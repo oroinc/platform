@@ -177,7 +177,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
     /**
      * @param TranslatorInterface|null $translator
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected function getTranslator(TranslatorInterface $translator = null)
     {
@@ -185,7 +185,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormRegistry
      */
     protected function createFormRegistryMock()
     {
@@ -195,7 +195,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry
      */
     protected function createWorkflowRegistryMock()
     {
@@ -206,7 +206,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AttributeGuesser
+     * @return \PHPUnit\Framework\MockObject\MockObject|AttributeGuesser
      */
     protected function createAttributeGuesserMock()
     {
@@ -217,7 +217,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DefaultValuesListener
+     * @return \PHPUnit\Framework\MockObject\MockObject|DefaultValuesListener
      */
     protected function createDefaultValuesListenerMock()
     {
@@ -228,7 +228,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormInitListener
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormInitListener
      */
     protected function createFormInitListenerMock()
     {
@@ -239,7 +239,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RequiredAttributesListener
+     * @return \PHPUnit\Framework\MockObject\MockObject|RequiredAttributesListener
      */
     protected function createRequiredAttributesListenerMock()
     {
@@ -250,7 +250,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
      */
     protected function createDispatcherMock()
     {
@@ -260,7 +260,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PropertyPathSecurityHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|PropertyPathSecurityHelper
      */
     protected function createPropertyPathSecurityHelper()
     {

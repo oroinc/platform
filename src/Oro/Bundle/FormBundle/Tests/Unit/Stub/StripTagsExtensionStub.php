@@ -11,7 +11,7 @@ class StripTagsExtensionStub extends StripTagsExtension
     /**
      * {@inheritDoc}
      */
-    public function __construct(\PHPUnit_Framework_MockObject_MockObject $htmlTagHelper)
+    public function __construct(\PHPUnit\Framework\MockObject\MockObject $htmlTagHelper)
     {
         $htmlTagHelper->expects(FormIntegrationTestCase::any())
             ->method('stripTags')

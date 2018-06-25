@@ -567,7 +567,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | AbstractQuery
+     * @return \PHPUnit\Framework\MockObject\MockObject | AbstractQuery
      */
     private function createQueryMock()
     {
@@ -575,7 +575,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject | ClassMetadata
      */
     private function createClassMetadataMock()
     {
@@ -590,7 +590,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | QueryBuilder
+     * @return \PHPUnit\Framework\MockObject\MockObject | QueryBuilder
      */
     private function createQueryBuilderMock()
     {
@@ -598,8 +598,8 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @param  \PHPUnit_Framework_MockObject_MockObject | ClassMetadata $classMetadata
-     * @return \PHPUnit_Framework_MockObject_MockObject | EntityManager
+     * @param  \PHPUnit\Framework\MockObject\MockObject | ClassMetadata $classMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject | EntityManager
      */
     private function createEntityManagerMock($classMetadata)
     {
@@ -615,8 +615,8 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @param  \PHPUnit_Framework_MockObject_MockObject | QueryBuilder $queryBuilder
-     * @return \PHPUnit_Framework_MockObject_MockObject | OrmDatasource
+     * @param  \PHPUnit\Framework\MockObject\MockObject | QueryBuilder $queryBuilder
+     * @return \PHPUnit\Framework\MockObject\MockObject | OrmDatasource
      */
     private function createDatasourceMock($queryBuilder)
     {
@@ -636,7 +636,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | DatagridConfiguration
+     * @return \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration
      */
     private function createDataGridConfigurationMock()
     {
@@ -652,9 +652,9 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @param  \PHPUnit_Framework_MockObject_MockObject | DatagridConfiguration $gridConfig
-     * @param  \PHPUnit_Framework_MockObject_MockObject | OrmDatasource $dataSource
-     * @return \PHPUnit_Framework_MockObject_MockObject | DatagridInterface
+     * @param  \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration $gridConfig
+     * @param  \PHPUnit\Framework\MockObject\MockObject | OrmDatasource $dataSource
+     * @return \PHPUnit\Framework\MockObject\MockObject | DatagridInterface
      */
     private function createDatagridMock($gridConfig, $dataSource)
     {
@@ -674,7 +674,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ContextInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | ContextInterface
      */
     private function createContextMock()
     {
@@ -683,7 +683,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
 
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ServiceLink
+     * @return \PHPUnit\Framework\MockObject\MockObject | ServiceLink
      */
     private function createGridManagerLinkMock()
     {
@@ -691,7 +691,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EventDispatcherInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | EventDispatcherInterface
      */
     private function createEventDispatcherMock()
     {

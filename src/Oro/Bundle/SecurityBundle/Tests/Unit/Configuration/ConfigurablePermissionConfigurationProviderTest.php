@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBund
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider bundlesProvider
@@ -89,7 +89,7 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
 
     /**
      * @param array $bundles
-     * @return ConfigurablePermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createConfigurationProvider(array $bundles)
     {

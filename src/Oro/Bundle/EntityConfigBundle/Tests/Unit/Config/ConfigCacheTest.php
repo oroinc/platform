@@ -10,17 +10,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ConfigCacheTest extends \PHPUnit_Framework_TestCase
+class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {
     const SCOPE = 'testScope';
     const ENTITY_CLASS = 'Test\Entity';
     const FIELD_NAME = 'testField';
     const FIELD_TYPE = 'integer';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $modelCache;
 
     /** @var ConfigCache */

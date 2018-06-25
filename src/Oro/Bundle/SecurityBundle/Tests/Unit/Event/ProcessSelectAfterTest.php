@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 
-class ProcessSelectAfterTest extends \PHPUnit_Framework_TestCase
+class ProcessSelectAfterTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {

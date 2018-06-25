@@ -15,15 +15,15 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
+class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|InlineEditColumnOptionsGuesser */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|InlineEditColumnOptionsGuesser */
     protected $guesser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
     /** @var InlineEditingExtension */

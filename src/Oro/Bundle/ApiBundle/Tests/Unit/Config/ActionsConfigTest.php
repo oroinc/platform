@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 
-class ActionsConfigTest extends \PHPUnit_Framework_TestCase
+class ActionsConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()
     {

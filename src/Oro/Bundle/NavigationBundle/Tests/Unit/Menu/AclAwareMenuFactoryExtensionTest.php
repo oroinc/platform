@@ -17,18 +17,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
+class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Router */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Router */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ClassAuthorizationChecker */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ClassAuthorizationChecker */
     protected $classAuthorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
     /** @var MenuFactory */
@@ -40,7 +40,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var CacheProvider */
     protected $cache;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     protected function setUp()

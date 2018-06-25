@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilder;
 
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 
-class ArrayAccessorTest extends \PHPUnit_Framework_TestCase
+class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayAccessor */
     protected $arrayAccessor;

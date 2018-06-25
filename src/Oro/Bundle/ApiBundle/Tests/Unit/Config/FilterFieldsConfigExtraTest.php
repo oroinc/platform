@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class FilterFieldsConfigExtraTest extends \PHPUnit_Framework_TestCase
+class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterFieldsConfigExtra */
     protected $extra;

@@ -8,12 +8,12 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\BarBundl
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationProvider */
     protected $configurationProvider;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
     /**

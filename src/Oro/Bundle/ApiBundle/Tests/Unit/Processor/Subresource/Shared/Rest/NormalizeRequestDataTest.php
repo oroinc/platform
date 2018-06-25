@@ -15,7 +15,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
     private const ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var NormalizeRequestData */

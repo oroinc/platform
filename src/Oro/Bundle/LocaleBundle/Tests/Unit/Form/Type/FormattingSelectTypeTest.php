@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class FormattingSelectTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LocalizationChoicesProvider
+     * @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider
      */
     protected $provider;
 

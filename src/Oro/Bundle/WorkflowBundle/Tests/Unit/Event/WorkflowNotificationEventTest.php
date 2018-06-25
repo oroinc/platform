@@ -7,9 +7,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 
-class WorkflowNotificationEventTest extends \PHPUnit_Framework_TestCase
+class WorkflowNotificationEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject */
     private $transitionRecord;
 
     /** @var AbstractUser */

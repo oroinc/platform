@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class ObjectLabelTypeTest extends \PHPUnit_Framework_TestCase
+class ObjectLabelTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectLabelType */
     protected $formType;

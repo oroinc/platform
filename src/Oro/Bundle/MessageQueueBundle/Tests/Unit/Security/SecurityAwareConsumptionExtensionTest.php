@@ -14,15 +14,15 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class SecurityAwareConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
+class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
     private $tokenSerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $logger;
 
     /** @var SecurityAwareConsumptionExtension */

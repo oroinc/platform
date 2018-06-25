@@ -5,7 +5,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
-class ActionFactoryTest extends \PHPUnit_Framework_TestCase
+class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**#@+
      * Test parameters

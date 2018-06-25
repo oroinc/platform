@@ -10,15 +10,15 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityBundle\EventListener\ORM\PartialIndexListener;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
-class PartialIndexListenerTest extends \PHPUnit_Framework_TestCase
+class PartialIndexListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LoadClassMetadataEventArgs|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var ClassMetadataInfo|\PHPUnit_Framework_MockObject_MockObject
+     * @var ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $metadata;
 
@@ -73,7 +73,7 @@ class PartialIndexListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $driverName
      *
-     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getManagerMock($driverName)
     {
@@ -91,7 +91,7 @@ class PartialIndexListenerTest extends \PHPUnit_Framework_TestCase
      * @param string $table
      * @param string $index
      *
-     * @return ClassMetadataInfo|\PHPUnit_Framework_MockObject_MockObject
+     * @return ClassMetadataInfo|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getClassMetadataInfoMock($table, $index)
     {

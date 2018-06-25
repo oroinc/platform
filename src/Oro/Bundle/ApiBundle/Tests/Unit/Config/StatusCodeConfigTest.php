@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 
-class StatusCodeConfigTest extends \PHPUnit_Framework_TestCase
+class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {

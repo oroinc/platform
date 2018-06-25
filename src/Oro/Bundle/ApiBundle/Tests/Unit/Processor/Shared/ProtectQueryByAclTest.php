@@ -17,10 +17,10 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
     /** @var Context */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclAnnotationProvider;
 
     public function setUp()

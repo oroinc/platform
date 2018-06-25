@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Extension;
 
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 
-class DataStorageExtensionTest extends \PHPUnit_Framework_TestCase
+class DataStorageExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet()
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 
-class WorkflowRecordContextTest extends \PHPUnit_Framework_TestCase
+class WorkflowRecordContextTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructionValues()
     {

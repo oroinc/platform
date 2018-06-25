@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EndsWithComparisonExpression;
 
-class EndsWithComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class EndsWithComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {

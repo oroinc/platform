@@ -7,7 +7,7 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Layout\Config\Loader\LayoutUpdateCumulativeResourceLoader;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
 
-class FolderContentsCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsResourceFreshFileWasAdded()
     {

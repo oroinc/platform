@@ -7,7 +7,7 @@ use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 use Oro\Component\Routing\Tests\Unit\Resolver\TestResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
+class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 {
     const STATIC_CLASS = 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest';
     const CONST1 = 'const1';

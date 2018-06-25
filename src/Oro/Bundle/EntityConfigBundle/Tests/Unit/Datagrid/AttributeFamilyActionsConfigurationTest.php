@@ -9,17 +9,17 @@ use Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AttributeFamilyActionsConfigurationTest extends \PHPUnit_Framework_TestCase
+class AttributeFamilyActionsConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var int */
     const ENTITY_ID = 777;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
     /** @var AttributeFamilyActionsConfiguration */

@@ -17,12 +17,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class SubresourceContextTest extends \PHPUnit_Framework_TestCase
+class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
     /** @var SubresourceContext */

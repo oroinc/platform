@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Render;
 
 use Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener;
 
-class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
+class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalizedValueRenderListener
@@ -12,32 +12,32 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     protected $target;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $addressFormatter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dateTimeFormatter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $numberFormatter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $metadata;
 

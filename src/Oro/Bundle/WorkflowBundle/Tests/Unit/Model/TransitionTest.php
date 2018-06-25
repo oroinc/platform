@@ -14,11 +14,11 @@ use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TransitionTest extends \PHPUnit_Framework_TestCase
+class TransitionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */
     protected $optionsResolver;
 
     /** @var Transition */
@@ -351,7 +351,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      * @param bool $isFinal
      * @param bool $hasAllowedTransitions
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Step
+     * @return \PHPUnit\Framework\MockObject\MockObject|Step
      */
     protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true)
     {

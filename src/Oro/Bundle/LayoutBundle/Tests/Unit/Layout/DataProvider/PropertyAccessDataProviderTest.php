@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class PropertyAccessDataProviderTest extends \PHPUnit_Framework_TestCase
+class PropertyAccessDataProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetValue()
     {

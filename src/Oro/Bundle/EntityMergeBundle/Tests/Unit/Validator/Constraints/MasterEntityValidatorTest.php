@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MasterEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MasterEntityValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class MasterEntityValidatorTest extends \PHPUnit_Framework_TestCase
+class MasterEntityValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MasterEntityValidator

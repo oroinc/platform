@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer;
 
-class EntityAliasCacheWarmerTest extends \PHPUnit_Framework_TestCase
+class EntityAliasCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityAliasResolver;
 
     /** @var EntityAliasCacheWarmer */

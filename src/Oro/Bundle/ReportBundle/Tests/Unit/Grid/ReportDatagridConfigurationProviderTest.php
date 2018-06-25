@@ -13,7 +13,7 @@ use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 
-class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ReportDatagridConfigurationProvider
@@ -21,37 +21,37 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     protected $target;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $functionProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $virtualFieldProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrine;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var DatagridDateGroupingBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dateGroupingBuilder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | Cache
+     * @var \PHPUnit\Framework\MockObject\MockObject | Cache
      */
     protected $reportCacheManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SystemAwareResolver
+     * @var \PHPUnit\Framework\MockObject\MockObject|SystemAwareResolver
      */
     protected $resolver;
 
@@ -382,7 +382,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function prepareMetadata()
     {
@@ -410,7 +410,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      * @param string $className
      * @param array  $definition
      *
-     * @return Report|\PHPUnit_Framework_MockObject_MockObject
+     * @return Report|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getReportEntity($className, array $definition)
     {
@@ -450,7 +450,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
     /**
      * @param string $viewRoute
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEntityMetadata($viewRoute)
     {

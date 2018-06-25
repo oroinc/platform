@@ -7,7 +7,7 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
 
-class NotificationManagerTest extends \PHPUnit_Framework_TestCase
+class NotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_EVENT_NAME = 'namespace.event_name';
 
@@ -17,12 +17,12 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entity;
 

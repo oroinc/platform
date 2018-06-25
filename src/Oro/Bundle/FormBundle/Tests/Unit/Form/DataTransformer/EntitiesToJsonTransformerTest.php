@@ -6,9 +6,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 
-class EntitiesToJsonTransformerTest extends \PHPUnit_Framework_TestCase
+class EntitiesToJsonTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     /** @var EntitiesToJsonTransformer */

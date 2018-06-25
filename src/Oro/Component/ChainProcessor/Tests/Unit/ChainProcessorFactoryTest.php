@@ -4,7 +4,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ChainProcessorFactory;
 
-class ChainProcessorFactoryTest extends \PHPUnit_Framework_TestCase
+class ChainProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testFactory()
     {

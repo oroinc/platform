@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 
 use Oro\Bundle\UserBundle\Entity\Manager\RoleManager;
 
-class RoleManagerTest extends \PHPUnit_Framework_TestCase
+class RoleManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\UserBundle\Entity\Manager\RoleManager

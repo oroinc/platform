@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Annotation;
 use Oro\Bundle\LayoutBundle\Annotation\Layout;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class LayoutTest extends \PHPUnit_Framework_TestCase
+class LayoutTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetAlias()
     {

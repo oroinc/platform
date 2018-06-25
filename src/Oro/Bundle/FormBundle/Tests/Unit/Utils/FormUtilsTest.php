@@ -8,7 +8,7 @@ use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormView;
 
-class FormUtilsTest extends \PHPUnit_Framework_TestCase
+class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider optionsProvider

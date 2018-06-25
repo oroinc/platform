@@ -6,7 +6,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelDeleteEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelDeleteEventFactory;
 
-class ChannelDeleteEventFactoryTest extends \PHPUnit_Framework_TestCase
+class ChannelDeleteEventFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

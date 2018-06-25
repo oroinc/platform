@@ -12,7 +12,7 @@ use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle2\TestBundle2;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CumulativeConfigLoaderTest extends \PHPUnit_Framework_TestCase
+class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

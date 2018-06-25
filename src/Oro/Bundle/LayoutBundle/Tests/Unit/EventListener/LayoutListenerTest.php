@@ -18,15 +18,15 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class LayoutListenerTest extends \PHPUnit_Framework_TestCase
+class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManager;
 
     /** @var LayoutListener */
     protected $listener;
 
-    /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutHelper;
 
     protected function setUp()
@@ -344,7 +344,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $renderBlocks
      * @param string $blockId
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLayoutMock($renderBlocks, $blockId)
     {
@@ -382,7 +382,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayoutAnnotation')
             ->willReturn($annotation);
 
-        /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject $kernel */
+        /** @var HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject $kernel */
         $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
         return new GetResponseForControllerResultEvent(

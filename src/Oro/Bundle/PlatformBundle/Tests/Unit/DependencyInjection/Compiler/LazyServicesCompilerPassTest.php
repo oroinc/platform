@@ -7,7 +7,7 @@ use Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class LazyServicesCompilerPassTest extends \PHPUnit_Framework_TestCase
+class LazyServicesCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldMarkServicesAsLazy()
     {

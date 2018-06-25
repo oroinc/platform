@@ -25,9 +25,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
+class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityMetadataHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */

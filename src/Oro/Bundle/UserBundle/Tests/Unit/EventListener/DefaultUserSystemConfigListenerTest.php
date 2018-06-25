@@ -12,18 +12,18 @@ use Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
+class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var DefaultUserProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DefaultUserProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultUserProvider;
 
     /** @var DefaultUserSystemConfigListener */
     private $listener;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
@@ -167,7 +167,7 @@ class DefaultUserSystemConfigListenerTest extends \PHPUnit_Framework_TestCase
      * @param int       $id
      * @param User|null $user
      *
-     * @return EntityRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getUserRepository(int $id, User $user = null)
     {

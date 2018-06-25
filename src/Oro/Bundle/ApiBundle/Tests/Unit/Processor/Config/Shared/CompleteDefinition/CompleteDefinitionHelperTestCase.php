@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class CompleteDefinitionHelperTestCase extends \PHPUnit_Framework_TestCase
+class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS_NAME   = 'Test\Class';
     const TEST_VERSION      = '1.1';
@@ -76,7 +76,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {

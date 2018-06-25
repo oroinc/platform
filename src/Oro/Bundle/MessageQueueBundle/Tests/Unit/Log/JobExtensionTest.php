@@ -6,7 +6,7 @@ use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\JobExtension;
 use Oro\Component\MessageQueue\Job\Job;
 
-class JobExtensionTest extends \PHPUnit_Framework_TestCase
+class JobExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnPreRunUnique()
     {

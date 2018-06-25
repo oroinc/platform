@@ -17,18 +17,18 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class ImportStrategyListenerTest extends \PHPUnit_Framework_TestCase
+class ImportStrategyListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportStrategyListener */
     private $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadataProvider;
 
     protected function setUp()

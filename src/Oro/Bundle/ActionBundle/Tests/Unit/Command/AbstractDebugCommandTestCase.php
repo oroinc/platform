@@ -9,15 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
 {
-    /** @var FactoryWithTypesInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FactoryWithTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
     /** @var ContainerAwareCommand */

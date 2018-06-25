@@ -9,14 +9,14 @@ use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 
-class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
+class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'Oro\Bundle\CronBundle\Entity\Schedule';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SchedulesByArgumentsFilterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SchedulesByArgumentsFilterInterface */
     private $schedulesByArgumentsFilter;
 
     /** @var ScheduleManager */
@@ -162,14 +162,14 @@ class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
             $findBy['definition'] = $definition;
         }
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectRepository $repository */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectRepository $repository */
         $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->once())
             ->method('findBy')
             ->with($findBy)
             ->willReturn($schedules);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $em */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $em */
         $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $em->expects($this->once())
             ->method('getRepository')

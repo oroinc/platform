@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Job\Job;
 
-class JobTest extends \PHPUnit_Framework_TestCase
+class JobTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldConstructWithNullId()
     {

@@ -10,9 +10,9 @@ use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileManagerTest extends \PHPUnit_Framework_TestCase
+class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $filesystem;
 
     /** @var FileManager */

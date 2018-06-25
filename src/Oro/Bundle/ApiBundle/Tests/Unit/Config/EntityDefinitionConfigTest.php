@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
+class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testKey()
     {

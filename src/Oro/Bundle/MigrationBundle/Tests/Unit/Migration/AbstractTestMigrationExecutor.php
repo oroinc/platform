@@ -7,9 +7,9 @@ use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
-class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
+class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
     /** @var ArrayLogger */
@@ -18,7 +18,7 @@ class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
     /** @var MigrationQueryExecutor */
     protected $queryExecutor;
 
-    /** @var OroDataCacheManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OroDataCacheManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheManager;
 
     protected function setUp()

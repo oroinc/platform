@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\FormSubmitLayoutAjaxRe
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit_Framework_TestCase
+class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormSubmitLayoutAjaxResponseProcessor */
     protected $processor;
@@ -23,12 +23,12 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testCreateJsonResponseResult()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getResult')->willReturn(new WorkflowResult(['result data']));
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $request->expects($this->once())->method('isXmlHttpRequest')->willReturn(true);
 
@@ -50,7 +50,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testShouldSkipNotSaved()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('isSaved')->willReturn(false);
 
@@ -61,7 +61,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testShouldSkipUnsupportedResultType()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('isSaved')->willReturn(true);
         $context->expects($this->once())
@@ -74,11 +74,11 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit_Framework_TestC
 
     public function testShouldSkipNotXhr()
     {
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $request->expects($this->once())->method('isXmlHttpRequest')->willReturn(false);
 
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('isSaved')->willReturn(true);
         $context->expects($this->once())

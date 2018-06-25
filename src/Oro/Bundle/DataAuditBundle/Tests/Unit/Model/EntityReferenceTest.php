@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 
-class EntityReferenceTest extends \PHPUnit_Framework_TestCase
+class EntityReferenceTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldCreateNullReference()
     {

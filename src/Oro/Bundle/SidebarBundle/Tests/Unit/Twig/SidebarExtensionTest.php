@@ -10,23 +10,23 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
+class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetDefinitionRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetDefinitionRegistry */
     protected $widgetDefinitionsRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssetHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssetHelper */
     protected $assetHelper;
 
     /** @var SidebarExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     protected function setUp()

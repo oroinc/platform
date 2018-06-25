@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
+class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ACTION = 'test';
 
@@ -36,10 +36,10 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var ProcessorBagConfigBuilder */
     protected $processorBagConfigBuilder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
     /** @var ProcessorBag */
@@ -99,7 +99,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
      * @param string $processorId
      * @param string $groupName
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface
      */
     protected function addProcessor($processorId, $groupName)
     {
@@ -956,7 +956,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->will(new \PHPUnit_Framework_MockObject_Stub_Exception($internalPhpError));
+            ->will(new \PHPUnit\Framework\MockObject\Stub\Exception($internalPhpError));
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
