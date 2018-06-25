@@ -149,7 +149,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 FormType::class,
                 $parentEntity,
                 [
-                    'data_class'           => $parentBaseEntityClass,
+                    'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'    => false

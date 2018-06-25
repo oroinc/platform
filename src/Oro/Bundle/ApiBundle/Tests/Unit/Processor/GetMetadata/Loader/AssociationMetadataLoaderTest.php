@@ -165,4 +165,41 @@ class AssociationMetadataLoaderTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame($targetMetadata, $association->getTargetMetadata());
     }
+
+    public function testAssociationWhenItsTargetClassIsNotEqualToTargetClassInConfig()
+    {
+        $config = new EntityDefinitionConfig();
+        $fieldConfig = $config->addField('association');
+        $fieldConfig->setTargetClass('Test\TargetClassFromConfig');
+        $targetConfig = $fieldConfig->createAndSetTargetEntity();
+
+        $entityMetadata = new EntityMetadata();
+        $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
+        $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
+        $association->addAcceptableTargetClassName(self::TEST_TARGET_CLASS_NAME);
+
+        $targetMetadata = new EntityMetadata();
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                'Test\TargetClassFromConfig',
+                self::TEST_VERSION,
+                new RequestType([self::TEST_REQUEST_TYPE]),
+                self::identicalTo($targetConfig),
+                [new TestMetadataExtra('test')],
+                true
+            )
+            ->willReturn($targetMetadata);
+
+        $this->associationMetadataLoader->completeAssociationMetadata(
+            $entityMetadata,
+            $config,
+            $this->context
+        );
+
+        self::assertSame($targetMetadata, $association->getTargetMetadata());
+        self::assertEquals('Test\TargetClassFromConfig', $association->getTargetClassName());
+        self::assertEquals(['Test\TargetClassFromConfig'], $association->getAcceptableTargetClassNames());
+    }
 }

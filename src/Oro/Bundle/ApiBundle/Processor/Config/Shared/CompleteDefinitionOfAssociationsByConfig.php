@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -25,16 +26,22 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
     /** @var RelationConfigProvider */
     private $relationConfigProvider;
 
+    /** @var EntityOverrideProviderRegistry */
+    private $entityOverrideProviderRegistry;
+
     /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param RelationConfigProvider $relationConfigProvider
+     * @param DoctrineHelper                 $doctrineHelper
+     * @param RelationConfigProvider         $relationConfigProvider
+     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        RelationConfigProvider $relationConfigProvider
+        RelationConfigProvider $relationConfigProvider,
+        EntityOverrideProviderRegistry $entityOverrideProviderRegistry
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->relationConfigProvider = $relationConfigProvider;
+        $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
     /**
@@ -83,6 +90,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
         RequestType $requestType,
         array $extras
     ) {
+        $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $propertyPath => $mapping) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
@@ -90,17 +98,15 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
                 continue;
             }
 
+            $targetClass = $mapping['targetEntity'];
+            $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
+            if ($substituteTargetClass) {
+                $targetClass = $substituteTargetClass;
+            }
             if (!$fieldName) {
                 $fieldName = $propertyPath;
             }
-            $this->completeAssociation(
-                $definition,
-                $fieldName,
-                $mapping['targetEntity'],
-                $version,
-                $requestType,
-                $extras
-            );
+            $this->completeAssociation($definition, $fieldName, $targetClass, $version, $requestType, $extras);
             $field = $definition->getField($fieldName);
             if (null !== $field && $field->getTargetClass()) {
                 $field->setTargetType(

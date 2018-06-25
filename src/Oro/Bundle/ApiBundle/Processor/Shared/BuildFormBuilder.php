@@ -59,17 +59,24 @@ class BuildFormBuilder implements ProcessorInterface
             );
         }
 
-        $context->setFormBuilder($this->getFormBuilder($context));
+        $formBuilder = $this->getFormBuilder($context);
+        if (null !== $formBuilder) {
+            $context->setFormBuilder($formBuilder);
+        }
     }
 
     /**
      * @param FormContext $context
      *
-     * @return FormBuilderInterface
+     * @return FormBuilderInterface|null
      */
     protected function getFormBuilder(FormContext $context)
     {
         $config = $context->getConfig();
+        if (null === $config) {
+            return null;
+        }
+
         $formType = $config->getFormType() ?: FormType::class;
 
         $formBuilder = $this->formHelper->createFormBuilder(
@@ -82,7 +89,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (FormType::class === $formType) {
             $metadata = $context->getMetadata();
             if (null !== $metadata) {
-                $this->formHelper->addFormFields($formBuilder, $context->getMetadata(), $config);
+                $this->formHelper->addFormFields($formBuilder, $metadata, $config);
             }
         }
 

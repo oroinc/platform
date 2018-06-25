@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -41,6 +42,8 @@ class EntityType extends AbstractType
     {
         /** @var AssociationMetadata $metadata */
         $metadata = $options['metadata'];
+        /** @var EntityMapper|null $entityMapper */
+        $entityMapper = $options['entity_mapper'];
         /** @var IncludedEntityCollection|null $includedEntities */
         $includedEntities = $options['included_entities'];
         if ($metadata->isCollection()) {
@@ -52,6 +55,7 @@ class EntityType extends AbstractType
                             $this->doctrineHelper,
                             $this->entityLoader,
                             $metadata,
+                            $entityMapper,
                             $includedEntities
                         )
                     ),
@@ -63,6 +67,7 @@ class EntityType extends AbstractType
                     $this->doctrineHelper,
                     $this->entityLoader,
                     $metadata,
+                    $entityMapper,
                     $includedEntities
                 )
             );
@@ -75,9 +80,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false, 'included_entities' => null])
+            ->setDefaults(['compound' => false, 'entity_mapper' => null, 'included_entities' => null])
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
+            ->setAllowedTypes('entity_mapper', ['null', EntityMapper::class])
             ->setAllowedTypes('included_entities', ['null', IncludedEntityCollection::class]);
     }
 }

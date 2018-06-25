@@ -179,12 +179,19 @@ class ValidateSorting implements ProcessorInterface
      */
     protected function validateAssociationSorter(array $path, Context $context): ?string
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
-        if (!$metadata) {
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if (!$entityClass) {
+            // only manageable entities or resources based on manageable entities are supported
             return null;
         }
 
-        $targetFieldName = array_pop($path);
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+
+        $targetFieldName = \array_pop($path);
         list($targetSorters, $associations) = $this->getAssociationSorters($path, $context, $metadata);
         $targetFieldName = $this->validateSorter($targetFieldName, $targetSorters);
         if (!$targetFieldName) {

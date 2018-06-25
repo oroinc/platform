@@ -12,6 +12,7 @@ abstract class SwitchFormExtension
 
     const PREVIOUS_METADATA_ACCESSOR  = 'previousMetadataAccessor';
     const PREVIOUS_CONFIG_ACCESSOR    = 'previousConfigAccessor';
+    const PREVIOUS_ENTITY_MAPPER      = 'previousEntityMapper';
     const PREVIOUS_INCLUDED_ENTITIES  = 'previousIncludedEntities';
 
     /** @var FormExtensionSwitcherInterface */
@@ -69,6 +70,11 @@ abstract class SwitchFormExtension
         // and this context should be restored when the current action is finished
         $this->rememberValue(
             $context,
+            self::PREVIOUS_ENTITY_MAPPER,
+            $this->metadataTypeGuesser->getEntityMapper()
+        );
+        $this->rememberValue(
+            $context,
             self::PREVIOUS_INCLUDED_ENTITIES,
             $this->metadataTypeGuesser->getIncludedEntities()
         );
@@ -89,10 +95,12 @@ abstract class SwitchFormExtension
      */
     protected function restoreContext(FormContext $context)
     {
+        $this->metadataTypeGuesser->setEntityMapper($context->get(self::PREVIOUS_ENTITY_MAPPER));
         $this->metadataTypeGuesser->setIncludedEntities($context->get(self::PREVIOUS_INCLUDED_ENTITIES));
         $this->metadataTypeGuesser->setMetadataAccessor($context->get(self::PREVIOUS_METADATA_ACCESSOR));
         $this->metadataTypeGuesser->setConfigAccessor($context->get(self::PREVIOUS_CONFIG_ACCESSOR));
 
+        $context->remove(self::PREVIOUS_ENTITY_MAPPER);
         $context->remove(self::PREVIOUS_INCLUDED_ENTITIES);
         $context->remove(self::PREVIOUS_METADATA_ACCESSOR);
         $context->remove(self::PREVIOUS_CONFIG_ACCESSOR);

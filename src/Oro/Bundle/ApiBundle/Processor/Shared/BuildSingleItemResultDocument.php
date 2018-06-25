@@ -16,11 +16,10 @@ class BuildSingleItemResultDocument extends BuildResultDocument
      */
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context)
     {
-        $result = $context->getResult();
-        if (null === $result) {
-            $documentBuilder->setDataObject($result, $context->getRequestType());
-        } else {
-            $documentBuilder->setDataObject($result, $context->getRequestType(), $context->getMetadata());
-        }
+        $documentBuilder->setDataObject(
+            $context->getResult(),
+            $context->getRequestType(),
+            $context->getMetadata()
+        );
     }
 }

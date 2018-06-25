@@ -85,7 +85,7 @@ class CorrectSortValue implements ProcessorInterface
      *
      * @return mixed
      */
-    protected function normalizeValue($value, $entityClass, EntityDefinitionConfig $config = null)
+    protected function normalizeValue($value, $entityClass, ?EntityDefinitionConfig $config)
     {
         if (empty($value) || !is_array($value)) {
             return $value;
@@ -113,7 +113,7 @@ class CorrectSortValue implements ProcessorInterface
         array &$result,
         $entityClass,
         $direction,
-        EntityDefinitionConfig $config = null
+        ?EntityDefinitionConfig $config
     ) {
         if (null === $config) {
             $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);

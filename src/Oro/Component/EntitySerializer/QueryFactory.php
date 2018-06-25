@@ -5,35 +5,51 @@ namespace Oro\Component\EntitySerializer;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
+/**
+ * A set of methods to build queries used by the entity serializer to retrieve data.
+ */
 class QueryFactory
 {
     /**
      * this value is used to optimize (avoid redundant call parseQuery) UNION ALL queries
      * for the getRelatedItemsIds() method
      */
-    const FAKE_ID = '__fake_id__';
+    private const FAKE_ID = '__fake_id__';
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var QueryHintResolverInterface */
-    protected $queryHintResolver;
+    /** @var QueryResolver */
+    private $queryResolver;
 
     /**
-     * @param DoctrineHelper             $doctrineHelper
-     * @param QueryHintResolverInterface $queryHintResolver
+     * @param DoctrineHelper $doctrineHelper
+     * @param QueryResolver  $queryResolver
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        QueryHintResolverInterface $queryHintResolver
+        QueryResolver $queryResolver
     ) {
-        $this->doctrineHelper    = $doctrineHelper;
-        $this->queryHintResolver = $queryHintResolver;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->queryResolver = $queryResolver;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param EntityConfig $config
+     *
+     * @return Query
+     */
+    public function getQuery(QueryBuilder $qb, EntityConfig $config)
+    {
+        $query = $qb->getQuery();
+        $this->queryResolver->resolveQuery($query, $config);
+
+        return $query;
     }
 
     /**
@@ -125,7 +141,7 @@ class QueryFactory
      * @return SqlQueryBuilder
      * @throws Query\QueryException
      */
-    protected function getRelatedItemsUnionAllQuery(
+    private function getRelatedItemsUnionAllQuery(
         $associationMapping,
         array $entityIds,
         EntityConfig $config,
@@ -177,7 +193,7 @@ class QueryFactory
      *
      * @return Query
      */
-    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, EntityConfig $config)
+    private function getRelatedItemsIdsQuery($associationMapping, $entityIds, EntityConfig $config)
     {
         $qb = $this->getToManyAssociationQueryBuilder($associationMapping, $entityIds)
             ->addSelect(
@@ -188,19 +204,5 @@ class QueryFactory
             );
 
         return $this->getQuery($qb, $config);
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param EntityConfig $config
-     *
-     * @return Query
-     */
-    public function getQuery(QueryBuilder $qb, EntityConfig $config)
-    {
-        $query = $qb->getQuery();
-        $this->queryHintResolver->resolveHints($query, $config->getHints());
-
-        return $query;
     }
 }

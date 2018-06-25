@@ -160,7 +160,7 @@ class NormalizeIncludedData implements ProcessorInterface
                 $data[JsonApiDoc::TYPE]
             );
             if (null !== $entityClass) {
-                $updateFlag = $this->getUpdateFlag($pointer, $data, $entityClass);
+                $updateFlag = $this->getUpdateFlag($pointer, $data);
                 if (null !== $updateFlag) {
                     $entityId = $this->getEntityId(
                         $this->buildPointer($pointer, JsonApiDoc::ID),
@@ -217,37 +217,26 @@ class NormalizeIncludedData implements ProcessorInterface
     /**
      * @param string $pointer
      * @param array  $data
-     * @param string $entityClass
      *
      * @return bool|null
      */
-    protected function getUpdateFlag($pointer, $data, $entityClass)
+    protected function getUpdateFlag($pointer, $data)
     {
         if (empty($data[JsonApiDoc::META]) || !array_key_exists(self::UPDATE_META, $data[JsonApiDoc::META])) {
             return false;
         }
+
         $flag = $data[JsonApiDoc::META][self::UPDATE_META];
-        if (true === $flag || false === $flag) {
-            if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                $this->addValidationError(
-                    Constraint::VALUE,
-                    $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
-                    'Only manageable entity can be updated.'
-                );
-
-                return null;
-            }
-
-            return $flag;
+        if (true !== $flag && false !== $flag) {
+            $this->addValidationError(
+                Constraint::VALUE,
+                $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
+                'This value should be boolean.'
+            );
+            $flag = null;
         }
 
-        $this->addValidationError(
-            Constraint::VALUE,
-            $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
-            'This value should be boolean.'
-        );
-
-        return null;
+        return $flag;
     }
 
     /**
@@ -318,11 +307,19 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getEntity($pointer, $entityClass, $entityId, $updateFlag)
     {
+        $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
+
         if ($updateFlag) {
-            return $this->getExistingEntity($pointer, $entityClass, $entityId);
+            if ($resolvedEntityClass) {
+                return $this->getExistingEntity($pointer, $resolvedEntityClass, $entityId);
+            }
+
+            $this->addValidationError(Constraint::VALUE, $pointer, 'Only manageable entity can be updated.');
+
+            return null;
         }
 
-        return $this->entityInstantiator->instantiate($entityClass);
+        return $this->entityInstantiator->instantiate($resolvedEntityClass ?? $entityClass);
     }
 
     /**
@@ -335,13 +332,11 @@ class NormalizeIncludedData implements ProcessorInterface
     protected function getExistingEntity($pointer, $entityClass, $entityId)
     {
         $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->getEntityMetadata($entityClass));
-        if (null !== $entity) {
-            return $entity;
+        if (null === $entity) {
+            $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
         }
 
-        $this->addValidationError(Constraint::ENTITY, $pointer, 'The entity does not exist.');
-
-        return null;
+        return $entity;
     }
 
     /**
