@@ -1,0 +1,16 @@
+/* @theme: blank; */
+
+$line-clamp-overflow: hidden !default;
+$line-clamp-display: -webkit-box !default;
+$line-clamp-line-clamp: 2 !default;
+$line-clamp-box-orient: vertical !default;
+
+$line-clamp-polyfill-position: relative !default;
+$line-clamp-polyfill-display: block !default;
+$line-clamp-polyfill-overflow: hidden !default;
+
+$line-clamp-polyfill-after-top: ceil($base-font-size * $base-line-height * ($line-clamp-line-clamp - 1)) !default;
+$line-clamp-polyfill-after-right: 0 !default;
+$line-clamp-polyfill-after-width: 12% !default;
+$line-clamp-polyfill-after-height: ceil($base-font-size * $base-line-height) !default;
+$line-clamp-polyfill-after-background: linear-gradient(to right, rgba(get-color('additional', 'ultra'), 0), rgba(get-color('additional', 'ultra'), 1) 50%) !default;
