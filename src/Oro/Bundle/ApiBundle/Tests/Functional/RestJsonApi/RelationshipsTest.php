@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @group regression
+ */
 class RelationshipsTest extends RestJsonApiTestCase
 {
     /**
