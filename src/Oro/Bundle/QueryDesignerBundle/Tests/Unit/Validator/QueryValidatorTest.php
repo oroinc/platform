@@ -10,7 +10,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class QueryValidatorTest extends \PHPUnit_Framework_TestCase
+class QueryValidatorTest extends \PHPUnit\Framework\TestCase
 {
     const MESSAGE = 'Invalid query';
 
@@ -25,22 +25,22 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $chainConfigurationProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $gridBuilder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
@@ -86,7 +86,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $datasource
+     * @param \PHPUnit\Framework\MockObject\MockObject $datasource
      * @param bool                                     $useOrmDatasource
      * @param \Exception                               $exception
      * @param \Exception                               $configurationException
@@ -235,7 +235,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getOrmDataSourceInterfaceMock()
     {

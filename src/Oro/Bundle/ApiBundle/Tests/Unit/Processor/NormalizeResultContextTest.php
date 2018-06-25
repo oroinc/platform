@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 
-class NormalizeResultContextTest extends \PHPUnit_Framework_TestCase
+class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NormalizeResultContext */
     protected $context;

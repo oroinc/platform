@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipRequestDataValidator;
 
-class RelationshipRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
+class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationshipRequestDataValidator */
     private $validator;

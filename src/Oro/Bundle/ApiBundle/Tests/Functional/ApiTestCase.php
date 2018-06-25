@@ -357,8 +357,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -388,8 +388,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -424,14 +424,14 @@ abstract class ApiTestCase extends WebTestCase
                     if (!empty($message)) {
                         $failureMessage = $message . "\n" . $failureMessage;
                     }
-                    throw new \PHPUnit_Framework_ExpectationFailedException($failureMessage);
+                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
                 }
             } else {
-                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+                \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
-                $e = new \PHPUnit_Framework_ExpectationFailedException(
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
                 );

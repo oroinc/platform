@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
+class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {

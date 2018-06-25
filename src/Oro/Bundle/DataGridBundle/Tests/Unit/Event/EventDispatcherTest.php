@@ -9,14 +9,14 @@ use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcherTest extends \PHPUnit_Framework_TestCase
+class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_EVENT_NAME = 'test.event';
 
     /** @var  EventDispatcherInterface */
     protected $dispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $realDispatcherMock;
 
     protected function setUp()

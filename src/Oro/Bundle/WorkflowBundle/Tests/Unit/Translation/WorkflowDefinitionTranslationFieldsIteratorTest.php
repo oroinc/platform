@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowDefinitionTranslationFieldsIterator;
 
-class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider readWorkflowDefinitionFieldsProvider

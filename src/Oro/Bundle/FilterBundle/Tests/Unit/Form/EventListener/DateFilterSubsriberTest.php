@@ -15,17 +15,17 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
+class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
-    /** @var DateFilterModifier|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $modifier;
 
     protected function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(['getTimezone'])
@@ -34,9 +34,9 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
             ->method('getTimezone')
             ->will($this->returnValue('Europe/Moscow'));
 
-        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translatorMock */
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translatorMock */
         $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        /** @var DateModifierProvider|\PHPUnit_Framework_MockObject_MockObject $providerMock */
+        /** @var DateModifierProvider|\PHPUnit\Framework\MockObject\MockObject $providerMock */
         $providerMock = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
 
         $this->modifier   = new DateFilterModifier(

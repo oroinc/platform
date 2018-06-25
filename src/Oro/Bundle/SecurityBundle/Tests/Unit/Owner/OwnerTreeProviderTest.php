@@ -43,16 +43,16 @@ class OwnerTreeProviderTest extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DatabaseChecker */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseChecker */
     protected $databaseChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
     protected $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
     protected function setUp()
@@ -140,13 +140,13 @@ class OwnerTreeProviderTest extends OrmTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param int                                      $expectsAt
      * @param string                                   $sql
      * @param array                                    $result
      */
     protected function setFetchAllQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $expectsAt,
         $sql,
         $result
@@ -163,7 +163,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $connection
+     * @param \PHPUnit\Framework\MockObject\MockObject $connection
      * @param string[]                                 $businessUnits
      */
     protected function setGetBusinessUnitsExpectation($connection, array $businessUnits)
@@ -188,7 +188,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $connection
+     * @param \PHPUnit\Framework\MockObject\MockObject $connection
      * @param string[]                                 $users
      */
     protected function setGetUsersExpectation($connection, array $users)

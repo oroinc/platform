@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\NotificationBundle\Entity\Repository\EventRepository;
 
-class EventRepositoryTest extends \PHPUnit_Framework_TestCase
+class EventRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'EventEntityName';
 
@@ -16,7 +16,7 @@ class EventRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

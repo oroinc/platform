@@ -9,12 +9,12 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 
-class TranslationDomainProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationKeyRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
     /** @var TranslationDomainProvider */

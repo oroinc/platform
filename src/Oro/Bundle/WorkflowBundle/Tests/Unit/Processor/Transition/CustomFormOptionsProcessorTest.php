@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormOptionsProcessor;
 use Oro\Component\Action\Action\ActionInterface;
 
-class CustomFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
+class CustomFormOptionsProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomFormOptionsProcessor */
     protected $processor;
@@ -21,11 +21,11 @@ class CustomFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipDefaultTransitionForms()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(false);
 
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('getTransition')->willReturn($transition);
         $context->expects($this->never())->method('getWorkflowItem');
@@ -37,20 +37,20 @@ class CustomFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $formData = (object)['id' => 42];
 
-        /** @var WorkflowData|\PHPUnit_Framework_MockObject_MockObject $data */
+        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $data */
         $data = $this->createMock(WorkflowData::class);
         $data->expects($this->once())->method('get')->with('formAttribute')->willReturn($formData);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getData')->willReturn($data);
 
-        /** @var ActionInterface|\PHPUnit_Framework_MockObject_MockObject $action */
+        /** @var ActionInterface|\PHPUnit\Framework\MockObject\MockObject $action */
         $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())->method('execute')->with($workflowItem);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
         $transition->expects($this->any())->method('getFormOptions')->willReturn(['form_init' => $action]);
@@ -69,16 +69,16 @@ class CustomFormOptionsProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $formData = (object)['id' => 42];
 
-        /** @var WorkflowData|\PHPUnit_Framework_MockObject_MockObject $data */
+        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $data */
         $data = $this->createMock(WorkflowData::class);
         $data->expects($this->once())->method('get')->with('formAttribute')->willReturn($formData);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getData')->willReturn($data);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
         $transition->expects($this->any())->method('getFormOptions')->willReturn([]);

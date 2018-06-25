@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Validation;
 
-class ChangeRelationshipProcessorTestCase extends \PHPUnit_Framework_TestCase
+class ChangeRelationshipProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
     protected const TEST_VERSION      = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
@@ -22,10 +22,10 @@ class ChangeRelationshipProcessorTestCase extends \PHPUnit_Framework_TestCase
     /** @var ChangeRelationshipContext */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
     protected function setUp()

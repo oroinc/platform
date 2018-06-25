@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Yaml\Yaml;
 
-class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
+class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 {
     protected static $path1;
     protected static $path2;

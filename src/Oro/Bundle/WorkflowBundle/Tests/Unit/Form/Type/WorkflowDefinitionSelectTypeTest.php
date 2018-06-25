@@ -23,7 +23,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     const WORKFLOW_ENTITY_NAME = 'stdClass';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
     protected $workflowRegistry;
 
     /** @var WorkflowDefinitionSelectType */
@@ -32,7 +32,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     /** @var array|WorkflowDefinition[] */
     protected $definitions = [];
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()

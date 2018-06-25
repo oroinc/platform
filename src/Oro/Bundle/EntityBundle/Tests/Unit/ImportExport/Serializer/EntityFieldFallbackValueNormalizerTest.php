@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\ImportExport\Serializer\EntityFieldFallbackValueNormalizer;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityFieldFallbackValueNormalizerTest extends \PHPUnit_Framework_TestCase
+class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 

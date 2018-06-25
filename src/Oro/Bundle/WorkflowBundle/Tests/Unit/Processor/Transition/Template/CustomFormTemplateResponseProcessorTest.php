@@ -19,12 +19,12 @@ use Symfony\Component\HttpFoundation\Response;
  * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCase
+class CustomFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
-    /** @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $templateDataProviderRegistry;
 
     /** @var CustomFormTemplateResponseProcessor */
@@ -43,7 +43,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testRenderedResponseResult()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getDialogTemplate')->willReturn(null);
         $transition->expects($this->once())->method('getFormDataProvider')->willReturn('provider_name');
@@ -51,15 +51,15 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
         $entity = (object)['id' => 42];
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getData')->willReturn(new WorkflowData(['entity' => $entity]));
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context = new TransitionContext();
@@ -72,7 +72,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
         $context->setRequest($request);
         $context->set('template_parameters', ['p1' => 'v1', 'p2' => 'v2']);
 
-        /** @var FormTemplateDataProviderInterface|\PHPUnit_Framework_MockObject_MockObject $dataProvider */
+        /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $dataProvider */
         $dataProvider = $this->createMock(FormTemplateDataProviderInterface::class);
         $dataProvider->expects($this->once())
             ->method('getData')
@@ -100,7 +100,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testSkipNonCustomFormContext()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())
@@ -121,7 +121,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testSkipUnsupportedResultType()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())
@@ -138,7 +138,7 @@ class CustomFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testSkipNotSaved()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
 
         $context->expects($this->once())

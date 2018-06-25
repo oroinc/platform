@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 
-class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
+class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
     public function testGroupRangeApplicableCheckerWithoutFirstAndLastGroups()
     {

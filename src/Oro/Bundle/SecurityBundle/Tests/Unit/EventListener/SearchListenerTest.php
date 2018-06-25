@@ -11,12 +11,12 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsOrganization;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
-class SearchListenerTest extends \PHPUnit_Framework_TestCase
+class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchListener */
     protected $listener;
 
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
     /**

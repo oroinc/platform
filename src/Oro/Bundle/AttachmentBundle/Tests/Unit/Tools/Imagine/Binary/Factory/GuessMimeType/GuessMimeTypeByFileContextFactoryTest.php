@@ -7,7 +7,7 @@ use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
-class GuessMimeTypeByFileContextFactoryTest extends \PHPUnit_Framework_TestCase
+class GuessMimeTypeByFileContextFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GuessMimeTypeByFileContextFactory
@@ -15,12 +15,12 @@ class GuessMimeTypeByFileContextFactoryTest extends \PHPUnit_Framework_TestCase
     private $factory;
 
     /**
-     * @var MimeTypeGuesserInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var MimeTypeGuesserInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mimeTypeGuesser;
 
     /**
-     * @var ExtensionGuesserInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExtensionGuesserInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $extensionGuesser;
 

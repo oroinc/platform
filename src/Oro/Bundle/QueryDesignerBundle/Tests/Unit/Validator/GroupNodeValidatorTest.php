@@ -9,7 +9,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupNodeConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\GroupNodeValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class GroupNodeValidatorTest extends \PHPUnit_Framework_TestCase
+class GroupNodeValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected $executionContext;
     protected $validator;

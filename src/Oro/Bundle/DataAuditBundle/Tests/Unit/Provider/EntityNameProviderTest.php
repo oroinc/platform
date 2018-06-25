@@ -8,15 +8,15 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrine;
 
     /**
-     * @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityNameResolver;
 

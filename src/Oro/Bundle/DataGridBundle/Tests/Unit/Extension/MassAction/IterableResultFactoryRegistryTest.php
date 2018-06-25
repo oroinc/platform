@@ -12,7 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactoryRegistry;
 
-class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
+class IterableResultFactoryRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var IterableResultFactoryRegistry
@@ -26,17 +26,17 @@ class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateIterableResultWhenNoApplicableFactory()
     {
-        /** @var ActionConfiguration|\PHPUnit_Framework_MockObject_MockObject $actionConfiguration **/
+        /** @var ActionConfiguration|\PHPUnit\Framework\MockObject\MockObject $actionConfiguration **/
         $actionConfiguration = $this->createMock(ActionConfiguration::class);
 
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfiguration **/
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
 
         $selectedItems = SelectedItems::createFromParameters([]);
 
         $dataSource = new ArrayDatasource();
 
-        /** @var IterableResultFactoryInterface|\PHPUnit_Framework_MockObject_MockObject $firstFactory **/
+        /** @var IterableResultFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $firstFactory **/
         $firstFactory = $this->createMock(IterableResultFactoryInterface::class);
         $firstFactory
             ->expects($this->once())
@@ -44,7 +44,7 @@ class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($dataSource)
             ->willReturn(false);
 
-        /** @var IterableResultFactoryInterface|\PHPUnit_Framework_MockObject_MockObject $secondFactory **/
+        /** @var IterableResultFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $secondFactory **/
         $secondFactory = $this->createMock(IterableResultFactoryInterface::class);
         $secondFactory
             ->expects($this->once())
@@ -66,18 +66,18 @@ class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateIterableResult()
     {
-        /** @var ActionConfiguration|\PHPUnit_Framework_MockObject_MockObject $actionConfiguration **/
+        /** @var ActionConfiguration|\PHPUnit\Framework\MockObject\MockObject $actionConfiguration **/
         $actionConfiguration = $this->createMock(ActionConfiguration::class);
 
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfiguration **/
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
 
         $selectedItems = SelectedItems::createFromParameters([]);
 
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(DatasourceInterface::class);
 
-        /** @var IterableResultFactoryInterface|\PHPUnit_Framework_MockObject_MockObject $firstFactory **/
+        /** @var IterableResultFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $firstFactory **/
         $firstFactory = $this->createMock(IterableResultFactoryInterface::class);
         $firstFactory
             ->expects($this->once())
@@ -85,7 +85,7 @@ class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($dataSource)
             ->willReturn(false);
 
-        /** @var IterableResultFactoryInterface|\PHPUnit_Framework_MockObject_MockObject $secondFactory **/
+        /** @var IterableResultFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $secondFactory **/
         $secondFactory = $this->createMock(IterableResultFactoryInterface::class);
         $secondFactory
             ->expects($this->once())
@@ -93,7 +93,7 @@ class IterableResultFactoryRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($dataSource)
             ->willReturn(true);
 
-        /** @var IterableResultInterface|\PHPUnit_Framework_MockObject_MockObject $iterableResult */
+        /** @var IterableResultInterface|\PHPUnit\Framework\MockObject\MockObject $iterableResult */
         $iterableResult = $this->createMock(IterableResultInterface::class);
 
         $secondFactory

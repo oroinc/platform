@@ -6,11 +6,11 @@ use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
+class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PhoneProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PhoneProvider */
     protected $provider;
 
     /** @var PhoneExtension */

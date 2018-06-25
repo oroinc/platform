@@ -10,18 +10,18 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
-class FileListenerTest extends \PHPUnit_Framework_TestCase
+class FileListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileListener  */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject  */
     protected $fileManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject  */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject  */
     protected $em;
 
     /**

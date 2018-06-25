@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class AssociationMetadataTest extends \PHPUnit_Framework_TestCase
+class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityMetadata */
     protected $entityMetadata;

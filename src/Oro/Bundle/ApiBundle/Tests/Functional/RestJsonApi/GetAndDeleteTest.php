@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @group regression
+ */
 class GetAndDeleteTest extends RestJsonApiTestCase
 {
     /**

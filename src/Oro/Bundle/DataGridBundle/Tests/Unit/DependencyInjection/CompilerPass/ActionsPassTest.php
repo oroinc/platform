@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ActionsPassTest extends \PHPUnit_Framework_TestCase
+class ActionsPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionsPass */
     protected $actionsPass;

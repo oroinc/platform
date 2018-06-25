@@ -7,7 +7,7 @@ use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Symfony\Component\Yaml\Yaml;
 
-class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class AddTreeGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddTreeGeneratorExtension

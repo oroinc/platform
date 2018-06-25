@@ -7,9 +7,9 @@ use Oro\Bundle\SearchBundle\Query\AbstractSearchQuery;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
-class YamlToSearchQueryConverterTest extends \PHPUnit_Framework_TestCase
+class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $query;
 
     public function setUp()

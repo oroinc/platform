@@ -9,7 +9,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LazyResultTest extends \PHPUnit_Framework_TestCase
+class LazyResultTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     protected $elements = [];

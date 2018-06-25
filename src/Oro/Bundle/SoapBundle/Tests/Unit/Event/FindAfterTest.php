@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 
-class FindAfterTest extends \PHPUnit_Framework_TestCase
+class FindAfterTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntity()
     {

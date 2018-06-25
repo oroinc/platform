@@ -4,7 +4,7 @@ namespace Oro\Bundle\ShoppingListBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemIdTransformer;
 
-class TreeItemIdTransformerTest extends \PHPUnit_Framework_TestCase
+class TreeItemIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException

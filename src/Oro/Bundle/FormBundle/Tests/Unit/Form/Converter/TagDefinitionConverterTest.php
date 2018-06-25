@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Converter;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 
-class TagDefinitionConverterTest extends \PHPUnit_Framework_TestCase
+class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TagDefinitionConverter

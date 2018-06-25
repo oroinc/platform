@@ -6,11 +6,11 @@ use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\EventListener\AbstractDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
-class AbstractDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
+class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
     const LISTENERS = ['test_listener_1', 'test_listener_2'];
 
-    /** @var OptionalListenerManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;
 
     /** @var AbstractDataFixturesListener */
@@ -32,7 +32,7 @@ class AbstractDataFixturesListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethods(bool $isDemoData)
     {
-        /** @var MigrationDataFixturesEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(MigrationDataFixturesEvent::class);
         $event->expects($this->any())
             ->method('isDemoFixtures')

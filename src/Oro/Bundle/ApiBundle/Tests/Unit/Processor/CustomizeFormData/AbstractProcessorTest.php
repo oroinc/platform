@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\AbstractProcessor;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 
-class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
+class AbstractProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider processProvider

@@ -7,15 +7,15 @@ use Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class TestSessionListenerCompilerPassTest extends \PHPUnit_Framework_TestCase
+class TestSessionListenerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TestSessionListenerCompilerPass */
     protected $compilerPass;
 
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
-    /** @var Definition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Definition|\PHPUnit\Framework\MockObject\MockObject */
     protected $definition;
 
     protected function setUp()

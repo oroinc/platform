@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractEventTriggerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -18,16 +18,16 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_Test
     const ENTITY_ID = 42;
     const FIELD = 'name';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventTriggerCache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventTriggerCache */
     protected $triggerCache;
 
     /** @var AbstractEventTriggerExtension */

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class DocumentBuilderCompilerPassTest extends \PHPUnit_Framework_TestCase
+class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DocumentBuilderCompilerPass */
     private $compiler;

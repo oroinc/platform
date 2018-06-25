@@ -26,10 +26,7 @@ class TestKernel extends Kernel
 
     public function registerBundles()
     {
-        return array(
-            new \SomeProject\Bundle\SomeBundle\SomeBundle(),
-            new \SomeAnotherProject\Bundle\SomeAnotherBundle\SomeAnotherBundle()
-        );
+        return [];
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)

@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailUserTest extends \PHPUnit_Framework_TestCase
+class EmailUserTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetterSetter()
     {

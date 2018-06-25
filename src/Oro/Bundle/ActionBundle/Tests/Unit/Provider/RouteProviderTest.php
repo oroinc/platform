@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Provider\RouteProvider;
 
-class RouteProviderTest extends \PHPUnit_Framework_TestCase
+class RouteProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RouteProvider */
     protected $provider;

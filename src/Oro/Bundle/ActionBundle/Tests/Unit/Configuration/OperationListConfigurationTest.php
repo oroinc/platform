@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
+class OperationListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OperationListConfiguration

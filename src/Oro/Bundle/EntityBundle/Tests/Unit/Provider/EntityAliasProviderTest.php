@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProvider;
 
-class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
+class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasConfigBag */
     protected $entityAliasConfigBag;

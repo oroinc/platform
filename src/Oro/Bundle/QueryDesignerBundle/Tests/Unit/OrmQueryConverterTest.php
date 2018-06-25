@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
-abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
+abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
 {
     protected function getVirtualFieldProvider(array $config = [])
     {
@@ -73,7 +73,7 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
      *                                 'Test\Entity1' => ['id'],
      *                                 'Test\Entity2' => ['id'],
      *
-     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDoctrine(array $config = [], array $identifiersConfig = [])
     {

@@ -11,7 +11,7 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessStepExecutor;
 
-class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
+class PostProcessStepExecutorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PostProcessStepExecutor
@@ -19,22 +19,22 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
     protected $executor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutor
+     * @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor
      */
     protected $jobExecutor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ItemReaderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ItemReaderInterface
      */
     protected $reader;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ItemProcessorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ItemProcessorInterface
      */
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ItemWriterInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ItemWriterInterface
      */
     protected $writer;
 
@@ -85,7 +85,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->executor->setContextSharedKeys($contextSharedKeys);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|StepExecution $stepExecution */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution $stepExecution */
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();

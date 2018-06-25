@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Guesser;
 
 use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
 
-class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
+class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MsMimeTypeGuesser

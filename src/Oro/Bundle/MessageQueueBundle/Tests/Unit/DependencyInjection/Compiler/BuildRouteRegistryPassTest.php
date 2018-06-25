@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
+class BuildRouteRegistryPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithoutAnyArguments()
     {

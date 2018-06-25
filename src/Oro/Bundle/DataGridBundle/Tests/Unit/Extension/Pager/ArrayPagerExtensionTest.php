@@ -11,12 +11,12 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
-class ArrayPagerExtensionTest extends \PHPUnit_Framework_TestCase
+class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ArrayPager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ArrayPager|\PHPUnit\Framework\MockObject\MockObject */
     protected $pager;
 
-    /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $config **/
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config **/
     protected $config;
 
     /** @var  ArrayDatasource */

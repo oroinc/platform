@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
-class PreFlushConfigEventTest extends \PHPUnit_Framework_TestCase
+class PreFlushConfigEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

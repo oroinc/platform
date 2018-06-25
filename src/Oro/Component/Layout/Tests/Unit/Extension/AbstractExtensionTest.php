@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit\Extension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 
-class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasType()
     {
@@ -248,7 +248,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|LayoutItemInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LayoutItemInterface
      */
     protected function getLayoutItem($id)
     {

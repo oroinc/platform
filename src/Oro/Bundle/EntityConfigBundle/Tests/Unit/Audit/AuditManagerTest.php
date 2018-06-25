@@ -10,18 +10,18 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AuditManagerTest extends \PHPUnit_Framework_TestCase
+class AuditManagerTest extends \PHPUnit\Framework\TestCase
 {
     const SCOPE = 'testScope';
     const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var AuditManager */

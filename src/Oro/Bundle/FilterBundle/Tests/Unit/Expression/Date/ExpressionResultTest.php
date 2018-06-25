@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
-class ExpressionResultTest extends \PHPUnit_Framework_TestCase
+class ExpressionResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testDateResult()
     {

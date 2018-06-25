@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
 
-class CustomizeLoadedDataConfigExtraTest extends \PHPUnit_Framework_TestCase
+class CustomizeLoadedDataConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataConfigExtra */
     protected $extra;

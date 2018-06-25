@@ -6,7 +6,7 @@ use Oro\Bundle\UIBundle\Provider\WidgetContextProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase
+class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetContextProvider */
     protected $provider;

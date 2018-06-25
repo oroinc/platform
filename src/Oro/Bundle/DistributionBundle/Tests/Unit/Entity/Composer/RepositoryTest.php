@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity\Composer;
 
 use Oro\Bundle\DistributionBundle\Entity\Composer\Repository;
 
-class RepositoryTest extends \PHPUnit_Framework_TestCase
+class RepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

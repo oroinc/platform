@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Extension;
 
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\AbstractExtensionStub;
 
-class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasExpression()
     {

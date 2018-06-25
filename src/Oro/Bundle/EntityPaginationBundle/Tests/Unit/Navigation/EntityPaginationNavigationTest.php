@@ -9,21 +9,21 @@ use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EntityPaginationNavigationTest extends \PHPUnit_Framework_TestCase
+class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'stdClass';
     const FIELD_NAME  = 'id';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $storage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $paginationManager;
 
     /** @var EntityPaginationNavigation */

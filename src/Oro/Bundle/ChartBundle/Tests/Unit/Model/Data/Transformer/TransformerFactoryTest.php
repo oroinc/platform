@@ -4,10 +4,10 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data\Transformer;
 
 use Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory;
 
-class TransformerFactoryTest extends \PHPUnit_Framework_TestCase
+class TransformerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 

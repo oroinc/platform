@@ -5,12 +5,12 @@ namespace Oro\Bundle\WindowsBundle\Tests\Manager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 
-class WindowsStateManagerRegistryTest extends \PHPUnit_Framework_TestCase
+class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WindowsStateManagerRegistry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
     protected $defaultManager;
 
     protected function setUp()
@@ -31,7 +31,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetManager()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManager $manager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager $manager */
         $manager = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateManager')
             ->disableOriginalConstructor()
             ->getMock();

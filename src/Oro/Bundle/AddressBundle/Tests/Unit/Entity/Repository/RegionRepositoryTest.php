@@ -8,7 +8,7 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 
-class RegionRepositoryTest extends \PHPUnit_Framework_TestCase
+class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME = 'RegionEntityName';
 
@@ -18,7 +18,7 @@ class RegionRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

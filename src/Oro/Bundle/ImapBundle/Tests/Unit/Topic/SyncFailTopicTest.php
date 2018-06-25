@@ -11,23 +11,23 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SyncFailTopicTest extends \PHPUnit_Framework_TestCase
+class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ClientManipulator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClientManipulator|\PHPUnit\Framework\MockObject\MockObject */
     protected $clientManipulator;
 
-    /** @var ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $conn;
 
-    /** @var Topic|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Topic|\PHPUnit\Framework\MockObject\MockObject */
     protected $topic;
 
-    /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $parameterBag;
 
-    /** @var WampRequest|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     /** @var SyncFailTopic */

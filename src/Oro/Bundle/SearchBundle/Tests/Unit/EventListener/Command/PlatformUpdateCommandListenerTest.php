@@ -11,20 +11,20 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PlatformUpdateCommandListenerTest extends \PHPUnit_Framework_TestCase
+class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
     const COMMAND_NAME = 'test:command';
 
-    /** @var Command|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
     protected $command;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $input;
 
-    /** @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $output;
 
-    /** @var CommandExecutor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
     /** @var InstallerEvent */

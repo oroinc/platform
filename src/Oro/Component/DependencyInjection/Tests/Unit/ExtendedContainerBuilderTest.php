@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
-class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
+class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const EXTENSION = 'ext';
 
@@ -19,7 +19,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension = $this->createMock(ExtensionInterface::class);
         $extension
             ->expects($this->any())

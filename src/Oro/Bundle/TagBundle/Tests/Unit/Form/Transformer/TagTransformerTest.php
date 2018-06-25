@@ -4,7 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Transformer;
 
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
 
-class TagTransformerTest extends \PHPUnit_Framework_TestCase
+class TagTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TagTransformer
@@ -12,7 +12,7 @@ class TagTransformerTest extends \PHPUnit_Framework_TestCase
     protected $transformer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $manager;
 

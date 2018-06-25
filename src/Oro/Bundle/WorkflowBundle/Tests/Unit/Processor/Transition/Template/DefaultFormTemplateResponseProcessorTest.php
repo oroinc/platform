@@ -9,9 +9,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
 
-class DefaultFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
     protected $twig;
 
     /** @var DefaultFormTemplateResponseProcessor */
@@ -32,7 +32,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCa
      */
     public function testRenderedResponseResult($dialogTemplate, $expectedToRender)
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getDialogTemplate')->willReturn($dialogTemplate);
 
@@ -72,7 +72,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCa
 
     public function testSkipUnsupportedResultTypeContextSaved()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('isSaved')->willReturn(true);
         $context->expects($this->never())->method('getResultType');
@@ -83,7 +83,7 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCa
 
     public function testSkipUnsupportedResultTypeContextResultType()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('isSaved')->willReturn(false);
         $context->expects($this->once())

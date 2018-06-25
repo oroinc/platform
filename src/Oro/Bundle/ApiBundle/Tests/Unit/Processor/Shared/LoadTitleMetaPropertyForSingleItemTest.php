@@ -12,10 +12,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
     protected $entityTitleProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExpandedAssociationExtractor */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpandedAssociationExtractor */
     protected $expandedAssociationExtractor;
 
     /** @var LoadTitleMetaPropertyForCollection */

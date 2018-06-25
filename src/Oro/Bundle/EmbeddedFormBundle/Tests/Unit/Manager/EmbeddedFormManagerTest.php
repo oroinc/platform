@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
-class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -221,7 +221,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFormFactoryMock()
     {
@@ -230,7 +230,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param null|object $typeInstance
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createContainerMock($typeInstance = null)
     {

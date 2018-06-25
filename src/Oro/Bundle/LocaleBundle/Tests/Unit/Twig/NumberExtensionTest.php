@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class NumberExtensionTest extends \PHPUnit_Framework_TestCase
+class NumberExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var NumberExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     protected function setUp()

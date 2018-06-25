@@ -7,12 +7,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EnumVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
+class EnumVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var EnumVirtualFieldProvider */
@@ -148,7 +148,7 @@ class EnumVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string[] $associationNames
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getClassMetadata($associationNames = [])
     {

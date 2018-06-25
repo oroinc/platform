@@ -23,7 +23,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
     protected $attributeRenderRegistry;
 
     /**
-     * @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $localizationHelper;
 

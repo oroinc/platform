@@ -7,12 +7,12 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridCallbackActionProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
-class DatagridCallbackActionProviderTest extends \PHPUnit_Framework_TestCase
+class DatagridCallbackActionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridCallbackActionProvider */
     protected $provider;
 
-    /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
     protected function setUp()

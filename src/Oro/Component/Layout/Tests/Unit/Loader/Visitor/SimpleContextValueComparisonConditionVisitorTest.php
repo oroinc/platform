@@ -9,7 +9,7 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\SimpleContextValueComparisonConditionVisitor;
 
-class SimpleContextValueComparisonConditionVisitorTest extends \PHPUnit_Framework_TestCase
+class SimpleContextValueComparisonConditionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider conditionDataProvider

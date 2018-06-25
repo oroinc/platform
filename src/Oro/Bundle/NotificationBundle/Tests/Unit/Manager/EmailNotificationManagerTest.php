@@ -11,7 +11,7 @@ use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 
-class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldCreateWithAllRequiredArguments()
     {
@@ -112,7 +112,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailRenderer
+     * @return \PHPUnit\Framework\MockObject\MockObject | EmailRenderer
      */
     private function createEmailRendererMock()
     {
@@ -124,7 +124,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject | ConfigManager
      */
     private function createConfigManagerMock()
     {
@@ -136,7 +136,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailNotificationSender
+     * @return \PHPUnit\Framework\MockObject\MockObject | EmailNotificationSender
      */
     private function createEmailNotificationSenderMock()
     {
@@ -148,7 +148,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -156,7 +156,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailTemplate
+     * @return \PHPUnit\Framework\MockObject\MockObject | EmailTemplate
      */
     private function createTemplateMock()
     {
@@ -164,7 +164,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | EmailNotificationInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | EmailNotificationInterface
      */
     private function createEmailNotificationMock()
     {
@@ -172,7 +172,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | User
+     * @return \PHPUnit\Framework\MockObject\MockObject | User
      */
     private function createUserMock()
     {

@@ -20,10 +20,10 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 abstract class AbstractConfigTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $testConfigProvider;
 
     protected function setUp()
@@ -69,7 +69,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
      * @param string                                     $formName
      * @param string                                     $formTypeClass
      * @param array                                      $options
-     * @param \PHPUnit_Framework_MockObject_MockObject[] $configProviders
+     * @param \PHPUnit\Framework\MockObject\MockObject[] $configProviders
      * @param mixed                                      $newVal
      * @param mixed                                      $oldVal
      * @param string                                     $state
@@ -181,7 +181,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

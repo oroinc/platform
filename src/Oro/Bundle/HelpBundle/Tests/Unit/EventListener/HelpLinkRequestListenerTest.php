@@ -6,7 +6,7 @@ use Oro\Bundle\HelpBundle\EventListener\HelpLinkRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernel;
 
-class HelpLinkRequestListenerTest extends \PHPUnit_Framework_TestCase
+class HelpLinkRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var HelpLinkRequestListener
@@ -14,12 +14,12 @@ class HelpLinkRequestListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $linkProvider;
 

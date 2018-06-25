@@ -5,10 +5,10 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Config;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider;
 
-class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
+class DefaultCurrencyConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     protected $configManager;
 

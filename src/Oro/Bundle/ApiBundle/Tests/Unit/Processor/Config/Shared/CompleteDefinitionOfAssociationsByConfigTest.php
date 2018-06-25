@@ -15,13 +15,13 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RelationConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RelationConfigProvider */
     private $relationConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
     /** @var CompleteDefinitionOfAssociationsByConfig */

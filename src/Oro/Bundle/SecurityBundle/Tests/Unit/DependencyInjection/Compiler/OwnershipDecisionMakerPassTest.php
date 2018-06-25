@@ -6,10 +6,10 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMake
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OwnershipDecisionMakerPassTest extends \PHPUnit_Framework_TestCase
+class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
      */
     protected $container;
 

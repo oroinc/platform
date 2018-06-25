@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\FormBundle\Form\Extension\ExtraFieldsValidationExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ExtraFieldsValidationExtensionTest extends \PHPUnit_Framework_TestCase
+class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExtraFieldsValidationExtension

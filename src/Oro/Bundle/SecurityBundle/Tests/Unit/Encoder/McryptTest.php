@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Encoder;
 
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
-class McryptTest extends \PHPUnit_Framework_TestCase
+class McryptTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test two way encoding/decoding

@@ -9,10 +9,10 @@ use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
+class TransitionIsAllowedValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 

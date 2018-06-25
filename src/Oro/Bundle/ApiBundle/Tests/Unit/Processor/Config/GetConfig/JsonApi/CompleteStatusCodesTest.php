@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompleteStatusCodesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var CompleteStatusCodes */

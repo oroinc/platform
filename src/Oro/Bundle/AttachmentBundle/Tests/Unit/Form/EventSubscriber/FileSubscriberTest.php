@@ -7,15 +7,15 @@ use Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Symfony\Component\Form\FormEvents;
 
-class FileSubscriberTest extends \PHPUnit_Framework_TestCase
+class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileSubscriber */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $validator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     public function setUp()

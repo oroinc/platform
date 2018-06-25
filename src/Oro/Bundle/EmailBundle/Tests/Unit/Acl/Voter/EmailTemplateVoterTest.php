@@ -8,11 +8,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class EmailTemplateVoterTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var EmailTemplateVoter */
@@ -50,7 +50,7 @@ class EmailTemplateVoterTest extends \PHPUnit_Framework_TestCase
             ->with($template, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -79,7 +79,7 @@ class EmailTemplateVoterTest extends \PHPUnit_Framework_TestCase
             ->with($object, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -109,7 +109,7 @@ class EmailTemplateVoterTest extends \PHPUnit_Framework_TestCase
             ->with($template, false)
             ->willReturn(1);
 
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_ABSTAIN,
@@ -139,7 +139,7 @@ class EmailTemplateVoterTest extends \PHPUnit_Framework_TestCase
             ->with($template, false)
             ->willReturn(2);
 
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
         $this->assertEquals(
             EmailTemplateVoter::ACCESS_DENIED,

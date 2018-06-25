@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 
-class NullFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
+class NullFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NullFilterValueAccessor */
     protected $nullFilterValueAccessor;

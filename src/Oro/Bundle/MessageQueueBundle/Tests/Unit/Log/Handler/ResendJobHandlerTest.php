@@ -7,9 +7,9 @@ use Oro\Bundle\MessageQueueBundle\Log\Handler\ResendJobHandler;
 use Oro\Component\MessageQueue\Job\Job;
 use Psr\Log\LoggerInterface;
 
-class ResendJobHandlerTest extends \PHPUnit_Framework_TestCase
+class ResendJobHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $jobLogger;
 
     /** @var ConsumerState */

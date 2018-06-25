@@ -13,7 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CriteriaConnector */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CriteriaConnector */
     private $criteriaConnector;
 
     /** @var BuildQuery */

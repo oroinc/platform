@@ -14,10 +14,10 @@ use Oro\Component\EntitySerializer\QueryResolver;
 
 class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryResolver */
     private $queryResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryModifierRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierRegistry */
     private $queryModifier;
 
     /** @var AclProtectedQueryFactory */

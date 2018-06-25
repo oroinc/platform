@@ -16,7 +16,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpressio
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
 
-class QueryExpressionVisitorTest extends \PHPUnit_Framework_TestCase
+class QueryExpressionVisitorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEmptyParameters()
     {

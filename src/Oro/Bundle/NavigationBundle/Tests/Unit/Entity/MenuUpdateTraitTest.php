@@ -8,7 +8,7 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class MenuUpdateTraitTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateTraitTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

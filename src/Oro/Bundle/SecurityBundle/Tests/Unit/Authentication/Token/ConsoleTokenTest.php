@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Token;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 
-class ConsoleTokenTest extends \PHPUnit_Framework_TestCase
+class ConsoleTokenTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConsoleToken

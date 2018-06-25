@@ -9,7 +9,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
+class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -38,7 +38,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver */
         $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
             ->disableOriginalConstructor()
             ->getMock();

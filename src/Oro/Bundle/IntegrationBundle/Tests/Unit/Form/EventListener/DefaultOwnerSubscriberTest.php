@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
+class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var */
     protected $user;

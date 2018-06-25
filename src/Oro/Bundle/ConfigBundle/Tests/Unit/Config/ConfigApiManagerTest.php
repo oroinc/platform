@@ -9,12 +9,12 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
-class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
+class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ConfigApiManager */

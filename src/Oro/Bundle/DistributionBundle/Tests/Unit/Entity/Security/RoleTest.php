@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity\Security;
 use Oro\Bundle\DistributionBundle\Entity\Security\Role;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
-class RoleTest extends \PHPUnit_Framework_TestCase
+class RoleTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;
 

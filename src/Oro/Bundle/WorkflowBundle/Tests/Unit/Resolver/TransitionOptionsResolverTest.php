@@ -7,9 +7,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
-class TransitionOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class TransitionOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsResolver;
 
     /** @var TransitionOptionsResolver */
@@ -26,10 +26,10 @@ class TransitionOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTransitionOptions()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFrontendOptions')
             ->willReturn(['option1' => 'value1']);
@@ -46,10 +46,10 @@ class TransitionOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveTransitionOptionsWithoutOptions()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFrontendOptions')->willReturn([]);
         $transition->expects($this->never())->method('setFrontendOptions');

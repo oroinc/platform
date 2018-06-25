@@ -11,18 +11,18 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\LayoutFactoryInterface;
 
-class LayoutManagerTest extends \PHPUnit_Framework_TestCase
+class LayoutManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
-    /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHolder;
 
     /** @var LayoutManager */
     private $manager;
 
-    /** @var LayoutDataCollector|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutDataCollector|\PHPUnit\Framework\MockObject\MockObject */
     private $layoutDataCollector;
 
     protected function setUp()

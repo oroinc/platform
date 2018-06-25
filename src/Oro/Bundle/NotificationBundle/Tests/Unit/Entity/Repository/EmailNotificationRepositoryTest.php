@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository;
 
-class EmailNotificationRepositoryTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_NAME  = 'EmailNotificationEntityName';
     const TEST_NAME    = 'TestEntityName';
@@ -18,7 +18,7 @@ class EmailNotificationRepositoryTest extends \PHPUnit_Framework_TestCase
     protected $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\SearchBundle\Datagrid\Event\SearchResultAfter;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
-class SearchResultAfterTest extends \PHPUnit_Framework_TestCase
+class SearchResultAfterTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetQuery()
     {

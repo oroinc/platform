@@ -17,12 +17,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExceptionTextExtractorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var RequestType */

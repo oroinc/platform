@@ -16,7 +16,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 class AttributeFieldConfigExtensionTest extends TypeTestCase
 {
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeConfigProvider;
 

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociati
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class CascadeRemoveAssociationListenerTest extends \PHPUnit_Framework_TestCase
+class CascadeRemoveAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CascadeRemoveAssociationListener
@@ -15,12 +15,12 @@ class CascadeRemoveAssociationListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $accessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 

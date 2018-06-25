@@ -8,7 +8,7 @@ use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
-class WebsocketClientTest extends \PHPUnit_Framework_TestCase
+class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 {
     private const WS_HOST = 'testHost';
     private const WS_PORT = '8080';
@@ -17,13 +17,13 @@ class WebsocketClientTest extends \PHPUnit_Framework_TestCase
     private const WS_ORIGIN = 'testOrigin';
     private const TICKET = 'sampleTicket';
 
-    /** @var GosClientFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GosClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $gosClientFactory;
 
-    /** @var TicketProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketProvider;
 
-    /** @var GosClient|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GosClient|\PHPUnit\Framework\MockObject\MockObject */
     private $gosClient;
 
     /** @var WebsocketClient */

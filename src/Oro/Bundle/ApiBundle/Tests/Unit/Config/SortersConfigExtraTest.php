@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 
-class SortersConfigExtraTest extends \PHPUnit_Framework_TestCase
+class SortersConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SortersConfigExtra */
     protected $extra;

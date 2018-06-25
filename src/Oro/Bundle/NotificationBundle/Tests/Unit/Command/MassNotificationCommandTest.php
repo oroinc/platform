@@ -4,15 +4,15 @@ namespace  Oro\Bundle\NotificationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\NotificationBundle\Command\MassNotificationCommand;
 
-class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
+class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $sender;
 
@@ -22,12 +22,12 @@ class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
     protected $command;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $in;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $out;
 

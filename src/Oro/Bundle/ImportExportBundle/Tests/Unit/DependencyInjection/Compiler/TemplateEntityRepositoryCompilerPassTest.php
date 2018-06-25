@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
+class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {

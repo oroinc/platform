@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DataTransformer;
 
 use Oro\Bundle\ApiBundle\DataTransformer\DateToStringTransformer;
 
-class DateToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class DateToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateToStringTransformer */
     protected $transformer;

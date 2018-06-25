@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 
-class EmailOwnerProviderTest extends \PHPUnit_Framework_TestCase
+class EmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
 {
     private function getEmailOwnerProviderStorageMock(array $providers)
     {

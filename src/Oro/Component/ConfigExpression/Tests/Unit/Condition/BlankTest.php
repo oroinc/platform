@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class BlankTest extends \PHPUnit_Framework_TestCase
+class BlankTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\Blank */
     protected $condition;

@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
-class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
+class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
 {
 
     /**
@@ -15,12 +15,12 @@ class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TitleService
+     * @var \PHPUnit\Framework\MockObject\MockObject|TitleService
      */
     private $titleService;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     private $userConfigManager;
 

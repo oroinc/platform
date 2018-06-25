@@ -13,10 +13,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
     /** @var FilterFieldsByExtra */

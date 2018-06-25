@@ -6,10 +6,10 @@ use Assetic\Asset\AssetInterface;
 use Assetic\Asset\FileAsset;
 use Oro\Bundle\AsseticBundle\Twig\DebugAsseticNode;
 
-class DebugAsseticNodeTest extends \PHPUnit_Framework_TestCase
+class DebugAsseticNodeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $compiler;
 

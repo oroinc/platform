@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 
-class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
+class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
 {
     protected $em;
     protected $qb;

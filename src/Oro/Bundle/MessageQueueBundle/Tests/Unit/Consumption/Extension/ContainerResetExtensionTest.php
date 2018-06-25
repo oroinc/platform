@@ -12,12 +12,12 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class ContainerResetExtensionTest extends \PHPUnit_Framework_TestCase
+class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ClearerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ClearerInterface */
     private $clearer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ChainExtensionAwareClearer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ChainExtensionAwareClearer */
     private $chainExtensionAwareClearer;
 
     /** @var ContainerResetExtension */

@@ -9,7 +9,7 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Symfony\Component\Filesystem\Filesystem;
 
-class YamlDriverTest extends \PHPUnit_Framework_TestCase
+class YamlDriverTest extends \PHPUnit\Framework\TestCase
 {
     protected $cacheDir;
 

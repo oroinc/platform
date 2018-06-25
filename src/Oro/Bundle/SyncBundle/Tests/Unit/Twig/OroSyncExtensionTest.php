@@ -7,14 +7,14 @@ use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\Twig\OroSyncExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
+class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $connectionChecker;
 
-    /** @var TagGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tagGenerator;
 
     /** @var OroSyncExtension */

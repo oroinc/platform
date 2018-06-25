@@ -9,12 +9,12 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
+class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var EntityIdAccessor */

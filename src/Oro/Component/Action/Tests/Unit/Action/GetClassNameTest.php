@@ -8,7 +8,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GetClassNameTest extends \PHPUnit_Framework_TestCase
+class GetClassNameTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GetClassName

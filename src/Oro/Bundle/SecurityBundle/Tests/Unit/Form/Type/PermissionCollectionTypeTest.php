@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class PermissionCollectionTypeTest extends \PHPUnit_Framework_TestCase
+class PermissionCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PermissionCollectionType */
     protected $formType;

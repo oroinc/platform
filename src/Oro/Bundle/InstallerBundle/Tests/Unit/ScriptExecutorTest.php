@@ -4,7 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 
-class ScriptExecutorTest extends \PHPUnit_Framework_TestCase
+class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
 {
     public function testRunScript()
     {

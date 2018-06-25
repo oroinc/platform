@@ -6,9 +6,9 @@ use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SkipTagTrackingPassTest extends \PHPUnit_Framework_TestCase
+class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var SkipTagTrackingPass */
@@ -49,7 +49,7 @@ class SkipTagTrackingPassTest extends \PHPUnit_Framework_TestCase
 
         $skippedEntityClasses = [];
 
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(Definition::class);
         $definition->expects($this->any())
             ->method('addMethodCall')

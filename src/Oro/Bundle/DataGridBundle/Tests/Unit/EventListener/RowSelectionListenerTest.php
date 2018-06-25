@@ -12,20 +12,20 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class RowSelectionListenerTest extends \PHPUnit_Framework_TestCase
+class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var BuildAfter|\PHPUnit_Framework_MockObject_MockObject
+     * @var BuildAfter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $datagrid;
 
     /**
-     * @var OrmDatasource|\PHPUnit_Framework_MockObject_MockObject
+     * @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $datasource;
 
@@ -35,7 +35,7 @@ class RowSelectionListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 

@@ -6,7 +6,7 @@ use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass;
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\LayoutManagerPass;
 use Oro\Bundle\EmbeddedFormBundle\OroEmbeddedFormBundle;
 
-class OroEmbeddedFormBundleTest extends \PHPUnit_Framework_TestCase
+class OroEmbeddedFormBundleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

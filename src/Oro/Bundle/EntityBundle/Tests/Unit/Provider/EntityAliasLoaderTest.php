@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
-class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
+class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasLoader */
     private $loader;

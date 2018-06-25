@@ -4,10 +4,10 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DataFixtures;
 
 use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
 
-class AbstractTranslatableEntityFixtureTest extends \PHPUnit_Framework_TestCase
+class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AbstractTranslatableEntityFixture
+     * @var \PHPUnit\Framework\MockObject\MockObject|AbstractTranslatableEntityFixture
      */
     protected $fixture;
 

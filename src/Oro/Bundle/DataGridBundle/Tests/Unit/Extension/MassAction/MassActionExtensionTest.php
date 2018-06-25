@@ -21,18 +21,18 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MassActionExtensionTest extends \PHPUnit_Framework_TestCase
+class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MassActionFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MassActionFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $actionFactory;
 
-    /** @var MassActionMetadataFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MassActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $actionMetadataFactory;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var CsrfTokenManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CsrfTokenManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenManager;
 
     /** @var MassActionExtension */

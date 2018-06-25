@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 
-class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
+class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DateTimeFormatter
@@ -28,7 +28,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testFormatProvider
+     * @dataProvider formatProvider
      *
      * @param string $dateTimeString
      * @param string $dateTimeZone
@@ -43,7 +43,7 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFormatProvider()
+    public function formatProvider()
     {
         return [
             [

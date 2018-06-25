@@ -16,17 +16,17 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
-class DeletedAttributeRelationListenerTest extends \PHPUnit_Framework_TestCase
+class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /**
-     * @var MessageProducerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $messageProducer;
 
     /**
-     * @var DeletedAttributeProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $deletedAttributeProvider;
 
@@ -57,7 +57,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit_Framework_TestCase
         $uow->addDeletion($this->getFilledAttributeGroupRelation($attributeFamily, $deletedAttributeId));
         $uow->addDeletion(new \stdClass());
 
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getUnitOfWork')

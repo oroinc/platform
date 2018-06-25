@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ConfigProviderCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigProviderCompilerPass
@@ -22,21 +22,21 @@ class ConfigProviderCompilerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with(ConfigProviderCompilerPass::PROVIDER_SERVICE)
             ->will($this->returnValue(true));
 
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $container->expects($this->once())
             ->method('getDefinition')
             ->with(ConfigProviderCompilerPass::PROVIDER_SERVICE)
             ->will($this->returnValue($definition));
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject $configProvider */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock('Oro\Bundle\RequireJSBundle\Provider\Config');
         $container->expects($this->once())
             ->method('findTaggedServiceIds')

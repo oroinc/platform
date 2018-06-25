@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 
-class EntityManagerBagTest extends \PHPUnit_Framework_TestCase
+class EntityManagerBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     /** @var EntityManagerBag */

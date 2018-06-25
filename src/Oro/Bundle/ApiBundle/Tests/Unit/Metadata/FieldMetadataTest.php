@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class FieldMetadataTest extends \PHPUnit_Framework_TestCase
+class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {

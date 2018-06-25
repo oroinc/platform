@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 
-class JoinIdentifierHelperTest extends \PHPUnit_Framework_TestCase
+class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
 {
     const ROOT_ENTITY = 'Acme\RootEntity';
 

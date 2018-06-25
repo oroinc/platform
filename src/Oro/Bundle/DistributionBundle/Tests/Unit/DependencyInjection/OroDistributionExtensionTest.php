@@ -13,9 +13,9 @@ use Oro\Bundle\DistributionBundle\Security\AccessDeniedListener;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroDistributionExtensionTest extends \PHPUnit_Framework_TestCase
+class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
     /** @var OroDistributionExtension */

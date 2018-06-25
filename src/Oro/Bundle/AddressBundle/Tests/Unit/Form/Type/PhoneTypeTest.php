@@ -6,7 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class PhoneTypeTest extends \PHPUnit_Framework_TestCase
+class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PhoneType

@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
+class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclRoleType */
     protected $formType;

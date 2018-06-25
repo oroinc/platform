@@ -7,7 +7,7 @@ use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
+class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetAlias()
     {
@@ -18,7 +18,7 @@ class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $featureChecker */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $featureChecker */
         $featureCheckerDefinition = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -36,7 +36,7 @@ class OroFeatureToggleExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('addArgument')
             ->with(true);
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -48,20 +48,20 @@ class TestContainerBuilder
     }
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ContainerInterface
      */
-    public function getContainer(\PHPUnit_Framework_TestCase $testCase)
+    public function getContainer(\PHPUnit\Framework\TestCase $testCase)
     {
         $container = $testCase->getMockBuilder(ContainerInterface::class)->getMock();
         if (!empty($this->serviceMap)) {
-            $container->expects(\PHPUnit_Framework_TestCase::any())
+            $container->expects(\PHPUnit\Framework\TestCase::any())
                 ->method('get')
                 ->willReturnMap($this->serviceMap);
         }
         if (!empty($this->parameterMap)) {
-            $container->expects(\PHPUnit_Framework_TestCase::any())
+            $container->expects(\PHPUnit\Framework\TestCase::any())
                 ->method('getParameter')
                 ->willReturnMap($this->parameterMap);
         }

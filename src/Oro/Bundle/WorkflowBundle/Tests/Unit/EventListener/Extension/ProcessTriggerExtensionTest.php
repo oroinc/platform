@@ -22,19 +22,19 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 {
     use MessageQueueExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessTriggerRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessTriggerRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessJobRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessJobRepository */
     protected $processJobRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessHandler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessHandler */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessLogger */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessLogger */
     protected $logger;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessSchedulePolicy */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessSchedulePolicy */
     protected $schedulePolicy;
 
     protected function setUp()
@@ -761,7 +761,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $entityManager
+     * @param \PHPUnit\Framework\MockObject\MockObject $entityManager
      * @param array $entityParams
      * @param int $callOrder
      */

@@ -18,7 +18,7 @@ use Psr\Log\NullLogger;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class QueueConsumerTest extends \PHPUnit_Framework_TestCase
+class QueueConsumerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithConnectionAndSingleExtension()
     {
@@ -959,7 +959,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageConsumerInterface
      */
     protected function createMessageConsumerStub($message = null)
     {
@@ -974,7 +974,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createConnectionStub($session = null)
     {
@@ -989,7 +989,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return SessionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SessionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createSessionStub($messageConsumer = null)
     {
@@ -1013,7 +1013,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorMock()
     {
@@ -1021,7 +1021,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessorStub()
     {
@@ -1036,7 +1036,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     protected function createMessageMock()
     {
@@ -1044,7 +1044,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExtensionInterface
      */
     protected function createExtension()
     {

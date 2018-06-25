@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
+class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectNormalizer */
     protected $objectNormalizer;

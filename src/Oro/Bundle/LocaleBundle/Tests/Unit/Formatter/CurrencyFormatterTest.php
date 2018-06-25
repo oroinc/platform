@@ -5,12 +5,12 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 use Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
-class CurrencyFormatterTest extends \PHPUnit_Framework_TestCase
+class CurrencyFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CurrencyFormatter */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $numberFormatter;
 
     protected function setUp()

@@ -6,7 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
-class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
+class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateFilterUtility */
     protected $utility;

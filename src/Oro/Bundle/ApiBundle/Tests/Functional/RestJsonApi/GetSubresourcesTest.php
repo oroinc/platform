@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
- * @dbIsolationPerTest
+ * @group regression
  */
 class GetSubresourcesTest extends RestJsonApiTestCase
 {

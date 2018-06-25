@@ -11,7 +11,7 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
     const LOCALIZATION_CLASS = 'Oro\Bundle\LocaleBundle\Entity\Localization';
 
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 

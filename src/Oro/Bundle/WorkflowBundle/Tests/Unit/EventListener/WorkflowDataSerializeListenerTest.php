@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 
-class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowDataSerializeListener
@@ -23,12 +23,12 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var WorkflowAwareSerializer|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
@@ -198,7 +198,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definition */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->once())->method('getEntityAttributeName')->willReturn('entity_attr');
         $definition->expects($this->once())->method('getVirtualAttributes')->willReturn($virtualAttributes);
@@ -228,7 +228,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $uowExpectedCalls
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Doctrine\ORM\EntityManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Doctrine\ORM\EntityManager
      */
     protected function getPostFlushEntityManagerMock(array $uowExpectedCalls)
     {

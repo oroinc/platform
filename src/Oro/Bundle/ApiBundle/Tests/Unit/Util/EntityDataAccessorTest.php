@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 
-class EntityDataAccessorTest extends \PHPUnit_Framework_TestCase
+class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityDataAccessor */
     protected $entityDataAccessor;

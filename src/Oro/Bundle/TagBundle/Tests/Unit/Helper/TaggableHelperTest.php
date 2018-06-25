@@ -7,12 +7,12 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\TestEntity;
 
-class TaggableHelperTest extends \PHPUnit_Framework_TestCase
+class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TaggableHelper */
     protected $helper;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
     protected function setUp()

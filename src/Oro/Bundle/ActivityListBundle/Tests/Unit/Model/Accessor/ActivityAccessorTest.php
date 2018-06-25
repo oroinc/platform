@@ -8,12 +8,12 @@ use Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
-class ActivityAccessorTest extends \PHPUnit_Framework_TestCase
+class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityAccessor $fieldAccessor */
     protected $accessor;
 
-    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()

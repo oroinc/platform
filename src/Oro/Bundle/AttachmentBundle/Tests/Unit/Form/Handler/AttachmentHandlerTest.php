@@ -7,10 +7,10 @@ use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
+class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $form;
 
@@ -20,7 +20,7 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
     private $request;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $om;
 

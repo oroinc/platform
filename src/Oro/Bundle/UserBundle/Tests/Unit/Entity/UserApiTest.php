@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
-class UserApiTest extends \PHPUnit_Framework_TestCase
+class UserApiTest extends \PHPUnit\Framework\TestCase
 {
     public function testId()
     {

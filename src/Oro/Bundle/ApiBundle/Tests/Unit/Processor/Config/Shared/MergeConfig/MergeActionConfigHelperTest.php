@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\MergeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 
-class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeActionConfigHelper */
     protected $mergeActionConfigHelper;

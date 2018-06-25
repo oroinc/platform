@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ErrorCompleterCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ErrorCompleterCompilerPass */
     private $compiler;

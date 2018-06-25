@@ -9,10 +9,10 @@ use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
-class ScopeEntityStorageTest extends \PHPUnit_Framework_TestCase
+class ScopeEntityStorageTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $registry;
 

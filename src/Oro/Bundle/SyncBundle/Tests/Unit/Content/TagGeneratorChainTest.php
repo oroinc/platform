@@ -5,7 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\SimpleGeneratorStub;
 
-class TagGeneratorChainTest extends \PHPUnit_Framework_TestCase
+class TagGeneratorChainTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @return array

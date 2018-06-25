@@ -11,16 +11,16 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ChoiceTreeFilterTest extends OrmTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     protected $formFactory;
 
     /** @var ChoiceTreeFilter */
     protected $filter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $dispatcher;
 
     protected function setUp()

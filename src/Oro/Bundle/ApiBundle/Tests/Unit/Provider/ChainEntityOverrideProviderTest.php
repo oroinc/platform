@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 
-class ChainEntityOverrideProviderTest extends \PHPUnit_Framework_TestCase
+class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainEntityOverrideProvider */
     private $chainEntityOverrideProvider;

@@ -11,12 +11,12 @@ use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class FilterHelperTest extends \PHPUnit_Framework_TestCase
+class FilterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterCollection */
     protected $filters;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $filterValues;
 
     /** @var FilterHelper */

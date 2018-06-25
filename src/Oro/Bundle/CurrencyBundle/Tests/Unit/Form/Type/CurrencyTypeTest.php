@@ -6,7 +6,7 @@ use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType as BaseCurrencyType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
+class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CurrencyType
@@ -23,7 +23,7 @@ class CurrencyTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 
-class IdentifierToReferenceFilterTest extends \PHPUnit_Framework_TestCase
+class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilterWithIdentifierField()
     {

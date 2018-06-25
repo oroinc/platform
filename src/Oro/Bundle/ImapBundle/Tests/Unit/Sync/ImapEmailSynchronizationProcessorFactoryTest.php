@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Sync;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory;
 use Psr\Log\LoggerInterface;
 
-class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit_Framework_TestCase
+class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

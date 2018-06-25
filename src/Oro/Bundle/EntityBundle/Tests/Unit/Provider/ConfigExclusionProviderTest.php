@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
-class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigExclusionProvider */
     private $provider;

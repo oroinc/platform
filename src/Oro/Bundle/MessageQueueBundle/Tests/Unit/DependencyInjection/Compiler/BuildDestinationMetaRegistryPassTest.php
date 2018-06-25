@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class BuildDestinationMetaRegistryPassTest extends \PHPUnit_Framework_TestCase
+class BuildDestinationMetaRegistryPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithoutAnyArguments()
     {

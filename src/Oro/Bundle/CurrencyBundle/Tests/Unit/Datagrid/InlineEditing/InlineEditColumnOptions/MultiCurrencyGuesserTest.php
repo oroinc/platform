@@ -5,10 +5,10 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Extension\InlineEditing\InlineEdi
 use Oro\Bundle\CurrencyBundle\Converter\CurrencyToString;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser;
 
-class MultiCurrencyGuesserTest extends \PHPUnit_Framework_TestCase
+class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $currencyHelper;
 

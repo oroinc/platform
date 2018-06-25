@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 
-class ConfigDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
+class ConfigDatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCheckDatabaseForInstalledApplication()
     {
@@ -165,7 +165,7 @@ class ConfigDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      * @param string[] $tables
      * @param bool     $result
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     protected function setTablesExistExpectation($tables, $result)
     {

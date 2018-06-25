@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
 
-class ConfigUtilTest extends \PHPUnit_Framework_TestCase
+class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testConvertObjectsToArrayDoNotTreatEmptyAsNull()
     {

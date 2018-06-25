@@ -3,7 +3,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker\Condition;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 
-class JoinAclConditionTest extends \PHPUnit_Framework_TestCase
+class JoinAclConditionTest extends \PHPUnit\Framework\TestCase
 {
     public function testJoinAclCondition()
     {

@@ -10,9 +10,9 @@ use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class MessageProcessorClassProviderTest extends \PHPUnit_Framework_TestCase
+class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProcessorRegistryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProcessorRegistryInterface */
     private $messageProcessorRegistry;
 
     /** @var MessageProcessorClassProvider */

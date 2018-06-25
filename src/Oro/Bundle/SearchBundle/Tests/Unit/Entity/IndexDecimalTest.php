@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class IndexDecimalTest extends \PHPUnit_Framework_TestCase
+class IndexDecimalTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\IndexDecimal

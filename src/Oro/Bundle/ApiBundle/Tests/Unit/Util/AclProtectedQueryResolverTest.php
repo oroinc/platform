@@ -11,10 +11,10 @@ use Oro\Component\EntitySerializer\EntityConfig;
 
 class AclProtectedQueryResolverTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryHintResolverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryHintResolverInterface */
     private $queryHintResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
     private $aclHelper;
 
     /** @var AclProtectedQueryResolver */

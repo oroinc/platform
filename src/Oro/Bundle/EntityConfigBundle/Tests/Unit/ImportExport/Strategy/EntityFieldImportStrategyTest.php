@@ -14,24 +14,24 @@ use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
+class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DatabaseHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
     protected $databaseHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldTypeProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
     protected $fieldTypeProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityFieldImportStrategy */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFieldImportStrategy */
     protected $strategy;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
     protected $fieldHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ImportStrategyHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
     protected $strategyHelper;
 
     /**

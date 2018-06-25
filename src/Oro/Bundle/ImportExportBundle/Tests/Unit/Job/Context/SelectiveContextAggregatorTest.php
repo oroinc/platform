@@ -11,9 +11,9 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SelectiveContextAggregator;
 
-class SelectiveContextAggregatorTest extends \PHPUnit_Framework_TestCase
+class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
 
     /** @var SelectiveContextAggregator */

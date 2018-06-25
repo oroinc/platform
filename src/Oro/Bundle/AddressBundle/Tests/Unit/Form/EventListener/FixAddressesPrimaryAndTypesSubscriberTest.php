@@ -8,7 +8,7 @@ use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
 use Symfony\Component\Form\FormEvents;
 
-class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestCase
+class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FixAddressesPrimaryAndTypesSubscriber

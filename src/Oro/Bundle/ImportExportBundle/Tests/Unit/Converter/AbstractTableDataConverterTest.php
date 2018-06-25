@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
-class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
+class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array

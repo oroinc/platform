@@ -6,10 +6,10 @@ use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class AttributeConfigHelperTest extends \PHPUnit_Framework_TestCase
+class AttributeConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $attributeConfigProvider;
 

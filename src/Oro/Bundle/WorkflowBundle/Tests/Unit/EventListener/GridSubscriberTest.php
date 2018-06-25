@@ -8,18 +8,18 @@ use Oro\Bundle\DatagridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber;
 
-class GridSubscriberTest extends \PHPUnit_Framework_TestCase
+class GridSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var GridsSubscriber|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GridsSubscriber|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridSubscriber;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featurechecker;
 
     /** @var QueryBuilder */
     protected $queryBuilder;
 
-    /** @var OrmResultBeforeQuery|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OrmResultBeforeQuery|\PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
     /**

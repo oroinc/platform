@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Guesser;
 
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
 
-class MimeTypeExtensionGuesserTest extends \PHPUnit_Framework_TestCase
+class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MimeTypeExtensionGuesser */
     protected $guesser;

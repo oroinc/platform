@@ -9,7 +9,7 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributesImportTopicSenderTest extends \PHPUnit_Framework_TestCase
+class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -17,17 +17,17 @@ class AttributesImportTopicSenderTest extends \PHPUnit_Framework_TestCase
     const USER_ID = 44;
 
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $websocketClient;
 
     /**
-     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $connectionChecker;
 
     /**
-     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenAccessor;
 

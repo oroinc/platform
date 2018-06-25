@@ -10,15 +10,15 @@ use Doctrine\ORM\QueryBuilder;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper;
 
-class ChoiceFieldHelperTest extends \PHPUnit_Framework_TestCase
+class ChoiceFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChoiceFieldHelper */
     protected $choiceHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     protected function setUp()

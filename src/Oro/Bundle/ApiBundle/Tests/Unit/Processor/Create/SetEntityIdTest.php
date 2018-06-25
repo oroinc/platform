@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class SetEntityIdTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityIdHelper;
 
     /** @var SetEntityId */

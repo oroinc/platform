@@ -14,10 +14,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 
 class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormExtensionSwitcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionSwitcherInterface */
     private $formExtensionSwitcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataTypeGuesser */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataTypeGuesser */
     private $metadataTypeGuesser;
 
     /** @var InitializeApiFormExtension */

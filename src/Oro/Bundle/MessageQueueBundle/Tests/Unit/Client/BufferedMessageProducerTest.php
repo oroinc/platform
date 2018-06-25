@@ -5,9 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class BufferedMessageProducerTest extends \PHPUnit_Framework_TestCase
+class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $inner;
 
     /** @var BufferedMessageProducer */

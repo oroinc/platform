@@ -6,7 +6,7 @@ use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 
-class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
+class ThemeFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeFactory */
     protected $factory;

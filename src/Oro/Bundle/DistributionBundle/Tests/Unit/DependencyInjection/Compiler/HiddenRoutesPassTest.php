@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\HiddenRoutesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class HiddenRoutesPassTest extends \PHPUnit_Framework_TestCase
+class HiddenRoutesPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HiddenRoutesPass */
     protected $compilerPass;

@@ -9,15 +9,15 @@ use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 
-class ValidateEntityFallbackTest extends \PHPUnit_Framework_TestCase
+class ValidateEntityFallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EntityFallbackResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fallbackResolver;
 
     /**
-     * @var ValueNormalizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $valueNormalizer;
 
@@ -27,7 +27,7 @@ class ValidateEntityFallbackTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var CreateContext|\PHPUnit_Framework_MockObject_MockObject
+     * @var CreateContext|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

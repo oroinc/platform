@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ResourceDocParserCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResourceDocParserCompilerPass */
     private $compiler;

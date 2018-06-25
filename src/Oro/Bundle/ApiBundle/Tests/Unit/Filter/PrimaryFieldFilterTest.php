@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 
-class PrimaryFieldFilterTest extends \PHPUnit_Framework_TestCase
+class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

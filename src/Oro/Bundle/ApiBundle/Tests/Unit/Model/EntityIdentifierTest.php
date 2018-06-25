@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 
-class EntityIdentifierTest extends \PHPUnit_Framework_TestCase
+class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithoutArguments()
     {

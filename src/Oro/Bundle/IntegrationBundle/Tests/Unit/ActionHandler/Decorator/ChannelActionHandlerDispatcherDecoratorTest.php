@@ -11,25 +11,25 @@ use Oro\Bundle\IntegrationBundle\Event\Action\ChannelActionEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelActionEventFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit_Framework_TestCase
+class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var ChannelActionEventFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelActionEventFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventFactory;
 
     /**
-     * @var ChannelActionHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelActionHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $actionHandler;
 
     /**
-     * @var ChannelActionErrorHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelActionErrorHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $errorHandler;
 

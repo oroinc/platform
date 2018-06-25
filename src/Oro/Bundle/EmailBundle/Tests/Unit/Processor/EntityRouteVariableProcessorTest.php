@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-class EntityRouteVariableProcessorTest extends \PHPUnit_Framework_TestCase
+class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_GENERATED_ROUTE = 'generated_route';
     const TEST_BASE_PATH = 'http://localhost/';
@@ -21,19 +21,19 @@ class EntityRouteVariableProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var EntityRouteVariableProcessor */
     protected $processor;
 
-    /** @var  RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var  DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var  ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var  EntityConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigManager;
 
-    /** @var  ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
     /**

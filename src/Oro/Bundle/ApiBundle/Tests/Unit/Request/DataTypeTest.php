@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class DataTypeTest extends \PHPUnit_Framework_TestCase
+class DataTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider nestedObjectProvider

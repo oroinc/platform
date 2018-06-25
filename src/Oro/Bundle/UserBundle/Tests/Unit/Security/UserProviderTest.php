@@ -4,12 +4,12 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Oro\Bundle\UserBundle\Security\UserProvider;
 
-class UserProviderTest extends \PHPUnit_Framework_TestCase
+class UserProviderTest extends \PHPUnit\Framework\TestCase
 {
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $userManager;
 

@@ -5,15 +5,15 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
+class CreateRelatedEntityTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 

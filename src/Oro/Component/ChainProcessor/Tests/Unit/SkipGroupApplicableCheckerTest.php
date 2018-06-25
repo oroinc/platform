@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\SkipGroupApplicableChecker;
 
-class SkipGroupApplicableCheckerTest extends \PHPUnit_Framework_TestCase
+class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSkipGroupApplicableChecker()
     {

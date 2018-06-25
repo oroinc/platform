@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 
-class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeFilterConfigHelper */
     protected $mergeFilterConfigHelper;

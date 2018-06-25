@@ -10,14 +10,14 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RunActionGroupTest extends \PHPUnit_Framework_TestCase
+class RunActionGroupTest extends \PHPUnit\Framework\TestCase
 {
     const ACTION_GROUP_NAME = 'test_action_group';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroupRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroupRegistry */
     protected $mockActionGroupRegistry;
 
     /** @var RunActionGroup */

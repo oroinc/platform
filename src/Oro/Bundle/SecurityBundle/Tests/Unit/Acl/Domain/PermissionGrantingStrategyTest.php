@@ -29,7 +29,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
+class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
 {
     const SERVICE_BITS        = -16;
     const REMOVE_SERVICE_BITS = 15;
@@ -53,13 +53,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var UserSecurityIdentity */
     private $sid;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface */
     private $securityToken;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionGrantingStrategyContextInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionGrantingStrategyContextInterface */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionInterface */
     private $extension;
 
     /** @var PermissionGrantingStrategy */
@@ -91,7 +91,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @param object $service
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ServiceLink
+     * @return \PHPUnit\Framework\MockObject\MockObject|ServiceLink
      */
     private function createServiceLink($service)
     {

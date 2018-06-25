@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocalizationSelectTypeTest extends \PHPUnit_Framework_TestCase
+class LocalizationSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalizationSelectType
@@ -29,7 +29,7 @@ class LocalizationSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

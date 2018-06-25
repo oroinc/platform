@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 
-class DomainObjectReferenceTest extends \PHPUnit_Framework_TestCase
+class DomainObjectReferenceTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetObjectData()
     {

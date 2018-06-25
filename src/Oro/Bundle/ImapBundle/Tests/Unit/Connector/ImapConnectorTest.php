@@ -6,15 +6,15 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapServices;
 
-class ImapConnectorTest extends \PHPUnit_Framework_TestCase
+class ImapConnectorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImapConnector */
     private $connector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $storage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $searchStringManager;
 
     protected function setUp()

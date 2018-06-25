@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
-class WorkflowAvailableByRecordGroupTest extends \PHPUnit_Framework_TestCase
+class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
 {
     const GROUP_NAME = 'test_group_name';
     const ENTITY_CLASS = 'stdClass';
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     /** @var WorkflowAvailableByRecordGroup */

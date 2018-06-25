@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
 
-class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
+class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     protected $configBag;
 
     /** @var LoadFromConfigBag */

@@ -11,10 +11,10 @@ use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
 class FilterProcessorTest extends OrmQueryConverterTest
 {
-    /** @var RestrictionBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RestrictionBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $restrictionBuilder;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     protected function setUp()

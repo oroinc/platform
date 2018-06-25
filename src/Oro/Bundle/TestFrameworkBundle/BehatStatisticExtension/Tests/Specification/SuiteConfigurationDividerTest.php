@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Feature
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specification\Stub\AvgTimeProviderStub;
 
-class SuiteConfigurationDividerTest extends \PHPUnit_Framework_TestCase
+class SuiteConfigurationDividerTest extends \PHPUnit\Framework\TestCase
 {
     protected $featureDuration = [
         '1.feature' => 1,
@@ -135,7 +135,7 @@ class SuiteConfigurationDividerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FeaturePathLocator
+     * @return \PHPUnit\Framework\MockObject\MockObject|FeaturePathLocator
      */
     private function getFeaturePathLocatorMock()
     {

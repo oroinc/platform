@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class DbalMessageTest extends \PHPUnit_Framework_TestCase
+class DbalMessageTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

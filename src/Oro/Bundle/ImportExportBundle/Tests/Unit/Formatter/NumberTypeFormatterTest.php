@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
+class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var NumberTypeFormatter
@@ -15,7 +15,7 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $numberFormatter */
+        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $numberFormatter */
         $numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -24,7 +24,7 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testFormatTypeProvider
+     * @dataProvider formatTypeProvider
      * @param string          $value
      * @param string          $type
      * @param \Exception|null $exception
@@ -41,7 +41,7 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function testFormatTypeProvider()
+    public function formatTypeProvider()
     {
         $value = 1;
 

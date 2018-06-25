@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\AliasCollection;
 
-class AliasCollectionTest extends \PHPUnit_Framework_TestCase
+class AliasCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AliasCollection */
     protected $aliasCollection;

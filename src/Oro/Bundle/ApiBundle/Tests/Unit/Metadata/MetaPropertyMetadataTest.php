@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class MetaPropertyMetadataTest extends \PHPUnit_Framework_TestCase
+class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {

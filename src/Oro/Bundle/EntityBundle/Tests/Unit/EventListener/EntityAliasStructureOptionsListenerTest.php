@@ -8,11 +8,11 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityAliasStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityAliasStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EntityAliasResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityAliasResolver;
 
     /** @var EntityAliasStructureOptionsListener */

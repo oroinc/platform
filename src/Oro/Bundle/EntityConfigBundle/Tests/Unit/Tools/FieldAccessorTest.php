@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\FieldAccessorTestEntity;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 
-class FieldAccessorTest extends \PHPUnit_Framework_TestCase
+class FieldAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetValue()
     {

@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ResolveDestinationPageTest extends \PHPUnit_Framework_TestCase
+class ResolveDestinationPageTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var DestinationPageResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $resolver;
 
     /** @var ResolveDestinationPage */

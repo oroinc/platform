@@ -8,12 +8,12 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
+class ScopeOrganizationCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ScopeOrganizationCriteriaProvider */
     private $provider;
 
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
     protected function setUp()
@@ -26,7 +26,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
     {
         $organization = new Organization();
 
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(OrganizationContextTokenInterface::class);
 
         $this->tokenStorage
@@ -55,7 +55,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCriteriaForCurrentScopeWithoutOrganizationAwareToken()
     {
-        /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
+        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $token */
         $token = $this->createMock(TokenInterface::class);
 
         $this->tokenStorage

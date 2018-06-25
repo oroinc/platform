@@ -8,12 +8,12 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
+class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MutableAclProvider */
     private $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
     protected function setUp()
@@ -160,7 +160,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|MutableAclProvider $provider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|MutableAclProvider $provider */
         $provider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
             ->setMethods(['deleteAcl'])
             ->setConstructorArgs([
@@ -192,7 +192,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
     {
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|MutableAclProvider $provider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|MutableAclProvider $provider */
         $provider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
             ->setMethods(['deleteAcl'])
             ->setConstructorArgs([

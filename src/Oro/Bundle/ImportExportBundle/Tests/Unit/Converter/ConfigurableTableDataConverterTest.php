@@ -10,7 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
 
-class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
+class ConfigurableTableDataConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -221,12 +221,12 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     protected $converter;
 
     /**
-     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldHelper;
 
     /**
-     * @var RelationCalculator|\PHPUnit_Framework_MockObject_MockObject
+     * @var RelationCalculator|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $relationCalculator;
 
@@ -603,7 +603,7 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->converter->setTranslateUsingLocale($translateUsingLocale);
 
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->exactly($expectedCallsToGetLocale))
             ->method('get')

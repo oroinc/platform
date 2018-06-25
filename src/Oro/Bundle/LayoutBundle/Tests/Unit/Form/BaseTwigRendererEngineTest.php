@@ -9,7 +9,7 @@ use Twig\Environment;
 class BaseTwigRendererEngineTest extends RendererEngineTest
 {
     /**
-     * @var Environment|\PHPUnit_Framework_MockObject_MockObject
+     * @var Environment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $environment;
 
@@ -32,7 +32,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $template = $this->createTheme($blockName);
         $resource = [$template, $blockName];
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
@@ -56,7 +56,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $firstTheme = $this->createTheme($blockName);
         $secondTheme = $this->createTheme($blockName);
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
@@ -81,7 +81,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
             '__datagrid__datagrid',
         ];
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = '_customer_role_datagrid';
 
@@ -119,7 +119,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
 
     /**
      * @param string $blockName
-     * @return \Twig_Template|\PHPUnit_Framework_MockObject_MockObject
+     * @return \Twig_Template|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createTheme($blockName)
     {

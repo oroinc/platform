@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
+class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetAndGetField()
     {

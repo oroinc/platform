@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
-class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
+class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithoutParameters()
     {

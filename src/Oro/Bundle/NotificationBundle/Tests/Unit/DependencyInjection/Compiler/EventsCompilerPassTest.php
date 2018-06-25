@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
 
-class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     const EVENT_NAME = 'test';
     const CLASS_NAME = 'Oro\Bundle\NotificationBundle\Entity\Event';
@@ -79,7 +79,7 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates and configure EM mock object
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function configureConnectionMock()
     {

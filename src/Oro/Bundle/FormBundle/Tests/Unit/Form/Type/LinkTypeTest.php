@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\LinkType;
 
-class LinkTypeTest extends \PHPUnit_Framework_TestCase
+class LinkTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LinkType

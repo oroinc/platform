@@ -10,10 +10,10 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ScopeTypeTest extends \PHPUnit_Framework_TestCase
+class ScopeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $scopeManager;
 
@@ -32,7 +32,7 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver **/
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver **/
         $resolver = $this->createMock(OptionsResolver::class);
 
         $resolver->expects($this->once())
@@ -72,12 +72,12 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testFinishView(array $options, array $children, array $expected)
     {
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = new FormView();
 
         $view->children = $children;
 
-        /** @var \Symfony\Component\Form\FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var \Symfony\Component\Form\FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -120,7 +120,7 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
         $scopeType = 'test_scope_type';
         $scopeTransformer = new ScopeTransformer($this->scopeManager, $scopeType);
 
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')

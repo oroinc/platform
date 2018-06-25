@@ -10,7 +10,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
 
-class FolderingCumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CopyFixturesToTemp */
     private $copier;

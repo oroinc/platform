@@ -7,11 +7,11 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 
-class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
+class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_SERVICE_ID = 'test_service_id';
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()

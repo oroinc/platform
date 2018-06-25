@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 
-class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
+class EmailActivityUpdatesTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldFilterOutEntitiesIfOwnerIsMissing()
     {
@@ -73,7 +73,7 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EmailOwnersProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|EmailOwnersProvider
      */
     private function createEmailOwnersProviderMock()
     {

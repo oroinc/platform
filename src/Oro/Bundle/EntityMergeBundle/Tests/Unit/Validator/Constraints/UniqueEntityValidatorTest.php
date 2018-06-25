@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class UniqueEntityValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueEntityValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UniqueEntityValidator

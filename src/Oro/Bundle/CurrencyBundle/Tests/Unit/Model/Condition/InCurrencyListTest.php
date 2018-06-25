@@ -9,7 +9,7 @@ use Oro\Bundle\CurrencyBundle\Model\Condition\InCurrencyList;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Provider\CurrencyListProviderStub;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
-class InCurrencyListTest extends \PHPUnit_Framework_TestCase
+class InCurrencyListTest extends \PHPUnit\Framework\TestCase
 {
     /** @var InCurrencyList */
     private $condition;

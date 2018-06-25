@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
-class EntityAliasTest extends \PHPUnit_Framework_TestCase
+class EntityAliasTest extends \PHPUnit\Framework\TestCase
 {
     public function testSuccessCreationAndGetters()
     {

@@ -9,12 +9,12 @@ use Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
+class CommentLifecycleListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommentLifecycleListener */
     protected $subscriber;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     protected function setUp()
@@ -125,7 +125,7 @@ class CommentLifecycleListenerTest extends \PHPUnit_Framework_TestCase
      * @param bool   $reloadUser
      * @param object $newUser
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEntityManagerMock($reloadUser = false, $newUser = null)
     {

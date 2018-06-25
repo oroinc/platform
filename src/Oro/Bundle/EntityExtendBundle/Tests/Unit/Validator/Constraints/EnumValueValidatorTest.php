@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
+class EnumValueValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Constraints\EnumValue
@@ -16,7 +16,7 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface
      */
     protected $context;
 

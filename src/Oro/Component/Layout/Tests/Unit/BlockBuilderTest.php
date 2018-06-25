@@ -9,24 +9,24 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistryInterface;
 use Oro\Component\Layout\RawLayout;
 
-class BlockBuilderTest extends \PHPUnit_Framework_TestCase
+class BlockBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
     protected $rawLayout;
 
-    /** @var BlockTypeHelperInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
     /** @var LayoutContext */
     protected $context;
 
-    /** @var LayoutManipulatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManipulator;
 
     /** @var BlockBuilder */
     protected $blockBuilder;
 
-    /** @var LayoutRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayoutRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()

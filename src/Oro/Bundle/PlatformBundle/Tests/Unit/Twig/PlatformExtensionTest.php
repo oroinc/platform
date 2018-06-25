@@ -6,11 +6,11 @@ use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\PlatformBundle\Twig\PlatformExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class PlatformExtensionTest extends \PHPUnit_Framework_TestCase
+class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $versionHelper;
 
     /** @var PlatformExtension */

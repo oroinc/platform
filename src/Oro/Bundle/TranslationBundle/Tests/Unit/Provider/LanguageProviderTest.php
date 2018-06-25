@@ -10,18 +10,18 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-class LanguageProviderTest extends \PHPUnit_Framework_TestCase
+class LanguageProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
     protected $localeSettings;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|AclHelper */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|AclHelper */
     protected $aclHelper;
 
     /** @var LanguageProvider */

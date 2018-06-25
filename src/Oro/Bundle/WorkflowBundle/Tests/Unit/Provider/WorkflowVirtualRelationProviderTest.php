@@ -10,12 +10,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 
-class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
+class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     protected $entitiesWithWorkflowCache;
 
     /** @var WorkflowVirtualRelationProvider */
@@ -221,7 +221,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
             $classes[] = $class;
             $expectedClasses[$class] = true;
         }
-        /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject $repo */
+        /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject $repo */
         $repo = $this->createMock(WorkflowDefinitionRepository::class);
         $repo->expects($this->once())
             ->method('getAllRelatedEntityClasses')

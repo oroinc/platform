@@ -8,15 +8,15 @@ use Doctrine\ORM\UnitOfWork;
 class EntityManagerMockBuilder
 {
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      * @param array                       $insertions
      * @param array                       $updates
      * @param array                       $deletions
      * @param array                       $entityChangeSet
-     * @return EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getEntityManager(
-        \PHPUnit_Framework_TestCase $testCase,
+        \PHPUnit\Framework\TestCase $testCase,
         array $insertions = [],
         array $updates = [],
         array $deletions = [],
@@ -39,7 +39,7 @@ class EntityManagerMockBuilder
             ->method('getEntityChangeSet')
             ->willReturn($entityChangeSet);
 
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->getMockBuilder($testCase, EntityManagerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -51,12 +51,12 @@ class EntityManagerMockBuilder
     }
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      * @param  string                     $className
-     * @return \PHPUnit_Framework_MockObject_MockBuilder
+     * @return \PHPUnit\Framework\MockObject\MockBuilder
      */
-    protected function getMockBuilder(\PHPUnit_Framework_TestCase $testCase, $className)
+    protected function getMockBuilder(\PHPUnit\Framework\TestCase $testCase, $className)
     {
-        return new \PHPUnit_Framework_MockObject_MockBuilder($testCase, $className);
+        return new \PHPUnit\Framework\MockObject\MockBuilder($testCase, $className);
     }
 }

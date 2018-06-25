@@ -52,7 +52,7 @@ class ImportExportConfigurationRegistryTest extends TestCase
     /**
      * @param ImportExportConfigurationInterface $configuration
      *
-     * @return ImportExportConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ImportExportConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createProvider(ImportExportConfigurationInterface $configuration)
     {

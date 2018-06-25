@@ -9,12 +9,12 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class EmailAddressValidatorTest extends \PHPUnit_Framework_TestCase
+class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddress */
     protected $constraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /** @var EmailAddressHelper */

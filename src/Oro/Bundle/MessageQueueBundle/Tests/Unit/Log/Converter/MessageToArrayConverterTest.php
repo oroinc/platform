@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Converter;
 use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverter;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class MessageToArrayConverterTest extends \PHPUnit_Framework_TestCase
+class MessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MessageToArrayConverter */
     private $converter;

@@ -4,15 +4,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension;
 
-class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
+class SwitchableDependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extension1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extension2;
 
     /** @var SwitchableDependencyInjectionExtension */
