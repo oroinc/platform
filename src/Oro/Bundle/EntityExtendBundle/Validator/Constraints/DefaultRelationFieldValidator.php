@@ -26,6 +26,7 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
         if (strpos(strtolower($fieldName), trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')) === 0) {
             $guessedName = substr($fieldName, strlen(trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')));
             if (!empty($guessedName)) {
+                // note, that we cant create ONE_TO_MANY & MANY_TO_MANY fields via CSV import, so next search is enough
                 $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
                 if ($fieldConfig
                     && in_array(
@@ -44,12 +45,12 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
             }
         } elseif (in_array($value->getType(), [RelationType::ONE_TO_MANY, RelationType::MANY_TO_MANY], true)) {
             $guessedName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-            $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
-            if ($fieldConfig && $this->validationHelper->hasFieldNameConflict($guessedName, $fieldConfig)) {
+            $existingFieldName = $this->validationHelper->getSimilarExistingFieldData($className, $guessedName);
+            if ($existingFieldName) {
                 $this->addViolation(
                     $constraint->duplicateFieldMessage,
                     $fieldName,
-                    $fieldConfig->getId()->getFieldName()
+                    $existingFieldName[0]
                 );
             }
         }
