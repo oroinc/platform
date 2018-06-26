@@ -10,15 +10,15 @@ use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class OptionsHelperTest extends \PHPUnit_Framework_TestCase
+class OptionsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var FormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $formProvider;
 
     /** @var OptionsHelper */
@@ -172,7 +172,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
      * @param string $label
      * @param array $templateData
      *
-     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getButton($label, array $templateData)
     {

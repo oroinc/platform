@@ -4,15 +4,15 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 
-class DictionaryHelperTest extends \PHPUnit_Framework_TestCase
+class DictionaryHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  DictionaryHelper */
     protected $dictionaryHelper;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $classMetadataMock;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataMock;
 
     protected function setUp()

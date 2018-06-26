@@ -5,10 +5,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\DataConverter;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter;
 
-class IntegrationAwareDataConverterTest extends \PHPUnit_Framework_TestCase
+class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var IntegrationAwareDataConverter|\PHPUnit_Framework_MockObject_MockObject
+     * @var IntegrationAwareDataConverter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dataConverter;
 

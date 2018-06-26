@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
-class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CACHE_KEY = 'testCache.Key';
     const TEST_CLASS_NAME = 'someClassName';
@@ -15,7 +15,7 @@ class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityConfigListener */
     protected $listener;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
     protected function setUp()

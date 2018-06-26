@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ApiContextTest extends \PHPUnit_Framework_TestCase
+class ApiContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ApiContext */
     protected $context;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 
-class ChainSearchProviderTest extends \PHPUnit_Framework_TestCase
+class ChainSearchProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddProvider()
     {

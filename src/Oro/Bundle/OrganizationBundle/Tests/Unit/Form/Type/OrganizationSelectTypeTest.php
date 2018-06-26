@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationSelectType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OrganizationSelectTypeTest extends \PHPUnit_Framework_TestCase
+class OrganizationSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OrganizationSelectType

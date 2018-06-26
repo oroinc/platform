@@ -5,7 +5,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Functional\Provider;
 use Oro\Bundle\CacheBundle\Provider\PhpFileCache;
 use Oro\Bundle\CacheBundle\Tests\Functional\Stub\SetStateClassStub;
 
-class PhpFileCacheTest extends \PHPUnit_Framework_TestCase
+class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string

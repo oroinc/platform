@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
-class PrepareResultItemEventTest extends \PHPUnit_Framework_TestCase
+class PrepareResultItemEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PrepareResultItemEvent

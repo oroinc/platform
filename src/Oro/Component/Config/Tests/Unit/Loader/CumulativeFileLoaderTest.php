@@ -9,7 +9,7 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
 
-class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
+class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CopyFixturesToTemp */
     private $copier;
@@ -227,7 +227,7 @@ class CumulativeFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $relativeFilePath
-     * @return CumulativeFileLoader|\PHPUnit_Framework_MockObject_MockObject
+     * @return CumulativeFileLoader|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createLoader($relativeFilePath)
     {

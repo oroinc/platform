@@ -6,7 +6,7 @@ use Oro\Bundle\AddressBundle\Form\Type\RegionType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\FormView;
 
-class RegionTypeTest extends \PHPUnit_Framework_TestCase
+class RegionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RegionType

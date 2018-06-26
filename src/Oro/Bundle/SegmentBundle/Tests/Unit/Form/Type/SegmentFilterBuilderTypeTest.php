@@ -26,12 +26,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
     /**
-     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tokenStorage;
 

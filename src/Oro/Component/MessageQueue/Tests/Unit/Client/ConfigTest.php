@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
 use Oro\Component\MessageQueue\Client\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldReturnRouterMessageProcessorNameSetInConstructor()
     {

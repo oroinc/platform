@@ -9,12 +9,12 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\LayoutRegistry;
 
-class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
+class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRegistry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
     protected function setUp()

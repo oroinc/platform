@@ -56,7 +56,7 @@ class FormIntegrationTestCase extends BaseTestCase
      */
     protected function getValidator()
     {
-        /* @var $loader \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
+        /* @var $loader \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
         $loader = $this->createMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
         $loader
             ->expects($this->any())
@@ -147,11 +147,11 @@ class FormIntegrationTestCase extends BaseTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface
      */
     protected function getConstraintValidatorFactory()
     {
-        /* @var $factory \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface */
+        /* @var $factory \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface */
         $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
         $factory->expects($this->any())
@@ -173,11 +173,11 @@ class FormIntegrationTestCase extends BaseTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected function getTranslator()
     {
-        /* @var $translator \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+        /* @var $translator \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
         $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $translator->expects($this->any())

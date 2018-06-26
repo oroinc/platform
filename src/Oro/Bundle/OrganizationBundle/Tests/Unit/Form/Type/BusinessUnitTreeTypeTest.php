@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BusinessUnitTreeTypeTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitTreeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BusinessUnitTreeType

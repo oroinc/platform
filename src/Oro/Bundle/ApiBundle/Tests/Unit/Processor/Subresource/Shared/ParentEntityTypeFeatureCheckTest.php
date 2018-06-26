@@ -8,7 +8,7 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
 {
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     /** @var ParentEntityTypeFeatureCheck */

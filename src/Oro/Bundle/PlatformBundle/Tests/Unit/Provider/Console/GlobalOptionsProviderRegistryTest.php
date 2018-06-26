@@ -7,15 +7,15 @@ use Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 
-class GlobalOptionsProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GlobalOptionsProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $firstProvider;
 
     /**
-     * @var GlobalOptionsProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $secondProvider;
 

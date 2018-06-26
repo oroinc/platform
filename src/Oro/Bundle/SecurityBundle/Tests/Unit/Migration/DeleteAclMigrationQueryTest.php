@@ -7,12 +7,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 
-class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $aclProvider;
 
     /** @var ObjectIdentityInterface */

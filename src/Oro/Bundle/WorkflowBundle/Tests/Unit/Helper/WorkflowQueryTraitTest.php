@@ -10,19 +10,19 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 
-class WorkflowQueryTraitTest extends \PHPUnit_Framework_TestCase
+class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
 {
     use WorkflowQueryTrait;
 
     const ENTITY_CLASS = 'SomeEntityClass';
 
-    /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $queryBuilder;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $classMetadata;
 
     /**

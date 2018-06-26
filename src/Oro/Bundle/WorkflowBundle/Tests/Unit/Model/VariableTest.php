@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class VariableTest extends \PHPUnit_Framework_TestCase
+class VariableTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

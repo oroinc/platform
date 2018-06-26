@@ -16,7 +16,7 @@ class ResetTypeTest extends FormIntegrationTestCase
     /** @var ResetType */
     protected $type;
 
-    /** @var PasswordFieldOptionsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsProvider;
 
     protected function setUp()
@@ -37,7 +37,7 @@ class ResetTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface $builder */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $this->optionsProvider->expects($this->once())
@@ -68,7 +68,7 @@ class ResetTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $resolver->expects($this->once())

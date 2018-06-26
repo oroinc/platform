@@ -39,31 +39,31 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailTypeTest extends TypeTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailRenderer;
 
-    /** @var EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailModelBuilderHelper;
 
     /** @var EmailTemplate */
     protected $emailTemplate;
 
-    /** @var MailboxManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailboxManager;
 
-    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailOriginHelper;
 
     /** @var ConfigManager */

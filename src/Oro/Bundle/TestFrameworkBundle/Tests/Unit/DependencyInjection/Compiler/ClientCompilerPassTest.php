@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class ClientCompilerPassTest extends \PHPUnit_Framework_TestCase
+class ClientCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ClientCompilerPass
@@ -15,7 +15,7 @@ class ClientCompilerPassTest extends \PHPUnit_Framework_TestCase
     protected $compilerPass;
 
     /**
-     * @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
+class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
     const ORGANIZATION  = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
@@ -31,13 +31,13 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclVoter;
 
     /** @var OwnerTree */
@@ -230,7 +230,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $aclGroupProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $aclGroupProvider */
         $aclGroupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $aclGroupProvider->expects($this->any())->method('getGroup')->willReturn($expectedGroup);
 

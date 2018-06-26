@@ -10,9 +10,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
-class TranslationListenerTest extends \PHPUnit_Framework_TestCase
+class TranslationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
     /** @var TranslationListener */

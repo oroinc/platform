@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class PersistIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var PersistIncludedEntities */

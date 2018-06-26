@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
+class WsseAuthProviderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SALT = 'someSalt';
     const TEST_PASSWORD = 'somePassword';
@@ -28,7 +28,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     const TEST_API_KEY = 'someApiKey';
     const PROVIDER_KEY = 'someProviderKey';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UserProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UserProviderInterface */
     protected $userProvider;
 
     /** @var MessageDigestPasswordEncoder */
@@ -37,10 +37,10 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /** @var WsseAuthProvider */
     protected $provider;
 
-    /** @var UserCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $userChecker;
 
-    /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $token;
 
     protected function setUp()

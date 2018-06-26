@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigration;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigMigrationQuery;
 
-class UpdateEntityConfigMigrationTest extends \PHPUnit_Framework_TestCase
+class UpdateEntityConfigMigrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testUp()
     {

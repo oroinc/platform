@@ -57,8 +57,8 @@ class ConfigurationControllerTest extends WebTestCase
     {
         try {
             $this->assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Wrong %s response for section: "%s". Error message: %s',
                     $statusCode,

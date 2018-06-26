@@ -11,36 +11,36 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\UserBundle\Mailer\BaseProcessor;
 
-abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const FROM_EMAIL = 'email_from@example.com';
     const FROM_NAME = 'From Name';
 
-    /** @var EmailTemplateRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $objectRepository;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $objectManager;
 
-    /** @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
     protected $renderer;
 
-    /** @var EmailHolderHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailHolderHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailHolderHelper;
 
-    /** @var \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Swift_Mailer|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailer;
 
-    /** @var BaseProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BaseProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailProcessor;
 
-    /** @var EmailTemplateInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailTemplateInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailTemplate;
 
     protected function setUp()
@@ -118,7 +118,7 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $className
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockForClass($className)
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SidebarBundle\Entity\Widget;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class WidgetTest extends \PHPUnit_Framework_TestCase
+class WidgetTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider

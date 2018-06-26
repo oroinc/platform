@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\OroDataGridBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class OroDataGridBundleTest extends \PHPUnit_Framework_TestCase
+class OroDataGridBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

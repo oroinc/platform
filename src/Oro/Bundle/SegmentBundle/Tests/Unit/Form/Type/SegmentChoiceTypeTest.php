@@ -9,14 +9,14 @@ use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SegmentChoiceTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'TestEntityClass';
 
     /** @var SegmentChoiceType */
     protected $formType;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()

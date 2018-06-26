@@ -9,12 +9,12 @@ use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class EmailFoldersValidatorTest extends \PHPUnit_Framework_TestCase
+class EmailFoldersValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailFolders */
     protected $constraint;
 
-    /** @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     /** @var EmailFoldersValidator */

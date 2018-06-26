@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DataTransformer;
 
 use Oro\Bundle\ApiBundle\DataTransformer\TimeToStringTransformer;
 
-class TimeToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class TimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TimeToStringTransformer */
     protected $transformer;

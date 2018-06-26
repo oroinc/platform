@@ -5,12 +5,12 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
-class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
+class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HtmlTagHelper */
     protected $helper;
 
-    /** @var HtmlTagProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagProvider;
 
     protected function setUp()

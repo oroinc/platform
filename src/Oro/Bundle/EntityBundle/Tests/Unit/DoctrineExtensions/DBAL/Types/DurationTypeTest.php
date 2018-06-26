@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType;
 
-class DurationTypeTest extends \PHPUnit_Framework_TestCase
+class DurationTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DurationType */
     protected $type;

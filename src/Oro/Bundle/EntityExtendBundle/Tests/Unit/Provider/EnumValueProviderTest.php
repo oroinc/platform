@@ -8,10 +8,10 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 
-class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
+class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
@@ -21,7 +21,7 @@ class EnumValueProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject
+     * @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 

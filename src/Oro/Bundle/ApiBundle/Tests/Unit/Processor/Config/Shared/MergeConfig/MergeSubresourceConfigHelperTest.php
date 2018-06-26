@@ -6,12 +6,12 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHe
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 
-class MergeSubresourceConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mergeActionConfigHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mergeFilterConfigHelper;
 
     /** @var MergeSubresourceConfigHelper */

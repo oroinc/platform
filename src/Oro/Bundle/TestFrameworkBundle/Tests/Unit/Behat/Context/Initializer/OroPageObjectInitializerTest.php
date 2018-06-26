@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Context\Initializer;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\OroPageObjectInitializer;
 
-class OroPageObjectInitializerTest extends \PHPUnit_Framework_TestCase
+class OroPageObjectInitializerTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitializeContext()
     {

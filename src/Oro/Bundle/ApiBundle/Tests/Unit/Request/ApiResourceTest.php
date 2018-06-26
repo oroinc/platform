@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class ApiResourceTest extends \PHPUnit_Framework_TestCase
+class ApiResourceTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityClass()
     {

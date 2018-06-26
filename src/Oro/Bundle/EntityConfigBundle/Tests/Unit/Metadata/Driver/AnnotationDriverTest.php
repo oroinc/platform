@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Driver\AnnotationDriver;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 
-class AnnotationDriverTest extends \PHPUnit_Framework_TestCase
+class AnnotationDriverTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadMetadataForClass()
     {

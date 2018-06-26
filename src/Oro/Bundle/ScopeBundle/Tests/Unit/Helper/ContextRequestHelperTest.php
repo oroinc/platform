@@ -5,7 +5,7 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Helper;
 use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class ContextRequestHelperTest extends \PHPUnit_Framework_TestCase
+class ContextRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetFromRequest()
     {

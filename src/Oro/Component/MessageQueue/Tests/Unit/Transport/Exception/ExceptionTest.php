@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\Exception\ExceptionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
     

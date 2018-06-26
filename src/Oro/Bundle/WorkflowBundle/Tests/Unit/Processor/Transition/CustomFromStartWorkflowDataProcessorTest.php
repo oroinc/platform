@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFromStartWorkflowDataProcessor;
 use Symfony\Component\Form\FormInterface;
 
-class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestCase
+class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomFromStartWorkflowDataProcessor */
     protected $processor;
@@ -21,11 +21,11 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestCa
     {
         $formData = (object)['id' => 42];
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('attribute');
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('getData')->willReturn($formData);
 
@@ -47,13 +47,13 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestCa
 
     public function testCreatesArrayForInitDataIfNo()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('attribute');
 
         $formData = (object)['id' => 42];
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('getData')->willReturn($formData);
 
@@ -69,11 +69,11 @@ class CustomFromStartWorkflowDataProcessorTest extends \PHPUnit_Framework_TestCa
 
     public function testNothingChangedIfAlreadyDefined()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('attribute');
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->never())->method('getData');
 

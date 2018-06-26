@@ -4,7 +4,7 @@ namespace Oro\Bundle\SSOBundle\Tests\OAuth\ResourceOwner;
 
 use Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner;
 
-class GoogleResourceOwnerTest extends \PHPUnit_Framework_TestCase
+class GoogleResourceOwnerTest extends \PHPUnit\Framework\TestCase
 {
     private $cm;
     private $googleResourceOwner;

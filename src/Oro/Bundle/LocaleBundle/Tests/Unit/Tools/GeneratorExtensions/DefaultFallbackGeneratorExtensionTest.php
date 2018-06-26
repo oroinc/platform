@@ -8,7 +8,7 @@ use CG\Generator\PhpParameter;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
 
-class DefaultFallbackGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultFallbackGeneratorExtension */
     protected $extension;

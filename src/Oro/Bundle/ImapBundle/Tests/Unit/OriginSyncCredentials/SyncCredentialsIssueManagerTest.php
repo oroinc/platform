@@ -9,15 +9,15 @@ use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SyncCredentialsIssueManagerTest extends \PHPUnit_Framework_TestCase
+class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SyncCredentialsIssueManager */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $credentialsDriver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Config\Definition\Builder;
 
 use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
-class MenuTreeBuilderTest extends \PHPUnit_Framework_TestCase
+class MenuTreeBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MenuTreeBuilder

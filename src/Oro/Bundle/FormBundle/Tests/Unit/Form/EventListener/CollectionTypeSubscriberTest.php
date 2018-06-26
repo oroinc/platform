@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
+class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CollectionTypeSubscriber

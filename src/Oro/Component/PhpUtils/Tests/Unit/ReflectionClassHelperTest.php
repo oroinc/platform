@@ -4,7 +4,7 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ReflectionClassHelper;
 
-class ReflectionClassHelperTest extends \PHPUnit_Framework_TestCase
+class ReflectionClassHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReflectionClassHelper */
     protected $utils;

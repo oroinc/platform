@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class HasPropertyTest extends \PHPUnit_Framework_TestCase
+class HasPropertyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\HasProperty */
     protected $condition;

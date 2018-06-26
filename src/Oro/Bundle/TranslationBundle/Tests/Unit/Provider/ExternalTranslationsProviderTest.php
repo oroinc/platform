@@ -9,15 +9,15 @@ use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 use Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 
-class ExternalTranslationsProviderTest extends \PHPUnit_Framework_TestCase
+class ExternalTranslationsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationServiceProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationServiceProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $serviceProvider;
 
-    /** @var LanguageHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageHelper;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var ExternalTranslationsProvider */

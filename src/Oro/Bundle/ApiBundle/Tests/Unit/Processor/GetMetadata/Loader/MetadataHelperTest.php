@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
-class MetadataHelperTest extends \PHPUnit_Framework_TestCase
+class MetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MetadataHelper */
     protected $metadataHelper;

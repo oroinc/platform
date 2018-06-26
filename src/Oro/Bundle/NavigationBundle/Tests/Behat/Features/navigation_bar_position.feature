@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-16267
 Feature: Navigation bar position
   In order to provide better navigation for users
@@ -54,10 +53,11 @@ Feature: Navigation bar position
 
     Examples:
       | menu                                | breadcrumb                            |
+      | Activities/ Calendar Events         | "Activities/ Calendar Events"         |
       | Dashboards/ Manage Dashboards       | "Dashboards/ Manage Dashboards"       |
       | System/ Localization/ Translations  | "System/ Localization/ Translations"  |
       | System/ Entities/ Entity Management | "System/ Entities/ Entity Management" |
-      | Activities/ Calendar Events         | "Activities/ Calendar Events"         |
+      | System/ Configuration               | "System/ Configuration" |
 
   Scenario: Change navigation bar position from "Left" to "Top"
     When I go to System/ Configuration

@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-class AclRoleHandlerTest extends \PHPUnit_Framework_TestCase
+class AclRoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclPrivilegeRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AclPrivilegeRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $privilegeRepository;
 
     /** @var AclManager */

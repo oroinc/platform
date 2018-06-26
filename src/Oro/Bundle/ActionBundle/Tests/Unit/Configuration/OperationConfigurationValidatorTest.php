@@ -9,18 +9,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
+class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var \Twig_Loader_Filesystem|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Twig_Loader_Filesystem|\PHPUnit\Framework\MockObject\MockObject */
     protected $twigLoader;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var OperationConfigurationValidator */
@@ -65,7 +65,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $this->createValidator($inputData['debug']);
 
-        /* @var $collection RouteCollection|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $collection RouteCollection|\PHPUnit\Framework\MockObject\MockObject */
         $collection = $this->createMock('Symfony\Component\Routing\RouteCollection');
 
         $this->doctrineHelper->expects($this->any())

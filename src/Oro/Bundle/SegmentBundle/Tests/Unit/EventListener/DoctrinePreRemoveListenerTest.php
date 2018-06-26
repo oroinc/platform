@@ -11,12 +11,12 @@ use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 use Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener;
 use Oro\Bundle\SegmentBundle\Tests\Unit\Fixtures\StubEntity;
 
-class DoctrinePreRemoveListenerTest extends \PHPUnit_Framework_TestCase
+class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var DoctrinePreRemoveListener */

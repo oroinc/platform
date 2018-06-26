@@ -5,10 +5,10 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
-class ItemTest extends \PHPUnit_Framework_TestCase
+class ItemTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Item|\PHPUnit_Framework_MockObject_MockObject
+     * @var Item|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $item;
 

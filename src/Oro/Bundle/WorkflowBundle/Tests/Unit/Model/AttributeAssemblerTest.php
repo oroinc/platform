@@ -11,7 +11,7 @@ use Oro\Component\Action\Exception\AssemblerException;
 use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
+class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface */
     protected $translator;
@@ -39,7 +39,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflowDefinition()
     {
@@ -50,7 +50,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return AttributeGuesser|\PHPUnit_Framework_MockObject_MockObject
+     * @return AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getAttributeGuesser()
     {

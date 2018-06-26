@@ -1,8 +1,10 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block list %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-            <div class="dropdown header-dropdown-shortcut header-utility-dropdown">
+            <div class="dropdown header-dropdown-shortcut header-utility-dropdown" data-layout="separate"
+                {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></a>
                 <ul class="dropdown-menu">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>

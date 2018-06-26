@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetConfigTreeBuilder()
     {

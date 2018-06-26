@@ -12,27 +12,27 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class AclManagerTest extends \PHPUnit_Framework_TestCase
+class AclManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclManager */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aceProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $fieldExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extensionSelector;
 
     protected function setUp()

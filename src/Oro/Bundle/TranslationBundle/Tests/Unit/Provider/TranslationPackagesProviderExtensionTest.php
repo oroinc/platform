@@ -10,12 +10,12 @@ use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Oro\Bundle\TranslationBundle\OroTranslationBundle;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension;
 
-class TranslationPackagesProviderExtensionTest extends \PHPUnit_Framework_TestCase
+class TranslationPackagesProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WritableRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WritableRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var InstallationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InstallationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     /** @var TranslationPackagesProviderExtension */
@@ -28,13 +28,13 @@ class TranslationPackagesProviderExtensionTest extends \PHPUnit_Framework_TestCa
     {
         $this->repository = $this->createMock(WritableRepositoryInterface::class);
 
-        /** @var LocalRepositoryFactory|\PHPUnit_Framework_MockObject_MockObject $localRepositoryFactory */
+        /** @var LocalRepositoryFactory|\PHPUnit\Framework\MockObject\MockObject $localRepositoryFactory */
         $localRepositoryFactory = $this->createMock(LocalRepositoryFactory::class);
         $localRepositoryFactory->expects($this->any())->method('getLocalRepository')->willReturn($this->repository);
 
         $this->manager = $this->createMock(InstallationManager::class);
 
-        /** @var Composer|\PHPUnit_Framework_MockObject_MockObject $composer */
+        /** @var Composer|\PHPUnit\Framework\MockObject\MockObject $composer */
         $composer = $this->createMock(Composer::class);
         $composer->expects($this->any())->method('getInstallationManager')->willReturn($this->manager);
 

@@ -16,13 +16,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
-    /** @var NameStrategyInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameStrategy;
 
-    /** @var ManagerInterface|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject  */
     protected $manager;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     protected function setUp()
@@ -110,7 +110,7 @@ class DatagridTypeTest extends BlockTypeTestCase
      */
     public function testBuildBlock()
     {
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfig */
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfig */
         $gridConfig = $this
             ->createMock('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration');
 
@@ -134,7 +134,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             ->with('test-grid')
             ->will($this->returnValue($gridConfig));
 
-        /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getId')
@@ -237,7 +237,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             'block_prefixes' => ['block', 'datagrid_toolbar', '_product_datagrid_toolbar'],
         ];
 
-        /** @var BlockView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var BlockView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(BlockView::class);
         $view->vars = [
             'block_type' => 'datagrid',
@@ -246,7 +246,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         ];
         $view->children = [$childView];
 
-        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+        /** @var BlockInterface|\PHPUnit\Framework\MockObject\MockObject $block */
         $block = $this->createMock(BlockInterface::class);
         $block->expects($this->any())
             ->method('getId')

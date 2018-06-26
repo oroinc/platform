@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 
-class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
+class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {

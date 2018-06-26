@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class LocalizedFallbackValueTest extends \PHPUnit_Framework_TestCase
+class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
     

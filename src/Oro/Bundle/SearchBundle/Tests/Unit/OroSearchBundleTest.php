@@ -5,7 +5,7 @@ use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\SearchBundle\OroSearchBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSearchBundleTest extends \PHPUnit_Framework_TestCase
+class OroSearchBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldRegisterExpectedCompilerPasses()
     {

@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
+class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
     protected const TEST_CLASS_NAME   = 'Test\Class';
     protected const TEST_VERSION      = '1.1';
@@ -55,7 +55,7 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {

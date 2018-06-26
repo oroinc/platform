@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Extension;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Extension\SecurityExtensionHelper;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
-class SecurityExtensionHelperTest extends \PHPUnit_Framework_TestCase
+class SecurityExtensionHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testMakeFirewallLatestNoFirewall()
     {
@@ -49,7 +49,7 @@ class SecurityExtensionHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $securityConfig
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExtendedContainerBuilder
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder
      */
     protected function getContainerBuilder(array $securityConfig)
     {

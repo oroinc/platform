@@ -5,7 +5,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider;
 
-class EmailBodyEntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailBodyEntityNameProvider */
     protected $emailBodyEntityNameProvider;

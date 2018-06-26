@@ -13,10 +13,10 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormTypeTest extends TypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var FormType */

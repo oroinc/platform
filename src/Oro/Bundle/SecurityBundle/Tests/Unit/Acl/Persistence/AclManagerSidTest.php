@@ -4,12 +4,12 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 
-class AclManagerSidTest extends \PHPUnit_Framework_TestCase
+class AclManagerSidTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclSidManager */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclProvider;
 
     protected function setUp()

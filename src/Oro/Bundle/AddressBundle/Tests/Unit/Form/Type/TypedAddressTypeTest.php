@@ -7,10 +7,10 @@ use Oro\Bundle\AddressBundle\Form\Type\TypedAddressType;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
+class TypedAddressTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TypedAddressType
+     * @var \PHPUnit\Framework\MockObject\MockObject|TypedAddressType
      */
     protected $type;
 

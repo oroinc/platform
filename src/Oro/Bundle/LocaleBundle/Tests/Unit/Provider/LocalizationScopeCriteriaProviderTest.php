@@ -6,7 +6,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider;
 
-class LocalizationScopeCriteriaProviderTest extends \PHPUnit_Framework_TestCase
+class LocalizationScopeCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalizationScopeCriteriaProvider
@@ -14,7 +14,7 @@ class LocalizationScopeCriteriaProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /**
-     * @var CurrentLocalizationProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $currentLocalizationProvider;
 

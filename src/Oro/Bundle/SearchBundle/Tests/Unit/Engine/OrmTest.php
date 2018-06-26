@@ -12,19 +12,19 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrmTest extends \PHPUnit_Framework_TestCase
+class OrmTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS = 'Stub\TestEntity';
     const TEST_ALIAS = 'test_entity';
     const TEST_INDEX = 'test_index';
 
-    /** @var SearchIndexRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SearchIndexRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var ObjectMapper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
     protected $mapper;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     /** @var Orm */
@@ -40,7 +40,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
             ->with('OroSearchBundle:Item')
             ->willReturn($this->repository);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')

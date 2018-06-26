@@ -7,15 +7,15 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 
-class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
+class DeleteHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BaseDeleteHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BaseDeleteHandler|\PHPUnit\Framework\MockObject\MockObject */
     protected $deleteHandler;
 
-    /** @var ApiEntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ApiEntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $apiEntityManager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var DeleteHandler */

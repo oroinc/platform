@@ -21,7 +21,7 @@ use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
+class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ValueNormalizer */
     private $valueNormalizer;

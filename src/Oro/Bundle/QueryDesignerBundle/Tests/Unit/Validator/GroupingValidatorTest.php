@@ -6,7 +6,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class GroupingValidatorTest extends \PHPUnit_Framework_TestCase
+class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GroupingValidator
@@ -14,12 +14,12 @@ class GroupingValidatorTest extends \PHPUnit_Framework_TestCase
     protected $validator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

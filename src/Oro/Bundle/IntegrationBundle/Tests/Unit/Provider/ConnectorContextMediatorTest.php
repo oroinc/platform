@@ -9,15 +9,15 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\DependencyInjection\Container;
 
-class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
+class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConnectorContextMediator */
     protected $contextMediator;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repo;
 
-    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp()

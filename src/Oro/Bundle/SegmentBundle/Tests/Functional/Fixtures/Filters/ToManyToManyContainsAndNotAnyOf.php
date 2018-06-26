@@ -22,7 +22,7 @@ class ToManyToManyContainsAndNotAnyOf implements FixtureInterface
     /**
      * {@inheritdoc}
      */
-    public function assert(\PHPUnit_Framework_Assert $assertions, array $actualData)
+    public function assert(\PHPUnit\Framework\Assert $assertions, array $actualData)
     {
         $assertions->assertCount(1, $actualData);
         $assertions->assertEquals('b', $actualData[0]['c1']);

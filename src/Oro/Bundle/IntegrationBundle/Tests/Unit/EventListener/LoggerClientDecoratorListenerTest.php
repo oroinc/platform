@@ -9,7 +9,7 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 use Psr\Log\LoggerInterface;
 
-class LoggerClientDecoratorListenerTest extends \PHPUnit_Framework_TestCase
+class LoggerClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LoggerClientDecoratorListener
@@ -17,7 +17,7 @@ class LoggerClientDecoratorListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     protected $logger;
 

@@ -4,17 +4,17 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
 
-class EmailTemplateTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailTemplateType
      */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp()

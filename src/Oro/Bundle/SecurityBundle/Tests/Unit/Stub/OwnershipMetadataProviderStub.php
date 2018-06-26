@@ -15,21 +15,21 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /** @var array */
     private $metadata = [];
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManagerMock;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessorMock;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheMock;
 
     /**
-     * @param \PHPUnit_Framework_TestCase $testCase
+     * @param \PHPUnit\Framework\TestCase $testCase
      *
      * @param array                       $classes
      */
-    public function __construct(\PHPUnit_Framework_TestCase $testCase, array $classes = [])
+    public function __construct(\PHPUnit\Framework\TestCase $testCase, array $classes = [])
     {
         $this->configManagerMock = $testCase->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
@@ -90,7 +90,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     /**
-     * @return ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getConfigManagerMock()
     {
@@ -98,7 +98,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     /**
-     * @return TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getTokenAccessorMock()
     {
@@ -106,7 +106,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     /**
-     * @return CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getCacheMock()
     {

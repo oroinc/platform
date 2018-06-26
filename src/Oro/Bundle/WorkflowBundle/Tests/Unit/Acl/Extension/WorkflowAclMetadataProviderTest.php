@@ -14,15 +14,15 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     /** @var WorkflowAclMetadataProvider */
@@ -44,7 +44,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function loadWorkflowExpectations()
     {

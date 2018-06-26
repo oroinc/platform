@@ -5,7 +5,7 @@ namespace Oro\Component\Testing\Assert;
 /**
  * Constraint that asserts that the array contains an expected array.
  */
-class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
+class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     /** @var array */
     private $expected;
@@ -213,8 +213,8 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
     private function isInternalType($expectedType, $value, array $path)
     {
         try {
-            \PHPUnit_Framework_Assert::assertInternalType($expectedType, $value);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            \PHPUnit\Framework\Assert::assertInternalType($expectedType, $value);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;
@@ -233,8 +233,8 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
     private function isArrayHasKey($key, $array, array $path)
     {
         try {
-            \PHPUnit_Framework_Assert::assertArrayHasKey($key, $array);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            \PHPUnit\Framework\Assert::assertArrayHasKey($key, $array);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;
@@ -255,16 +255,16 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
         try {
             if (is_string($actual) && is_string($expected)) {
                 if ($actual !== $expected) {
-                    throw new \PHPUnit_Framework_ExpectationFailedException(sprintf(
+                    throw new \PHPUnit\Framework\ExpectationFailedException(sprintf(
                         'Failed asserting that \'%s\' is identical to \'%s\'.',
                         $actual,
                         $expected
                     ));
                 }
             } else {
-                \PHPUnit_Framework_Assert::assertSame($expected, $actual);
+                \PHPUnit\Framework\Assert::assertSame($expected, $actual);
             }
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;

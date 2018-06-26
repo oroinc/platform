@@ -17,16 +17,16 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var OroRichTextType */
     protected $formType;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Packages */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Packages */
     protected $assetsHelper;
 
-    /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|HtmlTagProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
     protected $htmlTagProvider;
 
     protected function setUp()

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
-class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
+class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
@@ -19,19 +19,19 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     const ACTION_NAME = 'FooBarBundle:Test:test';
     const DELIMITER = '<br/>';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $environment;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $kernelExtension;
 
-    /** @var FragmentHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     protected $fragmentHandler;
 
     /** @var PlaceholderExtension */

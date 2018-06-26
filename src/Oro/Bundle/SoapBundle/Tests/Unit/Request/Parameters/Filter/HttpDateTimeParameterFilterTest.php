@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 
-class HttpDateTimeParameterFilterTest extends \PHPUnit_Framework_TestCase
+class HttpDateTimeParameterFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilter()
     {

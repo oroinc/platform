@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 
-class ExportProcessorTest extends \PHPUnit_Framework_TestCase
+class ExportProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExportProcessor
@@ -12,7 +12,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

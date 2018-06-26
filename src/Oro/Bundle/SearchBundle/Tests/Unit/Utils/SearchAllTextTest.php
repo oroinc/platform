@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Utils;
 use Oro\Bundle\SearchBundle\Utils\SearchAllText;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SearchAllTextTest extends \PHPUnit_Framework_TestCase
+class SearchAllTextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorChoices()
     {

@@ -13,15 +13,15 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class IndexListenerTest extends \PHPUnit_Framework_TestCase
+class IndexListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchIndexer;
 
@@ -245,7 +245,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createEntityManager()
     {
@@ -255,7 +255,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createClassMetadata()
     {

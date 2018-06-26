@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class AllTest extends \PHPUnit_Framework_TestCase
+class AllTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTargets()
     {

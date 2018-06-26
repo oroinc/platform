@@ -13,10 +13,10 @@ use Oro\Component\EntitySerializer\QueryResolver;
 
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CountQueryBuilderOptimizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CountQueryBuilderOptimizer */
     private $countQueryBuilderOptimizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryResolver */
     private $queryResolver;
 
     /** @var SetTotalCountHeader */

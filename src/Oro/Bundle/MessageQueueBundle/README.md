@@ -328,7 +328,7 @@ namespace Acme\Bundle\AcmeBundle\Tests\Unit;
 use Acme\Bundle\AcmeBundle\SomeClass;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 
-class SomeTest extends \PHPUnit_Framework_TestCase
+class SomeTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 

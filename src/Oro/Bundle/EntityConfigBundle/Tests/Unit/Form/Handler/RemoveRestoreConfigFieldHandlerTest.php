@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
+class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const SAMPLE_ERROR_MESSAGE = 'Restore error message';
     const SAMPLE_SUCCESS_MESSAGE = 'Entity config was successfully saved';
@@ -29,27 +29,27 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     const SAMPLE_VALIDATION_ERROR_MESSAGE2 = 'Validation error 2';
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var FieldNameValidationHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $validationHelper;
 
     /**
-     * @var ConfigHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configHelper;
 
     /**
-     * @var Session|\PHPUnit_Framework_MockObject_MockObject
+     * @var Session|\PHPUnit\Framework\MockObject\MockObject
      */
     private $session;
 
     /**
-     * @var FieldConfigModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldConfigModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldConfigModel;
 
@@ -58,11 +58,11 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $handler;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
@@ -98,8 +98,8 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockBuilder $fieldConfig
-     * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockBuilder $entityConfig
+     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $fieldConfig
+     * @param ConfigInterface|\PHPUnit\Framework\MockObject\MockBuilder $entityConfig
      */
     private function expectsConfigManagerPersistAndFlush(ConfigInterface $fieldConfig, ConfigInterface $entityConfig)
     {
@@ -423,9 +423,9 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function prepareEntityConfig(): \PHPUnit_Framework_MockObject_MockObject
+    protected function prepareEntityConfig(): \PHPUnit\Framework\MockObject\MockObject
     {
         $entityConfig = $this->createMock(ConfigInterface::class);
         $entityConfig
@@ -443,9 +443,9 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function prepareFieldConfig(): \PHPUnit_Framework_MockObject_MockObject
+    protected function prepareFieldConfig(): \PHPUnit\Framework\MockObject\MockObject
     {
         $fieldConfig = $this->createMock(ConfigInterface::class);
 

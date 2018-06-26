@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\MappingException;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 
-class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
     protected $entityManager;
 
@@ -283,7 +283,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockEntityManager()
     {
@@ -302,7 +302,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $property
      * @param mixed $value
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function createMockEntity($property, $value)
     {

@@ -13,17 +13,17 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
+class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $permissionManager;
 
     /** @var OroSecurityExtension */

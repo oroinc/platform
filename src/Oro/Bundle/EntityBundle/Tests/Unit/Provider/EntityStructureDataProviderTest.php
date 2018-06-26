@@ -11,15 +11,15 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EntityStructureDataProviderTest extends \PHPUnit_Framework_TestCase
+class EntityStructureDataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var EntityWithFieldsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityWithFieldsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityWithFieldsProvider;
 
-    /** @var EntityClassNameHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $classNameHelper;
 
     /** @var EntityStructureDataProvider */

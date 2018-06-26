@@ -5,10 +5,10 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-abstract class AbstractProvidersPassTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
      */
     protected $container;
 

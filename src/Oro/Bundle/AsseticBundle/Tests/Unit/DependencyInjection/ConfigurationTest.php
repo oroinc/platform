@@ -3,7 +3,7 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AsseticBundle\DependencyInjection\Configuration;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetConfigTreeBuilder()
     {

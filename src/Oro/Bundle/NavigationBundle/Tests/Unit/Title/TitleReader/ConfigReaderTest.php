@@ -5,11 +5,11 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 
-class ConfigReaderTest extends \PHPUnit_Framework_TestCase
+class ConfigReaderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ROUTE = 'test_route';
 
-    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationProvider;
 
     /** @var ConfigReader */

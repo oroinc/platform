@@ -8,23 +8,23 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\EventListener\EmailUserListener;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
+class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailUserListener */
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $processor;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject
+     * @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $uow;
 

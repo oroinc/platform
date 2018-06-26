@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 
-class IncludedEntityCollectionTest extends \PHPUnit_Framework_TestCase
+class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IncludedEntityCollection */
     protected $collection;

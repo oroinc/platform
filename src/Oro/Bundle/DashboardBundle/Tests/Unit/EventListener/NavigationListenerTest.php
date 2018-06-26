@@ -7,15 +7,15 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class NavigationListenerTest extends \PHPUnit_Framework_TestCase
+class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NavigationListener */
     protected $navigationListener;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     protected function setUp()
@@ -35,7 +35,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testonnavigationconfigureWithoutUser()
     {
-        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,7 +47,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnNavigationConfigureWithDisabledDisplaying()
     {
-        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();

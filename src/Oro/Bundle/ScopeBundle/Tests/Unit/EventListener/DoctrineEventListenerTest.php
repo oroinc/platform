@@ -8,15 +8,15 @@ use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener;
 use Oro\Bundle\ScopeBundle\Manager\ScopeEntityStorage;
 
-class DoctrineEventListenerTest extends \PHPUnit_Framework_TestCase
+class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeEntityStorage|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeEntityStorage|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityStorage;
 
     /**
-     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $scopeManagerCache;
 

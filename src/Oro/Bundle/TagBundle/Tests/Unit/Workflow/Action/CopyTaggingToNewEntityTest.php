@@ -21,20 +21,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class CopyTaggingToNewEntityTest extends \PHPUnit_Framework_TestCase
+class CopyTaggingToNewEntityTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TagManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var TagManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tagManager;
 
     /**
-     * @var TaggableHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $taggableHelper;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
@@ -87,7 +87,8 @@ class CopyTaggingToNewEntityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $inputData, $exception, $exceptionMessage)
     {
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->action->initialize($inputData);
     }
@@ -189,8 +190,10 @@ class CopyTaggingToNewEntityTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethodExceptionSource()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(
+            \LogicException::class
+        );
+        $this->expectExceptionMessage(
             'Object in path "source" in "copy_tagging_to_new_entity" action should be taggable.'
         );
 
@@ -215,8 +218,10 @@ class CopyTaggingToNewEntityTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethodExceptionDestination()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(
+            \LogicException::class
+        );
+        $this->expectExceptionMessage(
             'Object in path "destination" in "copy_tagging_to_new_entity" action should be taggable.'
         );
 

@@ -3,7 +3,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider;
 
-class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigVirtualRelationProvider */
     private $configVirtualRelationProvider;

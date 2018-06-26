@@ -6,7 +6,7 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class NoteTest extends \PHPUnit_Framework_TestCase
+class NoteTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters()
     {

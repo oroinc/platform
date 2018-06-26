@@ -7,7 +7,7 @@ use CG\Generator\PhpClass;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\ElementDependentVisitor;
 
-class ElementDependentVisitorTest extends \PHPUnit_Framework_TestCase
+class ElementDependentVisitorTest extends \PHPUnit\Framework\TestCase
 {
     // @codingStandardsIgnoreStart
     public function testVisit()

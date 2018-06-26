@@ -5,9 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
-class ResourceFileImportProcessorFactoryTest extends \PHPUnit_Framework_TestCase
+class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
     /** @var ResourceFileImportProcessorFactory */

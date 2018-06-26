@@ -6,9 +6,9 @@ use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilterFactory;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 
-class CompositeIdentifierFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class CompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
     protected $entityIdTransformerRegistry;
 
     /** @var CompositeIdentifierFilterFactory */

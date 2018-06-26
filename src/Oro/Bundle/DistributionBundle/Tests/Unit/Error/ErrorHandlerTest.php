@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
-class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
+class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ErrorHandler

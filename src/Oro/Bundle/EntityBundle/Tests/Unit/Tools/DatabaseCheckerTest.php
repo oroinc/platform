@@ -7,7 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
-class DatabaseCheckerTest extends \PHPUnit_Framework_TestCase
+class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCheckDatabaseForInstalledApplication()
     {
@@ -88,7 +88,7 @@ class DatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      * @param string[] $tables
      * @param bool     $result
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     protected function setTablesExistExpectation($tables, $result)
     {

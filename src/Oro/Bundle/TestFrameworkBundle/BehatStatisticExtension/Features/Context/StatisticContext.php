@@ -167,13 +167,13 @@ class StatisticContext implements Context
                 echo 'Actual output:' . PHP_EOL . PHP_EOL . $this->getOutput();
             }
 
-            \PHPUnit_Framework_Assert::assertNotEquals(0, $this->getExitCode());
+            \PHPUnit\Framework\Assert::assertNotEquals(0, $this->getExitCode());
         } else {
             if (0 !== $this->getExitCode()) {
                 echo 'Actual output:' . PHP_EOL . PHP_EOL . $this->getOutput();
             }
 
-            \PHPUnit_Framework_Assert::assertEquals(0, $this->getExitCode());
+            \PHPUnit\Framework\Assert::assertEquals(0, $this->getExitCode());
         }
     }
 
@@ -186,7 +186,7 @@ class StatisticContext implements Context
      */
     public function theOutputShouldContain(PyStringNode $text)
     {
-        \PHPUnit_Framework_Assert::assertContains($this->getExpectedOutput($text), $this->getOutput());
+        \PHPUnit\Framework\Assert::assertContains($this->getExpectedOutput($text), $this->getOutput());
     }
 
     /**
@@ -198,7 +198,7 @@ class StatisticContext implements Context
      */
     public function theOutputShouldNotContain(PyStringNode $text)
     {
-        \PHPUnit_Framework_Assert::assertNotContains($this->getExpectedOutput($text), $this->getOutput());
+        \PHPUnit\Framework\Assert::assertNotContains($this->getExpectedOutput($text), $this->getOutput());
     }
 
     /**
@@ -252,7 +252,7 @@ class StatisticContext implements Context
         ;
         $result = $queryBuilder->execute()->fetchAll();
 
-        \PHPUnit_Framework_Assert::assertEquals($table->getHash(), $result);
+        \PHPUnit\Framework\Assert::assertEquals($table->getHash(), $result);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Processor;
 
 use Oro\Bundle\MessageQueueBundle\Log\Processor\RestoreOriginalChannelProcessor;
 
-class RestoreOriginalChannelProcessorTest extends \PHPUnit_Framework_TestCase
+class RestoreOriginalChannelProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RestoreOriginalChannelProcessor */
     private $processor;

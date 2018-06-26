@@ -9,12 +9,12 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 
-class ArraySorterExtensionTest extends \PHPUnit_Framework_TestCase
+class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArraySorterExtension */
     protected $arraySorterExtension;
 
-    /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $config **/
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config **/
     protected $config;
 
     /** @var  ArrayDatasource */

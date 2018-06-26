@@ -12,7 +12,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class LanguageFilterTypeTest extends FormIntegrationTestCase
 {
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     /** @var LanguageFilterType */

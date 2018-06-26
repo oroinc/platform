@@ -14,10 +14,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class InitializeApiFormExtensionTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formExtensionSwitcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataTypeGuesser;
 
     /** @var InitializeApiFormExtension */

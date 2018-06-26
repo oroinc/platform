@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserChain;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
-class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
+class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithInvalidGuesser()
     {

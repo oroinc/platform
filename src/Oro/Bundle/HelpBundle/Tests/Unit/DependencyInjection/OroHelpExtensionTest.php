@@ -8,7 +8,7 @@ use Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\FooB
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
+class OroHelpExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OroHelpExtension

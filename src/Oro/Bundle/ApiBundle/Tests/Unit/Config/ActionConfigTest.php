@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class ActionConfigTest extends \PHPUnit_Framework_TestCase
+class ActionConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()
     {

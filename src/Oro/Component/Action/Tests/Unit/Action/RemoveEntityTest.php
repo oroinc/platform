@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class RemoveEntityTest extends \PHPUnit_Framework_TestCase
+class RemoveEntityTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor
@@ -17,7 +17,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 

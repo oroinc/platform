@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\FeatureCheckProcessor;
 
-class FeatureCheckProcessorTest extends \PHPUnit_Framework_TestCase
+class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FeatureCheckProcessor */
     protected $processor;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
     protected function setUp()

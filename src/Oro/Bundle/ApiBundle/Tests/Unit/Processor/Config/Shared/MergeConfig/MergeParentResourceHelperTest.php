@@ -13,9 +13,9 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResource
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
-class MergeParentResourceHelperTest extends \PHPUnit_Framework_TestCase
+class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
     /** @var ConfigContext */

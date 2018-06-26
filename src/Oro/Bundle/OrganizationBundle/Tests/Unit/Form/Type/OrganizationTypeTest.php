@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class OrganizationTypeTest extends \PHPUnit_Framework_TestCase
+class OrganizationTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OrganizationType */
     protected $formType;

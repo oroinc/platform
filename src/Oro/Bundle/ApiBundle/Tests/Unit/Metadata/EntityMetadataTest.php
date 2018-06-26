@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class EntityMetadataTest extends \PHPUnit_Framework_TestCase
+class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {

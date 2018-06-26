@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\SecurityBundle\Form\DataTransformer\CryptedDataTransformer;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
-class CryptedDataTransformerTest extends \PHPUnit_Framework_TestCase
+class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
@@ -19,7 +19,7 @@ class CryptedDataTransformerTest extends \PHPUnit_Framework_TestCase
     private $transformer;
 
     /**
-     * @var SymmetricCrypterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $crypter;
 

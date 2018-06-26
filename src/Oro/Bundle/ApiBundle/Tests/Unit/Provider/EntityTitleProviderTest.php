@@ -9,7 +9,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EntityTitleProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNameResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNameResolver */
     protected $entityNameResolver;
 
     /** @var EntityTitleProvider */

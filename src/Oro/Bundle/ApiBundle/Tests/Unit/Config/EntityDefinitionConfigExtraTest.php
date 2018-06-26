@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class EntityDefinitionConfigExtraTest extends \PHPUnit_Framework_TestCase
+class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetName()
     {

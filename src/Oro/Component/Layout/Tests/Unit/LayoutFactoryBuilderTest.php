@@ -18,12 +18,12 @@ use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
-class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
+class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $expressionProcessor;
 
-    /** @var BlockViewCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockViewCache;
 
     /** @var LayoutFactoryBuilder */
@@ -132,7 +132,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $name = 'test';
         $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
 
-        /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
+        /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
         $extension     = $this->createMock('Oro\Component\Layout\Extension\ExtensionInterface');
         $layoutFactory = $this->layoutFactoryBuilder
             ->addExtension($extension)
@@ -156,7 +156,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddType()
     {
         $name = 'test';
-        /** @var BlockTypeInterface|\PHPUnit_Framework_MockObject_MockObject $type */
+        /** @var BlockTypeInterface|\PHPUnit\Framework\MockObject\MockObject $type */
         $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->once())
             ->method('getName')
@@ -175,7 +175,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddTypeExtension()
     {
         $name          = 'test';
-        /** @var BlockTypeExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $typeExtension */
+        /** @var BlockTypeExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $typeExtension */
         $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
         $typeExtension->expects($this->once())
             ->method('getExtendedType')
@@ -197,11 +197,11 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddLayoutUpdate()
     {
         $id                = 'test';
-        /** @var LayoutUpdateInterface|\PHPUnit_Framework_MockObject_MockObject $layoutUpdate */
+        /** @var LayoutUpdateInterface|\PHPUnit\Framework\MockObject\MockObject $layoutUpdate */
         $layoutUpdate      = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
         /** @var DeferredLayoutManipulatorInterface $layoutManipulator */
         $layoutManipulator = $this->createMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        /** @var LayoutItemInterface|\PHPUnit_Framework_MockObject_MockObject $layoutItem */
+        /** @var LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject $layoutItem */
         $layoutItem        = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItem->expects($this->any())->method('getId')->willReturn($id);
 

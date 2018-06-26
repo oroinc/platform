@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
 
-class TransitionIsAllowedTest extends \PHPUnit_Framework_TestCase
+class TransitionIsAllowedTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

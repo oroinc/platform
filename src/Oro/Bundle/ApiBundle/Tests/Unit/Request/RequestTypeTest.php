@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class RequestTypeTest extends \PHPUnit_Framework_TestCase
+class RequestTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmptyForEmptyRequestType()
     {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Isolation;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class UnixFileCacheIsolatorTest extends \PHPUnit_Framework_TestCase
+class UnixFileCacheIsolatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider onlyFileHandlerIsApplicableProvider

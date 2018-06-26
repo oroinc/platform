@@ -10,15 +10,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Router;
 
-class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
+class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Reader|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Reader|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var AnnotationsReader */

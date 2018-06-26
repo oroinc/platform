@@ -13,9 +13,9 @@ use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Zend\Mail\Header\ContentType;
 
-class EmailTest extends \PHPUnit_Framework_TestCase
+class EmailTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Message|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Message|\PHPUnit\Framework\MockObject\MockObject */
     private $message;
 
     /** @var Email */
@@ -171,7 +171,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Attachment|\PHPUnit_Framework_MockObject_MockObject
+     * @return Attachment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getAttachmentMock()
     {

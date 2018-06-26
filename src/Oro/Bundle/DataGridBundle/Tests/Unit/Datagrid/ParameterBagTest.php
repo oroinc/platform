@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 
-class ParameterBagTest extends \PHPUnit_Framework_TestCase
+class ParameterBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testAll()
     {

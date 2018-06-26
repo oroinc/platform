@@ -13,7 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
 
@@ -59,7 +59,7 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
             'enum'
         );
 
-        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->validator = new MultiEnumSnapshotFieldValidator(

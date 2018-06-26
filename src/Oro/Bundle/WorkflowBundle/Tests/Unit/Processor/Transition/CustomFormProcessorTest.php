@@ -12,9 +12,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormProcessor;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomFormProcessorTest extends \PHPUnit_Framework_TestCase
+class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormHandlerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $formHandlerRegistry;
 
     /** @var CustomFormProcessor */
@@ -28,29 +28,29 @@ class CustomFormProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSaved()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('getFormHandler')->willReturn('formHandlerName');
         $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('dataAttribute');
 
         $dataObject = (object)['id' => 42];
 
-        /** @var WorkflowData|\PHPUnit_Framework_MockObject_MockObject $workflowData */
+        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $workflowData */
         $workflowData = $this->createMock(WorkflowData::class);
         $workflowData->expects($this->once())->method('get')->with('dataAttribute')->willReturn($dataObject);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
         $workflowItem->expects($this->once())->method('getData')->willReturn($workflowData);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
-        /** @var FormHandlerInterface|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var FormHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $handler = $this->createMock(FormHandlerInterface::class);
         $handler->expects($this->once())
             ->method('process')

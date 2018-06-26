@@ -12,13 +12,13 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $associationManager;
 
     /** @var CompleteCustomAssociationHelper */

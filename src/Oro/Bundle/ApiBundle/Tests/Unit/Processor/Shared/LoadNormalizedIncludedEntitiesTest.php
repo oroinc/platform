@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $processorBag;
 
     /** @var LoadNormalizedIncludedEntities */

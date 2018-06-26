@@ -1,17 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'routing',
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/modal',
-    'oroui/js/app/views/base/view',
-    'base64',
-    'oroui/js/tools'
-], function($, _, routing, __, mediator, Modal, BaseView, base64, tools) {
+define(function(require) {
     'use strict';
 
     var PageStateView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var base64 = require('base64');
+    var routing = require('routing');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var Modal = require('oroui/js/modal');
+    var PageStateModel = require('oronavigation/js/app/models/page-state-model');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     PageStateView = BaseView.extend({
         listen: {
@@ -39,8 +38,9 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
             var confirmModal;
+            this.model = new PageStateModel();
 
             this._initialState = null;
             this._resetChanges = false;
@@ -56,7 +56,7 @@ define([
 
             $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
 
-            PageStateView.__super__.initialize.apply(this, arguments);
+            PageStateView.__super__.initialize.call(this, options);
         },
 
         /**

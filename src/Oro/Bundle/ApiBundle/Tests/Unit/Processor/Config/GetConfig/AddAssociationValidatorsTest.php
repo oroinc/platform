@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 
 class AddAssociationValidatorsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var AddAssociationValidators */

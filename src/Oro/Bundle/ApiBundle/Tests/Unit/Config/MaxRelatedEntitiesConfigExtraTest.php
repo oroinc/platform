@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\MaxRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
+class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MaxRelatedEntitiesConfigExtra */
     protected $extra;

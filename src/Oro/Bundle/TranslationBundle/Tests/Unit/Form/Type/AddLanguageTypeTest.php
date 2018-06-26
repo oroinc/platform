@@ -17,16 +17,16 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
     /** @var AddLanguageType */
     protected $formType;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
     protected $localeSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationStatisticProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationStatisticProvider */
     protected $translationStatisticProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()

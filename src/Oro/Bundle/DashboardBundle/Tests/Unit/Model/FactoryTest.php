@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\Factory;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Factory
@@ -13,17 +13,17 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     protected $dashboardFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Bundle\DashboardBundle\Model\ConfigProvider
+     * @var \PHPUnit\Framework\MockObject\MockObject|Oro\Bundle\DashboardBundle\Model\ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Bundle\DashboardBundle\Model\StateManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|Oro\Bundle\DashboardBundle\Model\StateManager
      */
     protected $stateManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Oro\Bundle\DashboardBundle\Model\WidgetConfigs
+     * @var \PHPUnit\Framework\MockObject\MockObject|Oro\Bundle\DashboardBundle\Model\WidgetConfigs
      */
     protected $widgetConfigs;
 

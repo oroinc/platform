@@ -32,7 +32,7 @@
         "symfony/swiftmailer-bundle": "2.6.*",
         "symfony/monolog-bundle": "3.3.*",
         "sensio/distribution-bundle": "5.0.*",
-        "sensio/framework-extra-bundle": "3.0.*",
+        "sensio/framework-extra-bundle": "~3.0.12",
         "incenteev/composer-parameter-handler": "2.1.*",
         "jms/serializer": "1.12.*",
         "jms/serializer-bundle": "1.5.*",

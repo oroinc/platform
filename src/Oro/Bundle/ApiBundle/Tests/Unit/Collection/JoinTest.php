@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Collection\Join;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JoinTest extends \PHPUnit_Framework_TestCase
+class JoinTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithAllParameters()
     {

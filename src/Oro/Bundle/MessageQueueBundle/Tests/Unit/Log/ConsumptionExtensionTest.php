@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class ConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
+class ConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnBeforeReceive()
     {

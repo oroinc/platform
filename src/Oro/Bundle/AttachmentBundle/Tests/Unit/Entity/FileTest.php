@@ -6,7 +6,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 use Symfony\Component\HttpFoundation\File\File as FileType;
 
-class FileTest extends \PHPUnit_Framework_TestCase
+class FileTest extends \PHPUnit\Framework\TestCase
 {
     /** @var File */
     protected $entity;

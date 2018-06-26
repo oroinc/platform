@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\ImportExport\Normalizer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 
-class LocalizationCodeFormatterTest extends \PHPUnit_Framework_TestCase
+class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LocalizationCodeFormatter */
     protected $formatter;

@@ -228,7 +228,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm($options, array $expectedCalls = array())
     {
-        /** @var FormBuilder|\PHPUnit_Framework_MockObject_MockObject $formBuilder */
+        /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject $formBuilder */
         $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->setMethods(array('addEventSubscriber', 'addViewTransformer'))

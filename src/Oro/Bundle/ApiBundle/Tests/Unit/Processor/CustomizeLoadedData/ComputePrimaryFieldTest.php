@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 
-class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
+class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
     protected $context;

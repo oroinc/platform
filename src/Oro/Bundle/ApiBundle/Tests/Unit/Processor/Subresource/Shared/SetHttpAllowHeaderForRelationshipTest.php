@@ -12,10 +12,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 
 class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
     private $subresourcesProvider;
 
     /** @var SetHttpAllowHeaderForRelationship */

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 
-class ActiveDashboardTest extends \PHPUnit_Framework_TestCase
+class ActiveDashboardTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ActiveDashboard

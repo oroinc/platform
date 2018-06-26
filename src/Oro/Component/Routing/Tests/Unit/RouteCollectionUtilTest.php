@@ -7,7 +7,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
+class RouteCollectionUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testCloneWithoutHidden()
     {
@@ -16,13 +16,13 @@ class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
         $src->add('route2', new Route('/route2', [], [], ['hidden' => true]));
         $src->add('route3', new Route('/route3', [], [], ['hidden' => false]));
 
-        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource1 */
+        /** @var DirectoryResource|\PHPUnit\Framework\MockObject\MockObject $resource1 */
         $resource1 = $this->createMock(DirectoryResource::class);
         $resource1->expects($this->any())
             ->method('getResource')
             ->willReturn('resource1');
 
-        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource2 */
+        /** @var DirectoryResource|\PHPUnit\Framework\MockObject\MockObject $resource2 */
         $resource2 = $this->createMock(DirectoryResource::class);
         $resource2->expects($this->any())
             ->method('getResource')
@@ -45,13 +45,13 @@ class RouteCollectionUtilTest extends \PHPUnit_Framework_TestCase
         $src->add('route2', new Route('/route2', [], [], ['hidden' => true]));
         $src->add('route3', new Route('/route3', [], [], ['hidden' => false]));
 
-        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource1 */
+        /** @var DirectoryResource|\PHPUnit\Framework\MockObject\MockObject $resource1 */
         $resource1 = $this->createMock(DirectoryResource::class);
         $resource1->expects($this->any())
             ->method('getResource')
             ->willReturn('resource1');
 
-        /** @var DirectoryResource|\PHPUnit_Framework_MockObject_MockObject $resource2 */
+        /** @var DirectoryResource|\PHPUnit\Framework\MockObject\MockObject $resource2 */
         $resource2 = $this->createMock(DirectoryResource::class);
         $resource2->expects($this->any())
             ->method('getResource')

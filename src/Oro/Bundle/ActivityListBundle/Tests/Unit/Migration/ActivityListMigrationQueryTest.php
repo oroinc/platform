@@ -11,7 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
-class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListMigrationQuery */
     protected $migrationQuery;
@@ -19,19 +19,19 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
     /** @var Schema */
     protected $schema;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
     /** @var ActivityListExtension */
     protected $activityListExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataHelper;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     public function setUp()

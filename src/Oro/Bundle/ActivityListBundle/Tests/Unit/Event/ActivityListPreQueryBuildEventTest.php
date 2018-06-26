@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 
-class ActivityListPreQueryBuildEventTest extends \PHPUnit_Framework_TestCase
+class ActivityListPreQueryBuildEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

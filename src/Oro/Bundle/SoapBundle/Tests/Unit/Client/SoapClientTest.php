@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class SoapClientTest extends TestCase
 {
     /**
-     * @var NativeSoapClientFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var NativeSoapClientFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     private $clientFactory;
 

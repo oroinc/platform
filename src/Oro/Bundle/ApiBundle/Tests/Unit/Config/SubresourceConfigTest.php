@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 
-class SubresourceConfigTest extends \PHPUnit_Framework_TestCase
+class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()
     {

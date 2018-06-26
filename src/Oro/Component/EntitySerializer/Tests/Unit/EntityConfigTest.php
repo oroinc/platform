@@ -5,7 +5,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
 
-class EntityConfigTest extends \PHPUnit_Framework_TestCase
+class EntityConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testToArray()
     {

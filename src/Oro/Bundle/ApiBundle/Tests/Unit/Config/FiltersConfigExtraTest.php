@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 
-class FiltersConfigExtraTest extends \PHPUnit_Framework_TestCase
+class FiltersConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FiltersConfigExtra */
     protected $extra;

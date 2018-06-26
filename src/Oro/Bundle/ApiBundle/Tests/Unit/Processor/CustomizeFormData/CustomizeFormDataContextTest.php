@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 
-class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
+class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeFormDataContext */
     protected $context;

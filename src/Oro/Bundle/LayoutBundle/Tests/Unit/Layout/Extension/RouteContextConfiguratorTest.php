@@ -7,7 +7,7 @@ use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class RouteContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RouteContextConfigurator */
     protected $configurator;

@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Context;
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutDialogResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\LayoutResultTypeInterface;
 
-class LayoutDialogResultTypeTest extends \PHPUnit_Framework_TestCase
+class LayoutDialogResultTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testInterface()
     {

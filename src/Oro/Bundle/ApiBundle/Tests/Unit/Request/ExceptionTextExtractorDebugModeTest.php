@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ExceptionTextExtractorDebugModeTest extends \PHPUnit_Framework_TestCase
+class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExceptionTextExtractor */
     protected $exceptionTextExtractor;

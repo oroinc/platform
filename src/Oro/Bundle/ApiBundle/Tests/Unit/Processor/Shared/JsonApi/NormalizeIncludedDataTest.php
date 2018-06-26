@@ -25,19 +25,19 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityInstantiator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
     private $entityInstantiator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
     private $entityLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var NormalizeIncludedData */

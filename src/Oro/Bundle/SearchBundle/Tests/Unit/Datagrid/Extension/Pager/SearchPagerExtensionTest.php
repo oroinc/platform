@@ -10,12 +10,12 @@ use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\IndexerPager;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Pager\SearchPagerExtension;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
-class SearchPagerExtensionTest extends \PHPUnit_Framework_TestCase
+class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject | DatagridConfiguration */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject | DatagridConfiguration */
     protected $datagridConfig;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject | IndexerPager */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject | IndexerPager */
     protected $pager;
 
     /** @var SearchPagerExtension */

@@ -9,18 +9,18 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
-class TransitionButtonTest extends \PHPUnit_Framework_TestCase
+class TransitionButtonTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflow;
 
-    /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject */
     protected $definition;
 
-    /** @var Transition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Transition|\PHPUnit\Framework\MockObject\MockObject */
     protected $transition;
 
-    /** @var ButtonContext|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ButtonContext|\PHPUnit\Framework\MockObject\MockObject */
     protected $buttonContext;
 
     /** @var TransitionButton */

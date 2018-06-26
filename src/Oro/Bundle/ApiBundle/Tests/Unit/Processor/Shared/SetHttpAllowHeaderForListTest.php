@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
     /** @var SetHttpAllowHeaderForList */

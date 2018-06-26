@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\MergeModesListener;
 
-class MergeModesListenerTest extends \PHPUnit_Framework_TestCase
+class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MergeModesListener
@@ -13,12 +13,12 @@ class MergeModesListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityMetadata;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldMetadata;
 

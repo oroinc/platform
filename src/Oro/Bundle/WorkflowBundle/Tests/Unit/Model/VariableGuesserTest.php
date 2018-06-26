@@ -14,15 +14,15 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class VariableGuesserTest extends \PHPUnit_Framework_TestCase
+class VariableGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var VariableGuesser|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
     protected $guesser;
 
-    /** @var Variable|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Variable|\PHPUnit\Framework\MockObject\MockObject */
     protected $variable;
 
-    /** @var  ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigProvider;
 
     /**
@@ -35,7 +35,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->formConfigProvider = $this->createMock(ConfigProvider::class);
 
-        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')

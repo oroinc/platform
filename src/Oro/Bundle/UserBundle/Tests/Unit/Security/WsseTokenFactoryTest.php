@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
 
-class WsseTokenFactoryTest extends \PHPUnit_Framework_TestCase
+class WsseTokenFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

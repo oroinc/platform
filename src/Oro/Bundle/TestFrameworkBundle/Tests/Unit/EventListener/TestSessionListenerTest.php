@@ -9,20 +9,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
+class TestSessionListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 
     /**
-     * @var TestSessionListener|\PHPUnit_Framework_MockObject_MockObject
+     * @var TestSessionListener|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $testSessionListener;
 

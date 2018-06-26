@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class BusinessUnitTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BusinessUnit

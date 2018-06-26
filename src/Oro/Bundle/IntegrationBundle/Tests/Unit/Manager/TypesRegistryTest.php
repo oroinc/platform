@@ -8,7 +8,7 @@ use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithIcon;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\IntegrationTypeWithoutIcon;
 
-class TypesRegistryTest extends \PHPUnit_Framework_TestCase
+class TypesRegistryTest extends \PHPUnit\Framework\TestCase
 {
     const CHANNEL_TYPE_ONE   = 'type1';
     const CHANNEL_TYPE_TWO   = 'type2';

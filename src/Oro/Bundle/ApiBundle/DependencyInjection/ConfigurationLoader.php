@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -418,10 +417,10 @@ class ConfigurationLoader
     private function configureConfigBag(string $configKey, array $config): string
     {
         $configBagServiceId = $this->buildConfigBagServiceId($configKey);
-        $this->container->setDefinition(
-            $configBagServiceId,
-            new Definition(ConfigBag::class, [$config])
-        );
+        $this->container
+            ->register($configBagServiceId, ConfigBag::class)
+            ->setArguments([$config])
+            ->setPublic(true);
 
         return $configBagServiceId;
     }
@@ -435,17 +434,14 @@ class ConfigurationLoader
     private function configureCombinedConfigBag(string $configKey, array $configBags): string
     {
         $configBagServiceId = 'oro_api.config_bag.' . $configKey;
-        $this->container->setDefinition(
-            $configBagServiceId,
-            new Definition(
-                CombinedConfigBag::class,
-                [
-                    $configBags,
-                    new Reference('oro_api.config_merger.entity'),
-                    new Reference('oro_api.config_merger.relation')
-                ]
-            )
-        );
+        $this->container
+            ->register($configBagServiceId, CombinedConfigBag::class)
+            ->setArguments([
+                $configBags,
+                new Reference('oro_api.config_merger.entity'),
+                new Reference('oro_api.config_merger.relation')
+            ])
+            ->setPublic(true);
 
         return $configBagServiceId;
     }
@@ -465,44 +461,37 @@ class ConfigurationLoader
         string $entityOverrideProviderServiceId
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
-        $cacheDef = $this->container->setDefinition(
-            $cacheServiceId,
-            new ChildDefinition('oro.cache.abstract')
-        );
-        $cacheDef->setPublic(false);
-        $cacheDef->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);
+        $this->container
+            ->setDefinition($cacheServiceId, new ChildDefinition('oro.cache.abstract'))
+            ->setPublic(false)
+            ->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);
 
         $providerServiceId = 'oro_api.entity_alias_provider.' . $configKey;
-        $providerDef = $this->container->setDefinition(
-            $providerServiceId,
-            new Definition(EntityAliasProvider::class, [$aliases, $exclusions])
-        );
-        $providerDef->setPublic(false);
+        $this->container
+            ->register($providerServiceId, EntityAliasProvider::class)
+            ->setArguments([$aliases, $exclusions])
+            ->setPublic(false);
 
         $loaderServiceId = 'oro_api.entity_alias_loader.' . $configKey;
-        $loaderDef = $this->container->setDefinition(
-            $loaderServiceId,
-            new Definition(EntityAliasLoader::class, [new Reference($entityOverrideProviderServiceId)])
-        );
-        $loaderDef->setPublic(false);
-        $loaderDef->addMethodCall('addEntityAliasProvider', [new Reference($providerServiceId)]);
-        $loaderDef->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
+        $this->container
+            ->register($loaderServiceId, EntityAliasLoader::class)
+            ->setArguments([new Reference($entityOverrideProviderServiceId)])
+            ->setPublic(false)
+            ->addMethodCall('addEntityAliasProvider', [new Reference($providerServiceId)])
+            ->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
 
         $entityAliasResolverServiceId = 'oro_api.entity_alias_resolver.' . $configKey;
-        $resolverDef = $this->container->setDefinition(
-            $entityAliasResolverServiceId,
-            new Definition(
-                EntityAliasResolver::class,
-                [
-                    new Reference($loaderServiceId),
-                    new Reference($entityOverrideProviderServiceId),
-                    new Reference($cacheServiceId),
-                    new Reference('logger'),
-                    $this->container->getParameter('kernel.debug')
-                ]
-            )
-        );
-        $resolverDef->addTag('monolog.logger', ['channel' => 'api']);
+        $this->container
+            ->register($entityAliasResolverServiceId, EntityAliasResolver::class)
+            ->setArguments([
+                new Reference($loaderServiceId),
+                new Reference($entityOverrideProviderServiceId),
+                new Reference($cacheServiceId),
+                new Reference('logger'),
+                $this->container->getParameter('kernel.debug')
+            ])
+            ->setPublic(true)
+            ->addTag('monolog.logger', ['channel' => 'api']);
 
         return $entityAliasResolverServiceId;
     }
@@ -516,10 +505,10 @@ class ConfigurationLoader
     private function configureEntityOverrideProvider(string $configKey, array $substitutions): string
     {
         $entityOverrideProviderServiceId = 'oro_api.entity_override_provider.' . $configKey;
-        $this->container->setDefinition(
-            $entityOverrideProviderServiceId,
-            new Definition(EntityOverrideProvider::class, [$substitutions])
-        );
+        $this->container
+            ->register($entityOverrideProviderServiceId, EntityOverrideProvider::class)
+            ->setArguments([$substitutions])
+            ->setPublic(true);
 
         return $entityOverrideProviderServiceId;
     }
@@ -539,43 +528,28 @@ class ConfigurationLoader
         string $entityAliasResolverServiceId
     ): string {
         $exclusionProviderServiceId = 'oro_api.config_entity_exclusion_provider.' . $configKey;
-        $exclusionProviderDef = $this->container->setDefinition(
-            $exclusionProviderServiceId,
-            new Definition(
-                ConfigExclusionProvider::class,
-                [
-                    new Reference('oro_entity.entity_hierarchy_provider.all'),
-                    $exclusions,
-                    $inclusions
-                ]
-            )
-        );
-        $exclusionProviderDef->setPublic(false);
+        $this->container
+            ->register($exclusionProviderServiceId, ConfigExclusionProvider::class)
+            ->setArguments([
+                new Reference('oro_entity.entity_hierarchy_provider.all'),
+                $exclusions,
+                $inclusions
+            ])
+            ->setPublic(false);
 
         $aliasedExclusionProviderServiceId = 'oro_api.aliased_entity_exclusion_provider.' . $configKey;
-        $aliasedExclusionProviderDef = $this->container->setDefinition(
-            $aliasedExclusionProviderServiceId,
-            new Definition(AliasedEntityExclusionProvider::class, [new Reference($entityAliasResolverServiceId)])
-        );
-        $aliasedExclusionProviderDef->setPublic(false);
+        $this->container
+            ->register($aliasedExclusionProviderServiceId, AliasedEntityExclusionProvider::class)
+            ->setArguments([new Reference($entityAliasResolverServiceId)])
+            ->setPublic(false);
 
         $chainExclusionProviderServiceId = 'oro_api.chain_entity_exclusion_provider.' . $configKey;
-        $chainExclusionProviderDef = $this->container->setDefinition(
-            $chainExclusionProviderServiceId,
-            new Definition(ChainExclusionProvider::class)
-        );
-        $chainExclusionProviderDef->addMethodCall(
-            'addProvider',
-            [new Reference($exclusionProviderServiceId)]
-        );
-        $chainExclusionProviderDef->addMethodCall(
-            'addProvider',
-            [new Reference($aliasedExclusionProviderServiceId)]
-        );
-        $chainExclusionProviderDef->addMethodCall(
-            'addProvider',
-            [new Reference(self::SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)]
-        );
+        $this->container
+            ->register($chainExclusionProviderServiceId, ChainExclusionProvider::class)
+            ->setPublic(true)
+            ->addMethodCall('addProvider', [new Reference($exclusionProviderServiceId)])
+            ->addMethodCall('addProvider', [new Reference($aliasedExclusionProviderServiceId)])
+            ->addMethodCall('addProvider', [new Reference(self::SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)]);
 
         return $chainExclusionProviderServiceId;
     }

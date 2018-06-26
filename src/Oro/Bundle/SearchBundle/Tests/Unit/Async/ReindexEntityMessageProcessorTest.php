@@ -12,7 +12,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
@@ -191,7 +191,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -199,7 +199,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|IndexerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|IndexerInterface
      */
     private function createIndexerMock()
     {

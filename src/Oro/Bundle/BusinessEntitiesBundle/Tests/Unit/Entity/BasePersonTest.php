@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson;
 
-class BasePersonTest extends \PHPUnit_Framework_TestCase
+class BasePersonTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_STRING = 'testString';
     const TEST_ID     = 123;

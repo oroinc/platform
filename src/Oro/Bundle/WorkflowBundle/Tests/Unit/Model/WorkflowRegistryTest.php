@@ -17,27 +17,27 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
+class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'testEntityClass';
     const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $entityRepository;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
-    /** @var WorkflowDefinitionFilters|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionFilters|\PHPUnit\Framework\MockObject\MockObject */
     private $filters;
 
-    /** @var WorkflowDefinitionFilterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $filter;
 
     /** @var WorkflowRegistry */
@@ -440,7 +440,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param Collection $in
      * @param Collection $out
-     * @return WorkflowDefinitionFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinitionFilterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createDefinitionFilterMock(Collection $in, Collection $out)
     {
@@ -481,7 +481,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
      * @param string $workflowName
      *
      * @param string|null $relatedEntity
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createWorkflow($workflowName, $relatedEntity = null)
     {
@@ -514,11 +514,11 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param WorkflowDefinition $definition
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createWorkflowFromDefinition(WorkflowDefinition $definition)
     {
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
             ->getMock();

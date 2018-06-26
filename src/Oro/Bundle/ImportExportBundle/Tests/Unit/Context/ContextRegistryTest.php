@@ -6,7 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
-class ContextRegistryTest extends \PHPUnit_Framework_TestCase
+class ContextRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextRegistry
@@ -30,7 +30,7 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
         $barContext = $this->registry->getByStepExecution($barStepExecution);
         $this->assertNotSame($barContext, $fooContext);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|JobInstance $jobInstance */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|JobInstance $jobInstance */
         $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobInstance->expects($this->any())
             ->method('getAlias')
@@ -42,7 +42,7 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $alias
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function createStepExecution($alias = null)
     {

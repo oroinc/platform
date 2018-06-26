@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Util\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
+class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider normalizeConfigProvider

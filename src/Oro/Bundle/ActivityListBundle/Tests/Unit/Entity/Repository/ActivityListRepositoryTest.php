@@ -6,12 +6,12 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
-class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
+class ActivityListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
     protected function setUp()

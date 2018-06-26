@@ -12,18 +12,18 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EntityIdTransformerRegistryTest extends \PHPUnit_Framework_TestCase
+class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $transformer1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $transformer2;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdResolverRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverRegistry */
     private $entityIdResolverRegistry;
 
     /** @var EntityIdTransformerRegistry */

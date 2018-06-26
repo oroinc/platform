@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
+class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedTopics()
     {
@@ -110,7 +110,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject | JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -120,7 +120,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -128,7 +128,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | CommandRunnerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | CommandRunnerInterface
      */
     private function createCommandRunnerMock()
     {
@@ -136,7 +136,7 @@ class CommandRunnerProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | SessionInterface
      */
     private function createSessionMock()
     {

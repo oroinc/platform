@@ -4,7 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 
-class MoneyValueTransformerTest extends \PHPUnit_Framework_TestCase
+class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MoneyValueTransformer

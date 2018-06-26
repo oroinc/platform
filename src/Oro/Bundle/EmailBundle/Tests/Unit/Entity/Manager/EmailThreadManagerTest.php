@@ -8,15 +8,15 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
 
-class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
+class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|EmailThreadProvider */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|EmailThreadManager */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|EmailThreadManager */
     protected $emailThreadManager;
 
     /** @var array */

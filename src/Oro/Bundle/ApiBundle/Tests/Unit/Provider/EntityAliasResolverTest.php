@@ -10,18 +10,18 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Psr\Log\LoggerInterface;
 
-class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
+class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
     private $loader;
 
     /** @var EntityOverrideProvider */
     private $entityOverrideProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Cache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
     private $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $logger;
 
     /** @var EntityAliasResolver */

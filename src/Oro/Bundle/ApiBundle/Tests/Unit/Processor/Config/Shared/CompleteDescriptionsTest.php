@@ -28,19 +28,19 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDescriptionProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDescriptionProvider */
     private $entityDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocProvider */
     private $resourceDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserRegistry */
     private $resourceDocParserRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserInterface */
     private $resourceDocParser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
     /** @var ConfigProviderMock */

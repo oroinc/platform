@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class GetValueTest extends \PHPUnit_Framework_TestCase
+class GetValueTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Func\GetValue */
     protected $function;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\ChainFilterFactory;
 
-class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class ChainFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testChainFactory()
     {

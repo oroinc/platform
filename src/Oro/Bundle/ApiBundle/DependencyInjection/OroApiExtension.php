@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use Oro\Component\ChainProcessor\Debug\TraceableActionProcessor;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -139,16 +140,11 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $configBagServiceId = $configBag[0];
             $configBagDecoratorServiceId = str_replace('oro_api.', 'oro_api.tests.', $configBagServiceId);
             $container
-                ->setDefinition(
-                    $configBagDecoratorServiceId,
-                    new Definition(
-                        'Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigBag',
-                        [
-                            new Reference($configBagDecoratorServiceId . '.inner'),
-                            new Reference('oro_api.config_merger.entity')
-                        ]
-                    )
-                )
+                ->register($configBagDecoratorServiceId, TestConfigBag::class)
+                ->setArguments([
+                    new Reference($configBagDecoratorServiceId . '.inner'),
+                    new Reference('oro_api.config_merger.entity')
+                ])
                 ->setDecoratedService($configBagServiceId, null, 255)
                 ->setPublic(false);
         }
@@ -210,16 +206,11 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                 if ($debug) {
                     $actionProcessorDecoratorServiceId = $actionProcessorServiceId . '.oro_api.profiler';
                     $container
-                        ->setDefinition(
-                            $actionProcessorDecoratorServiceId,
-                            new Definition(
-                                'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor',
-                                [
-                                    new Reference($actionProcessorDecoratorServiceId . '.inner'),
-                                    new Reference('oro_api.profiler.logger')
-                                ]
-                            )
-                        )
+                        ->register($actionProcessorDecoratorServiceId, TraceableActionProcessor::class)
+                        ->setArguments([
+                            new Reference($actionProcessorDecoratorServiceId . '.inner'),
+                            new Reference('oro_api.profiler.logger')
+                        ])
                         // should be at the top of the decoration chain
                         ->setDecoratedService($actionProcessorServiceId, null, -255)
                         ->setPublic(false);

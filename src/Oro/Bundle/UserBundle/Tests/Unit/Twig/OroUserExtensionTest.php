@@ -7,14 +7,14 @@ use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
+class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var OroUserExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $genderProvider;
 
     protected function setUp()

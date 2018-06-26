@@ -16,13 +16,13 @@ class SetLocationHeaderTest extends FormProcessorTestCase
 {
     private const ITEM_ROUTE_NAME = 'item_route';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     private $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var SetLocationHeader */

@@ -14,18 +14,18 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class TicketAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
+class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const USERNAME = 'sampleUsername';
     private const NONCE = 'sampleNonce';
     private const TICKET_DIGEST = 'sampleTicketDigest';
     /**
-     * @var UserProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $userProvider;
 
     /**
-     * @var TicketDigestGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ticketDigestGenerator;
 

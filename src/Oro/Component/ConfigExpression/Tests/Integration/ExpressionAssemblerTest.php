@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Tests\Integration;
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
 
-class ExpressionAssemblerTest extends \PHPUnit_Framework_TestCase
+class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionAssembler */
     protected $expressionAssembler;

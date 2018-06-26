@@ -323,11 +323,11 @@ class OperationTypeTest extends FormIntegrationTestCase
 
     /**
      * @param array $attributes
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createOperation(array $attributes = [])
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeManager $attributeManager */
         $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -354,7 +354,7 @@ class OperationTypeTest extends FormIntegrationTestCase
                 }
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Operation $operation */
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();

@@ -6,9 +6,9 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadDictionaries;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class LoadDictionariesTest extends \PHPUnit_Framework_TestCase
+class LoadDictionariesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dictionaryProvider;
 
     /** @var LoadDictionaries */

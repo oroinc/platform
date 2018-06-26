@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Util;
 
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\ObfuscatedEmailStub;
 
-class ObfuscatedEmailTraitTest extends \PHPUnit_Framework_TestCase
+class ObfuscatedEmailTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ObfuscatedEmailStub

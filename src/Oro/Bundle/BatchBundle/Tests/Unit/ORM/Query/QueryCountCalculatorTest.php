@@ -15,7 +15,7 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\ORM\SqlQuery;
 
-class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
+class QueryCountCalculatorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_COUNT = 42;
 
@@ -37,9 +37,9 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         array $queryParams = [],
         $useWalker = null
     ) {
-        /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
-        /** @var $connection Connection|\PHPUnit_Framework_MockObject_MockObject */
-        /** @var $statement Statement|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var $entityManager EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var $connection Connection|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var $statement Statement|\PHPUnit\Framework\MockObject\MockObject */
         list($entityManager, $connection, $statement) = $this->prepareMocks();
 
         $query = new Query($entityManager);
@@ -136,8 +136,8 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCalculateCountForSqlQuery($sql, $useWalker = null)
     {
-        /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
-        /** @var $statement Statement|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var $entityManager EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+        /** @var $statement Statement|\PHPUnit\Framework\MockObject\MockObject */
         list($entityManager, , $statement) = $this->prepareMocks();
 
         $dbalQb = $this->createMock(

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
-class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
+class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasProvider */
     protected $entityAliasProvider;

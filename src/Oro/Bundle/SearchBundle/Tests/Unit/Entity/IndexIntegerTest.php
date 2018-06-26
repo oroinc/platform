@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class IndexIntegerTest extends \PHPUnit_Framework_TestCase
+class IndexIntegerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\IndexInteger

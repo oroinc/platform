@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DocumentBuilderFactoryTest extends \PHPUnit_Framework_TestCase
+class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     protected $container;
 
     protected function setUp()

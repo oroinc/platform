@@ -8,17 +8,17 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var SchemaDumperExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $platform;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     protected function setUp()

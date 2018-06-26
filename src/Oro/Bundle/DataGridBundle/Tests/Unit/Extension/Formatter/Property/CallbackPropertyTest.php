@@ -6,9 +6,9 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 
-class CallbackPropertyTest extends \PHPUnit_Framework_TestCase
+class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \stdClass|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \stdClass|\PHPUnit\Framework\MockObject\MockObject */
     protected $callable;
 
     /** @var CallbackProperty */

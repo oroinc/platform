@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class JobResultTest extends \PHPUnit_Framework_TestCase
+class JobResultTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider

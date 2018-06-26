@@ -20,28 +20,28 @@ use Ratchet\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class ClientEventListenerTest extends \PHPUnit_Framework_TestCase
+class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
     private const CONNECTION_RESOURCE_ID = 45654;
 
-    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $websocketAuthenticationProvider;
 
     /** @var ClientStorage */
     private $clientStorage;
 
-    /** @var DriverInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $storageDriver;
 
     /** @var ClientEventListener */
     private $clientEventListener;
 
-    /** @var GosClientEventListener|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GosClientEventListener|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClientEventListener;
 
-    /** @var ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
     /** @var ClientEvent */

@@ -11,15 +11,15 @@ use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class OrmTranslationLoaderTest extends \PHPUnit_Framework_TestCase
+class OrmTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var TranslationRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var DatabaseChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DatabaseChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $databaseChecker;
 
     /** @var OrmTranslationLoader */

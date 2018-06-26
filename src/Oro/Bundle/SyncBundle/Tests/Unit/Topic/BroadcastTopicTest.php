@@ -7,7 +7,7 @@ use Oro\Bundle\SyncBundle\Topic\BroadcastTopic;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 
-class BroadcastTopicTest extends \PHPUnit_Framework_TestCase
+class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BroadcastTopic */
     private $broadcast;
@@ -24,20 +24,20 @@ class BroadcastTopicTest extends \PHPUnit_Framework_TestCase
 
     public function testOnPublish(): void
     {
-        /** @var ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject $connection */
+        /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection */
         $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects(self::never())
             ->method(self::anything());
 
         $event = new \stdClass();
 
-        /** @var Topic|\PHPUnit_Framework_MockObject_MockObject $topic */
+        /** @var Topic|\PHPUnit\Framework\MockObject\MockObject $topic */
         $topic = $this->createMock(Topic::class);
         $topic->expects(self::once())
             ->method('broadcast')
             ->with($event, ['data1'], ['data2']);
 
-        /** @var WampRequest|\PHPUnit_Framework_MockObject_MockObject $wampRequest */
+        /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject $wampRequest */
         $wampRequest = $this->createMock(WampRequest::class);
         $wampRequest->expects(self::never())
             ->method(self::anything());

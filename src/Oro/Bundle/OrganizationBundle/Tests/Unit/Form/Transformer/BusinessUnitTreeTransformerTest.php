@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 
-class BusinessUnitTreeTransformerTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BusinessUnitTreeTransformer

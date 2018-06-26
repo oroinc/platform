@@ -8,15 +8,15 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class ExtendedAssociationFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
     /** @var ExtendedAssociationFilterFactory */

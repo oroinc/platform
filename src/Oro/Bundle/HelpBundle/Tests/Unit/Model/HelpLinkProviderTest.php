@@ -7,17 +7,17 @@ use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 use Symfony\Component\HttpFoundation\Request;
 
-class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
+class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
     const VERSION = '1.0';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $parser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $helper;
 

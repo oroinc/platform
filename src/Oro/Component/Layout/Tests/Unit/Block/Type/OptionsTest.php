@@ -4,7 +4,7 @@ namespace Oro\Tests\Unit\Component\Layout\Block\Type;
 
 use Oro\Component\Layout\Block\Type\Options;
 
-class OptionsTest extends \PHPUnit_Framework_TestCase
+class OptionsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Options

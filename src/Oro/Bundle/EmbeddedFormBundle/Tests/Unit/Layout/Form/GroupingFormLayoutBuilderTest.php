@@ -14,17 +14,17 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
-class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
+class GroupingFormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const ROOT_ID = 'rootId';
     const FORM_NAME = 'testForm';
     const FIELD_PREFIX = 'testForm_';
     const GROUP_PREFIX = 'testForm:group_';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $layoutManipulator;
 
-    /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $blockBuilder;
 
     /** @var GroupingFormLayoutBuilder */

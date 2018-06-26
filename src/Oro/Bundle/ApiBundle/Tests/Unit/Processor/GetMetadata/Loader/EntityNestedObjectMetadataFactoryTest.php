@@ -14,10 +14,10 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper
 
 class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $nestedObjectMetadataHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataFactory;
 
     /** @var EntityNestedObjectMetadataFactory */

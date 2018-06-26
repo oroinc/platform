@@ -10,7 +10,7 @@ use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
 
-class FormUtilsTest extends \PHPUnit_Framework_TestCase
+class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TypesRegistry */
     protected $typesRegistry;

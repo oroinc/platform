@@ -11,18 +11,18 @@ use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
+class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ColumnsExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder */
     protected $aclHelper;
 
     /** @var ColumnsHelper*/

@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * @group regression
+ */
 class FormValidationTest extends RestJsonApiTestCase
 {
     /**

@@ -6,10 +6,10 @@ use Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorH
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FlashBagChannelActionErrorHandlerTest extends \PHPUnit_Framework_TestCase
+class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Session|\PHPUnit_Framework_MockObject_MockObject
+     * @var Session|\PHPUnit\Framework\MockObject\MockObject
      */
     private $session;
 

@@ -16,7 +16,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 
-class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
+class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -235,7 +235,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProcessHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessHandler
      */
     private function createProcessHandlerMock()
     {
@@ -243,7 +243,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
     private function createEntityManagerMock()
     {
@@ -251,7 +251,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityRepository
      */
     private function createEntityRepositoryMock()
     {
@@ -259,7 +259,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -270,7 +270,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      * @param null $entityManager
      * @param null $entityRepository
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     private function createDoctrineHelperStub($entityManager = null, $entityRepository = null)
     {

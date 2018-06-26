@@ -11,7 +11,7 @@ use Oro\Bundle\CronBundle\Validator\Constraints\ScheduleIntervalsIntersectionVal
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
-class ScheduleIntervalsIntersectionValidatorTest extends \PHPUnit_Framework_TestCase
+class ScheduleIntervalsIntersectionValidatorTest extends \PHPUnit\Framework\TestCase
 {
     const MESSAGE = 'oro.cron.validators.schedule_intervals_overlap.message';
 
@@ -253,7 +253,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface $context
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface $context
      */
     protected function getContextMock()
     {

@@ -11,9 +11,9 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class MetadataProviderTest extends \PHPUnit_Framework_TestCase
+class MetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $processor;
 
     /** @var MetadataProvider */

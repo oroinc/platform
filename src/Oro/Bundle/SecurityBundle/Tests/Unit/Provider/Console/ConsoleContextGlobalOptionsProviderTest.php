@@ -19,10 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
-class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCase
+class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $container;
 
@@ -72,7 +72,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
 
     public function testResolveGlobalOptionsWhenNoUserAndOrganization()
     {
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -89,7 +89,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     public function testResolveGlobalOptionsWhenNoUser()
     {
         $organizationId = 777;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -110,7 +110,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     public function testResolveGlobalOptionsWhenUserIsNotFound()
     {
         $userId = 777;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -148,7 +148,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     public function testResolveGlobalOptionsWhenUserIsIntAndNoOrganization()
     {
         $userId = 777;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -192,7 +192,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     public function testResolveGlobalOptionsWhenUserIsStringAndNoOrganization()
     {
         $username = 'username';
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -232,7 +232,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     {
         $username = 'username';
         $organizationId = 777;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -276,7 +276,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     {
         $username = 'username';
         $organizationId = 555;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -323,7 +323,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     {
         $username = 'username';
         $organizationId = 555;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -376,7 +376,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     {
         $username = 'username';
         $organizationId = 555;
-        /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject $input */
+        /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
@@ -428,8 +428,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @param RegistryInterface|\PHPUnit_Framework_MockObject_MockObject $registry
-     * @return OrganizationRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @param RegistryInterface|\PHPUnit\Framework\MockObject\MockObject $registry
+     * @return OrganizationRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getOrganizationRepository(RegistryInterface $registry)
     {

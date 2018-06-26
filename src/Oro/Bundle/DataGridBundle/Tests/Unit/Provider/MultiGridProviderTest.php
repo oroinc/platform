@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class MultiGridProviderTest extends \PHPUnit_Framework_TestCase
+class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MultiGridProvider */
     protected $multiGridProvider;

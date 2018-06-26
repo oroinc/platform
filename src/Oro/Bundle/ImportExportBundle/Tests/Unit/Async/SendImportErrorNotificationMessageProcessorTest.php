@@ -16,7 +16,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testSendImportNotificationProcessCanBeConstructedWithRequiredAttributes()
     {
@@ -250,7 +250,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     protected function createMessageProducerInterfaceMock()
     {
@@ -258,7 +258,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerInterfaceMock()
     {
@@ -266,7 +266,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     private function createConfigManagerMock()
     {
@@ -274,7 +274,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
      */
     protected function createDoctrineMock()
     {
@@ -282,7 +282,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     private function createMessageMock()
     {
@@ -290,7 +290,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -298,7 +298,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit_Framework
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|UserRepository
      */
     private function createUserRepositoryMock()
     {

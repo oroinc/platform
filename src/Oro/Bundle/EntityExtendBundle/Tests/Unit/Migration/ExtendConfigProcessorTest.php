@@ -12,11 +12,11 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
+class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'Test\ExtendConfigProcessorTestBundle\Entity\SomeClass';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ExtendConfigProcessor */
@@ -698,7 +698,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

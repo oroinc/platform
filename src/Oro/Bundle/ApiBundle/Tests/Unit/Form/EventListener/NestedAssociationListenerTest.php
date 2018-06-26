@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class NestedAssociationListenerTest extends \PHPUnit_Framework_TestCase
+class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NestedAssociationListener */
     protected $listener;

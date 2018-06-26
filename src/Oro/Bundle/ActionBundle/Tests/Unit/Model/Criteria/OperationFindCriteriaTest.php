@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\ClassWithToString;
 
-class OperationFindCriteriaTest extends \PHPUnit_Framework_TestCase
+class OperationFindCriteriaTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider criteriaData

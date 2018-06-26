@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 
-class ContextParentConfigAccessorTest extends \PHPUnit_Framework_TestCase
+class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourceContext */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourceContext */
     private $context;
 
     /** @var ContextParentConfigAccessor */

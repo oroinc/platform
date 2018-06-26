@@ -17,7 +17,7 @@ class PriceTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        /* @var $currencyProvider \PHPUnit_Framework_MockObject_MockObject|CurrencyProviderInterface */
+        /* @var $currencyProvider \PHPUnit\Framework\MockObject\MockObject|CurrencyProviderInterface */
         $currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
@@ -26,12 +26,12 @@ class PriceTypeTest extends FormIntegrationTestCase
             ->method('getCurrencyList')
             ->will($this->returnValue(['USD', 'EUR']));
 
-        /* @var $localeSettings \PHPUnit_Framework_MockObject_MockObject|LocaleSettings */
+        /* @var $localeSettings \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
         $currencyNameHelper = $this
             ->getMockBuilder('Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper')
             ->disableOriginalConstructor()

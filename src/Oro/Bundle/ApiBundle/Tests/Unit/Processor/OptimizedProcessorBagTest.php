@@ -11,21 +11,21 @@ use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 
-class OptimizedProcessorBagTest extends \PHPUnit_Framework_TestCase
+class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface */
     protected $processorFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorApplicableCheckerFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
     protected $applicableCheckerFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorIteratorFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     protected $processorIteratorFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorApplicableCheckerFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
     protected $ungroupedApplicableCheckerFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessorIteratorFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
     protected $ungroupedProcessorIteratorFactory;
 
     /** @var ChainApplicableChecker */

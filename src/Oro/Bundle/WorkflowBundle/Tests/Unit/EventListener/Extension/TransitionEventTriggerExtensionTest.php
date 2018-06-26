@@ -17,13 +17,13 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 {
     use MessageQueueExtension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerHelper */
     protected $helper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionEventTriggerHandler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionEventTriggerHandler */
     protected $handler;
 
     protected function setUp()

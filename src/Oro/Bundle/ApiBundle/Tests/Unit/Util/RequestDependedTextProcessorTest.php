@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 
-class RequestDependedTextProcessorTest extends \PHPUnit_Framework_TestCase
+class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestDependedTextProcessor */
     protected $processor;

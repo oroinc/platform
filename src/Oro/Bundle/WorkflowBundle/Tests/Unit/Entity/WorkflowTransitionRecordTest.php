@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 
-class WorkflowTransitionRecordTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowTransitionRecord

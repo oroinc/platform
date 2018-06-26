@@ -9,21 +9,21 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
 
-class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
+class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MigrationsLoader */
     protected $loader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $kernel;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
     protected function setUp()

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 
-class WidgetStateTest extends \PHPUnit_Framework_TestCase
+class WidgetStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WidgetState

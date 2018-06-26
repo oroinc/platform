@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 
-class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
+class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */
     protected $collection;

@@ -7,15 +7,15 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\RegistryDelegateProcessor;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Processor\Mocks\ClassWithCloseMethod;
 
-class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
+class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $processorRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextRegistry;
 
@@ -266,7 +266,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockStepExecution()
     {

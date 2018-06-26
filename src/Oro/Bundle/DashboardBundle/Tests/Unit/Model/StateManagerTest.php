@@ -7,18 +7,18 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class StateManagerTest extends \PHPUnit_Framework_TestCase
+class StateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $widget;
 
     /** @var StateManager */

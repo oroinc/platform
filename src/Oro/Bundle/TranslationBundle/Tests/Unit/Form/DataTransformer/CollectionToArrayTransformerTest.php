@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
 
-class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
+class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param mixed $data

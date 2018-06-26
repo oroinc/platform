@@ -6,18 +6,18 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
-class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
+class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailGridHelper */
     private $helper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $emailSyncManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $activityManager;
 
     /** @var string */

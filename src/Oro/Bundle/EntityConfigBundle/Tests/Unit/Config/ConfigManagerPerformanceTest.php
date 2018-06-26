@@ -25,7 +25,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * modification of ConfigManager and related classes.
  * To enable tests use ENABLE_TESTS constant.
  */
-class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
+class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 {
     const ENABLE_TESTS = false;
     const ENABLE_ASSERTS = true;
@@ -41,13 +41,13 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
     /** @var Stopwatch */
     protected static $stopwatch;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     public function testConfigGet()

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 
-class ApiResourceCollectionTest extends \PHPUnit_Framework_TestCase
+class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddAndCountableAndIterator()
     {

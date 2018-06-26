@@ -4,15 +4,15 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
-class ChainDictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
+class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  ChainDictionaryValueListProvider */
     protected $chainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider2;
 
     protected function setUp()

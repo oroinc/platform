@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension;
 
-class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumFieldConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EnumFieldConfigExtension */
     protected $extension;

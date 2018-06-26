@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
-class EntityClassToEntityTypeTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $valueNormalizer;
 
     /** @var EntityClassToEntityTypeTransformer */

@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ValidationHelperTest extends \PHPUnit_Framework_TestCase
+class ValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataFactory;
 
     /** @var ValidationHelper */

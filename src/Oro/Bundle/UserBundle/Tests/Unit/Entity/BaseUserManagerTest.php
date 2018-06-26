@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
+class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
 {
     private const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
     private const TEST_NAME  = 'Jack';
@@ -26,16 +26,16 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
     /** @var BaseUserManager */
     protected $userManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     protected $repository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EncoderFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EncoderFactoryInterface */
     protected $ef;
 
     protected function setUp()

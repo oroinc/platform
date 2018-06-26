@@ -24,18 +24,18 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class LoadFromConfigBagTest extends \PHPUnit_Framework_TestCase
+class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     private $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigLoaderFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigLoaderFactory */
     private $configLoaderFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagRegistry */
     private $configBagRegistry;
 
     /** @var CollectSubresourcesContext */

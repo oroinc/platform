@@ -4,15 +4,15 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data;
 
 use Oro\Bundle\ChartBundle\Model\Data\DataGridData;
 
-class DataGridDataTest extends \PHPUnit_Framework_TestCase
+class DataGridDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $datagrid;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $resultObject;
 

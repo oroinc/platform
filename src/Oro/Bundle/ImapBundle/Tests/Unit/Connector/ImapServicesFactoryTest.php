@@ -6,7 +6,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapServices;
 use Oro\Bundle\ImapBundle\Connector\ImapServicesFactory;
 
-class ImapServicesFactoryTest extends \PHPUnit_Framework_TestCase
+class ImapServicesFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException Oro\Bundle\ImapBundle\Connector\Exception\InvalidConfigurationException

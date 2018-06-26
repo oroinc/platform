@@ -5,7 +5,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
 
-class AssignValueTest extends \PHPUnit_Framework_TestCase
+class AssignValueTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ActionInterface
@@ -13,7 +13,7 @@ class AssignValueTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextAccessor;
 

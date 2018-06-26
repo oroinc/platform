@@ -14,12 +14,12 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchPercentFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class SearchPercentFilterTest extends \PHPUnit_Framework_TestCase
+class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchPercentFilter */
     protected $filter;
 
-    /** @var FilterDatasourceAdapterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $datasource;
 
     protected function setUp()

@@ -5,7 +5,7 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\Annotation;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class HelpTest extends \PHPUnit_Framework_TestCase
+class HelpTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetAlias()
     {

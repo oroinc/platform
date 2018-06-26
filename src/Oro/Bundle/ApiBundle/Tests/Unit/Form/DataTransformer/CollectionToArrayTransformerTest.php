@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
 
-class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
+class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $elementTransformer;
 
     /** @var CollectionToArrayTransformer */

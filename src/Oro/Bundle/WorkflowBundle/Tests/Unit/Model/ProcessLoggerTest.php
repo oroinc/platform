@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 
-class ProcessLoggerTest extends \PHPUnit_Framework_TestCase
+class ProcessLoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param bool $hasLogger

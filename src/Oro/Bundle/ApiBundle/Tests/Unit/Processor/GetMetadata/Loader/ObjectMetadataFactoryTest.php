@@ -12,7 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class ObjectMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $associationManager;
 
     /** @var ObjectMetadataFactory */

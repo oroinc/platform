@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
+class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const WORKFLOW_NAME = 'test_workflow_name';
     const TRANSITION_NAME = 'transition_name';
@@ -23,13 +23,13 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \stdClass */
     private $entity;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var WorkflowNotificationEvent|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowNotificationEvent|\PHPUnit\Framework\MockObject\MockObject */
     private $event;
 
-    /** @var EmailNotificationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /** @var WorkflowNotificationHandler */
@@ -119,7 +119,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->expects($this->never())->method('process');
 
-        /** @var NotificationEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var NotificationEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(NotificationEvent::class);
         $event->expects($this->never())->method('stopPropagation');
 
@@ -137,14 +137,14 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionRecord()
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn(self::WORKFLOW_NAME);
 
-        /** @var WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject $transitionRecord */
+        /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject $transitionRecord */
         $transitionRecord = $this->createMock(WorkflowTransitionRecord::class);
         $transitionRecord->expects($this->any())->method('getTransitionName')->willReturn(self::TRANSITION_NAME);
         $transitionRecord->expects($this->any())->method('getWorkflowItem')->willReturn($workflowItem);

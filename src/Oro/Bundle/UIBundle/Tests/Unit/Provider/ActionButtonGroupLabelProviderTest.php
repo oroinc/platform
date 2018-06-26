@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider;
 
-class ActionButtonGroupLabelProviderTest extends \PHPUnit_Framework_TestCase
+class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLabelWithDefaultGroupAndWithoutEntityClass()
     {

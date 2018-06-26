@@ -9,7 +9,7 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
+class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WebSocketSendProcessor
@@ -17,22 +17,22 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $websocketClient;
 
     /**
-     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $connectionChecker;
 
     /**
-     * @var MessageParamsProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $messageParamsProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $reminder;
 
@@ -237,7 +237,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $recipient
-     * @return Reminder|\PHPUnit_Framework_MockObject_MockObject
+     * @return Reminder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createReminder(User $recipient)
     {
@@ -250,7 +250,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $userId
-     * @return User|\PHPUnit_Framework_MockObject_MockObject
+     * @return User|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createUser($userId)
     {

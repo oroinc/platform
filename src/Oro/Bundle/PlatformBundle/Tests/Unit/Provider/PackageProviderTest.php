@@ -6,12 +6,12 @@ use Composer\Package\Package;
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 
-class PackageProviderTest extends \PHPUnit_Framework_TestCase
+class PackageProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PackageProvider */
     protected $provider;
 
-    /** @var LocalRepositoryFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalRepositoryFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
     protected function setUp()

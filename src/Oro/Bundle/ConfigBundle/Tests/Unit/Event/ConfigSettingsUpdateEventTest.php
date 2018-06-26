@@ -5,10 +5,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
-class ConfigSettingsUpdateEventTest extends \PHPUnit_Framework_TestCase
+class ConfigSettingsUpdateEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     protected $configManager;
 

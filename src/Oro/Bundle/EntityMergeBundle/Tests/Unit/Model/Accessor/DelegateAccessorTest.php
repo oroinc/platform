@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor;
 
-class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
+class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DelegateAccessor $merger

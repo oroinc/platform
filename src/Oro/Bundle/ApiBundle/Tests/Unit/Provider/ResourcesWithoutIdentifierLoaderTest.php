@@ -16,9 +16,9 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 
-class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit_Framework_TestCase
+class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
 
     /** @var ResourcesWithoutIdentifierLoader */
@@ -32,7 +32,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|GetProcessor
+     * @return \PHPUnit\Framework\MockObject\MockObject|GetProcessor
      */
     private function getProcessorMock()
     {

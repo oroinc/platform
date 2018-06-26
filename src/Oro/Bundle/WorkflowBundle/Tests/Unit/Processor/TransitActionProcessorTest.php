@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
  * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
+class TransitActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
     protected $processorBagConfigBuilder;
@@ -23,10 +23,10 @@ class TransitActionProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var ProcessorBag */
     protected $processorBag;
 
-    /** @var ProcessorFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProcessorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var TransitActionProcessor */

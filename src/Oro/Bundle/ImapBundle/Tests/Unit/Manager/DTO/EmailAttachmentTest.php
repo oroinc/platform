@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
 
-class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersAndSetters()
     {

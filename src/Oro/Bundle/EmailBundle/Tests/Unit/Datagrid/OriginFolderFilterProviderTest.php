@@ -14,24 +14,24 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
+class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MailboxNameHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MailboxNameHelper */
     protected $mailboxNameHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MailboxRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MailboxRepository */
     protected $mailboxRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $originRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AbstractQuery */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AbstractQuery */
     protected $originQuery;
 
     /** @var OriginFolderFilterProvider */

@@ -16,18 +16,18 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
     protected $cache;
 
     /** @var OwnershipMetadataProvider */

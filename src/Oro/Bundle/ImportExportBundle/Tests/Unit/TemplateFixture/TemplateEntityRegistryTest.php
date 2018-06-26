@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 
-class TemplateEntityRegistryTest extends \PHPUnit_Framework_TestCase
+class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TemplateEntityRegistry */
     protected $entityRegistry;

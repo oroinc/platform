@@ -5,7 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 
-class ReminderTest extends \PHPUnit_Framework_TestCase
+class ReminderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Reminder

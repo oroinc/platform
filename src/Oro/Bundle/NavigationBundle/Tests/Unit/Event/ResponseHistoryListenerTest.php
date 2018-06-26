@@ -15,15 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
+class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenStorage;
 
@@ -33,22 +33,22 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var NavigationHistoryItem|\PHPUnit_Framework_MockObject_MockObject
+     * @var NavigationHistoryItem|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $item;
 
     /**
-     * @var ItemFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var ItemFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $factory;
 
     /**
-     * @var Request|\PHPUnit_Framework_MockObject_MockObject
+     * @var Request|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $request;
 
     /**
-     * @var TitleService|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleService|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $titleService;
 
@@ -258,7 +258,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return TitleService|\PHPUnit_Framework_MockObject_MockObject
+     * @return TitleService|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getTitleService()
     {
@@ -346,7 +346,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @param  mixed $returnValue
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getDefaultRepositoryMock($returnValue)
     {

@@ -8,12 +8,12 @@ use Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
+class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Constraints\Localization */
     protected $constraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface */
     protected $context;
 
     /** @var LocalizationValidator */

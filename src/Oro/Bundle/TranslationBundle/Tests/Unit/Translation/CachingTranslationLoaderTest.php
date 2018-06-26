@@ -7,9 +7,9 @@ use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class CachingTranslationLoaderTest extends \PHPUnit_Framework_TestCase
+class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $innerLoader;
 
     /** @var CachingTranslationLoader */

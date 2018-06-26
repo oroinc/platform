@@ -23,12 +23,12 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
+class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_CLASS    = 'Test\Entity';
     private const TEST_PROPERTY = 'testField';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var MetadataTypeGuesser */

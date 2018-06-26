@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 
-class ItemIdTest extends \PHPUnit_Framework_TestCase
+class ItemIdTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

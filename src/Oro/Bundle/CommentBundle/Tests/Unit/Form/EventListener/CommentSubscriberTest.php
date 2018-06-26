@@ -5,15 +5,15 @@ namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 use Symfony\Component\Form\FormEvents;
 
-class CommentSubscriberTest extends \PHPUnit_Framework_TestCase
+class CommentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommentSubscriber */
     protected $subscriber;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
     /**

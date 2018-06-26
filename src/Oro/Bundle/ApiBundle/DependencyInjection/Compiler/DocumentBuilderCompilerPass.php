@@ -20,16 +20,14 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find document builders
         $documentBuilders = [];
         $taggedServices = $container->findTaggedServiceIds(self::DOCUMENT_BUILDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
-            $definition = DependencyInjectionUtil::findDefinition($container, $id);
-            if (!$definition->isPublic() || $definition->isShared()) {
-                throw new LogicException(
-                    sprintf('The document builder service "%s" should be public and non shared.', $id)
-                );
+            $definition = $container->getDefinition($id);
+            if ($definition->isShared()) {
+                throw new LogicException(sprintf('The document builder service "%s" should be non shared.', $id));
             }
+            $definition->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $documentBuilders[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
@@ -41,10 +39,8 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
         $documentBuilders = DependencyInjectionUtil::sortByPriorityAndFlatten($documentBuilders);
 
-        // register
         $container->getDefinition(self::DOCUMENT_BUILDER_FACTORY_SERVICE_ID)
             ->replaceArgument(0, $documentBuilders);
     }

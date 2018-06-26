@@ -6,10 +6,10 @@ use Liip\ImagineBundle\Binary\BinaryInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\UnsupportedBinaries;
 
-class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit_Framework_TestCase
+class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ImagineBinaryFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $decoratedFilter;
 
@@ -68,7 +68,7 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit_Fram
     }
 
     /**
-     * @return BinaryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return BinaryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createBinaryMock()
     {

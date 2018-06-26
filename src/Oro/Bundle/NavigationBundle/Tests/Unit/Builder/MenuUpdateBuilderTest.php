@@ -7,18 +7,18 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProviderInterface;
 
-class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MenuUpdateBuilder */
     private $menuUpdateBuilder;
 
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationHelper;
 
-    /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $menuItem;
 
-    /** @var MenuUpdateProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuUpdateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $menuUpdateProvider;
 
     protected function setUp()
@@ -48,7 +48,7 @@ class MenuUpdateBuilderTest extends \PHPUnit_Framework_TestCase
             ->with($this->menuItem)
             ->willReturn([]);
 
-        /** @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject */
         $childItem = $this->createMock(ItemInterface::class);
 
         $this->menuItem->expects(static::exactly(2))

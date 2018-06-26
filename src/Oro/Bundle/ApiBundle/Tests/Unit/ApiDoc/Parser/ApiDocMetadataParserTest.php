@@ -12,12 +12,12 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
-class ApiDocMetadataParserTest extends \PHPUnit_Framework_TestCase
+class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ApiDocDataTypeConverter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ApiDocDataTypeConverter */
     protected $dataTypeConverter;
 
     /** @var ApiDocMetadataParser */

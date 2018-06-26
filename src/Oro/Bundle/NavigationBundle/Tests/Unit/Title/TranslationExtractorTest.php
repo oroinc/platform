@@ -9,15 +9,15 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
+class TranslationExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationExtractor */
     private $translatorExtractor;
 
-    /** @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $titleReaderRegistry;
 
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
     /**
@@ -38,7 +38,7 @@ class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $routes = ['route_1' => new Route('route_1', ['_controller' => 'TestBundle/Controller/TestController'])];
 
-        /** @var RouteCollection|\PHPUnit_Framework_MockObject_MockObject $routeCollection */
+        /** @var RouteCollection|\PHPUnit\Framework\MockObject\MockObject $routeCollection */
         $routeCollection = $this->getMockBuilder(RouteCollection::class)->getMock();
         $routeCollection->expects($this->once())
             ->method('all')
@@ -55,7 +55,7 @@ class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
             ->with('route_1')
             ->willReturn('test.title');
 
-        /** @var MessageCatalogue|\PHPUnit_Framework_MockObject_MockObject $catalogue */
+        /** @var MessageCatalogue|\PHPUnit\Framework\MockObject\MockObject $catalogue */
         $catalogue = $this->getMockBuilder(MessageCatalogue::class)->disableOriginalConstructor()->getMock();
         $catalogue->expects($this->once())
             ->method('set')

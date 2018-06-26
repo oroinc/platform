@@ -4,7 +4,7 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ClassLoader;
 
-class ClassLoaderTest extends \PHPUnit_Framework_TestCase
+class ClassLoaderTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadClass()
     {

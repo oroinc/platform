@@ -18,24 +18,24 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
+class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityListChainProvider */
     protected $provider;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var EntityRoutingHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeHelper;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var TestActivityProvider */

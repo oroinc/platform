@@ -12,10 +12,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var DeleteListDataByDeleteHandler */

@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
 use Oro\Bundle\LocaleBundle\Twig\DateFormatExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
+class DateFormatExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     const TEST_TYPE = 'test_format_type';
     const TEST_FORMAT = 'MMM, d y t';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $converterRegistry;
 
     /** @var DateFormatExtension */
@@ -131,7 +131,7 @@ class DateFormatExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFormatConverter()
     {

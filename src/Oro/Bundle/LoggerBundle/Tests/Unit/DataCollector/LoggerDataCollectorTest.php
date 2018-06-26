@@ -5,7 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\DataCollector;
 use Oro\Bundle\LoggerBundle\DataCollector\LoggerDataCollector;
 use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\DebugLoggerStub;
 
-class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
+class LoggerDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testLateCollect()
     {

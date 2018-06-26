@@ -9,9 +9,9 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter\Stub\SystemDefinitionFilte
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WorkflowDefinitionFiltersTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
     /** @var WorkflowDefinitionFilters */

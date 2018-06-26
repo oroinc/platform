@@ -5,12 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 
-class ChainConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
+class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainConstraintTextExtractor */
     protected $extractor;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
     protected $extractors = [];
 
     protected function setUp()

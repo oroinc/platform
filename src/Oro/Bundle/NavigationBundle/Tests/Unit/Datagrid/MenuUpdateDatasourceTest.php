@@ -9,21 +9,21 @@ use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
-class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MenuUpdateDatasource */
     protected $datasource;
 
-    /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $chainProvider;
 
-    /** @var MenuManipulator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
     protected $menuManipulator;
 
     /** @var string */
     protected $scopeType = 'default';
 
-    /** @var MenuConfiguration|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     protected $menuConfiguration;
 
     /**
@@ -47,7 +47,7 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $grid */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $grid */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
             ->method('setDatasource')

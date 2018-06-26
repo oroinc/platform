@@ -10,15 +10,15 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ResourcesProviderTest extends \PHPUnit_Framework_TestCase
+class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CollectResourcesProcessor */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CollectResourcesProcessor */
     private $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesCache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCache */
     private $resourcesCache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesWithoutIdentifierLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesWithoutIdentifierLoader */
     private $resourcesWithoutIdentifierLoader;
 
     /** @var ResourcesProvider */

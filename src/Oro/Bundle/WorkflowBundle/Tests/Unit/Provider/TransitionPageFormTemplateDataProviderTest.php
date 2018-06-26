@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class TransitionPageFormTemplateDataProviderTest extends \PHPUnit_Framework_TestCase
+class TransitionPageFormTemplateDataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionPageFormTemplateDataProvider */
     protected $provider;
@@ -23,17 +23,17 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit_Framework_Test
 
     public function testGetData()
     {
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $form */
         $formView = $this->createMock(FormView::class);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
-        /** @var StubEntity|\PHPUnit_Framework_MockObject_MockObject $entity */
+        /** @var StubEntity|\PHPUnit\Framework\MockObject\MockObject $entity */
         $entity = $this->createMock(StubEntity::class);
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $this->assertSame(

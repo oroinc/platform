@@ -12,18 +12,18 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
-class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
+class FormConfigGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormConfigGuesser */
     protected $guesser;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigProvider;
 
     /**
@@ -214,10 +214,10 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive([$class], [$associationClass])
             ->willReturnOnConsecutiveCalls($sourceEntityManager, $associationEntityManager);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Config $sourceEntityConfig */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $sourceEntityConfig */
         $sourceEntityConfig = $this->createPartialMock(Config::class, []);
         $sourceEntityConfig->setValues([]);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Config $associationEntityConfig */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $associationEntityConfig */
         $associationEntityConfig = $this->createPartialMock(Config::class, []);
         $associationEntityConfig->setValues([
             'form_type' => $associationFormType,
@@ -265,7 +265,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function setFormConfig($class, $property, array $parameters)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Config $config */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $config */
         $config = $this->createPartialMock(Config::class, []);
         $config->setValues($parameters);
 
@@ -286,7 +286,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function setEntityConfig($class, $property, array $parameters)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Config $config */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Config $config */
         $config = $this->createPartialMock(Config::class, []);
         $config->setValues($parameters);
 

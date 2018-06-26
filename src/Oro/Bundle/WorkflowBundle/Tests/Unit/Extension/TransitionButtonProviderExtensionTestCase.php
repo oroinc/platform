@@ -81,7 +81,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
         $buttons = [];
 
         if ($expected) {
-            /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+            /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
             $transition = $this->createMock(Transition::class);
 
             $transitionManager = $this->getTransitionManager([$transition], 'getTransitions');
@@ -185,12 +185,12 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
     }
 
     /**
-     * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @param TransitionManager|\PHPUnit\Framework\MockObject\MockObject $transitionManager
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflow(TransitionManager $transitionManager)
     {
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getTransitionManager'])
             ->disableOriginalConstructor()
@@ -214,7 +214,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
      * @param bool $isHidden
      * @param bool $isAllowedTransition
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|TransitionButton
+     * @return \PHPUnit\Framework\MockObject\MockObject|TransitionButton
      */
     protected function createTransitionButton(
         $isAvailable,

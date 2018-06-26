@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener;
 
-class KeepAliveListenerTest extends \PHPUnit_Framework_TestCase
+class KeepAliveListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnWriterAfterFlush()
     {

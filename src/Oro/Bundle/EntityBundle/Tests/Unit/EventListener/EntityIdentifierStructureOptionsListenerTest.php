@@ -12,11 +12,11 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
     /** @var EntityIdentifierStructureOptionsListener */

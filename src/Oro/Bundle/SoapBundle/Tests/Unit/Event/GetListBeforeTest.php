@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Event;
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
 
-class GetListBeforeTest extends \PHPUnit_Framework_TestCase
+class GetListBeforeTest extends \PHPUnit\Framework\TestCase
 {
     public function testEventClass()
     {

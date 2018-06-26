@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurablePermissionListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurablePermissionListConfiguration */
     protected $configuration;

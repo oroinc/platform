@@ -12,8 +12,8 @@ use Oro\Component\ChainProcessor\MatchApplicableChecker as BaseMatchApplicableCh
  */
 class MatchApplicableChecker extends BaseMatchApplicableChecker
 {
-    /** @var string[] */
-    protected $classAttributes;
+    /** @var array [attribute name => true, ...] */
+    private $classAttributes;
 
     /**
      * @param string[] $ignoredAttributes

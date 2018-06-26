@@ -8,7 +8,7 @@ use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MenuUpdateTreeHandlerTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MenuUpdateTreeHandler
@@ -21,7 +21,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit_Framework_TestCase
     protected $factory;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 

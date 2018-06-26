@@ -8,14 +8,14 @@ use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use Oro\Bundle\ThemeBundle\Twig\ThemeExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
+class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $themeRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $theme;
 
     /** @var ThemeExtension */
