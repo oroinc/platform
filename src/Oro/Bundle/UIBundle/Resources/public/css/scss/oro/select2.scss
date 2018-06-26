@@ -128,9 +128,10 @@
         z-index: $select2-search-choice-close-z-index;
         color: $select2-search-choice-close-icon-color;
 
-        @include fa-icon($icon: $select2-search-choice-close-icon, $size: $select2-search-choice-close-icon-font-size) {
+        @include fa-icon($icon: $select2-search-choice-close-icon) {
             top: $select2-search-choice-close-icon-top;
             right: $select2-search-choice-close-icon-right;
+            font-size: $select2-search-choice-close-icon-font-size;
         }
     }
 

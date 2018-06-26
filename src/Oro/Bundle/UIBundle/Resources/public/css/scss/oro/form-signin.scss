@@ -137,12 +137,6 @@
     input[type="email"],
     input[type="password"],
     select {
-        height: 16px;
-        font: 14px/16px $base-font-family;
-        color: #000;
-        padding: 7px 10px;
-        width: 300px;
-        border-radius: 2px;
         &:-ms-input-placeholder {
             color: #999
         }
@@ -158,9 +152,7 @@
         & + input[type="text"],
         & + input[type="password"],
         & + select {
-            width: calc(100% - 117px);
-            border: 2px solid #d6d6d6;
-            border-radius: 2px;
+            width: calc(100% - 93px);
         }
         & + select {
             display: inline-block;
@@ -178,7 +170,7 @@
         min-width: 270px;
 
         input {
-            width: calc(100% - 24px);
+            width: 100%;
         }
     }
     .oro-remember-me {

@@ -37,11 +37,12 @@
             right: $mobile-select2-search-choice-close-right;
             color: $primary-200;
 
-            @include fa-icon($icon: "\f00d", $size: 16px) {
+            @include fa-icon($icon: $mobile-select2-search-choice-close-icon-content) {
                 top: $mobile-select2-search-choice-close-icon-top;
                 right: $mobile-select2-search-choice-close-icon-right;
                 position: $mobile-select2-search-choice-close-icon-position;
                 transform: $mobile-select2-search-choice-close-icon-transform;
+                font-size: $mobile-select2-search-choice-close-icon-size;
             }
         }
     }
