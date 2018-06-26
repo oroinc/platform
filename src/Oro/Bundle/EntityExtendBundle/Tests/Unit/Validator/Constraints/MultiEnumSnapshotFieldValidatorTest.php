@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -10,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\MultiEnumSnapshotField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\MultiEnumSnapshotFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -63,7 +66,7 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->validator = new MultiEnumSnapshotFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher)
+            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
         );
     }
 
@@ -107,6 +110,9 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($field, $constraint);
     }
 
+    /**
+     * @return array
+     */
     public function validateProvider()
     {
         return [
