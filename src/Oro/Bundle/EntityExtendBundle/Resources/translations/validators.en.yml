@@ -20,3 +20,4 @@ oro:
     entity_extend:
         enum:
             options_error.message: Invalid enum options provided
+        change_type_not_allowed.message: Changing type of existing field {{ field }} is not allowed.

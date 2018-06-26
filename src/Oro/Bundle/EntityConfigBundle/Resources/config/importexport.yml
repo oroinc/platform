@@ -30,6 +30,7 @@ services:
             - [setTranslator, ['@translator']]
             - [setConstraintFactory, ['@oro_form.validator.constraint_factory']]
             - [setFieldTypeProvider, ['@oro_entity_extend.field_type_provider']]
+            - [setFieldValidationHelper, ['@oro_entity_extend.extend.field_name_validation_helper']]
 
     # Template Fixture
     oro_entity_config.importexport.template_fixture.entity_field:

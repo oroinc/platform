@@ -1,5 +1,6 @@
 @regression
 @ticket-BAP-16397
+@ticket-BB-14555
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator
@@ -66,7 +67,7 @@ Feature: Import extend entity fields
       | fieldName         | type   | entity.label    | form.is_enabled | datagrid.is_visible |
       | bigIntTableColumn | bigint | FieldText Label | yes             | 0                   |
     And I import file
-    Then Email should contains the following "Errors: 0 processed: 1, read: 1, added: 1, updated: 0, replaced: 0" text
+    Then Email should contains the following "Errors: 0 processed: 1, read: 1, added: 0, updated: 1, replaced: 0" text
     When I reload the page
     Then I should not see "Update schema"
 
@@ -75,7 +76,7 @@ Feature: Import extend entity fields
       | fieldName         | type   | entity.label    | form.is_enabled | datagrid.is_visible |
       | bigIntTableColumn | bigint | FieldText Label | yes             | 1                   |
     And I import file
-    Then Email should contains the following "Errors: 0 processed: 1, read: 1, added: 1, updated: 0, replaced: 0" text
+    Then Email should contains the following "Errors: 0 processed: 1, read: 1, added: 0, updated: 1, replaced: 0" text
     When I reload the page
     Then I should see "Update schema"
     When I click update schema
@@ -103,6 +104,29 @@ Feature: Import extend entity fields
       | fieldName        | type   | entity.label    | datagrid.show_filter | datagrid.is_visible |
       | bigIntSerialized | bigint | FieldText Label | no                   | 0                   |
     When I import file
-    And Email should contains the following "Errors: 0 processed: 1, read: 1, added: 1, updated: 0, replaced: 0" text
+    And Email should contains the following "Errors: 0 processed: 1, read: 1, added: 0, updated: 1, replaced: 0" text
     When I reload the page
     Then I should not see "Update schema"
+
+  Scenario: It should be impossible to import columns with similar or invalid names or properties
+    When I fill template with data:
+      | fieldName            | type   | entity.label    | datagrid.show_filter | datagrid.is_visible |
+      | correct_field_name   | bigint | FieldText Label | no                   | 0                   |
+      | correctFieldName     | bigint | FieldText Label | no                   | 0                   |
+      | inc@rrect_field_name | bigint | FieldText Label | no                   | 0                   |
+      | incorrect_field      | qwerty | FieldText Label | no                   | 0                   |
+      | UNION                | bigint | FieldText Label | no                   | 0                   |
+      |                      | bigint | FieldText Label | no                   | 0                   |
+      | correct_field_name_2 |        | FieldText Label | no                   | 0                   |
+    And I import file
+    Then Email should contains the following "Errors: 6 processed: 7, read: 7, added: 1, updated: 0, replaced: 0" text
+    When I reload the page
+    Then I should see correct_field_name in grid
+    And I should not see "correctFieldName"
+    And I should not see "inc@rrect_field_name"
+    And I should not see "incorrect_field"
+    And I should not see "UNION"
+    And I should not see "correct_field_name_2"
+    And I should see "Update schema"
+    When I click update schema
+    Then I should see Schema updated flash message
