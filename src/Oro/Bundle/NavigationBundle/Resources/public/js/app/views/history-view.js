@@ -1,9 +1,8 @@
-define([
-    'oroui/js/app/views/base/page-region-view'
-], function(PageRegionView) {
+define(function(require) {
     'use strict';
 
     var HistoryView;
+    var PageRegionView = require('oroui/js/app/views/base/page-region-view');
 
     HistoryView = PageRegionView.extend({
         template: function() {},

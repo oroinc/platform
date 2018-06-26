@@ -1,0 +1,12 @@
+services:
+    Oro\Bundle\PlatformBundle\Command\HelpCommand:
+        public: false
+        class: Oro\Bundle\PlatformBundle\Command\HelpCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand:
+        public: false
+        class: Oro\Bundle\PlatformBundle\Command\OptionalListenersCommand
+        tags:
+            - { name: console.command }

@@ -12,12 +12,12 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
-class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
+class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $autoResponseManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $producer;
 
     /** @var AutoResponseListener */
@@ -143,7 +143,7 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PostFlushEventArgs
+     * @return \PHPUnit\Framework\MockObject\MockObject|PostFlushEventArgs
      */
     private function createPostFlushEventArgsMock()
     {

@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
-class TopicsCommandTest extends \PHPUnit_Framework_TestCase
+class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TopicsCommand */
     private $command;
@@ -16,7 +16,7 @@ class TopicsCommandTest extends \PHPUnit_Framework_TestCase
     /** @var Container */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $topicRegistry;
 
     protected function setUp()

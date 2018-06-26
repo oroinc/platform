@@ -28,19 +28,19 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDescriptionProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDescriptionProvider */
     private $entityDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocProvider */
     private $resourceDocProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserRegistry */
     private $resourceDocParserRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourceDocParserInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserInterface */
     private $resourceDocParser;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
     /** @var ConfigProviderMock */
@@ -101,6 +101,40 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testIdentifierDescriptionWhenItDoesNotExist()
+    {
+        $config = [];
+
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testIdentifierDescriptionWhenItAlreadyExists()
+    {
+        $config = [
+            'identifier_description' => 'identifier description'
+        ];
+
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'identifier_description' => 'identifier description'
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testIdentifierField()
     {
         $config = [
@@ -120,6 +154,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'identifier_field_names' => ['id'],
                 'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'fields'                 => [
                     'id'     => [
                         'description' => CompleteDescriptions::ID_DESCRIPTION
@@ -152,6 +187,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'identifier_field_names' => ['id'],
                 'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'fields'                 => [
                     'id'     => [
                         'description' => 'existing description'
@@ -182,6 +218,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'identifier_field_names' => ['id1'],
                 'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'fields'                 => [
                     'id'  => null,
                     'id1' => [
@@ -213,6 +250,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'identifier_field_names' => ['id1', 'id2'],
                 'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'fields'                 => [
                     'id'  => null,
                     'id1' => null,
@@ -239,8 +277,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'id'     => null,
                     'field1' => null
                 ]
@@ -264,7 +303,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'id'        => null,
                     'createdAt' => [
                         'description' => CompleteDescriptions::CREATED_AT_DESCRIPTION
@@ -292,7 +332,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'id'        => null,
                     'createdAt' => [
                         'description' => 'existing description'
@@ -319,7 +360,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'id'        => null,
                     'created'   => null,
                     'updatedAt' => [
@@ -348,7 +390,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'fields' => [
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'id'        => null,
                     'updatedAt' => [
                         'description' => 'existing description'
@@ -374,7 +417,14 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         $this->assertConfig(
-            $config,
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
+                    'owner'        => null,
+                    'organization' => null
+                ]
+            ],
             $this->context->getResult()
         );
     }
@@ -399,7 +449,14 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         $this->assertConfig(
-            $config,
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
+                    'owner'        => null,
+                    'organization' => null
+                ]
+            ],
             $this->context->getResult()
         );
     }
@@ -425,8 +482,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'owner'        => [
                         'description' => CompleteDescriptions::OWNER_DESCRIPTION
                     ],
@@ -458,8 +516,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'owner'        => null,
                     'organization' => [
                         'description' => CompleteDescriptions::ORGANIZATION_DESCRIPTION
@@ -491,8 +550,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'owner2'       => [
                         'property_path' => 'owner1',
                         'description'   => CompleteDescriptions::OWNER_DESCRIPTION
@@ -525,8 +585,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'owner'         => null,
                     'organization2' => [
                         'property_path' => 'organization1',
@@ -556,8 +617,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'name'     => [
                         'description' => CompleteDescriptions::ENUM_NAME_DESCRIPTION
                     ],
@@ -592,8 +654,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'field description'
                     ]
@@ -627,8 +690,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'translated field description'
                     ]
@@ -662,8 +726,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'field description, field description from the entity config'
                     ]
@@ -698,8 +763,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'renamedField' => [
                         'property_path' => 'testField',
                         'description'   => 'field description, field description from the entity config'
@@ -733,8 +799,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'field description'
                     ]
@@ -769,8 +836,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'action field description. common field description'
                     ]
@@ -809,8 +877,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'action field description. common field description. '
                             . 'field description from the entity config'
@@ -850,8 +919,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'action field description. field description from the entity config'
                     ]
@@ -886,8 +956,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'common field description'
                     ]
@@ -926,8 +997,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'common field description. field description from the entity config'
                     ]
@@ -966,8 +1038,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'description' => 'field description from the entity config'
                     ]
@@ -1006,8 +1079,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'fields' => [
                             'nestedField' => [
@@ -1051,8 +1125,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'renamedField' => [
                         'property_path' => 'testField',
                         'fields'        => [
@@ -1098,8 +1173,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'fields' => [
                             'renamedNestedField' => [
@@ -1144,8 +1220,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'testField' => [
                         'target_class' => 'Test\AssociationEntity',
                         'fields'       => [
@@ -1377,8 +1454,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => 'JSON API'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => 'JSON API'
             ],
             $this->context->getResult()
         );
@@ -1402,8 +1480,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'fields'           => [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'fields'                 => [
                     'field1' => [
                         'description' => 'JSON API'
                     ]
@@ -1441,8 +1520,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => 'test description'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => 'test description'
             ],
             $this->context->getResult()
         );
@@ -1463,8 +1543,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => 'test description'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => 'test description'
             ],
             $this->context->getResult()
         );
@@ -1488,8 +1569,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => 'translated description'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => 'translated description'
             ],
             $this->context->getResult()
         );
@@ -1515,8 +1597,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => 'translated description'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => 'translated description'
             ],
             $this->context->getResult()
         );
@@ -1548,8 +1631,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => $actionDescription
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
             ],
             $this->context->getResult()
         );
@@ -1583,8 +1667,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => $subresourceDescription
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $subresourceDescription
             ],
             $this->context->getResult()
         );
@@ -1617,8 +1702,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => $actionDescription
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
             ],
             $this->context->getResult()
         );
@@ -1653,8 +1739,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'description'      => $subresourceDescription
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $subresourceDescription
             ],
             $this->context->getResult()
         );
@@ -1690,6 +1777,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy'       => 'all',
                 'documentation_resource' => ['foo_file.md', 'bar_file.md'],
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'documentation'          => $actionDocumentation
             ],
             $this->context->getResult()
@@ -1725,6 +1813,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             [
                 'exclusion_policy'       => 'all',
                 'documentation_resource' => ['documentation.md'],
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
                 'documentation'          => $subresourceDocumentation
             ],
             $this->context->getResult()
@@ -1744,8 +1833,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => 'test documentation'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => 'test documentation'
             ],
             $this->context->getResult()
         );
@@ -1766,8 +1856,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => 'test documentation'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => 'test documentation'
             ],
             $this->context->getResult()
         );
@@ -1793,8 +1884,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => 'action documentation. entity documentation'
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => 'action documentation. entity documentation'
             ],
             $this->context->getResult()
         );
@@ -1826,8 +1918,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => $resourceDocumentation
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => $resourceDocumentation
             ],
             $this->context->getResult()
         );
@@ -1861,8 +1954,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => $subresourceDocumentation
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => $subresourceDocumentation
             ],
             $this->context->getResult()
         );
@@ -1897,8 +1991,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => $subresourceDocumentation
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => $subresourceDocumentation
             ],
             $this->context->getResult()
         );
@@ -1930,8 +2025,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'exclusion_policy' => 'all',
-                'documentation'    => $expectedText
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'documentation'          => $expectedText
             ],
             $this->context->getResult()
         );

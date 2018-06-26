@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 $enable-safe-area: true;
 
 @mixin clearfix {
@@ -39,12 +41,10 @@ $enable-safe-area: true;
     font-weight: bold;
     padding-left: 15px;
     background: $accordion-heading-background-color;
-    border-bottom: 1px solid darken($accordion-heading-background-color, 5%);
-    border-top: 1px solid lighten($accordion-heading-background-color, 5%);
 }
 
 @mixin accordion-toggle-before() {
-    content: "\f0d7";
+    content: "\f107";
     font-family: FontAwesome;
     margin: 0 7px 0 -7px;
     width: 10px;
@@ -52,7 +52,7 @@ $enable-safe-area: true;
 }
 
 @mixin accordion-toggle-collapsed-before() {
-    content: "\f0da";
+    content: "\f105";
     margin: 0 5px 0 -5px;
 }
 
@@ -60,6 +60,27 @@ $enable-safe-area: true;
     border-radius: 0;
     margin-bottom: 0;
     border: none;
+}
+
+@mixin header-cell-dropdown() {
+    > .dropdown {
+        margin-left: -5px;
+
+        > .dropdown-toggle {
+            padding: 4px;
+            line-height: 12px;
+            height: 22px;
+        }
+
+        .dropdown-menu {
+            min-width: 60px;
+            padding-bottom: 5px;
+        }
+    }
+
+    .btn .caret {
+        margin-top: 5px;
+    }
 }
 
 @mixin horizontal-icon-menu() {
@@ -293,17 +314,33 @@ $enable-safe-area: true;
     }
 }
 
-@mixin fa-icon($icon: null, $state: before, $size: 12px, $color: inherit) {
+// Mixin for include font-awesome icons to custom elements
+// List of icons https://github.com/FortAwesome/Font-Awesome/blob/v4.7.0/scss/_variables.scss
+// @param $icon (Font Awesome icon)
+// @param $state {CSS pseudo-element}
+// Use:  @include fa-icon($view-product-gallery-icon, before, true) {
+//  extra rules
+// }
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
+            font-family: 'FontAwesome', $base-font-family;
 
-            color: $color;
-            font-size: $size;
-            font-family: FontAwesome;
-
-
-            @content;
+            @if ($extra-rules) {
+                @content;
+            }
         }
+    }
+}
+
+// Creates set of keyframes with vendor prefixes
+@mixin keyframe($animation-name) {
+    @-webkit-keyframes $animation-name {
+        @content;
+    }
+
+    @keyframes $animation-name {
+        @content;
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessScalarNormalizer;
 
-class ProcessScalarNormalizerTest extends \PHPUnit_Framework_TestCase
+class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessScalarNormalizer

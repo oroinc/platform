@@ -5,12 +5,11 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 
-class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
+class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
@@ -20,17 +19,20 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     const ACTION_NAME = 'FooBarBundle:Test:test';
     const DELIMITER = '<br/>';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $environment;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $kernelExtension;
+
+    /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
+    protected $fragmentHandler;
 
     /** @var PlaceholderExtension */
     protected $extension;
@@ -59,13 +61,13 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->kernelExtension = $this->getMockBuilder(HttpKernelExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+
+        $this->fragmentHandler = $this->createMock(FragmentHandler::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.placeholder.provider', $this->placeholderProvider)
             ->add('request_stack', $this->requestStack)
+            ->add('fragment.handler', $this->fragmentHandler)
             ->getContainer($this);
 
         $this->extension = new PlaceholderExtension($container);
@@ -94,23 +96,9 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('render')
             ->with(self::TEMPLATE_NAME, $variables)
             ->will($this->returnValue($expectedTemplateRender));
-        $this->environment->expects($this->once())
-            ->method('getExtension')
-            ->with(HttpKernelExtension::class)
-            ->willReturn($this->kernelExtension);
 
-        $controllerReference = $this->getMockBuilder(ControllerReference::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->kernelExtension->expects($this->once())
-            ->method('controller')
-            ->with(self::ACTION_NAME, $variables, $query)
-            ->will($this->returnValue($controllerReference));
-
-        $this->kernelExtension->expects($this->once())
-            ->method('renderFragment')
-            ->with($controllerReference)
+        $this->fragmentHandler->expects($this->once())
+            ->method('render')
             ->will($this->returnValue($expectedActionRender));
 
         $result = self::callTwigFunction(

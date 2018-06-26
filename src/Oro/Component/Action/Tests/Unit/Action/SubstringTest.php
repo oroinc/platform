@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class SubstringTest extends \PHPUnit_Framework_TestCase
+class SubstringTest extends \PHPUnit\Framework\TestCase
 {
     const ATTRIBUTE_PATH = 'attribute';
     const TEST_STRING = 'some test string';

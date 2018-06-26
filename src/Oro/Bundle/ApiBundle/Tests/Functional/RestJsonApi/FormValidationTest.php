@@ -2,33 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\SkippedEntitiesProvider;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
+/**
+ * @group regression
+ */
 class FormValidationTest extends RestJsonApiTestCase
 {
-
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var OwnershipMetadataProviderInterface */
-    protected $metadataProvider;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->configProvider = $this->getContainer()->get('oro_entity_config.provider.ownership');
-        $this->metadataProvider = $this->getContainer()->get('oro_security.owner.ownership_metadata_provider');
-    }
-
     /**
      * @param string   $entityClass
      * @param string[] $excludedActions
@@ -42,34 +26,26 @@ class FormValidationTest extends RestJsonApiTestCase
         }
 
         $entityType = $this->getEntityType($entityClass);
-
         $response = $this->post(
             ['entity' => $entityType],
             ['data' => ['type' => $entityType, 'attributes' => ['notExistingField' => null]]],
             [],
             false
         );
-        self::assertApiResponseStatusCodeEquals($response, [400, 403, 405], $entityType, 'post');
+        self::assertApiResponseStatusCodeEquals($response, [400, 403], $entityType, 'post');
 
-        // Make sure Entity can be created without setting Owner or Organization
+        // Make sure that an entity can be created without setting Owner or Organization
         // Owner and or Organization will be set from context for configurable entities
-        if ($this->configProvider->hasConfig($entityClass)) {
-            $content = json_decode($response->getContent(), true);
+        if ($response->getStatusCode() === 400) {
+            $content = self::jsonToArray($response->getContent());
             if (isset($content['errors'])) {
-                /** @var OwnershipMetadataInterface $classMetadata */
-                $classMetadata = $this->metadataProvider->getMetadata($entityClass);
-                foreach ($content['errors'] as $error) {
-                    if (isset($error['source']['pointer'])) {
-                        self::assertNotEquals(
-                            '/data/relationships/' . $classMetadata->getOwnerFieldName() . '/data',
-                            $error['source']['pointer'],
-                            "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Owner'"
-                        );
-                        self::assertNotEquals(
-                            '/data/relationships/' . $classMetadata->getOrganizationFieldName() . '/data',
-                            $error['source']['pointer'],
-                            "Entity {$entityClass} should not have '{$error['title']}' constraint for 'Organization'"
-                        );
+                /** @var OwnershipMetadataProviderInterface $ownershipMetadataProvider */
+                $ownershipMetadataProvider = self::getContainer()
+                    ->get('oro_security.owner.ownership_metadata_provider');
+                $ownershipMetadata = $ownershipMetadataProvider->getMetadata($entityClass);
+                if ($ownershipMetadata->hasOwner()) {
+                    foreach ($content['errors'] as $error) {
+                        $this->assertOwnershipErrors($error, $entityClass, $ownershipMetadata);
                     }
                 }
             }
@@ -77,29 +53,53 @@ class FormValidationTest extends RestJsonApiTestCase
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $excludedActions
-     *
-     * @dataProvider getEntities
+     * @param array                      $error
+     * @param string                     $entityClass
+     * @param OwnershipMetadataInterface $ownershipMetadata
      */
-    public function testUpdateRequests($entityClass, $excludedActions)
+    private function assertOwnershipErrors(
+        array $error,
+        string $entityClass,
+        OwnershipMetadataInterface $ownershipMetadata
+    ) {
+        if (!isset($error['source']['pointer'])) {
+            return;
+        }
+
+        $metadata = $this->getApiMetadata($entityClass, ApiActions::CREATE);
+        if (null === $metadata) {
+            return;
+        }
+
+        $this->assertOwnershipError($error, $metadata, $ownershipMetadata->getOwnerFieldName());
+        $this->assertOwnershipError($error, $metadata, $ownershipMetadata->getOrganizationFieldName());
+    }
+
+    /**
+     * @param array          $error
+     * @param EntityMetadata $metadata
+     * @param string|null    $fieldName
+     */
+    private function assertOwnershipError(array $error, EntityMetadata $metadata, ?string $fieldName)
     {
-        if (in_array(ApiActions::UPDATE, $excludedActions, true)) {
+        if (!$fieldName) {
             return;
         }
 
-        if (in_array($entityClass, SkippedEntitiesProvider::getForUpdateAction(), true)) {
+        $field = $metadata->getPropertyByPropertyPath($fieldName);
+        if (null === $field) {
             return;
         }
 
-        $entityType = $this->getEntityType($entityClass);
-
-        $response = $this->patch(
-            ['entity' => $entityType, 'id' => '1'],
-            ['data' => ['type' => $entityType, 'id' => '1', 'attributes' => ['notExistingField' => null]]],
-            [],
-            false
+        self::assertNotEquals(
+            '/data/relationships/' . $field->getName() . '/data',
+            $error['source']['pointer'],
+            sprintf(
+                'Entity %s should not have "%s" constraint for "%s"',
+                $metadata->getClassName(),
+                $error['title'],
+                $field->getName()
+            )
         );
-        self::assertApiResponseStatusCodeEquals($response, [400, 403, 404, 405], $entityType, 'post');
     }
 }

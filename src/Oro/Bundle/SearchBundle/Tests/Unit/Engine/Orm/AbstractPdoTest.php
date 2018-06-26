@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine\Orm;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-abstract class AbstractPdoTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractPdoTest extends \PHPUnit\Framework\TestCase
 {
     const JOIN_ALIAS = 'item';
 

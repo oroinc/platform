@@ -9,15 +9,15 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $exceptionTextExtractor;
 
     /** @var RequestType */
     private $requestType;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
     /** @var ErrorCompleter */

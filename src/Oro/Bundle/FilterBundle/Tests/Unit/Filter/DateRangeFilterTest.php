@@ -14,10 +14,10 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DateRangeFilterTest extends OrmTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DateFilterUtility */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DateFilterUtility */
     private $dateFilterUtility;
 
     /** @var DateRangeFilter */

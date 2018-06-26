@@ -7,7 +7,7 @@ use Oro\Component\Layout\HierarchyCollection;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class HierarchyCollectionTest extends \PHPUnit_Framework_TestCase
+class HierarchyCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HierarchyCollection */
     protected $hierarchyCollection;

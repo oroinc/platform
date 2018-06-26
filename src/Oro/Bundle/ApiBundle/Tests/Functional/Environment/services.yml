@@ -72,8 +72,8 @@ services:
     oro_api.tests.load_test_resource_without_identifier_entity:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestResourceWithoutIdentifierEntity
         tags:
-            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
-            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier, priority: -20 }
+            - { name: oro.api.processor, action: update, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
+            - { name: oro.api.processor, action: delete, group: load_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
 
     oro_api.tests.delete_test_resource_without_identifier_entity:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DeleteTestResourceWithoutIdentifierEntity
@@ -88,17 +88,45 @@ services:
             - { name: oro.api.processor, action: create, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
             - { name: oro.api.processor, action: update, group: normalize_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier }
 
-    oro_api.tests.subresource.json_api.validate_request_data.custom:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\ValidateSubresourceRequestData
+    oro_api.tests.change_subresource.json_api.validate_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\ValidateRequestData
         arguments:
             - false
             - true
         tags:
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, collection: false, requestType: json_api, priority: 89 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, class: Extend\Entity\TestApiE2, collection: false, requestType: json_api, priority: 91 }
 
-    oro_api.tests.subresource.json_api.load_entity.custom:
-        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\LoadTestSubresourceEntity
+    oro_api.tests.change_subresource.build_form_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\BuildFormBuilder
         arguments:
-            - '@form.property_accessor'
+            - '@oro_api.form_helper'
         tags:
-            - { name: oro.api.processor, action: update_subresource, group: load_data, collection: false, priority: -100 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, association: biM2O, collection: false, priority: 101 }
+
+    oro_api.tests.change_subresource.build_form_builder.throw_exception:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BuildFormBuilderThrowException
+        tags:
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, parentClass: Extend\Entity\TestApiE1, priority: 100 }
+
+    oro_api.tests.add_order_line_items_to_order:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddOrderLineItemsToOrder
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder, priority: -55 }
+
+    oro_api.tests.add_order_line_item_to_order:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AddOrderLineItemToOrder
+        tags:
+            - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem, priority: -55 }
+
+    oro_api.tests.update_loaded_data_for_overridden_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataForOverriddenEntity
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTarget }
+
+    oro_api.tests.update_loaded_data_for_resource_inherited_from_entity:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataForResourceInheritedFromEntity
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel }
+            - { name: oro.api.processor, action: customize_loaded_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget }

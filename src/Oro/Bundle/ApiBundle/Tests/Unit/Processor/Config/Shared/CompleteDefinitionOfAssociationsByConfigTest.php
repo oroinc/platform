@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
@@ -13,11 +15,14 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RelationConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RelationConfigProvider */
     private $relationConfigProvider;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
+    private $entityOverrideProvider;
 
     /** @var CompleteDefinitionOfAssociationsByConfig */
     private $processor;
@@ -28,10 +33,18 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->relationConfigProvider = $this->createMock(RelationConfigProvider::class);
+        $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+
+        $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
+        $entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityOverrideProvider);
 
         $this->processor = new CompleteDefinitionOfAssociationsByConfig(
             $this->doctrineHelper,
-            $this->relationConfigProvider
+            $this->relationConfigProvider,
+            $entityOverrideProviderRegistry
         );
     }
 
@@ -344,6 +357,73 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'property_path'    => 'realAssociation5',
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association5Target',
+                        'target_type'      => 'to-one',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForManageableEntityWithAssociationToOverriddenEntity()
+    {
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([
+                'association1' => [
+                    'targetEntity' => 'Test\Association1Target',
+                    'type'         => ClassMetadata::MANY_TO_ONE
+                ]
+            ]);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Association1Target')
+            ->willReturn('Test\Association1SubstituteTarget');
+
+        $this->relationConfigProvider->expects(self::once())
+            ->method('getRelationConfig')
+            ->with(
+                'Test\Association1SubstituteTarget',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $this->context->getPropagableExtras()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ]
+                )
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->context->setResult($this->createConfigObject([]));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'association1' => [
+                        'exclusion_policy' => 'all',
+                        'target_class'     => 'Test\Association1SubstituteTarget',
                         'target_type'      => 'to-one',
                         'collapse'         => true,
                         'fields'           => [

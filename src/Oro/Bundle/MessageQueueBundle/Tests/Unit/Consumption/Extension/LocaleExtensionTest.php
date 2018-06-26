@@ -7,7 +7,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\LocaleExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 
-class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
+class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetLocaleOnBeforeReceive()
     {

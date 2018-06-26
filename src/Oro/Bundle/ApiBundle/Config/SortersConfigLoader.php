@@ -4,11 +4,13 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * The loader for "sorters" configuration section.
+ */
 class SortersConfigLoader extends AbstractConfigLoader
 {
-    /** @var array */
-    protected $fieldMethodMap = [
-        SorterFieldConfig::EXCLUDE => 'setExcluded',
+    private const FIELD_METHOD_MAP = [
+        ConfigUtil::EXCLUDE => 'setExcluded'
     ];
 
     /**
@@ -51,7 +53,7 @@ class SortersConfigLoader extends AbstractConfigLoader
         $sorter = new SorterFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                $this->loadConfigValue($sorter, $key, $value, $this->fieldMethodMap);
+                $this->loadConfigValue($sorter, $key, $value, self::FIELD_METHOD_MAP);
             }
         }
 

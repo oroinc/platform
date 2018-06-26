@@ -9,12 +9,12 @@ use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ResetPasswordActionHandlerTest extends \PHPUnit_Framework_TestCase
+class ResetPasswordActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResetPasswordActionHandler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResetPasswordActionHandler */
     protected $handler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResetPasswordActionHandler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResetPasswordActionHandler */
     protected $translator;
 
     /** @var int */

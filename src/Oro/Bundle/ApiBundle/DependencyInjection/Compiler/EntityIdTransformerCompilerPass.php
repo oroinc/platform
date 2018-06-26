@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers all entity identifir transformers.
+ * Registers all entity identifier transformers.
  */
 class EntityIdTransformerCompilerPass implements CompilerPassInterface
 {
@@ -20,13 +19,13 @@ class EntityIdTransformerCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find entity id transformers
         $transformers = [];
         $taggedServices = $container->findTaggedServiceIds(self::TRANSFORMER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            $container->getDefinition($id)->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
-                    new Reference($id),
+                    $id,
                     DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
                 ];
             }
@@ -35,10 +34,8 @@ class EntityIdTransformerCompilerPass implements CompilerPassInterface
             return;
         }
 
-        // sort by priority and flatten
         $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
 
-        // register
         $container->getDefinition(self::TRANSFORMER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $transformers);
     }

@@ -12,15 +12,15 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcess
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultFormStartHandleProcessorTest extends \PHPUnit_Framework_TestCase
+class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var DefaultFormStartHandleProcessor */
     protected $processor;
 
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     protected function setUp()
@@ -34,7 +34,7 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessSavedTrue()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())
             ->method('getFormOptions')
@@ -65,9 +65,10 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit_Framework_TestCase
             'not scheduled for insert' => $notScheduledForInsert
         ]);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('handleRequest')->with($this->request);
+        $form->expects($this->once())->method('isSubmitted')->willReturn(true);
         $form->expects($this->once())->method('isValid')->willReturn(true);
         $form->expects($this->once())->method('getData')->willReturn($workflowData);
 
@@ -76,10 +77,10 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit_Framework_TestCase
         $context->setTransition($transition);
         $context->setForm($form);
 
-        /** @var UnitOfWork|\PHPUnit_Framework_MockObject_MockObject $unitOfWork */
+        /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject $unitOfWork */
         $unitOfWork = $this->createMock(UnitOfWork::class);
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())->method('getUnitOfWork')->willReturn($unitOfWork);
 

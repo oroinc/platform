@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\Request\Parameters\Filter;
 
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
-class StringToArrayParameterFilterTest extends \PHPUnit_Framework_TestCase
+class StringToArrayParameterFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testFilterWithDefaultSeparator()
     {

@@ -8,7 +8,7 @@ oro:
             view_all:    View All
             view_email:  View Email
             reply:       Reply
-            description: This widget allows you to see most recent additions to your inbox and outbox
+            description: This widget enables you to see the most recent additions to your inbox and outbox
 
     email:
         imap.folder.checkAll: All
@@ -36,9 +36,9 @@ oro:
 
             tooltip:
                 attachment_sync:
-                    enable: Enable load attachments on email sync.
+                    enable: Enable loading attachments on email sync.
                     max_size: Maximum sync attachment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
-                    preview_limit: Limit to show preview for attachments (thumbnail for images and big file icon for other files). Set to 0 to see a list with file names only.
+                    preview_limit: Limit to show preview for attachments (thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
 

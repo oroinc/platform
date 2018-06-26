@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestCase
+class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeCreatedWithRequiredArguments()
     {
@@ -79,7 +79,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function createMessageConsumerMock()
     {
@@ -87,7 +87,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -95,7 +95,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {

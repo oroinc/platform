@@ -7,14 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class EntityFallbackCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EntityFallbackCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityFallbackCompilerPass
      */
     protected $entityFallbackCompilerPass;
 
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject * */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject * */
     protected $container;
 
     protected function setUp()

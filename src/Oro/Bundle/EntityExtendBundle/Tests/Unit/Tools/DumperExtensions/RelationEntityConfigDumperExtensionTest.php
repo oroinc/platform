@@ -16,12 +16,12 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationEntityConfigDumperExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var array */

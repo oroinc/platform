@@ -6,7 +6,7 @@ use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
-class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
+class ImportLayoutManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ImportLayoutManipulator
@@ -14,12 +14,12 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
     protected $importLayoutManipulator;
 
     /**
-     * @var LayoutUpdateImport|\PHPUnit_Framework_MockObject_MockObject
+     * @var LayoutUpdateImport|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $import;
 
     /**
-     * @var LayoutManipulatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $layoutManipulator;
 
@@ -583,7 +583,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
      * @param string $root
      * @param string $namespace
      *
-     * @return LayoutUpdateImport|\PHPUnit_Framework_MockObject_MockObject
+     * @return LayoutUpdateImport|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getImportMock($id, $root, $namespace)
     {

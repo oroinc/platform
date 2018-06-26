@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType as SymfonyLocaleType;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,9 +17,9 @@ class LocaleType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
-                'choices' => array_flip(Intl::getLocaleBundle()->getLocaleNames('en')),
+                'choice_loader' => new CallbackChoiceLoader(function () {
+                    return array_flip(Intl::getLocaleBundle()->getLocaleNames('en'));
+                })
             ]
         );
     }

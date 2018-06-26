@@ -21,19 +21,19 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
     protected $workflowRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     protected $repository;
 
     /** @var WorkflowStepSelectType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Translator */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MessageCatalogueInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageCatalogueInterface */
     protected $translatorCatalogue;
 
     protected function setUp()
@@ -233,7 +233,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
      * @param string $class
      * @param string $definitionLabel
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Workflow|WorkflowStep
+     * @return \PHPUnit\Framework\MockObject\MockObject|Workflow|WorkflowStep
      */
     protected function getWorkflowDefinitionAwareClassMock($class, $definitionLabel = null)
     {
@@ -252,7 +252,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     {
         $func = new Expr\Func('ws.definition IN', ':workflowDefinitions');
 
-        /** @var Expr|\PHPUnit_Framework_MockObject_MockObject $expr */
+        /** @var Expr|\PHPUnit\Framework\MockObject\MockObject $expr */
         $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')->disableOriginalConstructor()->getMock();
         $expr->expects($this->once())
             ->method('in')
@@ -294,7 +294,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             [
                 [
                     'class' => 'OroWorkflowBundle:WorkflowStep',
-                    'property' => 'label'
+                    'choice_label' => 'label'
                 ]
             ]
         ];

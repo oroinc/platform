@@ -33,8 +33,11 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
     {
         if (!empty($options['route']) && $this->getOptionValue($options, ['extras', 'isAllowed'], true)) {
             $params = $this->getOptionValue($options, ['routeParameters'], []);
+            $referenceType = !empty($options['routeAbsolute'])
+                ? RouterInterface::ABSOLUTE_URL
+                : RouterInterface::ABSOLUTE_PATH;
 
-            $newOptions['uri'] = $this->router->generate($options['route'], $params, !empty($options['routeAbsolute']));
+            $newOptions['uri'] = $this->router->generate($options['route'], $params, $referenceType);
             $newOptions['extras']['routes'] = [$options['route']];
             $newOptions['extras']['routesParameters'] = [$options['route'] => $params];
 

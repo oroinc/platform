@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
-class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
+class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
     public function testWarmUpAndIsOptional()
     {
@@ -67,8 +67,8 @@ class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
     }
 
     private function setTwigAndSaveExpectations(
-        \PHPUnit_Framework_MockObject_MockObject $twig,
-        \PHPUnit_Framework_MockObject_MockObject $warmer,
+        \PHPUnit\Framework\MockObject\MockObject $twig,
+        \PHPUnit\Framework\MockObject\MockObject $warmer,
         $ext,
         $at
     ) {

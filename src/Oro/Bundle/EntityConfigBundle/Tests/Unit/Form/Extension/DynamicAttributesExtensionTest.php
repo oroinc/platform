@@ -31,32 +31,32 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     const DATA_CLASS = TestActivityTarget::class;
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
     /**
-     * @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $attributeManager;
 
     /**
-     * @var AttributeConfigHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $attributeConfigHelper;
 
     /**
-     * @var ConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $attributeEntityConfig;
 
     /**
-     * @var DynamicFieldsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DynamicFieldsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dynamicFieldsHelper;
 
@@ -124,7 +124,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder
             ->expects($this->never())
@@ -164,7 +164,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->method('isFieldAttribute')
             ->willReturnOnConsecutiveCalls(false, true);
 
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder
             ->expects($this->exactly(2))
@@ -395,7 +395,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     }
 
     /**
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getViewConfigProvider()
     {
@@ -407,7 +407,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     }
 
     /**
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getFormConfigProvider()
     {
@@ -449,7 +449,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     }
 
     /**
-     * @return FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getForm()
     {
@@ -469,7 +469,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
     }
 
     /**
-     * @return FormView|\PHPUnit_Framework_MockObject_MockObject
+     * @return FormView|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getFormView()
     {

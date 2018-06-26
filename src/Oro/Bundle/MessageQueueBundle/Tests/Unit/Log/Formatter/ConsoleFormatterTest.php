@@ -5,7 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Client\Config;
 
-class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
+class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultDataMap()
     {
@@ -14,6 +14,8 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => [
                 'processor'          => 'TestProcessor',
                 'message_body'       => 'message body',
@@ -25,7 +27,9 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            'DEBUG: test message {"processor":"TestProcessor","topic":"test topic","message":"message body"} ' . "\n",
+            '<fg=white>DEBUG    :</> test message '
+            . '["processor" => "TestProcessor","topic" => "test topic","message" => "message body"] '
+            . "\n",
             $formatter->format($record)
         );
     }
@@ -37,15 +41,19 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => [
                 'processor'    => 'TestProcessor',
                 'message_body' => 'message body'
             ]
         ];
-        $formatter = new ConsoleFormatter([]);
+        $formatter = new ConsoleFormatter([
+            'data_map' => [],
+        ]);
 
         self::assertEquals(
-            'DEBUG: test message  ' . "\n",
+            '<fg=white>DEBUG    :</> test message  ' . "\n",
             $formatter->format($record)
         );
     }
@@ -57,6 +65,8 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => [
                 'processor' => 'TestProcessor',
                 'message'   => [
@@ -65,11 +75,11 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $formatter = new ConsoleFormatter([
-            'message' => ['extra', 'message', 'body']
+            'data_map' => ['message' => ['extra', 'message', 'body']],
         ]);
 
         self::assertEquals(
-            'DEBUG: test message {"message":"message body"} ' . "\n",
+            '<fg=white>DEBUG    :</> test message ["message" => "message body"] ' . "\n",
             $formatter->format($record)
         );
     }
@@ -81,12 +91,14 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => []
         ];
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            'DEBUG: test message  ' . "\n",
+            '<fg=white>DEBUG    :</> test message  ' . "\n",
             $formatter->format($record)
         );
     }
@@ -98,16 +110,18 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => [
                 'message' => 'test message'
             ]
         ];
         $formatter = new ConsoleFormatter([
-            'message' => ['extra', 'message', 'body']
+            'data_map' => ['message' => ['extra', 'message', 'body']]
         ]);
 
         self::assertEquals(
-            'DEBUG: test message  ' . "\n",
+            '<fg=white>DEBUG    :</> test message  ' . "\n",
             $formatter->format($record)
         );
     }
@@ -121,6 +135,8 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'context'    => [
                 'key' => 'value'
             ],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => [
                 'processor'    => 'TestProcessor',
                 'message_body' => 'message body'
@@ -129,7 +145,9 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            'DEBUG: test message {"processor":"TestProcessor","message":"message body"} {"key":"value"}' . "\n",
+            '<fg=white>DEBUG    :</> test message ["processor" => "TestProcessor","message" => "message body"] '
+            . '["key" => "value"]'
+            . "\n",
             $formatter->format($record)
         );
     }
@@ -145,16 +163,17 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
                 'jsonString1' => '{"class":"Test\Class","encodedjsonString":"{\"Test\\\\Class\"}"}',
                 'jsonString2' => '{"class":"Test\Another\Class"}'
             ],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => []
         ];
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            'DEBUG: test message  {'
-            . '"key":"value",'
-            . '"jsonString1":{"class":"Test\Class","encodedjsonString":"{\"Test\Class\"}"},'
-            . '"jsonString2":{"class":"Test\Another\Class"}'
-            . '}' . "\n",
+            '<fg=white>DEBUG    :</> test message  ['
+            . '"key" => "value","jsonString1" => "{"class":"Test\Class","encodedjsonString":"{\"Test\\\\Class\"}"}",'
+            . '"jsonString2" => "{"class":"Test\Another\Class"}"]'
+            . "\n",
             $formatter->format($record)
         );
     }
@@ -166,12 +185,14 @@ class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
             'level'      => 100,
             'level_name' => 'DEBUG',
             'context'    => [],
+            'datetime'   => new \DateTime(),
+            'channel'    => 'app',
             'extra'      => []
         ];
         $formatter = new ConsoleFormatter();
 
         self::assertEquals(
-            "DEBUG: test\nmessage  \n",
+            "<fg=white>DEBUG    :</> test\nmessage  \n",
             $formatter->format($record)
         );
     }

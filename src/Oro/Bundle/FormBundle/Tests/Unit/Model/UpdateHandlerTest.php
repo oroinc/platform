@@ -19,37 +19,37 @@ use Symfony\Component\HttpFoundation\Session\Session;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
+class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Request
+     * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
     protected $request;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Session
+     * @var \PHPUnit\Framework\MockObject\MockObject|Session
      */
     protected $session;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Router
+     * @var \PHPUnit\Framework\MockObject\MockObject|Router
      */
     protected $router;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
      */
     protected $eventDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form
+     * @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form
      */
     protected $form;
 
@@ -58,7 +58,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $resultCallbackInvoked;
 
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack */
     protected $requestStack;
 
     /**
@@ -137,7 +137,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateWorksWithBlankDataAndNoHandler()
     {
         $this->request->initialize(['_wid' => 'WID']);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form */
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $entity = $this->getObject();
         $expected = $this->getExpectedSaveData($form, $entity);
@@ -529,7 +529,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $saveAndCloseCallback = function () use ($saveAndCloseRoute) {
             return $saveAndCloseRoute;
         };
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $expectedForm */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $expectedForm */
         $expectedForm = $this->createMock(FormInterface::class);
 
         $expected = $this->getExpectedSaveData($this->form, $entity);
@@ -652,7 +652,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $message
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFlashBagMock($message)
     {
@@ -667,7 +667,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param object $entity
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getHandlerStub($entity)
     {
@@ -681,7 +681,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject|FormInterface $form
+     * @param \PHPUnit\Framework\MockObject\MockObject|FormInterface $form
      * @param object $entity
      * @return array
      */

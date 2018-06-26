@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TransitionContextTest extends \PHPUnit_Framework_TestCase
+class TransitionContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionContext */
     protected $context;

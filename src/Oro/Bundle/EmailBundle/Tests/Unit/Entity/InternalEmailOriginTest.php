@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
-class InternalEmailOriginTest extends \PHPUnit_Framework_TestCase
+class InternalEmailOriginTest extends \PHPUnit\Framework\TestCase
 {
     public function testNameGetterAndSetter()
     {

@@ -6,13 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase
+class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
 {
     const MODEL_ID = 42;
     const FIELD_NAME = 'someFieldName';
     const FIELD_TYPE = 'enum';
 
-    /** @var Session|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
     /**

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettings;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-class ConfigExtensionRegistryTest extends \PHPUnit_Framework_TestCase
+class ConfigExtensionRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testDefaultConstructor()
     {

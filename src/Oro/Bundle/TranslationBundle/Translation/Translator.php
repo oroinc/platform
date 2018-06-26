@@ -4,12 +4,15 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -50,8 +53,8 @@ class Translator extends BaseTranslator
     /** @var string|null */
     protected $strategyName;
 
-    /** @var MessageSelector */
-    protected $messageSelector;
+    /** @var MessageFormatter */
+    protected $formatter;
 
     /** @var array */
     protected $originalOptions;
@@ -59,20 +62,64 @@ class Translator extends BaseTranslator
     /** @var array */
     protected $resourceFiles = [];
 
+    /** @var ServiceLink */
+    private $strategyProviderLink;
+
+    /** @var TranslationDomainProvider */
+    private $translationDomainProvider;
+
     /**
-     * {@inheritdoc}
+     * @param ContainerInterface $container
+     * @param MessageFormatter $formatter
+     * @param null $defaultLocale
+     * @param array $loaderIds
+     * @param array $options
      */
     public function __construct(
         ContainerInterface $container,
-        MessageSelector $messageSelector,
+        MessageFormatter $formatter,
+        $defaultLocale = null,
         $loaderIds = [],
         array $options = []
     ) {
-        $this->messageSelector = $messageSelector;
+        parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
+
+        // BC 3.x, to be removed in 4.0 along with the $defaultLocale default value
+        if (is_array($defaultLocale) || 3 > func_num_args()) {
+            if (!$container instanceof SymfonyContainerInterface) {
+                throw new \InvalidArgumentException('Missing third $defaultLocale argument.');
+            }
+
+            $options = $loaderIds;
+        }
+
+        $this->formatter = $formatter;
         $this->originalOptions = $options;
         $this->resourceFiles = $options['resource_files'];
+    }
 
-        parent::__construct($container, $messageSelector, $loaderIds, $options);
+    /**
+     * @param ServiceLink $strategyProviderLink
+     */
+    public function setStrategyProviderLink(ServiceLink $strategyProviderLink)
+    {
+        $this->strategyProviderLink = $strategyProviderLink;
+    }
+
+    /**
+     * @param TranslationDomainProvider $translationDomainProvider
+     */
+    public function setTranslationDomainProvider(TranslationDomainProvider $translationDomainProvider)
+    {
+        $this->translationDomainProvider = $translationDomainProvider;
+    }
+
+    /**
+     * @param $installed
+     */
+    public function setInstalled($installed)
+    {
+        $this->installed = $installed;
     }
 
     /**
@@ -250,7 +297,17 @@ class Translator extends BaseTranslator
             $provider->setStrategy($strategy);
 
             /* @var $translator Translator */
-            $translator = new static($this->container, $this->messageSelector, $this->loaderIds, $options);
+            $translator = new static(
+                $this->container,
+                $this->formatter,
+                $this->getLocale(),
+                $this->loaderIds,
+                $options
+            );
+
+            $translator->setStrategyProviderLink($this->strategyProviderLink);
+            $translator->setTranslationDomainProvider($this->translationDomainProvider);
+            $translator->setInstalled($this->installed);
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
 
             $translator->warmUp($tmpDir);
@@ -365,8 +422,7 @@ class Translator extends BaseTranslator
 
         // check if any dynamic resource is changed and update translation catalogue if needed
         if (!empty($this->dynamicResources[$locale])) {
-            $catalogueFile = $this->options['cache_dir']
-                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
+            $catalogueFile = $this->getCatalogueCachePath($locale);
             if (is_file($catalogueFile)) {
                 $time = filemtime($catalogueFile);
                 foreach ($this->dynamicResources[$locale] as $item) {
@@ -386,6 +442,19 @@ class Translator extends BaseTranslator
                 }
             }
         }
+    }
+
+    /**
+     * @param string $locale
+     * @return string
+     */
+    private function getCatalogueCachePath(string $locale): string
+    {
+        return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(
+            substr(base64_encode(hash('sha256', serialize($this->getFallbackLocales()), true)), 0, 7),
+            '/',
+            '_'
+        ).'.php';
     }
 
     /**
@@ -422,7 +491,7 @@ class Translator extends BaseTranslator
      */
     protected function ensureDynamicResourcesLoaded($locale)
     {
-        if (null !== $this->databaseTranslationMetadataCache && $this->isInstalled()) {
+        if (null !== $this->databaseTranslationMetadataCache && $this->isApplicationInstalled()) {
             $hasDatabaseResources = false;
             if (!empty($this->dynamicResources[$locale])) {
                 foreach ($this->dynamicResources[$locale] as $item) {
@@ -432,12 +501,12 @@ class Translator extends BaseTranslator
                     }
                 }
             }
-            if (!$hasDatabaseResources && $this->checkDatabase()) {
+            if (!$hasDatabaseResources && $this->isApplicationInstalled()) {
                 $locales = $this->getFallbackLocales();
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);
 
-                $availableDomainsData = $this->container->get('oro_translation.provider.translation_domain')
+                $availableDomainsData = $this->translationDomainProvider
                     ->getAvailableDomainsForLocales($locales);
                 foreach ($availableDomainsData as $item) {
                     $item['resource'] = new OrmTranslationResource(
@@ -453,35 +522,21 @@ class Translator extends BaseTranslator
     }
 
     /**
-     * Check if the platform is installed
-     *
-     * @return bool
-     */
-    protected function isInstalled()
-    {
-        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
-    }
-
-    /**
-     * Checks whether the translations table exists in the database
-     *
-     * @return bool
-     */
-    protected function checkDatabase()
-    {
-        if (null === $this->installed) {
-            $this->installed = (bool)$this->container->getParameter('installed');
-        }
-
-        return $this->installed;
-    }
-
-    /**
      * @return TranslationStrategyProvider
      */
     protected function getStrategyProvider()
     {
-        // can't inject strategy provider directly because container creates new instances for each injected service
-        return $this->container->get('oro_translation.strategy.provider');
+        /** @var TranslationStrategyProvider $strategyProvider */
+        $strategyProvider = $this->strategyProviderLink->getService();
+
+        return $strategyProvider;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isApplicationInstalled()
+    {
+        return !empty($this->installed);
     }
 }

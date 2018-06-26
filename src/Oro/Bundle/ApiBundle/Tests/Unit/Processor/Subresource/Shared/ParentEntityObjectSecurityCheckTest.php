@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ParentEntityObjectSecurityCheckTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     /** @var ParentEntityObjectSecurityCheck */

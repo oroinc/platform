@@ -17,13 +17,13 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class EntityDescriptionProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassNameProviderInterface */
     private $entityClassNameProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     private $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
     /** @var EntityDescriptionProvider */

@@ -7,10 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
+class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessNoMainService()
     {
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $containerBuilder->expects($this->once())
@@ -31,6 +32,7 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
     {
         $definition = new Definition();
 
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $containerBuilder->expects($this->once())
@@ -49,10 +51,12 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit_Framework_TestCase
                 [
                     [
                         'oro_imap.origin_credentials.notification_sender',
+                        false,
                         ['first_service' => [], 'second_service' => []]
                     ],
                     [
                         'oro_imap.origin_credentials.user_notification_sender',
+                        false,
                         ['first_user_service' => []]
                     ],
                 ]

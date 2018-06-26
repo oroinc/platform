@@ -13,50 +13,50 @@ use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
+class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailProcessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $renderer;
 
     /**
-     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $objectManager;
 
     /**
-     * @var EmailTemplateRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $objectRepository;
 
     /**
-     * @var EmailTemplateInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailTemplateInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailTemplate;
 
     /**
-     * @var ValidatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $validator;
 
@@ -66,7 +66,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $logger;
 

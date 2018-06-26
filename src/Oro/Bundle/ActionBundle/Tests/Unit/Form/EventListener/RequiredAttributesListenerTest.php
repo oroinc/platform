@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
+class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequiredAttributesListener */
     protected $listener;
@@ -80,7 +80,7 @@ class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActionData
+     * @return \PHPUnit\Framework\MockObject\MockObject|ActionData
      */
     protected function createActionData()
     {
@@ -90,7 +90,7 @@ class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormEvent
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormEvent
      */
     protected function createFormEvent()
     {

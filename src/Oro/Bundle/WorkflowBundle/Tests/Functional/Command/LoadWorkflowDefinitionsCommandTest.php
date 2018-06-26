@@ -129,10 +129,10 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     {
         yield 'invalid cron expression' => [
             'expectedMessages' => [
-                'InvalidConfigurationException',
+                'In WorkflowConfigurationProvider.php',
                 'Invalid configuration for path "workflows.first_workflow',
-                'invalid cron expression is not a valid',
-                'CRON expression'
+                'invalid cron expression is not',
+                'a valid CRON expression'
             ],
             'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
         ];

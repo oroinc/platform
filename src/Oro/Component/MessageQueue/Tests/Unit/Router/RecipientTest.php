@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Router\Recipient;
 use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class RecipientTest extends \PHPUnit_Framework_TestCase
+class RecipientTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldAllowGetMessageSetInConstructor()
     {

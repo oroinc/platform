@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 
-class CaseInsensitiveParameterBagTest extends \PHPUnit_Framework_TestCase
+class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CaseInsensitiveParameterBag */
     protected $caseInsensitiveParameterBag;

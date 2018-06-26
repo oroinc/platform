@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
+class NormalizeValueContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NormalizeValueContext */
     protected $context;

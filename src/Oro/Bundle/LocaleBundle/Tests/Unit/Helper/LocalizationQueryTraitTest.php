@@ -6,11 +6,11 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
 
-class LocalizationQueryTraitTest extends \PHPUnit_Framework_TestCase
+class LocalizationQueryTraitTest extends \PHPUnit\Framework\TestCase
 {
     use LocalizationQueryTrait;
 
-    /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $queryBuilder;
 
     /**

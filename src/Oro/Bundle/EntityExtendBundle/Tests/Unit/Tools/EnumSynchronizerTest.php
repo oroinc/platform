@@ -13,21 +13,21 @@ use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
+class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dbTranslationMetadataCache;
 
-    /** @var ConfigTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
 
     /** @var EnumSynchronizer */
@@ -103,7 +103,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->with('Test\Entity1', 'field1')
             ->will($this->returnValue($enumFieldConfig1));
 
-        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
             ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'])
             ->setConstructorArgs([
@@ -159,7 +159,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
             ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
             ->setConstructorArgs([
@@ -236,7 +236,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('flush');
 
-        /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
+        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
             ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
             ->setConstructorArgs([
@@ -525,6 +525,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
@@ -538,6 +542,41 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('invalidateCache');
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
+    }
+
+    public function testApplyEnumOptionsTransactionError()
+    {
+        $enumValueClassName = 'Test\EnumValue';
+        $locale             = 'fr';
+
+        $values      = [
+            new TestEnumValue('opt1', 'Option 1', 1, true)
+        ];
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->never())
+            ->method('commit');
+        $em->expects($this->once())
+            ->method('rollback');
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($enumValueClassName)
+            ->will($this->returnValue($em));
+
+        $em->expects($this->once())
+            ->method('flush')
+            ->willThrowException(new \Exception());
+
+        $this->expectException(\Exception::class);
+        $this->translationHelper->expects($this->never())
+            ->method('invalidateCache');
+
+        $this->synchronizer->applyEnumOptions($enumValueClassName, [], $locale);
     }
 
     public function testApplyEnumOptionsNoChanges()
@@ -555,6 +594,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
@@ -594,6 +637,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
@@ -612,7 +659,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->identicalTo($newValue));
 
-        $em->expects($this->once())
+        $em->expects($this->exactly(2))
             ->method('flush');
         $this->translationHelper->expects($this->once())
             ->method('invalidateCache')
@@ -653,6 +700,10 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
@@ -660,34 +711,28 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, []);
 
-        $enumRepo->expects($this->at(1))
+        $enumRepo->expects($this->exactly(4))
             ->method('createEnumValue')
-            ->with('0', 1, true, '0')
-            ->will($this->returnValue($newValue1));
-        $em->expects($this->at(1))
+            ->withConsecutive(
+                ['0', 1, true, '0'],
+                ['*0*', 2, false, '0_1'],
+                ['**0**', 3, false, '0_2'],
+                ['0_1', 4, false, '0_1_1']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $newValue1,
+                $newValue2,
+                $newValue3,
+                $newValue4
+            );
+        $em->expects($this->exactly(4))
             ->method('persist')
-            ->with($this->identicalTo($newValue1));
-        $enumRepo->expects($this->at(2))
-            ->method('createEnumValue')
-            ->with('*0*', 2, false, '0_1')
-            ->will($this->returnValue($newValue2));
-        $em->expects($this->at(2))
-            ->method('persist')
-            ->with($this->identicalTo($newValue2));
-        $enumRepo->expects($this->at(3))
-            ->method('createEnumValue')
-            ->with('**0**', 3, false, '0_2')
-            ->will($this->returnValue($newValue3));
-        $em->expects($this->at(3))
-            ->method('persist')
-            ->with($this->identicalTo($newValue3));
-        $enumRepo->expects($this->at(4))
-            ->method('createEnumValue')
-            ->with('0_1', 4, false, '0_1_1')
-            ->will($this->returnValue($newValue4));
-        $em->expects($this->at(4))
-            ->method('persist')
-            ->with($this->identicalTo($newValue4));
+            ->withConsecutive(
+                $newValue1,
+                $newValue2,
+                $newValue3,
+                $newValue4
+            );
 
         $em->expects($this->once())
             ->method('flush');
@@ -733,6 +778,14 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
+        $em->expects($this->once())
+            ->method('beginTransaction');
+        $em->expects($this->once())
+            ->method('commit');
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
@@ -751,7 +804,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->identicalTo($newValue));
 
-        $em->expects($this->once())
+        $em->expects($this->exactly(2))
             ->method('flush');
         $this->translationHelper->expects($this->once())
             ->method('invalidateCache')
@@ -827,12 +880,12 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $em
+     * @param \PHPUnit\Framework\MockObject\MockObject $em
      * @param string                                   $enumValueClassName
      * @param string                                   $locale
      * @param array                                    $values
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values)
     {
@@ -869,7 +922,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

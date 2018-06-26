@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\SimpleProcessorFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class CleanUpProcessorsCompilerPassTest extends \PHPUnit_Framework_TestCase
+class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessWithoutSimpleFactory()
     {

@@ -11,14 +11,14 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class AttributeTypeRegistryTest extends \PHPUnit_Framework_TestCase
+class AttributeTypeRegistryTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = \stdClass::class;
 
-    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var AttributeTypeRegistry */
@@ -160,7 +160,7 @@ class AttributeTypeRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      *
-     * @return AttributeTypeInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return AttributeTypeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getAttributeType($name)
     {

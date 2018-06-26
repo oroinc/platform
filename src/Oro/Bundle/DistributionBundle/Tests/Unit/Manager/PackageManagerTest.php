@@ -32,7 +32,7 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class PackageManagerTest extends \PHPUnit_Framework_TestCase
+class PackageManagerTest extends \PHPUnit\Framework\TestCase
 {
     use MockHelperTrait;
     use ReflectionHelperTrait;
@@ -325,7 +325,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('runInstallScripts')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $rootPackageMock */
         $rootPackageMock = $composer->getPackage();
         $rootPackageMock->expects($this->once())
             ->method('setRequires');
@@ -471,7 +471,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositories')
             ->will($this->returnValue([$localRepository]));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $rootPackageMock */
         $rootPackageMock = $composer->getPackage();
 
         $composer->expects($this->once())
@@ -578,7 +578,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositories')
             ->will($this->returnValue([new WritableArrayRepository($installedPackages)]));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $rootPackageMock */
         $rootPackageMock = $composer->getPackage();
 
         $composer->expects($this->once())
@@ -1260,7 +1260,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Composer
+     * @return \PHPUnit\Framework\MockObject\MockObject|Composer
      */
     protected function createComposerMock()
     {
@@ -1277,7 +1277,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RepositoryManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|RepositoryManager
      */
     protected function createRepositoryManagerMock()
     {
@@ -1285,7 +1285,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ComposerRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|ComposerRepository
      */
     protected function createComposerRepositoryMock()
     {
@@ -1293,7 +1293,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Installer
+     * @return \PHPUnit\Framework\MockObject\MockObject|Installer
      */
     protected function createComposerInstallerMock()
     {
@@ -1301,7 +1301,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Link
+     * @return \PHPUnit\Framework\MockObject\MockObject|Link
      */
     protected function createComposerPackageLinkMock()
     {
@@ -1309,7 +1309,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RootPackageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RootPackageInterface
      */
     protected function createRootPackageMock()
     {
@@ -1317,7 +1317,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|BufferIO
+     * @return \PHPUnit\Framework\MockObject\MockObject|BufferIO
      */
     protected function createComposerIO()
     {
@@ -1325,7 +1325,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Runner
+     * @return \PHPUnit\Framework\MockObject\MockObject|Runner
      */
     protected function createScriptRunnerMock()
     {
@@ -1333,7 +1333,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|InstallationManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|InstallationManager
      */
     protected function createInstallationManagerMock()
     {
@@ -1396,7 +1396,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      * @param string $packageName
      * @param bool $runReturnValue
      *
-     * @return Installer|\PHPUnit_Framework_MockObject_MockObject
+     * @return Installer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function prepareInstallerMock($packageName, $runReturnValue)
     {
@@ -1438,11 +1438,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $name
-     * @return PackageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return PackageInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createPackageMock($name)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Package $package */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Package $package */
         $package = $this->createMock('Composer\Package\PackageInterface');
         $package->id = $name . uniqid();
 
@@ -1454,7 +1454,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MaintenanceMode
+     * @return \PHPUnit\Framework\MockObject\MockObject|MaintenanceMode
      */
     protected function createMaintenanceMock()
     {
@@ -1464,7 +1464,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {
@@ -1473,7 +1473,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $bufferOutput
-     * @return BufferIO|\PHPUnit_Framework_MockObject_MockObject
+     * @return BufferIO|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createBufferIoMock($bufferOutput)
     {
@@ -1486,7 +1486,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|WritableRepositoryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|WritableRepositoryInterface
      */
     protected function createLocalRepositoryMock()
     {
@@ -1494,7 +1494,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MaintenanceMode
+     * @return \PHPUnit\Framework\MockObject\MockObject|MaintenanceMode
      */
     protected function getEnableMaintenanceMock()
     {

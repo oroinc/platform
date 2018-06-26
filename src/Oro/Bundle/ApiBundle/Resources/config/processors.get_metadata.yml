@@ -120,5 +120,6 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_metadata_factory'
             - '@oro_api.metadata_provider'
+            - '@oro_api.entity_override_provider_registry'
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -100 }

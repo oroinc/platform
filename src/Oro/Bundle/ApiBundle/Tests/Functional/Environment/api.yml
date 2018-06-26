@@ -12,9 +12,6 @@ api:
         Extend\Entity\EV_Api_Enum2:
             alias: testapienum2
             plural_alias: testapienum2
-        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceInheritedFromEntity:
-            alias: testapimodelinheritedfromentity
-            plural_alias: testapimodelinheritedfromentity
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment:
             alias: testapicurrentdepartment
             plural_alias: testapicurrentdepartments
@@ -24,6 +21,21 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestUnaccessibleModel:
             alias: testapiunaccessiblemodel
             plural_alias: testapiunaccessiblemodel
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassOwnerModel:
+            alias: testapioverrideclassowner
+            plural_alias: testapioverrideclassowners
+            override_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassOwner
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel:
+            alias: testapioverrideclasstarget
+            plural_alias: testapioverrideclasstargets
+            override_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTarget
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTargetA:
+            alias: testapioverrideclassanothertarget
+            plural_alias: testapioverrideclassanothertargets
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassActivityModel:
+            alias: testapioverrideclassactivity
+            plural_alias: testapioverrideclassactivities
+            override_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassActivity
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
@@ -79,6 +91,20 @@ api:
             sorters:
                 fields:
                     email: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrder:
+            fields:
+                poNumber:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
+                items:
+                    property_path: lineItems
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem:
+            fields:
+                quantity:
+                    form_options:
+                        constraints:
+                            - NotBlank: ~
         Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
             subresources:
                 accessible-target:
@@ -212,7 +238,6 @@ api:
                     fieldCurrency: ~
         Extend\Entity\TestApiE1: ~
         Extend\Entity\TestApiE2: ~
-        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceInheritedFromEntity: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
             fields:
@@ -265,3 +290,17 @@ api:
                         update_subresource: true
                         add_subresource: true
                         delete_subresource: true
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
+            fields:
+                activityTargets:
+                    data_type: association:manyToMany:activity
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassOwnerModel: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassTargetModel: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassTargetA: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestOverrideClassActivityModel: ~
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOverrideClassActivity:
+            fields:
+                activityTargets:
+                    data_type: association:manyToMany:activity

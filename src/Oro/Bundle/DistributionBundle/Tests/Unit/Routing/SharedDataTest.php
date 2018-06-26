@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Routing;
 use Oro\Bundle\DistributionBundle\Routing\SharedData;
 use Symfony\Component\Routing\RouteCollection;
 
-class SharedDataTest extends \PHPUnit_Framework_TestCase
+class SharedDataTest extends \PHPUnit\Framework\TestCase
 {
     public function testRoutes()
     {

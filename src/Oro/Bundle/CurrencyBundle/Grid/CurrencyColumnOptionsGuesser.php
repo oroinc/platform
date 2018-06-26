@@ -29,8 +29,6 @@ class CurrencyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                 'type' => 'choice',
                 'options' => [
                     'field_options' => [
-                        // TODO: remove 'choices_as_values' option and array_flip function below in scope of BAP-15236
-                        'choices_as_values' => true,
                         'choices' => $this->currencyHelper->getCurrencyChoices('full_name'),
                         'multiple' => true
                     ]

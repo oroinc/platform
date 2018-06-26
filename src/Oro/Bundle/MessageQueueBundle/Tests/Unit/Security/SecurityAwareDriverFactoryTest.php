@@ -11,15 +11,15 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class SecurityAwareDriverFactoryTest extends \PHPUnit_Framework_TestCase
+class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DriverFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverFactoryInterface */
     private $driverFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     private $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
     private $tokenSerializer;
 
     /** @var SecurityAwareDriverFactory */

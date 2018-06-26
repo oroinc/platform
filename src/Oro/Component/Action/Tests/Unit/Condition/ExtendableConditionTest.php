@@ -11,20 +11,20 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ExtendableConditionTest extends \PHPUnit_Framework_TestCase
+class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 
     /**
-     * @var FlashBag|\PHPUnit_Framework_MockObject_MockObject
+     * @var FlashBag|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $flashBag;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 

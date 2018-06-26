@@ -10,7 +10,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
+class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigurationPass
@@ -48,7 +48,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container **/
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();

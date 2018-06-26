@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class SwitchableFormRegistryTest extends \PHPUnit_Framework_TestCase
+class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

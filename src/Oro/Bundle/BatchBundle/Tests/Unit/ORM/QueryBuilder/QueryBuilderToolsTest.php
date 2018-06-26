@@ -7,7 +7,7 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
+class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
 {
     public function testPrepareFieldAliases()
     {
@@ -385,7 +385,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
      * @param string $join
      * @param string $condition
      * @param string $alias
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getJoinMock($join, $condition, $alias)
     {
@@ -407,7 +407,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getParameterMock($name)
     {
@@ -426,7 +426,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $parts
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getSelectMock($parts)
     {

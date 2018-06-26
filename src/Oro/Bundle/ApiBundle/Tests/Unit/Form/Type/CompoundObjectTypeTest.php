@@ -17,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class CompoundObjectTypeTest extends TypeTestCase
 {
@@ -40,6 +41,7 @@ class CompoundObjectTypeTest extends TypeTestCase
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );
     }
@@ -59,7 +61,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
@@ -83,7 +85,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['renamedName' => 'testName']);
@@ -106,7 +108,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['id' => '123']);
@@ -129,7 +131,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['renamedName' => 'testName']);
@@ -153,7 +155,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
@@ -177,7 +179,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['name' => 'testName']);
@@ -200,7 +202,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
@@ -225,7 +227,7 @@ class CompoundObjectTypeTest extends TypeTestCase
             [
                 'data_class' => Entity\User::class,
                 'metadata'   => $metadata,
-                'config'     => $config,
+                'config'     => $config
             ]
         );
         $form->submit(['owner' => ['name' => 'testName']]);
@@ -254,10 +256,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -286,10 +287,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -318,10 +318,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -350,10 +349,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -383,10 +381,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -417,10 +414,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -451,10 +447,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();
@@ -485,10 +480,9 @@ class CompoundObjectTypeTest extends TypeTestCase
             'price',
             CompoundObjectType::class,
             [
-                'data_class'   => Entity\ProductPrice::class,
-                'by_reference' => false,
-                'metadata'     => $metadata,
-                'config'       => $config,
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
             ]
         );
         $form = $formBuilder->getForm();

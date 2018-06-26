@@ -17,13 +17,13 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySerializer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
     protected $entitySerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     protected $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
     protected $entityTitleProvider;
 
     /** @var LoadExtendedAssociation */
@@ -138,7 +138,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals(
             [
                 'id'                   => 1,
-                ConfigUtil::CLASS_NAME => Entity\User::class,
+                ConfigUtil::CLASS_NAME => Entity\User::class
             ],
             $this->context->getResult()
         );

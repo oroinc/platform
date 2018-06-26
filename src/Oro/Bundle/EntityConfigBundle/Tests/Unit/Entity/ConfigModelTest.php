@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
-class ConfigModelTest extends \PHPUnit_Framework_TestCase
+class ConfigModelTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS = 'Oro\Bundle\TestBundle\Entity\TestEntity';
     const TEST_MODULE = 'OroTestBundle';

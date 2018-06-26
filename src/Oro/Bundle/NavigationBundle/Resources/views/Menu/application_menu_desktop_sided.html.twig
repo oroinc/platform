@@ -18,7 +18,7 @@
 
 {% block item %}
     {% if item.hasChildren and item.displayChildren %}
-        {%- set classes = classes|merge(['dropdown']) %}
+        {%- set classes = classes|merge(['dropdown', 'dropdown-level-' ~ item.level]) %}
         {%- if item.level != 1 %}
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
         {% endif -%}
@@ -48,9 +48,17 @@
         {% set linkAttributes = linkAttributes|merge({
             'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
         }) %}
+
+        {% if item.level > 1 %}
+            {% set linkAttributes = linkAttributes|merge({
+                'tabindex': -1
+            }) %}
+        {% endif %}
     {% endif %}
 
-    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
+    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}>
+        <span class="title {{ 'title-level-' ~ item.level}}">{{ block('label')|trim|raw }}</span>
+    </a>
 {% endblock %}
 
 {% block item_content %}

@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class WorkflowDefinitionHandleBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionHandleBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildFromRawConfiguration()
     {

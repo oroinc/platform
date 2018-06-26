@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 
-class AclLoadFieldMetadataListenerTest extends \PHPUnit_Framework_TestCase
+class AclLoadFieldMetadataListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnLoad()
     {
@@ -21,7 +21,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit_Framework_TestCase
         ];
         $event = new LoadFieldsMetadata($className, $fields);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $multicurrencyProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $multicurrencyProvider */
         $multicurrencyProvider = $this->createMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
         $multicurrencyProvider->expects($this->once())
             ->method('filter')
@@ -47,7 +47,7 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit_Framework_TestCase
                 )
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $entityProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $entityProvider */
         $entityProvider = $this->createMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
         $entityProvider->expects($this->once())
             ->method('getConfig')
@@ -61,14 +61,14 @@ class AclLoadFieldMetadataListenerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $configManager */
         $configManager = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigManager');
         $configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->withConsecutive(['multicurrency'], ['entity'])
             ->willReturnOnConsecutiveCalls($multicurrencyProvider, $entityProvider);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockForAbstractClass('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')

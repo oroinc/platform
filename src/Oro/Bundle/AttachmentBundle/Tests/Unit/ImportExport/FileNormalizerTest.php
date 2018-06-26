@@ -8,18 +8,18 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class FileNormalizerTest extends \PHPUnit_Framework_TestCase
+class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileNormalizer */
     protected $normalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $validator;
 
     public function setUp()

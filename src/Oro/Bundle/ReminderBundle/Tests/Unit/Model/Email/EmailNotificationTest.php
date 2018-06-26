@@ -9,7 +9,7 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailNotification;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailNotificationTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 {
     const LOCALE   = 'locale';
     const EMAIL    = 'test@example.com';
@@ -19,22 +19,22 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     const SENDER_NAME = 'John Doe';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $provider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $sender;
 

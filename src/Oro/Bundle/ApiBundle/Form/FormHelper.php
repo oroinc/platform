@@ -7,36 +7,51 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Provides a set of reusable utility methods to simplify
  * creation and configuration of FormBuilder for forms used in Data API actions,
- * such as "create", "update", "update_relationship", "add_relationship" and "delete_relationship".
+ * such as "create", "update",
+ * "update_subresource", "add_subresource" and "delete_subresource",
+ * "update_relationship", "add_relationship" and "delete_relationship".
  */
 class FormHelper
 {
-    const EXTRA_FIELDS_MESSAGE = 'oro.api.form.extra_fields';
+    public const EXTRA_FIELDS_MESSAGE = 'oro.api.form.extra_fields';
 
     /** @var FormFactoryInterface */
     private $formFactory;
+
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
 
     /** @var ContainerInterface */
     private $container;
 
     /**
-     * @param FormFactoryInterface $formFactory
-     * @param ContainerInterface   $container
+     * @param FormFactoryInterface      $formFactory
+     * @param PropertyAccessorInterface $propertyAccessor
+     * @param ContainerInterface        $container
      */
-    public function __construct(FormFactoryInterface $formFactory, ContainerInterface $container)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        PropertyAccessorInterface $propertyAccessor,
+        ContainerInterface $container
+    ) {
         $this->formFactory = $formFactory;
+        $this->propertyAccessor = $propertyAccessor;
         $this->container = $container;
     }
 
     /**
      * Creates a form builder.
+     * Please note that the form validation is disabled by default,
+     * to enable it use "enable_validation" option.
+     * @see getFormDefaultOptions to find all default options
      *
      * @param string     $formType
      * @param mixed      $data
@@ -51,15 +66,11 @@ class FormHelper
             null,
             $formType,
             $data,
-            array_merge($this->getFormDefaultOptions(), $options)
+            \array_merge($this->getFormDefaultOptions(), $options)
         );
+        $formBuilder->setDataMapper(new PropertyPathMapper($this->propertyAccessor));
         if (!empty($eventSubscribers)) {
-            foreach ($eventSubscribers as $eventSubscriber) {
-                if (is_string($eventSubscriber)) {
-                    $eventSubscriber = $this->container->get($eventSubscriber);
-                }
-                $formBuilder->addEventSubscriber($eventSubscriber);
-            }
+            $this->addFormEventSubscribers($formBuilder, $eventSubscribers);
         }
 
         return $formBuilder;
@@ -100,6 +111,7 @@ class FormHelper
      * @param string                      $fieldName
      * @param EntityDefinitionFieldConfig $fieldConfig
      * @param PropertyMetadata            $fieldMetadata
+     * @param array                       $options
      *
      * @return FormBuilderInterface
      */
@@ -107,13 +119,24 @@ class FormHelper
         FormBuilderInterface $formBuilder,
         $fieldName,
         EntityDefinitionFieldConfig $fieldConfig,
-        PropertyMetadata $fieldMetadata
+        PropertyMetadata $fieldMetadata,
+        array $options = []
     ) {
-        return $formBuilder->add(
+        $fieldFormBuilder = $formBuilder->add(
             $fieldName,
             $fieldConfig->getFormType(),
-            $this->getFormFieldOptions($fieldMetadata, $fieldConfig)
+            \array_replace($options, $this->getFormFieldOptions($fieldMetadata, $fieldConfig))
         );
+
+        $targetConfig = $fieldConfig->getTargetEntity();
+        if (null !== $targetConfig) {
+            $eventSubscribers = $targetConfig->getFormEventSubscribers();
+            if (!empty($eventSubscribers)) {
+                $this->addFormEventSubscribers($fieldFormBuilder, $eventSubscribers);
+            }
+        }
+
+        return $fieldFormBuilder;
     }
 
     /**
@@ -125,7 +148,8 @@ class FormHelper
     {
         return [
             'validation_groups'    => ['Default', 'api'],
-            'extra_fields_message' => self::EXTRA_FIELDS_MESSAGE
+            'extra_fields_message' => self::EXTRA_FIELDS_MESSAGE,
+            'enable_validation'    => false
         ];
     }
 
@@ -143,13 +167,29 @@ class FormHelper
         if (null === $options) {
             $options = [];
         }
-        $propertyPath = $property->getPropertyPath();
-        if (!$propertyPath) {
-            $options['mapped'] = false;
-        } elseif ($propertyPath !== $property->getName()) {
-            $options['property_path'] = $propertyPath;
+        if (!\array_key_exists('property_path', $options)) {
+            $propertyPath = $property->getPropertyPath();
+            if (!$propertyPath) {
+                $options['mapped'] = false;
+            } elseif ($propertyPath !== $property->getName()) {
+                $options['property_path'] = $propertyPath;
+            }
         }
 
         return $options;
+    }
+
+    /**
+     * @param FormBuilderInterface $formBuilder
+     * @param array                $eventSubscribers
+     */
+    private function addFormEventSubscribers(FormBuilderInterface $formBuilder, array $eventSubscribers)
+    {
+        foreach ($eventSubscribers as $eventSubscriber) {
+            if (\is_string($eventSubscriber)) {
+                $eventSubscriber = $this->container->get($eventSubscriber);
+            }
+            $formBuilder->addEventSubscriber($eventSubscriber);
+        }
     }
 }

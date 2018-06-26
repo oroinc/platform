@@ -5,7 +5,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Exception;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
-class VerboseExceptionTest extends \PHPUnit_Framework_TestCase
+class VerboseExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;
 

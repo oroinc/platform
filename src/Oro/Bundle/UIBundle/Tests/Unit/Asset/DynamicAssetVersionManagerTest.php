@@ -4,9 +4,9 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 
-class DynamicAssetVersionManagerTest extends \PHPUnit_Framework_TestCase
+class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
     /** @var DynamicAssetVersionManager */

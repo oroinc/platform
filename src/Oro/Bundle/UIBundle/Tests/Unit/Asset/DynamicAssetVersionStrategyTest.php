@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionStrategy;
 
-class DynamicAssetVersionStrategyTest extends \PHPUnit_Framework_TestCase
+class DynamicAssetVersionStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider applyVersionProvider

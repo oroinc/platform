@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
 
-class MixinConfigurationHelperTest extends \PHPUnit_Framework_TestCase
+class MixinConfigurationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MixinConfigurationHelper
@@ -14,7 +14,7 @@ class MixinConfigurationHelperTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationProviderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface
      */
     protected $configProvider;
 

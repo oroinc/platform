@@ -9,15 +9,15 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class AddressFormatterTest extends \PHPUnit_Framework_TestCase
+class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings
+     * @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings
      */
     protected $localeSettings;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|NameFormatter
+     * @var \PHPUnit\Framework\MockObject\MockObject|NameFormatter
      */
     protected $nameFormatter;
 

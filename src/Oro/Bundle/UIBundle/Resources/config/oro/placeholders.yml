@@ -9,7 +9,7 @@ placeholders:
                 user_dots_menu:
                     order: 150
                 help:
-                    order: 200
+                    order: 100
         form_buttons:
             items:
                 add_update_delete:
@@ -20,14 +20,6 @@ placeholders:
             items:
                 ui_requirejs_config:
                     order: 10
-        right_panel:
-            items:
-                navbar:
-                    order: 250
-        left_panel:
-            items:
-                navbar:
-                    order: 150
         view_navButtons_after:
             items:
                 view_buttons:
@@ -36,6 +28,9 @@ placeholders:
             items:
                 update_buttons:
                     order: 200
+        before_body_end:
+            items:
+                debug_toolbar_view: ~
 
     items:
         logo:
@@ -48,8 +43,6 @@ placeholders:
             template: OroUIBundle:Form:buttons.html.twig
         ui_requirejs_config:
             template: OroUIBundle::requirejs.config.js.twig
-        navbar:
-            template: OroUIBundle:Default/navbar:sided.html.twig
         view_buttons:
             template: OroUIBundle::buttons.html.twig
             applicable: "@oro_ui.widget_provider.view_actions->supports($entity$)"
@@ -58,3 +51,5 @@ placeholders:
             template: OroUIBundle::buttons.html.twig
             applicable: "@oro_ui.widget_provider.update_actions->supports($entity$)"
             data: "@oro_ui.widget_provider.update_actions->getWidgets($entity$)"
+        debug_toolbar_view:
+            template: OroUIBundle::debug_toolbar_view.html.twig

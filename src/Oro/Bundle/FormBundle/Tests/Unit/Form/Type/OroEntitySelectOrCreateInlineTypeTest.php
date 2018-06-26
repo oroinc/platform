@@ -9,13 +9,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OroEntitySelectOrCreateInlineType */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OroEntitySelectOrCreateInlineType */
     protected $formType;
 
     protected function setUp()
@@ -53,7 +53,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->setMethods(['getClassMetadata', 'getRepository'])
             ->getMockForAbstractClass();
 
-        /** EntityToIdTransformer|\PHPUnit_Framework_MockObject_MockObject */
+        /** EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
         $entityToIdTransformer =
             $this->getMockBuilder('Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer')
                 ->disableOriginalConstructor()

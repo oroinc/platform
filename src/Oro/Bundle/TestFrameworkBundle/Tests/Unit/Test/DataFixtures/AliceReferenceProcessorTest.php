@@ -10,10 +10,10 @@ use Nelmio\Alice\Instances\Processor\Processable;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class AliceReferenceProcessorTest extends \PHPUnit_Framework_TestCase
+class AliceReferenceProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var RegistryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var RegistryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $registry;
 

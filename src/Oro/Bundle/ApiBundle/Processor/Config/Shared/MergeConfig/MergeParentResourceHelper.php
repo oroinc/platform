@@ -5,10 +5,14 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigBagInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Provides a method to merge entity configuration with configuration of parent entity.
+ */
 class MergeParentResourceHelper
 {
     /** @var ConfigProvider */
@@ -36,7 +40,7 @@ class MergeParentResourceHelper
         );
         if ($parentConfig->hasDefinition()) {
             $parentDefinition = $parentConfig->getDefinition();
-            $parentDefinition->remove(ConfigUtil::EXCLUSION_POLICY);
+            $parentDefinition->setExclusionPolicy(null);
             if ($context->hasResult()) {
                 $this->mergeDefinition($parentDefinition, $context->getResult());
             }
@@ -46,7 +50,7 @@ class MergeParentResourceHelper
         }
         foreach ($parentConfig as $sectionName => $parentSection) {
             if ($parentSection instanceof EntityConfigInterface) {
-                $parentSection->remove(ConfigUtil::EXCLUSION_POLICY);
+                $parentSection->setExclusionPolicy(null);
                 if ($context->has($sectionName)) {
                     $this->mergeConfigSection($parentSection, $context->get($sectionName));
                 }
@@ -62,12 +66,12 @@ class MergeParentResourceHelper
     protected function mergeDefinition(EntityDefinitionConfig $config, EntityDefinitionConfig $configToMerge)
     {
         $config->setKey($configToMerge->getKey());
-        $this->mergeConfigAttributes($config, $configToMerge);
+        $this->mergeEntityConfigAttributes($config, $configToMerge);
         $fieldsToMerge = $configToMerge->getFields();
         foreach ($fieldsToMerge as $fieldName => $fieldToMerge) {
             if ($config->hasField($fieldName)) {
                 $field = $config->getField($fieldName);
-                $this->mergeConfigAttributes($field, $fieldToMerge);
+                $this->mergeFieldConfigAttributes($field, $fieldToMerge);
                 $targetEntity = $field->getTargetEntity();
                 $targetEntityToMerge = $fieldToMerge->getTargetEntity();
                 if (null !== $targetEntity) {
@@ -90,14 +94,38 @@ class MergeParentResourceHelper
      */
     protected function mergeConfigSection(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
     {
-        $this->mergeConfigAttributes($config, $configToMerge);
+        $this->mergeEntityConfigAttributes($config, $configToMerge);
         $fieldsToMerge = $configToMerge->getFields();
         foreach ($fieldsToMerge as $fieldName => $fieldToMerge) {
             if ($config->hasField($fieldName)) {
-                $this->mergeConfigAttributes($config->getField($fieldName), $fieldToMerge);
+                $this->mergeFieldConfigAttributes($config->getField($fieldName), $fieldToMerge);
             } else {
                 $config->addField($fieldName, $fieldToMerge);
             }
+        }
+    }
+
+    /**
+     * @param EntityConfigInterface $config
+     * @param EntityConfigInterface $configToMerge
+     */
+    protected function mergeEntityConfigAttributes(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
+    {
+        $this->mergeConfigAttributes($config, $configToMerge);
+        if ($configToMerge->hasExclusionPolicy()) {
+            $config->setExclusionPolicy($configToMerge->getExclusionPolicy());
+        }
+    }
+
+    /**
+     * @param FieldConfigInterface $config
+     * @param FieldConfigInterface $configToMerge
+     */
+    protected function mergeFieldConfigAttributes(FieldConfigInterface $config, FieldConfigInterface $configToMerge)
+    {
+        $this->mergeConfigAttributes($config, $configToMerge);
+        if ($configToMerge->hasExcluded()) {
+            $config->setExcluded($configToMerge->isExcluded());
         }
     }
 

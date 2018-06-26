@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -13,8 +14,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Handles request and reset password logic
+ */
 class ResetController extends Controller
 {
+    use ObfuscatedEmailTrait;
+
     const SESSION_EMAIL = 'oro_user_reset_email';
 
     /**
@@ -51,7 +57,7 @@ class ResetController extends Controller
             $user->setConfirmationToken($user->generateToken());
         }
 
-        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user->getEmail()));
         try {
             $this->get('oro_user.mailer.processor')->sendResetPasswordEmail($user);
         } catch (\Exception $e) {
@@ -111,7 +117,7 @@ class ResetController extends Controller
         $resetPasswordHandler = $this->get('oro_user.handler.reset_password_handler');
         $translator = $this->get('translator');
 
-        $session->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+        $session->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user->getEmail()));
 
         $resetPasswordSuccess = $resetPasswordHandler->resetPasswordAndNotify($user);
         $em->flush();
@@ -263,25 +269,6 @@ class ResetController extends Controller
         $responseData['formAction'] = $formAction;
 
         return $responseData;
-    }
-
-    /**
-     * Get the truncated email displayed when requesting the resetting.
-     * The default implementation only keeps the part following @ in the address.
-     *
-     * @param User $user
-     *
-     * @return string
-     */
-    protected function getObfuscatedEmail(User $user)
-    {
-        $email = $user->getEmail();
-
-        if (false !== $pos = strpos($email, '@')) {
-            $email = '...' . substr($email, $pos);
-        }
-
-        return $email;
     }
 
     /**

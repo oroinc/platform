@@ -7,21 +7,21 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
 use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
-class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
+class ProcessFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionAssembler $actionAssembler */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler $actionAssembler */
         $actionAssembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ProcessDefinition $processDefinition */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessDefinition $processDefinition */
         $processDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory $conditionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();

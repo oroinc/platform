@@ -8,7 +8,7 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Entity\TestFilter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class WidgetProviderFilterTest extends \PHPUnit_Framework_TestCase
+class WidgetProviderFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetProviderFilterManager */
     protected $widgetProviderFilter;

@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilterInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
-class AclPrivilegeConfigurableFilterTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeConfigurableFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeConfigurableFilter */
     protected $filter;
@@ -19,7 +19,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        /** @var ConfigurablePermissionProvider|\PHPUnit_Framework_MockObject_MockObject $permissionProvider */
+        /** @var ConfigurablePermissionProvider|\PHPUnit\Framework\MockObject\MockObject $permissionProvider */
         $permissionProvider = $this->createMock(ConfigurablePermissionProvider::class);
         $permissionProvider->expects($this->any())->method('get')
             ->willReturn($this->createMock(ConfigurablePermission::class));
@@ -83,7 +83,7 @@ class AclPrivilegeConfigurableFilterTest extends \PHPUnit_Framework_TestCase
      * @param bool $isSupported
      * @param bool $result
      *
-     * @return AclPrivilegeConfigurableFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return AclPrivilegeConfigurableFilterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createFilter($isSupported, $result)
     {

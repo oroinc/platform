@@ -82,8 +82,6 @@ class ActivityListFilterHelper
                     'options'   => [
                         'field_options' => [
                             'multiple' => true,
-                            // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            'choices_as_values' => true,
                             'choices' => $this->chainProvider->getSupportedActivities()
                         ]
                     ]

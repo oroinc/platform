@@ -21,8 +21,6 @@ class TagConfigChoiceType extends AbstractConfigType
         $resolver->setDefaults(
             [
                 'placeholder' => false,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => [
                     'No' => 0,
                     'Yes' => 1,

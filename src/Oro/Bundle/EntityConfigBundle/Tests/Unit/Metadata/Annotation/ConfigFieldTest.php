@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Annotation;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-class ConfigFieldTest extends \PHPUnit_Framework_TestCase
+class ConfigFieldTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider constructorDataProvider

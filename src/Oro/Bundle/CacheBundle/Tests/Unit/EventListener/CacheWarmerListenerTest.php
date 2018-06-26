@@ -6,7 +6,7 @@ use Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener;
 use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
 use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 
-class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
+class CacheWarmerListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CacheWarmerListener */
     protected $listener;
@@ -77,7 +77,7 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isCall
-     * @return ConfigCacheWarmerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigCacheWarmerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createWarmer($isCall)
     {
@@ -90,7 +90,7 @@ class CacheWarmerListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isFresh
-     * @return ConfigMetadataDumperInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigMetadataDumperInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createDumper($isFresh)
     {

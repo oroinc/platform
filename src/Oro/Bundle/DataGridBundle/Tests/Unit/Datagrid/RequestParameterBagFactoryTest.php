@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
+class RequestParameterBagFactoryTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'testGrid';
 
@@ -15,7 +15,7 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
     /** @var RequestParameterBagFactory */
     protected $factory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     protected function setUp()
@@ -36,11 +36,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue($gridParameters));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue(array()));
 
         $parameters = $this->factory->createParameters($gridName);
@@ -60,11 +60,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue($gridParameters));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue($minifiedParameters));
 
         $parameters = $this->factory->createParameters($gridName);
@@ -83,11 +83,11 @@ class RequestParameterBagFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->at(0))
             ->method('get')
-            ->with($gridName, [], false)
+            ->with($gridName, [])
             ->will($this->returnValue('foo'));
         $this->request->expects($this->at(1))
             ->method('get')
-            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [], false)
+            ->with(RequestParameterBagFactory::DEFAULT_ROOT_PARAM, [])
             ->will($this->returnValue(null));
 
         $parameters = $this->factory->createParameters($gridName);

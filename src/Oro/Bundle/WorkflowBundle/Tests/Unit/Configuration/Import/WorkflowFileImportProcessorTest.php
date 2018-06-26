@@ -6,14 +6,14 @@ use Oro\Bundle\WorkflowBundle\Configuration\ConfigImportProcessorInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
-class WorkflowFileImportProcessorTest extends \PHPUnit_Framework_TestCase
+class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const FILE_PATH = './filePath';
 
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
-    /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $parentProcessor;
 
     /** @var string */

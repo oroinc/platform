@@ -3,29 +3,36 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Provides implementation of FormContext interface.
+ * Provides the implementation for methods from FormContext interface.
  * @see \Oro\Bundle\ApiBundle\Processor\FormContext
  */
 trait FormContextTrait
 {
     /** @var array */
-    protected $requestData;
+    private $requestData;
 
     /** @var array */
-    protected $includedData;
+    private $includedData;
 
     /** @var IncludedEntityCollection|null */
-    protected $includedEntities;
+    private $includedEntities;
+
+    /** @var EntityMapper|null */
+    private $entityMapper;
 
     /** @var FormBuilderInterface|null */
-    protected $formBuilder;
+    private $formBuilder;
 
     /** @var FormInterface|null */
-    protected $form;
+    private $form;
+
+    /** @var bool */
+    protected $skipFormValidation = false;
 
     /**
      * Returns request data.
@@ -88,6 +95,26 @@ trait FormContextTrait
     }
 
     /**
+     * Gets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @return EntityMapper|null
+     */
+    public function getEntityMapper()
+    {
+        return $this->entityMapper;
+    }
+
+    /**
+     * Sets a service that can be used to convert an entity object to a model object and vise versa.
+     *
+     * @param EntityMapper|null $entityMapper
+     */
+    public function setEntityMapper(EntityMapper $entityMapper = null)
+    {
+        $this->entityMapper = $entityMapper;
+    }
+
+    /**
      * Checks whether the form builder exists.
      *
      * @return bool
@@ -145,5 +172,25 @@ trait FormContextTrait
     public function setForm(FormInterface $form = null)
     {
         $this->form = $form;
+    }
+
+    /**
+     * Indicates whether the validation of the form should be skipped or not.
+     *
+     * @return bool
+     */
+    public function isFormValidationSkipped()
+    {
+        return $this->skipFormValidation;
+    }
+
+    /**
+     * Sets a flag indicates whether the validation of the form should be skipped or not.
+     *
+     * @param bool $skipFormValidation
+     */
+    public function skipFormValidation($skipFormValidation)
+    {
+        $this->skipFormValidation = $skipFormValidation;
     }
 }

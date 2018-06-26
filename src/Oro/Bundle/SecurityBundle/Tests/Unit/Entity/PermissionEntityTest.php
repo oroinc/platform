@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 
-class PermissionEntityTest extends \PHPUnit_Framework_TestCase
+class PermissionEntityTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PermissionEntity */
     protected $object;

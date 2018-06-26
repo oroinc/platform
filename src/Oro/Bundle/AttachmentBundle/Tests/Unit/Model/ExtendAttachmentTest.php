@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Model;
 
 use Oro\Bundle\AttachmentBundle\Model\ExtendAttachment;
 
-class ExtendAttachmentTest extends \PHPUnit_Framework_TestCase
+class ExtendAttachmentTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendAttachment */
     protected $extendedAttachment;

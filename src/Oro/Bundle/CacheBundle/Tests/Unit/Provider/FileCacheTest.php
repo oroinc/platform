@@ -5,7 +5,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class FileCacheTest extends \PHPUnit_Framework_TestCase
+class FileCacheTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $cacheClass
@@ -48,7 +48,7 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
     {
         $namespace = '123';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SyncCacheInterface $cache */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SyncCacheInterface $cache */
         $cache = $this->getMockBuilder($cacheClass)
             ->disableOriginalConstructor()
             ->setMethods(['setNamespace', 'getNamespace'])

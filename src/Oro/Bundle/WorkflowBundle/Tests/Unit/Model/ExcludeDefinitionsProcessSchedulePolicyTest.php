@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 use Oro\Bundle\WorkflowBundle\Model\ExcludeDefinitionsProcessSchedulePolicy;
 
-class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit_Framework_TestCase
+class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExcludeDefinitionsProcessSchedulePolicy
@@ -142,7 +142,7 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit_Framework_Tes
     /**
      * @param string $processDefinitionName
      * @param array $excludeDefinitions
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockProcessTrigger($processDefinitionName, array $excludeDefinitions = array())
     {
@@ -167,7 +167,7 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit_Framework_Tes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockProcessData()
     {
@@ -177,7 +177,7 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit_Framework_Tes
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getMockProcess()
     {

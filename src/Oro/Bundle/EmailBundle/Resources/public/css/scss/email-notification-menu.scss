@@ -1,38 +1,43 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
+
+@import "email-variables";
+@import "oroui/css/scss/mixins";
 
 .email-notification-menu {
-    .fa-envelope {
-        color: #fff;
-
-        &.highlight {
-            color: #fabb18;
-        }
-    }
-
     .oro-dropdown-toggle {
-        .fa-envelope {
+        .mail-icon {
+            @include fa-icon($email-inactive-mail-icon);
             position: relative;
             padding-top: 3px;
-
-            span {
+            display: inline-block;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 16px;
+            line-height: 16px;
+            .item-counter {
                 display: none;
-                background: #36424c;
+                color: $primary-inverse;
+                background-color: $extra;
+                color: $email-item-counter-text-color;
+                background-color: $email-item-counter-bg;
             }
-
-            &.highlight {
-                width: 25px;
-
-                span {
+            &.has-icon-counter {
+                .item-counter {
                     display: inline-block;
                 }
+            }
+            &.highlight {
+                @include fa-icon($email-active-mail-icon);
             }
         }
     }
 
     .dropdown-menu {
-        width: 335px !important;
+        background-color: $email-dropdown-bg;
+        width: $email-recent-emails-popup-width !important;
         padding: 0;
         outline: none;
+        right: -7px;
 
         .empty {
             padding: 5px 10px;
@@ -42,13 +47,12 @@
     .new-email-notification {
         position: absolute;
         top: 100%;
-        right: 0;
-        margin-top: 6px;
+        right: -18px;
         display: none;
         width: 160px;
         padding: 8px 12px;
-        background: #fff;
-        color: #666;
+        background: $email-dropdown-bg;
+        color: $primary-400;
         border-radius: 4px;
         z-index: $zindexPopover;
         box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .5);
@@ -58,7 +62,7 @@
             display: inline-block;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-bottom: 6px solid #fff;
+            border-bottom: 6px solid $email-dropdown-bg;
             position: absolute;
             top: -6px;
             right: 24px;

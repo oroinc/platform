@@ -3,7 +3,7 @@ placeholders:
         user_menu:
             items:
                 menu_user:
-                    order: 100
+                    order: 200
         scripts_after:
             items:
                 oro_user_outdated_page:

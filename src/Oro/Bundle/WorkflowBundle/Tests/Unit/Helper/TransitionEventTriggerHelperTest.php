@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var TransitionEventTrigger */

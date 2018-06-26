@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CommonTemplateDataPr
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class CommonTemplateDataProcessorTest extends \PHPUnit_Framework_TestCase
+class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  CommonTemplateDataProcessor */
     protected $processor;
@@ -23,16 +23,16 @@ class CommonTemplateDataProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testDataProcessing()
     {
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $formView */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
@@ -61,7 +61,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipNonTemplateResponseTypeContext()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
@@ -74,7 +74,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipSavedContext()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')

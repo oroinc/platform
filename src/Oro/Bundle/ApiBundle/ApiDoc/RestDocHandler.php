@@ -23,7 +23,9 @@ use Symfony\Component\Routing\Route;
  */
 class RestDocHandler implements HandlerInterface
 {
-    private const ID_PLACEHOLDER = '{id}';
+    private const ID_PLACEHOLDER   = '{id}';
+    private const INPUT_DIRECTION  = 'input';
+    private const OUTPUT_DIRECTION = 'output';
 
     private const SUCCESS_STATUS_CODES_WITH_CONTENT = [
         Response::HTTP_OK,
@@ -112,10 +114,17 @@ class RestDocHandler implements HandlerInterface
         }
 
         if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+            $entityConfig = $config;
+            $entityMetadata = $metadata;
+            if ($associationName) {
+                $entityConfig = $context->getParentConfig();
+                $entityMetadata = $context->getParentMetadata();
+            }
             $this->identifierHandler->handle(
                 $annotation,
                 $route,
-                $associationName ? $context->getParentMetadata() : $metadata
+                $entityMetadata,
+                $entityConfig->getIdentifierDescription()
             );
         }
 
@@ -268,8 +277,8 @@ class RestDocHandler implements HandlerInterface
         if ($this->isActionWithInput($action)) {
             $this->setDirectionValue(
                 $annotation,
-                'input',
-                $this->getDirectionValue($action, 'input', $config, $metadata)
+                self::INPUT_DIRECTION,
+                $this->getDirectionValue($action, self::INPUT_DIRECTION, $config, $metadata)
             );
         }
     }
@@ -304,8 +313,8 @@ class RestDocHandler implements HandlerInterface
 
             $this->setDirectionValue(
                 $annotation,
-                'output',
-                $this->getDirectionValue($action, 'output', $config, $metadata)
+                self::OUTPUT_DIRECTION,
+                $this->getDirectionValue($action, self::OUTPUT_DIRECTION, $config, $metadata)
             );
         }
     }

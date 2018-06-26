@@ -18,10 +18,14 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+/**
+ * Guesses form types based on "form_type_guesses" configuration and Data API metadata.
+ */
 class MetadataTypeGuesser implements FormTypeGuesserInterface
 {
     /** @var array [data type => [form type, options], ...] */
@@ -35,6 +39,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
 
     /** @var ConfigAccessorInterface|null */
     protected $configAccessor;
+
+    /** @var EntityMapper|null */
+    protected $entityMapper;
 
     /** @var IncludedEntityCollection|null */
     protected $includedEntities;
@@ -79,6 +86,22 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     public function setConfigAccessor(ConfigAccessorInterface $configAccessor = null)
     {
         $this->configAccessor = $configAccessor;
+    }
+
+    /**
+     * @return EntityMapper|null
+     */
+    public function getEntityMapper()
+    {
+        return $this->entityMapper;
+    }
+
+    /**
+     * @param EntityMapper|null $entityMapper
+     */
+    public function setEntityMapper(EntityMapper $entityMapper = null)
+    {
+        $this->entityMapper = $entityMapper;
     }
 
     /**
@@ -255,7 +278,11 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return $this->createTypeGuess(
             EntityType::class,
-            ['metadata' => $metadata, 'included_entities' => $this->includedEntities],
+            [
+                'metadata'          => $metadata,
+                'entity_mapper'     => $this->entityMapper,
+                'included_entities' => $this->includedEntities
+            ],
             TypeGuess::HIGH_CONFIDENCE
         );
     }

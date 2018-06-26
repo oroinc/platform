@@ -5,9 +5,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Processor;
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 
-class ContentProcessorTest extends \PHPUnit_Framework_TestCase
+class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $part;
 
     /** @var ContentProcessor */

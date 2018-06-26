@@ -6,9 +6,9 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class TransitionTranslationHelperTest extends \PHPUnit_Framework_TestCase
+class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var TransitionTranslationHelper */

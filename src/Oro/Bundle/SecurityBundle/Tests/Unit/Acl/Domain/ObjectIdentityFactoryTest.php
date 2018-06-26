@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntityImplementsDomainObjectInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 
-class ObjectIdentityFactoryTest extends \PHPUnit_Framework_TestCase
+class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ObjectIdentityFactory

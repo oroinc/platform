@@ -7,15 +7,15 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Configuration\Checker\ConfigurationChecker;
 use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
-class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
+class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionPermissionProvider */
     protected $provider;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    /** @var ConfigurationChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationChecker;
 
     protected function setUp()
@@ -370,7 +370,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $active weather workflow is active
-     * @return \PHPUnit_Framework_MockObject_MockObject|ResultRecordInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ResultRecordInterface
      */
     protected function getDefinitionMock($active)
     {

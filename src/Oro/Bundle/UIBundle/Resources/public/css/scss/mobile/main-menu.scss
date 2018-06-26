@@ -1,103 +1,192 @@
-$mainMenuFontColor:                        #444;
-$mainMenuWidth:                            240px;
-$mainMenuBackgroundColor:                  $accordion-heading-background-color;
-$mainMenuBorderColor:                      darken($mainMenuBackgroundColor, 5%);
+/* @theme: admin.oro; */
 
-#main-menu {
-  display: none;
-  position: fixed;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  padding-bottom: $headerHeight;
-  z-index: $oro-mobile-header-zindex;
-  background: rgba(0,0,0,0.5);
-  > ul {
-    background: white;
-    width: $mainMenuWidth;
-    overflow: auto;
-    height: 100%;
-    margin-bottom: 0;
-    > .accordion-group > .accordion-heading [class^="fa-"] {
-      // hide first level icons
-      display: none !important;
-    }
-  }
-  > .main-menu {
-    margin-left: 0;
-    /* iOS 11 */
-    margin-left: constant(safe-area-inset-left);
-    /* iOS 11.2+ */
-    margin-left: env(safe-area-inset-left);
-  }
-  ul {
-    margin-left: 0;
-  }
-  a {
-    display: block;
-    color: $mainMenuFontColor;
-    .title {
-      font-size: $base-font-size--l;
-      display: block;
-      padding: 8px 10px;
-      border-bottom: 1px solid lighten($mainMenuBorderColor, 5%);
-    }
-  }
-  .active > a {
-    font-weight: bold;
-  }
-  .accordion-toggle.title {
-    margin: 0;
-    font-size: $base-font-size * 1.3;
-    @include accordion-toggle();
-  }
-  .accordion-toggle:before {
-    @include accordion-toggle-before();
-  }
-  .accordion-toggle.collapsed:before {
-    @include accordion-toggle-collapsed-before();
-  }
-  .menu_level_1 {
-    .title {
-      padding-left: 25px;
-    }
-    .accordion-toggle {
-      padding-left: 32px;
-      background: lighten($mainMenuBackgroundColor, 3%);
-      border-bottom-color: lighten($mainMenuBorderColor, 3%);
-    }
-    > .dropdown-menu-title,
-    > .dropdown-menu-title + .divider {
-      display: none;
-    }
-  }
-  .menu_level_2 {
-    .title {
-      padding-left: 42px;
-    }
-    .accordion-toggle {
-      padding-left: 49px;
-      background: lighten($mainMenuBackgroundColor, 6%);
-      border-bottom-color: lighten($mainMenuBorderColor, 6%);
-    }
-  }
-  .menu_level_3 {
-    .title {
-      padding-left: 59px;
-    }
-    .accordion-toggle {
-      padding-left: 66px;
-      background: lighten($mainMenuBackgroundColor, 9%);
-      border-bottom-color: lighten($mainMenuBorderColor, 9%);
-    }
-  }
-  .accordion-group {
-    @include accordion-group();
-  }
-  .accordion-body.accordion {
-    margin-bottom: 0;
-  }
-  .divider {
+$main-menu-mobile-width: 320px;
+
+.main-menu-top {
     display: none;
-  }
+    position: fixed;
+    z-index: $oro-mobile-header-zindex;
+
+    width: 100%;
+    top: $app-header-height;
+    bottom: 0;
+
+    font-size: $menu-font-size + 2;
+
+    background: rgba($primary-inverse, .5);
+
+    overflow: hidden;
+
+    @include fa-icon($fa-var-times, after);
+
+    &:after {
+        position: absolute;
+        top: 5px;
+        left: $main-menu-mobile-width - 36px;
+
+        width: 32px;
+        height: 32px;
+
+        text-align: center;
+        line-height: 32px;
+
+        border-radius: 50%;
+        background-color: rgba($menu-background-color, .15);
+        color: $menu-full-screen-button-color;
+    }
+
+    .divider {
+        height: 1px;
+
+        border: 1px solid $menu-item-divider-color;
+        border-width: 1px 0 0;
+    }
+
+    .main-menu {
+        height: 100%;
+
+        margin-bottom: 0;
+
+        margin-left: 0;
+        /* iOS 11 */
+        margin-left: constant(safe-area-inset-left);
+        /* iOS 11.2+ */
+        margin-left: env(safe-area-inset-left);
+
+        padding-top: 8px;
+
+        width: $main-menu-mobile-width;
+        background-color: $menu-background-color;
+
+        box-shadow:0 2px 10px 0 rgba(0, 0, 0, 0.19);
+
+        overflow: auto;
+    }
+
+    .accordion {
+        .title {
+            @include text-line-truncate();
+        }
+
+        a {
+            display: block;
+        }
+    }
+
+    .accordion-group {
+        margin-bottom: 0;
+
+        border: none;
+        border-radius: 0;
+
+        .menu {
+            margin: 0;
+
+            .title,
+            .accordion-toggle {
+                color: $menu-item-text-color;
+
+                &::before {
+                    content: '';
+
+                    display: inline-block;
+                    height: 16px;
+                    min-width: 16px;
+                    margin-right: 8px;
+
+                    font-weight: normal;
+                    line-height: 1;
+                    text-align: center;
+
+                    color: $menu-accordion-icon-color;
+
+                    transition: $menu-animation;
+                }
+            }
+
+            .accordion-toggle {
+                font-weight: bold;
+
+                @include fa-icon($fa-var-angle-right);
+
+                &::before {
+                    transform: rotate(90deg);
+                }
+
+                &.collapsed {
+                    font-weight: normal;
+
+                    &::before {
+                        transform: rotate(0);
+                    }
+                }
+            }
+
+            .title {
+                display: block;
+                padding: 10px 15px;
+
+                &:hover {
+                    background-color: $menu-background-color-active;
+                }
+
+                $menu-mobile-title-offset: 0;
+                @for $i from 1 through 5 {
+                    $selector: '&-level-' + $i;
+
+                    #{$selector} {
+                        padding-left: $menu-mobile-title-offset * 1px;
+                    }
+
+                    $menu-mobile-title-offset: $menu-mobile-title-offset + 22;
+                }
+            }
+        }
+    }
+
+    .accordion-body {
+        background-color: $menu-dropdown-background-color;
+
+        & > a {
+            display: none;
+        }
+
+        .active {
+            background-color: $menu-background-color-active;
+        }
+
+        .accordion-group {
+            background-color: transparent;
+        }
+    }
+
+    // First level
+    .accordion-toggle.title-level-1 {
+        position: relative;
+
+        padding: 14px 22px 14px 24px;
+
+        background-color: $menu-dropdown-background-color-active;
+        color: $menu-item-first-level-text-color;
+
+        .menu-icon {
+            min-width: 16px;
+            margin-right: 8px;
+            margin-left: 0;
+
+            text-align: center;
+        }
+
+        &.collapsed {
+            background-color: $menu-background-color;
+        }
+
+        &:hover {
+            background-color: $menu-dropdown-background-color-active;
+        }
+    }
+
+    .dropdown-menu-title-level-1 {
+        display: none;
+    }
 }

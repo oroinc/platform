@@ -7,9 +7,9 @@ use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
+class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $themeManagerMock;
 
     /** @var PageTemplatesManager */

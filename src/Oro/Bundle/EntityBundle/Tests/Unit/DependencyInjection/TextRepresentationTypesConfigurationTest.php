@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\EntityBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
-class TextRepresentationTypesConfigurationTest extends \PHPUnit_Framework_TestCase
+class TextRepresentationTypesConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     // @codingStandardsIgnoreStart
     /**

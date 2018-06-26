@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Symfony\Component\HttpFoundation\Request;
 
-class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
+class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request */
     protected $request;

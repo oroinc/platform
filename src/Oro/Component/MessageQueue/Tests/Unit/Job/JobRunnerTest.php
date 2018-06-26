@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
 
-class JobRunnerTest extends \PHPUnit_Framework_TestCase
+class JobRunnerTest extends \PHPUnit\Framework\TestCase
 {
     public function testRunUniqueShouldCreateRootAndChildJobAndCallCallback()
     {
@@ -685,7 +685,7 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobProcessor
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobProcessor
      */
     private function createJobProcessorMock()
     {
@@ -693,7 +693,7 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExtensionInterface
      */
     private function createJobExtensionMock()
     {

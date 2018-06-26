@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
-class ConfigContextTest extends \PHPUnit_Framework_TestCase
+class ConfigContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigContext */
     protected $context;

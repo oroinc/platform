@@ -4,12 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Entity\Manager\Field;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator;
 
-class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translation;
 
     /** @var EntityFieldValidator */

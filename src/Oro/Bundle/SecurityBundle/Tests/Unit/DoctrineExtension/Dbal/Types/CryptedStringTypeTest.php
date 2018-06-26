@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
-class CryptedStringTypeTest extends \PHPUnit_Framework_TestCase
+class CryptedStringTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CryptedStringType */
     protected $fieldType;

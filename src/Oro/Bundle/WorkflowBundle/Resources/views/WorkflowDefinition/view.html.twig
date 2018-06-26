@@ -321,13 +321,14 @@
     {% set dataBlocks = [
         {
             'title': 'oro.workflow.block.title.general_information'|trans,
-            'class': 'active',
+            'class': 'nav-item active',
             'subblocks': [
                 {'data' : [workflowDefinitionInfo] },
             ]
         },
         {
             'title': 'oro.workflow.block.title.steps_and_transitions'|trans,
+            'class': 'nav-item',
             'subblocks': [
                 {
                     'data':  [workflowStepsAndTransitions]
@@ -364,6 +365,7 @@
 
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'class': 'nav-item',
             'subblocks': [
                 {'data':  [variablesInfo]},
             ]

@@ -12,7 +12,7 @@ use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableFeaturesControllerTest extends \PHPUnit_Framework_TestCase
+class AvailableFeaturesControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {
@@ -29,7 +29,7 @@ class AvailableFeaturesControllerTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        /** @var SuiteGenerator|\PHPUnit_Framework_MockObject_MockObject $generator */
+        /** @var SuiteGenerator|\PHPUnit\Framework\MockObject\MockObject $generator */
         $generator = $this->getMockBuilder(SuiteGenerator::class)->getMock();
         $generator->method('supportsTypeAndSettings')->willReturn(true);
         $generator->method('generateSuite')->willReturn(new GenericSuite('AcmeSuite', []));

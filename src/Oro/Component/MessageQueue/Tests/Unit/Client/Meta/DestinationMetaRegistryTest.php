@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 
-class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
+class DestinationMetaRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithDestinations()
     {

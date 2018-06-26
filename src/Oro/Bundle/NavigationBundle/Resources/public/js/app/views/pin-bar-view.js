@@ -1,12 +1,12 @@
-define([
-    'underscore',
-    'oroui/js/app/views/base/collection-view'
-], function(_, BaseCollectionView) {
+define(function(require) {
     'use strict';
 
     var BarCollectionView;
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     BarCollectionView = BaseCollectionView.extend({
+        animationDuration: 0,
+
         /**
          * @inheritDoc
          */

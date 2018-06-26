@@ -3,10 +3,10 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider;
 
-class FlashMessagesContentProviderTest extends \PHPUnit_Framework_TestCase
+class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $session;
 

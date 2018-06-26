@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
+class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 

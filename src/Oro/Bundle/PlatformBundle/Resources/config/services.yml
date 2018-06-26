@@ -1,6 +1,6 @@
 parameters:
     oro_platform.composer.local_repo_factory.class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
-    oro_platform.composer.installed_json:           '%kernel.root_dir%/../vendor/composer/installed.json'
+    oro_platform.composer.installed_json:           '%kernel.project_dir%/vendor/composer/installed.json'
 
     oro_platform.composer.version_helper.class:     Oro\Bundle\PlatformBundle\Composer\VersionHelper
 

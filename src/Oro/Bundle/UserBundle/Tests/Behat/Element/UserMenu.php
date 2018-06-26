@@ -16,7 +16,7 @@ class UserMenu extends Element
 
     public function open()
     {
-        $this->find('css', 'i.fa-sort-desc')->click();
+        $this->find('css', 'i.fa-caret-down')->click();
     }
 
     /**

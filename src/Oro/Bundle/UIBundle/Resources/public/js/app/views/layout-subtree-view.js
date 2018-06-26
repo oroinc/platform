@@ -5,6 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var LayoutSubtreeManager = require('oroui/js/layout-subtree-manager');
+    var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var _ = require('underscore');
 
@@ -56,6 +57,8 @@ define(function(require) {
 
         afterContentLoading: function() {
             this._restoreFormState();
+            // Initialize tooltips and other elements
+            mediator.execute('layout:init', this.$el);
         },
 
         contentLoadingFail: function() {

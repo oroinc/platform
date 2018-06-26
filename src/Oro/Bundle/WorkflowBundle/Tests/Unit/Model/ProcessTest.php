@@ -8,20 +8,20 @@ use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
-class ProcessTest extends \PHPUnit_Framework_TestCase
+class ProcessTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ProcessDefinition $processDefinition
+     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessDefinition $processDefinition
      */
     protected $processDefinition;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory $conditionFactory
      */
     protected $conditionFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ActionAssembler $actionAssembler
+     * @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler $actionAssembler
      */
     protected $actionAssembler;
 

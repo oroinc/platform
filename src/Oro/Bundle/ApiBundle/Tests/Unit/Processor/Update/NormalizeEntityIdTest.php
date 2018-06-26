@@ -7,23 +7,29 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeEntityIdTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    private $entityIdTransformer;
 
     /** @var NormalizeEntityId */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
 
-        $this->processor = new NormalizeEntityId($this->entityIdTransformer);
+        $this->processor = new NormalizeEntityId($entityIdTransformerRegistry);
     }
 
     /**

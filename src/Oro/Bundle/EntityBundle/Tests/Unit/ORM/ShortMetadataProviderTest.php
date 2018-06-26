@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\ShortMetadataProvider;
 
-class ShortMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetAllShortMetadataWithEmptyCache()
     {

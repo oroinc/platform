@@ -9,12 +9,12 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
-class BeforeMapObjectSearchListenerTest extends \PHPUnit_Framework_TestCase
+class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BeforeMapObjectSearchListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected $expectedConfig = [

@@ -11,9 +11,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class ConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $processor;
 
     /** @var ConfigProvider */

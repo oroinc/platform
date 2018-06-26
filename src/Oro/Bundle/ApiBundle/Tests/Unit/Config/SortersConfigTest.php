@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 
-class SortersConfigTest extends \PHPUnit_Framework_TestCase
+class SortersConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {
@@ -45,30 +45,43 @@ class SortersConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
+        $this->assertEquals([], $config->toArray());
+        $this->assertTrue($config->isEmpty());
 
         $config->setExclusionPolicy('all');
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('all', $config->getExclusionPolicy());
         $this->assertTrue($config->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExclusionPolicy('none');
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
         $this->assertEquals([], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExcludeAll();
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('all', $config->getExclusionPolicy());
         $this->assertTrue($config->isExcludeAll());
         $this->assertEquals(['exclusion_policy' => 'all'], $config->toArray());
+        $this->assertFalse($config->isEmpty());
 
         $config->setExcludeNone();
         $this->assertTrue($config->hasExclusionPolicy());
         $this->assertEquals('none', $config->getExclusionPolicy());
         $this->assertFalse($config->isExcludeAll());
         $this->assertEquals([], $config->toArray());
+        $this->assertFalse($config->isEmpty());
+
+        $config->setExclusionPolicy(null);
+        $this->assertFalse($config->hasExclusionPolicy());
+        $this->assertEquals('none', $config->getExclusionPolicy());
+        $this->assertFalse($config->isExcludeAll());
+        $this->assertEquals([], $config->toArray());
+        $this->assertTrue($config->isEmpty());
     }
 
     public function testFields()

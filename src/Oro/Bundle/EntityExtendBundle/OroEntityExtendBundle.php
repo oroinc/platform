@@ -91,12 +91,13 @@ class OroEntityExtendBundle extends Bundle
     private function ensureInitialized()
     {
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
-            && !CommandExecutor::isCurrentCommand('oro:install', true)
-            && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
-            && !CommandExecutor::isCommandRunning('oro:entity-extend:update-config')
+            && !CommandExecutor::isCurrentCommand('oro:install')
+            && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20')
         ) {
             ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
-            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {
+            if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))
+                && !CommandExecutor::isCommandRunning('oro:entity-extend:update-config')
+            ) {
                 $this->checkConfigs();
                 $this->initializeCache();
             }
@@ -198,7 +199,7 @@ class OroEntityExtendBundle extends Bundle
         return ProcessBuilder::create()
             ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
             ->add($this->getPhpExecutable())
-            ->add($this->kernel->getRootDir() . '/../bin/console')
+            ->add($this->kernel->getProjectDir() . '/bin/console')
             ->add($commandName)
             ->add(sprintf('%s=%s', '--env', $this->kernel->getEnvironment()))
             ->add(sprintf('%s=%s', '--cache-dir', $this->cacheDir));

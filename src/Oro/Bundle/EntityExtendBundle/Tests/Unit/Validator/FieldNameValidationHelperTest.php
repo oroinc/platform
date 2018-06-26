@@ -12,7 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
+class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
 
@@ -24,7 +24,7 @@ class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
     /** @var FieldNameValidationHelper */
     protected $validationHelper;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     protected function setUp()

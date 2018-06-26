@@ -1,5 +1,9 @@
-@import "colors";
+/* @theme: admin.oro; */
+
+@import "bowerassets/font-awesome/scss/_variables";
 @import "bootstrap/variables";
+
+@import "colors";
 
 // Oro variables
 $enable-safe-area:                      true;
@@ -12,7 +16,7 @@ $margin-bottom-box:                     $content-padding;
 $general-border-color:                  #ddd;
 $width-page:                            960px;
 $width-body-page:                       980px;
-$width-popup:                           $width-page/2;
+$width-popup:                           480px;
 $width-close-panel:                     25px;
 $width-left-panel:                      230px;
 $width-left-panel2:                     210;
@@ -36,8 +40,8 @@ $header-text-color:                     #cad2da;
 $inline-action-color:                   #94b4c9;
 $inline-action-background:              #edf5fb;
 $cell-selected-background:              $inline-action-background;
-$row-selected-background:               #fdf8e4;
-$row-highlight-background:              lighten($row-selected-background, 2%);
+$row-selected-background:               $extra-300;
+$row-highlight-background:              darken($row-selected-background, 2%);
 $cell-success-background:               #f1f8dc;
 $cell-success-color:                    #96b76d;
 $cell-error-background:                 #fcd4d3;

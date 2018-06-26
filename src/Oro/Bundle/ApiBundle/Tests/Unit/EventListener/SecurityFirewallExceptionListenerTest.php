@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
 

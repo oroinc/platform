@@ -332,7 +332,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 $val = $this->convertConfigValueToHumanReadableRepresentation($val);
             }
         );
-        $output->write(Yaml::dump($config, 100, 4, true, true));
+        $output->write(Yaml::dump($config, 100, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT));
     }
 
     /**
@@ -346,13 +346,13 @@ class DumpConfigCommand extends AbstractDebugCommand
         $entityClass = reset($keys);
         $config = $config[$entityClass];
         $documentationResource = [];
-        if (array_key_exists(EntityDefinitionConfig::DOCUMENTATION_RESOURCE, $config)) {
-            $documentationResource = $config[EntityDefinitionConfig::DOCUMENTATION_RESOURCE];
+        if (array_key_exists(ConfigUtil::DOCUMENTATION_RESOURCE, $config)) {
+            $documentationResource = $config[ConfigUtil::DOCUMENTATION_RESOURCE];
         }
 
         return [
             $entityClass => [
-                EntityDefinitionConfig::DOCUMENTATION_RESOURCE => $documentationResource
+                ConfigUtil::DOCUMENTATION_RESOURCE => $documentationResource
             ]
         ];
     }

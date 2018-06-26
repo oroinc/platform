@@ -5,7 +5,7 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
-class ThemeRegistryTest extends \PHPUnit_Framework_TestCase
+class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ThemeRegistry

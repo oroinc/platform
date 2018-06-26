@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specifica
 
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SpecificationCountDivider;
 
-class SpecificationDividerTest extends \PHPUnit_Framework_TestCase
+class SpecificationDividerTest extends \PHPUnit\Framework\TestCase
 {
     const BASE_NAME = 'SuiteStub';
 

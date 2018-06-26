@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NumberToStringTransformer;
 
-class NumberToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider transformDataProvider

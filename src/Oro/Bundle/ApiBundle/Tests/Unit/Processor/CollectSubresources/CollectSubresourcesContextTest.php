@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 
-class CollectSubresourcesContextTest extends \PHPUnit_Framework_TestCase
+class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CollectSubresourcesContext */
     protected $context;

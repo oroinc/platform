@@ -4,17 +4,17 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ChartBundle\Model\ChartView;
 
-class ChartViewTest extends \PHPUnit_Framework_TestCase
+class ChartViewTest extends \PHPUnit\Framework\TestCase
 {
     const TEMPLATE = 'template.twig.html';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $twig;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $data;
 

@@ -8,13 +8,13 @@ use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepos
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\SecondEntityRepository;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\ThirdEntity;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityRepositoryCompilerPass */
     protected $compilerPass;
@@ -58,18 +58,25 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container = $this->prepareContainer(
             [
                 'oro_entity.repository.factory' => ['arguments' => [null, []]],
-                'doctrine.orm.configuration' => []
+                'doctrine.orm.configuration' => [],
+                'doctrine.orm.first_configuration' => ['parent' => 'doctrine.orm.configuration'],
+                'doctrine.orm.second_configuration' => ['parent' => 'doctrine.orm.configuration']
             ]
         );
         $this->compilerPass->process($container);
 
         $repositoryFactory = $container->getDefinition('oro_entity.repository.factory');
-        $doctrineConfiguration = $container->getDefinition('doctrine.orm.configuration');
+        $firstConfiguration = $container->getDefinition('doctrine.orm.first_configuration');
+        $secondConfiguration = $container->getDefinition('doctrine.orm.second_configuration');
 
         $this->assertSame([], $repositoryFactory->getArgument(1));
         $this->assertEquals(
             [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
-            $doctrineConfiguration->getMethodCalls()
+            $firstConfiguration->getMethodCalls()
+        );
+        $this->assertEquals(
+            [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
+            $secondConfiguration->getMethodCalls()
         );
     }
 
@@ -80,6 +87,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 'oro_entity.abstract_repository' => ['abstract' => true],
                 'oro_entity.repository.factory' => ['arguments' => [null, []]],
                 'doctrine.orm.configuration' => [],
+                'doctrine.orm.first_configuration' => ['parent' => 'doctrine.orm.configuration'],
+                'doctrine.orm.second_configuration' => ['parent' => 'doctrine.orm.configuration'],
                 'test.repository.first' => [
                     'parent' => 'oro_entity.abstract_repository',
                     'class' => '%first.entity.repository.class%',
@@ -111,7 +120,8 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->compilerPass->process($container);
 
         $repositoryFactory = $container->getDefinition('oro_entity.repository.factory');
-        $doctrineConfiguration = $container->getDefinition('doctrine.orm.configuration');
+        $firstConfiguration = $container->getDefinition('doctrine.orm.first_configuration');
+        $secondConfiguration = $container->getDefinition('doctrine.orm.second_configuration');
 
         $this->assertSame(
             [
@@ -123,7 +133,11 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
-            $doctrineConfiguration->getMethodCalls()
+            $firstConfiguration->getMethodCalls()
+        );
+        $this->assertEquals(
+            [['setRepositoryFactory', [new Reference('oro_entity.repository.factory')]]],
+            $secondConfiguration->getMethodCalls()
         );
 
         $this->assertEquals(
@@ -244,7 +258,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
      * ]
      *
      * @param array $services
-     * @return ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -256,7 +270,7 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
             $arguments = array_key_exists('arguments', $config) ? $config['arguments'] : [];
 
             if (array_key_exists('parent', $config)) {
-                $definition = new DefinitionDecorator($config['parent']);
+                $definition = new ChildDefinition($config['parent']);
                 if ($class) {
                     $definition->setClass($class);
                 }

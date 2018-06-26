@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
-class SettingsBuilderTest extends \PHPUnit_Framework_TestCase
+class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testAppendBoolean()
     {

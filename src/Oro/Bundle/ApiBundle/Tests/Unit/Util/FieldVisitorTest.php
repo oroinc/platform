@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Util\FieldVisitor;
 
-class FieldVisitorTest extends \PHPUnit_Framework_TestCase
+class FieldVisitorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FieldVisitor */
     protected $fieldVisitor;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 
-class SanitizeHTMLTransformerTest extends \PHPUnit_Framework_TestCase
+class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $value

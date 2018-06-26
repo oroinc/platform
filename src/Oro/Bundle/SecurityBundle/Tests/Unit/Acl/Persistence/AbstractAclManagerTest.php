@@ -6,9 +6,9 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 
-class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
+class AbstractAclManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $abstract;
 
     protected function setUp()

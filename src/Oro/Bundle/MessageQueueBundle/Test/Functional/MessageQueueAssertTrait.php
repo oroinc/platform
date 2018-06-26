@@ -23,6 +23,14 @@ trait MessageQueueAssertTrait
         return self::getContainer()->get('oro_message_queue.test.message_collector');
     }
 
+    public function clearMessageCollector()
+    {
+        if (null === self::getContainer()) {
+            return;
+        }
+        self::getMessageCollector()->clear();
+    }
+
     /**
      * Gets the message producer.
      * Use this alias for "getMessageCollector" method in case if it makes your tests more intuitive.

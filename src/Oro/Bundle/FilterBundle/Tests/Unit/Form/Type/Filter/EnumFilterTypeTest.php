@@ -13,10 +13,10 @@ class EnumFilterTypeTest extends TypeTestCase
     /** @var EnumFilterType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
     protected function setUp()
@@ -122,8 +122,6 @@ class EnumFilterTypeTest extends TypeTestCase
                         'choices'  => [
                             'Value1' => 'val1'
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ],
                 ]
             ],
@@ -147,8 +145,6 @@ class EnumFilterTypeTest extends TypeTestCase
                             'None' => ':empty:',
                             'Value1' => 'val1'
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -171,8 +167,6 @@ class EnumFilterTypeTest extends TypeTestCase
                         'choices'  => [
                             'Value1' => 'val1'
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -196,8 +190,6 @@ class EnumFilterTypeTest extends TypeTestCase
                             'None' => ':empty:',
                             'Value1' => 'val1'
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -222,8 +214,6 @@ class EnumFilterTypeTest extends TypeTestCase
                         'choices'  => [
                             'Value1' => 'val1'
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ]
                 ]
             ],
@@ -249,8 +239,6 @@ class EnumFilterTypeTest extends TypeTestCase
                             'None' => ':empty:',
                             'Value1' => 1
                         ],
-                        // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                        'choices_as_values' => true,
                     ]
                 ]
             ]

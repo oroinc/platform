@@ -12,6 +12,7 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\Select2ArrayToStringTransformerDecorator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -118,7 +119,9 @@ class Select2Type extends AbstractType
     private function addHiddenTypeTransformer(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['configs']['multiple'])) {
-            $builder->addViewTransformer(new ArrayToStringTransformer(',', true));
+            $builder->addViewTransformer(
+                new Select2ArrayToStringTransformerDecorator(new ArrayToStringTransformer(',', true))
+            );
         } elseif (null !== $options['transformer']) {
             $builder->addModelTransformer($options['transformer']);
         }

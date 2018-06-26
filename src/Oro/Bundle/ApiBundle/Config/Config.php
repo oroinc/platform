@@ -9,8 +9,6 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class Config implements \IteratorAggregate
 {
-    use Traits\ConfigTrait;
-
     /** @var array */
     protected $items = [];
 
@@ -29,7 +27,7 @@ class Config implements \IteratorAggregate
      */
     public function toArray()
     {
-        return $this->convertItemsToArray();
+        return ConfigUtil::convertItemsToArray($this->items);
     }
 
     /**
@@ -198,5 +196,69 @@ class Config implements \IteratorAggregate
     public function setSubresources(SubresourcesConfig $subresources = null)
     {
         $this->set(ConfigUtil::SUBRESOURCES, $subresources);
+    }
+
+    /**
+     * Checks whether the configuration attribute exists.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has($key)
+    {
+        return \array_key_exists($key, $this->items);
+    }
+
+    /**
+     * Gets the configuration value.
+     *
+     * @param string $key
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
+    public function get($key, $defaultValue = null)
+    {
+        if (!\array_key_exists($key, $this->items)) {
+            return $defaultValue;
+        }
+
+        return $this->items[$key];
+    }
+
+    /**
+     * Sets the configuration value.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function set($key, $value)
+    {
+        if (null !== $value) {
+            $this->items[$key] = $value;
+        } else {
+            unset($this->items[$key]);
+        }
+    }
+
+    /**
+     * Removes the configuration value.
+     *
+     * @param string $key
+     */
+    public function remove($key)
+    {
+        unset($this->items[$key]);
+    }
+
+    /**
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
+     */
+    public function keys()
+    {
+        return \array_keys($this->items);
     }
 }

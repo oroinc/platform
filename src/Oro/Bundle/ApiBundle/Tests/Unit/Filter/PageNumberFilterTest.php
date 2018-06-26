@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class PageNumberFilterTest extends \PHPUnit_Framework_TestCase
+class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {

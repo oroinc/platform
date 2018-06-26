@@ -9,7 +9,7 @@ parameters:
 services:
     oro_importexport.handler.abstract:
         class: '%oro_importexport.handler.abstract.class%'
-        absract: true
+        abstract: true
         arguments:
             - '@oro_importexport.job_executor'
             - '@oro_importexport.processor.registry'
@@ -22,7 +22,7 @@ services:
 
     oro_importexport.handler.import.abstract:
         class: '%oro_importexport.handler.import.abstract.class%'
-        absract: true
+        abstract: true
         parent: oro_importexport.handler.abstract
         arguments:
             index_6: '@oro_importexport.file.batch_file_manager.import'

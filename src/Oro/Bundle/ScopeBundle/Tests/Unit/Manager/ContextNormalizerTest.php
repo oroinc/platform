@@ -7,15 +7,15 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 
-class ContextNormalizerTest extends \PHPUnit_Framework_TestCase
+class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  ContextNormalizer */
     protected $contextNormalizer;
 
-    /** @var  ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var  ScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $scopeManager;
 
     protected function setUp()

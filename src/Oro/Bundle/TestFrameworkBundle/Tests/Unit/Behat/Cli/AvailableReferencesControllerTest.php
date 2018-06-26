@@ -10,7 +10,7 @@ use Oro\Component\Testing\Unit\Command\Stub\InputStub;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Command\Command;
 
-class AvailableReferencesControllerTest extends \PHPUnit_Framework_TestCase
+class AvailableReferencesControllerTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {

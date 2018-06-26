@@ -9,22 +9,22 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributeFamilyManagerTest extends \PHPUnit_Framework_TestCase
+class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     const FAMILY_ID = 777;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var AttributeFamilyManager */
     private $familyManager;
 
-    /** @var AttributeFamilyRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $familyRepository;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $entityRepository;
 
     /** @var AttributeFamily */

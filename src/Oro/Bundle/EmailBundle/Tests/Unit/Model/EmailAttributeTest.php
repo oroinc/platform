@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 
-class EmailAttributeTest extends \PHPUnit_Framework_TestCase
+class EmailAttributeTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmailAttributeShouldBeConstructed()
     {

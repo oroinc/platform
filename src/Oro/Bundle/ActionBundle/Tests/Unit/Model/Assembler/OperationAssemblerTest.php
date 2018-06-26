@@ -11,7 +11,7 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
+class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OperationAssembler */
     protected $assembler;
@@ -229,7 +229,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActionFactory
+     * @return \PHPUnit\Framework\MockObject\MockObject|ActionFactory
      */
     protected function getActionFactory()
     {
@@ -237,7 +237,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConditionFactory
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConditionFactory
      */
     protected function getConditionFactory()
     {
@@ -247,7 +247,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler
+     * @return \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler
      */
     protected function getAttributeAssembler()
     {
@@ -257,7 +257,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler
      */
     protected function getFormOptionsAssembler()
     {

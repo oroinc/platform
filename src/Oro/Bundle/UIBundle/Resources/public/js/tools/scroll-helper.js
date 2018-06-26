@@ -204,7 +204,7 @@ define(function(require) {
                  * Equals header height. Cannot calculate dynamically due to issues on ipad
                  */
                 if (resultRect.top < this.MOBILE_HEADER_HEIGHT && tools.isMobile()) {
-                    if (current.id === 'top-page' && !$(document.body).hasClass('input-focused')) {
+                    if (current.id === 'central-panel' && !$(document.body).hasClass('input-focused')) {
                         resultRect.top = this.MOBILE_HEADER_HEIGHT;
                     } else if (current.className.split(/\s+/).indexOf('widget-content') !== -1) {
                         resultRect.top = this.MOBILE_POPUP_HEADER_HEIGHT;

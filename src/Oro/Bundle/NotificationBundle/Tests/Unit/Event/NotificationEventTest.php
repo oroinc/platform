@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 
-class NotificationEventTest extends \PHPUnit_Framework_TestCase
+class NotificationEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \stdClass

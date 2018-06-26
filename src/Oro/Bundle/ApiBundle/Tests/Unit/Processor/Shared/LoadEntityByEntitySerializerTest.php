@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase
 
 class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $serializer;
 
     /** @var LoadEntityByEntitySerializer */

@@ -15,7 +15,7 @@ use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
+class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ObjectNormalizer */
     protected $objectNormalizer;

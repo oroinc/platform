@@ -1,6 +1,6 @@
 # How To
 
- - [Turn on API for an Entity](#overview)
+ - [Turn on API for an Entity](#turn-on-api-for-an-entity)
  - [Turn on API for an Entity Disabled in "Resources/config/oro/entity.yml"](#turn-on-api-for-an-entity-disabled-in-resourcesconfigoroentityyml)
  - [Enable Advanced Operators for String Filter](#enable-advanced-operators-for-string-filter)
  - [Enable Case-insensitive String Filter](#enable-case-insensitive-string-filter)
@@ -19,6 +19,7 @@
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
  - [Enable API for an Entity Without Identifier](#enable-api-for-an-entity-without-identifier)
  - [Enable Custom API](#enable-custom-api)
+ - [Add a Predefined Identifier for API Resource](./how_to.md#add-a-predefined-identifier-for-api-resource)
 
 
 ## Turn on API for an Entity
@@ -817,3 +818,88 @@ for `oro.api.processor` tag, e.g.:
 
 For more details about the configuration and processors see [Configuration Reference](./configuration.md),
 [Actions](./actions.md) and [Processors](./processors.md).
+
+## Add a Predefined Identifier for API Resource
+
+Imagine that you want to provide an API resource for the current authenticated user. There are several ways to do this:
+
+- [add a custom route](#add-a-custom-route)
+- [add a custom controller](#add-a-custom-controller)
+- create a model inherited from an User entity and expose it as a separate API resource
+- reserve some word, e.g. **mine**, as an predefined identifier of the current authenticated user
+
+The last approach is simplest to implement and more preferred in the most cases, because it gives a possibility
+to use such identifier in a resource path, filters and request data.
+
+To implement this approach you need to do the following:
+
+- create a class that implements [EntityIdResolverInterface](../../Request/EntityIdResolverInterface.php), e.g.:
+
+```php
+<?php
+
+namespace Oro\Bundle\UserBundle\Api;
+
+use Oro\Bundle\ApiBundle\Request\EntityIdResolverInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+
+/**
+ * Resolves "mine" identifier for User entity.
+ * This identifier can be used to identify the current authenticated user.
+ */
+class MineUserEntityIdResolver implements EntityIdResolverInterface
+{
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
+
+    /**
+     * @param TokenAccessorInterface $tokenAccessor
+     */
+    public function __construct(TokenAccessorInterface $tokenAccessor)
+    {
+        $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription(): string
+    {
+        return <<<MARKDOWN
+**mine** can be used to identify the current authenticated user.
+MARKDOWN;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolve()
+    {
+        $user = $this->tokenAccessor->getUser();
+
+        return $user instanceof User
+            ? $user->getId()
+            : null;
+    }
+}
+```
+
+- register this class as a service and tag it with `oro.api.entity_id_resolver`, e.g.:
+
+```yaml
+    oro_user.api.mine_user_entity_id_resolver:
+        class: Oro\Bundle\UserBundle\Api\MineUserEntityIdResolver
+        arguments:
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User }
+```
+
+In case if a predefined identifier should be available only for a specific request type
+the [requestType](./request_type.md) attribute of the tag can be used, e.g.:
+
+```yaml
+        tags:
+            - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User, requestType: json_api }
+```

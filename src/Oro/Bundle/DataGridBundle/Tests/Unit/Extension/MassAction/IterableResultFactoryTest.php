@@ -11,10 +11,10 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
-class IterableResultFactoryTest extends \PHPUnit_Framework_TestCase
+class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var AclHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $aclHelper;
 
@@ -44,7 +44,7 @@ class IterableResultFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateIterableResultWithNotSupportedDatasource()
     {
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfiguration **/
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);
 

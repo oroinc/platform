@@ -17,20 +17,21 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
     private const TEST_ASSOCIATION_NAME  = 'testAssociation';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     /** @var BuildFormBuilder */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -39,7 +40,13 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
 
-        $this->processor = new BuildFormBuilder(new FormHelper($this->formFactory, $this->container));
+        $this->processor = new BuildFormBuilder(
+            new FormHelper(
+                $this->formFactory,
+                $this->createMock(PropertyAccessorInterface::class),
+                $this->container
+            )
+        );
 
         $this->context->setParentClassName(self::TEST_PARENT_CLASS_NAME);
         $this->context->setAssociationName(self::TEST_ASSOCIATION_NAME);
@@ -100,7 +107,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -141,9 +149,10 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 FormType::class,
                 $parentEntity,
                 [
-                    'data_class'           => $parentBaseEntityClass,
+                    'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -187,7 +196,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -214,6 +224,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setFormOptions(['validation_groups' => ['test', 'api']]);
         $associationConfig = $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $associationConfig->setPropertyPath('realAssociationName');
         $associationConfig->setFormType('customType');
@@ -231,8 +242,9 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 $parentEntity,
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
-                    'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'validation_groups'    => ['test', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -273,7 +285,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -317,7 +330,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -364,7 +378,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);
@@ -405,7 +420,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 [
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'    => false
                 ]
             )
             ->willReturn($formBuilder);

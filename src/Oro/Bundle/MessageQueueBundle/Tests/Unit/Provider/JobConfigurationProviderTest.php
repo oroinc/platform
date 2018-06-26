@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\MessageQueueBundle\Provider\JobConfigurationProvider;
 
-class JobConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class JobConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testTimeBeforeStaleIsTakenFromDefaultIfNoneJobNameMatch()
     {

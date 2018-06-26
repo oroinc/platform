@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 
-class DbalSchemaTest extends \PHPUnit_Framework_TestCase
+class DbalSchemaTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -50,7 +50,7 @@ class DbalSchemaTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
      */
     private function createConnectionMock()
     {

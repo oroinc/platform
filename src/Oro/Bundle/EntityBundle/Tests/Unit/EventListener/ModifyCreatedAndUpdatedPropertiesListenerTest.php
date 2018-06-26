@@ -13,12 +13,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_TestCase
+class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ModifyCreatedAndUpdatedPropertiesListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
     protected function setUp()

@@ -12,12 +12,12 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SyncBundle\Content\DataGridTagListener;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
 
-class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
+class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_GRID_NAME   = 'gridName';
     const TEST_ENTITY_NAME = 'someEntity';
 
-    /** @var TagGeneratorChain|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TagGeneratorChain|\PHPUnit\Framework\MockObject\MockObject */
     protected $generator;
 
     /** @var DataGridTagListener */

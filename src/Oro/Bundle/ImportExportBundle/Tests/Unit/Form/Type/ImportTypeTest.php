@@ -7,6 +7,8 @@ use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Validator\Validation;
@@ -14,7 +16,7 @@ use Symfony\Component\Validator\Validation;
 class ImportTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ProcessorRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistry
      */
     protected $processorRegistry;
 
@@ -45,7 +47,7 @@ class ImportTypeTest extends FormIntegrationTestCase
             ->will(
                 $this->returnCallback(
                     function ($type, $entityName) {
-                        \PHPUnit_Framework_Assert::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
+                        \PHPUnit\Framework\Assert::assertEquals(ProcessorRegistry::TYPE_IMPORT, $type);
                         return array($type . $entityName);
                     }
                 )
@@ -54,11 +56,14 @@ class ImportTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create(ImportType::class, null, $formOptions);
 
         $this->assertTrue($form->has('file'));
-        $this->assertEquals('file', $form->get('file')->getConfig()->getType()->getName());
+        $this->assertInstanceOf(FileType::class, $form->get('file')->getConfig()->getType()->getInnerType());
         $this->assertTrue($form->get('file')->getConfig()->getOption('required'));
 
         $this->assertTrue($form->has('processorAlias'));
-        $this->assertEquals('choice', $form->get('processorAlias')->getConfig()->getType()->getName());
+        $this->assertInstanceOf(
+            ChoiceType::class,
+            $form->get('processorAlias')->getConfig()->getType()->getInnerType()
+        );
         $this->assertTrue($form->get('processorAlias')->getConfig()->getOption('required'));
         $key = ProcessorRegistry::TYPE_IMPORT . $formOptions['entityName'];
         $this->assertEquals(

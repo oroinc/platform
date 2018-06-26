@@ -14,6 +14,9 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /** @var bool */
     private $enabled = false;
 
+    /** @var bool */
+    private $stopped = false;
+
     /**
      * Allows to enable the buffering of messages.
      */
@@ -31,10 +34,37 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     }
 
     /**
+     * Indicates whether the sending of messages is stopped or not.
+     */
+    public function isSendingOfMessagesStopped()
+    {
+        return $this->stopped;
+    }
+
+    /**
+     * Restores sending of messages.
+     */
+    public function restoreSendingOfMessages()
+    {
+        $this->stopped = false;
+    }
+
+    /**
+     * Stops sending of messages.
+     */
+    public function stopSendingOfMessages()
+    {
+        $this->stopped = true;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function send($topic, $message)
     {
+        if ($this->stopped) {
+            return;
+        }
         if (!$this->enabled && $this->isBufferingEnabled()) {
             $this->disableBuffering();
             try {

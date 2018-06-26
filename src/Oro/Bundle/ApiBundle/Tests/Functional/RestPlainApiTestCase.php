@@ -69,7 +69,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
             $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
 
         self::assertArrayContains($expectedContent, $content);
@@ -96,7 +96,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     {
         static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
 
-        $content = json_decode($response->getContent(), true);
+        $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains($expectedErrors, $response);
             self::assertCount(
@@ -104,8 +104,8 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
                 $content,
                 'Unexpected number of validation errors'
             );
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),

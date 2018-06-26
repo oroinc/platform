@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class NullValueTransformerTest extends \PHPUnit_Framework_TestCase
+class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
     private $innerTransformer;
 
     /** @var NullValueTransformer */

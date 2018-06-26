@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class RestDocViewDetectorTest extends \PHPUnit_Framework_TestCase
+class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
     protected $requestStack;
 
     /** @var RestDocViewDetector */

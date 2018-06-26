@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class EmailTemplateTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailTemplate

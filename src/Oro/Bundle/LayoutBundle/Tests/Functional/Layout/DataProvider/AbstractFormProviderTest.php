@@ -14,7 +14,7 @@ class AbstractFormProviderTest extends WebTestCase
     /** @var FormFactoryInterface */
     protected $formFactory;
 
-    /** @var UrlGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
     /** @var FormProviderStub */

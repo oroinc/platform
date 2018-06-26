@@ -11,30 +11,30 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-class FieldsHelperTest extends \PHPUnit_Framework_TestCase
+class FieldsHelperTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
     const FIELD_NAME = 'testFieldName';
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var FieldsHelper */
     protected $helper;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridConfigProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $viewConfigProvider;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     /**
@@ -232,7 +232,7 @@ class FieldsHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

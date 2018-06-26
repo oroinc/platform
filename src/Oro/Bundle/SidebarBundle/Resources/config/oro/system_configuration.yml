@@ -9,8 +9,6 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     No: 0
                     Yes: 1
@@ -20,8 +18,6 @@ system_configuration:
             search_type: choice
             options:
                 label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     No: 0
                     Yes: 1

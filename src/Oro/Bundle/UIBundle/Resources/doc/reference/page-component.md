@@ -25,6 +25,8 @@ To define PageComponent for a block define several data-attributes for the HTML 
      data-page-component-options="{{ options|json_encode }}"></div>
 ```
 
+(see also [Component Shortcuts](./component-shortcuts.md))
+
 ## How it works
 
 `PageController` loads a page, triggering `'page:update'` event. Global views (`PageRegionView`) have updated their contents. And once it is done — each `PageRegionView` executes `initLayout` method for it's layout element (in common case it's the view element). Inside this method, the view excutes `'layout:init'` handler, that initializes system UI-controls (such as ScrollSpy, ToolTips, PopOvers and other), after that invokes `initPageComponents` method, that initializes components defined in HTML. This method:

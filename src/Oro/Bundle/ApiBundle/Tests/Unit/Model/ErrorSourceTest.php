@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 
-class ErrorSourceTest extends \PHPUnit_Framework_TestCase
+class ErrorSourceTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateByPropertyPath()
     {

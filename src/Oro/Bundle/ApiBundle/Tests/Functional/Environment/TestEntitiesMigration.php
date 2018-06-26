@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
+use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -11,10 +13,13 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
+class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface, ActivityExtensionAwareInterface
 {
     /** @var ExtendExtension */
     private $extendExtension;
+
+    /** @var ActivityExtension */
+    private $activityExtension;
 
     /**
      * {@inheritdoc}
@@ -22,6 +27,14 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setActivityExtension(ActivityExtension $activityExtension)
+    {
+        $this->activityExtension = $activityExtension;
     }
 
     /**
@@ -38,6 +51,10 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestEntityTables($schema);
+        $this->createTestProductTable($schema);
+        $this->createTestOrderTables($schema);
+        $this->createTestOverrideClassEntityTables($schema);
     }
 
     /**
@@ -45,7 +62,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestDepartmentTable(Schema $schema)
+    private function createTestDepartmentTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_department')) {
             return;
@@ -78,7 +95,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestPersonTable(Schema $schema)
+    private function createTestPersonTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_person')) {
             return;
@@ -120,7 +137,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestDefaultAndNullTable(Schema $schema)
+    private function createTestDefaultAndNullTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_default_and_null')) {
             return;
@@ -164,8 +181,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table->addForeignKeyConstraint($table, ['parent_id'], ['id']);
 
         $tableLinks = $schema->createTable('test_api_nested_objects_links');
-        $tableLinks->addColumn('owner_id', 'integer', []);
-        $tableLinks->addColumn('link_id', 'integer', []);
+        $tableLinks->addColumn('owner_id', 'integer');
+        $tableLinks->addColumn('link_id', 'integer');
         $tableLinks->setPrimaryKey(['owner_id', 'link_id']);
         $tableLinks->addIndex(['owner_id']);
         $tableLinks->addIndex(['link_id']);
@@ -178,7 +195,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestWithoutIdGeneratorTable(Schema $schema)
+    private function createTestWithoutIdGeneratorTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_without_id_generator')) {
             return;
@@ -195,7 +212,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestCompositeIdentifierTable(Schema $schema)
+    private function createTestCompositeIdentifierTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_composite_id')) {
             return;
@@ -213,9 +230,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
 
         $tableChildren = $schema->createTable('test_api_composite_id_children');
         $tableChildren->addColumn('parent_key1', 'string', ['length' => 255]);
-        $tableChildren->addColumn('parent_key2', 'integer', []);
+        $tableChildren->addColumn('parent_key2', 'integer');
         $tableChildren->addColumn('child_key1', 'string', ['length' => 255]);
-        $tableChildren->addColumn('child_key2', 'integer', []);
+        $tableChildren->addColumn('child_key2', 'integer');
         $tableChildren->setPrimaryKey(['parent_key1', 'parent_key2', 'child_key1', 'child_key2']);
         $tableChildren->addIndex(['parent_key1', 'parent_key2']);
         $tableChildren->addIndex(['child_key1', 'child_key2']);
@@ -228,7 +245,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestCustomIdentifierTables(Schema $schema)
+    private function createTestCustomIdentifierTables(Schema $schema)
     {
         if ($schema->hasTable('test_api_custom_id')
             || $schema->hasTable('test_api_custom_composite_id')
@@ -256,8 +273,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table2->addForeignKeyConstraint($table2, ['parent_id'], ['id']);
 
         $table1Children = $schema->createTable('test_api_custom_id_children');
-        $table1Children->addColumn('parent_id', 'integer', []);
-        $table1Children->addColumn('child_id', 'integer', []);
+        $table1Children->addColumn('parent_id', 'integer');
+        $table1Children->addColumn('child_id', 'integer');
         $table1Children->setPrimaryKey(['parent_id', 'child_id']);
         $table1Children->addIndex(['parent_id']);
         $table1Children->addIndex(['child_id']);
@@ -265,8 +282,8 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
         $table1Children->addForeignKeyConstraint($table1, ['child_id'], ['id']);
 
         $table2Children = $schema->createTable('test_api_custom_composite_id_c');
-        $table2Children->addColumn('parent_id', 'integer', []);
-        $table2Children->addColumn('child_id', 'integer', []);
+        $table2Children->addColumn('parent_id', 'integer');
+        $table2Children->addColumn('child_id', 'integer');
         $table2Children->setPrimaryKey(['parent_id', 'child_id']);
         $table2Children->addIndex(['parent_id']);
         $table2Children->addIndex(['child_id']);
@@ -279,7 +296,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestAllDataTypesTable(Schema $schema)
+    private function createTestAllDataTypesTable(Schema $schema)
     {
         if ($schema->hasTable('test_api_all_data_types')) {
             return;
@@ -315,7 +332,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      *
      * @param Schema $schema
      */
-    protected function createTestCustomEntityTables(Schema $schema)
+    private function createTestCustomEntityTables(Schema $schema)
     {
         if ($schema->hasTable('oro_ext_testapie1') || $schema->hasTable('oro_ext_testapie2')) {
             return;
@@ -367,7 +384,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param string $code
      * @param bool   $isMultiple
      */
-    protected function addEnumField($s, $t, $name, $code, $isMultiple = false)
+    private function addEnumField($s, $t, $name, $code, $isMultiple = false)
     {
         $this->extendExtension->addEnumField(
             $s,
@@ -387,9 +404,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param array  $options
      */
-    protected function addManyToOneRelation($s, $t, $name, $tt, $options = [])
+    private function addManyToOneRelation($s, $t, $name, $tt, array $options = [])
     {
-        $options = array_merge_recursive(
+        $options = \array_merge_recursive(
             [
                 'extend' => [
                     'owner'        => ExtendScope::OWNER_CUSTOM,
@@ -408,7 +425,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param string $targetName
      */
-    protected function addManyToOneInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addManyToOneInverseRelation($s, $t, $name, $tt, $targetName)
     {
         $this->extendExtension->addManyToOneInverseRelation(
             $s,
@@ -430,9 +447,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param array  $options
      */
-    protected function addManyToManyRelation($s, $t, $name, $tt, $options = [])
+    private function addManyToManyRelation($s, $t, $name, $tt, array $options = [])
     {
-        $options = array_merge_recursive(
+        $options = \array_merge_recursive(
             [
                 'extend' => [
                     'owner'           => ExtendScope::OWNER_CUSTOM,
@@ -453,7 +470,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param string $targetName
      */
-    protected function addManyToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addManyToManyInverseRelation($s, $t, $name, $tt, $targetName)
     {
         $this->extendExtension->addManyToManyInverseRelation(
             $s,
@@ -475,9 +492,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param array  $options
      */
-    protected function addOneToManyRelation($s, $t, $name, $tt, $options = [])
+    private function addOneToManyRelation($s, $t, $name, $tt, array $options = [])
     {
-        $options = array_merge_recursive(
+        $options = \array_merge_recursive(
             [
                 'extend' => [
                     'owner'           => ExtendScope::OWNER_CUSTOM,
@@ -498,7 +515,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
      * @param Table  $tt
      * @param string $targetName
      */
-    protected function addOneToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addOneToManyInverseRelation($s, $t, $name, $tt, $targetName)
     {
         $this->extendExtension->addOneToManyInverseRelation(
             $s,
@@ -508,6 +525,218 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             $targetName,
             'name',
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        );
+    }
+
+    /**
+     * Create the following tables:
+     * * test_api_owner
+     * * test_api_target
+     * * test_api_activity
+     *
+     * @param Schema $schema
+     */
+    private function createTestEntityTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_owner')
+            || $schema->hasTable('test_api_target')
+            || $schema->hasTable('test_api_activity')
+        ) {
+            return;
+        }
+
+        $ownerTable = $schema->createTable('test_api_owner');
+        $ownerTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $ownerTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $ownerTable->addColumn('target_id', 'integer', ['notnull' => false]);
+        $ownerTable->setPrimaryKey(['id']);
+        $ownerTable->addIndex(['target_id']);
+
+        $targetTable = $schema->createTable('test_api_target');
+        $targetTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $targetTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $targetTable->setPrimaryKey(['id']);
+        $targetTable->addIndex(['name'], 'test_api_t_name_idx');
+
+        $ownerTable->addForeignKeyConstraint(
+            $targetTable,
+            ['target_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $targetsRelTable = $schema->createTable('test_api_rel_targets');
+        $targetsRelTable->addColumn('owner_id', 'integer');
+        $targetsRelTable->addColumn('target_id', 'integer');
+        $targetsRelTable->setPrimaryKey(['owner_id', 'target_id']);
+        $targetsRelTable->addIndex(['owner_id']);
+        $targetsRelTable->addIndex(['target_id']);
+        $targetsRelTable->addForeignKeyConstraint($ownerTable, ['owner_id'], ['id']);
+        $targetsRelTable->addForeignKeyConstraint($targetTable, ['target_id'], ['id']);
+
+        $activityTable = $schema->createTable('test_api_activity');
+        $activityTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $activityTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $activityTable->setPrimaryKey(['id']);
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $ownerTable->getName(),
+            true
+        );
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $targetTable->getName(),
+            true
+        );
+    }
+
+    /**
+     * Create test_api_product table
+     *
+     * @param Schema $schema
+     */
+    private function createTestProductTable(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_product')) {
+            return;
+        }
+
+        $table = $schema->createTable('test_api_product');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
+     * Create test_api_order and test_api_order_line_item tables
+     *
+     * @param Schema $schema
+     */
+    protected function createTestOrderTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_order') || $schema->hasTable('test_api_order_line_item')) {
+            return;
+        }
+
+        $orderTable = $schema->createTable('test_api_order');
+        $orderTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $orderTable->addColumn('po_number', 'string', ['notnull' => false, 'length' => 255]);
+        $orderTable->setPrimaryKey(['id']);
+
+        $orderLineItemTable = $schema->createTable('test_api_order_line_item');
+        $orderLineItemTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $orderLineItemTable->addColumn('product_id', 'integer', ['notnull' => false]);
+        $orderLineItemTable->addColumn('order_id', 'integer', ['notnull' => false]);
+        $orderLineItemTable->addColumn('quantity', 'float', ['notnull' => false]);
+        $orderLineItemTable->setPrimaryKey(['id']);
+        $orderLineItemTable->addIndex(['product_id']);
+        $orderLineItemTable->addIndex(['order_id']);
+        $orderLineItemTable->addForeignKeyConstraint(
+            $schema->getTable('test_product'),
+            ['product_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $orderLineItemTable->addForeignKeyConstraint(
+            $orderTable,
+            ['order_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Create the following tables:
+     * * test_api_override_owner
+     * * test_api_override_target
+     * * test_api_override_a_target
+     * * test_api_override_activity
+     *
+     * @param Schema $schema
+     */
+    private function createTestOverrideClassEntityTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_override_owner')
+            || $schema->hasTable('test_api_override_target')
+            || $schema->hasTable('test_api_override_a_target')
+            || $schema->hasTable('test_api_override_activity')
+        ) {
+            return;
+        }
+
+        $ownerTable = $schema->createTable('test_api_override_owner');
+        $ownerTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $ownerTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $ownerTable->addColumn('target_id', 'integer', ['notnull' => false]);
+        $ownerTable->addColumn('another_target_id', 'integer', ['notnull' => false]);
+        $ownerTable->setPrimaryKey(['id']);
+        $ownerTable->addIndex(['target_id']);
+        $ownerTable->addIndex(['another_target_id']);
+
+        $targetTable = $schema->createTable('test_api_override_target');
+        $targetTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $targetTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $targetTable->setPrimaryKey(['id']);
+        $targetTable->addIndex(['name'], 'test_api_override_t_name_idx');
+
+        $anotherTargetTable = $schema->createTable('test_api_override_a_target');
+        $anotherTargetTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $anotherTargetTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $anotherTargetTable->setPrimaryKey(['id']);
+        $anotherTargetTable->addIndex(['name'], 'test_api_override_a_t_name_idx');
+
+        $ownerTable->addForeignKeyConstraint(
+            $targetTable,
+            ['target_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $targetsRelTable = $schema->createTable('test_api_override_rel_targets');
+        $targetsRelTable->addColumn('owner_id', 'integer');
+        $targetsRelTable->addColumn('target_id', 'integer');
+        $targetsRelTable->setPrimaryKey(['owner_id', 'target_id']);
+        $targetsRelTable->addIndex(['owner_id']);
+        $targetsRelTable->addIndex(['target_id']);
+        $targetsRelTable->addForeignKeyConstraint($ownerTable, ['owner_id'], ['id']);
+        $targetsRelTable->addForeignKeyConstraint($targetTable, ['target_id'], ['id']);
+
+        $ownerTable->addForeignKeyConstraint(
+            $anotherTargetTable,
+            ['another_target_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL']
+        );
+        $anotherTargetsRelTable = $schema->createTable('test_api_override_a_rel_ts');
+        $anotherTargetsRelTable->addColumn('owner_id', 'integer');
+        $anotherTargetsRelTable->addColumn('target_id', 'integer');
+        $anotherTargetsRelTable->setPrimaryKey(['owner_id', 'target_id']);
+        $anotherTargetsRelTable->addIndex(['owner_id']);
+        $anotherTargetsRelTable->addIndex(['target_id']);
+        $anotherTargetsRelTable->addForeignKeyConstraint($ownerTable, ['owner_id'], ['id']);
+        $anotherTargetsRelTable->addForeignKeyConstraint($anotherTargetTable, ['target_id'], ['id']);
+
+        $activityTable = $schema->createTable('test_api_override_activity');
+        $activityTable->addColumn('id', 'integer', ['autoincrement' => true]);
+        $activityTable->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $activityTable->setPrimaryKey(['id']);
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $ownerTable->getName(),
+            true
+        );
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $targetTable->getName(),
+            true
+        );
+        $this->activityExtension->addActivityAssociation(
+            $schema,
+            $activityTable->getName(),
+            $anotherTargetTable->getName(),
+            true
         );
     }
 }

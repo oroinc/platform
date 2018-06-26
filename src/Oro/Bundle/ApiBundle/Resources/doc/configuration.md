@@ -51,7 +51,7 @@ php bin/console oro:api:config:dump-reference --max-nesting-level=0
 The default nesting level is `3`. It is specified in the configuration of ApiBundle via the `config_max_nesting_level` parameter. If needed, change this value:
 
 ```yaml
-# app/config/config.yml
+# config/config.yml
 
 oro_api:
     config_max_nesting_level: 3
@@ -150,7 +150,11 @@ oro_entity:
 
 ## entity_aliases Configuration Section
 
-Use the `entity_aliases` section to override the existing system-wide entity aliases or add aliases for models to be used only in the data API.
+The `entity_aliases` section can be used to:
+
+- override the existing system-wide entity aliases
+- add aliases for models to be used only in the data API
+- completely replace an ORM entity with a model
 
 Use it when you need to provide entity aliases for the data API, but it is not possible to share them system-wide. For example, because of the backward compatibility promise or because your models were created for use only in the data API.
 
@@ -166,7 +170,51 @@ api:
             plural_alias: acmeentities
 ```
 
-## entities" Configuration Section
+To completely replace an ORM entity with a model in the API, use the `override_class` option. As a result,
+instead of the overridden ORM entity, the model will be used in the primary API resource, sub-resources,
+and relationships. This is helpful when creating and using a model can significantly simplify implementation
+of the API, for example, when the schema of the API resource is very different from the schema of the ORM entity.
+
+**Example:**
+
+```yaml
+api:
+    entity_aliases:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel:
+            alias: acmeentity
+            plural_alias: acmeentities
+            override_class: Acme\Bundle\AcmeBundle\Entity\AcmeEntity
+```
+
+**Note:** When `override_class` option is used, some entity specific configuration,
+like [Extended Associations](./how_to.md#configure-an-extended-many-to-one-association), need to be done
+for an overridden ORM entity, not for a model.
+
+**Example of correct configuration:**
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel: ~
+
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+**Example of incorrect configuration:**
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AcmeBundle\Api\Model\AcmeModel: ~
+            fields:
+                target:
+                    data_type: association:manyToOne
+```
+
+## entities Configuration Section
 
 The `entities` section describes a configuration of entities.
 
@@ -376,7 +424,7 @@ api:
                         exclude: true
 ```
 
-## actions" Configuration Section
+## actions Configuration Section
 
 The `actions` configuration section serves to specify action-specific options. The options from this section are added to the entity configuration. If an option exists in both the entity and action configurations, the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration.
 

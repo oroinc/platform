@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
 
-class DebugTranslatorPassTest extends \PHPUnit_Framework_TestCase
+class DebugTranslatorPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param bool $enabled

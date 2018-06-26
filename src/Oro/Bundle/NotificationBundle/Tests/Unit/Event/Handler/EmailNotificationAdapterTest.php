@@ -10,7 +10,7 @@ use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -20,10 +20,10 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var EmailHolderStub */
     private $entity;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotification */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotification */
     private $emailNotification;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     private $em;
 
     protected function setUp()

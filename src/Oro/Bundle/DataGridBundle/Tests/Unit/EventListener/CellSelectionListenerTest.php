@@ -5,20 +5,20 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener;
 
-class CellSelectionListenerTest extends \PHPUnit_Framework_TestCase
+class CellSelectionListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \Oro\Bundle\DataGridBundle\Event\BuildAfter|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Oro\Bundle\DataGridBundle\Event\BuildAfter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $datagrid;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $datasource;
 

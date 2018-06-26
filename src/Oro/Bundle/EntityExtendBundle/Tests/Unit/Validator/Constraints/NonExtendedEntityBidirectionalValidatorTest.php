@@ -17,12 +17,12 @@ use Symfony\Component\Form\FormConfigInterface;
 class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintValidatorTest
 {
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var Form|\PHPUnit_Framework_MockObject_MockObject
+     * @var Form|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $rootMock;
 
@@ -133,7 +133,7 @@ class NonExtendedEntityBidirectionalValidatorTest extends AbstractConstraintVali
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

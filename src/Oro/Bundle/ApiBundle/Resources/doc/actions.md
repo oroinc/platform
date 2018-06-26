@@ -313,7 +313,12 @@ For examples of usage, see the `handleGetSubresource` method of [RequestActionHa
 
 ## update_subresource Action
 
-Updates an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+Updates an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to.
+As this action do not have default implementation, additional processors should be added, at least a processor that
+will build a form builder for your sub-resource. Take a look at
+[BuildFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildFormBuilder.php)
+and [BuildCollectionFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildCollectionFormBuilder.php)
+as examples of such processors.
 
 The route name for REST API: `oro_rest_api_subresource`.
 
@@ -345,9 +350,25 @@ This action has the following processor groups:
 
 For examples of usage, see the `handleUpdateSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
+An example how to register a processor to buld a form builder:
+
+```yaml
+    acme.api.items.build_form_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\BuildFormBuilder
+        arguments:
+            - '@oro_api.form_helper'
+        tags:
+            - { name: oro.api.processor, action: update_subresource, group: transform_data, parentClass: Acme\Bundle\ShoppingListBundle\Entity\ShoppingList, association: items, priority: 100 }
+```
+
 ## add_subresource Action
 
-Adds an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+Adds an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to.
+As this action do not have default implementation, additional processors should be added, at least a processor that
+will build a form builder for your sub-resource. Take a look at
+[BuildFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildFormBuilder.php)
+and [BuildCollectionFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildCollectionFormBuilder.php)
+as examples of such processors.
 
 The route name for REST API: `oro_rest_api_subresource`.
 
@@ -379,15 +400,31 @@ This action has the following processor groups:
 
 For examples of usage, see the `handleAddSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
+An example how to register a processor to buld a form builder:
+
+```yaml
+    acme.api.items.build_form_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\BuildFormBuilder
+        arguments:
+            - '@oro_api.form_helper'
+        tags:
+            - { name: oro.api.processor, action: add_subresource, group: transform_data, parentClass: Acme\Bundle\ShoppingListBundle\Entity\ShoppingList, association: items, priority: 100 }
+```
+
 ## delete_subresource Action
 
-Deletes an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to. This action do not have default implementation, additional processors should be added for each sub-resource.
+Deletes an entity (or entities, it depends on the association type) connected to an entity the sub-resource belongs to.
+As this action do not have default implementation, additional processors should be added, at least a processor that
+will build a form builder for your sub-resource. Take a look at
+[BuildFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildFormBuilder.php)
+and [BuildCollectionFormBuilder](../../Processor/Subresource/ChangeSubresource/BuildCollectionFormBuilder.php)
+as examples of such processors.
 
 The route name for REST API: `oro_rest_api_subresource`.
 
 The URL template for REST API: `/api/{entity}/{id}/{association}`.
 
-The HTTP method for REST API: `POST`.
+The HTTP method for REST API: `DELETE`.
 
 The context class: [ChangeSubresourceContext](../../Processor/Subresource/ChangeSubresourceContext.php). See the [SubresourceContext](#subresourcecontext-class) class for more details.
 
@@ -412,6 +449,17 @@ This action has the following processor groups:
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
 For examples of usage, see the `handleDeleteSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
+
+An example how to register a processor to buld a form builder:
+
+```yaml
+    acme.api.items.build_form_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\BuildFormBuilder
+        arguments:
+            - '@oro_api.form_helper'
+        tags:
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, parentClass: Acme\Bundle\ShoppingListBundle\Entity\ShoppingList, association: items, priority: 100 }
+```
 
 ## get_relationship Action
 

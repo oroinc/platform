@@ -1,10 +1,24 @@
-## 3.0.0-rc
+## 3.1.0
+### Added
+#### UIBundle
+* Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
+
+### Removed
+#### UIBundle
+* Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](./src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
+
+### Changed
+#### UIBundle
+* All global JS Views and Components are defined in the HTML through data attributes.
+
+## 3.0.0-rc (2018-05-31)
+[Show detailed list of changes](incompatibilities-3-0-rc.md)
 
 ### Added
 #### ApiBundle
-* Added `direction` option for fields in `actions` section to be able to specify if the request data and the the response data can contain a field. Possible values are `input-only`, `output-only` or `bidirectional`. The `bidirectional` is the default value.
+* Added `direction` option for fields in the `actions` section to be able to specify if the request data and the the response data can contain a field. Possible values are `input-only`, `output-only` or `bidirectional`. The `bidirectional` is the default value.
 * Added the following operators for ComparisonFilter: `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`), `!~` (`not_contains`), `^` (`starts_with`), `!^` (`not_starts_with`), `$` (`ends_with`), `!$` (`not_ends_with`). For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-advanced-operators-for-string-filter).
-* Added `case_insensitive` and `value_transformer` options for ComparisonFilter. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-case-insensitive-string-filter).
+* Added the `case_insensitive` and `value_transformer` options for ComparisonFilter. See [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-case-insensitive-string-filter) for more details.
 
 ### Removed
 #### ApiBundle
@@ -12,43 +26,43 @@
 
 ### Changed
 #### ApiBundle
-* The service `oro_api.get_config.add_owner_validator` was renamed to `oro_organization.api.config.add_owner_validator`
-* The DIC tag `oro_api.request_type_provider` was renamed to `oro.api.request_type_provider`
-* The DIC tag `oro_api.routing_options_resolver` was renamed to `oro.api.routing_options_resolver`
-* The DIC tag `oro_api.api_doc_annotation_handler` was renamed to `oro.api.api_doc_annotation_handler`
+* The `oro_api.get_config.add_owner_validator` service was renamed to `oro_organization.api.config.add_owner_validator`
+* The `oro_api.request_type_provider` DIC tag was renamed to `oro.api.request_type_provider`
+* The `oro_api.routing_options_resolver` DIC tag was renamed to `oro.api.routing_options_resolver`
+* The `oro_api.api_doc_annotation_handler` DIC tag was renamed to `oro.api.api_doc_annotation_handler`
 
 ## 3.0.0-beta (2018-03-30)
 [Show detailed list of changes](incompatibilities-3-0-beta.md)
 
 ### Added
 #### ApiBundle
-* Added a possibility to enable custom API. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api).
+* Added a possibility to enable custom API. See [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#enable-custom-api) for more information.
 
 ### Removed
 #### ApiBundle
-* Removed deprecated class `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext`
-* Removed deprecated class `Oro\Bundle\ApiBundle\Model\EntityDescriptor`
+* Removed the deprecated `Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext` class
+* Removed the deprecated `Oro\Bundle\ApiBundle\Model\EntityDescriptor` class
 
 #### EntityConfigBundle
-* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor`
+* Removed the deprecated `getDefaultTimeout` and `setDefaultTimeout` methods from the `Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor` class
 
 #### ImportExportBundle
-* Removed class `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` and corresponding service `oro_importexport.event_listener.export_join_listener`
-* Parameter `%oro_importexport.file.split_csv_file.size_of_batch%` was removed use `%oro_importexport.import.size_of_batch%` instead.
+* Removed the `Oro\Bundle\ImportExportBundle\EventListener\ExportJoinListener` class and the corresponding `oro_importexport.event_listener.export_join_listener` service 
+* The `%oro_importexport.file.split_csv_file.size_of_batch%` parameter was removed; use `%oro_importexport.import.size_of_batch%` instead.
 
 #### InstallerBundle
-* Removed deprecated methods `getDefaultTimeout` and `setDefaultTimeout` from class `Oro\Bundle\InstallerBundle\CommandExecutor`
+* Removed the deprecated `getDefaultTimeout` and `setDefaultTimeout` methods from the `Oro\Bundle\InstallerBundle\CommandExecutor` class 
 
 #### UIBundle
-* Removed twig filter `oro_html_tag_trim` use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
-* Removed twig filter `oro_html_purify` use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
+* Removed twig filter `oro_html_tag_trim`; use `oro_html_escape` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_escape).
+* Removed twig filter `oro_html_purify`; use `oro_html_strip_tags` instead. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
 
 #### WorkflowBundle
-* Removed cache provider `oro_workflow.cache.provider.workflow_definition`. Doctrine result cache is used instead of.
+* Removed the `oro_workflow.cache.provider.workflow_definition` cache provider. Doctrine result cache is used instead.
 
 ### Changed
 #### ApiBundle
-* The HTTP method depended routes and controllers were replaced with more general ones. The full list of changes:
+* The HTTP method depended routes and controllers were replaced with the more general ones. The following is the full list of changes:
 
     | Removed Route | Removed Controller | New Route | New Controller |
     | --- | --- | --- | --- |
@@ -68,20 +82,20 @@
 * Twig filter `oro_tag_filter` was renamed to `oro_html_strip_tags`. See [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/twig-filters.md#oro_html_strip_tags).
 
 #### UserBundle
-* The `oro_rest_api_get_user_profile` route was removed, use `oro_rest_api_user_profile` route instead.
-* The `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver` and `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver` route option resolvers were removed in favor of [routing.yml](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#add-a-custom-route).
+* The `oro_rest_api_get_user_profile` route was removed; use the `oro_rest_api_user_profile` route instead.
+* The `Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver` and the `Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver` route option resolvers were removed in favor of [routing.yml](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#add-a-custom-route).
 
 ## 2.6.0 (2018-01-31)
 [Show detailed list of changes](incompatibilities-2-6.md)
 
 ### Added
 #### ConfigBundle
-* Added configuration search provider functionality (see [documentation](./src/Oro/Bundle/ConfigBundle/Resources/doc/system_configuration.md#search-type-provider))
+* Added the configuration search provider functionality (see [documentation](./src/Oro/Bundle/ConfigBundle/Resources/doc/system_configuration.md#search-type-provider))
     * Service should be registered as a service with the `oro_config.configuration_search_provider` tag.
     * Class should implement `Oro\Bundle\ConfigBundle\Provider\SearchProviderInterface` interface.
 #### EntityBundle
-* Added event `oro_entity.structure.options` (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
-* Added provider `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider` for getting data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
+* Added the `oro_entity.structure.options` event (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/events.md#entity-structure-options-event))
+* Added the `Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider`provider to retrieve data of entities structure (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/entity_structure_data_provider.md))
 * Added JS `EntityModel`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/models/entity-model.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-model.md))
 * Added JS `EntityStructureDataProvider`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js) (see [documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md))
 * Added `FieldChoiceView`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/views/field-choice-view.js) Backbone view, as replacement for jQuery widget `oroentity.fieldChoice`.
@@ -94,14 +108,14 @@
 #### UIBundle
 * Added JS `Registry`[[?]](https://github.com/oroinc/platform/tree/2.6.0/src/Oro/Bundle/UIBundle/Resources/public/js/app/services/registry/registry.js) (see [documentation](./src/Oro/Bundle/UIBundle/Resources/doc/reference/client-side/registry.md))
 #### PlatformBundle
-* Added new DIC compiler pass `Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass`
-* Added tag `oro_platform.console.global_options_provider` to be able to register console command global options provider for `GlobalOptionsProviderRegistry`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderRegistry.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry")</sup> and it will be used in `GlobalOptionsListener`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/EventListener/Console/GlobalOptionsListener.php "Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener")</sup>. This providers must implement `GlobalOptionsProviderInterface`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderInterface.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface")</sup>.
+* Added a new DIC compiler pass `Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass`
+* Added the `oro_platform.console.global_options_provider` tag to be able to register the console command global options provider for `GlobalOptionsProviderRegistry`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderRegistry.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry")</sup> and it will be used in `GlobalOptionsListener`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/EventListener/Console/GlobalOptionsListener.php "Oro\Bundle\PlatformBundle\EventListener\Console\GlobalOptionsListener")</sup>. This providers must implement `GlobalOptionsProviderInterface`<sup>[[?]](./src/Oro/Bundle/PlatformBundle/Provider/Console/GlobalOptionsProviderInterface.php "Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderInterface")</sup>.
 
 ### Changed
 
 #### ApiBundle
 * The `build_query` group was removed from `update` and `delete` actions. From now the updating/deleting entity is loaded by `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntity` processor instead of `Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery` processor.
-* The priorities of some groups for `update` action were changed. All changes are in the following table:
+* The priorities of some groups for the `update` action were changed. All changes are in the following table:
 
     | Group | Old Priority | New Priority |
     | --- | --- | --- |
@@ -112,7 +126,7 @@
     | finalize | -90 | -80 |
     | normalize_result | -100 | -90 |
 
-* The priorities of some groups for `delete` action were changed. All changes are in the following table:
+* The priorities of some groups for the `delete` action were changed. All changes are in the following table:
 
     | Group | Old Priority | New Priority |
     | --- | --- | --- |
@@ -121,10 +135,10 @@
     | finalize | -70 | -60 |
     | normalize_result | -80 | -70 |
 
-* A handling of `percent` data type in POST and PATCH requests was fixed. Before the fix the percent value in GET and POST/PATCH requests was inconsistent, in POST/PATCH requests it was divided by 100, but GET request returns it as is. In this fix the division by 100 was removed.
-* For string filters the default value of `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
+* Handling of `percent` data type in POST and PATCH requests was fixed. Before the fix, the percent value in GET and POST/PATCH requests was inconsistent; in POST/PATCH requests it was divided by 100, but GET request returned it as is. In this fix, the division by 100 was removed.
+* For string filters the default value of the `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
 #### SegmentBundle
-* Refactored `SegmentComponent` js-component to use `EntityStructureDataProvider`.
+* Refactored the `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle
 * In the `Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry` class, the return type in the `getWidgetDefinitions` and `getWidgetDefinitionsByPlacement` methods were changed from `ArrayCollection` to `array`.
 #### UIBundle
@@ -173,20 +187,20 @@
 * Added `ActivityConditionView` as substitution for removed `oroactivity.activityCondition` jQuery widget.
 #### ApiBundle
 * Added an additional syntax for data filters: `key[operator_name]=value`. For example `GET /api/users?filter[id][neq]=2` can be used instead of `GET /api/users?filter[id]!=2`. The supported operators are `eq`, `neq`, `lt`, `lte`, `gt` and `gte`.
-* Added a possibility to specify **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
+* Added a possibility to specify the **documentation_resource** option for the same entity in different `Resources/config/oro/api.yml` files. It can be helpful when some bundle needs to add a field to an entity declared in another bundle.
 * Added a possibility to configure own identifier field(s) instead of the database primary key. For details see [how_to.md](./src/Oro/Bundle/ApiBundle/Resources/doc/how_to.md#using-a-non-primary-key-to-identify-entity)
 * Added filters for the following data types: `smallint`, `date`, `time`, `guid`, `percent`, `money` and `duration`
 * Added a range filter and option `allow_range` that allow to enable or disable this filter. An example of usage of this filter `/api/leads?filter[createdAt]=2017-10-19T10:00:00..2017-10-19T10:30:00`
 #### DataAuditBundle
 * Added `DataAuditConditionView` as substitution for removed `oroauditquerydesigner.dataAuditCondition` jQuery widget.
 #### EntityConfigBundle
-* Added interface `Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` that should be implemented in case new type of arguments added.
+* Added the`Oro\Bundle\EntityConfigBundle\Attribute\Type\AttributeTypeInterface` interface that should be implemented in case a new type of arguments was added.
 #### MessageQueue Component
 * Added method `onPreCreateDelayed` to `Oro\Component\MessageQueue\Job\ExtensionInterface` interface.
 * Added Stale Jobs functionality
-    * Added method `setJobConfigurationProvider` to `Oro\Component\MessageQueue\Job\JobProcessor`
-    * Added new state oro.message_queue_job.status.stale
-    * Added new interface `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` 
+    * Added the `setJobConfigurationProvider` method to `Oro\Component\MessageQueue\Job\JobProcessor`
+    * Added the new oro.message_queue_job.status.stale state 
+    * Added the new `Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface` interface 
 #### MessageQueueBundle
 * Added interface `Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearerInterface`. For details see [container_in_consumer.md](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/container_in_consumer.md#container-reset)
 * Added configuration for Stale Jobs
@@ -315,13 +329,13 @@ datagrids:
 attribute. Otherwise `'Error'` will be thrown.
 ### Removed
 #### ApiBundle
-* The `data_transformer` option for fields was removed from `Resources/config/oro/api.yml`. This option is required very very rarely and it is quite confusing for developers because its name is crossed with data transformers used in Symfony Forms, but the purpose of this option was very different and it was used to transform a field value from one data type to another during loading data. If you used this option for some of your API resources, please replace it with a processor for [customize_loaded_data](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md#customize_loaded_data-action) action.
+* The `data_transformer` option for fields was removed from `Resources/config/oro/api.yml`. This option is required rarely and it is quite confusing for developers because its name is crossed with data transformers used in Symfony Forms. However, the purpose of this option was different and it was used to transform a field value from one data type to another when loading data. If you used this option for some of your API resources, please replace it with a processor for [customize_loaded_data](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md#customize_loaded_data-action) action.
 * Class `ApiActions`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/Request/ApiActions.php "Oro\Bundle\ApiBundle\Request\ApiActions")</sup>
     * removed methods `isInputAction`, `isOutputAction` and `getActionOutputFormatActionType`. They were moved to `RestDocHandler`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/RestDocHandler.php "Oro\Bundle\ApiBundle\ApiDoc\RestDocHandler")</sup>
     * removed method `isIdentifierNeededForAction`. This code was moved to `ApiDocMetadataParser`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/ApiBundle/ApiDoc/Parser/ApiDocMetadataParser.php "Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser")</sup>
 #### FormBundle
-* Removed usage of `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
-#### SearchBundle
+* Removed usage of the `'tinymce/jquery.tinymce'` extension. Use `'tinymce/tinymce'` directly instead
+#### SearchBundle.
 * Removed method `getUniqueId` from class `BaseDriver`<sup>[[?]](https://github.com/oroinc/platform/tree/2.4.0/src/Oro/Bundle/SearchBundle/Engine/Orm/BaseDriver.php "Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver")</sup>. Use method `getJoinAttributes` instead.
 #### SegmentBundle
 * Services `oro_segment.query_converter.segment` and `oro_segment.query_converter.segment.link` were removed.
@@ -408,7 +422,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 #### EmailBundle
 * Class `EmailExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/EmailBundle/Twig/EmailExtension.php "Oro\Bundle\EmailBundle\Twig\EmailExtension")</sup> method `getSecurityFacade` was replaces with `getAuthorizationChecker` and `getTokenAccessor`
 * Class `EmailQueryFactory`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/EmailBundle/Datagrid/EmailQueryFactory.php "Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory")</sup> method `prepareQuery` renamed to `addFromEmailAddress`
-* The performance of following data grids were improved and as result theirs definitions and TWIG templates were significantly changed. The main change is to return only fields required fir the grid, instead return whole entity
+* The performance of the following data grids was improved. As a result, their definitions and TWIG templates were significantly changed. The main change is to return only the fields required for the grid, instead of returning the whole entity
     * `base-email-grid`
     * `email-grid`
     * `dashboard-recent-emails-inbox-grid`
@@ -505,18 +519,18 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 * Class `EmailExtension`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/EmailBundle/Twig/EmailExtension.php "Oro\Bundle\EmailBundle\Twig\EmailExtension")</sup> method `getEmailThreadRecipients` was marked as deprecated. Use `EmailGridResultHelper::addEmailRecipients` instead
 #### SecurityBundle
 * Interface `AccessLevelOwnershipDecisionMakerInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Acl/Extension/AccessLevelOwnershipDecisionMakerInterface.php "Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface")</sup>
-    * method `isGlobalLevelEntity` was marked ad deprecated, use method `isOrganization` instead
-    * method `isLocalLevelEntity` was marked ad deprecated, use method `isBusinessUnit` instead
-    * method `isBasicLevelEntity` was marked ad deprecated, use method `isUser` instead
-    * method `isAssociatedWithGlobalLevelEntity` was marked ad deprecated, use method `isAssociatedWithOrganization` instead
-    * method `isAssociatedWithLocalLevelEntity` was marked ad deprecated, use method `isAssociatedWithBusinessUnit` instead
-    * method `isAssociatedWithBasicLevelEntity` was marked ad deprecated, use method `isAssociatedWithUser` instead
+    * method `isGlobalLevelEntity` was marked as deprecated, use method `isOrganization` instead
+    * method `isLocalLevelEntity` was marked as deprecated, use method `isBusinessUnit` instead
+    * method `isBasicLevelEntity` was marked as deprecated, use method `isUser` instead
+    * method `isAssociatedWithGlobalLevelEntity` was marked as deprecated, use method `isAssociatedWithOrganization` instead
+    * method `isAssociatedWithLocalLevelEntity` was marked as deprecated, use method `isAssociatedWithBusinessUnit` instead
+    * method `isAssociatedWithBasicLevelEntity` was marked as deprecated, use method `isAssociatedWithUser` instead
 * Interface `OwnerTreeInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeInterface.php "Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface")</sup> was renamed to `OwnerTreeBuilderInterface`
-    * method `addBasicEntity` was marked ad deprecated, use method `addUser` instead
-    * method `addGlobalEntity` was marked ad deprecated, use method `addUserOrganization` instead
-    * method `addLocalEntityToBasic` was marked ad deprecated, use method `addUserBusinessUnit` instead
-    * method `addDeepEntity` was marked ad deprecated, use method `addBusinessUnitRelation` instead
-    * method `addLocalEntity` was marked ad deprecated, use method `addBusinessUnit` instead
+    * method `addBasicEntity` was marked as deprecated, use method `addUser` instead
+    * method `addGlobalEntity` was marked as deprecated, use method `addUserOrganization` instead
+    * method `addLocalEntityToBasic` was marked as deprecated, use method `addUserBusinessUnit` instead
+    * method `addDeepEntity` was marked as deprecated, use method `addBusinessUnitRelation` instead
+    * method `addLocalEntity` was marked as deprecated, use method `addBusinessUnit` instead
 * Interface `OwnershipMetadataInterface`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Owner/Metadata/OwnershipMetadataInterface.php "Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface")</sup>
     * method `isBasicLevelOwned` was marked as deprecated, use method `isUserOwned` instead
     * method `isLocalLevelOwned` was marked as deprecated, use method `isBusinessUnitOwned` instead
@@ -557,7 +571,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 * Removed service `oro_security.owner.tree`
 * Removed service `oro_security.owner.decision_maker.abstract`
 * Removed service `oro_security.link.ownership_tree_provider`
-* Class `AbstractMetadataProvider`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Owner/Metadata/AbstractMetadataProvider.php "Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider")</sup> was removed. Logic was moved to `AbstractOwnershipMetadataProvider`
+* Class `AbstractMetadataProvider`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Owner/Metadata/AbstractMetadataProvider.php "Oro\Bundle\SecurityBundle\Owner\Metadata\AbstractMetadataProvider")</sup> was removed. The logic was moved to `AbstractOwnershipMetadataProvider`
     * changed the constructor signature: old signature was `__construct(array $owningEntityNames)`, new signature is `__construct(ConfigManager $configManager)`
     * removed property `localCache`
     * removed property `owningEntityNames`
@@ -568,7 +582,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
     * removed method `setAccessLevelClasses`
 * Class `ChainMetadataProvider`<sup>[[?]](https://github.com/oroinc/platform/tree/2.3.0/src/Oro/Bundle/SecurityBundle/Owner/Metadata/ChainMetadataProvider.php "Oro\Bundle\SecurityBundle\Owner\Metadata\ChainMetadataProvider")</sup> was removed. Logic was moved to `ChainOwnershipMetadataProvider`
 #### TestFrameworkBundle
-* Removed `--applicable-suites` parameter from behat. Now every bundle should provide only features that applicable to any application that include that bundle.
+* Removed `--applicable-suites` parameter from behat. Now every bundle should provide only features that are applicable to any application that includes that bundle.
 #### TranslationBundle
 * Removed service `oro_translation.distribution.package_manager.link`
 #### WorkflowBundle
@@ -593,7 +607,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 
 ### Added
 #### ApiBundle
-* Added `form_event_subscriber` option to `Resources/config/oro/api.yml`. It can be used to add an event subscriber(s) to a form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`. For details see `/src/Oro/Bundle/ApiBundle/Resources/doc/configuration.md`
+* Added the `form_event_subscriber` option to `Resources/config/oro/api.yml`. It can be used to add an event subscriber(s) to the form of such actions as `create`, `update`, `add_relationship`, `update_relationship` and `delete_relationship`. See `/src/Oro/Bundle/ApiBundle/Resources/doc/configuration.md` for more information.
 #### WorkflowBundle
 * Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 * Class `WorkflowAwareCache`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowAwareCache.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache")</sup> added:
@@ -619,8 +633,8 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
     * `CompleteEntityDefinitionHelper`<sup>[[?]](https://github.com/orocrm/platform/tree/2.1.0/src/Oro/Bundle/ApiBundle/Processor/Config/Shared/CompleteDefinition/CompleteEntityDefinitionHelper.php#L130 "Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper")</sup>
     * `CompleteObjectDefinitionHelper`<sup>[[?]](https://github.com/orocrm/platform/tree/2.1.0/src/Oro/Bundle/ApiBundle/Processor/Config/Shared/CompleteDefinition/CompleteObjectDefinitionHelper.php#L130 "Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteObjectDefinitionHelper")</sup>
 #### EmailBundle
-* template `Resources/views/Form/autoresponseFields.html.twig` was removed as it contained possibility to add collection item after arbitrary item, which is not needed anymore with new form
-* Next templates were changed:
+* template `Resources/views/Form/autoresponseFields.html.twig` was removed as it contained possibility to add a collection item after an arbitrary item, which is unnecessary with new form
+* The following templates were changed:
     * `Resources/views/AutoResponseRule/dialog/update.html.twig`
     * `Resources/views/Configuration/Mailbox/update.html.twig`
     * `EmailBundle/Resources/views/Form/fields.html.twig`
@@ -639,7 +653,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
     * service `oro_importexport.async.cli_import` decorates `oro_importexport.async.import`
 #### SegmentBundle
 * Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
-    * method `run` now accept also a dynamic segment
+    * method `run` now also accepts a dynamic segment
 #### WorkflowBundle
 * Class `WorkflowItemListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowItemListener.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener")</sup> auto start workflow part were moved into `WorkflowStartListener`<sup>[[?]](https://github.com/oroinc/platform/tree/2.2.0/src/Oro/Bundle/WorkflowBundle/EventListener/WorkflowStartListener.php "Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener")</sup>
 ### Deprecated
@@ -685,7 +699,7 @@ job is handled by `ContainerResetExtension`<sup>[[?]](https://github.com/oroinc/
 * Added new action with alias `resolve_destination_page` and class `ResolveDestinationPage`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/ActionBundle/Action/ResolveDestinationPage.php "Oro\Bundle\ActionBundle\Action\ResolveDestinationPage")</sup>
 * Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `AttributeGuesser`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/ActionBundle/Model/AttributeGuesser.php "Oro\Bundle\ActionBundle\Model\AttributeGuesser")</sup>
 #### BatchBundle
-* Added `BufferedIdentityQueryResultIterator`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/BatchBundle/ORM/Query/BufferedIdentityQueryResultIterator.php "Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator")</sup> that allows to iterate through changing dataset
+* Added `BufferedIdentityQueryResultIterator`<sup>[[?]](https://github.com/oroinc/platform/tree/2.1.0/src/Oro/Bundle/BatchBundle/ORM/Query/BufferedIdentityQueryResultIterator.php "Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator")</sup> that allows to iterate through the changing dataset
 #### EntityBundle
 * Added class `Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener' that should be used for entities with single table inheritance.
     Example:

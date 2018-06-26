@@ -1,3 +1,16 @@
+/* @theme: admin.oro; */
+
+&,
+.app-page,
+.app-page__central-panel {
+  height: 100%;
+  overflow: hidden; // prevents scroll bar appearance
+}
+
+& {
+  overflow-x: auto;
+}
+
 .responsive-block{
   min-width: 340px;
   padding-right: 5px;
@@ -6,12 +19,28 @@
   }
 }
 
-#left-panel,
-#right-panel {
-  overflow: visible;
-}
-#left-panel, #right-panel, #main {
-  float: left;
+.app-page {
+  box-sizing: border-box;
+  display: flex;
+  &__content-side {
+    flex-shrink: 0;
+  }
+  &__content {
+    flex-grow: 1;
+    overflow: inherit;
+  }
+
+  &__main {
+    display: flex;
+    width: 100%;
+  }
+  &__left-panel,
+  &__right-panel {
+    overflow: visible;
+  }
+  &__central-panel {
+    flex-grow: 1;
+  }
 }
 
 .oro-page {

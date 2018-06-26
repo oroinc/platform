@@ -11,21 +11,21 @@ use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendEntityConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendEntityConfigProvider */
     private $extendEntityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     private $configManager;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $enumProvider;
 
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendProvider;
 
     protected function setUp()

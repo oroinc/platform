@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class AclPermissionTypeTest extends \PHPUnit_Framework_TestCase
+class AclPermissionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPermissionType */
     protected $formType;

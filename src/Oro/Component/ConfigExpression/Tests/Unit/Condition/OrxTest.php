@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
 
-class OrxTest extends \PHPUnit_Framework_TestCase
+class OrxTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\Orx */
     protected $condition;

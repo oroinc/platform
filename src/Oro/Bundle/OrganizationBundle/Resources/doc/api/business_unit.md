@@ -17,14 +17,13 @@ Retrieve a collection of business unit records.
 ### create
     
 Create a new business unit record.
+
 The created record is returned in the response.
 
 {@inheritdoc}
 
 {@request:json_api}
 Example:
-
-`</api/businessunits>`
 
 ```JSON
 {  
@@ -76,8 +75,6 @@ Edit a specific business unit record.
 {@request:json_api}
 Example:
 
-`</api/businessunits/4>`
-
 ```JSON
 {  
    "data":{  
@@ -116,7 +113,6 @@ Delete a specific business unit record
 ### delete_list
 
 Delete a collection of business unit records.
-The list of records that will be deleted, could be limited by filters.
 
 {@inheritdoc}
 
@@ -165,8 +161,6 @@ Replace the organization record a specific business unit record belongs to.
 {@request:json_api}
 Example:
 
-`</api/businessunits/1/relationships/organization>`
-
 ```JSON
 {
   "data": {
@@ -193,8 +187,6 @@ Replace the owner of a specific business unit record.
 
 {@request:json_api}
 Example:
-
-`</api/businessunits/2/relationships/owner>`
 
 ```JSON
 {
@@ -223,8 +215,6 @@ Set the user records that will have access to a specific business unit record.
 {@request:json_api}
 Example:
 
-`</api/businessunits/2/relationships/users>`
-
 ```JSON
 {
   "data": [
@@ -251,8 +241,6 @@ Replace the user records that have access to a specific business unit record.
 
 {@request:json_api}
 Example:
-
-`</api/businessunits/2/relationships/users>`
 
 ```JSON
 {

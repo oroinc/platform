@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\GteComparisonExpression;
 
-class GteComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class GteComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {

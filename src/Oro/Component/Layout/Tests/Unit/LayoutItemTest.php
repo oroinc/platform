@@ -6,7 +6,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItem;
 use Oro\Component\Layout\RawLayoutBuilder;
 
-class LayoutItemTest extends \PHPUnit_Framework_TestCase
+class LayoutItemTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;

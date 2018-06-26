@@ -9,15 +9,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
 
-class YamlProcessorTest extends \PHPUnit_Framework_TestCase
+class YamlProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var YamlProcessor */
     protected $processor;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     protected function setUp()

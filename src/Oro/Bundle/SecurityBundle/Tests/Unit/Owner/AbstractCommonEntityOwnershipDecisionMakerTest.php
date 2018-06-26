@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
-abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OwnerTree */
     protected $tree;

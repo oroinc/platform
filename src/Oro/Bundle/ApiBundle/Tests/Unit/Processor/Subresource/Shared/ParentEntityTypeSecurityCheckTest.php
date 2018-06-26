@@ -12,10 +12,10 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $aclGroupProvider;
 
     public function setUp()

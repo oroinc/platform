@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 
@@ -16,10 +17,10 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
     private const ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
     private $entityIdTransformer;
 
     /** @var NormalizeRequestData */
@@ -31,8 +32,13 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
         $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
 
-        $this->processor = new NormalizeRequestData($this->valueNormalizer, $this->entityIdTransformer);
+        $this->processor = new NormalizeRequestData($this->valueNormalizer, $entityIdTransformerRegistry);
     }
 
     public function testNormalizeDataForToOneAssociation()

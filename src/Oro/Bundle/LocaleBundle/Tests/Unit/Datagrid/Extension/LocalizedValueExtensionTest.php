@@ -20,21 +20,21 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
+class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassResolver;
 
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationHelper;
 
-    /** @var OrmDatasource|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
     protected $datasource;
 
-    /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $queryBuilder;
 
     /** @var LocalizedValueExtension */

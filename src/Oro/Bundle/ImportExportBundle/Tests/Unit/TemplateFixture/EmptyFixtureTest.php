@@ -6,7 +6,7 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
-class EmptyFixtureTest extends \PHPUnit_Framework_TestCase
+class EmptyFixtureTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityClass()
     {

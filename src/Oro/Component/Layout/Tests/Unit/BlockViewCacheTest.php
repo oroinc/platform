@@ -21,12 +21,12 @@ class BlockViewCacheTest extends LayoutTestCase
     protected $blockViewCache;
 
     /**
-     * @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cacheProvider;
 
     /**
-     * @var Serializer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Serializer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 

@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class AttributeGroupTest extends \PHPUnit_Framework_TestCase
+class AttributeGroupTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

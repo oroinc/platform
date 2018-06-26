@@ -5,10 +5,10 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\Command\Proxy;
 use Oro\Bundle\AsseticBundle\Command\Proxy\ContainerProxy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ContainerProxyTest extends \PHPUnit_Framework_TestCase
+class ContainerProxyTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $target;
 
@@ -19,7 +19,7 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->target = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->target = $this->createMock(ContainerInterface::class);
         $this->proxy = new ContainerProxy($this->target);
     }
 
@@ -56,6 +56,10 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $name
+     * @param array  $params
+     * @param mixed  $returnValue
+     *
      * @dataProvider methodProvider
      */
     public function testMethod($name, $params, $returnValue)
@@ -72,21 +76,36 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $result = call_user_func_array(array($this->proxy, $name), $params);
+        $result = call_user_func_array([$this->proxy, $name], $params);
 
         $this->assertEquals($params, $targetParams);
         $this->assertEquals($returnValue, $result);
     }
 
+    /**
+     * @return array
+     */
     public function methodProvider()
     {
         return [
-            ['set', ['id', new \stdClass(), ContainerInterface::SCOPE_CONTAINER], null],
+            ['set', ['id', new \stdClass()], null],
             ['get', ['id', ContainerInterface::IGNORE_ON_INVALID_REFERENCE], new \stdClass()],
             ['has', ['id'], true],
             ['getParameter', ['name'], 'test'],
             ['hasParameter', ['name'], true],
             ['setParameter', ['name', 'test'], null],
         ];
+    }
+
+    public function testInitialized()
+    {
+        $id = 'acme.service_id';
+
+        $this->target->expects($this->once())
+            ->method('initialized')
+            ->with($id)
+            ->willReturn(true);
+
+        $this->assertTrue($this->proxy->initialized($id));
     }
 }

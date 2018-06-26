@@ -10,7 +10,9 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -24,22 +26,22 @@ class NormalizeRequestData implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var EntityIdTransformerInterface */
-    protected $entityIdTransformer;
+    /** @var EntityIdTransformerRegistry */
+    protected $entityIdTransformerRegistry;
 
     /** @var ChangeRelationshipContext */
     protected $context;
 
     /**
-     * @param ValueNormalizer              $valueNormalizer
-     * @param EntityIdTransformerInterface $entityIdTransformer
+     * @param ValueNormalizer             $valueNormalizer
+     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
         ValueNormalizer $valueNormalizer,
-        EntityIdTransformerInterface $entityIdTransformer
+        EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
         $this->valueNormalizer = $valueNormalizer;
-        $this->entityIdTransformer = $entityIdTransformer;
+        $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
 
     /**
@@ -129,7 +131,8 @@ class NormalizeRequestData implements ProcessorInterface
     protected function normalizeEntityId($pointer, $entityId, EntityMetadata $entityMetadata)
     {
         try {
-            return $this->entityIdTransformer->reverseTransform($entityId, $entityMetadata);
+            return $this->getEntityIdTransformer($this->context->getRequestType())
+                ->reverseTransform($entityId, $entityMetadata);
         } catch (\Exception $e) {
             $error = Error::createValidationError(Constraint::ENTITY_ID)
                 ->setInnerException($e)
@@ -162,6 +165,16 @@ class NormalizeRequestData implements ProcessorInterface
         }
 
         return null;
+    }
+
+    /**
+     * @param RequestType $requestType
+     *
+     * @return EntityIdTransformerInterface
+     */
+    protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
+    {
+        return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
     /**

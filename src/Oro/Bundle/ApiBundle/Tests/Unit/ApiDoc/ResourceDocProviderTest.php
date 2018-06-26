@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
-class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
+class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResourceDocProvider */
     private $resourceDocProvider;

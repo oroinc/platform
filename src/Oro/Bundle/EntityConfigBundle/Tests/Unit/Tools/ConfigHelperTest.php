@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
-class ConfigHelperTest extends \PHPUnit_Framework_TestCase
+class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isConfigModelEntityProvider

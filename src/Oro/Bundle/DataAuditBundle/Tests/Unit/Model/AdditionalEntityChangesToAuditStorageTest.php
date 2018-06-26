@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 
-class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit_Framework_TestCase
+class AdditionalEntityChangesToAuditStorageTest extends \PHPUnit\Framework\TestCase
 {
     public function testWhenNoEntityManagerInStorage()
     {

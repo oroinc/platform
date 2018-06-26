@@ -11,12 +11,12 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataH
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class NestedAssociationMetadataHelperTest extends \PHPUnit_Framework_TestCase
+class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $objectMetadataFactory;
 
     /** @var NestedAssociationMetadataHelper */

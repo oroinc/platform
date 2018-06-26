@@ -6,12 +6,12 @@ use Oro\Bundle\MessageQueueBundle\Log\Converter\ChainMessageToArrayConverter;
 use Oro\Bundle\MessageQueueBundle\Log\Converter\MessageToArrayConverterInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 
-class ChainMessageToArrayConverterTest extends \PHPUnit_Framework_TestCase
+class ChainMessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $converter1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $converter2;
 
     /** @var ChainMessageToArrayConverter */

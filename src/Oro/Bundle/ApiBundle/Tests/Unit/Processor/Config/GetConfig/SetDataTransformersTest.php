@@ -12,10 +12,10 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerRegistry */
     protected $dataTransformerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var SetDataTransformers */
@@ -38,7 +38,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
     {
         $config = [];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityMetadataForClass');
 
         /** @var EntityDefinitionConfig $configObject */
@@ -52,13 +52,12 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
     public function testProcessForNotCompletedConfig()
     {
         $config = [
-            'exclusion_policy' => 'none',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityMetadataForClass');
 
         /** @var EntityDefinitionConfig $configObject */
@@ -104,15 +103,15 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         ];
 
         $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
-        $this->dataTransformerRegistry->expects($this->any())
+        $this->dataTransformerRegistry->expects(self::any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $this->context->getRequestType(), $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer]
                 ]
             );
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME, false)
             ->willReturn(null);
@@ -158,37 +157,37 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         ];
 
         $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
-        $this->dataTransformerRegistry->expects($this->any())
+        $this->dataTransformerRegistry->expects(self::any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $this->context->getRequestType(), $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer]
                 ]
             );
 
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $metadata->expects($this->exactly(4))
+        $metadata->expects(self::exactly(4))
             ->method('hasField')
             ->willReturnMap(
                 [
                     ['field3', true],
                     ['field4', true],
                     ['realField5', true],
-                    ['someAssociation.field6', false],
+                    ['someAssociation.field6', false]
                 ]
             );
-        $metadata->expects($this->exactly(3))
+        $metadata->expects(self::exactly(3))
             ->method('getTypeOfField')
             ->willReturnMap(
                 [
                     ['field3', 'time'],
                     ['field4', 'integer'],
-                    ['realField5', 'time'],
+                    ['realField5', 'time']
                 ]
             );
 
-        $this->doctrineHelper->expects($this->exactly(1))
+        $this->doctrineHelper->expects(self::exactly(1))
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME, false)
             ->willReturn($metadata);
@@ -219,63 +218,63 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                         'field12' => null,
                         'field13' => [
                             'property_path' => 'realField13'
-                        ],
+                        ]
                     ]
                 ]
             ]
         ];
 
         $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
-        $this->dataTransformerRegistry->expects($this->any())
+        $this->dataTransformerRegistry->expects(self::any())
             ->method('getDataTransformer')
             ->willReturnMap(
                 [
-                    ['time', $this->context->getRequestType(), $timeDataTransformer],
+                    ['time', $this->context->getRequestType(), $timeDataTransformer]
                 ]
             );
 
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, false, $metadata],
-                    ['Test\Association1Target', true, $association1Metadata],
+                    ['Test\Association1Target', true, $association1Metadata]
                 ]
             );
 
-        $metadata->expects($this->exactly(1))
+        $metadata->expects(self::exactly(1))
             ->method('hasAssociation')
             ->willReturnMap(
                 [
-                    ['association1', true],
+                    ['association1', true]
                 ]
             );
-        $metadata->expects($this->exactly(1))
+        $metadata->expects(self::exactly(1))
             ->method('getAssociationTargetClass')
             ->willReturnMap(
                 [
-                    ['association1', 'Test\Association1Target'],
+                    ['association1', 'Test\Association1Target']
                 ]
             );
 
-        $association1Metadata->expects($this->exactly(3))
+        $association1Metadata->expects(self::exactly(3))
             ->method('hasField')
             ->willReturnMap(
                 [
                     ['field11', true],
                     ['field12', true],
-                    ['realField13', true],
+                    ['realField13', true]
                 ]
             );
-        $association1Metadata->expects($this->exactly(3))
+        $association1Metadata->expects(self::exactly(3))
             ->method('getTypeOfField')
             ->willReturnMap(
                 [
                     ['field11', 'time'],
                     ['field12', 'integer'],
-                    ['realField13', 'time'],
+                    ['realField13', 'time']
                 ]
             );
 

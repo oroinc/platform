@@ -9,12 +9,12 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EventListener\EntityAliasConfigListener;
 
-class EntityAliasConfigListenerTest extends \PHPUnit_Framework_TestCase
+class EntityAliasConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityAliasResolver;
 
     /** @var EntityAliasConfigListener */

@@ -11,27 +11,27 @@ use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
-class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
+class EmailOriginHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emailModel;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emailOwnerProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var  EmailAddressHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailAddressHelper;
 
     protected function setUp()
@@ -140,12 +140,12 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
      * @dataProvider findEmailOriginDataProvider
      *
      * @param bool                                               $expected
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $mailModelExpects
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $mailModelExpects
      * @param string                                             $emailOwner
      * @param bool                                               $enableUseUserEmailOrigin
      * @param bool                                               $isOriginsNotEmpty
-     * @param \PHPUnit_Framework_MockObject_MockObject           $origin
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $emailOriginsTimes
+     * @param \PHPUnit\Framework\MockObject\MockObject           $origin
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $emailOriginsTimes
      */
     public function testFindEmailOrigin(
         $expected,
@@ -153,7 +153,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         $emailOwner,
         $enableUseUserEmailOrigin,
         $isOriginsNotEmpty,
-        \PHPUnit_Framework_MockObject_MockObject $origin,
+        \PHPUnit\Framework\MockObject\MockObject $origin,
         $emailOriginsTimes,
         $exactly
     ) {
@@ -315,7 +315,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEmailOwnerMailBoxMock()
     {
@@ -325,7 +325,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getUserEmailOriginMock()
     {
@@ -335,7 +335,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getInternalEmailOriginMock()
     {

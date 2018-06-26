@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 
-class TransitionManagerTest extends \PHPUnit_Framework_TestCase
+class TransitionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionManager */
     protected $transitionManager;
@@ -131,7 +131,7 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param bool $isStart
      * @param Step $step
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionMock($name, $isStart = false, $step = null)
     {

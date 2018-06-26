@@ -5,27 +5,27 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
+class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetConfigs */
     protected $target;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $resolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $valueProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $widgetConfigVisibilityFilter;
 
     protected function setUp()

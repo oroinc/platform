@@ -7,12 +7,12 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ControllerTest extends \PHPUnit_Framework_TestCase
+class ControllerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $templating;
 
     /** @var array */
@@ -61,7 +61,7 @@ class ControllerTest extends \PHPUnit_Framework_TestCase
             []
         );
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getMimeType')

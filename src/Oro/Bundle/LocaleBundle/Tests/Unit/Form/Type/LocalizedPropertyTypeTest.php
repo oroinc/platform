@@ -29,7 +29,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         $localizationCollection = new LocalizationCollectionType($this->registry);
         $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface $translator */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface $translator */
         $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         return [

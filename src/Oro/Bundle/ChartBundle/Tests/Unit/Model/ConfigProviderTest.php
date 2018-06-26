@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 
-class ConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetConfigs()
     {

@@ -13,7 +13,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
  */
 class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
 {
-    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
     protected function setUp()
@@ -28,7 +28,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject $doctrineHelper */
+        /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper */
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')

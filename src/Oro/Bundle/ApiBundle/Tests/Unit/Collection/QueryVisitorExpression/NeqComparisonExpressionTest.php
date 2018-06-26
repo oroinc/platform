@@ -7,7 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqComparisonExpression;
 
-class NeqComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class NeqComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {

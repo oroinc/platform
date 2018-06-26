@@ -10,15 +10,15 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class RelatedEntityTransformerTest extends \PHPUnit_Framework_TestCase
+class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassNameHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     /** @var RelatedEntityTransformer */

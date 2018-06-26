@@ -68,8 +68,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No: 0
                                 Yes: 1
@@ -83,8 +81,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No: 0
                                 Yes: 1
@@ -98,8 +94,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 oro.entity_config.field_config.filter_by.exact_value.label: exact_value
                                 oro.entity_config.field_config.filter_by.fuzzy_search.label: fuzzy_search
@@ -114,8 +108,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No: 0
                                 Yes: 1
@@ -129,8 +121,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No: 0
                                 Yes: 1
@@ -149,8 +139,6 @@ entity_config:
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
-                            # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                            choices_as_values: true
                             choices:
                                 No: 0
                                 Yes: 1

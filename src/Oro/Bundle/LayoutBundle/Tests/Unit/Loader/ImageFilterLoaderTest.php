@@ -12,7 +12,7 @@ use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 use Prophecy\Argument;
 
-class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
+class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
 {
     const PRODUCT_ORIGINAL = 'product_original';
     const PRODUCT_LARGE = 'product_large';

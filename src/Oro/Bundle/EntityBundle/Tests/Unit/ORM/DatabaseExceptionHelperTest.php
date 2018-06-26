@@ -9,10 +9,10 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 
-class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
+class DatabaseExceptionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 

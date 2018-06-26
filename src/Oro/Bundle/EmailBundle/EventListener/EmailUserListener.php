@@ -41,7 +41,7 @@ class EmailUserListener
     }
 
     /**
-     * Send notification to clank that user have new emails
+     * Send notification to websocket that user have new emails
      *
      * @param PostFlushEventArgs $args
      */

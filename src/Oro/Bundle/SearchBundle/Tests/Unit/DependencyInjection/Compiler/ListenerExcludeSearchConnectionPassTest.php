@@ -5,12 +5,12 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ListenerExcludeSearchConnectionPassTest extends \PHPUnit_Framework_TestCase
+class ListenerExcludeSearchConnectionPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ListenerExcludeSearchConnectionPass */
     protected $compiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
     protected function setUp()

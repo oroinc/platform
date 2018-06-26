@@ -5,8 +5,9 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\UserBundle\DependencyInjection\Compiler\SecurityFirewallCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
-class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SecurityFirewallCompilerPass */
     private $compiler;
@@ -20,6 +21,9 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
     /** @var Definition */
     private $listenerDef;
 
+    /** @var Definition */
+    private $listener;
+
     protected function setUp()
     {
         $this->container = new ContainerBuilder();
@@ -27,9 +31,20 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $this->providerDef = new Definition();
         $this->listenerDef = new Definition();
+        $this->listener = new Definition();
 
         $this->container->setDefinition('escape_wsse_authentication.provider.test_firewall', $this->providerDef);
         $this->container->setDefinition('escape_wsse_authentication.listener.test_firewall', $this->listenerDef);
+        $this->container->setDefinition('escape_wsse_authentication.listener', $this->listener);
+    }
+
+    public function testProcessAddedArgumentForListener()
+    {
+        $this->compiler->process($this->container);
+
+        $arguments = $this->listener->getArguments();
+        self::assertCount(1, $arguments);
+        self::assertEquals(new Reference('oro_user.token.factory.wsse'), $arguments[0]);
     }
 
     public function testProcessOnEmptySecurityFirewallsConfig()

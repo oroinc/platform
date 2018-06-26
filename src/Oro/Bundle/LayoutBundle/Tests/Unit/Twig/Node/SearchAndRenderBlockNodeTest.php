@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
 use Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode;
 
-class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
+class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
     const RENDER_CALL = '$this->env->getExtension(\'layout\')->renderer->searchAndRenderBlock';
 

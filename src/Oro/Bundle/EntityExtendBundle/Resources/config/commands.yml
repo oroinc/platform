@@ -1,0 +1,45 @@
+services:
+    Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheCheckCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheClearCommand
+        tags:
+            - { name: console.command }
+
+
+    Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand
+        tags:
+            - { name: console.command }
+
+
+    Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\MigrationUpdateConfigCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand
+        tags:
+            - { name: console.command }
+
+
+    Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand:
+        public: false
+        class: Oro\Bundle\EntityExtendBundle\Command\UpdateSchemaCommand
+        tags:
+            - { name: console.command }

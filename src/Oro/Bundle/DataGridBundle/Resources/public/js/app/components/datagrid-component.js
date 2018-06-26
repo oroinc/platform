@@ -10,7 +10,7 @@ define(function(require) {
     var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var Grid = require('orodatagrid/js/datagrid/grid');
+    var GridView = require('orodatagrid/js/datagrid/grid');
     var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
     var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
     var gridContentManager = require('orodatagrid/js/content-manager');
@@ -237,6 +237,17 @@ define(function(require) {
                     modules[helpers.customType(type)] = module;
                 }
             });
+
+            // preload all action confirmation modules
+            _.each(this.data.data, function(model) {
+                _.each(model.action_configuration, function(config) {
+                    var module = config.confirmation && config.confirmation.component;
+                    if (module) {
+                        // the key does not matter, the module just added to list to have it preloaded
+                        modules[module] = module;
+                    }
+                });
+            });
         },
 
         /**
@@ -250,7 +261,7 @@ define(function(require) {
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
 
-            Grid = modules.GridView || Grid;
+            var Grid = modules.GridView || GridView;
             PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};

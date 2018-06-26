@@ -12,12 +12,12 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class OrmExpressionVisitorTest extends \PHPUnit_Framework_TestCase
+class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BaseDriver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BaseDriver|\PHPUnit\Framework\MockObject\MockObject */
     protected $driver;
 
-    /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $qb;
 
     /** @var OrmExpressionVisitor */

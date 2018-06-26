@@ -6,9 +6,9 @@ use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
-class ThemeProviderTest extends \PHPUnit_Framework_TestCase
+class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $themeManager;
 
     /** @var ThemeProvider */

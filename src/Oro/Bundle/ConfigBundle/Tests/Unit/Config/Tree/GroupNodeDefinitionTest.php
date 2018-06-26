@@ -3,7 +3,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
-class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME  = 'testNodeName';
     const TEST_LEVEL = 2;

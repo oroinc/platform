@@ -12,12 +12,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
+class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumerState */
     private $consumerState;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
     private $output;
 
     /** @var ConsoleHandler */
@@ -67,15 +67,18 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('%level_name%: test message {"processor":"Test\Processor"} {"key":"value"}' . "\n");
+            ->with('<fg=white>DEBUG    :</> test message ["processor" => "Test\Processor"] ["key" => "value"]' . "\n");
 
         $this->consumerState->startConsumption();
         self::assertFalse(
             $this->handler->handle([
                 'message' => 'test message',
                 'level'   => Logger::DEBUG,
+                'level_name' => 'DEBUG',
+                'channel' => 'app',
                 'context' => ['key' => 'value'],
-                'extra'   => ['processor' => 'Test\Processor']
+                'extra'   => ['processor' => 'Test\Processor'],
+                'datetime' => new \DateTime()
             ])
         );
     }
@@ -107,13 +110,16 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('%level_name%: test message  ' . "\n");
+            ->with('<fg=white>DEBUG    :</> test message  ' . "\n");
         self::assertFalse(
             $this->handler->handle([
                 'message' => 'test message',
                 'level'   => Logger::DEBUG,
+                'level_name' => 'DEBUG',
+                'channel' => 'app',
                 'context' => [],
-                'extra'   => []
+                'extra'   => [],
+                'datetime' => new \DateTime()
             ])
         );
 

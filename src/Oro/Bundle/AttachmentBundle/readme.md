@@ -30,9 +30,9 @@ On the entity record's details page, this field is displayed as a thumbnail imag
 
 OroAttachmentBundle uses [KnpGaufretteBundle](https://github.com/KnpLabs/KnpGaufretteBundle) to provide a filesystem abstraction layer.
 
-Based on the default configuration, it stores files in `app/attachment directory` of your project. A user can reconfigure these settings. You can find more information on the KnpGaufretteBundle configuration in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
+Based on the default configuration, it stores files in `var/attachment directory` of your project. A user can reconfigure these settings. You can find more information on the KnpGaufretteBundle configuration in [documentation](https://github.com/KnpLabs/KnpGaufretteBundle/blob/master/README.markdown).
 
-Image thumbnail files are created from [LiipImagineBundle](https://github.com/liip/LiipImagineBundle) and are stored in the `web/media/cache/attachment` directory.
+Image thumbnail files are created from [LiipImagineBundle](https://github.com/liip/LiipImagineBundle) and are stored in the `public/media/cache/attachment` directory.
 
 ## ACL Protection
 
@@ -167,7 +167,7 @@ A user can use 3 formatters for image type fields.
 
 # Debug Images Configuration
 
-By default, images are processed by front controller (`app_dev.php`) in the `dev` environment. However, you can also enable your web server to process images instead of front controllers. It helps boost performance on all platforms and stability on Windows. 
+By default, images are processed by front controller (`index_dev.php`) in the `dev` environment. However, you can also enable your web server to process images instead of front controllers. It helps boost performance on all platforms and stability on Windows. 
 To disable debug images, set the `debug_images` option to `false` in the config.yml file:
 
 ```yml

@@ -4,18 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 
-class ApiDocMetadataTest extends \PHPUnit_Framework_TestCase
+class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $action;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestType;
 
     /** @var ApiDocMetadata */

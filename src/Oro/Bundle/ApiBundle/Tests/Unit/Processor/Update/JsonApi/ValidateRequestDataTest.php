@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update\UpdateProcessorTestCase;
 
 class ValidateRequestDataTest extends UpdateProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var ValidateRequestData */

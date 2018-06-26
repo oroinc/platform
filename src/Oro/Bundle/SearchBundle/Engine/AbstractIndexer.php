@@ -10,6 +10,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Query\Mode;
 
+/**
+ * Abstract indexer for standard search engine
+ */
 abstract class AbstractIndexer implements IndexerInterface
 {
     const BATCH_SIZE = 1000;
@@ -52,8 +55,8 @@ abstract class AbstractIndexer implements IndexerInterface
         if (false == $class) {
             return $this->mapper->getEntities([Mode::NORMAL, Mode::WITH_DESCENDANTS]);
         } else {
-            $entityNames = [$class];
-            
+            $entityNames = (array)$class;
+
             $mode = $this->mapper->getEntityModeConfig($class);
 
             if ($mode === Mode::WITH_DESCENDANTS) {
@@ -72,14 +75,11 @@ abstract class AbstractIndexer implements IndexerInterface
     public function reindex($class = null, array $context = [])
     {
         if (false == $class) {
-            $this->resetIndex();
             $entityNames = $this->getClassesForReindex();
+            $this->resetIndex();
         } else {
             $entityNames = $this->getClassesForReindex($class);
-
-            foreach ($entityNames as $class) {
-                $this->resetIndex($class);
-            }
+            $this->resetIndex($entityNames);
         }
 
         // index data by mapping config

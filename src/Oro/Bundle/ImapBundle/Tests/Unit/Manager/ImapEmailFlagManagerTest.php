@@ -4,18 +4,18 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
 
-class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase
+class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImapEmailFlagManager */
     private $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $connector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repoImapEmail;
 
     protected function setUp()

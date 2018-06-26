@@ -11,16 +11,18 @@ use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class SubresourceContextTest extends \PHPUnit_Framework_TestCase
+class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
     /** @var SubresourceContext */
@@ -28,12 +30,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new SubresourceContext($this->configProvider, $this->metadataProvider);
     }
@@ -55,78 +53,85 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
     public function testParentClassName()
     {
-        $this->assertNull($this->context->getParentClassName());
+        self::assertNull($this->context->getParentClassName());
 
         $this->context->setParentClassName('test');
-        $this->assertEquals('test', $this->context->getParentClassName());
-        $this->assertEquals('test', $this->context->get(SubresourceContext::PARENT_CLASS_NAME));
+        self::assertEquals('test', $this->context->getParentClassName());
+        self::assertEquals('test', $this->context->get(SubresourceContext::PARENT_CLASS_NAME));
     }
 
     public function testParentId()
     {
-        $this->assertNull($this->context->getParentId());
+        self::assertNull($this->context->getParentId());
 
         $this->context->setParentId('test');
-        $this->assertEquals('test', $this->context->getParentId());
-        $this->assertEquals('test', $this->context->get(SubresourceContext::PARENT_ID));
+        self::assertEquals('test', $this->context->getParentId());
+        self::assertEquals('test', $this->context->get(SubresourceContext::PARENT_ID));
     }
 
     public function testAssociationName()
     {
-        $this->assertNull($this->context->getAssociationName());
+        self::assertNull($this->context->getAssociationName());
 
         $this->context->setAssociationName('test');
-        $this->assertEquals('test', $this->context->getAssociationName());
-        $this->assertEquals('test', $this->context->get(SubresourceContext::ASSOCIATION));
+        self::assertEquals('test', $this->context->getAssociationName());
+        self::assertEquals('test', $this->context->get(SubresourceContext::ASSOCIATION));
     }
 
     public function testIsCollection()
     {
-        $this->assertFalse($this->context->isCollection());
-        $this->assertTrue($this->context->has(SubresourceContext::COLLECTION));
-        $this->assertFalse($this->context->get(SubresourceContext::COLLECTION));
+        self::assertFalse($this->context->isCollection());
+        self::assertTrue($this->context->has(SubresourceContext::COLLECTION));
+        self::assertFalse($this->context->get(SubresourceContext::COLLECTION));
 
         $this->context->setIsCollection(true);
-        $this->assertTrue($this->context->isCollection());
-        $this->assertTrue($this->context->get(SubresourceContext::COLLECTION));
+        self::assertTrue($this->context->isCollection());
+        self::assertTrue($this->context->get(SubresourceContext::COLLECTION));
     }
 
     public function testParentEntity()
     {
-        $this->assertNull($this->context->getParentEntity());
-        $this->assertFalse($this->context->hasParentEntity());
+        self::assertNull($this->context->getParentEntity());
+        self::assertFalse($this->context->hasParentEntity());
 
         $entity = new \stdClass();
         $this->context->setParentEntity($entity);
-        $this->assertSame($entity, $this->context->getParentEntity());
-        $this->assertSame($entity, $this->context->get(SubresourceContext::PARENT_ENTITY));
-        $this->assertTrue($this->context->hasParentEntity());
+        self::assertSame($entity, $this->context->getParentEntity());
+        self::assertSame($entity, $this->context->get(SubresourceContext::PARENT_ENTITY));
+        self::assertTrue($this->context->hasParentEntity());
 
         $this->context->setParentEntity(null);
-        $this->assertNull($this->context->getParentEntity());
-        $this->assertTrue($this->context->hasParentEntity());
+        self::assertNull($this->context->getParentEntity());
+        self::assertTrue($this->context->hasParentEntity());
     }
 
     public function testGetParentConfigExtras()
     {
-        $this->context->setParentClassName('Test\Class');
-        $this->context->setAssociationName('test');
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
 
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        self::assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
 
         $expectedParentConfigExtras = [
-            new EntityDefinitionConfigExtra(),
+            new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
             new CustomizeLoadedDataConfigExtra(),
             new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra(
                 [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
             )
         ];
-        $this->assertEquals(
+        self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
         );
@@ -135,11 +140,11 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     public function testSetParentConfigExtras()
     {
         $this->context->setParentConfigExtras([new EntityDefinitionConfigExtra('get_list')]);
-        $this->assertEquals(
+        self::assertEquals(
             [new EntityDefinitionConfigExtra('get_list')],
             $this->context->getParentConfigExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [new EntityDefinitionConfigExtra('get_list')],
             $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
         );
@@ -147,25 +152,32 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveParentConfigExtras()
     {
-        $this->context->setParentClassName('Test\Class');
-        $this->context->setAssociationName('test');
+        $action = 'update_relationship';
+        $isCollection = true;
+        $parentEntityClass = 'Test\Class';
+        $associationName = 'test';
+
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
 
         $this->context->setParentConfigExtras([]);
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
+        self::assertNull($this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS));
 
         $expectedParentConfigExtras = [
-            new EntityDefinitionConfigExtra(),
+            new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
             new CustomizeLoadedDataConfigExtra(),
             new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra(
                 [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
             )
         ];
-        $this->assertEquals(
+        self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->get(SubresourceContext::PARENT_CONFIG_EXTRAS)
         );
@@ -184,6 +196,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     {
         $version = '1.1';
         $requestType = 'rest';
+        $action = 'update_relationship';
+        $isCollection = true;
         $parentEntityClass = 'Test\Class';
         $associationName = 'test';
 
@@ -192,17 +206,19 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setVersion($version);
         $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra(),
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
                     new CustomizeLoadedDataConfigExtra(),
                     new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
@@ -213,21 +229,23 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasParentConfig());
+        self::assertFalse($this->context->hasParentConfig());
 
-        $this->assertEquals($config, $this->context->getParentConfig()); // load config
-        $this->assertTrue($this->context->hasParentConfig());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
-        $this->assertEquals($config, $this->context->get(SubresourceContext::PARENT_CONFIG));
+        self::assertEquals($config, $this->context->getParentConfig()); // load config
+        self::assertTrue($this->context->hasParentConfig());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
+        self::assertEquals($config, $this->context->get(SubresourceContext::PARENT_CONFIG));
 
         // test that a config is loaded only once
-        $this->assertEquals($config, $this->context->getParentConfig());
+        self::assertEquals($config, $this->context->getParentConfig());
     }
 
     public function testLoadParentConfigWhenExceptionOccurs()
     {
         $version = '1.1';
         $requestType = 'rest';
+        $action = 'update_relationship';
+        $isCollection = true;
         $parentEntityClass = 'Test\Class';
         $associationName = 'test';
         $exception = new \RuntimeException('some error');
@@ -237,17 +255,19 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setVersion($version);
         $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra(),
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
                     new CustomizeLoadedDataConfigExtra(),
                     new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
@@ -258,19 +278,19 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
             ->willThrowException($exception);
 
         // test that a config is not loaded yet
-        $this->assertFalse($this->context->hasParentConfig());
+        self::assertFalse($this->context->hasParentConfig());
 
         try {
             $this->context->getParentConfig(); // load config
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
-        $this->assertTrue($this->context->hasParentConfig());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_CONFIG));
+        self::assertTrue($this->context->hasParentConfig());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
+        self::assertNull($this->context->get(SubresourceContext::PARENT_CONFIG));
 
         // test that a config is loaded only once
-        $this->assertNull($this->context->getParentConfig());
+        self::assertNull($this->context->getParentConfig());
     }
 
     // @codingStandardsIgnoreStart
@@ -292,30 +312,30 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setParentClassName('Test\Class');
         $this->context->setAssociationName('test');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->context->setParentConfig($config);
 
-        $this->assertTrue($this->context->hasParentConfig());
-        $this->assertEquals($config, $this->context->getParentConfig());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
-        $this->assertEquals($config, $this->context->get(SubresourceContext::PARENT_CONFIG));
+        self::assertTrue($this->context->hasParentConfig());
+        self::assertEquals($config, $this->context->getParentConfig());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_CONFIG));
+        self::assertEquals($config, $this->context->get(SubresourceContext::PARENT_CONFIG));
 
         // test remove config
         $this->context->setParentConfig();
-        $this->assertFalse($this->context->hasParentConfig());
+        self::assertFalse($this->context->hasParentConfig());
     }
 
     public function testGetParentMetadataExtras()
     {
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
+        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->context->getParentMetadataExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
@@ -326,13 +346,13 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
         $action = 'test_action';
         $this->context->setAction($action);
 
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
+        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
 
-        $this->assertEquals(
+        self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getParentMetadataExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
@@ -341,11 +361,11 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     public function testSetParentMetadataExtras()
     {
         $this->context->setParentMetadataExtras([new TestMetadataExtra('test')]);
-        $this->assertEquals(
+        self::assertEquals(
             [new TestMetadataExtra('test')],
             $this->context->getParentMetadataExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [new TestMetadataExtra('test')],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
@@ -354,12 +374,12 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     public function testRemoveParentMetadataExtras()
     {
         $this->context->setParentMetadataExtras([]);
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
-        $this->assertEquals(
+        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS));
+        self::assertEquals(
             [],
             $this->context->getParentMetadataExtras()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->context->get(SubresourceContext::PARENT_METADATA_EXTRAS)
         );
@@ -378,6 +398,8 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
     {
         $version = '1.1';
         $requestType = 'rest';
+        $action = 'update_relationship';
+        $isCollection = true;
         $parentEntityClass = 'Test\Class';
         $associationName = 'test';
 
@@ -387,18 +409,20 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setVersion($version);
         $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
         $this->context->setParentMetadataExtras($metadataExtras);
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra(),
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
                     new CustomizeLoadedDataConfigExtra(),
                     new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
@@ -407,7 +431,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 ]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $parentEntityClass,
@@ -419,32 +443,34 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
             ->willReturn($metadata);
 
         // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasParentMetadata());
+        self::assertFalse($this->context->hasParentMetadata());
 
-        $this->assertSame($metadata, $this->context->getParentMetadata()); // load metadata
-        $this->assertTrue($this->context->hasParentMetadata());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
-        $this->assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
+        self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
+        self::assertTrue($this->context->hasParentMetadata());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
+        self::assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
 
-        $this->assertEquals($config, $this->context->getParentConfig());
+        self::assertEquals($config, $this->context->getParentConfig());
 
         // test that metadata are loaded only once
-        $this->assertSame($metadata, $this->context->getParentMetadata());
+        self::assertSame($metadata, $this->context->getParentMetadata());
     }
 
     public function testLoadParentMetadataWhenNoParentClassName()
     {
-        $this->metadataProvider->expects($this->never())
+        $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
 
-        $this->assertNull($this->context->getParentMetadata());
-        $this->assertTrue($this->context->hasParentMetadata());
+        self::assertNull($this->context->getParentMetadata());
+        self::assertTrue($this->context->hasParentMetadata());
     }
 
     public function testLoadParentMetadataWhenExceptionOccurs()
     {
         $version = '1.1';
         $requestType = 'rest';
+        $action = 'update_relationship';
+        $isCollection = true;
         $parentEntityClass = 'Test\Class';
         $associationName = 'test';
         $exception = new \RuntimeException('some error');
@@ -454,18 +480,20 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setVersion($version);
         $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
         $this->context->setParentMetadataExtras($metadataExtras);
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
                 [
-                    new EntityDefinitionConfigExtra(),
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
                     new CustomizeLoadedDataConfigExtra(),
                     new DataTransformersConfigExtra(),
                     new FilterFieldsConfigExtra(
@@ -474,7 +502,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
                 ]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(
                 $parentEntityClass,
@@ -486,21 +514,21 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
             ->willThrowException($exception);
 
         // test that metadata are not loaded yet
-        $this->assertFalse($this->context->hasParentMetadata());
+        self::assertFalse($this->context->hasParentMetadata());
 
         try {
             $this->context->getParentMetadata(); // load metadata
         } catch (\RuntimeException $e) {
-            $this->assertSame($exception, $e);
+            self::assertSame($exception, $e);
         }
-        $this->assertTrue($this->context->hasParentMetadata());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
-        $this->assertNull($this->context->get(SubresourceContext::PARENT_METADATA));
+        self::assertTrue($this->context->hasParentMetadata());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
+        self::assertNull($this->context->get(SubresourceContext::PARENT_METADATA));
 
-        $this->assertEquals($config, $this->context->getParentConfig());
+        self::assertEquals($config, $this->context->getParentConfig());
 
         // test that metadata are loaded only once
-        $this->assertNull($this->context->getParentMetadata());
+        self::assertNull($this->context->getParentMetadata());
     }
 
     public function testMetadataWhenItIsSetExplicitly()
@@ -509,20 +537,20 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setClassName('Test\Class');
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
-        $this->metadataProvider->expects($this->never())
+        $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
 
         $this->context->setParentMetadata($metadata);
 
-        $this->assertTrue($this->context->hasParentMetadata());
-        $this->assertSame($metadata, $this->context->getParentMetadata());
-        $this->assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
-        $this->assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
+        self::assertTrue($this->context->hasParentMetadata());
+        self::assertSame($metadata, $this->context->getParentMetadata());
+        self::assertTrue($this->context->has(SubresourceContext::PARENT_METADATA));
+        self::assertSame($metadata, $this->context->get(SubresourceContext::PARENT_METADATA));
 
         // test remove metadata
         $this->context->setParentMetadata();
-        $this->assertFalse($this->context->hasParentMetadata());
+        self::assertFalse($this->context->hasParentMetadata());
     }
 }

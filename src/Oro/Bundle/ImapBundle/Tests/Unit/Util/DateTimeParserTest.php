@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
-class DateTimeParserTest extends \PHPUnit_Framework_TestCase
+class DateTimeParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider parseProvider

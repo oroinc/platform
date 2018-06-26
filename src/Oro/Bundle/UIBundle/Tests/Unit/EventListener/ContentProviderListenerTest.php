@@ -6,15 +6,15 @@ use Oro\Bundle\UIBundle\EventListener\ContentProviderListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
+class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contentProviderManager;
 
@@ -76,7 +76,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     array(
-                        array('_enableContentProviders', null, false, 'test1,test2')
+                        array('_enableContentProviders', null, 'test1,test2')
                     )
                 )
             );
@@ -125,7 +125,7 @@ class ContentProviderListenerTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     array(
-                        array('_displayContentProviders', null, false, 'test2')
+                        array('_displayContentProviders', null, 'test2')
                     )
                 )
             );

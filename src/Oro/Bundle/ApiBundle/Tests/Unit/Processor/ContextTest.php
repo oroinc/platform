@@ -22,12 +22,12 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     private $metadataProvider;
 
     /** @var Context */
@@ -487,10 +487,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
 
         // test remove config
-        $this->context->setConfig();
-        $this->assertFalse($this->context->hasConfig());
-        $this->assertFalse($this->context->hasConfigOf('section1'));
-        $this->assertFalse($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->context->setConfig(null);
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertNull($this->context->getConfig());
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertNull($this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
     }
 
     public function testConfigWhenItIsSetExplicitlyForSection()
@@ -926,7 +929,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($metadata, $this->context->get(Context::METADATA));
 
         // test remove metadata
-        $this->context->setMetadata();
+        $this->context->setMetadata(null);
         $this->assertFalse($this->context->hasMetadata());
     }
 

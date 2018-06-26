@@ -17,12 +17,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExceptionTextExtractorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var RequestType */
@@ -200,19 +200,19 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
             [
                 'id',
                 [
-                    'detail' => 'test detail. Source: id.',
+                    'detail' => 'test detail. Source: id.'
                 ]
             ],
             [
                 'firstName',
                 [
-                    'detail' => 'test detail. Source: firstName.',
+                    'detail' => 'test detail. Source: firstName.'
                 ]
             ],
             [
                 'user',
                 [
-                    'detail' => 'test detail. Source: user.',
+                    'detail' => 'test detail. Source: user.'
                 ]
             ],
             [
@@ -588,6 +588,79 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
             ->willReturn('test_entity');
 
         $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForIdentifierInCollection()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $idField = new FieldMetadata();
+        $idField->setName('id');
+        $metadata->addField($idField);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('1.id'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/1/id'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForFieldInCollection()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $firstNameField = new FieldMetadata();
+        $firstNameField->setName('firstName');
+        $metadata->addField($firstNameField);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('1.firstName'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/1/attributes/firstName'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForAssociationInCollection()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+        $userAssociation = new AssociationMetadata();
+        $userAssociation->setName('user');
+        $metadata->addAssociation($userAssociation);
+
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('1.user'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->setSource(ErrorSource::createByPointer('/data/1/relationships/user/data'));
+
+        $this->errorCompleter->complete($error, $this->requestType, $metadata);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorForNotMappedPointerInCollection()
+    {
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->setSource(ErrorSource::createByPropertyPath('1.notMappedPointer'));
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail. Source: 1.notMappedPointer.');
+
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata());
         self::assertEquals($expectedError, $error);
     }
 }

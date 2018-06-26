@@ -28,9 +28,14 @@ abstract class SetDefaultPaging implements ProcessorInterface
             // a query is already built
             return;
         }
-        $pageSize = $context->getConfig()->getPageSize();
+
+        $pageSize = null;
+        $config = $context->getConfig();
+        if (null !== $config) {
+            $pageSize = $config->getPageSize();
+        }
         if (-1 === $pageSize) {
-            // a paging is disabled
+            // the paging is disabled
             return;
         }
 

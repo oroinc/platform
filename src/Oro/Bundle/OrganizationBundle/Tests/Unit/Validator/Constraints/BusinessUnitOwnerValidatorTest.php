@@ -7,7 +7,7 @@ use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwnerValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class BusinessUnitOwnerValidatorTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitOwnerValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var BusinessUnitOwnerValidator

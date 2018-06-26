@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests;
 
 use Oro\Component\Layout\OptionValueBag;
 
-class OptionValueBagTest extends \PHPUnit_Framework_TestCase
+class OptionValueBagTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider buildValueProvider

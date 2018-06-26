@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 
-class ActivityListFilterHelperTest extends \PHPUnit_Framework_TestCase
+class ActivityListFilterHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddFiltersToQuery()
     {
@@ -72,7 +72,6 @@ class ActivityListFilterHelperTest extends \PHPUnit_Framework_TestCase
                     'options'   => [
                         'field_options' => [
                             'multiple' => true,
-                            'choices_as_values' => true,
                             'choices'  => ['Acme\TestBundle\Entity\TestEntity']
                         ]
                     ]

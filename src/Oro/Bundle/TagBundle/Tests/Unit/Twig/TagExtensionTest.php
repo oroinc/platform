@@ -7,17 +7,17 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Twig\TagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class TagExtensionTest extends \PHPUnit_Framework_TestCase
+class TagExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var TagExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TagManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TagManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TaggableHelper */
     protected $helper;
 
     /**

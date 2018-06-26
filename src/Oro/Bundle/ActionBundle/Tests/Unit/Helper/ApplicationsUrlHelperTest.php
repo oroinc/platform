@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
+class ApplicationsUrlHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routerProvider;
 
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $mockRouter;
 
     /** @var ApplicationsUrlHelper */

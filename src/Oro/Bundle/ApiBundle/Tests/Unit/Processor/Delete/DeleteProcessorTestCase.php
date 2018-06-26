@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class DeleteProcessorTestCase extends \PHPUnit_Framework_TestCase
+class DeleteProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
     protected const TEST_VERSION      = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
@@ -16,10 +16,10 @@ class DeleteProcessorTestCase extends \PHPUnit_Framework_TestCase
     /** @var DeleteContext */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
 
     protected function setUp()

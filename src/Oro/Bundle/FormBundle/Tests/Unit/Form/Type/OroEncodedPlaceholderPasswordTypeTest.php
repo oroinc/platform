@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var SymmetricCrypterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $crypter;
 
@@ -115,7 +115,7 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit_Framework_MockObject_MockObject|OptionsResolver */
+        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver
             ->expects($this->once())

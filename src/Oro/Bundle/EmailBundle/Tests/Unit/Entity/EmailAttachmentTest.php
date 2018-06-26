@@ -6,7 +6,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
-class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

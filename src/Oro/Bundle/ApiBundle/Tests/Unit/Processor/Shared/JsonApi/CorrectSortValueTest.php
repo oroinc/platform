@@ -20,7 +20,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /** @var CorrectSortValue */
     protected $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $valueNormalizer;
 
     protected function setUp()

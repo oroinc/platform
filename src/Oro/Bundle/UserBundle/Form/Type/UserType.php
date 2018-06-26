@@ -74,6 +74,12 @@ class UserType extends AbstractType
         // user fields
         $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->tokenAccessor));
         $this->setDefaultUserFields($builder);
+        $attr = [];
+
+        if ($this->isMyProfilePage) {
+            $attr['readonly'] = true;
+        }
+
         if ($this->authorizationChecker->isGranted('oro_user_role_view')) {
             $builder->add(
                 'roles',
@@ -94,9 +100,7 @@ class UserType extends AbstractType
                     'required'      => !$this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
                     'translatable_options' => false,
-                    'attr' => [
-                        'readonly' => $this->isMyProfilePage
-                    ]
+                    'attr' => $attr
                 ]
             );
         }
@@ -113,9 +117,7 @@ class UserType extends AbstractType
                     'required'  => false,
                     'disabled'  => $this->isMyProfilePage,
                     'translatable_options' => false,
-                    'attr' => [
-                        'readonly' => $this->isMyProfilePage
-                    ]
+                    'attr' => $attr
                 ]
             );
         }

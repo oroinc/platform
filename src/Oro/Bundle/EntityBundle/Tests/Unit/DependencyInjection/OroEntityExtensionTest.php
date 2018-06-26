@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroEntityExtensionTest extends \PHPUnit_Framework_TestCase
+class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

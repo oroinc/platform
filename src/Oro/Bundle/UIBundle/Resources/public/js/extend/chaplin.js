@@ -9,34 +9,8 @@ define([
 
     var original = {};
     var utils = Chaplin.utils;
-    var location = window.location;
     original.viewDispose = Chaplin.View.prototype.dispose;
     original.collectionViewRender = Chaplin.CollectionView.prototype.render;
-
-    /**
-     * Added raw argument. Removed Internet Explorer < 9 workaround
-     *
-     * @param {string} subtitle
-     * @param {boolean=} raw
-     * @returns {string}
-     */
-    Chaplin.Layout.prototype.adjustTitle = function(subtitle, raw) {
-        var title;
-        if (!raw) {
-            if (!subtitle) {
-                subtitle = '';
-            }
-            title = this.settings.titleTemplate({
-                title: this.title,
-                subtitle: subtitle
-            });
-        } else {
-            title = subtitle;
-        }
-        // removed Internet Explorer < 9 workaround
-        document.title = title;
-        return title;
-    };
 
     Chaplin.View.prototype.dispose = function() {
         if (this.disposed) {
@@ -125,122 +99,89 @@ define([
         }
     };
 
-    /**
-     * Fixes issue when correspondent over options regions are not taken into account
-     * @override
-     */
-    Chaplin.Layout.prototype.registerGlobalRegions = function(instance) {
-        var name;
-        var selector;
-        var version;
-        var _i;
-        var _len;
-        var _ref = utils.getAllPropertyVersions(instance, 'regions');
-
-        if (instance.hasOwnProperty('regions')) {
-            _ref.push(instance.regions);
-        }
-
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            version = _ref[_i];
-            for (name in version) {
-                if (!version.hasOwnProperty(name)) {
-                    continue;
+    var insertView = function(list, viewEl, position, length, itemSelector) {
+        var children, childrenLength, insertInMiddle, isEnd, method; // eslint-disable-line one-var
+        insertInMiddle = (0 < position && position < length);
+        isEnd = function(length) {
+            return length === 0 || position >= length;
+        };
+        if (insertInMiddle || itemSelector) {
+            children = list.children(itemSelector);
+            childrenLength = children.length;
+            if (children[position] !== viewEl) {
+                if (isEnd(childrenLength)) {
+                    return list.append(viewEl);
+                } else {
+                    if (position === 0) {
+                        return children.eq(position).before(viewEl);
+                    } else {
+                        return children.eq(position - 1).after(viewEl);
+                    }
                 }
-                selector = version[name];
-                this.registerGlobalRegion(instance, name, selector);
             }
+        } else {
+            method = isEnd(length) ? 'append' : 'prepend';
+            return list[method](viewEl);
         }
     };
 
     /**
-     * Fixes issues
-     *  - empty hashes (like '#')
-     *  - routing full url (containing protocol and host)
-     *  - stops application's navigation if it's an error page
-     *  - process links with redirect options
+     * insertView is reverted to version 1.0.0, due to this method in 1.2.0 version has issues:
+     *  - helper function `insertView` gets invoked only for views that passed filter function and marked as `included`
+     *  - `insertView` is called only from `itemAdded` and `renderAllItems`,
+     *    so if a view passes filter function later it still wont be added to HTML
+     *  - on attempt to add a passed filter view manually to HTML with the help of `insertView -- another issue pops up:
+     *  wrong position (order) of elements in HTML. Assume `renderAllItems` renders only one model with index 3,
+     *  the view element in HTML it will get index 0. Late another model with index 2 passes filter as well,
+     *  it will be inserted after view element of model with index 3.
      * @override
      */
-    Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
-        var href;
-        var options;
-        var payload;
-        var external;
-        var isAnchor;
-        var skipRouting;
-        var type;
-        var el = event.currentTarget;
-        var $el = $(el);
-
-        if (event.isDefaultPrevented() || $el.parents('.sf-toolbar').length || tools.isErrorPage()) {
-            return;
+    Chaplin.CollectionView.prototype.insertView = function(item, view, position, enableAnimation) {
+        var elem, included, length, list, // eslint-disable-line one-var
+            _this = this;
+        if (enableAnimation == null) {
+            enableAnimation = true;
         }
-
-        if (el.nodeName === 'A' && el.getAttribute('href')) {
-            href = el.getAttribute('href');
-            // prevent click by empty hashes
-            if (href === '#') {
-                event.preventDefault();
-                return;
-            }
-            // fixes issue of routing full url
-            if (href.indexOf(':\/\/') !== -1 && el.host === location.host) {
-                el.setAttribute('href', el.pathname + el.search + el.hash);
+        if (this.animationDuration === 0) {
+            enableAnimation = false;
+        }
+        if (typeof position !== 'number') {
+            position = this.collection.indexOf(item);
+        }
+        included = typeof this.filterer === 'function' ? this.filterer(item, position) : true;
+        elem = $ ? view.$el : view.el;
+        if (included && enableAnimation) {
+            if (this.useCssAnimation) {
+                elem.addClass(this.animationStartClass);
+            } else {
+                elem.css('opacity', 0);
             }
         }
-
-        payload = {prevented: false, target: el};
-
-        /* original Chaplin's openLink code: start */
-        if (utils.modifierKeyPressed(event)) {
-            return;
+        if (this.filterer) {
+            this.filterCallback(view, included);
         }
-
-        // jshint -W107
-        // not link to same page and not javascript code link
-        if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
-            Chaplin.mediator.publish('openLink:before', payload);
-        }
-
-        if (payload.prevented !== false) {
-            event.preventDefault();
-            return;
-        }
-
-        el = $ ? event.currentTarget : event.delegateTarget;
-        isAnchor = el.nodeName === 'A';
-        href = el.getAttribute('href') || el.getAttribute('data-href') || null;
-        if (!(href !== null && href !== void 0) || href === '' || href.charAt(0) === '#') {
-            return;
-        }
-        skipRouting = this.settings.skipRouting;
-        type = typeof skipRouting;
-        if (type === 'function' && !skipRouting(href, el) ||
-                type === 'string' && ($ ? $(el).is(skipRouting) : $.find.matchesSelector(el, skipRouting))) {
-            return;
-        }
-        external = isAnchor && this.isExternalLink(el);
-        if (external) {
-            if (this.settings.openExternalToBlank) {
-                event.preventDefault();
-                window.open(href);
+        length = this.collection.length;
+        list = $ ? this.$list : this.list;
+        insertView(list, elem, position, length, this.itemSelector);
+        view.trigger('addedToParent');
+        this.updateVisibleItems(item, included);
+        if (included && enableAnimation) {
+            if (this.useCssAnimation) {
+                setTimeout(function() {
+                    return elem.addClass(_this.animationEndClass);
+                }, 0);
+            } else {
+                elem.animate({opacity: 1}, this.animationDuration);
             }
-            return;
         }
-        /* original Chaplin's openLink code:end */
-
-        // now it's possible to pass redirect options over elements data-options attribute
-        options = $el.data('options') || {};
-        utils.redirectTo({url: href}, options);
-        event.preventDefault();
-    });
+        return view;
+    };
 
     /**
      * Since IE removes content form child elements when parent node is emptied
      * we need re-render item subviews manually
      * (see https://jsfiddle.net/3hrfhppe/)
      */
-
     if (/(MSIE\s|Trident\/|Edge\/)/.test(window.navigator.userAgent)) {
         Chaplin.CollectionView.prototype.insertView = _.wrap(
             Chaplin.CollectionView.prototype.insertView, function(func, item, view) {

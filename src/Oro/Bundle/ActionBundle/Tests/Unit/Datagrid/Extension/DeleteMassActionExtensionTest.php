@@ -15,21 +15,21 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
+class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationRegistry */
     protected $registry;
 
     /** @var DeleteMassActionExtension */
     protected $extension;
 
-    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHelper;
 
     protected function setUp()

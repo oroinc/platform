@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Loads the entity from the database.
+ * Loads the entity from the database and adds it to the context.
  */
 class LoadEntity implements ProcessorInterface
 {
@@ -41,13 +41,13 @@ class LoadEntity implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
-            $entityClass = $context->getConfig()->getParentResourceClass();
-            if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                return;
-            }
+            return;
         }
 
         $entity = $this->entityLoader->findEntity($entityClass, $context->getId(), $context->getMetadata());

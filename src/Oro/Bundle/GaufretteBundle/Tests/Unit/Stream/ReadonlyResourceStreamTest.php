@@ -5,7 +5,7 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Unit\Stream;
 use Gaufrette\StreamMode;
 use Oro\Bundle\GaufretteBundle\Stream\ReadonlyResourceStream;
 
-class ReadonlyResourceStreamTest extends \PHPUnit_Framework_TestCase
+class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReadonlyResourceStream */
     private $stream;

@@ -8,9 +8,9 @@ use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface;
 
-class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
+class DQLNameFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NameFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameFormatter;
 
     /** @var DQLNameFormatter */

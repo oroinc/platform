@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-class WidgetDateTypeTest extends \PHPUnit_Framework_TestCase
+class WidgetDateTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetDateType */
     protected $formType;

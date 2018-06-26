@@ -32,12 +32,12 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
-    oro_api.update.rest.normalize_entity_id:
+    oro_api.update.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
         arguments:
-            - '@oro_api.rest.entity_id_transformer'
+            - '@oro_api.entity_id_transformer_registry'
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
 
     #
     # security_check
@@ -62,7 +62,7 @@ services:
     #
 
     oro_api.update.entity_object_security_check:
-        class: \Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
         arguments:
             - '@security.authorization_checker'
             - EDIT

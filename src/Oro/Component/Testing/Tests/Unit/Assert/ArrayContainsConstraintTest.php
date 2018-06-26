@@ -4,7 +4,7 @@ namespace Oro\Component\Testing\Tests\Unit\Assert;
 
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
-class ArrayContainsConstraintTest extends \PHPUnit_Framework_TestCase
+class ArrayContainsConstraintTest extends \PHPUnit\Framework\TestCase
 {
     public function testNull()
     {
@@ -16,7 +16,7 @@ Errors:
 Path: "". Error: Failed asserting that null is of type "array".
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -33,7 +33,7 @@ Errors:
 Path: "". Error: Failed asserting that 'test' is of type "array".
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -192,7 +192,7 @@ Errors:
 Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -219,7 +219,7 @@ Path: "0". Error: Failed asserting that 'value2' is identical to 'value1'.
 Path: "1". Error: Failed asserting that 'anotherValue' is identical to 'value2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -268,7 +268,7 @@ Path: "9". Error: Failed asserting that an array has the key 9.
 and others ...
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -301,7 +301,7 @@ Errors:
 Path: "key2.key22.key221". Error: Failed asserting that 'value221_other' is identical to 'value221'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -331,7 +331,7 @@ Path: "key2.0.key". Error: Failed asserting that 'value222' is identical to 'val
 Path: "key2.1.key". Error: Failed asserting that 'value221' is identical to 'value222'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -386,7 +386,7 @@ Path: "key2.1.key". Error: Failed asserting that Array &0 (
 ) is identical to 'value222'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
@@ -415,7 +415,61 @@ Errors:
 Path: "key2.0.key2". Error: Failed asserting that an array has the key 'key2'.
 TEXT;
 
-        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArraysNotEqualForWhenSeveralNotMatchedItemsFoundBeforeCallOfTryMatchIndexedElement()
+    {
+        $expected = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222',
+                        'key223' => 'value223'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '1'],
+                        ['type' => 'test', 'key' => '2']
+                    ]
+                ]
+            ]
+        ];
+        $actual = [
+            [
+                'key1' => 'value1',
+                'key2' => [
+                    'key21' => 'value21',
+                    'key22' => [
+                        'key221' => 'value221',
+                        'key222' => 'value222_a',
+                        'key223' => 'value223_a'
+                    ]
+                ],
+                'key3' => [
+                    'key31' => [
+                        ['type' => 'test', 'key' => '2'],
+                        ['type' => 'test', 'key' => '1']
+                    ]
+                ]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "0.key2.key22.key222". Error: Failed asserting that 'value222_a' is identical to 'value222'.
+Path: "0.key2.key22.key223". Error: Failed asserting that 'value223_a' is identical to 'value223'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);

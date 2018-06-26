@@ -41,7 +41,9 @@
       "between":1,
       "notBetween":2,
       "moreThan":3,
-      "lessThan":4
+      "lessThan":4,
+      "equal":5,
+      "notEqual":6
     },
     "dateParts":{
       "value":"value"

@@ -11,10 +11,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 
 class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
     /** @var NormalizeParentEntityClass */

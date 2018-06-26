@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
-class MarkdownApiDocParserTest extends \PHPUnit_Framework_TestCase
+class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @return MarkdownApiDocParser

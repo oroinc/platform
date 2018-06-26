@@ -48,6 +48,11 @@ class ReindexCommand extends ContainerAwareCommand
         $class = $input->getArgument('class');
         $isScheduled = $input->getOption('scheduled');
 
+        // convert short class name to FQCN
+        if ($class) {
+            $class = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityClass($class);
+        }
+
         $message = $class
             ? sprintf('Started reindex task for "%s" entity', $class)
             : 'Started reindex task for all mapped entities'

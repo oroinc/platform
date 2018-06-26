@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class PasswordComplexityValidatorTest extends \PHPUnit_Framework_TestCase
+class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConstraintViolationBuilderInterface */
     protected $violationBuilder;

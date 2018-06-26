@@ -8,7 +8,7 @@ use Oro\Component\ConfigExpression\Func;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\Yaml\Yaml;
 
-class EvaluateExpressionTest extends \PHPUnit_Framework_TestCase
+class EvaluateExpressionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider configurationForEvaluateDataProvider

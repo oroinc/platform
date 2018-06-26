@@ -4,28 +4,33 @@
 {% block bodyClass %}login-page{% endblock %}
 
 {% block content %}
-<div class="container">
-    {{ form_start(form, {
-        'action': path('oro_user_reset_reset', { token: token }),
-        'attr': {
-            'class': 'form-signin form-reset'
-        }
-    }) }}
-        <div class="title-box">
-            <h2 class="title">{{ 'Password Reset'|trans }}</h2>
-        </div>
-        <fieldset>
-            {% if form.vars.errors|length > 0 %}
-                <div class="alert alert-error">
-                    {{ form_errors(form) }}
-                </div>
-            {% endif %}
-            {{ form_rest(form) }}
-            <div class="form-buttons">
-                <button class="btn btn-large extra-submit btn-primary" type="submit">{{ 'Reset'|trans }}</button>
-                <a href="{{ path('oro_user_security_login') }}" class="btn btn-large extra-btn-large">{{ 'Cancel'|trans }}</a>
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-wrapper__inner">
+                {{ form_start(form, {
+                    'action': path('oro_user_reset_reset', { token: token }),
+                    'attr': {
+                        'class': 'form-signin form-reset'
+                    }
+                }) }}
+                    <div class="title-box">
+                        <h2 class="title">{{ 'Password Reset'|trans }}</h2>
+                    </div>
+                    <fieldset class="oro-forgot-password">
+                        {% if form.vars.errors|length > 0 %}
+                            <div class="alert alert-error">
+                                {{ form_errors(form) }}
+                            </div>
+                        {% endif %}
+                        {{ form_rest(form) }}
+                        <div class="form-row form-signin__footer form-signin__footer--reset">
+                            <a href="{{ path('oro_user_security_login') }}" class="btn">{{ 'Cancel'|trans }}</a>
+                            <button class="btn extra-submit btn-uppercase btn-primary" type="submit">{{ 'Reset'|trans }}</button>
+                        </div>
+                    </fieldset>
+                {{ form_end(form) }}
             </div>
-        </fieldset>
-    {{ form_end(form) }}
-</div>
+            <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>
+        </div>
+    </div>
 {% endblock %}

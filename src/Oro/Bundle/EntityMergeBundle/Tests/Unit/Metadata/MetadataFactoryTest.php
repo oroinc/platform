@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 
-class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MetadataFactory

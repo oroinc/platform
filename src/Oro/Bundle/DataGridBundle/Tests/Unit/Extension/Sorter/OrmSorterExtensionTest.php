@@ -11,7 +11,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 
-class OrmSorterExtensionTest extends \PHPUnit_Framework_TestCase
+class OrmSorterExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OrmSorterExtension

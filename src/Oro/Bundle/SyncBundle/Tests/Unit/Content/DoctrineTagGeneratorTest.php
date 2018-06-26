@@ -11,7 +11,7 @@ use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
 
-class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
+class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub';
     const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub';
@@ -20,10 +20,10 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var  DoctrineTagGenerator */
     protected $generator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UnitOfWork */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
     protected $uow;
 
     protected function setUp()
@@ -286,7 +286,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param mixed $data
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormMock($data)
     {

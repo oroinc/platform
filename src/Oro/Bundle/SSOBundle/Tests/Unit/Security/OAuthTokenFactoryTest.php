@@ -4,7 +4,7 @@ namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
 
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 
-class OAuthTokenFactoryTest extends \PHPUnit_Framework_TestCase
+class OAuthTokenFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

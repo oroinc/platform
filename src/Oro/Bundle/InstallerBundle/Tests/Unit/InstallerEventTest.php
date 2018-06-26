@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\NullOutput;
 
-class InstallerEventTest extends \PHPUnit_Framework_TestCase
+class InstallerEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetCommandExecutor()
     {

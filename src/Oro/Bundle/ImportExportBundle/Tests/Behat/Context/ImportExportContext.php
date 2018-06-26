@@ -175,7 +175,7 @@ class ImportExportContext extends OroFeatureContext implements
             ]
         ));
         $this->template = tempnam(
-            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
             'import_template_'
         );
 
@@ -188,19 +188,31 @@ class ImportExportContext extends OroFeatureContext implements
         self::assertEquals(200, $response->getStatusCode());
     }
 
-    //@codingStandardsIgnoreStart
     /**
      * This method strictly compares data from the downloaded file
      *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     *
+     * @param string $entity
+     * @param TableNode $expectedEntities
+     */
+    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities)
+    {
+        $this->exportedFileWithProcessorContainsFollowingData($entity, $expectedEntities, null);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * This method strictly compares data from the downloaded file
+     *
      * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains the following data:$/
      *
      * @param string $entity
-     * @param string $processorName
+     * @param string|null $processorName
      * @param TableNode $expectedEntities
      */
     //@codingStandardsIgnoreEnd
-    public function exportedFileContainsFollowingData($entity, TableNode $expectedEntities, $processorName = null)
+    public function exportedFileWithProcessorContainsFollowingData($entity, TableNode $expectedEntities, $processorName)
     {
         $filePath = $this->performExport($entity, $processorName);
 
@@ -241,12 +253,29 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @param string    $entity
      * @param TableNode $expectedEntities
-     * @param string    $processorName
      */
-    public function exportedFileContainsAtLeastFollowingColumns(
+    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
+    {
+        $this->exportedFileWithProcessorContainsAtLeastFollowingColumns($entity, $expectedEntities, null);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed columns (in any order) and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains at least the following columns:$/
+     *
+     * @param string      $entity
+     * @param TableNode   $expectedEntities
+     * @param string|null $processorName
+     */
+    //@codingStandardsIgnoreEnd
+    public function exportedFileWithProcessorContainsAtLeastFollowingColumns(
         $entity,
         TableNode $expectedEntities,
-        $processorName = null
+        $processorName
     ) {
         $filePath = $this->performExport($entity, $processorName);
 
@@ -288,14 +317,12 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @param string    $entity
      * @param TableNode $expectedEntities
-     * @param string    $processorName
      */
     public function exportedFileContainsFollowingRowsIAnyOrder(
         $entity,
-        TableNode $expectedEntities,
-        $processorName = null
+        TableNode $expectedEntities
     ) {
-        $filePath = $this->performExport($entity, $processorName);
+        $filePath = $this->performExport($entity, null);
 
         try {
             $exportedFile = new \SplFileObject($filePath, 'rb');
@@ -369,7 +396,7 @@ class ImportExportContext extends OroFeatureContext implements
     public function iFillTemplateWithData(TableNode $table)
     {
         $this->importFile = tempnam(
-            $this->getKernel()->getRootDir().DIRECTORY_SEPARATOR.'import_export',
+            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
             'import_data_'
         );
         $fp = fopen($this->importFile, 'w');
@@ -445,7 +472,11 @@ class ImportExportContext extends OroFeatureContext implements
 
         /** @var File $exportFile */
         $exportFile = reset($exportFiles);
-        $path = $this->getContainer()->getParameter('kernel.root_dir') . DIRECTORY_SEPARATOR . 'import_export';
+        $path = $this->getContainer()->getParameter('kernel.project_dir')
+            .DIRECTORY_SEPARATOR
+            .'var'
+            .DIRECTORY_SEPARATOR
+            .'import_export';
         $this->importFile = $path . DIRECTORY_SEPARATOR . $exportFile->getName();
         $this->tryImportFile();
     }

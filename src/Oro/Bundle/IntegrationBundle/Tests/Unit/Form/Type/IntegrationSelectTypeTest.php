@@ -10,7 +10,6 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormView;
@@ -21,13 +20,13 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var  IntegrationSelectType */
     protected $type;
 
-    /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp()
@@ -39,14 +38,12 @@ class IntegrationSelectTypeTest extends OrmTestCase
         $this->em          = $this->getTestEntityManager();
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()->getMock();
-        $choiceListFactory = $this->createMock(ChoiceListFactoryInterface::class);
 
         $this->type = new IntegrationSelectType(
             $this->em,
             $this->registry,
             $this->assetHelper,
-            $aclHelper,
-            $choiceListFactory
+            $aclHelper
         );
     }
 

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
@@ -46,7 +45,6 @@ class RegisterConfiguredFilters extends RegisterFilters
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function process(ContextInterface $context)
@@ -59,18 +57,16 @@ class RegisterConfiguredFilters extends RegisterFilters
             return;
         }
 
-        if (!$configOfFilters->isExcludeAll()) {
-            // it seems that filters' configuration was not normalized
-            throw new RuntimeException(
-                sprintf(
-                    'Expected "all" exclusion policy for filters. Got: %s.',
-                    $configOfFilters->getExclusionPolicy()
-                )
-            );
+        $metadata = null;
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if ($entityClass) {
+            // only manageable entities or resources based on manageable entities can have the metadata
+            $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         }
 
-        /** @var ClassMetadata|null $metadata */
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
         $idFieldName = $this->getSingleIdentifierFieldName($context->getConfig());
         $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
@@ -85,7 +81,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                 if ($filter instanceof FieldAwareFilterInterface) {
                     if ($idFieldName && $filterKey === $idFieldName) {
                         $filter->setSupportedOperators(
-                            array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
+                            \array_diff($filter->getSupportedOperators(), self::SINGLE_IDENTIFIER_EXCLUDED_OPERATORS)
                         );
                     }
                     // @todo BAP-11881. Update this code when NEQ operator for to-many collection
@@ -95,7 +91,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                     }
                     // only EQ, NEQ and EXISTS operators should be available for association filters
                     if (\in_array($propertyPath, $associationNames, true) &&
-                        [] !== array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
+                        [] !== \array_diff($filter->getSupportedOperators(), self::ASSOCIATION_ALLOWED_OPERATORS)
                     ) {
                         $filter->setSupportedOperators(self::ASSOCIATION_ALLOWED_OPERATORS);
                     }
@@ -117,11 +113,11 @@ class RegisterConfiguredFilters extends RegisterFilters
             return null;
         }
         $idFieldNames = $config->getIdentifierFieldNames();
-        if (count($idFieldNames) !== 1) {
+        if (\count($idFieldNames) !== 1) {
             return null;
         }
 
-        return reset($idFieldNames);
+        return \reset($idFieldNames);
     }
 
     /**
@@ -129,7 +125,7 @@ class RegisterConfiguredFilters extends RegisterFilters
      *
      * @return string[]
      */
-    protected function getAssociationNames(ClassMetadata $metadata = null)
+    protected function getAssociationNames(?ClassMetadata $metadata)
     {
         return null !== $metadata
             ? \array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
@@ -150,7 +146,8 @@ class RegisterConfiguredFilters extends RegisterFilters
             if ($metadata->isCollectionValuedAssociation($fieldName)) {
                 $isCollection = true;
                 break;
-            } elseif (!$metadata->hasAssociation($fieldName)) {
+            }
+            if (!$metadata->hasAssociation($fieldName)) {
                 break;
             }
 

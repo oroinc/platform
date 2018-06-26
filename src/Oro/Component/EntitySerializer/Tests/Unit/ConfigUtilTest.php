@@ -4,7 +4,7 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigUtil;
 
-class ConfigUtilTest extends \PHPUnit_Framework_TestCase
+class ConfigUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetArrayValueWhenConfigDoesNotContainsKey()
     {
@@ -71,15 +71,15 @@ class ConfigUtilTest extends \PHPUnit_Framework_TestCase
         return [
             'no exclusion_policy'   => [
                 [],
-                ConfigUtil::EXCLUSION_POLICY_NONE
+                'none'
             ],
             'exclusion_policy=all'  => [
-                ['exclusion_policy' => ConfigUtil::EXCLUSION_POLICY_ALL],
-                ConfigUtil::EXCLUSION_POLICY_ALL
+                ['exclusion_policy' => 'all'],
+                'all'
             ],
             'exclusion_policy=none' => [
-                ['exclusion_policy' => ConfigUtil::EXCLUSION_POLICY_NONE],
-                ConfigUtil::EXCLUSION_POLICY_NONE
+                ['exclusion_policy' => 'none'],
+                'none'
             ],
         ];
     }
@@ -100,11 +100,11 @@ class ConfigUtilTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             'exclusion_policy=all'  => [
-                ['exclusion_policy' => ConfigUtil::EXCLUSION_POLICY_ALL],
+                ['exclusion_policy' => 'all'],
                 true
             ],
             'exclusion_policy=none' => [
-                ['exclusion_policy' => ConfigUtil::EXCLUSION_POLICY_NONE],
+                ['exclusion_policy' => 'none'],
                 false
             ],
         ];

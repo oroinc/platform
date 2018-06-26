@@ -13,12 +13,12 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensio
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroEntityConfigBundleTest extends \PHPUnit_Framework_TestCase
+class OroEntityConfigBundleTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OroEntityConfigBundle */
     protected $bundle;
 
-    /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $containerBuilder;
 
     protected function setUp()

@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\TokenParser;
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
-class BlockThemeTokenParserTest extends \PHPUnit_Framework_TestCase
+class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getTestsForLayoutTheme

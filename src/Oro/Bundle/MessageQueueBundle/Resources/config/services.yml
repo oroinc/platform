@@ -41,7 +41,7 @@ services:
             - '@oro_platform.maintenance'
             - '%oro_message_queue.maintenance.idle_time%'
         calls:
-            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
+            - ['setFilePathServerLockFromConfig', ['%kernel.project_dir%/config/oro_env.conf']]
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
@@ -163,3 +163,10 @@ services:
             - '%oro_message_queue.consumer_heartbeat_update_period%'
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
+
+    oro_message_queue.topic.message_queue_heartbeat:
+        class: Oro\Bundle\SyncBundle\Topic\BroadcastTopic
+        arguments:
+            - 'oro_message_queue.message_queue_heartbeat'
+        tags:
+            - { name: gos_web_socket.topic }

@@ -170,13 +170,13 @@ config:
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view.js'
         'oroui/js/app/views/flash-message-view': 'bundles/oroui/js/app/views/flash-message-view.js'
+        'oroui/js/app/views/swipeable-view': 'bundles/oroui/js/app/views/swipeable-view.js'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
-        'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'
         'oroui/js/tools': 'bundles/oroui/js/tools.js'
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
@@ -185,6 +185,8 @@ config:
         'oroui/js/extend/jquery': 'bundles/oroui/js/extend/jquery.js'
         'oroui/js/extend/underscore': 'bundles/oroui/js/extend/underscore.js'
 
+        'oroui/js/app/components/app-loading-mask-component': 'bundles/oroui/js/app/components/app-loading-mask-component.js'
+        'oroui/js/app/components/app-loading-bar-component': 'bundles/oroui/js/app/components/app-loading-bar-component.js'
         'oroui/js/app/components/ajax-button': 'bundles/oroui/js/app/components/ajax-button.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'
         'oroui/js/app/components/tabs-component': 'bundles/oroui/js/app/components/tabs-component.js'
@@ -212,12 +214,8 @@ config:
 
         'oroui/js/app/views/loading-bar-view': 'bundles/oroui/js/app/views/loading-bar-view.js'
 
-        #layouts only
-        'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
         'oroui/js/layout-subtree-manager': 'bundles/oroui/js/layout-subtree-manager.js'
-        'oroui/js/swipe-action-manager': 'bundles/oroui/js/swipe-action-manager.js'
-        'oroui/js/app/modules/swipe-actions-module': 'bundles/oroui/js/app/modules/swipe-actions-module.js'
 
     appmodules:
         - oroui/js/app/modules/init-layout
@@ -228,10 +226,6 @@ config:
         - oroui/js/app/modules/input-widgets
         - oroui/js/app/modules/component-shortcuts-module
         - oroui/js/app/modules/viewport-module
-        - oroui/js/app/modules/swipe-actions-module
-
-        #layouts only
-        - oroui/blank/js/app/modules/views-module
 
 build:
     paths:

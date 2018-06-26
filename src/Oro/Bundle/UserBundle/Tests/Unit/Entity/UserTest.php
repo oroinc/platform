@@ -186,7 +186,7 @@ class UserTest extends AbstractUserTest
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -206,7 +206,7 @@ class UserTest extends AbstractUserTest
         $updatedAt = new \DateTime('2015-01-01');
         $user->setUpdatedAt($updatedAt);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|PreUpdateEventArgs $event */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
         $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
             ->disableOriginalConstructor()
             ->getMock();

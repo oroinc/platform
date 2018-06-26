@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Add additional recipient choices
+ */
 class AdditionalEmailsSubscriber implements EventSubscriberInterface
 {
     const MAX_NESTING_LEVEL = 2;
@@ -116,8 +119,6 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,
-                // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                'choices_as_values' => true,
                 'choices' => $choices,
                 'tooltip'     => 'oro.notification.emailnotification.additional_associations.tooltip',
             ]
@@ -176,7 +177,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
      */
     private function getFieldLabel($entityName, $fieldName)
     {
-        if (!$this->configManager->hasConfigEntityModel($entityName)) {
+        if (!$this->configManager->hasConfig($entityName, $fieldName)) {
             return $this->prettifyFieldName($fieldName);
         }
 

@@ -5,7 +5,7 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
-class ConfigureMenuEventTest extends \PHPUnit_Framework_TestCase
+class ConfigureMenuEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FactoryInterface

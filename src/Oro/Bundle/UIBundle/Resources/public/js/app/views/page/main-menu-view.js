@@ -9,16 +9,39 @@ define([
     var PageMainMenuView;
 
     PageMainMenuView = PageRegionView.extend({
-        events: {
-            'mouseenter .dropdown': '_onDropdownMouseEnter'
-        },
-
         template: function(data) {
             return data.mainMenu;
         },
+
         pageItems: ['mainMenu', 'currentRoute'],
 
         maxHeightModifier: 50,
+
+        timeout: 100,
+
+        positions: ['align-menu-left', 'align-menu-right', 'align-single-item-left', 'align-single-item-right'],
+
+        events: function() {
+            var events = {};
+            if (this.$el.hasClass('main-menu-top')) {
+                events = {
+                    'mouseenter .dropdown': '_onDropdownMouseEnter',
+                    'mouseleave .dropdown': '_onDropdownMouseLeave'
+                };
+            }
+            return events;
+        },
+
+        listen: function() {
+            var listen = {};
+            if (this.$el.hasClass('main-menu-top')) {
+                var originalMenuWidth = Math.ceil(this.$('.main-menu').outerWidth());
+                listen['layout:reposition mediator'] = _.debounce(function() {
+                    this.$el.toggleClass('narrow-mode', this.$el.width() < originalMenuWidth);
+                }.bind(this), this.timeout);
+            }
+            return listen;
+        },
 
         /**
          * @inheritDoc
@@ -36,6 +59,7 @@ define([
             // Local cache of route to menu item
             this.routeMatchedMenuItemsCache = {};
 
+            this.initRouteMatches();
             PageMainMenuView.__super__.initialize.call(this, options);
         },
 
@@ -58,12 +82,8 @@ define([
             var data = this.getTemplateData();
             var currentRoute = this.getCurrentRoute(data);
 
-            if (data) {
-                if (!_.isUndefined(data.mainMenu)) {
-                    PageMainMenuView.__super__.render.call(this);
-                    this.initRouteMatches();
-                }
-            } else {
+            if (data && !_.isUndefined(data.mainMenu)) {
+                PageMainMenuView.__super__.render.call(this);
                 this.initRouteMatches();
             }
 
@@ -80,8 +100,19 @@ define([
         },
 
         _onDropdownMouseEnter: function(e) {
+            this.updateDropdownChildAlign($(e.currentTarget));
             this.updateDropdownChildPosition($(e.currentTarget));
             this.updateDropdownScroll($(e.currentTarget));
+        },
+
+        _onDropdownMouseLeave: function(e) {
+            var dropdowns = $([]);
+
+            if ($(e.currentTarget).hasClass('dropdown-level-1')) {
+                dropdowns = dropdowns.add(e.currentTarget);
+            }
+            dropdowns = dropdowns.add('.dropdown', e.currentTarget);
+            dropdowns.removeClass(this.positions.join(' '));
         },
 
         /**
@@ -139,35 +170,62 @@ define([
             $scrollable.css('max-height', maxHeight + 'px');
         },
 
+        updateDropdownChildAlign: function($node) {
+            var limit = this.calculateRightPosition(this.$el);
+            var $innerDropdown = $node.find('.dropdown-menu:first');
+            var $innerDropdownChildren = $innerDropdown.children('.dropdown');
+            var isDropdownChildrenOutside = false;
+
+            // Align first level
+            if ($node.hasClass('dropdown-level-1')) {
+                $node.addClass(
+                    this.positions[this.calculateRightPosition($innerDropdown) > limit ? 0: 1]
+                );
+            }
+
+            if (!$innerDropdownChildren.length) {
+                return;
+            }
+
+            _.each($innerDropdownChildren, function(element) {
+                if (this.calculateRightPosition($(element).find('.dropdown-menu:first')) > limit) {
+                    isDropdownChildrenOutside = true;
+                }
+            }, this);
+
+            if (isDropdownChildrenOutside) {
+                $innerDropdownChildren.addClass(this.positions[0]);
+                $node.addClass(this.positions[2]);
+            } else {
+                $innerDropdownChildren.addClass(this.positions[1]);
+                $node.addClass(this.positions[3]);
+            }
+        },
+
+        calculateRightPosition: function($element) {
+            return Math.ceil($element.offset().left + $element.outerWidth());
+        },
+
         updateDropdownChildPosition: function($toggle) {
             var $child = $toggle.children('.dropdown-menu-wrapper__child:first');
+
             if (!$child.length) {
                 return;
             }
 
             // reset styles to recalc it
             $child.css({
-                'margin-left': 0,
                 'margin-top': 0
             });
 
-            var $scrollable = $child.closest('.dropdown-menu-wrapper__scrollable');
-            var scrollControlWidth = $scrollable.outerWidth() - $toggle.outerWidth();
-
-            var scrollTop = $scrollable.scrollTop();
-            var toggleHeight = $toggle.outerHeight();
-
-            var marginTop = -1 * (toggleHeight + scrollTop);
-            $child.css({
-                'margin-left': 'calc(100% - ' + scrollControlWidth + 'px)',
-                'margin-top': marginTop + 'px'
-            });
+            // align elements vertically
+            $child.offset({top: $toggle.offset().top});
 
             // change dropdown direction if necessary
             var childHeight = $child.outerHeight();
             var childTop = $child.get(0).getBoundingClientRect().top;
             if (childHeight + childTop > window.innerHeight) {
-                marginTop = -1 * (childHeight + scrollTop);
+                var marginTop = -1 * (childHeight - $toggle.outerHeight());
                 $child.css({
                     'margin-top': marginTop + 'px'
                 });

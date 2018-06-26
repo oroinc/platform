@@ -19,9 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
  * Suppressing for stubs and mock classes
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class BaseContextInitProcessorTest extends \PHPUnit_Framework_TestCase
+class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowManager;
 
     /** @var BaseContextInitProcessor */
@@ -120,7 +120,7 @@ class BaseContextInitProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testStartContextInit()
     {
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context = new TransitionContext();
@@ -130,8 +130,8 @@ class BaseContextInitProcessorTest extends \PHPUnit_Framework_TestCase
         $context->setRequest($request);
         $context->setResultType(new ResultTypeStub('type', true));
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         list($workflow, $transition) = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
         $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(false);
@@ -178,12 +178,12 @@ class BaseContextInitProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testRegularContextInitAttributes()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('getWorkflowName')->willReturn('the_workflow');
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         list($workflow, $transition) = $this->extractWorkflowAndTransition('the_workflow', 'the_transition');
 
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn(true);
@@ -191,7 +191,7 @@ class BaseContextInitProcessorTest extends \PHPUnit_Framework_TestCase
 
         $context = new TransitionContext();
 
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
         $context->setRequest($request);

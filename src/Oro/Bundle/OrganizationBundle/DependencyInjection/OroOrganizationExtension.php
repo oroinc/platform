@@ -23,5 +23,6 @@ class OroOrganizationExtension extends Extension
         $loader->load('filters.yml');
         $loader->load('form.yml');
         $loader->load('importexport.yml');
+        $loader->load('commands.yml');
     }
 }

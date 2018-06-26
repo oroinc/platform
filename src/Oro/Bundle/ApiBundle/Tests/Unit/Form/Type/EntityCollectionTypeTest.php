@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
-use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -27,12 +26,12 @@ class EntityCollectionTypeTest extends TypeTestCase
 
     public function testShouldClearCollectionWhenRemoveAllItems()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ArrayCollection $groups */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ArrayCollection $groups */
         $groups = $this->getMockBuilder(ArrayCollection::class)
             ->setMethods(['clear'])
             ->getMock();
 
-        $groups->expects($this->once())
+        $groups->expects(self::once())
             ->method('clear');
 
         $entity = new User();

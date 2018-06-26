@@ -17,11 +17,11 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CriteriaConnector */
-    protected $criteriaConnector;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CriteriaConnector */
+    private $criteriaConnector;
 
     /** @var BuildSingleItemQuery */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -41,7 +41,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getQuery());
+        self::assertNull($this->context->getQuery());
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -51,7 +51,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setQuery($qb);
         $this->processor->process($this->context);
 
-        $this->assertSame($qb, $this->context->getQuery());
+        self::assertSame($qb, $this->context->getQuery());
     }
 
     public function testProcessForNotManageableEntity()
@@ -64,7 +64,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getQuery());
+        self::assertNull($this->context->getQuery());
     }
 
     public function testProcessForManageableEntityWithSingleId()
@@ -76,26 +76,27 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
-        $this->criteriaConnector->expects($this->once())
+        $this->criteriaConnector->expects(self::once())
             ->method('applyCriteria');
 
         $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasQuery());
+        self::assertTrue($this->context->hasQuery());
         /** @var QueryBuilder $query */
         $query = $this->context->getQuery();
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id', $entityClass),
             $query->getDQL()
         );
         /** @var Parameter $parameter */
         $parameter = $query->getParameters()->first();
-        $this->assertEquals('id', $parameter->getName());
-        $this->assertEquals($entityId, $parameter->getValue());
+        self::assertEquals('id', $parameter->getName());
+        self::assertEquals($entityId, $parameter->getValue());
     }
 
     public function testProcessForManageableEntityWithCompositeId()
@@ -111,24 +112,25 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasQuery());
+        self::assertTrue($this->context->hasQuery());
         /** @var QueryBuilder $query */
         $query = $this->context->getQuery();
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id1 AND e.title = :id2', $entityClass),
             $query->getDQL()
         );
         /** @var Parameter $parameter */
         $parameters = $query->getParameters();
         $idParameter = $parameters[0];
-        $this->assertEquals('id1', $idParameter->getName());
-        $this->assertEquals($entityId['id'], $idParameter->getValue());
+        self::assertEquals('id1', $idParameter->getName());
+        self::assertEquals($entityId['id'], $idParameter->getValue());
         $titleParameter = $parameters[1];
-        $this->assertEquals('id2', $titleParameter->getName());
-        $this->assertEquals($entityId['title'], $titleParameter->getValue());
+        self::assertEquals('id2', $titleParameter->getName());
+        self::assertEquals($entityId['title'], $titleParameter->getValue());
     }
 
     public function testProcessForResourceBasedOnManageableEntity()
@@ -145,7 +147,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
 
-        $this->criteriaConnector->expects($this->once())
+        $this->criteriaConnector->expects(self::once())
             ->method('applyCriteria');
 
         $this->context->setCriteria(new Criteria($this->createMock(EntityClassResolver::class)));
@@ -155,17 +157,17 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasQuery());
+        self::assertTrue($this->context->hasQuery());
         /** @var QueryBuilder $query */
         $query = $this->context->getQuery();
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id', $parentResourceClass),
             $query->getDQL()
         );
         /** @var Parameter $parameter */
         $parameter = $query->getParameters()->first();
-        $this->assertEquals('id', $parameter->getName());
-        $this->assertEquals($entityId, $parameter->getValue());
+        self::assertEquals('id', $parameter->getName());
+        self::assertEquals($entityId, $parameter->getValue());
     }
 
     public function testProcessForResourceBasedOnNotManageableEntity()
@@ -187,7 +189,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getQuery());
+        self::assertNull($this->context->getQuery());
     }
 
     public function testProcessWhenCriteriaObjectDoesNotExist()
@@ -199,24 +201,25 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
-        $this->criteriaConnector->expects($this->never())
+        $this->criteriaConnector->expects(self::never())
             ->method('applyCriteria');
 
         $this->context->setClassName($entityClass);
         $this->context->setId($entityId);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertTrue($this->context->hasQuery());
+        self::assertTrue($this->context->hasQuery());
         /** @var QueryBuilder $query */
         $query = $this->context->getQuery();
-        $this->assertEquals(
+        self::assertEquals(
             sprintf('SELECT e FROM %s e WHERE e.id = :id', $entityClass),
             $query->getDQL()
         );
         /** @var Parameter $parameter */
         $parameter = $query->getParameters()->first();
-        $this->assertEquals('id', $parameter->getName());
-        $this->assertEquals($entityId, $parameter->getValue());
+        self::assertEquals('id', $parameter->getName());
+        self::assertEquals($entityId, $parameter->getValue());
     }
 }

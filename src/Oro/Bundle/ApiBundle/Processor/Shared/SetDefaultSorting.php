@@ -32,7 +32,7 @@ class SetDefaultSorting implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if ($config->isSortingEnabled()) {
+        if (null !== $config && $config->isSortingEnabled()) {
             $this->addSortFilter($context->getFilters(), $config);
         }
     }

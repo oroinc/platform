@@ -6,11 +6,11 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
-class EntityFieldFixtureTest extends \PHPUnit_Framework_TestCase
+class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldTypeProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
     protected $fieldTypeProvider;
 
     /** @var EntityFieldFixture */

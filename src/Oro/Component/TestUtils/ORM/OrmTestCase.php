@@ -14,23 +14,36 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * This class is a clone of Doctrine\Tests\OrmTestCase that is excluded from doctrine package since v2.4.
  */
-abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
+abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * The metadata cache that is shared between all ORM tests (except functional tests).
      */
     private static $metadataCacheImpl = null;
-
     /**
      * The query cache that is shared between all ORM tests (except functional tests).
      */
     private static $queryCacheImpl = null;
 
+    protected function getProxyDir($shouldBeCreated = true)
+    {
+        $proxyDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'TestDoctrineProxies';
+        if ($shouldBeCreated) {
+            $fs = new Filesystem();
+            if (!$fs->exists($proxyDir)) {
+                $fs->mkdir($proxyDir);
+            }
+        }
+
+        return $proxyDir;
+    }
+
     public function __destruct()
     {
+        $path = $this->getProxyDir(false);
         $fs = new Filesystem();
-        if ($fs->exists(__DIR__ . '/Proxies')) {
-            $fs->remove(__DIR__ . '/Proxies');
+        if ($fs->exists($path)) {
+            $fs->remove($path);
         }
     }
 
@@ -42,9 +55,10 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * be configured in the tests to simulate the DBAL behavior that is desired
      * for a particular test,
      *
-     * @param mixed $conn
+     * @param mixed        $conn
      * @param EventManager $eventManager
-     * @param bool $withSharedMetadata
+     * @param bool         $withSharedMetadata
+     *
      * @return EntityManagerMock
      */
     protected function getTestEntityManager($conn = null, $eventManager = null, $withSharedMetadata = true)
@@ -56,9 +70,9 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $config = new \Doctrine\ORM\Configuration();
 
         $config->setMetadataCacheImpl($metadataCache);
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(array(), true));
+        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
         $config->setQueryCacheImpl(self::getSharedQueryCacheImpl());
-        $config->setProxyDir(__DIR__ . '/Proxies');
+        $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
         // Namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create
@@ -67,12 +81,12 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $config->setCustomStringFunctions(['cast' => 'Oro\ORM\Query\AST\Functions\Cast']);
 
         if ($conn === null) {
-            $conn = array(
+            $conn = [
                 'driverClass'  => 'Oro\Component\TestUtils\ORM\Mocks\DriverMock',
                 'wrapperClass' => 'Oro\Component\TestUtils\ORM\Mocks\ConnectionMock',
                 'user'         => 'john',
                 'password'     => 'wayne'
-            );
+            ];
         }
 
         if (is_array($conn)) {
@@ -101,7 +115,8 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array $records
      * @param array $params
      * @param array $types
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
@@ -109,7 +124,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
-                new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
+                new \PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls(
                     array_merge($records, [false])
                 )
             );
@@ -140,7 +155,8 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * Creates a mock for 'Doctrine\DBAL\Driver\Connection' and sets it to the given entity manager
      *
      * @param EntityManagerMock $em
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
@@ -154,7 +170,8 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * Creates a mock for a statement which handles counting a number of records
      *
      * @param int $numberOfRecords
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCountStatementMock($numberOfRecords)
     {
@@ -166,14 +183,14 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
-     * @param string                                   $sql SQL that run in database
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
+     * @param string                                   $sql    SQL that run in database
      * @param array                                    $result data that will return after SQL execute
      * @param array                                    $params
      * @param array                                    $types
      */
     protected function setQueryExpectation(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $sql,
         $result,
         $params = [],
@@ -195,7 +212,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param int                                      $expectsAt
      * @param string                                   $sql
      * @param array                                    $result
@@ -203,7 +220,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array                                    $types
      */
     protected function setQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $expectsAt,
         $sql,
         $result,

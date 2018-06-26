@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendHelperTest extends \PHPUnit_Framework_TestCase
+class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getReverseRelationTypeProvider

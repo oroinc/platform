@@ -44,16 +44,14 @@ class MergeFieldType extends AbstractType
         $builder->add(
             'sourceEntity',
             EntityType::class,
-            array(
+            [
                 'class'                   => $metadata->getEntityMetadata()->getClassName(),
                 'choices'                 => $options['entities'],
                 'multiple'                => false,
                 'expanded'                => true,
-                // TODO: Remove 'choices_as_values' option in scope of BAP-15236
-                'choices_as_values'       => true,
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,
-            )
+            ]
         );
 
         $mergeModes = $metadata->getMergeModes();
@@ -63,8 +61,6 @@ class MergeFieldType extends AbstractType
                 'mode',
                 ChoiceType::class,
                 [
-                    // TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                    'choices_as_values' => true,
                     'choices'  => $this->getMergeValues($mergeModes),
                     'multiple' => false,
                     'expanded' => false,
@@ -97,7 +93,7 @@ class MergeFieldType extends AbstractType
      */
     protected function getMergeValues(array $modes)
     {
-        $result = array();
+        $result = [];
 
         foreach ($modes as $mode) {
             $result[$this->translator->trans('oro.entity_merge.merge_modes.' . $mode)] = $mode;
@@ -115,7 +111,7 @@ class MergeFieldType extends AbstractType
         foreach ($view->children['sourceEntity']->children as $child) {
             $child->vars['block_prefixes'] = array_merge(
                 $child->vars['block_prefixes'],
-                array('oro_entity_merge_choice_value')
+                ['oro_entity_merge_choice_value']
             );
             $child->vars['merge_entity_offset'] = $offset++;
             $child->vars['merge_field_data'] = $view->vars['value'];
@@ -128,16 +124,16 @@ class MergeFieldType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
-            array(
+            [
                 'metadata',
                 'entities',
-            )
+            ]
         );
 
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\\Bundle\\EntityMergeBundle\\Data\\FieldData'
-            )
+            ]
         );
 
         $resolver->setAllowedTypes('metadata', 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata');

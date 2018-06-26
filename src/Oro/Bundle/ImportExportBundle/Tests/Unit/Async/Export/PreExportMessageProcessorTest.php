@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
@@ -187,7 +187,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -195,7 +195,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
      */
     private function createDependentJobMock()
     {
@@ -203,7 +203,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
@@ -211,7 +211,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     private function createMessageProducerMock()
     {
@@ -219,7 +219,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
      */
     private function createExportHandlerMock()
     {
@@ -227,7 +227,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -235,7 +235,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     private function createDoctrineHelperMock()
     {
@@ -243,7 +243,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -251,7 +251,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
      */
     private function createTokenStorageMock()
     {
@@ -269,7 +269,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
      */
     private function createTokenMock()
     {
@@ -277,7 +277,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Organization
+     * @return \PHPUnit\Framework\MockObject\MockObject|Organization
      */
     private function createOrganizationMock()
     {
@@ -285,7 +285,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OrganizationRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|OrganizationRepository
      */
     private function createOrganizationRepositoryMock()
     {
@@ -293,7 +293,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
      */
     private function createUserStub()
     {

@@ -7,12 +7,12 @@ use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\GroupSearchProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class GroupSearchProviderTest extends \PHPUnit_Framework_TestCase
+class GroupSearchProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
     private $configBag;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translate;
 
     /** @var GroupSearchProvider */

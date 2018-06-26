@@ -13,9 +13,9 @@ use Oro\Bundle\SearchBundle\Datagrid\Extension\Filter\SearchFilterExtension;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
+class SearchFilterExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var OrmFilterExtension */

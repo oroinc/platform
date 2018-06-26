@@ -39,6 +39,7 @@ services:
         public: false
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_override_provider_registry'
             - '@oro_api.entity_id_helper'
             - '@oro_api.complete_definition_helper.association'
             - '@oro_api.complete_definition_helper.custom_association'
@@ -88,6 +89,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.relation_config_provider'
+            - '@oro_api.entity_override_provider_registry'
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, requestType: rest&!json_api, priority: -28 }
 
@@ -96,7 +98,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
     oro_api.get_config.json_api.fix_field_naming:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\JsonApi\FixFieldNaming
@@ -200,6 +202,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.config_provider'
+            - '@oro_api.entity_override_provider_registry'
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&expand_related_entities&definition, priority: -20 }
             - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&expand_related_entities&definition, priority: -20 }
@@ -219,6 +222,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_api.resources_provider'
+            - '@oro_api.entity_override_provider_registry'
         tags:
             - { name: oro.api.processor, action: get_config, extra: !identifier_fields_only&definition, priority: -40 }
             - { name: oro.api.processor, action: get_relation_config, extra: !identifier_fields_only&definition, priority: -40 }

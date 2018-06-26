@@ -1,157 +1,234 @@
+/* @theme: admin.oro; */
+
 /* Login + Forgot Password */
 .login-page {
-  background: #f7f7f7;
-  height: 100%;
-  min-height: 280px;
-  #page{
-    #top-page {
-      display: table;
-      > .container{
-        display: table-cell;
-        vertical-align: middle;
-      }
+    background: url("../../img/background.jpg") no-repeat 50% 50% #fff;
+    background-size: cover;
+    height: 100%;
+    min-height: 280px;
+    overflow: visible;
+
+    .app-page {
+        &__central-panel {
+            > .container {
+                width: auto;
+            }
+        }
     }
-  }
 }
+
+.form-wrapper {
+    max-width: 515px;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, .8);
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+
+    &__title {
+        display: none;
+    }
+
+    &__inner {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        margin: 0 auto;
+        padding: 0 65px;
+        min-width: 100%;
+    }
+}
+
 .form-signin {
-  margin: 0 auto;
-  max-width: 410px;
-  padding: 0;
-  background: #fff;
-  border: 0;
+    width: 100%;
 
-  border-radius: 5px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
-  .title-box {
-    overflow: hidden;
-    padding:10px 18px;
-    color: #fff;
-    border-radius: 5px 5px 0 0;
-    background: linear-gradient($title-background-start, $title-background-end);
-    .divider-vertical {
-      float: left;
-      background: url("../../img/vertical-divider.png") no-repeat;
-      width: 2px;
-      height: 28px;
-      margin: 0 10px 0;
+    &__footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 93px;
+
+        &--forgot {
+            padding-left: 0;
+        }
+
+        &--reset {
+            padding-left: 155px;
+        }
     }
-    .oro-title {
-      float: left;
-      font-size: 22px;
-      line-height: 28px;
-      margin: 0;
-      text-shadow: 1px 1px 1px #000000;
-      a {
-        color: #fff;
-      }
+
+    &__oauth {
+        padding-left: 93px;
     }
-    .title {
-      font: 20px/28px $base-font-family;
-      margin: 0;
-      text-shadow: 1px 1px 1px #000000;
+
+    &__section {
+        max-width: 380px;
+        margin: 0 auto;
     }
-  } // Ends .title-box
-  .oro-hint {
-    margin: 0 0 14px;
-  }
-  .add-on {
-    width: 105px;
-    height: 36px;
-    font: bold 14px/36px $base-font-family;
-    color: #5b636d;
-    background: linear-gradient(#dde0e3, #d2d7db);
-    padding:0 10px;
-  }
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  select{
-    height: 16px;
-    font: 14px/16px $base-font-family;
-    color: #000;
-    padding: 9px 10px;
-    width: 300px;
-    border-radius: 5px;
-    &:-ms-input-placeholder {
-      color:#999
+
+    &__roles {
+        margin-bottom: 30px;
+        text-align: center;
     }
-  }
-  .organization-selector-arrow{
-    position: relative;
-    top: 8px;
-    left: -15px;
-    margin-right: -9px;
-    z-index: 5;
-  }
-  .add-on {
-    & + input[type="text"],
-    & + input[type="password"],
-    & + select{
-      width: 205px;
-      border-left-color:#ccc;
-      border-radius: 0 5px 5px 0;
+
+    &__roles-item {
+        display: inline-block;
+        margin: 8px 0;
     }
-    & + select{
-      display: inline-block;
-      height: 34px;
-      width: 225px;
-      padding: 0;
+
+    &__info {
+        margin: 30px 0;
+
+        .alert {
+            padding: 8px 35px;
+        }
     }
-  }
-  .forgot-pass {
-    float: left;
-    font-weight: bold;
-    margin: 9px 10px 0 0;
-  }
-  .oro-forgot-password {
-    padding: 30px 33px;
-    input {
-      width: 320px;
+
+    .title-box {
+        color: #565656;
+        margin: 0 0 27px;
+        text-align: left;
+
+        .divider-vertical {
+            float: left;
+            background: url("../../img/vertical-divider.png") no-repeat;
+            width: 2px;
+            height: 28px;
+            margin: 0 10px 0;
+        }
+        .oro-title {
+            float: left;
+            font-size: 22px;
+            line-height: 28px;
+            margin: 0;
+            text-shadow: 1px 1px 1px #000000;
+            a {
+                color: #fff;
+            }
+        }
+        .title {
+            font: bold 18px/1 $base-font-family;
+            color: #565656;
+            margin: 0;
+        }
     }
-  }
-  .oro-remember-me {
-    margin-bottom: 10px;
-  }
-  .extra-btn-large {
-    height: 32px;
-    line-height: 32px;
-    min-width: 95px;
-    float: left;
-  }
-  .extra-submit {
-    float: right;
-  }
-  fieldset {
-    border: solid $navbarBorder;
-    border-width: 0 1px 1px 1px;
-    padding: 30px 38px;
-    background: #fff;
-    border-radius: 0 0 5px 5px;
-  }
-  span.validation-failed {
-    margin: 0 0 14px 14px;
-  }
+    // Ends .title-box
+    .input-field-group {
+        margin-bottom: 5px;
+    }
+    .input-prepend {
+        width: 100%;
+        display: block;
+    }
+    .oro-hint {
+        margin: 0 0 14px;
+    }
+    .add-on {
+        background: none;
+        width: 93px;
+        height: 32px;
+        font: 14px/32px $base-font-family;
+        text-align: right;
+        color: #565656;
+        padding: 0 25px 0 0;
+        border: none;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        height: 16px;
+        font: 14px/16px $base-font-family;
+        color: #000;
+        padding: 7px 10px;
+        width: 300px;
+        border-radius: 2px;
+        &:-ms-input-placeholder {
+            color: #999
+        }
+    }
+    .organization-selector-arrow {
+        position: relative;
+        top: 8px;
+        left: -15px;
+        margin-right: -9px;
+        z-index: 5;
+    }
+    .add-on {
+        & + input[type="text"],
+        & + input[type="password"],
+        & + select {
+            width: calc(100% - 117px);
+            border: 2px solid #d6d6d6;
+            border-radius: 2px;
+        }
+        & + select {
+            display: inline-block;
+            height: 34px;
+            width: 225px;
+            padding: 0;
+        }
+    }
+    .forgot-pass {
+        float: left;
+        font-weight: bold;
+        margin: 9px 10px 0 0;
+    }
+    .oro-forgot-password {
+        min-width: 270px;
+
+        input {
+            width: calc(100% - 24px);
+        }
+    }
+    .oro-remember-me {
+        margin-bottom: 15px;
+        padding-left: 93px;
+    }
+    .extra-btn-large {
+        height: 32px;
+        line-height: 32px;
+        min-width: 95px;
+        float: left;
+    }
+    .extra-submit {
+        float: right;
+    }
+    fieldset {
+        margin: 0 0 25px;
+    }
+    span.validation-failed {
+        margin: 0 0 14px 14px;
+    }
 }
-.form-reset {
-  .form-buttons{
-    margin-top: 10px;
-  }
-  .add-on {
-    width: 155px;
 
-    & + input[type="text"],
-    & + input[type="password"],
-    & + select {
-      width: 156px;
+.form-reset {
+    .form-buttons {
+        margin-top: 10px;
     }
-  }
+    .add-on {
+        width: 155px;
+
+        & + input[type="text"],
+        & + input[type="password"],
+        & + select {
+            width: calc(100% - 178px);
+        }
+    }
 }
 
 .form-two-factor {
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  select {
-    width: 310px;
-  }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: calc(100% - 24px);
+    }
+}
+
+.login-copyright {
+    font-size: 12px;
+    color: #b3b3b3;
+    text-align: center;
+    padding: 0 16px;
 }

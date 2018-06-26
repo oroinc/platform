@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener;
 
-class ConfigSettingsListenerTest extends \PHPUnit_Framework_TestCase
+class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConfigSettingsListener
@@ -28,7 +28,7 @@ class ConfigSettingsListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBeforeMethod($given, $expected)
     {
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManagerMock */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManagerMock */
         $configManagerMock = $this->createMock(ConfigManager::class);
 
         $event = new ConfigSettingsUpdateEvent($configManagerMock, ['value' => $given]);

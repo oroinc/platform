@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -24,29 +25,23 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityInstantiator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
+    private $entityInstantiator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityLoader;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
+    private $entityLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $valueNormalizer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdTransformer;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    private $entityIdTransformer;
 
     /** @var NormalizeIncludedData */
-    protected $processor;
+    private $processor;
 
     public function setUp()
     {
@@ -60,12 +55,18 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
+        $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
+        $entityIdTransformerRegistry->expects(self::any())
+            ->method('getEntityIdTransformer')
+            ->with($this->context->getRequestType())
+            ->willReturn($this->entityIdTransformer);
+
         $this->processor = new NormalizeIncludedData(
             $this->doctrineHelper,
             $this->entityInstantiator,
             $this->entityLoader,
             $this->valueNormalizer,
-            $this->entityIdTransformer,
+            $entityIdTransformerRegistry,
             $this->configProvider,
             $this->metadataProvider
         );
@@ -149,9 +150,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setIncludedData($includedData);
         $this->processor->process($this->context);
 
-        $this->assertSame($includedData, $this->context->getIncludedData());
-        $this->assertNotNull($this->context->getIncludedEntities());
-        $this->assertSame(
+        self::assertSame($includedData, $this->context->getIncludedData());
+        self::assertNotNull($this->context->getIncludedEntities());
+        self::assertSame(
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
@@ -169,13 +170,13 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setIncludedEntities(new IncludedEntityCollection());
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ['data' => ['type' => 'testType', 'id' => 'testId']]
             ],
             $this->context->getIncludedData()
         );
-        $this->assertCount(0, $this->context->getIncludedEntities());
+        self::assertCount(0, $this->context->getIncludedEntities());
     }
 
     public function testProcessIncludedSectionDoesNotExistInRequestData()
@@ -185,8 +186,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedData());
-        $this->assertNull($this->context->getIncludedEntities());
+        self::assertNull($this->context->getIncludedData());
+        self::assertNull($this->context->getIncludedEntities());
     }
 
     public function testProcessIncludedSectionExistInRequestData()
@@ -215,18 +216,18 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ['data' => ['type' => 'testType', 'id' => 'testId']]
             ],
             $this->context->getIncludedData()
         );
-        $this->assertNotNull($this->context->getIncludedEntities());
-        $this->assertSame(
+        self::assertNotNull($this->context->getIncludedEntities());
+        self::assertSame(
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
-        $this->assertAttributeSame(
+        self::assertAttributeSame(
             ['Test\PrimaryClass', 'primaryId', null],
             'primaryEntity',
             $this->context->getIncludedEntities()
@@ -243,8 +244,10 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $normalizedType = 'Test\Class';
         $includedEntity = new \stdClass();
 
-        $this->doctrineHelper->expects(self::never())
-            ->method('isManageableEntityClass');
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -260,9 +263,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertNotNull($this->context->getIncludedEntities());
-        $this->assertSame(
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        self::assertSame(
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
@@ -276,28 +279,53 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
+        $normalizedId = 123;
+        $metadata = new EntityMetadata();
+
         $error = Error::createValidationError(
             Constraint::VALUE,
             'Only manageable entity can be updated.'
-        )->setSource(ErrorSource::createByPointer('/included/0/meta/update'));
+        )->setSource(ErrorSource::createByPointer('/included/0'));
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
+            ->method('resolveManageableEntityClass')
             ->with($normalizedType)
-            ->willReturn(false);
+            ->willReturn(null);
+
+        $config = new EntityDefinitionConfig();
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                self::identicalTo($config)
+            )
+            ->willReturn($metadata);
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn($normalizedType);
-        $this->entityIdTransformer->expects(self::never())
-            ->method('reverseTransform');
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with('testId', self::identicalTo($metadata))
+            ->willReturn($normalizedId);
 
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedEntities());
-        $this->assertEquals([$error], $this->context->getErrors());
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals([$error], $this->context->getErrors());
     }
 
     public function testProcessForExistingIncludedEntity()
@@ -313,9 +341,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $metadata = new EntityMetadata();
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
+            ->method('resolveManageableEntityClass')
             ->with($normalizedType)
-            ->willReturn(true);
+            ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
             ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
@@ -353,9 +381,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasErrors());
-        $this->assertNotNull($this->context->getIncludedEntities());
-        $this->assertSame(
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        self::assertSame(
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, $normalizedId)
         );
@@ -377,9 +405,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         )->setSource(ErrorSource::createByPointer('/included/0'));
 
         $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
+            ->method('resolveManageableEntityClass')
             ->with($normalizedType)
-            ->willReturn(true);
+            ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
             ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
@@ -417,8 +445,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedEntities());
-        $this->assertEquals([$error], $this->context->getErrors());
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals([$error], $this->context->getErrors());
     }
 
     public function testProcessWhenIncludedEntityTypeIsUnknown()
@@ -441,8 +469,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedEntities());
-        $this->assertEquals([$error], $this->context->getErrors());
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals([$error], $this->context->getErrors());
     }
 
     public function testProcessForInvalidUpdateFlag()
@@ -459,7 +487,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         )->setSource(ErrorSource::createByPointer('/included/0/meta/update'));
 
         $this->doctrineHelper->expects(self::never())
-            ->method('isManageableEntityClass');
+            ->method('resolveManageableEntityClass');
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -471,8 +499,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedEntities());
-        $this->assertEquals([$error], $this->context->getErrors());
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals([$error], $this->context->getErrors());
     }
 
     public function testProcessWhenNormalizationOfIncludedEntityIdFailed()
@@ -489,10 +517,8 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->setSource(ErrorSource::createByPointer('/included/0/id'))
             ->setInnerException($exception);
 
-        $this->doctrineHelper->expects(self::once())
-            ->method('isManageableEntityClass')
-            ->with($normalizedType)
-            ->willReturn(true);
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
 
         $config = new EntityDefinitionConfig();
         $this->configProvider->expects(self::once())
@@ -526,7 +552,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getIncludedEntities());
-        $this->assertEquals([$error], $this->context->getErrors());
+        self::assertNull($this->context->getIncludedEntities());
+        self::assertEquals([$error], $this->context->getErrors());
     }
 }

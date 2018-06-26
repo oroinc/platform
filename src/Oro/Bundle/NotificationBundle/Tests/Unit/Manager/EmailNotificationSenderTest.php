@@ -9,16 +9,16 @@ use Oro\Bundle\NotificationBundle\Model\EmailNotificationInterface;
 use Oro\Bundle\NotificationBundle\Model\SenderAwareEmailNotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
     public function testShouldCreateWithAllRequiredArguments()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface $producer */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface $producer */
         $producer = $this->createMock(MessageProducerInterface::class);
 
         new EmailNotificationSender(
@@ -36,7 +36,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testReceiverEmail = 'test_receiver@email.com';
         $testContentType = 'text/html';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager
             ->expects($this->exactly(2))
@@ -46,7 +46,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName]
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotificationInterface $notification */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationInterface $notification */
         $notification = $this->createMock(EmailNotificationInterface::class);
         $notification->expects($this->once())
             ->method('getRecipientEmails')
@@ -80,13 +80,13 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testReceiverEmail = 'test_receiver@email.com';
         $testContentType = 'text/html';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager
             ->expects($this->never())
             ->method('get');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SenderAwareEmailNotificationInterface $notification */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SenderAwareEmailNotificationInterface $notification */
         $notification = $this->createMock(SenderAwareEmailNotificationInterface::class);
         $notification->expects($this->once())
             ->method('getRecipientEmails')
@@ -126,7 +126,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testReceiverEmail = 'test_receiver@email.com';
         $testContentType = 'text/html';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager
             ->expects($this->exactly(2))
@@ -136,7 +136,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName]
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SenderAwareEmailNotificationInterface $notification */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SenderAwareEmailNotificationInterface $notification */
         $notification = $this->createMock(SenderAwareEmailNotificationInterface::class);
         $notification->expects($this->once())
             ->method('getRecipientEmails')
@@ -175,7 +175,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
         $testReceiverEmail = 'test_receiver@email@com';
         $testContentType = 'text/html';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager $configManager */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
         $configManager
             ->expects($this->exactly(2))
@@ -185,7 +185,7 @@ class EmailNotificationSenderTest extends \PHPUnit_Framework_TestCase
                 ['oro_notification.email_notification_sender_name', false, false, null, $testSenderName]
             ]);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|SenderAwareEmailNotificationInterface $notification */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|SenderAwareEmailNotificationInterface $notification */
         $notification = $this->createMock(SenderAwareEmailNotificationInterface::class);
         $notification->expects($this->once())
             ->method('getRecipientEmails')

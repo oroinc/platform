@@ -9,14 +9,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase
+class DefaultUserProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var DefaultUserProvider */
@@ -43,7 +43,7 @@ class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with('alias.key')
             ->willReturn(null);
 
-        /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject $repository */
+        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('findOneBy')
@@ -69,7 +69,7 @@ class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject $repository */
+        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('find')
@@ -95,7 +95,7 @@ class DefaultUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with('alias.key')
             ->willReturn(1);
 
-        /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject $repository */
+        /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('find')

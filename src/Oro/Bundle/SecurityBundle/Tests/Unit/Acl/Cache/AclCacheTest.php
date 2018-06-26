@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Cache;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AclCacheTest extends \PHPUnit_Framework_TestCase
+class AclCacheTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclCache */
     protected $aclCache;

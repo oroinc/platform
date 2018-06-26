@@ -32,8 +32,6 @@ system_configuration:
                 required: true
                 constraints:
                     - NotBlank: ~
-                # TODO: remove 'choices_as_values' option below in scope of BAP-15236
-                choices_as_values: true
                 choices:
                     oro.currency.system_configuration.fields.currency_display.choices.iso_code: iso_code
                     oro.currency.system_configuration.fields.currency_display.choices.symbol: symbol

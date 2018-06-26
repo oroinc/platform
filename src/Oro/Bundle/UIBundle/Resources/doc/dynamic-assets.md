@@ -7,11 +7,11 @@ The following samples of code show how to add dynamic versioning for any asset p
 
 Lets suppose that `acme` asset package should use the dynamic versioning.
 
-At first the package should be registered. You can use `Resources/config/oro/app.yml` in your bundle or `app/config/config.yml`:
+At first the package should be registered. You can use `Resources/config/oro/app.yml` in your bundle or `config/config.yml`:
 
 ```yaml
 framework:
-    templating:
+    assets:
         packages:
             acme:
                 version: %assets_version%

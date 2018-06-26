@@ -299,11 +299,6 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['disabled'] = true;
         }
 
-        // TODO: remove 'if' statement below in scope of BAP-15236
-        if (isset($attributeOptions['options']['choices'])) {
-            $attributeOptions['options']['choices_as_values'] = true;
-        }
-
         return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
     }
 

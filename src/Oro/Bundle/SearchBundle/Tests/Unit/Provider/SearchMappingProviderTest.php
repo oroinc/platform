@@ -15,12 +15,12 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
     protected $provider;
 
     /**
-     * @var Cache|\PHPUnit_Framework_MockObject_MockObject
+     * @var Cache|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 

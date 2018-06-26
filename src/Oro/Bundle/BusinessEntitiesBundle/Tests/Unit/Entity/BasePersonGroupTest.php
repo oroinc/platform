@@ -4,7 +4,7 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePersonGroup;
 
-class BasePersonGroupTest extends \PHPUnit_Framework_TestCase
+class BasePersonGroupTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'testGroupName';
     const TEST_ID   = 123;

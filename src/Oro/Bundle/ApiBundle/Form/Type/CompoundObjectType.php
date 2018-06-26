@@ -6,11 +6,18 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\EventListener\CompoundObjectListener;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for an object that properties are built based of Data API metadata
+ * and contain only properties classified as fields and associations that should be represented as a field.
+ * Usually this form type is used if an object should be represented as a field in Data API.
+ * @see \Oro\Bundle\ApiBundle\Request\DataType::isAssociationAsField
+ */
 class CompoundObjectType extends AbstractType
 {
     /** @var FormHelper */
@@ -36,12 +43,12 @@ class CompoundObjectType extends AbstractType
 
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
-            $this->formHelper->addFormField($builder, $name, $config->getField($name), $field);
+            $this->addFormField($builder, $config, $name, $field);
         }
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             if (DataType::isAssociationAsField($association->getDataType())) {
-                $this->formHelper->addFormField($builder, $name, $config->getField($name), $association);
+                $this->addFormField($builder, $config, $name, $association);
             }
         }
 
@@ -55,23 +62,28 @@ class CompoundObjectType extends AbstractType
     {
         $resolver
             ->setRequired(['metadata', 'config'])
-            ->setAllowedTypes('metadata', ['Oro\Bundle\ApiBundle\Metadata\EntityMetadata'])
-            ->setAllowedTypes('config', ['Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig']);
+            ->setAllowedTypes('metadata', [EntityMetadata::class])
+            ->setAllowedTypes('config', [EntityDefinitionConfig::class]);
     }
 
     /**
-     * {@inheritdoc}
+     * @param FormBuilderInterface   $formBuilder
+     * @param EntityDefinitionConfig $config
+     * @param string                 $fieldName
+     * @param PropertyMetadata       $fieldMetadata
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'oro_api_compound_object';
+    private function addFormField(
+        FormBuilderInterface $formBuilder,
+        EntityDefinitionConfig $config,
+        $fieldName,
+        PropertyMetadata $fieldMetadata
+    ) {
+        $this->formHelper->addFormField(
+            $formBuilder,
+            $fieldName,
+            $config->getField($fieldName),
+            $fieldMetadata,
+            ['required' => false]
+        );
     }
 }

@@ -43,7 +43,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
     }
 
     /**
-     * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockOptionsResolver()
     {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 
-class ExceptionUtilTest extends \PHPUnit_Framework_TestCase
+class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetProcessorUnderlyingExceptionWithoutInnerException()
     {

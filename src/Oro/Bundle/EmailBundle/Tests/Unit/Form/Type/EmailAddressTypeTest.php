@@ -48,7 +48,7 @@ class EmailAddressTypeTest extends TypeTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

@@ -19,16 +19,16 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var LocalizationChoicesProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationChoicesProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationChoicesProvider;
 
     /** @var LocalizationSelectionType */
@@ -82,12 +82,11 @@ class LocalizationSelectionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $resolver OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'choices_as_values' => true,
                 'choices' => function () {
                 },
                 'compact' => false,

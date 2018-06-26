@@ -7,7 +7,7 @@ use Oro\Bundle\SearchBundle\Query\Expression\Token;
 use Oro\Bundle\SearchBundle\Query\Expression\TokenStream;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit\Framework\TestCase
 {
     public function testParsesSelectKeyword()
     {

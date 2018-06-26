@@ -7,9 +7,9 @@ use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class ImagineFilterConfigListenerTest extends \PHPUnit_Framework_TestCase
+class ImagineFilterConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $listener;
 
     /** @var ImageFilterLoader */

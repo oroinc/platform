@@ -18,9 +18,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
+class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */

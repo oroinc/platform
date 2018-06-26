@@ -3,7 +3,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 
-class PackageRequirementTest extends \PHPUnit_Framework_TestCase
+class PackageRequirementTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 
-class DescriptionsConfigExtraTest extends \PHPUnit_Framework_TestCase
+class DescriptionsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DescriptionsConfigExtra */
     protected $extra;

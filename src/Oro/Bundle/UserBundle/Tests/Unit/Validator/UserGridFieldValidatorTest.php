@@ -6,12 +6,12 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\UserGridFieldValidator;
 
-class UserGridFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserGridFieldValidator */
     protected $validator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     protected function setUp()

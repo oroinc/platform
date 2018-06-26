@@ -1,4 +1,3 @@
-@regression
 @ticket-BAP-16267
 Feature: Navigation bar position
   In order to provide better navigation for users
@@ -7,24 +6,6 @@ Feature: Navigation bar position
 
   Scenario: Precondition
     When I login as administrator
-    Then menu must be at top
-
-  Scenario Outline: Navigation through the main menu with "Top" navigation bar position
-    When I go to <menu>
-    Then I should see <breadcrumb>
-
-    Examples:
-      | menu                               | breadcrumb                           |
-      | Dashboards/ Manage Dashboards      | "Dashboards/ Manage Dashboards"      |
-      | System/ Localization/ Translations | "System/ Localization/ Translations" |
-      | Activities/ Calendar Events        | "Activities/ Calendar Events"        |
-
-  Scenario: Change navigation bar position from "Top" to "Left"
-    When I go to System/ Configuration
-    And follow "System Configuration/General Setup/Display Settings" on configuration sidebar
-    And uncheck "Use default" for "Position" field
-    And select "Left" from "Position"
-    And I save setting
     Then menu must be on left side
     And menu must be minimized
 
@@ -37,6 +18,13 @@ Feature: Navigation bar position
       | Dashboards/ Manage Dashboards      | "Dashboards/ Manage Dashboards"      |
       | System/ Localization/ Translations | "System/ Localization/ Translations" |
       | Activities/ Calendar Events        | "Activities/ Calendar Events"        |
+
+  Scenario: Filter menu items using search input
+    When I select "Reports & Segments" in the side menu
+    And I fill in "MenuSearch" with "To"
+    Then I should see "Total Forecast"
+    When I go to Reports & Segments/ Reports/ Opportunities/ Total Forecast
+    Then I should see "Reports & Segments/ Reports/ Opportunities/ Total Forecast"
 
   Scenario: Expand main manu
     When I click "Main Menu Toggler"
@@ -65,7 +53,26 @@ Feature: Navigation bar position
 
     Examples:
       | menu                                | breadcrumb                            |
+      | Activities/ Calendar Events         | "Activities/ Calendar Events"         |
       | Dashboards/ Manage Dashboards       | "Dashboards/ Manage Dashboards"       |
       | System/ Localization/ Translations  | "System/ Localization/ Translations"  |
       | System/ Entities/ Entity Management | "System/ Entities/ Entity Management" |
-      | Activities/ Calendar Events         | "Activities/ Calendar Events"         |
+      | System/ Configuration               | "System/ Configuration" |
+
+  Scenario: Change navigation bar position from "Left" to "Top"
+    When I go to System/ Configuration
+    And follow "System Configuration/General Setup/Display Settings" on configuration sidebar
+    And uncheck "Use default" for "Position" field
+    And select "Top" from "Position"
+    And I save setting
+    Then menu must be at top
+
+  Scenario Outline: Navigation through the main menu with "Top" navigation bar position
+    When I go to <menu>
+    Then I should see <breadcrumb>
+
+    Examples:
+      | menu                               | breadcrumb                           |
+      | Dashboards/ Manage Dashboards      | "Dashboards/ Manage Dashboards"      |
+      | System/ Localization/ Translations | "System/ Localization/ Translations" |
+      | Activities/ Calendar Events        | "Activities/ Calendar Events"        |

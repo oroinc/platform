@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\AbstractDriverException;
 use Oro\Bundle\EntityBundle\ORM\DatabaseExceptionHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -11,21 +11,21 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
-class EntityWriterTest extends \PHPUnit_Framework_TestCase
+class EntityWriterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityDetachFixer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDetachFixer */
     protected $detachFixer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry */
     protected $contextRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DatabaseExceptionHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseExceptionHelper */
     protected $databaseExceptionHelper;
 
     /** @var EntityWriter */
@@ -189,7 +189,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->writer->setStepExecution($stepExecution);
 
-        $driverException = $this->createMock(DriverException::class);
+        $driverException = $this->createMock(AbstractDriverException::class);
         $this->databaseExceptionHelper->expects($this->once())
             ->method('getDriverException')
             ->with($exception)
@@ -238,7 +238,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->writer->setStepExecution($stepExecution);
 
-        $driverException = $this->createMock(DriverException::class);
+        $driverException = $this->createMock(AbstractDriverException::class);
         $this->databaseExceptionHelper->expects($this->once())
             ->method('getDriverException')
             ->with($exception)

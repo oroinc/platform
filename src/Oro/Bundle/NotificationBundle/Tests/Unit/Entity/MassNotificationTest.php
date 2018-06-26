@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 
-class MassNotificationTest extends \PHPUnit_Framework_TestCase
+class MassNotificationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MassNotification

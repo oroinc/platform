@@ -8,7 +8,7 @@ use Oro\Bundle\UIBundle\Twig\Environment;
 /**
  * Copy of Twig_Tests_EnvironmentTest. Should be removed after merging of pull-request with this service changes.
  */
-class EnvironmentTest extends \PHPUnit_Framework_TestCase
+class EnvironmentTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException        \LogicException

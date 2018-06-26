@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
-class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
+class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldSplitFile()
     {
@@ -188,7 +188,7 @@ class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractFileReader
+     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractFileReader
      */
     private function createReaderMock()
     {
@@ -196,14 +196,14 @@ class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileStreamWriter
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileStreamWriter
      */
     private function createWriterMock()
     {
         return $this->createMock(FileStreamWriter::class);
     }
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
      */
     private function createFileManagerMock()
     {

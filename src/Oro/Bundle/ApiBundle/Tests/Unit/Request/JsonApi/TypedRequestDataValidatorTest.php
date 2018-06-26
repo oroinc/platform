@@ -12,9 +12,9 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TypedRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
+class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
     /** @var RequestType */
@@ -596,8 +596,8 @@ class TypedRequestDataValidatorTest extends \PHPUnit_Framework_TestCase
             [[], 'The primary data object collection should exist', '/data'],
             [['data' => null], 'The primary data object collection should not be empty', '/data'],
             [['data' => []], 'The primary data object collection should not be empty', '/data'],
-            [['data' => 'test'], 'The primary data object collection should not be an array', '/data'],
-            [['data' => ['key' => 'value']], 'The primary data object collection should not be an array', '/data'],
+            [['data' => 'test'], 'The primary data object collection should be an array', '/data'],
+            [['data' => ['key' => 'value']], 'The primary data object collection should be an array', '/data'],
             [['data' => [null]], 'The primary resource object should be an object', '/data/0'],
             [['data' => ['test']], 'The primary resource object should be an object', '/data/0'],
             [['data' => [[]]], 'The \'type\' property is required', '/data/0/type'],

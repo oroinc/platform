@@ -7,12 +7,12 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 
-class QueryCalculatorTest extends \PHPUnit_Framework_TestCase
+class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var QueryCalculator */
     private $queryCalculator;
 
-    /** @var JobStorage|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var JobStorage|\PHPUnit\Framework\MockObject\MockObject */
     private $jobStorage;
 
     /**

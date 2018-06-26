@@ -6,11 +6,11 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Symfony\Component\Form\FormView;
 
-class FormAccessorTest extends \PHPUnit_Framework_TestCase
+class FormAccessorTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_NAME = 'test_form';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     protected function setUp()

@@ -4,7 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
-class SegmentTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAME = 'name_test';
 

@@ -5,12 +5,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 
-class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityNameProvider */
     protected $provider;
 
-    /** @var AbstractQueryDesigner|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
     protected $entity;
 
     protected function setUp()

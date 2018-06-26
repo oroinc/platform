@@ -1,4 +1,4 @@
-// @theme: admin;
+/* @theme: admin.oro; */
 @import '../variables/oro/button-variables';
 
 // Bootstrap - Buttons
@@ -318,6 +318,13 @@
         }
     }
 
+    &-login-roles {
+        width: 100%;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: block;
+    }
+
     &.process {
         @include process();
     }
@@ -383,6 +390,51 @@
                 background: $btn-group-success-open-btn-background;
                 border-color: $btn-group-success-open-btn-border-color;
                 box-shadow: $btn-group-success-open-btn-box-shadow;
+            }
+        }
+    }
+}
+
+.btn-brand {
+    &-google {
+        background: $btn-brand-google-background;
+        border-color: $btn-brand-google-border-color;
+        position: $btn-brand-google-position;
+        padding-left: $btn-brand-google-padding-left;
+        font-size: $btn-brand-google-font-size;
+        height: $btn-brand-google-height;
+        line-height: $btn-brand-google-line-height;
+
+        &:before {
+            content: $btn-brand-google-before-content;
+            font-family: $btn-brand-google-before-font-family;
+            font-size: $btn-brand-google-before-font-size;
+            position: $btn-brand-google-before-position;
+            top: $btn-brand-google-before-top;
+            left: $btn-brand-google-before-left;
+            transform: $btn-brand-google-before-transform;
+        }
+
+        &:hover,
+        &:focus {
+            background: $btn-brand-google-hover-background;
+            border-color: $btn-brand-google-hover-border-color;
+        }
+
+        &:active {
+            background: $btn-brand-google-active-background;
+            border-color: $btn-brand-google-active-border-color;
+            color: $btn-brand-google-active-color;
+        }
+
+        &[disabled] {
+            &,
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: $btn-brand-google-disabled-background-color;
+                border-color: $btn-brand-google-disabled-border-color;
+                color: $btn-brand-google-disabled-color;
             }
         }
     }

@@ -14,13 +14,13 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class AddOwnerValidatorTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValidationHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValidationHelper */
     private $validationHelper;
 
     /** @var AddOwnerValidator */
@@ -78,7 +78,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['constraints' => [new Owner()]],
+            ['constraints' => [new Owner(['groups' => ['api']])]],
             $configObject->getFormOptions()
         );
     }
@@ -134,7 +134,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(
-            ['constraints' => [new Owner()]],
+            ['constraints' => [new Owner(['groups' => ['api']])]],
             $configObject->getFormOptions()
         );
     }

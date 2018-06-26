@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeType;
 use Oro\Bundle\SecurityBundle\Form\Type\PermissionCollectionType;
 
-class AclPrivilegeTypeTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeType */
     protected $formType;

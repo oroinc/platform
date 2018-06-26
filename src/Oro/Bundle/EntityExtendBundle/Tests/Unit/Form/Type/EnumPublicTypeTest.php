@@ -15,7 +15,7 @@ class EnumPublicTypeTest extends TypeTestCase
     /** @var EnumPublicType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
     protected function setUp()

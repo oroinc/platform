@@ -5,17 +5,17 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventSubscriber;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
 use Symfony\Component\Form\FormEvents;
 
-class TagSubscriberTest extends \PHPUnit_Framework_TestCase
+class TagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_TAG_NAME = 'testName';
 
     /** @var TagSubscriber */
     protected $subscriber;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $taggableHelper;
 
     protected function setUp()
