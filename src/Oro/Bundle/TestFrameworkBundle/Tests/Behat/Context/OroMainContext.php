@@ -565,10 +565,11 @@ class OroMainContext extends MinkContext implements
      */
     public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $router = $this->getContainer()->get('router');
+        //quick way to logout user (delete all cookies)
+        $driver = $this->getSession()->getDriver();
+        $driver->reset();
 
-        $this->visit($router->generate('oro_user_security_logout'));
-        $this->visit($router->generate('oro_default'));
+        $this->visit($this->getContainer()->get('router')->generate('oro_default'));
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
