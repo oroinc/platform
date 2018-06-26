@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Strategy;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,6 +35,12 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ImportStrategyHelper */
     protected $strategyHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldNameValidationHelper */
+    protected $validationHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextInterface */
+    protected $context;
+
     /**
      * {@inheritdoc}
      */
@@ -43,10 +49,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
         $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->fieldTypeProvider->expects(static::any())
-            ->method('getSupportedFieldTypes')
-            ->willReturn(['type1', 'type2']);
 
         $this->fieldTypeProvider->expects(static::any())
             ->method('getFieldProperties')
@@ -77,14 +79,17 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
+
         $this->strategy = $this->createStrategy();
 
-        /** @var ContextInterface $context */
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $this->strategy->setImportExportContext($context);
+        $this->context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+
+        $this->strategy->setImportExportContext($this->context);
         $this->strategy->setEntityName('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
         $this->strategy->setTranslator($this->translator);
+        $this->strategy->setFieldValidationHelper($this->validationHelper);
     }
 
     public function testSetTranslator()
@@ -123,53 +128,64 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param FieldConfigModel $field
-     * @param bool $isExist
-     * @param FieldConfigModel|null $expected
-     *
-     * @dataProvider processProvider
      */
-    public function testProcess($field, $isExist, $expected)
+    public function testProcess()
     {
-        $this->databaseHelper->expects(static::any())->method('findOneBy')->willReturn($isExist ? $field : null);
+        $entity = new FieldConfigModel('testFieldName', 'integer');
+        $entity->setEntity(new EntityConfigModel(\stdClass::class));
 
-        static::assertEquals($expected, $this->strategy->process($field));
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(['string', 'integer', 'date']);
+
+        $this->strategyHelper->expects($this->never())
+            ->method('addValidationErrors');
+
+        $this->validationHelper->expects($this->once())
+            ->method('registerField')
+            ->with($entity);
+
+        self::assertSame($entity, $this->strategy->process($entity));
     }
 
-    /**
-     * @return array
-     */
-    public function processProvider()
+    public function testProcessWrongFieldType()
     {
-        $field = new FieldConfigModel('field_name', 'type1');
+        $entity = new FieldConfigModel('testFieldName', 'manyToOne');
 
-        $fieldWrongType = new FieldConfigModel('field_name', 'wrongType');
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(['string', 'integer', 'date']);
 
-        $fieldSystem = new FieldConfigModel('field_name', 'type1');
-        $fieldSystem->fromArray('extend', ['owner' => ExtendScope::OWNER_SYSTEM], []);
+        $this->strategyHelper->expects($this->atLeastOnce())
+            ->method('addValidationErrors');
 
-        return [
-            'empty' => [
-                'field' => new FieldConfigModel(),
-                'isExist' => false,
-                'expected' => null,
-            ],
-            'filled' => [
-                'field' => $field,
-                'isExist' => false,
-                'expected' => $field,
-            ],
-            'wrong type' => [
-                'field' => $fieldWrongType,
-                'isExist' => false,
-                'expected' => null,
-            ],
-            'system' => [
-                'field' => $fieldSystem,
-                'isExist' => true,
-                'expected' => null,
-            ],
-        ];
+        $this->validationHelper->expects($this->never())
+            ->method('registerField');
+
+        self::assertNull($this->strategy->process($entity));
+    }
+
+    public function testProcessValidationErrors()
+    {
+        $entity = new FieldConfigModel('testFieldName', 'integer');
+
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getSupportedFieldTypes')
+            ->willReturn(['string', 'integer', 'date']);
+
+        $this->strategyHelper->expects($this->once())
+            ->method('validateEntity')
+            ->with($entity)
+            ->willReturn(['first error message', 'second error message']);
+
+        $this->context->expects($this->once())
+            ->method('incrementErrorEntriesCount');
+
+        $this->strategyHelper->expects($this->once())
+            ->method('addValidationErrors')
+            ->with(['first error message', 'second error message'], $this->context);
+
+        self::assertNull($this->strategy->process($entity));
     }
 
     /**

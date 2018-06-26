@@ -96,7 +96,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider denormalizeExceptionDataProvider
      *
      * @@expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Data does not contain required properties: type, fieldType or entity_id
+     * @expectedExceptionMessage Data doesn't contains entity id
      *
      * @param array $data
      */
@@ -115,10 +115,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                 'data' => ['type' => 'test', 'fieldName' => 'test']
             ],
             [
-                'data' => ['type' => 'test', 'entity' => ['id' => 1]]
-            ],
-            [
-                'data' => ['fieldName' => 'test', 'entity' => ['id' => null]]
+                'data' => ['type' => 'test', 'fieldName' => 'test', 'entity' => ['id' => null]]
             ],
             [
                 'data' => []
@@ -261,7 +258,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'data' => [
                         'type' => 'fieldType1',
-                        'fieldName' => 'fieldName1',
+                        'fieldName' => null,
                         'entity' => [
                             'id' => 11,
                         ],
@@ -345,7 +342,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-                'expected' => $this->getFieldConfigModel(null, 'fieldName1', 'fieldType1', [
+                'expected' => $this->getFieldConfigModel(null, null, 'fieldType1', [
                     'bool' => [
                         'code1' => false,
                         'code2' => false,

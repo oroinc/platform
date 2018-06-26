@@ -193,6 +193,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.change_type_extend_entity_field_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityFieldValidator
+        arguments:
+            - "@oro_entity_extend.extend.field_name_validation_helper"
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.change_type_extend_entity_field }
+
     oro_entity_extend.validator.unique_extend_entity_method_name_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
         arguments:
@@ -258,8 +265,10 @@ services:
     oro_entity_extend.extend.field_name_validation_helper:
         class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper
         arguments:
-            - "@oro_entity_config.provider.extend"
-            - "@event_dispatcher"
+            - '@oro_entity_config.provider.extend'
+            - '@event_dispatcher'
+        calls:
+            - [setNewEntitiesHelper, ['@oro_importexport.strategy.new_entities_helper']]
 
     oro_entity_extend.migration.cleanup_marketing_entity_config.post_up.listener:
         class: %oro_entity_extend.migration.cleanup_marketing.post_up.listener.class%

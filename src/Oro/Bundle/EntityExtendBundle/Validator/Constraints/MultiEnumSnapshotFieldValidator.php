@@ -17,7 +17,6 @@ class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
     public function validate($value, Constraint $constraint)
     {
         /** @var FieldConfigModel $value */
-
         $this->assertValidatingValue($value);
 
         $className = $value->getEntity()->getClassName();
@@ -27,23 +26,26 @@ class MultiEnumSnapshotFieldValidator extends AbstractFieldValidator
         if (strtolower(substr($fieldName, $snapshotSuffixOffset)) === strtolower(ExtendHelper::ENUM_SNAPSHOT_SUFFIX)) {
             $guessedName = substr($fieldName, 0, $snapshotSuffixOffset);
             if (!empty($guessedName)) {
-                $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
-                if ($fieldConfig && $fieldConfig->getId()->getFieldType() === 'multiEnum') {
+                $existingFieldName = $this->validationHelper->getSimilarExistingFieldData($className, $guessedName);
+                if ($existingFieldName && $existingFieldName[1] === 'multiEnum') {
                     $this->addViolation(
                         $constraint->duplicateSnapshotMessage,
                         $fieldName,
-                        $fieldConfig->getId()->getFieldName()
+                        $existingFieldName[0]
                     );
                 }
             }
         } elseif ($value->getType() === 'multiEnum') {
-            $guessedName = $fieldName . ExtendHelper::ENUM_SNAPSHOT_SUFFIX;
-            $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
-            if ($fieldConfig && $this->validationHelper->hasFieldNameConflict($guessedName, $fieldConfig)) {
+            $existingFieldName = $this->validationHelper->getSimilarExistingFieldData(
+                $className,
+                $fieldName . ExtendHelper::ENUM_SNAPSHOT_SUFFIX
+            );
+
+            if ($existingFieldName) {
                 $this->addViolation(
                     $constraint->duplicateFieldMessage,
                     $fieldName,
-                    $fieldConfig->getId()->getFieldName()
+                    $existingFieldName[0]
                 );
             }
         }
