@@ -30,8 +30,7 @@ class YamlPersister
 
     public function parse()
     {
-        $data = Yaml::parse(file_get_contents($this->paramFile));
-
+        $data = Yaml::parse(file_get_contents($this->paramFile), Yaml::PARSE_CONSTANT);
         if (!is_array($data) || !isset($data['parameters'])) {
             return array();
         }
@@ -54,7 +53,7 @@ class YamlPersister
 
     public function dump(array $data)
     {
-        $fileData = Yaml::parse(file_get_contents($this->paramFile));
+        $fileData = Yaml::parse(file_get_contents($this->paramFile), Yaml::PARSE_CONSTANT);
         if (!is_array($fileData)) {
             $fileData = [];
         }
