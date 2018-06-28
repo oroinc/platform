@@ -14,3 +14,4 @@ oro_activity_bundle_api:
         version:  latest
     options:
         group: activity_association
+        priority: -5
