@@ -46,8 +46,6 @@ class Schema extends BaseSchema
          * It is required to do here because _addTable() method creates a new instance of Table object
          * and as result the options are added to wrong Table object.
          */
-        // Update options of the created table
-        // It is required to do here because "_addTable()" method
         $table = $this->getTable($tableName);
         foreach ($this->_schemaConfig->getDefaultTableOptions() as $name => $value) {
             $table->addOption($name, $value);
