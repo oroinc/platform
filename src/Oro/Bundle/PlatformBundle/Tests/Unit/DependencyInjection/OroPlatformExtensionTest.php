@@ -112,4 +112,136 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expectedConfig, $containerBuilder->getExtensionConfig('security'));
     }
+
+    public function testDbalConfigWithoutCommonConfig()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'default',
+                    'connections'        => [
+                        'default' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'another' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        self::assertEquals($doctrineConfig, $container->getExtensionConfig('doctrine'));
+    }
+
+    public function testDbalConfigWithCommonConfig()
+    {
+        $doctrineConfig = [
+            [
+                'dbal' => [
+                    'default_connection' => 'connection1',
+                    'connections'        => [
+                        'connection1' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection2' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection3' => [
+                            'driver' => 'pdo_pgsql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection4' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test1',
+                            'host'   => 'localhost',
+                            'port'   => '3306'
+                        ],
+                        'connection5' => [
+                            'driver' => 'pdo_mysql',
+                            'dbname' => 'test',
+                            'host'   => 'localhost'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'connections' => [
+                        'connection5' => [
+                            'port' => '3306'
+                        ]
+                    ]
+                ]
+            ],
+            [
+                'dbal' => [
+                    'default_connection'    => 'connection2',
+                    'charset'               => 'utf8mb4',
+                    'default_table_options' => [
+                        'charset' => 'utf8mb4',
+                        'collate' => 'utf8mb4_unicode_ci'
+                    ],
+                    'types'                 => [
+                        'type1' => 'Type1'
+                    ]
+                ]
+            ]
+        ];
+
+        $container = new ExtendedContainerBuilder();
+        $container->setParameter('database_driver', 'pdo_mysql');
+        $container->setExtensionConfig('doctrine', $doctrineConfig);
+
+        $platformExtension = new OroPlatformExtension();
+        $platformExtension->prepend($container);
+
+        $expectedDoctrineConfig = [
+            $doctrineConfig[0],
+            $doctrineConfig[1],
+            [
+                'dbal' => [
+                    'connections' => [
+                        'connection1' => [
+                            'charset'               => 'utf8mb4',
+                            'default_table_options' => [
+                                'charset' => 'utf8mb4',
+                                'collate' => 'utf8mb4_unicode_ci'
+                            ]
+                        ],
+                        'connection5' => [
+                            'charset'               => 'utf8mb4',
+                            'default_table_options' => [
+                                'charset' => 'utf8mb4',
+                                'collate' => 'utf8mb4_unicode_ci'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $doctrineConfig[2]
+        ];
+        self::assertEquals($expectedDoctrineConfig, $container->getExtensionConfig('doctrine'));
+    }
 }
