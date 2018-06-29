@@ -20,15 +20,15 @@ class ChangeLengthOfFields implements Migration
     {
         $processTriggerTable = $schema->getTable('oro_process_trigger');
         $processTriggerTable->getColumn('field')
-            ->setLength(100);
+            ->setLength(150);
 
         $transitionTriggerTable = $schema->getTable('oro_workflow_trans_trigger');
         $transitionTriggerTable->getColumn('field')
-            ->setLength(100);
+            ->setLength(150);
 
         $restrictionTable = $schema->getTable('oro_workflow_restriction');
         $restrictionTable->getColumn('field')
-            ->setLength(100);
+            ->setLength(150);
         $restrictionTable->getColumn('mode')
             ->setLength(8);
     }

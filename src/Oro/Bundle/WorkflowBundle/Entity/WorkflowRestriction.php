@@ -40,7 +40,7 @@ class WorkflowRestriction
     /**
      * @var string
      *
-     * @ORM\Column(name="field", type="string", length=100, nullable=false)
+     * @ORM\Column(name="field", type="string", length=150, nullable=false)
      */
     protected $field;
 

@@ -57,7 +57,7 @@ class ProcessTrigger implements EventTriggerInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="field", type="string", length=100, nullable=true)
+     * @ORM\Column(name="field", type="string", length=150, nullable=true)
      */
     protected $field;
 

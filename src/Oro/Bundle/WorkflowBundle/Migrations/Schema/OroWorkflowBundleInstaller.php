@@ -169,7 +169,7 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('definition_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('event', 'string', ['length' => 255, 'notnull' => false]);
-        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 150]);
         $table->addColumn('queued', 'boolean', []);
         $table->addColumn('time_shift', 'integer', ['notnull' => false]);
         $table->addColumn('cron', 'string', ['length' => 100, 'notnull' => false]);
@@ -278,7 +278,7 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('workflow_name', 'string', ['length' => 255]);
         $table->addColumn('workflow_step_id', 'integer', ['notnull' => false]);
         $table->addColumn('attribute', 'string', ['length' => 255]);
-        $table->addColumn('field', 'string', ['length' => 100]);
+        $table->addColumn('field', 'string', ['length' => 150]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
         $table->addColumn('mode', 'string', ['length' => 8]);
         $table->addColumn('mode_values', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
@@ -348,7 +348,7 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
         $table->addColumn('cron', 'string', ['notnull' => false, 'length' => 100]);
         $table->addColumn('filter', 'text', ['notnull' => false]);
         $table->addColumn('event', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('field', 'string', ['notnull' => false, 'length' => 150]);
         $table->addColumn('require', 'text', ['notnull' => false]);
         $table->addColumn('relation', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
