@@ -1867,4 +1867,28 @@ class OroMainContext extends MinkContext implements
         }
         $this->getSession()->switchToWindow($lastTab);
     }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be checked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeChecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isChecked());
+    }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be unchecked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeUnchecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertFalse($element->isChecked());
+    }
 }
