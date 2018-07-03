@@ -126,6 +126,12 @@ services:
     oro_translation.empty_array.loader:
         class: '%oro_translation.empty_array.loader.class%'
 
+    oro_translation.selector:
+        class: Oro\Bundle\TranslationBundle\Translation\MessageSelector
+        decorates: translator.selector
+        arguments:
+            - '@logger'
+
     oro_translation.cache:
         parent: oro.cache.abstract
         calls:
