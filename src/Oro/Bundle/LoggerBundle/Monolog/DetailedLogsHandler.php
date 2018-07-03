@@ -13,6 +13,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 
+/**
+ * Writes logs using the logging level is stored in user configuration.
+ * Also provide a possibility to change the logging level for a certain amount of time.
+ */
 class DetailedLogsHandler extends AbstractProcessingHandler implements ContainerAwareInterface
 {
     /** @var HandlerInterface */
@@ -23,6 +27,9 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
 
     /** @var ContainerInterface */
     protected $container;
+
+    /** @var bool|null */
+    private $loading;
 
     /**
      * {@inheritDoc}
@@ -59,17 +66,39 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
     }
 
     /**
-     * @return int
+     * @return string
      */
     private function getLogLevel()
     {
         /** @var CacheProvider $cache */
         $cache = $this->container->get('oro_logger.cache');
-        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
-            return $cache->fetch(Configuration::LOGS_LEVEL_KEY);
+
+        $logLevel = $cache->fetch(Configuration::LOGS_LEVEL_KEY);
+        if (false === $logLevel) {
+            $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
+            if (!$this->loading) {
+                $this->loading = true;
+                try {
+                    $logLevel = $this->loadLogLevel($cache, $logLevel);
+                } finally {
+                    $this->loading = false;
+                }
+            }
         }
 
-        $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
+        return $logLevel;
+    }
+
+    /**
+     * @param CacheProvider $cache
+     * @param string        $defaultLogLevel
+     *
+     * @return string
+     */
+    private function loadLogLevel(CacheProvider $cache, $defaultLogLevel)
+    {
+        $logLevel = $defaultLogLevel;
+        $lifeTime = 0;
         if ($this->isInstalled() && $this->container->has('oro_config.user')) {
             /** @var ConfigManager $config */
             $config = $this->container->get('oro_config.user');
@@ -78,14 +107,11 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
             $endTimestamp = $config->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
             if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
                 $logLevel = $config->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
-
-                $cache->save(Configuration::LOGS_LEVEL_KEY, $logLevel, $endTimestamp - $curTimestamp);
-
-                return $logLevel;
+                $lifeTime = $endTimestamp - $curTimestamp;
             }
         }
 
-        $cache->save(Configuration::LOGS_LEVEL_KEY, $logLevel);
+        $cache->save(Configuration::LOGS_LEVEL_KEY, $logLevel, $lifeTime);
 
         return $logLevel;
     }

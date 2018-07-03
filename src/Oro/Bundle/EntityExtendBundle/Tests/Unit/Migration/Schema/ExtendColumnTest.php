@@ -94,28 +94,28 @@ class ExtendColumnTest extends \PHPUnit_Framework_TestCase
             'length' => [
                 'name' => '_length',
                 'method' => 'setLength',
-                'options' => ['extend' => ['length' => 100]],
+                'options' => ['extend' => ['length' => 100], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => null,
                 'expected' => 100
             ],
             'precision' => [
                 'name' => '_precision',
                 'method' => 'setPrecision',
-                'options' => ['extend' => ['precision' => 8]],
+                'options' => ['extend' => ['precision' => 8], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => 10,
                 'expected' => 8
             ],
             'scale' => [
                 'name' => '_scale',
                 'method' => 'setScale',
-                'options' => ['extend' => ['scale' => 5]],
+                'options' => ['extend' => ['scale' => 5], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => 0,
                 'expected' => 5
             ],
             'default' => [
                 'name' => '_default',
                 'method' => 'setDefault',
-                'options' => ['extend' => ['default' => true]],
+                'options' => ['extend' => ['default' => true], ExtendOptionsManager::TYPE_OPTION => 'string'],
                 'initial' => null,
                 'expected' => true
             ],
