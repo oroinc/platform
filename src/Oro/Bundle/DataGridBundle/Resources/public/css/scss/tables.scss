@@ -173,6 +173,7 @@
 
         .dropdown-menu {
             margin-right: $table-action-cell-dropdown-menu-offset-right;
+            min-width: $table-action-cell-dropdown-menu-min-width;
         }
 
         @include horizontal-icon-menu;

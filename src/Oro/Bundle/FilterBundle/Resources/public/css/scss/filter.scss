@@ -5,6 +5,8 @@
 }
 
 .filter-box {
+    padding: 8px 20px 0 124px;
+
     .filter-criteria {
         position: $filter-box-criteria-position;
         font-size: $filter-box-criteria-font-size;
@@ -68,6 +70,16 @@
             .uneditable-input {
                 margin-bottom: $input-append-offset-bottom;
             }
+
+            > .btn-group {
+                > .dropdown-menu {
+                    min-width: $input-append-btn-group-min-width;
+
+                    a {
+                        padding: $input-append-btn-group-a-inner-offset;
+                    }
+                }
+            }
         }
 
         .choice-filter {
@@ -116,24 +128,54 @@
             }
         }
 
+        .btn-group {
+            & + .btn-group {
+                margin-left: $filter-box-criteria-btn-group-offset-left;
+            }
+        }
+
+        .oro-action {
+            width: $filter-box-oro-action-width;
+            margin: $filter-box-oro-action-offset;
+
+            .btn-group {
+                float: $filter-box-oro-action-btn-group-float;
+            }
+
+            .btn {
+                outline: $filter-box-oro-action-btn-outline;
+                position: $filter-box-oro-action-btn-position;
+            }
+        }
+
         &:focus {
             outline: $filter-box-criteria-focus-outline;
         }
+    }
+
+    .selector {
+        width: $filter-box-selector-width;
     }
 
     .filter-update {
         margin-left: $filter-update-offset-left;
     }
 
-    .filter-select-oro-wrapper {
-        width: $filter-select-oro-wrapper-width;
-        margin-bottom: $filter-select-oro-wrapper-offset-bottom;
+    .filter-select-oro {
+        height: $filter-select-oro-height;
+        line-height: $filter-select-oro-line-height;
+        width: $filter-select-oro-width; /* need for flexible width at filter grid */
 
-        .selector {
+        &-wrapper {
             width: $filter-select-oro-wrapper-width;
+            margin-bottom: $filter-select-oro-wrapper-offset-bottom;
 
-            span {
-                width: $filter-select-oro-wrapper-span-width;
+            .selector {
+                width: $filter-select-oro-wrapper-width;
+
+                span {
+                    width: $filter-select-oro-wrapper-span-width;
+                }
             }
         }
     }
@@ -164,6 +206,7 @@
             [class^="fa-"],
             [class*=" fa-"] {
                 vertical-align: $filter-box-reset-icon-vertical-align;
+                margin-top: $filter-box-reset-icon-offset-top;
             }
 
             &:hover {
@@ -255,6 +298,77 @@
                 display: $choice-tree-filter-value-field-display;
             }
         }
+
+        .filter-criteria-selector,
+        .dropdown-toggle.btn {
+            font-weight: $filter-criteria-selector-font-weight;
+        }
+
+        .select-filter-widget .caret {
+            margin-top: $select-filter-widget-caret-offset-top;
+        }
+
+        &.open-filter {
+            &:before {
+                content: $open-filter-before-content;
+                background: $open-filter-before-background;
+                width: $open-filter-before-width;
+                height: $open-filter-before-height;
+                position: $open-filter-before-position;
+                left: $open-filter-before-left;
+                bottom: $open-filter-before-bottom;
+                transform: $open-filter-before-transform;
+                box-shadow: $open-filter-before-box-shadow;
+            }
+
+            &:after {
+                border-bottom: $open-filter-after-border-bottom;
+                border-left: $open-filter-after-border-left;
+                border-right: $open-filter-after-border-right;
+                content: $open-filter-after-content;
+                left: $open-filter-after-left;
+                position: $open-filter-after-position;
+                bottom: $open-filter-after-bottom;
+                z-index: $open-filter-after-z-index+ 3;
+            }
+        }
+
+        .divider {
+            background: $filter-item-divider-background;
+            line-height: $filter-item-divider-line-height;
+            font-size: $filter-item-divider-font-size;
+            padding: $filter-item-divider-inner-offset;
+            margin: $filter-item-divider-offset;
+            position: $filter-item-divider-position;
+            top: $filter-item-divider-top;
+        }
+
+        .btn {
+            vertical-align: $filter-item-btn-vertical-align;
+
+            .caret {
+                margin-top: $filter-item-btn-caret-offset-top;
+            }
+        }
+
+        & > .btn {
+            height: $filter-item-btn-height;
+            font-size: $filter-item-btn-font-size;
+            line-height: $filter-item-btn-line-height;
+            text-transform: $filter-item-btn-text-transform;
+            border: $filter-item-btn-border;
+        }
+    }
+
+    .filter-list {
+        float: $filter-item-filter-list-float;
+        margin: $filter-item-filter-list-offset;
+        position: $filter-item-filter-list-position;
+    }
+
+    .fa-close:before {
+        color: $filter-item-fa-close-color;
+        font-size: $filter-item-fa-close-font-size;
     }
 
     .filter-select {
@@ -262,6 +376,10 @@
 
         .disable-filter {
             margin-left: $filter-select-disable-offset-left;
+        }
+
+        &:not(.filter-default-value) {
+            background-color: $extra-300;
         }
     }
 }
@@ -346,10 +464,14 @@
             label {
                 white-space: $select-filter-widget-checkboxes-label-white-space;
                 margin: $select-filter-widget-checkboxes-label-offset;
+                padding: $select-filter-widget-checkboxes-label-inner-offset;
+
                 float: $select-filter-widget-checkboxes-label-float;
 
                 span {
                     white-space: $select-filter-widget-checkboxes-label-span-white-space;
+                    vertical-align: $select-filter-widget-checkboxes-label-span-vertical-align;
+                    line-height: $select-filter-widget-checkboxes-label-span-line-height;
                 }
             }
 
@@ -372,7 +494,7 @@
             }
 
             &.fixed-li {
-                label {
+                li > label {
                     float: $select-filter-widget-label-float;
 
                     &.ui-state-hover {
@@ -383,7 +505,10 @@
                     &.ui-state-active {
                         background-image: $select-filter-widget-label-state-active-background-image;
                         background-color: $select-filter-widget-label-state-active-background-color;
-                        color: $select-filter-widget-label-state-active-color;
+                    }
+
+                    span {
+                        vertical-align: $select-filter-widget-label-state-span-vertical-align;
                     }
                 }
             }
@@ -540,5 +665,53 @@
 
     i {
         cursor: $field-condition-date-popover-cursor;
+    }
+}
+
+.open-filter {
+    &.oro-drop {
+        .filter-criteria.dropdown-menu {
+            min-width: 170px;
+        }
+    }
+}
+
+.filter-date-range {
+    .datetime-visual-element {
+        width: $filter-date-range-datetime-visual-element-width;
+        margin-bottom: $filter-date-range-datetime-visual-element-offset-bottom;
+    }
+
+    .timepicker-input {
+        width: $filter-date-range-timepicker-input-width;
+        margin: $filter-date-range-timepicker-input-offset;
+    }
+
+    .filter-separator {
+        display: $filter-date-range-filter-separator-display;
+    }
+}
+
+.number-range-filter {
+    vertical-align: $number-range-filter-vertical-align;
+
+    .filter-start {
+        display: $number-range-filter-field-display;
+
+        input[type='text'] {
+            width: $number-range-filter-field-width;
+        }
+    }
+
+    .filter-end {
+        display: $number-range-filter-field-display;
+
+        input[type='text'] {
+            width: $number-range-filter-field-width;
+        }
+    }
+
+    .filter-separator {
+        position: $number-range-filter-filter-separator-position;
     }
 }

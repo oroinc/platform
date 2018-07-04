@@ -10,9 +10,12 @@
     padding: $input-inner-offset;
     box-shadow: $input-box-shadow;
     color: $input-color;
-    height: $field-size;
     margin-bottom: $input-outer-offset-bottom;
     box-sizing: $input-box-sizing;
+
+    &:not(textarea) {
+        height: $field-size;
+    }
 
     &:focus {
         box-shadow: $input-focus-box-shadow;
@@ -40,6 +43,10 @@
 
     .control-group & {
         margin-bottom: $input-control-group-outer-offset-bottom;
+    }
+
+    @include placeholder {
+        color: $primary-700;
     }
 }
 
@@ -218,6 +225,7 @@ input[type="color"],
     line-height: $checkbox-line-height;
     display: $checkbox-display;
     vertical-align: $checkbox-vertical-align;
+    position: relative;
 
     > .controls & {
         margin-top: $checkbox-controls-offset-top;
@@ -281,14 +289,21 @@ input[type="color"],
         }
     }
 
-    input[type="checkbox"],
-    input[type="radio"] {
-        display: $checkbox-input-display;
+    input[type="radio"],
+    input[type="checkbox"] {
+        position: $checkbox-input-position;
+        height: $checkbox-icon-height;
+        width: $checkbox-icon-height;
     }
 
     &__input {
         position: $checkbox-input-position;
         z-index: $checkbox-input-z-index;
+        top: $checkbox-input-top;
+        left: $checkbox-input-left;
+        width: $checkbox-icon-height;
+        height: $checkbox-icon-height;
+        opacity: $checkbox-input-opacity;
 
         &:hover, &:focus {
             & ~ .checkbox-view__icon {
@@ -367,22 +382,27 @@ input[type="color"],
         float: $add-on-float;
         border: $add-on-border;
         background-color: $add-on-background-color;
+        color: $primary;
         height: $add-on-height;
         width: $add-on-height;
         line-height: $add-on-line-height;
         padding: $add-on-inner-offset;
+
+
 
         input[type='checkbox'],
         input[type='radio'] {
             margin-top: $add-on-input-outer-offset-top;
         }
 
-        &:last-child {
-            border-radius: $add-on-last-child-border-radius;
+        &:first-child,
+        &:first-of-type {
+            border-radius: $add-on-first-child-border-radius;
         }
 
-        &:first-child {
-            border-radius: $add-on-first-child-border-radius;
+        &:last-child,
+        &:last-of-type {
+            border-radius: $add-on-last-child-border-radius;
         }
 
         &:disabled {

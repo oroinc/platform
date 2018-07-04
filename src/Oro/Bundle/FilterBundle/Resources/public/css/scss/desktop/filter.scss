@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+.filter-box {
+    & > .filter-container {
+        & > .select-filter-widget {
+            margin: $filter-box-filter-container-select-filter-widget-offset;
+        }
+    }
+}

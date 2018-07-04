@@ -164,7 +164,6 @@ label.disabled {
 
             .tooltip-icon {
                 margin-right: 5px;
-                color: $primary-700;
             }
 
             label {
@@ -1717,25 +1716,6 @@ label.radio.error {
     }
 }
 
-.collection-fields-list {
-    input[type='email'],
-    input[type='text'] {
-        float: left;
-        margin-bottom: 0;
-    }
-
-    select,
-    .selector,
-    button {
-        float: left;
-        margin: 0 0 0 4px;
-    }
-
-    button.add-on {
-        float: none;
-    }
-}
-
 .choice-filter .input-append,
 .choice-filter .input-prepend {
     margin-bottom: 0;
@@ -1852,25 +1832,10 @@ label.radio.error {
     box-shadow: none;
     height: 26px;
     width: 26px;
-
-    &:hover {
-        background: #eee;
-
-        .fa-star:before,
-        .fa-thumb-tack:before {
-            color: #d7d7d7;
-        }
-    }
 }
 
 .btn.favorite-button {
     padding: 1px 0;
-}
-
-.btn.favorite-button .fa-star:before,
-.btn.minimize-button .fa-thumb-tack:before {
-    color: #e7e7e7;
-    font-size: 19px;
 }
 
 .btn.favorite-button.gold-icon i:before,
@@ -2126,7 +2091,7 @@ span.validation-failed {
 }
 
 .tooltip-icon {
-    color: #6b92d0;
+    color: $primary-700;
     font-size: 13px;
     cursor: pointer;
 }

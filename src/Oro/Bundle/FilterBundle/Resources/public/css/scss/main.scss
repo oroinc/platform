@@ -3,7 +3,10 @@
 @import "variables/main";
 
 @import "filter-button";
-@import "oro-filter";
+@import "filter";
+
+// desktop resolution
+@import "desktop/main";
 
 // mobile resolution
 @import "mobile/main";
