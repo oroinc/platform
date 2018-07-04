@@ -3,10 +3,11 @@
 & {
   min-height: 100%;
 }
+
 .app-page {
-  &__central-panel {
-    padding-top: $app-header-height;
-  }
+    &__central-panel {
+        padding-top: $app-header-height;
+    }
 }
 
 .mobile-hide {
@@ -127,6 +128,7 @@
         }
     }
 }
+
 .responsive-cell {
     margin-bottom: 15px;
 

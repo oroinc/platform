@@ -1,20 +1,14 @@
 /* @theme: admin.oro; */
 
-$main-menu-mobile-width: 320px;
-
 .main-menu-top {
     display: none;
     position: fixed;
     z-index: $oro-mobile-header-zindex;
-
     width: 100%;
     top: $app-header-height;
     bottom: 0;
-
     font-size: $menu-font-size + 2;
-
     background: rgba($primary-inverse, .5);
-
     overflow: hidden;
 
     @include fa-icon($fa-var-times, after);
@@ -23,13 +17,10 @@ $main-menu-mobile-width: 320px;
         position: absolute;
         top: 5px;
         left: $main-menu-mobile-width - 36px;
-
         width: 32px;
         height: 32px;
-
         text-align: center;
         line-height: 32px;
-
         border-radius: 50%;
         background-color: rgba($menu-background-color, .15);
         color: $menu-full-screen-button-color;
@@ -37,29 +28,24 @@ $main-menu-mobile-width: 320px;
 
     .divider {
         height: 1px;
-
         border: 1px solid $menu-item-divider-color;
         border-width: 1px 0 0;
     }
 
     .main-menu {
         height: 100%;
-
         margin-bottom: 0;
-
         margin-left: 0;
+
         /* iOS 11 */
         margin-left: constant(safe-area-inset-left);
+
         /* iOS 11.2+ */
         margin-left: env(safe-area-inset-left);
-
         padding-top: 8px;
-
         width: $main-menu-mobile-width;
         background-color: $menu-background-color;
-
-        box-shadow:0 2px 10px 0 rgba(0, 0, 0, 0.19);
-
+        box-shadow: 0 2px 10px 0 rgba(0, 0, 0, .19);
         overflow: auto;
     }
 
@@ -75,7 +61,6 @@ $main-menu-mobile-width: 320px;
 
     .accordion-group {
         margin-bottom: 0;
-
         border: none;
         border-radius: 0;
 
@@ -86,20 +71,16 @@ $main-menu-mobile-width: 320px;
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &::before {
+                &:before {
                     content: '';
-
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
                     margin-right: 8px;
-
                     font-weight: normal;
                     line-height: 1;
                     text-align: center;
-
                     color: $menu-accordion-icon-color;
-
                     transition: $menu-animation;
                 }
             }
@@ -109,14 +90,14 @@ $main-menu-mobile-width: 320px;
 
                 @include fa-icon($fa-var-angle-right);
 
-                &::before {
+                &:before {
                     transform: rotate(90deg);
                 }
 
                 &.collapsed {
                     font-weight: normal;
 
-                    &::before {
+                    &:before {
                         transform: rotate(0);
                     }
                 }
@@ -130,15 +111,10 @@ $main-menu-mobile-width: 320px;
                     background-color: $menu-background-color-active;
                 }
 
-                $menu-mobile-title-offset: 0;
                 @for $i from 1 through 5 {
-                    $selector: '&-level-' + $i;
-
-                    #{$selector} {
-                        padding-left: $menu-mobile-title-offset * 1px;
+                    &-level-#{$i} {
+                        padding-left: $main-menu-title-mobile-offset * ($i - 1);
                     }
-
-                    $menu-mobile-title-offset: $menu-mobile-title-offset + 22;
                 }
             }
         }
@@ -163,9 +139,7 @@ $main-menu-mobile-width: 320px;
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-
         padding: 14px 22px 14px 24px;
-
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
@@ -173,7 +147,6 @@ $main-menu-mobile-width: 320px;
             min-width: 16px;
             margin-right: 8px;
             margin-left: 0;
-
             text-align: center;
         }
 

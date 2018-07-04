@@ -2,7 +2,7 @@
 
 /* Login + Forgot Password */
 .login-page {
-    background: url("../../img/background.jpg") no-repeat 50% 50% #fff;
+    background: url(../../img/background.jpg) no-repeat 50% 50% #fff;
     background-size: cover;
     height: 100%;
     min-height: 280px;
@@ -91,38 +91,44 @@
 
         .divider-vertical {
             float: left;
-            background: url("../../img/vertical-divider.png") no-repeat;
+            background: url(../../img/vertical-divider.png) no-repeat;
             width: 2px;
             height: 28px;
             margin: 0 10px 0;
         }
+
         .oro-title {
             float: left;
             font-size: 22px;
             line-height: 28px;
             margin: 0;
-            text-shadow: 1px 1px 1px #000000;
+            text-shadow: 1px 1px 1px #000;
+
             a {
                 color: #fff;
             }
         }
+
         .title {
             font: bold 18px/1 $base-font-family;
             color: #565656;
             margin: 0;
         }
     }
-    // Ends .title-box
+
     .input-field-group {
         margin-bottom: 5px;
     }
+
     .input-prepend {
         width: 100%;
         display: block;
     }
+
     .oro-hint {
         margin: 0 0 14px;
     }
+
     .add-on {
         background: none;
         width: 93px;
@@ -133,6 +139,7 @@
         padding: 0 25px 0 0;
         border: none;
     }
+
     input[type="text"],
     input[type="email"],
     input[type="password"],
@@ -143,10 +150,12 @@
         padding: 7px 10px;
         width: 300px;
         border-radius: 2px;
+
         &:-ms-input-placeholder {
-            color: #999
+            color: #999;
         }
     }
+
     .organization-selector-arrow {
         position: relative;
         top: 8px;
@@ -154,6 +163,7 @@
         margin-right: -9px;
         z-index: 5;
     }
+
     .add-on {
         & + input[type="text"],
         & + input[type="password"],
@@ -162,6 +172,7 @@
             border: 2px solid #d6d6d6;
             border-radius: 2px;
         }
+
         & + select {
             display: inline-block;
             height: 34px;
@@ -169,11 +180,13 @@
             padding: 0;
         }
     }
+
     .forgot-pass {
         float: left;
         font-weight: bold;
         margin: 9px 10px 0 0;
     }
+
     .oro-forgot-password {
         min-width: 270px;
 
@@ -181,22 +194,27 @@
             width: calc(100% - 24px);
         }
     }
+
     .oro-remember-me {
         margin-bottom: 15px;
         padding-left: 93px;
     }
+
     .extra-btn-large {
         height: 32px;
         line-height: 32px;
         min-width: 95px;
         float: left;
     }
+
     .extra-submit {
         float: right;
     }
+
     fieldset {
         margin: 0 0 25px;
     }
+
     span.validation-failed {
         margin: 0 0 14px 14px;
     }
@@ -206,6 +224,7 @@
     .form-buttons {
         margin-top: 10px;
     }
+
     .add-on {
         width: 155px;
 

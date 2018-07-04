@@ -1,7 +1,5 @@
 /* @theme admin.oro; */
 
-@import '../variables/oro/loading-mask-variables';
-
 @-webkit-keyframes spin-loading {
     100% {
         -webkit-transform: rotate(360deg);
@@ -52,7 +50,7 @@
 .loading {
     position: relative;
 
-    min-height :$loading-mask-icon-size + 6px;
+    min-height: $loading-mask-icon-size + 6px;
 
     body& {
         height: 100vh;

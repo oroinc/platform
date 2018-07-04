@@ -1,21 +1,9 @@
 /* @theme: admin.oro; */
 
 @import "../colors";
-@import "variables/app-header";
-@import "variables/form-description";
+@import "variables/variables";
 @import "variables/accordion-variables";
-
-$accordion-heading-background-color:        $primary-900;
-$content-padding:                           10px;
-$horizontal-padding:                        $content-padding;
-$vertical-padding:                          $content-padding;
-$top-padding:                               $content-padding;
-$bottom-padding:                            $content-padding;
-$margin-bottom-box:                         $content-padding;
-$base-font-size:                            14px;
-
-$base-font-size--l:                         $base-font-size * 1.25; // ~18px
-$base-font-size--s:                         $base-font-size * 0.85; // ~12px
-$base-font-size--m:                         $base-font-size * 0.75; // ~11px
-
-$headerHeight:                             54px;
+@import "variables/app-header";
+@import "variables/dialog-variables";
+@import "variables/form-description";
+@import "variables/main-menu-variables";

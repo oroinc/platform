@@ -17,10 +17,10 @@
     .btn.disabled:active,
     .btn[disabled]:active,
     .ui-datepicker .ui-datepicker-buttonpane button {
-      font-size: 14px;
-      line-height: 38px;
-      height: 40px;
-      border-radius: 20px;
+        font-size: 14px;
+        line-height: 38px;
+        height: 40px;
+        border-radius: 20px;
     }
 }
 
@@ -54,6 +54,7 @@
 
     &__info {
         margin: 16px 0;
+
         .alert {
             padding: 8px;
         }
@@ -79,6 +80,7 @@
             line-height: 1.5;
         }
     }
+
     .add-on {
         height: auto;
         line-height: normal;
@@ -89,21 +91,26 @@
         & + input[type="password"] {
             width: calc(100% - 24px);
         }
+
         & + select {
             width: 174px;
             height: 36px;
             box-sizing: border-box;
         }
     }
+
     .oro-remember-me {
         padding-left: 0;
     }
+
     span.validation-failed {
         font-size: 13px;
     }
+
     .input-field-group {
         margin-bottom: 15px;
     }
+
     .input-append,
     .input-prepend {
         white-space: normal;
@@ -112,6 +119,7 @@
 
 .form-reset {
     max-width: 320px !important;
+
     .add-on {
         width: 120px;
         font-size: 12px;
