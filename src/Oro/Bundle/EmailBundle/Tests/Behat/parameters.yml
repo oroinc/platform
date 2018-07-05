@@ -1,0 +1,8 @@
+services:
+    oro_email.direct_mailer:
+        class: Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerMock
+        arguments:
+            - '@mailer'
+            - '@service_container'
+        calls:
+            - [setLogger, ['@oro_email.logger.link']]
