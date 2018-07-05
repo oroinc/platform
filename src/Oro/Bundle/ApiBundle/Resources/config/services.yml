@@ -5,6 +5,10 @@ parameters:
     # they are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
     oro_api.api_doc.views: []
 
+    # The name of default API view
+    # it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.api_doc.default_view: ~
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -609,7 +613,7 @@ services:
         arguments:
             - '@router'
             - '%oro_api.api_doc.views%'
-            - ~ # default view; it is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\RestDocUrlGeneratorCompilerPass
+            - '%oro_api.api_doc.default_view%'
 
     oro_api.api_doc.security_context:
         class: Oro\Bundle\ApiBundle\ApiDoc\SecurityContext
@@ -688,6 +692,7 @@ services:
         class: Oro\Bundle\ApiBundle\EventListener\ValidateApiDocViewListener
         arguments:
             - '%oro_api.api_doc.views%'
+            - '%oro_api.api_doc.default_view%'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 

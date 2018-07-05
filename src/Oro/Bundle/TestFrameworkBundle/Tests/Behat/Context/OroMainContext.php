@@ -165,7 +165,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -204,7 +204,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -1963,5 +1963,29 @@ JS;
             self::fail('No new browser tabs detected after the current one');
         }
         $this->getSession()->switchToWindow($lastTab);
+    }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be checked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeChecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isChecked());
+    }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be unchecked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeUnchecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertFalse($element->isChecked());
     }
 }

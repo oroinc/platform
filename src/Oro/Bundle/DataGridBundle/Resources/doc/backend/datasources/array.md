@@ -1,13 +1,11 @@
 Array datasource
 ===============
 
-Overview
---------
+## Overview
 
 This datasource provides ability to set data for datagrid from array.
 
-Example
--------
+### Example
 
 ``` yaml
 datagrids:
@@ -16,12 +14,31 @@ datagrids:
             type: array
 ```
 
-Configuration
--------------
+## Configuration
 
-To configure datasource you need to create datagrid event listener and subscribe on `oro_datagrid.datagrid.build.before.DATAGRID_NAME_HERE` event.
+To configure datasource you need to create datagrid event listener and subscribe on `oro_datagrid.datagrid.build.after.DATAGRID_NAME_HERE` event.
 
+```yaml
+acme_bundle.event_listener.datagrid.my_custom_listener:
+    class: Acme\Bundle\AcmeBundle\EventListener\Datagrid\MyCustomListener
+    tags:
+        - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.DATAGRID_NAME_HERE, method: onBuildAfter }
 ```
+
+```php
+<?php
+
+namespace Acme\Bundle\AcmeBundle\EventListener\Datagrid;
+
+use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
+
+class MyCustomListener
+{
+    /**
+    * @param BuildAfter $event
+    */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
@@ -31,7 +48,7 @@ To configure datasource you need to create datagrid event listener and subscribe
             throw new UnexpectedTypeException($datasource, ArrayDatasource::class);
         }
 
-        // Crate datagrid source array
+        // Create datagrid source array
         $source = [
             // row 1
             [
@@ -48,10 +65,11 @@ To configure datasource you need to create datagrid event listener and subscribe
 
         $datasource->setArraySource($source);
     }
+}
 ```
+Predefined columns can be defined using the following configuration:
 
-In the same time you can configure your grid with predefined columns:
-```
+```yaml
 datagrids:
     DATAGRID_NAME_HERE:
         source:
