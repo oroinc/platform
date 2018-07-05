@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents an entity restriction used in workflows.
+ *
  * @ORM\Table(
  *      name="oro_workflow_restriction",
  *      uniqueConstraints={

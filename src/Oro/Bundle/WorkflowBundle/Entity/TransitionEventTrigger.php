@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents a transition that is triggered by an event,
+ * e.g. when an entity is created or a field value is changed.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository")
  */
 class TransitionEventTrigger extends BaseTransitionTrigger implements EventTriggerInterface

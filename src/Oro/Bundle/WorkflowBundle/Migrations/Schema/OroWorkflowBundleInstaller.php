@@ -14,6 +14,8 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
+ * Created all tables required for WorkflowBundle.
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareInterface
