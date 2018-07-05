@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *                      charset: utf8mb4
  *                      collate: utf8mb4_unicode_ci
  * </code>
- * this assitional configuration will be added just before the unnamed DBAL configuration
+ * this additional configuration will be added just before the unnamed DBAL configuration
  * to be able to override any of the added options for a specific DBAL connection.
  */
 class DbalConfigurationLoader
