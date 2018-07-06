@@ -127,19 +127,19 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
                 continue;
             }
 
-            $initialErrorCount = count($this->errors);
+            $errors = $this->errors;
             $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
-            if (count($this->errors) === $initialErrorCount) {
+            if (count($errors) === count($this->errors)) {
                 $processedKeys[] = $expectedKey;
             } else {
-                $this->tryMatchIndexedElement(
-                    $expectedKey,
-                    $expectedValue,
-                    $actual,
-                    $path,
-                    $initialErrorCount,
-                    $processedKeys
-                );
+                $elementErrors = array_slice($this->errors, count($errors));
+                $this->errors = $errors;
+                $key = $this->tryMatchIndexedElement($expectedKey, $expectedValue, $actual, $path, $processedKeys);
+                if (null === $key) {
+                    $this->errors = array_merge($errors, $elementErrors);
+                } else {
+                    $processedKeys[] = $key;
+                }
             }
         }
     }
@@ -149,44 +149,35 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      * @param mixed $expectedValue
      * @param array $actual
      * @param array $path
-     * @param int   $initialErrorCount
      * @param int[] $processedKeys
+     *
+     * @return int|null
      */
     private function tryMatchIndexedElement(
         $expectedKey,
         $expectedValue,
         array $actual,
         array $path,
-        $initialErrorCount,
-        array &$processedKeys
+        array $processedKeys
     ) {
-        $isElementFound = false;
+        $foundKey = null;
         $elementPath = $path;
-        $elementErrorCount = count($this->errors);
-        $elementErrors = array_slice($this->errors, $initialErrorCount, $elementErrorCount - $initialErrorCount);
-        $this->errors = array_slice($this->errors, 0, $initialErrorCount);
         $lastPathIndex = count($path);
         foreach ($actual as $key => $value) {
             if ($key === $expectedKey || in_array($key, $processedKeys, true)) {
                 continue;
             }
+            $errors = $this->errors;
             $elementPath[$lastPathIndex] = $key;
             $this->matchArrayElement($expectedValue, $value, $elementPath);
-            $errorCount = count($this->errors);
-            if ($errorCount === $initialErrorCount) {
-                $processedKeys[] = $key;
-                $isElementFound = true;
+            if (count($errors) === count($this->errors)) {
+                $foundKey = $key;
                 break;
             }
-            if ($errorCount < $elementErrorCount) {
-                $elementErrorCount = $errorCount;
-                $elementErrors = array_slice($this->errors, $initialErrorCount, $errorCount - $initialErrorCount);
-            }
-            $this->errors = array_slice($this->errors, 0, -$initialErrorCount);
+            $this->errors = $errors;
         }
-        if (!$isElementFound) {
-            $this->errors = array_merge($this->errors, $elementErrors);
-        }
+
+        return $foundKey;
     }
 
     /**

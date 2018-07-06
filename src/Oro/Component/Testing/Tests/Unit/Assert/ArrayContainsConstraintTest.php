@@ -275,7 +275,7 @@ TEXT;
         $constraint->evaluate($actual);
     }
 
-    public function testArrayContainsWhenMultiDimensionalArraysAreDifferent()
+    public function testStrictArrayContainsWhenMultiDimensionalArraysAreDifferent()
     {
         $expected = [
             'key1' => 'value1',
@@ -467,6 +467,35 @@ Failed asserting that the array contains other array.
 Errors:
 Path: "0.key2.key22.key222". Error: Failed asserting that 'value222_a' is identical to 'value222'.
 Path: "0.key2.key22.key223". Error: Failed asserting that 'value223_a' is identical to 'value223'.
+TEXT;
+
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
+    public function testNotStrictArrayContainsWhenNestedAttributeOfFirstItemIsNotEqualAndOrderOfNextItemsAreDifferent()
+    {
+        $expected = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11', 'attr2' => 'val12']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']]
+            ]
+        ];
+        $expectedMessage = <<<TEXT
+Failed asserting that the array contains other array.
+Errors:
+Path: "data.0.attributes.attr2". Error: Failed asserting that an array has the key 'attr2'.
 TEXT;
 
         $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
