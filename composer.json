@@ -112,7 +112,8 @@
         "jms/cg": "1.2.*",
         "oro/redis-config": "2.x-dev",
         "brick/math": "0.5.*",
-        "bower-asset/fuse": "3.2.*"
+        "bower-asset/fuse": "3.2.*",
+        "twbs/bootstrap": "4.1.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "3.1.*",
