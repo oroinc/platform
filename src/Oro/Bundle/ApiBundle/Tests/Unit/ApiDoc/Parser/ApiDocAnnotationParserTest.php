@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocAnnotationParser;
 class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ApiDocAnnotationParser */
-    protected $parser;
+    private $parser;
 
     protected function setUp()
     {

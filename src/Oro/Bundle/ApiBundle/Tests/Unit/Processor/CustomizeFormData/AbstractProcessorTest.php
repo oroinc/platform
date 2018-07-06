@@ -19,9 +19,9 @@ class AbstractProcessorTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['processPreSubmit', 'processSubmit', 'processPostSubmit', 'processFinishSubmit'])
             ->getMockForAbstractClass();
 
-        $processor->expects($this->once())
+        $processor->expects(self::once())
             ->method($expectedMethodName)
-            ->with($this->identicalTo($context));
+            ->with(self::identicalTo($context));
 
         $processor->process($context);
     }
@@ -32,7 +32,7 @@ class AbstractProcessorTest extends \PHPUnit\Framework\TestCase
             ['pre_submit', 'processPreSubmit'],
             ['submit', 'processSubmit'],
             ['post_submit', 'processPostSubmit'],
-            ['finish_submit', 'processFinishSubmit'],
+            ['finish_submit', 'processFinishSubmit']
         ];
     }
 
@@ -45,13 +45,13 @@ class AbstractProcessorTest extends \PHPUnit\Framework\TestCase
             ->setMethods(['processPreSubmit', 'processSubmit', 'processPostSubmit', 'processFinishSubmit'])
             ->getMockForAbstractClass();
 
-        $processor->expects($this->never())
+        $processor->expects(self::never())
             ->method('processPreSubmit');
-        $processor->expects($this->never())
+        $processor->expects(self::never())
             ->method('processSubmit');
-        $processor->expects($this->never())
+        $processor->expects(self::never())
             ->method('processPostSubmit');
-        $processor->expects($this->never())
+        $processor->expects(self::never())
             ->method('processFinishSubmit');
 
         $processor->process($context);

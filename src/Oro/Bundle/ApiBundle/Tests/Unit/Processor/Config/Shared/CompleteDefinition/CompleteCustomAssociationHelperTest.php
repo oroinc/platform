@@ -12,17 +12,17 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $associationManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
+    private $associationManager;
 
     /** @var CompleteCustomAssociationHelper */
-    protected $completeCustomAssociationHelper;
+    private $completeCustomAssociationHelper;
 
     protected function setUp()
     {
@@ -45,18 +45,18 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -93,9 +93,9 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -108,18 +108,18 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToMany:kind'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToMany', 'kind')
             ->willReturn(['Test\TargetClass1' => 'field1']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -156,9 +156,9 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -171,18 +171,18 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:multipleManyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'multipleManyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -219,9 +219,9 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -234,19 +234,19 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type'    => 'association:manyToOne',
-                    'target_class' => 'Test\TargetClass',
-                ],
+                    'target_class' => 'Test\TargetClass'
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1']);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\TargetClass', $version, $requestType)
             ->willReturn(
@@ -285,7 +285,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -302,8 +302,8 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type'   => 'association:manyToOne',
-                    'target_type' => 'to-many',
-                ],
+                    'target_type' => 'to-many'
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
@@ -327,8 +327,8 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type'  => 'association:manyToOne',
-                    'depends_on' => ['field1'],
-                ],
+                    'depends_on' => ['field1']
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
@@ -348,45 +348,45 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1', 'Test\TargetClass2' => 'field2']);
 
         $target1EntityMetadata = $this->getClassMetadataMock('Test\TargetClass1');
-        $target1EntityMetadata->expects($this->any())
+        $target1EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $target1EntityMetadata->expects($this->once())
+        $target1EntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
 
         $target2EntityMetadata = $this->getClassMetadataMock('Test\TargetClass2');
-        $target2EntityMetadata->expects($this->any())
+        $target2EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $target2EntityMetadata->expects($this->once())
+        $target2EntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
 
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata],
+                    ['Test\TargetClass2', true, $target2EntityMetadata]
                 ]
             );
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -425,7 +425,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                                 'data_type' => 'integer'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -438,45 +438,45 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1', 'Test\TargetClass2' => 'field2']);
 
         $target1EntityMetadata = $this->getClassMetadataMock('Test\TargetClass1');
-        $target1EntityMetadata->expects($this->any())
+        $target1EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $target1EntityMetadata->expects($this->once())
+        $target1EntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
 
         $target2EntityMetadata = $this->getClassMetadataMock('Test\TargetClass2');
-        $target2EntityMetadata->expects($this->any())
+        $target2EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $target2EntityMetadata->expects($this->once())
+        $target2EntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('string');
 
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata],
+                    ['Test\TargetClass2', true, $target2EntityMetadata]
                 ]
             );
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -515,7 +515,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                                 'data_type' => 'string'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -528,43 +528,43 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn(['Test\TargetClass1' => 'field1', 'Test\TargetClass2' => 'field2']);
 
         $target1EntityMetadata = $this->getClassMetadataMock('Test\TargetClass1');
-        $target1EntityMetadata->expects($this->any())
+        $target1EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $target1EntityMetadata->expects($this->once())
+        $target1EntityMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with('id')
             ->willReturn('integer');
 
         $target2EntityMetadata = $this->getClassMetadataMock('Test\TargetClass2');
-        $target2EntityMetadata->expects($this->any())
+        $target2EntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id1', 'id2']);
-        $target2EntityMetadata->expects($this->never())
+        $target2EntityMetadata->expects(self::never())
             ->method('getTypeOfField');
 
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata],
+                    ['Test\TargetClass2', true, $target2EntityMetadata]
                 ]
             );
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -603,7 +603,7 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                                 'data_type' => 'string'
                             ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -616,18 +616,18 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
             'fields' => [
                 'association1' => [
                     'data_type' => 'association:manyToOne'
-                ],
+                ]
             ]
         ]);
         $version = self::TEST_VERSION;
         $requestType = new RequestType([self::TEST_REQUEST_TYPE]);
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
             ->willReturn([]);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with(EntityIdentifier::class, $version, $requestType)
             ->willReturn(
@@ -666,9 +666,9 @@ class CompleteCustomAssociationHelperTest extends CompleteDefinitionHelperTestCa
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config

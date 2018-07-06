@@ -11,10 +11,10 @@ use Symfony\Component\Routing\Route;
 class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var RestChainRouteOptionsResolver */
-    protected $chainRouteOptionsResolver;
+    private $chainRouteOptionsResolver;
 
     protected function setUp()
     {

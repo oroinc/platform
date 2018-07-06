@@ -13,10 +13,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class SaveEntityTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var SaveEntity */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

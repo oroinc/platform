@@ -13,10 +13,10 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var EntityLoader */
-    protected $entityLoader;
+    private $entityLoader;
 
     protected function setUp()
     {

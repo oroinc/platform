@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 class MetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MetadataHelper */
-    protected $metadataHelper;
+    private $metadataHelper;
 
     protected function setUp()
     {
@@ -88,7 +88,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
                 null,
                 ['property_path' => 'test'],
                 ApiActions::GET
-            ],
+            ]
         ];
     }
 

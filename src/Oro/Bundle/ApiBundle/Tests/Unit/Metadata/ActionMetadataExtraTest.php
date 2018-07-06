@@ -10,13 +10,13 @@ class ActionMetadataExtraTest extends \PHPUnit\Framework\TestCase
     public function testGetName()
     {
         $extra = new ActionMetadataExtra('test_action');
-        $this->assertEquals(ActionMetadataExtra::NAME, $extra->getName());
+        self::assertEquals(ActionMetadataExtra::NAME, $extra->getName());
     }
 
     public function testCacheKeyPart()
     {
         $extra = new ActionMetadataExtra('test_action');
-        $this->assertEquals(
+        self::assertEquals(
             'action:test_action',
             $extra->getCacheKeyPart()
         );
@@ -27,6 +27,6 @@ class ActionMetadataExtraTest extends \PHPUnit\Framework\TestCase
         $extra = new ActionMetadataExtra('test_action');
         $context = new MetadataContext();
         $extra->configureContext($context);
-        $this->assertEquals('test_action', $context->getTargetAction());
+        self::assertEquals('test_action', $context->getTargetAction());
     }
 }

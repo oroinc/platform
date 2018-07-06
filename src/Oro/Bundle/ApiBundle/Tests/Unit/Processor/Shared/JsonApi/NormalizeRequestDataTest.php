@@ -26,7 +26,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     /** @var NormalizeRequestData */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

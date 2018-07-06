@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -88,7 +87,6 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             });
 
         $result = $this->configProvider->getConfig($className, $version, $requestType, [$extra, $sectionExtra]);
-        self::assertInstanceOf(Config::class, $result);
         self::assertEquals('Test\Class|test_extra_key', $result->getDefinition()->getKey());
         self::assertTrue($definition->hasField('test_field'));
         self::assertEquals(['test_section_key' => 'value'], $result->get('test_section_extra'));

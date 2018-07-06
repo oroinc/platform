@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class SetDeleteLimitTest extends DeleteListProcessorTestCase
 {
     /** @var SetDeleteLimit */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -24,53 +25,47 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
 
         $context = clone $this->context;
         $this->processor->process($this->context);
-        $this->assertEquals($context, $this->context);
+        self::assertEquals($context, $this->context);
     }
 
     public function testProcessWhenCriteriaObjectDoesNotExist()
     {
         $context = clone $this->context;
         $this->processor->process($this->context);
-        $this->assertEquals($context, $this->context);
+        self::assertEquals($context, $this->context);
     }
 
     public function testProcessWhenLimitIsAlreadySet()
     {
         $maxResults = 2;
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(EntityClassResolver::class);
         $criteria = new Criteria($resolver);
         $criteria->setMaxResults($maxResults);
 
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
-        $this->assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertEquals($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitIsRemoved()
     {
         $maxResults = -1;
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(EntityClassResolver::class);
         $criteria = new Criteria($resolver);
         $criteria->setMaxResults($maxResults);
 
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
-        $this->assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertEquals($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenNoLimitInConfig()
     {
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(EntityClassResolver::class);
         $criteria = new Criteria($resolver);
 
         $config = new EntityDefinitionConfig();
@@ -79,16 +74,14 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals(100, $criteria->getMaxResults());
+        self::assertEquals(100, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitExistsInConfig()
     {
         $maxResults = 2;
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(EntityClassResolver::class);
         $criteria = new Criteria($resolver);
 
         $config = new EntityDefinitionConfig();
@@ -98,16 +91,14 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertEquals($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitIsRemovedByConfig()
     {
         $maxResults = -1;
 
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(EntityClassResolver::class);
         $criteria = new Criteria($resolver);
 
         $config = new EntityDefinitionConfig();
@@ -117,6 +108,6 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertEquals($maxResults, $criteria->getMaxResults());
     }
 }

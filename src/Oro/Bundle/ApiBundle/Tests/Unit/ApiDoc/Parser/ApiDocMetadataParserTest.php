@@ -15,13 +15,13 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ApiDocDataTypeConverter */
-    protected $dataTypeConverter;
+    private $dataTypeConverter;
 
     /** @var ApiDocMetadataParser */
-    protected $parser;
+    private $parser;
 
     protected function setUp()
     {

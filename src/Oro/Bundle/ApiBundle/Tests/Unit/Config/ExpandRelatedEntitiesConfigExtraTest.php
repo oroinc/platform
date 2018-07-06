@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpandRelatedEntitiesConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -17,12 +17,12 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(ExpandRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(ExpandRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testGetExpandedEntities()
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['products', 'categories'],
             $this->extra->getExpandedEntities()
         );
@@ -32,7 +32,7 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
-        $this->assertEquals(
+        self::assertEquals(
             ['products', 'categories'],
             $context->get(ExpandRelatedEntitiesConfigExtra::NAME)
         );
@@ -40,12 +40,12 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isPropagable());
+        self::assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(
+        self::assertEquals(
             'expand:products,categories',
             $this->extra->getCacheKeyPart()
         );

@@ -1,16 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\RemoveTotalCountHeader;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class RemoveTotalCountHeaderTest extends DeleteListProcessorTestCase
+class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
 {
-    const RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
+    private const RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
 
     /** @var RemoveTotalCountHeader */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -26,7 +27,7 @@ class RemoveTotalCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $testCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
         );
@@ -40,7 +41,7 @@ class RemoveTotalCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
         );
     }
@@ -51,7 +52,7 @@ class RemoveTotalCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
         );
     }

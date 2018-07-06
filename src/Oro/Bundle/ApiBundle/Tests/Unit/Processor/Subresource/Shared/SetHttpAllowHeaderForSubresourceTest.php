@@ -21,7 +21,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
     /** @var SetHttpAllowHeaderForSubresource */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

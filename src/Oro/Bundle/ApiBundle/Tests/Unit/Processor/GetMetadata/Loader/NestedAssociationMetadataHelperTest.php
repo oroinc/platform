@@ -13,23 +13,19 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */
+    private $metadataHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $objectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    private $objectMetadataFactory;
 
     /** @var NestedAssociationMetadataHelper */
-    protected $nestedAssociationMetadataHelper;
+    private $nestedAssociationMetadataHelper;
 
     protected function setUp()
     {
-        $this->metadataHelper = $this->getMockBuilder(MetadataHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataHelper = $this->createMock(MetadataHelper::class);
+        $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
 
         $this->nestedAssociationMetadataHelper = new NestedAssociationMetadataHelper(
             $this->metadataHelper,

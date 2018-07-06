@@ -17,13 +17,13 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $processorBag;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
+    private $processorBag;
 
     /** @var LoadNormalizedIncludedEntities */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -90,7 +90,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
             ->method('process')
             ->with(self::identicalTo($getContext))
             ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult, $getMetadata) {
+                function (GetContext $context) use ($expectedGetContext, $getResult) {
                     self::assertEquals($expectedGetContext, $context);
 
                     $context->setResult($getResult);
@@ -163,7 +163,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
             ->method('process')
             ->with(self::identicalTo($getContext))
             ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult, $getMetadata) {
+                function (GetContext $context) use ($expectedGetContext, $getResult) {
                     self::assertEquals($expectedGetContext, $context);
 
                     $context->setResult($getResult);

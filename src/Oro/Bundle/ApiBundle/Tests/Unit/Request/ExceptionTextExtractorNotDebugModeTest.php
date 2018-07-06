@@ -15,13 +15,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExceptionTextExtractor */
-    protected $exceptionTextExtractor;
+    private $exceptionTextExtractor;
 
     protected function setUp()
     {
         $this->exceptionTextExtractor = new ExceptionTextExtractor(
             false,
-            ['\UnexpectedValueException']
+            [\UnexpectedValueException::class]
         );
     }
 
@@ -31,7 +31,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
      *
      * @return ExecutionFailedException
      */
-    protected function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
+    private function createExecutionFailedException(\Exception $innerException = null, $processorId = 'processor1')
     {
         return new ExecutionFailedException(
             $processorId,
@@ -46,7 +46,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedStatusCode,
             $this->exceptionTextExtractor->getExceptionStatusCode($exception)
         );
@@ -64,13 +64,13 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [new ActionNotAllowedException(), 405],
             [new ForbiddenException('Reason.'), 403],
             [new ResourceNotAccessibleException(), 404],
-            [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400],
+            [new NotSupportedConfigOperationException('Test\Class', 'test_operation'), 400]
         ];
     }
 
     public function testGetExceptionCode()
     {
-        $this->assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
+        self::assertNull($this->exceptionTextExtractor->getExceptionCode(new \Exception()));
     }
 
     /**
@@ -78,7 +78,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
      */
     public function testExceptionType(\Exception $exception, $expectedType)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedType,
             $this->exceptionTextExtractor->getExceptionType($exception)
         );
@@ -100,7 +100,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
                 'not supported config operation exception'
-            ],
+            ]
         ];
     }
 
@@ -109,7 +109,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
      */
     public function testExceptionText(\Exception $exception, $expectedText)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expectedText,
             $this->exceptionTextExtractor->getExceptionText($exception)
         );
@@ -190,7 +190,7 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
             [
                 new NotSupportedConfigOperationException('Test\Class', 'test_operation'),
                 'Requested unsupported operation "test_operation" when building config for "Test\Class".'
-            ],
+            ]
         ];
     }
 }

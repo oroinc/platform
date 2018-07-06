@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayAccessor */
-    protected $arrayAccessor;
+    private $arrayAccessor;
 
     protected function setUp()
     {
@@ -16,18 +16,18 @@ class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClassName()
     {
-        $this->assertEquals(
+        self::assertEquals(
             'Test\Class',
             $this->arrayAccessor->getClassName(['__class__' => 'Test\Class'])
         );
-        $this->assertNull(
+        self::assertNull(
             $this->arrayAccessor->getClassName([])
         );
     }
 
     public function testGetValue()
     {
-        $this->assertEquals(
+        self::assertEquals(
             'val',
             $this->arrayAccessor->getValue(['name' => 'val'], 'name')
         );
@@ -53,35 +53,35 @@ class ArrayAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testHasProperty()
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->arrayAccessor->hasProperty(['name' => 'val'], 'name')
         );
     }
 
     public function testHasPropertyForPropertyWithNullValue()
     {
-        $this->assertTrue(
+        self::assertTrue(
             $this->arrayAccessor->hasProperty(['name' => null], 'name')
         );
     }
 
     public function testHasPropertyForMetadataProperty()
     {
-        $this->assertFalse(
+        self::assertFalse(
             $this->arrayAccessor->hasProperty(['__class__' => 'Test\Class'], '__class__')
         );
     }
 
     public function testHasPropertyForNotExistingProperty()
     {
-        $this->assertFalse(
+        self::assertFalse(
             $this->arrayAccessor->hasProperty([], 'name')
         );
     }
 
     public function testToArray()
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name' => 'val'
             ],

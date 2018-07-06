@@ -9,10 +9,10 @@ use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 class EntityConfigMergerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigExtensionRegistry */
-    protected $configExtensionRegistry;
+    private $configExtensionRegistry;
 
     /** @var EntityConfigMerger */
-    protected $entityConfigMerger;
+    private $entityConfigMerger;
 
     protected function setUp()
     {

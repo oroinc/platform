@@ -20,7 +20,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var BuildCriteria */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @return Criteria
      */
-    protected function getCriteria()
+    private function getCriteria()
     {
         $resolver = $this->createMock(EntityClassResolver::class);
 
@@ -45,7 +45,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
      *
      * @return ComparisonFilter
      */
-    protected function getComparisonFilter($dataType, $propertyPath)
+    private function getComparisonFilter($dataType, $propertyPath)
     {
         $filter = new ComparisonFilter($dataType);
         $filter->setSupportedOperators([ComparisonFilter::EQ, ComparisonFilter::NEQ]);

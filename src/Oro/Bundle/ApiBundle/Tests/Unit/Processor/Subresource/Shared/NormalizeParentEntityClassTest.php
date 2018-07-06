@@ -52,7 +52,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $this->processor->process($this->context);

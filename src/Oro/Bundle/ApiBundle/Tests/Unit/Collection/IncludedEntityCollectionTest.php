@@ -8,16 +8,14 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IncludedEntityCollection */
-    protected $collection;
+    private $collection;
 
     /** @var IncludedEntityData */
-    protected $entityData;
+    private $entityData;
 
     protected function setUp()
     {
-        $this->entityData = $this->getMockBuilder(IncludedEntityData::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityData = $this->createMock(IncludedEntityData::class);
 
         $this->collection = new IncludedEntityCollection();
     }

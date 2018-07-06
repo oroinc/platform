@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class ApiContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ApiContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -17,42 +17,42 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
 
     public function testRequestType()
     {
-        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
+        self::assertEquals(new RequestType([]), $this->context->getRequestType());
 
         $this->context->getRequestType()->add('test');
-        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test']), $this->context->get(ApiContext::REQUEST_TYPE));
+        self::assertEquals(new RequestType(['test']), $this->context->getRequestType());
+        self::assertEquals(new RequestType(['test']), $this->context->get(ApiContext::REQUEST_TYPE));
 
         $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(ApiContext::REQUEST_TYPE));
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->get(ApiContext::REQUEST_TYPE));
 
         // test that already existing type is not added twice
         $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(ApiContext::REQUEST_TYPE));
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->get(ApiContext::REQUEST_TYPE));
     }
 
     public function testVersion()
     {
-        $this->assertNull($this->context->getVersion());
+        self::assertNull($this->context->getVersion());
 
         $this->context->setVersion('test');
-        $this->assertEquals('test', $this->context->getVersion());
-        $this->assertEquals('test', $this->context->get(ApiContext::VERSION));
+        self::assertEquals('test', $this->context->getVersion());
+        self::assertEquals('test', $this->context->get(ApiContext::VERSION));
     }
 
     public function testProcessed()
     {
-        $this->assertFalse($this->context->isProcessed('test'));
+        self::assertFalse($this->context->isProcessed('test'));
 
         $this->context->setProcessed('test');
         $this->context->setProcessed('another');
-        $this->assertTrue($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
+        self::assertTrue($this->context->isProcessed('test'));
+        self::assertTrue($this->context->isProcessed('another'));
 
         $this->context->clearProcessed('test');
-        $this->assertFalse($this->context->isProcessed('test'));
-        $this->assertTrue($this->context->isProcessed('another'));
+        self::assertFalse($this->context->isProcessed('test'));
+        self::assertTrue($this->context->isProcessed('another'));
     }
 }

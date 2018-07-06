@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
 {
     /** @var ValidateIncludedDataDependencies */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -155,7 +155,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -193,7 +193,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -228,7 +228,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                             'data' => ['type' => 'groups', 'id' => 'included_group_1']
                         ]
                     ]
-                ],
+                ]
             ]
         ];
 
@@ -283,7 +283,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'groups',
                     'id'   => 'included_group_2'
-                ],
+                ]
             ]
         ];
 
@@ -373,7 +373,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
                 [
                     'type' => 'grouptypes',
                     'id'   => 'included_group_type_1'
-                ],
+                ]
             ]
         ];
 
@@ -391,7 +391,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
      *
      * @return Error
      */
-    protected function createValidationError($includedObjectIndex)
+    private function createValidationError($includedObjectIndex)
     {
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,

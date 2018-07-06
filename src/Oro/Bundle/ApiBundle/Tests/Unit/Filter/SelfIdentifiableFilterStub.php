@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\SelfIdentifiableFilterInterface;
 class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentifiableFilterInterface
 {
     /** @var string[]|\Exception|null */
-    protected $foundFilterKeys;
+    private $foundFilterKeys;
 
     /**
      * @param string[]|\Exception|null $filterKeys

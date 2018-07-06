@@ -11,10 +11,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     protected function setUp()
     {

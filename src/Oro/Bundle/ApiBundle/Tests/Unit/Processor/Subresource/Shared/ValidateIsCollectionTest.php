@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 class ValidateIsCollectionTest extends GetSubresourceProcessorTestCase
 {
     /** @var ValidateIsCollection */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

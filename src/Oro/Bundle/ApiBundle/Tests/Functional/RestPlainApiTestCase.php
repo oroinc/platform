@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class RestPlainApiTestCase extends RestApiTestCase
 {
-    const JSON_CONTENT_TYPE = 'application/json';
+    protected const JSON_CONTENT_TYPE = 'application/json';
 
     /**
      * {@inheritdoc}

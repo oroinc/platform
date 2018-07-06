@@ -7,10 +7,10 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\RemoveDeletedCountHeader;
 
 class RemoveDeletedCountHeaderTest extends DeleteListProcessorTestCase
 {
-    const RESPONSE_DELETED_COUNT_HEADER_NAME = 'X-Include-Deleted-Count';
+    private const RESPONSE_DELETED_COUNT_HEADER_NAME = 'X-Include-Deleted-Count';
 
     /** @var RemoveDeletedCountHeader */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -26,7 +26,7 @@ class RemoveDeletedCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             $testCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_DELETED_COUNT_HEADER_NAME)
         );
@@ -40,7 +40,7 @@ class RemoveDeletedCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_DELETED_COUNT_HEADER_NAME)
         );
     }
@@ -51,7 +51,7 @@ class RemoveDeletedCountHeaderTest extends DeleteListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertNull(
+        self::assertNull(
             $this->context->getResponseHeaders()->get(self::RESPONSE_DELETED_COUNT_HEADER_NAME)
         );
     }

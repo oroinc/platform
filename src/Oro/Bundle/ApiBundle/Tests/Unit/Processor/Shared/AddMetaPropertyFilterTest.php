@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 class AddMetaPropertyFilterTest extends GetProcessorTestCase
 {
     /** @var AddMetaPropertyFilter */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

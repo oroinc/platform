@@ -14,23 +14,19 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadata
 
 class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $nestedObjectMetadataHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NestedObjectMetadataHelper */
+    private $nestedObjectMetadataHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $objectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    private $objectMetadataFactory;
 
     /** @var ObjectNestedObjectMetadataFactory */
-    protected $objectNestedObjectMetadataFactory;
+    private $objectNestedObjectMetadataFactory;
 
     protected function setUp()
     {
-        $this->nestedObjectMetadataHelper = $this->getMockBuilder(NestedObjectMetadataHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->objectMetadataFactory = $this->getMockBuilder(ObjectMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->nestedObjectMetadataHelper = $this->createMock(NestedObjectMetadataHelper::class);
+        $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
 
         $this->objectNestedObjectMetadataFactory = new ObjectNestedObjectMetadataFactory(
             $this->nestedObjectMetadataHelper,

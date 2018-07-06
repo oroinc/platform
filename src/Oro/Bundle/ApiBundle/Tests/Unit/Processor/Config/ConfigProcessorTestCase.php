@@ -118,9 +118,7 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 
