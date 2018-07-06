@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class ValidateRequestDataExistTest extends FormProcessorTestCase
 {
     /** @var ValidateRequestDataExist */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->processor = new ValidateRequestDataExist();
@@ -20,7 +20,7 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
     public function testProcessOnNotExistingData()
     {
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [Error::createValidationError('request data constraint', 'The request data should not be empty')],
             $this->context->getErrors()
         );
@@ -30,7 +30,7 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
     {
         $this->context->setRequestData([]);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [Error::createValidationError('request data constraint', 'The request data should not be empty')],
             $this->context->getErrors()
         );
@@ -40,6 +40,6 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
     {
         $this->context->setRequestData(['a' => 'b']);
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasErrors());
+        self::assertFalse($this->context->hasErrors());
     }
 }

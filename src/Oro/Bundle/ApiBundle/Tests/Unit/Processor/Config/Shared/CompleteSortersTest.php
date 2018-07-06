@@ -9,11 +9,11 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class CompleteSortersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var CompleteSorters */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -34,7 +34,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                     'exclude' => true
                 ],
                 'field3' => null,
-                'field4' => null,
+                'field4' => null
             ]
         ];
 
@@ -45,11 +45,11 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'field2' => null,
                 'field3' => [
                     'exclude' => true
-                ],
+                ]
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $this->context->setResult($this->createConfigObject($config));
@@ -66,7 +66,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                     ],
                     'field3' => [
                         'exclude' => true
-                    ],
+                    ]
                 ]
             ],
             $this->context->getSorters()
@@ -84,7 +84,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
 
         $sorters = [];
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -121,7 +121,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 'field8'       => [
                     'property_path' => 'realField8'
                 ],
-                'association1' => null,
+                'association1' => null
             ]
         ];
 
@@ -134,38 +134,38 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                 ],
                 'field8' => [
                     'exclude' => true
-                ],
+                ]
             ]
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getIndexedFields')
-            ->with($this->identicalTo($rootEntityMetadata))
+            ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(
                 [
                     'field5'     => 'integer',
                     'field6'     => 'integer',
                     'realField7' => 'integer',
-                    'realField8' => 'integer',
+                    'realField8' => 'integer'
                 ]
             );
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getIndexedAssociations')
-            ->with($this->identicalTo($rootEntityMetadata))
+            ->with(self::identicalTo($rootEntityMetadata))
             ->willReturn(
                 [
                     'association1' => 'integer',
-                    'association2' => 'integer',
+                    'association2' => 'integer'
                 ]
             );
 
@@ -190,7 +190,7 @@ class CompleteSortersTest extends ConfigProcessorTestCase
                     'field8'       => [
                         'exclude' => true
                     ],
-                    'association1' => null,
+                    'association1' => null
                 ]
             ],
             $this->context->getSorters()

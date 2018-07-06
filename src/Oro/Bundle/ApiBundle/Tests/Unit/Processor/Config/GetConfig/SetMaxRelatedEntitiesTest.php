@@ -9,10 +9,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var SetMaxRelatedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

@@ -23,14 +23,12 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
     /** @var InitializeApiFormExtension */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         $this->formExtensionSwitcher = $this->createMock(FormExtensionSwitcherInterface::class);
-        $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataTypeGuesser = $this->createMock(MetadataTypeGuesser::class);
 
         $this->processor = new InitializeApiFormExtension(
             $this->formExtensionSwitcher,

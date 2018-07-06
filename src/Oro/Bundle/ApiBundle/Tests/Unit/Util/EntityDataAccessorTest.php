@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
 class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityDataAccessor */
-    protected $entityDataAccessor;
+    private $entityDataAccessor;
 
     protected function setUp()
     {

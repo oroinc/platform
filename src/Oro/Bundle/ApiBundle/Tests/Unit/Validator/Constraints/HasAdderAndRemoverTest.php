@@ -19,12 +19,12 @@ class HasAdderAndRemoverTest extends \PHPUnit\Framework\TestCase
     public function testGetStatusCode()
     {
         $constraint = new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'testProperty']);
-        $this->assertEquals(Response::HTTP_NOT_IMPLEMENTED, $constraint->getStatusCode());
+        self::assertEquals(Response::HTTP_NOT_IMPLEMENTED, $constraint->getStatusCode());
     }
 
     public function testGetTargets()
     {
         $constraint = new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'testProperty']);
-        $this->assertEquals('property', $constraint->getTargets());
+        self::assertEquals('property', $constraint->getTargets());
     }
 }

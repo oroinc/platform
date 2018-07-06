@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AssertHasResultTest extends GetProcessorTestCase
 {
     /** @var AssertHasResult */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

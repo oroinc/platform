@@ -26,10 +26,7 @@ class CreateEntityTest extends FormProcessorTestCase
     /** @var CreateEntity */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

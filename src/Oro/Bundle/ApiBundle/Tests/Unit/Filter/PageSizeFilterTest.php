@@ -16,7 +16,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
 
         $filter->apply($criteria);
 
-        $this->assertNull($criteria->getMaxResults());
+        self::assertNull($criteria->getMaxResults());
     }
 
     public function testApplyWithFilter()
@@ -27,6 +27,6 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
 
         $filter->apply($criteria, $filterValue);
 
-        $this->assertSame(10, $criteria->getMaxResults());
+        self::assertSame(10, $criteria->getMaxResults());
     }
 }

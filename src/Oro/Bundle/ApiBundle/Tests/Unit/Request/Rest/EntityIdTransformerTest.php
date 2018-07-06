@@ -10,10 +10,10 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    protected $valueNormalizer;
+    private $valueNormalizer;
 
     /** @var EntityIdTransformer */
-    protected $entityIdTransformer;
+    private $entityIdTransformer;
 
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     public function testTransform($id, $expectedResult)
     {
         $result = $this->entityIdTransformer->transform($id, new EntityMetadata());
-        $this->assertSame($expectedResult, $result);
+        self::assertSame($expectedResult, $result);
     }
 
     public function transformProvider()
@@ -36,7 +36,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         return [
             [123, '123'],
             [['id1' => 123, 'id2' => 456], 'id1=123;id2=456'],
-            [['id1' => 'key 1', 'id2' => 'key&1\'1'], 'id1=key+1;id2=key%261%271'],
+            [['id1' => 'key 1', 'id2' => 'key&1\'1'], 'id1=key+1;id2=key%261%271']
         ];
     }
 
@@ -50,13 +50,13 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('123', 'integer')
             ->willReturn(123);
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame(123, $result);
+        self::assertSame(123, $result);
     }
 
 
@@ -70,11 +70,11 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('string');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame($value, $result);
+        self::assertSame($value, $result);
     }
 
     public function testReverseTransformForCompositeIdentifier()
@@ -88,17 +88,17 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects($this->at(0))
+        $this->valueNormalizer->expects(self::at(0))
             ->method('normalizeValue')
             ->with('123', 'integer')
             ->willReturn(123);
-        $this->valueNormalizer->expects($this->at(1))
+        $this->valueNormalizer->expects(self::at(1))
             ->method('normalizeValue')
             ->with('456', 'integer')
             ->willReturn(456);
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame(
+        self::assertSame(
             ['id1' => 123, 'id2' => 456],
             $result
         );
@@ -115,11 +115,11 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame(
+        self::assertSame(
             ['id1' => '123', 'id2' => '456'],
             $result
         );
@@ -136,11 +136,11 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
-        $this->assertSame(
+        self::assertSame(
             ['id1' => 'key 1', 'id2' => 'key&1\'1'],
             $result
         );
@@ -163,7 +163,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('123', 'integer')
             ->willReturn(123);
@@ -188,7 +188,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('123', 'integer')
             ->willReturn(123);
@@ -213,7 +213,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects($this->once())
+        $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('123', 'integer')
             ->willReturn(123);

@@ -9,10 +9,10 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
-    protected $context;
+    private $context;
 
     /** @var ComputePrimaryField */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenNoData()
     {
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasResult());
+        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcessWhenNoConfigForPrimaryField()
@@ -45,7 +45,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'roles' => [
                     ['name' => 'role1', 'enabled' => false],
@@ -74,7 +74,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'roles' => [
                     ['name' => 'role1', 'enabled' => false],
@@ -104,7 +104,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'enabledRole' => 'role1',
                 'roles'       => [
@@ -134,7 +134,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'enabledRole' => 'role2',
                 'roles'       => [
@@ -173,7 +173,7 @@ class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
         );
         $this->context->setConfig($config);
         $this->processor->process($this->context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'renamedEnabledRole' => 'role2',
                 'renamedRoles'       => [

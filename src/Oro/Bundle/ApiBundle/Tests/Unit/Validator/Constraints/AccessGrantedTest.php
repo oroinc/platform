@@ -10,18 +10,18 @@ class AccessGrantedTest extends \PHPUnit\Framework\TestCase
     public function testGetStatusCode()
     {
         $constraint = new AccessGranted();
-        $this->assertEquals(Response::HTTP_FORBIDDEN, $constraint->getStatusCode());
+        self::assertEquals(Response::HTTP_FORBIDDEN, $constraint->getStatusCode());
     }
 
     public function testGetTargets()
     {
         $constraint = new AccessGranted();
-        $this->assertEquals('property', $constraint->getTargets());
+        self::assertEquals('property', $constraint->getTargets());
     }
 
     public function testValidatedBy()
     {
         $constraint = new AccessGranted();
-        $this->assertEquals('oro_api.validator.access_granted', $constraint->validatedBy());
+        self::assertEquals('oro_api.validator.access_granted', $constraint->validatedBy());
     }
 }

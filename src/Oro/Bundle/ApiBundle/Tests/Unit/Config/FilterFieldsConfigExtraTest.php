@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FilterFieldsConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -22,14 +22,14 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(FilterFieldsConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(FilterFieldsConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testConfigureContext()
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'products'   => ['id', 'code'],
                 'categories' => ['name']
@@ -40,12 +40,12 @@ class FilterFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
 
     public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isPropagable());
+        self::assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(
+        self::assertEquals(
             'fields:products(id,code)categories(name)',
             $this->extra->getCacheKeyPart()
         );

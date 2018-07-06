@@ -23,25 +23,25 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactory */
-    protected $metadataFactory;
+    private $metadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    private $objectMetadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataFactory */
-    protected $entityMetadataFactory;
+    private $entityMetadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedObjectMetadataFactory */
-    protected $nestedObjectMetadataFactory;
+    private $nestedObjectMetadataFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedAssociationMetadataFactory */
-    protected $nestedAssociationMetadataFactory;
+    private $nestedAssociationMetadataFactory;
 
     /** @var EntityMetadataLoader */
-    protected $entityMetadataLoader;
+    private $entityMetadataLoader;
 
     protected function setUp()
     {

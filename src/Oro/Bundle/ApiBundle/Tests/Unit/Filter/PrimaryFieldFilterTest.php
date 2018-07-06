@@ -37,8 +37,8 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $filter->setDataField('dataField');
         $filter->setPrimaryFlagField('primaryFlagField');
 
-        $this->assertEquals('dataField', $filter->getDataField());
-        $this->assertEquals('primaryFlagField', $filter->getPrimaryFlagField());
+        self::assertEquals('dataField', $filter->getDataField());
+        self::assertEquals('primaryFlagField', $filter->getPrimaryFlagField());
     }
 
     public function testApplyNullValue()
@@ -50,7 +50,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria();
         $filter->apply($criteria, null);
 
-        $this->assertNull($criteria->getWhereExpression());
+        self::assertNull($criteria->getWhereExpression());
     }
 
     public function testApplyWithDefaultPrimaryFlagField()
@@ -62,12 +62,12 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria();
         $filter->apply($criteria, new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 'AND',
                 [
                     new Comparison('association.dataField', Comparison::EQ, 'value'),
-                    new Comparison('association.primary', Comparison::EQ, true),
+                    new Comparison('association.primary', Comparison::EQ, true)
                 ]
             ),
             $criteria->getWhereExpression()
@@ -84,12 +84,12 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $criteria = new Criteria();
         $filter->apply($criteria, new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
 
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 'AND',
                 [
                     new Comparison('association.dataField', Comparison::EQ, 'value'),
-                    new Comparison('association.primaryFlagField', Comparison::EQ, true),
+                    new Comparison('association.primaryFlagField', Comparison::EQ, true)
                 ]
             ),
             $criteria->getWhereExpression()

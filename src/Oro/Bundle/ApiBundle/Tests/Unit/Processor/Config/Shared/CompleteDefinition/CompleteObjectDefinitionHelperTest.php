@@ -10,11 +10,11 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 
 class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
     /** @var CompleteObjectDefinitionHelper */
-    protected $completeObjectDefinitionHelper;
+    private $completeObjectDefinitionHelper;
 
     protected function setUp()
     {
@@ -38,7 +38,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
 
         $this->completeObjectDefinitionHelper->completeDefinition($config, $context);
@@ -58,15 +58,15 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $config = $this->createConfigObject([
             'fields' => [
                 'association1' => [
-                    'target_class' => 'Test\Association1Target',
-                ],
+                    'target_class' => 'Test\Association1Target'
+                ]
             ]
         ]);
         $context = new ConfigContext();
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -95,9 +95,9 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -110,14 +110,14 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             'fields' => [
                 'association1' => [
                     'target_class' => 'Test\Association1Target'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn($this->createRelationConfigObject());
@@ -129,7 +129,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'fields' => [
                     'association1' => [
                         'target_class' => 'Test\Association1Target'
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -143,14 +143,14 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
                     'target_type'  => 'to-many'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -180,9 +180,9 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -196,14 +196,14 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
                     'data_type'    => 'string'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -233,9 +233,9 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                         'fields'                 => [
                             'id' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -249,14 +249,14 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'association1' => [
                     'target_class' => 'Test\Association1Target',
                     'data_type'    => 'string'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
             ->willReturn(
@@ -292,9 +292,9 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                             ],
                             'id2' => [
                                 'data_type' => 'integer'
-                            ],
+                            ]
                         ]
-                    ],
+                    ]
                 ]
             ],
             $config
@@ -317,7 +317,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 ],
                 'field3'    => [
                     'property_path' => 'realField3'
-                ],
+                ]
             ]
         ]);
         $context = new ConfigContext();
@@ -335,7 +335,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     '__class__' => [
                         'meta_property' => true,
                         'data_type'     => 'string'
-                    ],
+                    ]
                 ]
             ],
             $config

@@ -13,19 +13,17 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entitySerializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
+    private $entitySerializer;
 
     /** @var LoadNestedAssociation */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->entitySerializer = $this->getMockBuilder(EntitySerializer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entitySerializer = $this->createMock(EntitySerializer::class);
 
         $this->processor = new LoadNestedAssociation(
             $this->entitySerializer,

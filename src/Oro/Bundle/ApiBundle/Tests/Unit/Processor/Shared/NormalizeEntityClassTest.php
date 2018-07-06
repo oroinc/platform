@@ -18,7 +18,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     private $resourcesProvider;
 
     /** @var NormalizeEntityClass */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -52,7 +52,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     {
         $this->context->setClassName('Test\Class');
 
-        $this->valueNormalizer->expects($this->never())
+        $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
 
         $this->processor->process($this->context);
