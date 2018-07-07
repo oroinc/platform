@@ -519,7 +519,7 @@ Errors:
 Path: "data.0.attributes.attr2". Error: Failed asserting that an array has the key 'attr2'.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
