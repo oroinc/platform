@@ -86,7 +86,7 @@ Errors:
 Path: "anotherKey". Error: Failed asserting that an array has the key 'anotherKey'.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -103,7 +103,7 @@ Errors:
 Path: "1". Error: Failed asserting that an array has the key 1.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected);
@@ -584,7 +584,7 @@ Errors:
 Path: "data.1.attributes.attr1". Error: Failed asserting that 'val21' is identical to 'val41'.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
@@ -618,7 +618,7 @@ Path: "data.1.attributes.attr1". Error: Failed asserting that 'val21' is identic
 Path: "data.4.attributes.attr1". Error: Failed asserting that 'val51' is identical to 'val21'.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
@@ -650,7 +650,7 @@ Path: "data.3.attributes.attr1". Error: Failed asserting that 'val41' is identic
 Path: "data.3.attributes.attr2". Error: Failed asserting that 'val42' is identical to 'val32'.
 TEXT;
 
-        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectException(\PHPUnit_Framework_ExpectationFailedException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $constraint = new ArrayContainsConstraint($expected, false);
