@@ -114,38 +114,48 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      */
     private function matchIndexedArray(array $expected, array $actual, array $path)
     {
-        $processedKeys = [];
+        $processedKeys = []; // [found key => expected key, ...]
         $lastPathIndex = count($path);
         $expectedPath = $path;
-        foreach ($expected as $expectedKey => $expectedValue) {
-            if (in_array($expectedKey, $processedKeys, true)) {
-                continue;
-            }
-            $expectedPath[$lastPathIndex] = $expectedKey;
-            if (!$this->isArrayHasKey($expectedKey, $actual, $expectedPath)) {
-                $processedKeys[] = $expectedKey;
-                continue;
-            }
 
-            $errors = $this->errors;
-            $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
-            if (count($errors) === count($this->errors)) {
-                $processedKeys[] = $expectedKey;
-            } else {
-                $elementErrors = array_slice($this->errors, count($errors));
-                $this->errors = $errors;
-                $key = $this->tryMatchIndexedElement($expectedKey, $expectedValue, $actual, $path, $processedKeys);
-                if (null === $key) {
-                    $this->errors = array_merge($errors, $elementErrors);
+        // 1. try to match expected and actual elements with the same index
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (array_key_exists($expectedKey, $actual)) {
+                $expectedPath[$lastPathIndex] = $expectedKey;
+                $errors = $this->errors;
+                $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
+                if (count($errors) === count($this->errors)) {
+                    $processedKeys[$expectedKey] = $expectedKey;
                 } else {
-                    $processedKeys[] = $key;
+                    $this->errors = $errors;
                 }
+            }
+        }
+
+        // 2. try to match expected elements that do not have appropriate actual elements with the same index
+        // this is required because the order of elements should not be matter
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (array_key_exists($expectedKey, $actual) && !in_array($expectedKey, $processedKeys, true)) {
+                $key = $this->tryMatchIndexedElement($expectedValue, $actual, $path, $processedKeys);
+                if (null !== $key) {
+                    $processedKeys[$key] = $expectedKey;
+                }
+            }
+        }
+
+        // 3. add errors for unmatched elements, including extra elements in expected data
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (!in_array($expectedKey, $processedKeys, true)) {
+                $expectedPath[$lastPathIndex] = $expectedKey;
+                if ($this->isArrayHasKey($expectedKey, $actual, $expectedPath)) {
+                    $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
+                }
+                $processedKeys[$expectedKey] = $expectedKey;
             }
         }
     }
 
     /**
-     * @param int   $expectedKey
      * @param mixed $expectedValue
      * @param array $actual
      * @param array $path
@@ -153,18 +163,13 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
      *
      * @return int|null
      */
-    private function tryMatchIndexedElement(
-        $expectedKey,
-        $expectedValue,
-        array $actual,
-        array $path,
-        array $processedKeys
-    ) {
+    private function tryMatchIndexedElement($expectedValue, array $actual, array $path, array $processedKeys)
+    {
         $foundKey = null;
         $elementPath = $path;
         $lastPathIndex = count($path);
         foreach ($actual as $key => $value) {
-            if ($key === $expectedKey || in_array($key, $processedKeys, true)) {
+            if (isset($processedKeys[$key])) {
                 continue;
             }
             $errors = $this->errors;
