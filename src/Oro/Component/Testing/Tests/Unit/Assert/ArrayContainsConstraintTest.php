@@ -476,6 +476,27 @@ TEXT;
         $constraint->evaluate($actual);
     }
 
+    public function testNotStrictArrayContainsWithNestedAttributesAndAndOrderOfElementIsDifferent()
+    {
+        $expected = [
+            'data' => [
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']],
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']]
+            ]
+        ];
+        $actual = [
+            'data' => [
+                ['id' => '1', 'attributes' => ['attr1' => 'val11']],
+                ['id' => '2', 'attributes' => ['attr1' => 'val21']],
+                ['id' => '3', 'attributes' => ['attr1' => 'val31']]
+            ]
+        ];
+
+        $constraint = new ArrayContainsConstraint($expected, false);
+        $constraint->evaluate($actual);
+    }
+
     public function testNotStrictArrayContainsWhenNestedAttributeOfFirstItemIsNotEqualAndOrderOfNextItemsAreDifferent()
     {
         $expected = [
