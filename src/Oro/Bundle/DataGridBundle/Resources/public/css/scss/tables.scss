@@ -438,6 +438,8 @@
 
                 &.thead-sizing {
                     display: table-header-group;
+
+                    visibility: hidden; // Should check why we have double headers for datagrid
                 }
             }
         }
