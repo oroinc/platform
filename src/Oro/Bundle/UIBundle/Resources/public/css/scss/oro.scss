@@ -2039,18 +2039,6 @@ label.radio.error {
         font-size: 0;
         line-height: 0;
         margin: 0 0 0 5px;
-
-        &:after {
-            display: inline-block;
-            font: 14px/1em FontAwesome;
-            color: #ddd;
-            content: '\f00d';
-            text-indent: 0;
-        }
-
-        &:hover:after {
-            color: #888;
-        }
     }
 
     .addAfterRow {
