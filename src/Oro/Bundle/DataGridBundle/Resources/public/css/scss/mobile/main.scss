@@ -1,8 +1,10 @@
+/* @theme: admin.oro; */
+
 .mobile-version {
-  @import "variables";
-  @import "oro-grid";
-  @import "column-manager";
-  @import "grid-toolbar";
-  @import "toolbar-mass-actions";
-  @import "tables";
+    @import "variables";
+    @import "oro-grid";
+    @import "column-manager";
+    @import "grid-toolbar";
+    @import "toolbar-mass-actions";
+    @import "tables";
 }

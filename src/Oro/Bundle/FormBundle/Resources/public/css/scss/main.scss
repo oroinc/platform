@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
+@import "oroui/css/scss/variables";
 @import "oroui/css/scss/mixins";
+
 @import "./multi-checkbox-editor";
 @import "./inline-editing";
 @import "./inline-editing-validation";

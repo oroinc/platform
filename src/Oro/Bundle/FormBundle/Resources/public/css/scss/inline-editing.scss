@@ -1,4 +1,4 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
 
 .oro-datagrid.grid-editable .grid {
     .number-cell,
@@ -136,7 +136,7 @@
     padding: 0 4px;
 
     &--over-multiselect {
-        z-index: 10004// to show over .ui-multiselect-menu
+        z-index: 10004; // to show over .ui-multiselect-menu
     }
 }
 

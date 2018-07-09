@@ -1,8 +1,7 @@
-@import "oroui/css/scss/mixins";
-@import "configuration-tree-view";
+/* @theme: admin.oro; */
 
 .left-panel-container {
-    background-color: white;
+    background-color: #fff;
 
     & > .placeholder {
         margin-left: 334px;
@@ -46,11 +45,11 @@
         }
 
         input[type="checkbox"] {
-            margin: -4px 10px 0 0
+            margin: -4px 10px 0 0;
         }
     }
 
-    .oro-item-collection input[type="text"]{
+    .oro-item-collection input[type="text"] {
         width: 240px;
     }
 
