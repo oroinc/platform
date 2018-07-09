@@ -11,7 +11,7 @@ $mobile-filter-box-dropdown-width: 100% !default;
 $mobile-filter-box-dropdown-toggle-text-align: center !default;
 $mobile-filter-box-dropdown-toggle-width: 100% !default;
 
-$mobile-filter-box-dropdown-toggle-before-content: '\f0b0' !default;
+$mobile-filter-box-dropdown-toggle-before-content: $fa-var-filter !default;
 $mobile-filter-box-dropdown-toggle-before-font-family: FontAwesome, sans-serif !default;
 $mobile-filter-box-dropdown-toggle-before-offset: 0 7px 0 -7px !default;
 $mobile-filter-box-dropdown-toggle-before-width: 10px !default;

@@ -19,10 +19,10 @@ $jstree-wrapper__label-before-font-family: FontAwesome !default;
 $jstree-wrapper__label-before-font-size: 9px !default;
 $jstree-wrapper__label-before-font-weight: normal !default;
 $jstree-wrapper__label-before-font-style: normal !default;
-$jstree-wrapper__label-before-content: '\f078' !default;
+$jstree-wrapper__label-before-content: $fa-var-chevron-down !default;
 $jstree-wrapper__label-before-color: #969696 !default;
 
-$jstree-wrapper__label-expanded-before-content: '\f054' !default;
+$jstree-wrapper__label-expanded-before-content: $fa-var-chevron-right !default;
 
 $jstree-wrapper__label-expanded-jstree-actions-before-display: inline-block !default;
 

@@ -154,8 +154,8 @@ $checkbox-icon-disabled-background-color: $secondary !default;
 $checkbox-icon-indeterminate-background-color: $secondary !default;
 $checkbox-icon-indeterminate-border-color: $secondary !default;
 
-$checkbox-checked-icon: "\f00c" !default;
-$checkbox-indeterminate-icon: "\f068" !default;
+$checkbox-checked-icon: $fa-var-check !default;
+$checkbox-indeterminate-icon: $fa-var-minus !default;
 $checkbox-circle-checked-icon: "" !default;
 
 $checkbox-disabled-opacity: .5 !default;
