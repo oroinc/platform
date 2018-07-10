@@ -13,9 +13,6 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
     border-radius: 3px;
     outline: none;
     width: 100%;
-    /* inline-block for ie7 */
-    zoom: 1;
-    *display: inline;
     vertical-align: middle;
 
     .select2-choice {
@@ -58,8 +55,6 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
             display: block;
             overflow: hidden;
             white-space: nowrap;
-            -ms-text-overflow: ellipsis;
-            -o-text-overflow: ellipsis;
             text-overflow: ellipsis;
         }
 
@@ -129,7 +124,7 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
 
     .select2-highlighted {
         .select2__result-entry-info {
-            color: lightblue;
+            color: #add8e6;
             font-style: italic;
         }
     }
@@ -350,7 +345,6 @@ body .select2-dropdown-open {
 
         -webkit-touch-callout: none;
         -webkit-user-select: none;
-        -khtml-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
@@ -494,7 +488,6 @@ disabled look for disabled choices in the results dropdown
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;

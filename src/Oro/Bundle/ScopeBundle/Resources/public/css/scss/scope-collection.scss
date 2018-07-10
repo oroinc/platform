@@ -1,4 +1,4 @@
-@import "oroui/css/scss/mixins";
+/* @theme: admin.oro; */
 
 .scope-collection {
     .small-row > div > div {
@@ -64,7 +64,6 @@
 
 @media screen and (min-width: 1470px) {
     .scope-collection {
-
         .small-row {
             display: inline-block;
         }
