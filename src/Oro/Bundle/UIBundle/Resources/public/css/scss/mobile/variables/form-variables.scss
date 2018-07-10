@@ -9,7 +9,8 @@ $input-appearance: none;
 $selector-inner-offset: 0;
 $selector-span-inner-offset: $input-inner-offset;
 $selector-span-line-height: 1;
-$selector-span-icon-top: 5px;
+$selector-span-height: $input-size;
+$selector-span-icon-top: 4px;
 $selector-span-icon-font-size: $base-font-size--l;
 
 $input-append-add-on-height: 40px;
