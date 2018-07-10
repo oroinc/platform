@@ -795,6 +795,10 @@ services:
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
 
+    oro_security.alias.acl.dbal.provider:
+        alias: 'security.acl.dbal.provider'
+        public: true
+
     oro_security.token_serializer:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
         arguments:
