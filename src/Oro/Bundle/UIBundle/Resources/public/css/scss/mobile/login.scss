@@ -87,7 +87,7 @@
         & + input[type="text"],
         & + input[type="email"],
         & + input[type="password"] {
-            width: calc(100% - 24px);
+            width: 100%;
         }
         & + select {
             width: 174px;

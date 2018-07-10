@@ -9,7 +9,7 @@ $filter-box-criteria-inner-offset: 16px !default;
 $filter-box-criteria-display: block !default;
 $filter-box-criteria-visibility: hidden !default;
 $filter-box-criteria-z-index: $oro-zindex-dropdown !default;
-$filter-box-criteria-offset-top: 0 !default;
+$filter-box-criteria-offset-top: 8px !default;
 $filter-box-criteria-top: auto !default;
 $filter-box-criteria-focus-outline: none !default;
 
@@ -304,7 +304,7 @@ $open-filter-before-width: 10px !default;
 $open-filter-before-height: 10px !default;
 $open-filter-before-position: absolute !default;
 $open-filter-before-left: 15px !default;
-$open-filter-before-bottom: -5px !default;
+$open-filter-before-bottom: -13px !default;
 $open-filter-before-transform: rotate(45deg) !default;
 $open-filter-before-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
 
@@ -314,7 +314,7 @@ $open-filter-after-border-right: 10px solid transparent !default;
 $open-filter-after-content: "" !default;
 $open-filter-after-left: 10px !default;
 $open-filter-after-position: absolute !default;
-$open-filter-after-bottom: -3px !default;
+$open-filter-after-bottom: -11px !default;
 $open-filter-after-z-index: $oro-zindex-dropdown  !default;
 
 $filter-date-range-datetime-visual-element-width: 113px !default;

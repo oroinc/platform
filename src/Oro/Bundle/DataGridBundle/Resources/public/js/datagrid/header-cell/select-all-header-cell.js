@@ -120,7 +120,6 @@ define([
 
         onDropdownClick: function(e) {
             var $el = $(e.target);
-            console.log($el)
             if ($el.is('[data-select-all]')) {
                 // Handles click on selectAll button
                 this.collection.trigger('backgrid:selectAll');

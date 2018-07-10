@@ -4,6 +4,7 @@
     & > .filter-container {
         & > .select-filter-widget {
             margin: $filter-box-filter-container-select-filter-widget-offset;
+            position: $filter-box-filter-container-select-filter-widget-position;
         }
     }
 }

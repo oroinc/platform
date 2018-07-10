@@ -12,32 +12,13 @@
     appearance: $input-appearance;
 }
 
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
-.uneditable-input,
-.selector {
-    @extend .input;
-}
-
 .selector {
     padding: $selector-inner-offset;
 
     span {
         padding: $selector-span-inner-offset;
         line-height: $selector-span-line-height;
+        height: $selector-span-height;
 
         &:after {
             top: $selector-span-icon-top;
