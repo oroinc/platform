@@ -122,7 +122,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $errors = array_merge(
             (array)$this->strategyHelper->validateEntity(
                 $entity,
-                null,
                 new GroupSequence(['FieldConfigModel', 'Sql', 'ChangeTypeField'])
             ),
             $this->validateEntityFields($entity)
