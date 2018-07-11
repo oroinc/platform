@@ -291,15 +291,23 @@ class OroMainContext extends MinkContext implements
             implode(',', array_keys($actualFlashMessages))
         ));
 
-        try {
-            /** @var NodeElement $closeButton */
-            $closeButton = $flashMessage->find('css', 'button.close');
-            $closeButton->press();
-        } catch (\Throwable $e) {
-            //No worries, flash message can disappeared till time next call
-        } catch (\Exception $e) {
-            //No worries, flash message can disappeared till time next call
-        }
+        return $flashMessage;
+    }
+
+    /**
+     * Example: Then I should see "Attachment created successfully" flash message and I close it
+     * Example: Then I should see "The email was sent" flash message and I close it
+     *
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message and I close it$/
+     * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message and I close it$/
+     */
+    public function iShouldSeeFlashMessageAndCloseIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $flashMessage = $this->iShouldSeeFlashMessage($title, $flashMessageElement, $timeLimit);
+
+        /** @var NodeElement $closeButton */
+        $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+        $closeButton->press();
     }
 
     /**

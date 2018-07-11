@@ -15,7 +15,7 @@
                 </div>
                 <fieldset class="oro-forgot-password">
                     {% if invalid_username is defined %}
-                        <div class="alert alert-error">
+                        <div class="alert alert-error" role="alert">
                             {{ 'There is no active user with username or email address "%username%".'|trans({ '%username%': invalid_username }) }}
                         </div>
                     {% endif %}

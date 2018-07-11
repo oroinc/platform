@@ -14,7 +14,7 @@
     {# Quick address update form template #}
     <div class="widget-content">
         {% if not form.vars.valid and form_errors(form) %}
-            <div class="alert alert-error" style="margin:0">
+            <div class="alert alert-error" role="alert" style="margin:0">
                 <div class="message">
                     {{ form_errors(form) }}
                 </div>

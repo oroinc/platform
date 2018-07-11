@@ -731,7 +731,7 @@ define(function(require) {
             }
 
             var failContent = '<div class="widget-content">' +
-                '<div class="alert alert-error">' + message + '</div>' +
+                '<div class="alert alert-error" role="alert">' + message + '</div>' +
                 '</div>';
 
             this._onContentLoad(failContent);

@@ -35,18 +35,13 @@ config:
                 - 'jquery'
         'json':
             exports: 'JSON'
-        'bootstrap-affix':
+        'bootstrap-util':
             deps:
                 - 'jquery'
         'bootstrap-alert':
             deps:
                 - 'jquery'
-        'bootstrap-button':
-            deps:
-                - 'jquery'
-        'bootstrap-carousel':
-            deps:
-                - 'jquery'
+                - 'bootstrap-util'
         'bootstrap-collapse':
             deps:
                 - 'jquery'
@@ -140,10 +135,8 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
-        'bootstrap-affix': 'bowerassets/bootstrap/js/bootstrap-affix.js'
-        'bootstrap-alert': 'bowerassets/bootstrap/js/bootstrap-alert.js'
-        'bootstrap-button': 'bowerassets/bootstrap/js/bootstrap-button.js'
-        'bootstrap-carousel': 'bowerassets/bootstrap/js/bootstrap-carousel.js'
+        'bootstrap-util': 'components/bootstrap/js/dist/util.js'
+        'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
         'bootstrap-collapse': 'bowerassets/bootstrap/js/bootstrap-collapse.js'
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
         'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
