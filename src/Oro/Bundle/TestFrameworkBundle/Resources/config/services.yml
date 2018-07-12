@@ -115,6 +115,7 @@ services:
         arguments:
             - '@oro_message_queue.transport.dbal.connection'
             - '@oro_message_queue.consumption.extensions'
+            - '@oro_message_queue.log.consumer_state'
 
     oro_test.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
