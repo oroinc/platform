@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 
+/**
+ * Delegates the handling of consumption to all child extensions
+ */
 class ChainExtension implements ResettableExtensionInterface, ChainExtensionAwareInterface
 {
     /** @var ExtensionInterface[] */

@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\LoggerBundle\OroLoggerBundle
+    - { name: Oro\Bundle\LoggerBundle\OroLoggerBundle, priority: -100 }
