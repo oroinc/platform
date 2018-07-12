@@ -391,7 +391,6 @@ define(function(require) {
             var filterWidth = this.$(this.containerSelector).width();
             var requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
-            widget.find('input[type="search"]').width(requiredWidth - 30);
         },
 
         /**

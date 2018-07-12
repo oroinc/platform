@@ -683,7 +683,6 @@ define(function(require) {
             var widget = this.selectWidget.getWidget();
             var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
-            widget.find('input[type="search"]').width(requiredWidth - 30);
         },
 
         /**

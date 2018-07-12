@@ -305,7 +305,9 @@
         text-indent: $btn-icon-text-indent;
 
         [class^="fa-"],
-        [class*=" fa-"] {
+        [class*=" fa-"],
+        &:before,
+        &:after {
             margin: $btn-icon-fa-offset;
             text-indent: $btn-icon-fa-text-indent;
             position: $btn-icon-fa-position;

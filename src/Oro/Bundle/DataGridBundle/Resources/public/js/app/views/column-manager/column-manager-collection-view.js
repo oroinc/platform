@@ -92,6 +92,7 @@ define(function(require) {
                 this.initSorting();
             }
             this.updateHeaderWidths();
+            this.$el.inputWidget('seekAndCreate');
             return this;
         },
 

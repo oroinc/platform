@@ -1,9 +1,9 @@
 /* @theme: admin.oro; */
 
 .jstree-wholerow-ul {
-    width: 100%;
-    margin-bottom: 10px;
-    padding-left: 8px;
+    width: $jstree-wholerow-ul-width;
+    margin-bottom: $jstree-wholerow-ul-offset-bottom;
+    padding-left: $jstree-wholerow-ul-inner-offset-left;
 }
 
 .jstree-default {
@@ -11,163 +11,176 @@
     .jstree-closed > .jstree-ocl,
     .jstree-leaf > .jstree-ocl,
     .jstree-node {
-        position: relative;
+        position: $jstree-default-node-position;
 
-        background: transparent;
+        background: $jstree-default-node-background;
     }
 
     .jstree-themeicon {
-        display: none;
+        display: $jstree-themeicon-display;
     }
 
     .jstree-open > .jstree-ocl:before,
     .jstree-closed > .jstree-ocl:before {
-        font-family: 'FontAwesome';
-        font-size: 10px;
-        font-weight: normal;
-        font-style: normal;
-        color: $tree-icon-color;
+        font-family: $jstree-open-font-family;
+        font-size: $jstree-open-font-size;
+        font-weight: $jstree-open-font-weight;
+        font-style: $jstree-open-font-style;
+        color: $jstree-open-color;
     }
 
     .jstree-open > .jstree-ocl:before {
-        content: '\f078';
+        content: $jstree-open-jocl-content;
     }
 
     .jstree-closed > .jstree-ocl:before {
-        content: '\f054';
+        content: $jstree-closed-jocl-content;
     }
 
     .jstree-icon,
     .jstree-icon:empty {
-        width: 26px;
-        height: 36px;
+        width: $jstree-icon-width;
+        height: $jstree-icon-height;
 
-        line-height: 36px;
+        line-height: $jstree-icon-line-height;
     }
 
     .jstree-clicked {
-        font-weight: bold;
+        font-weight: $jstree-clicked-font-weight;
     }
 
     .jstree-wholerow-clicked,
     .jstree-wholerow-hovered {
-        height: 35px;
-        background: $tree-link-bg-color;
+        height: $jstree-wholerow-hovered-height;
+        background: $jstree-wholerow-hovered-background;
     }
 
     .jstree-anchor {
-        display: inline-block;
+        display: $jstree-anchor-display;
 
-        width: 90%;
-        height: 36px;
-        padding: 0 8px 7px 8px;
+        width: $jstree-anchor-width;
+        height: $jstree-anchor-height;
+        padding: $jstree-anchor-inner-offset;
 
-        line-height: 36px;
+        line-height: $jstree-anchor-line-height;
 
-        color: $tree-link-color;
-        border-radius: 0;
-        box-shadow: none;
+        color: $jstree-anchor-color;
+        border-radius: $jstree-anchor-border-radius;
+        box-shadow: $jstree-anchor-box-shadow;
 
-        text-overflow: ellipsis;
-        overflow: hidden;
+        text-overflow: $jstree-anchor-text-overflow;
+        overflow: $jstree-anchor-overflow;
 
         &:link,
         &:visited,
         &:hover,
         &:active {
-            color: #858585;
+            color: $jstree-anchor-active-color;
         }
     }
 
     .jstree-anchor,
     .jstree-animated,
     .jstree-wholerow {
-        transition: none;
+        transition: $jstree-wholerow-transition;
     }
 
     .jstree-search {
-        font-style: normal;
-        font-weight: normal;
+        font-style: $jstree-search-font-style;
+        font-weight: $jstree-search-font-weight;
     }
 
     .jstree-icon.jstree-checkbox {
-        background-image: none;
-        font-family: 'FontAwesome';
-        font-size: 18px;
-        font-weight: normal;
-        font-style: normal;
-        color: #a8a8a8;
-        width: 30px;
-        height: 30px;
-        margin: 1px 0 0 -14px;
+        display: $jstree-icon-checkbox-display;
+
+        height: $jstree-icon-checkbox-height;
+        width: $jstree-icon-checkbox-width;
+
+        border: $jstree-icon-checkbox-border;
+        background: $jstree-icon-checkbox-background;
+
+        border-radius: $jstree-icon-checkbox-border-radius;
+
+        cursor: $jstree-icon-checkbox-cursor;
+
+        vertical-align: $jstree-icon-checkbox-vertical-align;
+
+        position: $jstree-icon-checkbox-position;
+
+        color: $jstree-icon-checkbox-color;
+        margin: $jstree-icon-checkbox-offset;
 
         &:before {
-            content: '\f096';
+            position: $jstree-icon-checkbox-icon-position;
+            top: $jstree-icon-checkbox-icon-top;
+            left: $jstree-icon-checkbox-icon-left;
+            transform: $jstree-icon-checkbox-icon-transform(-50%, -50%);
+            margin-left: $jstree-icon-checkbox-icon-offset-left;
+            font-size: $jstree-icon-checkbox-icon-font-size;
+            line-height: $jstree-icon-checkbox-icon-line-height;
+            font-family: $jstree-icon-checkbox-icon-font-family;
         }
     }
 
     .jstree-checked {
         .jstree-checkbox {
-            color: #48acfd;
+            background: $jstree-checked-background;
+            border-color: $jstree-checked-border-color;
 
             &:before {
-                content: '\f046';
-                margin-left: 2px;
+                content: $jstree-checked-content;
             }
         }
     }
 }
 
 .jstree-search-component {
-    position: relative;
+    position: $jstree-search-component-position;
 
     &.active-search & {
         &__clear-icon {
-            display: block;
+            display: $jstree-search-component-clear-active-search-clear-display;
         }
 
         &__search-icon {
-            display: none;
+            display: $jstree-search-component-clear-active-search-search-display;
         }
     }
 
     &__input {
-        width: 100%;
-        height: 30px !important;
-        box-sizing: border-box !important;
-        padding-right: 50px !important;
+        width: $jstree-search-component-input-width;
 
         &::-ms-clear {
-            display: none;
+            display: $jstree-search-component-clear-active-input-display;
         }
     }
 
     &__clear-icon,
     &__search-icon {
-        display: none;
-        position: absolute;
-        top: 5px;
-        right: 8px;
-        font-size: 16px;
-        z-index: 10;
-        color: $tree-icon-color;
-        cursor: pointer;
+        display: $jstree-search-component-clear-icon-display;
+        position: $jstree-search-component-clear-icon-position;
+        top: $jstree-search-component-clear-icon-top;
+        right: $jstree-search-component-clear-icon-right;
+        font-size: $jstree-search-component-clear-icon-font-size;
+        z-index: $jstree-search-component-clear-icon-z-index;
+        color: $jstree-search-component-clear-icon-color;
+        cursor: $jstree-search-component-clear-icon-cursor;
 
         &:hover {
-            color: darken($tree-icon-color, 10%);
+            color: $jstree-search-component-clear-icon-hover-color;
         }
     }
 
     &__search-icon {
-        display: block;
-        pointer-events: none;
+        display: $jstree-search-component-search-icon-display;
+        pointer-events: $jstree-search-component-search-icon-pointer-events;
     }
 }
 
 .content-with-sidebar--content {
     .tree-empty-content {
-        text-align: center;
-        padding: 15px;
-        background: #f1f1f1;
+        text-align: $tree-empty-content-sidebar-text-align;
+        padding: $tree-empty-content-sidebar-inner-offset;
+        background: $tree-empty-content-sidebar-background;
     }
 }

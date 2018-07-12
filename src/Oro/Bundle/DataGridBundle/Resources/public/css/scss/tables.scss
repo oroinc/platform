@@ -173,6 +173,7 @@
 
         .dropdown-menu {
             margin-right: $table-action-cell-dropdown-menu-offset-right;
+            min-width: $table-action-cell-dropdown-menu-min-width;
         }
 
         @include horizontal-icon-menu;
@@ -438,6 +439,8 @@
 
                 &.thead-sizing {
                     display: table-header-group;
+
+                    visibility: hidden; // Should check why we have double headers for datagrid
                 }
             }
         }

@@ -67,11 +67,6 @@
                     line-height: 1.2em;
                     text-transform: none;
                 }
-
-                .btn {
-                    height: 30px;
-                    line-height: 29px;
-                }
             }
 
             /* Header search dropdown */
@@ -100,10 +95,6 @@
                         padding: 0;
                         width: 100%;
 
-                        #search-bar-search {
-                            border-left: 0;
-                        }
-
                         .btn-group.btn-block {
                             width: auto;
                             float: left;
@@ -118,34 +109,21 @@
 
                             input[type='text'] {
                                 width: 100%;
-                                height: 30px;
-                                border-left-color: #ccc;
-                                border-radius: 0;
-                                box-sizing: border-box;
                             }
                         }
 
                         .dropdown-toggle {
-                            border-color: #ccc;
-                            background: #ebebeb;
-                            background: linear-gradient(#f0f0f0, #e1e1e1);
-                            color: #444;
                             min-width: 50px;
                             text-shadow: none;
                             font-weight: bold;
                         }
 
-                        .btn-group.open .btn.dropdown-toggle {
-                            background: #5c666f;
-                            background: linear-gradient(#f0f0f0, #e1e1e1);
+                        .btn.dropdown-toggle {
+                            border-right: none;
                         }
 
-                        .btn-search {
-                            position: relative;
-                            margin-left: -1px;
-                            border-radius: 0 3px 3px 0;
-                            border-color: #4978c2;
-                            min-width: 42px;
+                        .btn-group.open .btn.dropdown-toggle {
+
                         }
 
                         .custom-dropdown {
@@ -233,9 +211,7 @@
 
                 #search-bar-button {
                     width: 100%;
-                    min-width: 0;
-                    padding: 0 5px 0 9px;
-                    text-align: right;
+
                     .search-bar-type {
                         float: left;
                     }

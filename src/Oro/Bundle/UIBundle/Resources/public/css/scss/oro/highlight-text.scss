@@ -47,6 +47,8 @@
     }
 
     &-items-switcher {
+        padding: $highlight-text-items-switcher-inner-offset;
+
         &__control {
             &:last-child {
                 display: none;

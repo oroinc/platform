@@ -398,17 +398,6 @@ input[type='checkbox'] + label {
     display: inline-block;
 }
 
-textarea,
-input,
-select,
-.uneditable-input,
-body .select2-container {
-    box-sizing: content-box;
-    border-color: #ddd;
-    color: #333;
-    font-size: $base-font-size;
-}
-
 .btn-group > .btn:last-child,
 .btn-group > .dropdown-toggle {
     border-top-right-radius: 3px;
@@ -1010,6 +999,7 @@ a {
             width: 0;
             overflow: hidden;
             border-width: 0;
+            box-shadow: none;
         }
     }
 }
@@ -1019,6 +1009,7 @@ a {
 
     &.detach .nav {
         margin: 0;
+        padding: 10px;
     }
 }
 
@@ -1235,24 +1226,6 @@ a {
         padding: 4px 6px;
         border: none;
         color: $body-color;
-
-        .select2-search-choice-close {
-            position: relative;
-            display: inline-block;
-            right: -2px;
-            top: 0;
-
-            &:before {
-                width: 20px;
-                content: '\f00d';
-                font: 11px FontAwesome;
-                color: #ccc;
-            }
-
-            &:hover:before {
-                color: #999;
-            }
-        }
     }
 }
 
@@ -1466,8 +1439,8 @@ ul.inline-extra {
 
 label.required em,
 .form-horizontal label.required em {
-    color: #c30b25;
-    font-size: 15px;
+    color: $danger-dark;
+    font-size: 21px;
     line-height: 1px;
 }
 
@@ -1488,12 +1461,6 @@ label.required em,
 .form-horizontal .span6 .oro-multiselect-holder input[type="password"] {
     margin: 0 0 5px 0;
 } */
-
-input,
-textarea,
-.uneditable-input {
-    width: $width-input;
-}
 
 body .mce-tinymce {
     width: 292px;
@@ -1536,14 +1503,8 @@ textarea {
     }
 
     > input[type='checkbox']:only-child {
-        margin-top: 10px;
+        margin-top: 6px;
     }
-}
-
-.oro-action .btn-group > .btn,
-.oro-action .btn-group > .dropdown-menu,
-.oro-action .btn-group > .popover {
-    font-size: 14px;
 }
 
 .oro-action .btn-group {
@@ -1561,148 +1522,6 @@ textarea {
 .uploader * {
     margin: 0;
     padding: 0;
-}
-
-/* Uploader */
-
-div.uploader {
-    height: 28px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    float: left;
-    line-height: 28px;
-    border-radius: 3px;
-    white-space: nowrap;
-}
-
-div.uploader span.action {
-    display: inline-block;
-    height: 28px;
-    border-left: 1px solid #ccc;
-    padding: 0 10px;
-    overflow: hidden;
-    cursor: pointer;
-    background: linear-gradient(#fff, #e6e6e6);
-}
-
-div.uploader.active span.action {
-    background: linear-gradient(#e6e6e6, #fff);
-}
-
-div.uploader span.filename {
-    padding: 0 10px;
-    display: inline-block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: default;
-    width: 202px;
-
-    @media (max-width: 400px) {
-        width: 183px;
-    }
-}
-
-div.uploader input {
-    float: right;
-    height: 25px;
-    font-size: 40px; /* to expand real file input through whole ui substrate */
-}
-
-/* Select */
-
-select {
-    height: 26px;
-    line-height: 26px;
-}
-
-div.selector {
-    line-height: 30px;
-    height: 30px;
-    width: 235px;
-    border: 1px solid #ddd;
-    background-color: #fafafa;
-    background-image: linear-gradient(#fff, #f3f3f3);
-    background-repeat: repeat-x;
-    border-radius: 3px;
-
-    option {
-        padding-left: 6px;
-    }
-}
-
-div.selector span {
-    height: 30px;
-    display: block;
-    line-height: 30px;
-    box-sizing: border-box;
-    padding: 0 5px 0 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-
-    &:after {
-        margin: 3px 3px 0 0;
-        display: inline-block;
-        font: 16px FontAwesome;
-        content: "\f0dd";
-        position: absolute;
-        right: 5px;
-    }
-}
-
-div.selector select {
-    z-index: 1;
-    padding: 0 5px;
-    left: 0;
-    width: auto;
-    box-sizing: border-box;
-}
-
-div.selector.input-widget-select select {
-    width: 100%;
-}
-
-/* start uniformjs customization (see documentation http://uniformjs.com/ selectAutoWidth property for explain this styles) */
-.controls select {
-    width: 279px;
-}
-
-.controls .selector select {
-    width: 100%;
-}
-
-/* end uniformjs customization */
-
-div.selector:active,
-div.selector.active {
-    background-position: -483px -156px;
-}
-
-div.selector.focus,
-div.selector.hover,
-div.selector:hover {
-    background-position: -483px -182px;
-}
-
-div.selector.focus:active,
-div.selector.focus.active,
-div.selector:hover:active,
-div.selector.active:hover {
-    background-position: -483px -208px;
-}
-
-div.selector.disabled {
-    background-position: left top !important;
-}
-
-div.selector.disabled span {
-    color: #aaa;
-
-    &:after {
-        color: #ddd;
-    }
 }
 
 .ui-slider {
@@ -1811,20 +1630,6 @@ h5.user-fieldset {
     min-width: 20px;
 }
 
-input:focus:invalid:focus,
-textarea:focus:invalid:focus,
-select:focus:invalid:focus,
-div.selector.focus,
-div.uploader.focus,
-.select2-container-active .select2-choice,
-.select2-container-active .select2-choices {
-    border-color: rgba(82, 168, 236, .8);
-    outline: 0;
-    outline: thin dotted \9;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(82, 168, 236, .6);
-    color: #555;
-}
-
 .separator-btn {
     border-left: 1px solid #e9e9e9;
     margin: 4px 8px 0;
@@ -1858,53 +1663,6 @@ div.uploader.focus,
     overflow: hidden;
     vertical-align: middle;
 }
-
-/* validation-error */
-.validation-error {
-    .error {
-        border: 1px solid #e9322d;
-        border-radius: 3px;
-        outline: 0;
-        outline: thin dotted \9;
-        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(211, 33, 33, .6);
-        color: #555;
-
-        &.validate-group {
-            margin-left: -6px;
-            padding-left: 5px;
-        }
-    }
-
-    div.error {
-        min-height: 28px;
-    }
-
-    .input-append.error,
-    .input-prepend.error {
-        border-width: 0;
-    }
-
-    .input-append.error > *,
-    .input-prepend.error > * {
-        border: 1px solid #e9322d;
-    }
-
-    .entity-create-dropdown > .dropdown-toggle {
-        border-width: 0;
-        height: 28px;
-    }
-
-    div.selector {
-        display: inline-block;
-        vertical-align: middle;
-    }
-}
-
-/* .validation-error div.selector {
-    border: 1px solid #d32121;
-    outline: thin dotted \9;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(211, 33, 33, .6);
-} */
 
 .validation-tooltip {
     font-size: 0;
@@ -1958,60 +1716,9 @@ label.radio.error {
     }
 }
 
-.collection-fields-list {
-    input[type='email'],
-    input[type='text'] {
-        float: left;
-    }
-
-    select,
-    .selector,
-    button {
-        float: left;
-        margin: 0 0 0 4px;
-    }
-
-    button.add-on {
-        float: none;
-    }
-}
-
-.choice-filter {
-    select,
-    textarea,
-    input[type="text"],
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="color"],
-    .uneditable-input {
-        height: 19px;
-    }
-}
-
 .choice-filter .input-append,
 .choice-filter .input-prepend {
     margin-bottom: 0;
-}
-
-.input-append .add-on,
-.input-prepend .add-on {
-    float: none;
-    height: 30px;
-
-    input[type='checkbox'],
-    input[type='radio'] {
-        margin-top: -1px;
-    }
 }
 
 .add-list-item {
@@ -2037,6 +1744,13 @@ label.radio.error {
         font-size: 0;
         line-height: 0;
         margin: 0 0 0 5px;
+
+        &:after {
+            display: inline-block;
+            font: 14px/1em FontAwesome;
+            content: '\f00d';
+            text-indent: 0;
+        }
     }
 
     .addAfterRow {
@@ -2066,7 +1780,7 @@ label.radio.error {
 .oro-address-collection.oro-item-collection {
     & > div {
         position: relative;
-        padding: 10px 15px 0 0;
+        padding: 16px;
         margin: 0 0 20px;
         border: 1px solid #e6e6e6;
         background: #f8f8f8;
@@ -2088,15 +1802,6 @@ label.radio.error {
             color: #bbb;
         }
     }
-}
-
-.form-horizontal .control-group {
-    margin: 0;
-    max-width: 800px;
-}
-
-.form-container .control-group {
-    margin: 0 0 10px;
 }
 
 
@@ -2127,25 +1832,10 @@ label.radio.error {
     box-shadow: none;
     height: 26px;
     width: 26px;
-
-    &:hover {
-        background: #eee;
-
-        .fa-star:before,
-        .fa-thumb-tack:before {
-            color: #d7d7d7;
-        }
-    }
 }
 
 .btn.favorite-button {
     padding: 1px 0;
-}
-
-.btn.favorite-button .fa-star:before,
-.btn.minimize-button .fa-thumb-tack:before {
-    color: #e7e7e7;
-    font-size: 19px;
 }
 
 .btn.favorite-button.gold-icon i:before,
@@ -2255,20 +1945,11 @@ iframe.email-body {
 }
 
 span.validation-failed {
-    color: $error-text;
+    color: $danger-dark;
     display: block;
-    margin: 5px 0 5px 14px;
-    line-height: 1.1em;
+    margin: 3px 0;
+    line-height: 1;
     clear: both;
-
-    &:before {
-        content: '\f00d';
-        color: $error-text;
-        font: normal 1.15em/1em FontAwesome;
-        display: inline-block;
-        width: 14px;
-        margin-left: -14px;
-    }
 }
 
 .default-field {
@@ -2410,7 +2091,7 @@ span.validation-failed {
 }
 
 .tooltip-icon {
-    color: #6b92d0;
+    color: $primary-700;
     font-size: 13px;
     cursor: pointer;
 }
@@ -2596,7 +2277,7 @@ label .popover-content {
 .entity-create-enabled {
     .input-prepend .select2-container,
     .input-append .select2-container {
-        width: 229px;
+        width: 228px;
     }
 }
 

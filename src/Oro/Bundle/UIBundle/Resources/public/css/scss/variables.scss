@@ -63,8 +63,9 @@ $base-font-size:                        14px;
 $base-font-size--xxl:                   32px;
 $base-font-size--xl:                    24px;
 $base-font-size--l:                     18px;
+$base-font-size--m:                     16px;
 $base-font-size--s:                     12px;
-$base-font-size--m:                     11px;
+$base-font-size--xs:                     11px;
 
 $input-border-radius:                   3px;
 $window-border-radius:                  3px;
@@ -122,3 +123,4 @@ $dot-menu-dropdown-max-height:          330px;
 
 // Highlight variables
 $highlight-text-color:                  #ffefa5;
+$highlight-text-items-switcher-inner-offset:                  8px 12px !default;
