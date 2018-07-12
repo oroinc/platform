@@ -145,7 +145,7 @@ config:
         'bootstrap-tab': 'bowerassets/bootstrap/js/bootstrap-tab.js'
         'bootstrap-tooltip': 'bowerassets/bootstrap/js/bootstrap-tooltip.js'
         'bootstrap-transition': 'bowerassets/bootstrap/js/bootstrap-transition.js'
-        'bootstrap-typeahead': 'bowerassets/bootstrap/js/bootstrap-typeahead.js'
+        'bootstrap-typeahead': 'bundles/oroui/lib/bootstrap/bootstrap-typeahead.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.js'
         'underscore': 'bundles/bowerassets/underscore/underscore.js'
         'backbone': 'bundles/bowerassets/backbone/backbone.js'
