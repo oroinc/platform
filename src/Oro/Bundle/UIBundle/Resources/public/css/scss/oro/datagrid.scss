@@ -1,93 +1,91 @@
-// moved out from oro.scss
-.grid-toolbar {
-  /* FE */
-  position: relative;
-  margin: 0 0 -15px;
-  padding: 8px $content-padding 8px;
-  .actions-panel {
-    margin-left: 5px;
-  }
-  .pagination {
-    margin: 0;
-    > ul {
-      > li {
-        a {
-          width:22px;
-          height:32px;
-          line-height: 32px;
-          font-size: 16px;
-          padding:0;
+/* @theme: admin.oro; */
 
-          &:hover, &:focus {
-          }
-          &:active {
-          }
+.grid-toolbar {
+    position: relative;
+    margin: 0 0 -15px;
+    padding: 8px $content-padding 8px;
+
+    .actions-panel {
+        margin-left: 5px;
+    }
+
+    .pagination {
+        margin: 0;
+
+        > ul {
+            > li {
+                a {
+                    width: 22px;
+                    height: 32px;
+                    line-height: 32px;
+                    font-size: 16px;
+                    padding: 0;
+                }
+
+                .fa-chevron-left,
+                .fa-chevron-right {
+                    &:before {
+                        margin: 0 5px;
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            > .disabled {
+                a,
+                a:active,
+                a:hover,
+                a:focus {
+                    opacity: .65;
+                    box-shadow: none;
+                }
+            }
         }
-        .fa-chevron-left:before,
-        .fa-chevron-right:before {
-          margin: 0 5px;
-          font-size:12px;
+    }
+
+    .pagination-centered {
+        width: 375px;
+        margin: 0 auto;
+        padding: 0 5px;
+
+        .icons-holder {
+            margin-left: 5px;
         }
-      }
-      > .disabled {
-        a, a:active, a:hover, a:focus {
-          opacity: .65;
-          box-shadow: none;
+
+        & .dib + .dib {
+            padding-left: 0;
         }
-      }
+
+        label {
+            cursor: auto;
+
+            &.dib {
+                line-height: 29px;
+            }
+        }
     }
-  }
-  .pagination-centered {
-    width: 375px;
-    margin: 0 auto;
-    padding: 0 5px;
-    .icons-holder {
-      margin-left: 5px;
+
+    .page-size {
+        .control-label {
+            text-align: right;
+            width: auto;
+            padding-top: 7px;
+        }
     }
-    & .dib+.dib {
-      padding-left: 0;
+
+    .mass-actions-panel {
+        .btn {
+            [class^="fa-"] {
+                margin: 0 -4px 0 -2px;
+            }
+        }
     }
-    label {
-      cursor: auto;
-      &.dib{
-        line-height: 29px;
-      }
+
+    .extra-actions-panel {
+        display: inline-block;
     }
-  }
-  .page-size {
-    .control-label {
-      text-align:right;
-      width: auto;
-      padding-top: 7px;
-    }
-  }
-  .btn-group {
-    .btn {
-      padding-left:7px;
-      padding-right:9px;
-      [class^="fa-"] {
-          &:before {
-              display: inline-block;
-              margin: 4px 1px 0 0;
-              color: #666;
-              font-size: $base-font-size;
-              line-height: 1.3em;
-              margin-left: 1px;
-          }
-      }
-    }
-  }
-  .mass-actions-panel {
-    .btn {
-      [class^="fa-"] {
-        margin:0 -4px 0 -2px;
-      }
-    }
-  }
-  .extra-actions-panel {
-    display: inline-block;
-  }
 }
+
 .other-scroll-container {
     margin: $content-padding;
 }

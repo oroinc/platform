@@ -3,12 +3,6 @@
 .tags-container {
     line-height: 25px;
 
-    .table & {
-        line-height: 24px;
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-
     &__tag-entry {
         color: $tag-item-color;
         background-color: $tag-item-background;

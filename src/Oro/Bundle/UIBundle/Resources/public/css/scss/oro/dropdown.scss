@@ -6,6 +6,7 @@
     margin: $dropdown-menu-offset;
     padding: $dropdown-menu-inner-offset;
     border: $dropdown-menu-border;
+    border-radius: $dropdown-menu-border-radius;
     box-shadow: $dropdown-menu-box-shadow;
 
     &__select-all-header-cell,
@@ -26,6 +27,24 @@
         > li {
             display: table-cell;
         }
+    }
+
+    &__floating {
+        margin-top: 0;
+
+        > li > a,
+        > li > button {
+            padding-top: 1px;
+            padding-bottom: 1px;
+            font-size: 12px;
+            color: #444;
+            text-transform: capitalize;
+        }
+    }
+
+    .divider {
+        border-bottom-color: #eee;
+        margin: 4px 0;
     }
 }
 

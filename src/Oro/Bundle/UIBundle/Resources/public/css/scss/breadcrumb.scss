@@ -1,0 +1,48 @@
+/* @theme: admin.oro; */
+
+.breadcrumb {
+    float: left;
+    background: none;
+    margin: 0;
+    padding: 6px 15px 6px $content-padding;
+
+    > li {
+        &,
+        &.active {
+            color: #777;
+            font: 11px/14px $base-font-family;
+            word-break: break-all;
+        }
+
+        > .divider {
+            color: #777;
+            padding: 0 1px 0 4px;
+        }
+    }
+
+    .lang-en & {
+        li {
+            text-transform: capitalize;
+        }
+    }
+}
+
+.breadcrumb-pin {
+    border-bottom: 1px solid #f2f2f2;
+    padding: 0;
+    background-color: #fff;
+
+    #bookmark-buttons {
+        float: right;
+    }
+
+    #breadcrumb {
+        float: left;
+    }
+
+    &:after {
+        display: block;
+        content: '';
+        clear: both;
+    }
+}
