@@ -46,7 +46,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
-    public function testGetMetadata()
+    public function testGetMetadataWhenNoValueInBaseForm()
     {
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => 'field', 'class' => \stdClass::class]);
 
@@ -88,6 +88,60 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit_Framework_TestCase
                 'lazy' => false,
                 'class' => 'stdClass',
                 'initialData' => null
+            ],
+            $this->filter->getMetadata()
+        );
+    }
+
+    public function testGetMetadataWithIntegerValues()
+    {
+        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => 'field', 'class' => \stdClass::class]);
+
+        $childFormView = new FormView();
+        $childFormView->vars['choices'] = [];
+        $formView = new FormView();
+        $formView->children['type'] = $childFormView;
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('createView')
+            ->willReturn($formView);
+
+        $initialData = 'some initial data';
+        $valueForm = $this->createMock(FormInterface::class);
+        $valueForm->expects($this->once())
+            ->method('getData')
+            ->willReturn([105, 'tutti']);
+        $form->expects($this->once())
+            ->method('get')
+            ->with('value')
+            ->willReturn($valueForm);
+        $this->dictionaryManager->expects($this->once())
+            ->method('findValueByPrimaryKey')
+            ->with($this->equalTo(['105', 'tutti'], 0, 0, true))
+            ->willReturn($initialData);
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(
+                SearchEnumFilterType::NAME,
+                [],
+                ['csrf_protection' => false, 'class' => \stdClass::class]
+            )
+            ->willReturn($form);
+
+        $this->assertEquals(
+            [
+                'name' => 'test',
+                'label' => 'Test',
+                'choices' => [],
+                'data_name' => 'field',
+                'ftype' => 'multiselect',
+                'options' => [
+                    'class' => \stdClass::class
+                ],
+                'lazy' => false,
+                'class' => 'stdClass',
+                'initialData' => $initialData
             ],
             $this->filter->getMetadata()
         );

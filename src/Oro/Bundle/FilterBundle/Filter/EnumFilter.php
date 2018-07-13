@@ -10,6 +10,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
+/**
+ * Enum filter provides possibility to create filter form and build an expression by passed enum data
+ */
 class EnumFilter extends BaseMultiChoiceFilter
 {
     const FILTER_TYPE_NAME = 'enum';
@@ -64,9 +67,9 @@ class EnumFilter extends BaseMultiChoiceFilter
             $this->dictionaryApiEntityManager->setClass(
                 $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true)
             );
-            $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
-                $this->getForm()->get('value')->getData()
-            );
+            // Convert integer values in array to strings
+            $keys = array_map('strval', $this->getForm()->get('value')->getData() ?? []);
+            $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey($keys);
         }
 
         return $metadata;
