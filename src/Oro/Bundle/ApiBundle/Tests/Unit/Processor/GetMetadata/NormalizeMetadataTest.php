@@ -131,7 +131,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 ],
                 'association3' => [
                     'property_path' => 'realAssociation3'
-                ],
+                ]
             ]
         ];
 
@@ -183,7 +183,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 'field1' => null,
                 'field2' => [
                     'exclude' => true
-                ],
+                ]
             ]
         ];
 
@@ -213,7 +213,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'field1' => null,
+                'field1' => null
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -245,7 +245,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'field2' => [
                     'property_path' => 'realField2'
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -277,7 +277,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'association3' => [
                     'property_path' => 'association31.association311'
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -313,7 +313,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'association3' => [
                     'property_path' => 'association31.association311'
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -359,7 +359,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                             ]
                         ]
                     ]
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -452,7 +452,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'field5' => [
                     'property_path' => 'association51.field511'
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -502,7 +502,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'fields'           => [
                 'field6' => [
                     'property_path' => 'field61.field611'
-                ],
+                ]
             ]
         ];
         $configObject = $this->createConfigObject($config);
@@ -657,7 +657,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             'exclusion_policy' => 'all',
             'fields'           => [
                 'linkedAssociation1' => [
-                    'property_path' => 'realAssociation1.realAssociation11',
+                    'property_path' => 'realAssociation1.realAssociation11'
                 ],
                 'association1'       => [
                     'exclude'       => true,

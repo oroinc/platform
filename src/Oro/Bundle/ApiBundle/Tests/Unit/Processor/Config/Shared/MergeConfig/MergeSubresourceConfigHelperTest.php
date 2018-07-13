@@ -8,23 +8,19 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceCon
 
 class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mergeActionConfigHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeActionConfigHelper */
+    private $mergeActionConfigHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mergeFilterConfigHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeFilterConfigHelper */
+    private $mergeFilterConfigHelper;
 
     /** @var MergeSubresourceConfigHelper */
-    protected $mergeSubresourceConfigHelper;
+    private $mergeSubresourceConfigHelper;
 
     protected function setUp()
     {
-        $this->mergeActionConfigHelper = $this->getMockBuilder(MergeActionConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mergeFilterConfigHelper = $this->getMockBuilder(MergeFilterConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mergeActionConfigHelper = $this->createMock(MergeActionConfigHelper::class);
+        $this->mergeFilterConfigHelper = $this->createMock(MergeFilterConfigHelper::class);
 
         $this->mergeSubresourceConfigHelper = new MergeSubresourceConfigHelper(
             $this->mergeActionConfigHelper,

@@ -9,10 +9,10 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 class CompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
-    protected $entityIdTransformerRegistry;
+    private $entityIdTransformerRegistry;
 
     /** @var CompositeIdentifierFilterFactory */
-    protected $factory;
+    private $factory;
 
     protected function setUp()
     {

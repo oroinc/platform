@@ -60,7 +60,7 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap(
                 [
                     ['alias1', 'Test\Class1'],
-                    ['alias2', 'Test\Class2'],
+                    ['alias2', 'Test\Class2']
                 ]
             );
 

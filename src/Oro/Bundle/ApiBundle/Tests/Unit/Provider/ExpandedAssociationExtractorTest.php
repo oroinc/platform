@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpandedAssociationExtractor */
-    protected $extractor;
+    private $extractor;
 
     protected function setUp()
     {

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */
-    protected $collection;
+    private $collection;
 
     protected function setUp()
     {
@@ -84,7 +84,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [''],
-            [' '],
+            [' ']
         ];
     }
 
@@ -101,7 +101,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         return [
             ['test'],
             [123],
-            [1.23],
+            [1.23]
         ];
     }
 

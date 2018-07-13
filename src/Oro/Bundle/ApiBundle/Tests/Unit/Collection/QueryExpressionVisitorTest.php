@@ -132,7 +132,7 @@ class QueryExpressionVisitorTest extends \PHPUnit\Framework\TestCase
             [
                 new OrmComparison('e.test', '=', ':e_test'),
                 new OrmComparison('e.id', '=', ':e_id'),
-                new OrmComparison('e.id', '=', ':e_id_2'),
+                new OrmComparison('e.id', '=', ':e_id_2')
             ],
             $result->getParts()
         );
@@ -140,7 +140,7 @@ class QueryExpressionVisitorTest extends \PHPUnit\Framework\TestCase
             [
                 new Parameter('e_test', 1, 'integer'),
                 new Parameter('e_id', 12, 'integer'),
-                new Parameter('e_id_2', 25, 'integer'),
+                new Parameter('e_id_2', 25, 'integer')
             ],
             $expressionVisitor->getParameters()
         );

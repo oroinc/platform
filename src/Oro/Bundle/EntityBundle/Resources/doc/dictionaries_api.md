@@ -88,13 +88,3 @@ And second, you should register your provider service in the DI container by the
 
 Please, note that you can specify the priority for the dictionary value list provider. The bigger the priority number is, the earlier the provider will be executed.
 If there are more than one dictionary value list providers that support the same type of dictionary, only the one with the greater priority will be executed. The priority value is optional and defaults to 0.
-
-
-***Troubleshooting***
-
-In case if the REST API resource for your custom dictionary type is not available, do the following:
-
-- Make sure that `getSupportedEntityClasses()` method in the corresponding dictionary value provider returns your dictionary entity class
-- Find the plural alias of your dictionary entity using `php bin/console oro:entity-alias:debug` CLI command
-- Check if this alias is present in the routing list with the help of `php bin/console oro:entity-alias:debug` CLI command.
-The found route name should start with the `oro_api_get_dictionary_values_` prefix, e.g.: `oro_api_get_dictionary_values_auto_790    GET    ANY    ANY  /api/rest/{version}/casestatuses.{_format}`

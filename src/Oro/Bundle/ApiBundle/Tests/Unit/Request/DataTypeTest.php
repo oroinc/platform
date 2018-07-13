@@ -21,7 +21,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['object', false],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -39,7 +39,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['nestedAssociation', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -60,7 +60,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['nestedObject', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -79,7 +79,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['association:manyToOne:kind', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -97,7 +97,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     {
         return [
             ['association:manyToOne', 'manyToOne', null],
-            ['association:manyToOne:kind', 'manyToOne', 'kind'],
+            ['association:manyToOne:kind', 'manyToOne', 'kind']
         ];
     }
 
@@ -119,7 +119,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['association::'],
             ['association:manyToOne:'],
             [null],
-            [''],
+            ['']
         ];
     }
 }

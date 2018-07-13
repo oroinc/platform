@@ -10,10 +10,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
-    protected $cache;
+    private $cache;
 
     /** @var ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
 
     protected function setUp()
     {

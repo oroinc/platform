@@ -19,14 +19,14 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var SubresourceContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -41,7 +41,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
      *
      * @return Config
      */
-    protected function getConfig(array $data = [])
+    private function getConfig(array $data = [])
     {
         $result = new Config();
         foreach ($data as $sectionName => $config) {

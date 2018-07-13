@@ -18,7 +18,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
-    public const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
+    public const API_DOC_VIEWS_PARAMETER_NAME        = 'oro_api.api_doc.views';
+    public const API_DOC_DEFAULT_VIEW_PARAMETER_NAME = 'oro_api.api_doc.default_view';
 
     private const ACTION_PROCESSOR_BAG_SERVICE_ID               = 'oro_api.action_processor_bag';
     private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
@@ -169,7 +170,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
-        $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, array_keys($config['api_doc_views']));
+        $apiDocViews = $config['api_doc_views'];
+        $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, array_keys($apiDocViews));
+        $container->setParameter(self::API_DOC_DEFAULT_VIEW_PARAMETER_NAME, $this->getDefaultView($apiDocViews));
     }
 
     /**
@@ -259,5 +262,23 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                 );
             }
         }
+    }
+
+    /**
+     * @param array $views
+     *
+     * @return string|null
+     */
+    private function getDefaultView(array $views): ?string
+    {
+        $defaultView = null;
+        foreach ($views as $name => $view) {
+            if (\array_key_exists('default', $view) && $view['default']) {
+                $defaultView = $name;
+                break;
+            }
+        }
+
+        return $defaultView;
     }
 }

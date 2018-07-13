@@ -36,7 +36,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId(123);
 
-        $this->entityIdTransformer->expects($this->never())
+        $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
         $this->processor->process($this->context);
@@ -48,14 +48,14 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->context->setParentId('123');
         $this->context->setParentMetadata(new EntityMetadata());
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->with($this->context->getParentId(), self::identicalTo($this->context->getParentMetadata()))
             ->willReturn(123);
 
         $this->processor->process($this->context);
 
-        $this->assertSame(123, $this->context->getParentId());
+        self::assertSame(123, $this->context->getParentId());
     }
 
     public function testProcessForInvalidParentId()
@@ -64,15 +64,15 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->context->setParentId('123');
         $this->context->setParentMetadata(new EntityMetadata());
 
-        $this->entityIdTransformer->expects($this->once())
+        $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
             ->with($this->context->getParentId(), self::identicalTo($this->context->getParentMetadata()))
             ->willThrowException(new \Exception('some error'));
 
         $this->processor->process($this->context);
 
-        $this->assertSame('123', $this->context->getParentId());
-        $this->assertEquals(
+        self::assertSame('123', $this->context->getParentId());
+        self::assertEquals(
             [
                 Error::createValidationError('entity identifier constraint')
                     ->setInnerException(new \Exception('some error'))

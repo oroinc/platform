@@ -25,7 +25,7 @@ class InitializeEntityMapperTest extends FormProcessorTestCase
     /** @var InitializeEntityMapper */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

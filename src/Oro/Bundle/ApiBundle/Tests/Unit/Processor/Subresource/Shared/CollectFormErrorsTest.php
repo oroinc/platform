@@ -20,10 +20,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

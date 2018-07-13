@@ -16,7 +16,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $normalizedConfig = $normalizer->normalizeConfig($config);
 
-        $this->assertEquals($expectedConfig, $normalizedConfig);
+        self::assertEquals($expectedConfig, $normalizedConfig);
     }
 
     /**
@@ -44,9 +44,9 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                                         ],
                                         'field112' => null
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
@@ -62,9 +62,9 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                                     'fields' => [
                                         'field112' => null
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ]
             ],
@@ -131,7 +131,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     '_excluded_fields' => ['field1', 'field2'],
                     'fields'           => [
                         'field1' => [
-                            'exclude' => true,
+                            'exclude' => true
                         ],
                         'field2' => [
                             'exclude'    => true,
@@ -161,7 +161,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     '_excluded_fields' => ['field1', 'field2'],
                     'fields'           => [
                         'field1' => [
-                            'exclude' => false,
+                            'exclude' => false
                         ],
                         'field2' => [
                             'exclude'    => false,
@@ -180,7 +180,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                         'field' => [
                             'fields' => [
                                 'field1' => [
-                                    'exclude' => true,
+                                    'exclude' => true
                                 ],
                                 'field2' => [
                                     'depends_on' => ['field1']
@@ -196,7 +196,7 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                             '_excluded_fields' => ['field1'],
                             'fields'           => [
                                 'field1' => [
-                                    'exclude' => false,
+                                    'exclude' => false
                                 ],
                                 'field2' => [
                                     'depends_on' => ['field1']
@@ -367,9 +367,9 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                                             'exclude' => true
                                         ]
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
@@ -391,9 +391,9 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                                             'exclude' => false
                                         ]
                                     ]
-                                ],
+                                ]
                             ]
-                        ],
+                        ]
                     ]
                 ]
             ],
@@ -403,14 +403,14 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
                     'fields'           => [
                         'association1' => [
                             'data_type' => 'association:manyToOne'
-                        ],
+                        ]
                     ]
                 ],
                 'expectedConfig' => [
                     'exclusion_policy' => 'all',
                     'fields'           => []
                 ]
-            ],
+            ]
         ];
     }
 }

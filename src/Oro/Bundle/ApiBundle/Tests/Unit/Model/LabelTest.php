@@ -10,7 +10,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
     }

@@ -942,7 +942,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             'fields'   => [
                 'field1' => [
                     'property_path' => 'realField1'
-                ],
+                ]
             ],
             'filters'  => [
                 'fields' => [
@@ -953,7 +953,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 'fields' => [
                     'field1' => null
                 ]
-            ],
+            ]
         ];
 
         $this->configBag->expects(self::exactly(2))

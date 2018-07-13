@@ -23,8 +23,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function PageView() {
-            PageView.__super__.constructor.apply(this, arguments);
+        constructor: function PageLayoutView() {
+            PageLayoutView.__super__.constructor.apply(this, arguments);
         },
 
         /**

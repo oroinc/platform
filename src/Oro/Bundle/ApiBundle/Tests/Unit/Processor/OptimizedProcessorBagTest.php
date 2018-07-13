@@ -14,28 +14,28 @@ use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorFactoryInterface */
-    protected $processorFactory;
+    private $processorFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
-    protected $applicableCheckerFactory;
+    private $applicableCheckerFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
-    protected $processorIteratorFactory;
+    private $processorIteratorFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
-    protected $ungroupedApplicableCheckerFactory;
+    private $ungroupedApplicableCheckerFactory;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
-    protected $ungroupedProcessorIteratorFactory;
+    private $ungroupedProcessorIteratorFactory;
 
     /** @var ChainApplicableChecker */
-    protected $applicableChecker;
+    private $applicableChecker;
 
     /** @var ChainApplicableChecker */
-    protected $ungroupedApplicableChecker;
+    private $ungroupedApplicableChecker;
 
     /** @var OptimizedProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
     protected function setUp()
     {

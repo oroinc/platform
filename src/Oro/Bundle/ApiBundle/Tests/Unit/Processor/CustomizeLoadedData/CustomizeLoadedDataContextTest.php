@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -17,43 +17,43 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testRootClassName()
     {
-        $this->assertNull($this->context->getRootClassName());
+        self::assertNull($this->context->getRootClassName());
 
         $this->context->setRootClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getRootClassName());
+        self::assertEquals('Test\Class', $this->context->getRootClassName());
     }
 
     public function testClassName()
     {
-        $this->assertNull($this->context->getClassName());
+        self::assertNull($this->context->getClassName());
 
         $this->context->setClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getClassName());
+        self::assertEquals('Test\Class', $this->context->getClassName());
     }
 
     public function testPropertyPath()
     {
-        $this->assertNull($this->context->getPropertyPath());
+        self::assertNull($this->context->getPropertyPath());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertEquals('field1.field11', $this->context->getPropertyPath());
+        self::assertEquals('field1.field11', $this->context->getPropertyPath());
     }
 
     public function testRootConfig()
     {
-        $this->assertNull($this->context->getRootConfig());
+        self::assertNull($this->context->getRootConfig());
 
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        $this->assertNull($this->context->getRootConfig());
+        self::assertNull($this->context->getRootConfig());
 
         $this->context->setPropertyPath('test');
-        $this->assertSame($config, $this->context->getRootConfig());
+        self::assertSame($config, $this->context->getRootConfig());
     }
 
     public function testConfigForKnownField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config
@@ -63,10 +63,10 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
             ->createAndSetTargetEntity();
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
+        self::assertSame(
             $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
             $this->context->getConfig()
         );
@@ -74,21 +74,21 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigForUnknownField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('unknownField.field11');
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
     }
 
     public function testConfigForExcludedField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config
@@ -99,10 +99,10 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $config->getField('field1')->setExcluded();
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
+        self::assertSame(
             $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
             $this->context->getConfig()
         );

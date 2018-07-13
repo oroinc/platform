@@ -14,7 +14,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NestedAssociationListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @return FormEvent
      */
-    protected function getFormEvent($entity, $data)
+    private function getFormEvent($entity, $data)
     {
         $parentForm = $this->createMock(FormInterface::class);
         $parentForm->expects(self::once())
@@ -68,8 +68,8 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
             $this->getFormEvent($entity, new EntityIdentifier(123, 'Test\Entity'))
         );
 
-        $this->assertEquals('Test\Entity', $entity->relatedObjectClassName);
-        $this->assertEquals(123, $entity->relatedObjectId);
+        self::assertEquals('Test\Entity', $entity->relatedObjectClassName);
+        self::assertEquals(123, $entity->relatedObjectId);
     }
 
     public function testPostSubmitWithNullData()
@@ -80,8 +80,8 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
             $this->getFormEvent($entity, null)
         );
 
-        $this->assertNull($entity->relatedObjectClassName);
-        $this->assertNull($entity->relatedObjectId);
+        self::assertNull($entity->relatedObjectClassName);
+        self::assertNull($entity->relatedObjectId);
     }
 
     // @codingStandardsIgnoreStart

@@ -12,10 +12,10 @@ use Oro\Bundle\ApiBundle\Request\Version;
 class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    protected $configBag;
+    private $configBag;
 
     /** @var LoadFromConfigBag */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

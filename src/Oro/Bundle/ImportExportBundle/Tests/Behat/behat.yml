@@ -1,5 +1,9 @@
 oro_behat_extension:
   elements:
+    ImportFileForm:
+      selector: 'form[name="oro_importexport_import"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
     ActiveImportFileField:
       selector: ".import-widget-content .tab-pane.active input[id^='oro_importexport_import_file']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
@@ -23,3 +27,8 @@ oro_behat_extension:
     ImportErrors:
       selector: 'div.import-errors'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    ImportFileFieldValidation:
+      selector:
+        type: 'xpath'
+        locator: "//form[@name='oro_importexport_import_']/span[@class='validation-failed']/span"

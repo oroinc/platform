@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    protected $container;
+    private $container;
 
     protected function setUp()
     {

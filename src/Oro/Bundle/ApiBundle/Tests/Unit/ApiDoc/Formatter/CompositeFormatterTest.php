@@ -10,13 +10,13 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
-    protected $docViewDetector;
+    private $docViewDetector;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormatterInterface */
-    protected $formatter;
+    private $formatter;
 
     /** @var CompositeFormatter */
-    protected $compositeFormatter;
+    private $compositeFormatter;
 
     protected function setUp()
     {

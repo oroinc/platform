@@ -73,7 +73,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
         return [
             [new AccessDeniedException()],
             [new \LogicException('random', 0, new AccessDeniedException('embed', new AuthenticationException()))],
-            [new AccessDeniedException('random', new \LogicException())],
+            [new AccessDeniedException('random', new \LogicException())]
         ];
     }
 

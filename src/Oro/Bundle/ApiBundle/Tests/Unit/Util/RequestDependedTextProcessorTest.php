@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestDependedTextProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -46,7 +46,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
             ['{@request:json_api|another}JSON API | Another{@/request}', 'JSON API | Another'],
             ['{@request:json_api|!another}JSON API | !Another{@/request}', 'JSON API | !Another'],
             ['Hello {@request:json_api}JSON API{@/request}!', 'Hello JSON API!'],
-            ['{@request:rest}REST{@/request} {@request:json_api}JSON API{@/request}', 'REST JSON API'],
+            ['{@request:rest}REST{@/request} {@request:json_api}JSON API{@/request}', 'REST JSON API']
         ];
     }
 
@@ -73,7 +73,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
             ['{@request:json_api}JSON API{@request}'],
             ['{@request:json_api}JSON API{@/request'],
             ['{@request:json_api}JSON API{/@request}'],
-            ['{@request:json_api}JSON API@/request}'],
+            ['{@request:json_api}JSON API@/request}']
         ];
     }
 }

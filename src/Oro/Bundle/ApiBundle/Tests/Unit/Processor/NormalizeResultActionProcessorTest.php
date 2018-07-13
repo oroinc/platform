@@ -28,25 +28,25 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ACTION = 'test';
+    private const TEST_ACTION = 'test';
 
     /** @var SimpleProcessorFactory */
-    protected $processorFactory;
+    private $processorFactory;
 
     /** @var ProcessorBagConfigBuilder */
-    protected $processorBagConfigBuilder;
+    private $processorBagConfigBuilder;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /** @var ProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
     /** @var NormalizeResultActionProcessor */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -73,7 +73,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return NormalizeResultContext
      */
-    protected function getContext()
+    private function getContext()
     {
         $context = new NormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
@@ -87,7 +87,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return BufferingLogger
      */
-    protected function setLogger()
+    private function setLogger()
     {
         $logger = new BufferingLogger();
         $this->processor->setLogger($logger);
@@ -101,7 +101,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorInterface
      */
-    protected function addProcessor($processorId, $groupName)
+    private function addProcessor($processorId, $groupName)
     {
         $processor = $this->createMock(ProcessorInterface::class);
         $this->processorFactory->addProcessor($processorId, $processor);

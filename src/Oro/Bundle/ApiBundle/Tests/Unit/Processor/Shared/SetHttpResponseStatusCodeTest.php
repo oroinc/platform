@@ -12,7 +12,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
     /** @var SetHttpResponseStatusCode */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

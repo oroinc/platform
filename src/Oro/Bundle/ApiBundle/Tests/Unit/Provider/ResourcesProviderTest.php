@@ -44,7 +44,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
         $expectedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
@@ -82,7 +82,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
         $cachedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
 
         $this->processor->expects(self::never())
@@ -140,7 +140,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         ];
         $expectedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
@@ -248,7 +248,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         ];
         $expectedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 
@@ -356,7 +356,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         ];
         $expectedResources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $expectedAccessibleResources = ['Test\Entity3'];
 

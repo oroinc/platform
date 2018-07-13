@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 class AssertResultSchemaTest extends GetListProcessorTestCase
 {
     /** @var AssertResultSchema */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

@@ -8,11 +8,15 @@ use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * General methods of working with attachments
+ */
 class AttachmentManager
 {
     /**
@@ -207,11 +211,7 @@ class AttachmentManager
      */
     public function getFileSize($bytes)
     {
-        $sz = ['B', 'KB', 'MB', 'GB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
-        $key = (int)$factor;
-
-        return isset($sz[$key]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[$key] : $bytes;
+        return BytesFormatter::format($bytes);
     }
 
     /**

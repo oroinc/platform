@@ -30,7 +30,7 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
-        $qb = $this->getQueryBuilderMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $this->context->setQuery($qb);
         $this->processor->process($this->context);

@@ -31,11 +31,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
         $entityMetadataClone = clone $entityMetadata;
 
-        $this->assertEquals($entityMetadata, $entityMetadataClone);
-        $this->assertNotSame($objValue, $entityMetadataClone->get('test_object'));
-        $this->assertNotSame($metaProperty1, $entityMetadataClone->getMetaProperty('metaProperty1'));
-        $this->assertNotSame($field1, $entityMetadataClone->getField('field1'));
-        $this->assertNotSame($association1, $entityMetadataClone->getAssociation('association1'));
+        self::assertEquals($entityMetadata, $entityMetadataClone);
+        self::assertNotSame($objValue, $entityMetadataClone->get('test_object'));
+        self::assertNotSame($metaProperty1, $entityMetadataClone->getMetaProperty('metaProperty1'));
+        self::assertNotSame($field1, $entityMetadataClone->getField('field1'));
+        self::assertNotSame($association1, $entityMetadataClone->getAssociation('association1'));
     }
 
     public function testCloneForEmptyEntityMetadata()
@@ -44,7 +44,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
         $entityMetadataClone = clone $entityMetadata;
 
-        $this->assertEquals($entityMetadata, $entityMetadataClone);
+        self::assertEquals($entityMetadata, $entityMetadataClone);
     }
 
     public function testToArray()
@@ -68,7 +68,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1->setDataType('testDataType');
         $entityMetadata->addAssociation($association1);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'class'                    => 'Test\Class',
                 'inherited'                => true,
@@ -92,9 +92,9 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
                         'nullable'         => false,
                         'collapsed'        => false,
                         'association_type' => null,
-                        'collection'       => false,
+                        'collection'       => false
                     ]
-                ],
+                ]
             ],
             $entityMetadata->toArray()
         );
@@ -104,7 +104,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     {
         $associationMetadata = new EntityMetadata();
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $associationMetadata->toArray()
         );
@@ -113,138 +113,138 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     public function testClassName()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertNull($entityMetadata->getClassName());
+        self::assertNull($entityMetadata->getClassName());
 
         $entityMetadata->setClassName('Test\Class');
-        $this->assertEquals('Test\Class', $entityMetadata->getClassName());
+        self::assertEquals('Test\Class', $entityMetadata->getClassName());
     }
 
     public function testIdentifierFieldNames()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertEmpty($entityMetadata->getIdentifierFieldNames());
-        $this->assertFalse($entityMetadata->hasIdentifierFields());
+        self::assertEmpty($entityMetadata->getIdentifierFieldNames());
+        self::assertFalse($entityMetadata->hasIdentifierFields());
 
         $entityMetadata->setIdentifierFieldNames(['id']);
-        $this->assertEquals(['id'], $entityMetadata->getIdentifierFieldNames());
-        $this->assertTrue($entityMetadata->hasIdentifierFields());
+        self::assertEquals(['id'], $entityMetadata->getIdentifierFieldNames());
+        self::assertTrue($entityMetadata->hasIdentifierFields());
     }
 
     public function testInheritedType()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertFalse($entityMetadata->isInheritedType());
+        self::assertFalse($entityMetadata->isInheritedType());
 
         $entityMetadata->setInheritedType(true);
-        $this->assertTrue($entityMetadata->isInheritedType());
+        self::assertTrue($entityMetadata->isInheritedType());
 
         $entityMetadata->setInheritedType(false);
-        $this->assertFalse($entityMetadata->isInheritedType());
+        self::assertFalse($entityMetadata->isInheritedType());
     }
 
     public function testIdentifierGenerator()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertFalse($entityMetadata->hasIdentifierGenerator());
+        self::assertFalse($entityMetadata->hasIdentifierGenerator());
 
         $entityMetadata->setHasIdentifierGenerator(true);
-        $this->assertTrue($entityMetadata->hasIdentifierGenerator());
+        self::assertTrue($entityMetadata->hasIdentifierGenerator());
 
         $entityMetadata->setHasIdentifierGenerator(false);
-        $this->assertFalse($entityMetadata->hasIdentifierGenerator());
+        self::assertFalse($entityMetadata->hasIdentifierGenerator());
     }
 
     public function testMetaProperties()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertCount(0, $entityMetadata->getMetaProperties());
-        $this->assertFalse($entityMetadata->hasProperty('unknown'));
-        $this->assertFalse($entityMetadata->hasMetaProperty('unknown'));
-        $this->assertNull($entityMetadata->getProperty('unknown'));
-        $this->assertNull($entityMetadata->getMetaProperty('unknown'));
+        self::assertCount(0, $entityMetadata->getMetaProperties());
+        self::assertFalse($entityMetadata->hasProperty('unknown'));
+        self::assertFalse($entityMetadata->hasMetaProperty('unknown'));
+        self::assertNull($entityMetadata->getProperty('unknown'));
+        self::assertNull($entityMetadata->getMetaProperty('unknown'));
 
         $property1 = new MetaPropertyMetadata('property1');
-        $this->assertSame($property1, $entityMetadata->addMetaProperty($property1));
+        self::assertSame($property1, $entityMetadata->addMetaProperty($property1));
         $property2 = new MetaPropertyMetadata('property2');
-        $this->assertSame($property2, $entityMetadata->addMetaProperty($property2));
-        $this->assertCount(2, $entityMetadata->getMetaProperties());
+        self::assertSame($property2, $entityMetadata->addMetaProperty($property2));
+        self::assertCount(2, $entityMetadata->getMetaProperties());
 
-        $this->assertTrue($entityMetadata->hasProperty('property1'));
-        $this->assertTrue($entityMetadata->hasMetaProperty('property1'));
-        $this->assertSame($property1, $entityMetadata->getProperty('property1'));
-        $this->assertSame($property1, $entityMetadata->getMetaProperty('property1'));
+        self::assertTrue($entityMetadata->hasProperty('property1'));
+        self::assertTrue($entityMetadata->hasMetaProperty('property1'));
+        self::assertSame($property1, $entityMetadata->getProperty('property1'));
+        self::assertSame($property1, $entityMetadata->getMetaProperty('property1'));
 
         $entityMetadata->removeMetaProperty('property1');
-        $this->assertCount(1, $entityMetadata->getMetaProperties());
-        $this->assertFalse($entityMetadata->hasProperty('property1'));
-        $this->assertFalse($entityMetadata->hasMetaProperty('property1'));
+        self::assertCount(1, $entityMetadata->getMetaProperties());
+        self::assertFalse($entityMetadata->hasProperty('property1'));
+        self::assertFalse($entityMetadata->hasMetaProperty('property1'));
 
         $entityMetadata->removeProperty('property2');
-        $this->assertCount(0, $entityMetadata->getMetaProperties());
-        $this->assertFalse($entityMetadata->hasProperty('property2'));
-        $this->assertFalse($entityMetadata->hasMetaProperty('property2'));
+        self::assertCount(0, $entityMetadata->getMetaProperties());
+        self::assertFalse($entityMetadata->hasProperty('property2'));
+        self::assertFalse($entityMetadata->hasMetaProperty('property2'));
     }
 
     public function testFields()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertCount(0, $entityMetadata->getFields());
-        $this->assertFalse($entityMetadata->hasProperty('unknown'));
-        $this->assertFalse($entityMetadata->hasField('unknown'));
-        $this->assertNull($entityMetadata->getProperty('unknown'));
-        $this->assertNull($entityMetadata->getField('unknown'));
+        self::assertCount(0, $entityMetadata->getFields());
+        self::assertFalse($entityMetadata->hasProperty('unknown'));
+        self::assertFalse($entityMetadata->hasField('unknown'));
+        self::assertNull($entityMetadata->getProperty('unknown'));
+        self::assertNull($entityMetadata->getField('unknown'));
 
         $field1 = new FieldMetadata('field1');
-        $this->assertSame($field1, $entityMetadata->addField($field1));
+        self::assertSame($field1, $entityMetadata->addField($field1));
         $field2 = new FieldMetadata('field2');
-        $this->assertSame($field2, $entityMetadata->addField($field2));
-        $this->assertCount(2, $entityMetadata->getFields());
+        self::assertSame($field2, $entityMetadata->addField($field2));
+        self::assertCount(2, $entityMetadata->getFields());
 
-        $this->assertTrue($entityMetadata->hasProperty('field1'));
-        $this->assertTrue($entityMetadata->hasField('field1'));
-        $this->assertSame($field1, $entityMetadata->getProperty('field1'));
-        $this->assertSame($field1, $entityMetadata->getField('field1'));
+        self::assertTrue($entityMetadata->hasProperty('field1'));
+        self::assertTrue($entityMetadata->hasField('field1'));
+        self::assertSame($field1, $entityMetadata->getProperty('field1'));
+        self::assertSame($field1, $entityMetadata->getField('field1'));
 
         $entityMetadata->removeField('field1');
-        $this->assertCount(1, $entityMetadata->getFields());
-        $this->assertFalse($entityMetadata->hasProperty('field1'));
-        $this->assertFalse($entityMetadata->hasField('field1'));
+        self::assertCount(1, $entityMetadata->getFields());
+        self::assertFalse($entityMetadata->hasProperty('field1'));
+        self::assertFalse($entityMetadata->hasField('field1'));
 
         $entityMetadata->removeProperty('field2');
-        $this->assertCount(0, $entityMetadata->getFields());
-        $this->assertFalse($entityMetadata->hasProperty('field2'));
-        $this->assertFalse($entityMetadata->hasField('field2'));
+        self::assertCount(0, $entityMetadata->getFields());
+        self::assertFalse($entityMetadata->hasProperty('field2'));
+        self::assertFalse($entityMetadata->hasField('field2'));
     }
 
     public function testAssociations()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertCount(0, $entityMetadata->getAssociations());
-        $this->assertFalse($entityMetadata->hasProperty('unknown'));
-        $this->assertFalse($entityMetadata->hasAssociation('unknown'));
-        $this->assertNull($entityMetadata->getProperty('unknown'));
-        $this->assertNull($entityMetadata->getAssociation('unknown'));
+        self::assertCount(0, $entityMetadata->getAssociations());
+        self::assertFalse($entityMetadata->hasProperty('unknown'));
+        self::assertFalse($entityMetadata->hasAssociation('unknown'));
+        self::assertNull($entityMetadata->getProperty('unknown'));
+        self::assertNull($entityMetadata->getAssociation('unknown'));
 
         $association1 = new AssociationMetadata('association1');
-        $this->assertSame($association1, $entityMetadata->addAssociation($association1));
+        self::assertSame($association1, $entityMetadata->addAssociation($association1));
         $association2 = new AssociationMetadata('association2');
-        $this->assertSame($association2, $entityMetadata->addAssociation($association2));
-        $this->assertCount(2, $entityMetadata->getAssociations());
+        self::assertSame($association2, $entityMetadata->addAssociation($association2));
+        self::assertCount(2, $entityMetadata->getAssociations());
 
-        $this->assertTrue($entityMetadata->hasProperty('association1'));
-        $this->assertTrue($entityMetadata->hasAssociation('association1'));
-        $this->assertSame($association1, $entityMetadata->getProperty('association1'));
-        $this->assertSame($association1, $entityMetadata->getAssociation('association1'));
+        self::assertTrue($entityMetadata->hasProperty('association1'));
+        self::assertTrue($entityMetadata->hasAssociation('association1'));
+        self::assertSame($association1, $entityMetadata->getProperty('association1'));
+        self::assertSame($association1, $entityMetadata->getAssociation('association1'));
 
         $entityMetadata->removeAssociation('association1');
-        $this->assertCount(1, $entityMetadata->getAssociations());
-        $this->assertFalse($entityMetadata->hasProperty('association1'));
-        $this->assertFalse($entityMetadata->hasAssociation('association1'));
+        self::assertCount(1, $entityMetadata->getAssociations());
+        self::assertFalse($entityMetadata->hasProperty('association1'));
+        self::assertFalse($entityMetadata->hasAssociation('association1'));
 
         $entityMetadata->removeProperty('association2');
-        $this->assertCount(0, $entityMetadata->getAssociations());
-        $this->assertFalse($entityMetadata->hasProperty('association2'));
-        $this->assertFalse($entityMetadata->hasAssociation('association2'));
+        self::assertCount(0, $entityMetadata->getAssociations());
+        self::assertFalse($entityMetadata->hasProperty('association2'));
+        self::assertFalse($entityMetadata->hasAssociation('association2'));
     }
 
     public function testRenameMetaProperty()
@@ -254,13 +254,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $property1->setDataType('string');
 
         $entityMetadata->renameMetaProperty('property1', 'newProperty1');
-        $this->assertFalse($entityMetadata->hasMetaProperty('property1'));
-        $this->assertFalse($entityMetadata->hasProperty('property1'));
-        $this->assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
-        $this->assertTrue($entityMetadata->hasProperty('newProperty1'));
+        self::assertFalse($entityMetadata->hasMetaProperty('property1'));
+        self::assertFalse($entityMetadata->hasProperty('property1'));
+        self::assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
+        self::assertTrue($entityMetadata->hasProperty('newProperty1'));
         $expectedNewProperty1 = new MetaPropertyMetadata('newProperty1');
         $expectedNewProperty1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewProperty1,
             $entityMetadata->getMetaProperty('newProperty1')
         );
@@ -273,13 +273,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $property1->setDataType('string');
 
         $entityMetadata->renameProperty('property1', 'newProperty1');
-        $this->assertFalse($entityMetadata->hasMetaProperty('property1'));
-        $this->assertFalse($entityMetadata->hasProperty('property1'));
-        $this->assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
-        $this->assertTrue($entityMetadata->hasProperty('newProperty1'));
+        self::assertFalse($entityMetadata->hasMetaProperty('property1'));
+        self::assertFalse($entityMetadata->hasProperty('property1'));
+        self::assertTrue($entityMetadata->hasMetaProperty('newProperty1'));
+        self::assertTrue($entityMetadata->hasProperty('newProperty1'));
         $expectedNewProperty1 = new MetaPropertyMetadata('newProperty1');
         $expectedNewProperty1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewProperty1,
             $entityMetadata->getMetaProperty('newProperty1')
         );
@@ -292,13 +292,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $field1->setDataType('string');
 
         $entityMetadata->renameField('field1', 'newField1');
-        $this->assertFalse($entityMetadata->hasField('field1'));
-        $this->assertFalse($entityMetadata->hasProperty('field1'));
-        $this->assertTrue($entityMetadata->hasField('newField1'));
-        $this->assertTrue($entityMetadata->hasProperty('newField1'));
+        self::assertFalse($entityMetadata->hasField('field1'));
+        self::assertFalse($entityMetadata->hasProperty('field1'));
+        self::assertTrue($entityMetadata->hasField('newField1'));
+        self::assertTrue($entityMetadata->hasProperty('newField1'));
         $expectedNewField1 = new FieldMetadata('newField1');
         $expectedNewField1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewField1,
             $entityMetadata->getField('newField1')
         );
@@ -311,13 +311,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $field1->setDataType('string');
 
         $entityMetadata->renameProperty('field1', 'newField1');
-        $this->assertFalse($entityMetadata->hasField('field1'));
-        $this->assertFalse($entityMetadata->hasProperty('field1'));
-        $this->assertTrue($entityMetadata->hasField('newField1'));
-        $this->assertTrue($entityMetadata->hasProperty('newField1'));
+        self::assertFalse($entityMetadata->hasField('field1'));
+        self::assertFalse($entityMetadata->hasProperty('field1'));
+        self::assertTrue($entityMetadata->hasField('newField1'));
+        self::assertTrue($entityMetadata->hasProperty('newField1'));
         $expectedNewField1 = new FieldMetadata('newField1');
         $expectedNewField1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewField1,
             $entityMetadata->getField('newField1')
         );
@@ -330,13 +330,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1->setDataType('string');
 
         $entityMetadata->renameAssociation('association1', 'newAssociation1');
-        $this->assertFalse($entityMetadata->hasAssociation('association1'));
-        $this->assertFalse($entityMetadata->hasProperty('association1'));
-        $this->assertTrue($entityMetadata->hasAssociation('newAssociation1'));
-        $this->assertTrue($entityMetadata->hasProperty('newAssociation1'));
+        self::assertFalse($entityMetadata->hasAssociation('association1'));
+        self::assertFalse($entityMetadata->hasProperty('association1'));
+        self::assertTrue($entityMetadata->hasAssociation('newAssociation1'));
+        self::assertTrue($entityMetadata->hasProperty('newAssociation1'));
         $expectedNewAssociation1 = new AssociationMetadata('newAssociation1');
         $expectedNewAssociation1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewAssociation1,
             $entityMetadata->getAssociation('newAssociation1')
         );
@@ -349,13 +349,13 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1->setDataType('string');
 
         $entityMetadata->renameProperty('association1', 'newAssociation1');
-        $this->assertFalse($entityMetadata->hasAssociation('association1'));
-        $this->assertFalse($entityMetadata->hasProperty('association1'));
-        $this->assertTrue($entityMetadata->hasAssociation('newAssociation1'));
-        $this->assertTrue($entityMetadata->hasProperty('newAssociation1'));
+        self::assertFalse($entityMetadata->hasAssociation('association1'));
+        self::assertFalse($entityMetadata->hasProperty('association1'));
+        self::assertTrue($entityMetadata->hasAssociation('newAssociation1'));
+        self::assertTrue($entityMetadata->hasProperty('newAssociation1'));
         $expectedNewAssociation1 = new AssociationMetadata('newAssociation1');
         $expectedNewAssociation1->setDataType('string');
-        $this->assertEquals(
+        self::assertEquals(
             $expectedNewAssociation1,
             $entityMetadata->getAssociation('newAssociation1')
         );
@@ -368,10 +368,10 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
 
-        $this->assertSame($field1, $entityMetadata->getPropertyByPropertyPath('field1'));
-        $this->assertSame($association1, $entityMetadata->getPropertyByPropertyPath('association1'));
-        $this->assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('metaProperty1'));
-        $this->assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
+        self::assertSame($field1, $entityMetadata->getPropertyByPropertyPath('field1'));
+        self::assertSame($association1, $entityMetadata->getPropertyByPropertyPath('association1'));
+        self::assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('metaProperty1'));
+        self::assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
     }
 
     public function testGetPropertyByPropertyPathWhenPropertyPathIsNotEqualToName()
@@ -384,10 +384,10 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
         $metaProperty1->setPropertyPath('realMetaProperty1');
 
-        $this->assertSame($field1, $entityMetadata->getPropertyByPropertyPath('realField1'));
-        $this->assertSame($association1, $entityMetadata->getPropertyByPropertyPath('realAssociation1'));
-        $this->assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('realMetaProperty1'));
-        $this->assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
+        self::assertSame($field1, $entityMetadata->getPropertyByPropertyPath('realField1'));
+        self::assertSame($association1, $entityMetadata->getPropertyByPropertyPath('realAssociation1'));
+        self::assertSame($metaProperty1, $entityMetadata->getPropertyByPropertyPath('realMetaProperty1'));
+        self::assertNull($entityMetadata->getPropertyByPropertyPath('unknown'));
     }
 
     public function testGetPropertyByPropertyPathForIgnoredPropertyPath()
@@ -400,33 +400,33 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
         $metaProperty1->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $this->assertNull($entityMetadata->getPropertyByPropertyPath('field1'));
-        $this->assertNull($entityMetadata->getPropertyByPropertyPath('association1'));
-        $this->assertNull($entityMetadata->getPropertyByPropertyPath('metaProperty1'));
+        self::assertNull($entityMetadata->getPropertyByPropertyPath('field1'));
+        self::assertNull($entityMetadata->getPropertyByPropertyPath('association1'));
+        self::assertNull($entityMetadata->getPropertyByPropertyPath('metaProperty1'));
     }
 
     public function testAttributes()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertFalse($entityMetadata->has('attribute1'));
-        $this->assertNull($entityMetadata->get('attribute1'));
+        self::assertFalse($entityMetadata->has('attribute1'));
+        self::assertNull($entityMetadata->get('attribute1'));
 
         $entityMetadata->remove('attribute1');
-        $this->assertFalse($entityMetadata->has('attribute1'));
+        self::assertFalse($entityMetadata->has('attribute1'));
 
         $entityMetadata->set('attribute1', 'value1');
-        $this->assertTrue($entityMetadata->has('attribute1'));
-        $this->assertEquals('value1', $entityMetadata->get('attribute1'));
+        self::assertTrue($entityMetadata->has('attribute1'));
+        self::assertEquals('value1', $entityMetadata->get('attribute1'));
 
         $entityMetadata->remove('attribute1');
-        $this->assertFalse($entityMetadata->has('attribute1'));
-        $this->assertNull($entityMetadata->get('attribute1'));
+        self::assertFalse($entityMetadata->has('attribute1'));
+        self::assertNull($entityMetadata->get('attribute1'));
     }
 
     public function testHasIdentifierFieldsOnlyForEmptyMetadata()
     {
         $entityMetadata = new EntityMetadata();
-        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWithoutFields()
@@ -434,7 +434,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata = new EntityMetadata();
         $entityMetadata->setIdentifierFieldNames(['id']);
 
-        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWithoutIdentifierFieldNames()
@@ -442,7 +442,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata = new EntityMetadata();
         $entityMetadata->addField(new FieldMetadata('id'));
 
-        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlySingleIdentityField()
@@ -451,7 +451,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
-        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsSingleIdentityFieldAndMetaProperty()
@@ -461,7 +461,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addMetaProperty(new MetaPropertyMetadata('meta'));
 
-        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFields()
@@ -471,7 +471,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id1'));
         $entityMetadata->addField(new FieldMetadata('id2'));
 
-        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFieldsReverseOrderOfFields()
@@ -481,7 +481,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id2'));
         $entityMetadata->addField(new FieldMetadata('id1'));
 
-        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsCompositeIdentityFieldsAndMetaProperty()
@@ -492,7 +492,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id2'));
         $entityMetadata->addMetaProperty(new MetaPropertyMetadata('meta'));
 
-        $this->assertTrue($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertTrue($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsAdditionField()
@@ -502,7 +502,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('field1'));
 
-        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsAssociation()
@@ -512,7 +512,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
-        $this->assertFalse($entityMetadata->hasIdentifierFieldsOnly());
+        self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     /**

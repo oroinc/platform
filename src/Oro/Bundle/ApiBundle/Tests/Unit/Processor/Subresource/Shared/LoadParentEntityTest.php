@@ -13,10 +13,10 @@ class LoadParentEntityTest extends GetSubresourceProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Class';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
     private $entityLoader;
 
     /** @var LoadParentEntity */

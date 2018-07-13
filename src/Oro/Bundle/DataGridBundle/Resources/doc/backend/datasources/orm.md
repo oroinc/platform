@@ -1,31 +1,37 @@
 ORM datasource
 ===============
 
-Overview
---------
+# Table of contents
 
-This datasource provide adapter to allow access data from doctrine orm using doctrine query builder.
+- [Overview](#overview)
+- [Important notes](#important-notes)
+- [How to](#how-to)
+    - [Modify a query configuration from PHP code](#modify-a-query-configuration-from-php-code)
+    - [Add Query hints](#add-query-hints)
+
+# Overview
+
+This datasource provides an adapter to allow accessing data from doctrine ORM using doctrine query builder.
 You can configure query using `query` param under source tree. This query will be converted via [YamlConverter](../../../../Datasource/Orm/QueryConverter/YamlConverter.php) to doctrine `QueryBuilder` object.
 
-Example
--------
+## Example
 
-``` yaml
+```yaml
 datagrids:
     DATAGRID_NAME_HERE:
         source:
             type: orm
             query:
                 select:
-                    - g.id
-                    - g.label
+                    - email.id
+                    - email.subject
                 from:
-                    - { table: OroContactBundle:Group, alias: g }
+                    - { table: Oro\Bundle\EmailBundle\Entity\Email, alias: email }
 ```
-Important notes
----------------
 
-By default all datagrids that use ORM datasource is marked by [HINT_PRECISE_ORDER_BY](../../../../../../Component/DoctrineUtils/README.md#preciseorderbywalker-class) query hint. This guarantee that rows are sorted in the same way independent from a state of SQL server and from values of OFFSET and LIMIT clauses. More details you can find in [PostgreSQL documentation](https://www.postgresql.org/docs/8.1/static/queries-limit.html).
+# Important notes
+
+By default all datagrids that use ORM datasource are marked by the [HINT_PRECISE_ORDER_BY](../../../../../../Component/DoctrineUtils/README.md#preciseorderbywalker-class) query hint. This guarantees that rows are sorted the same way independently of the state of SQL server and the values of OFFSET and LIMIT clauses. More details are available in [PostgreSQL documentation](https://www.postgresql.org/docs/8.1/static/queries-limit.html).
 
 If you need to disable this behaviour for your datagrid the following configuration can be used:
 
@@ -41,10 +47,11 @@ datagrids:
                 - { name: HINT_PRECISE_ORDER_BY, value: false }
 ```
 
-Modification of a query configuration from PHP code
----------------------------------------------------
+# How to
 
-Sometime it is required to modify a query configuration from PHP code, for example from datagrid [extensions](../extensions.md) or [listeners](../datagrid.md#extendability). This can be done using [OrmQueryConfiguration](../../../../Datasource/Orm/OrmQueryConfiguration.php) class. To get an instance of this class use `getOrmQuery` method of [DatagridConfiguration](../../../../Datagrid/Common/DatagridConfiguration.php). For example:
+## Modify a query configuration from PHP code
+
+Sometimes it is required to modify a query configuration from PHP code, for example from datagrid [extensions](../extensions.md) or [listeners](../datagrid.md#extendability). This can be done using [OrmQueryConfiguration](../../../../Datasource/Orm/OrmQueryConfiguration.php) class. To get an instance of this class use `getOrmQuery` method of [DatagridConfiguration](../../../../Datagrid/Common/DatagridConfiguration.php). For example:
 
 ```php
 $query = $config->getOrmQuery();
@@ -106,8 +113,7 @@ query:
 
 Please investigate this class to find out all other features.
 
-Query hints
------------
+### Add Query hints
 
 The following example shows how [query hints](https://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html#query-hints) can be set:
 

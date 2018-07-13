@@ -25,7 +25,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
     private $metadataProvider;
 
     /** @var AssociationMetadataLoader */
-    protected $associationMetadataLoader;
+    private $associationMetadataLoader;
 
     protected function setUp()
     {

@@ -21,7 +21,7 @@ class QueryExpressionVisitorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $expressionVisitor = $factory->createExpressionVisitor();
 
-        $this->assertEquals(
+        self::assertEquals(
             new QueryExpressionVisitor($compositeExpressions, $comparisonExpressions),
             $expressionVisitor
         );
