@@ -1,4 +1,4 @@
-@import "./variables";
+/* @theme: admin.oro; */
 
 /* mixins */
 @mixin workflow-hover-block {
@@ -33,35 +33,40 @@
         border-top-width: 0;
     }
 }
+
 .workflow-flowchart-controls {
     padding: 10px 10px 0;
     min-height: 32px;
     position: absolute;
     z-index: 600;
+
     .checkbox-group {
-        background: rgba(251,251,251,0.7);
+        background: rgba(251, 251, 251, .7);
         padding: 5px 7px 2px 7px;
-        input[type=checkbox] {
+
+        input[type='checkbox'] {
             margin-top: -2px;
             margin-right: 6px;
         }
     }
 }
+
 .workflow-flowchart-wrapper {
     overflow: hidden;
     height: 700px;
 }
+
 .workflow-flowchart {
     position: relative;
     min-height: 610px;
     margin: 0;
+
     ._jsPlumb_endpoint {
         z-index: 100;
     }
 }
 
 .workflow-flowchart {
-    /* step */
     .workflow-step {
         z-index: 100;
         position: absolute;
@@ -73,7 +78,7 @@
         max-width: 180px;
         background: linear-gradient($step-gradient-start-color, $step-gradient-end-color);
         box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .3);
-        text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
 
         .step-label {
             text-align: center;
@@ -81,43 +86,44 @@
             font-weight: bold;
             width: 100%;
             cursor: default;
+
             > .dropdown-menu {
                 text-align: left;
             }
         }
 
         .jsplumb-source {
-            $source-radius: 8px;
-            width: $source-radius * 2;
-            height: $source-radius * 2;
-            border-radius: $source-radius;
-            border: $source-radius / 2 solid $source-border-color;
+            width: $jsplumb-source-radius * 2;
+            height: $jsplumb-source-radius * 2;
+            border-radius: $jsplumb-source-radius;
+            border: $jsplumb-source-radius / 2 solid $source-border-color;
             position: absolute;
             visibility: hidden;
             background: linear-gradient($source-gradient-start-color, $source-gradient-middle-color 3%, $source-gradient-end-color);
+
             &:hover {
                 background: linear-gradient(darken($source-gradient-start-color, 5%), darken($source-gradient-middle-color, 5%) 3%, darken($source-gradient-end-color, 5%));
                 cursor: pointer;
             }
 
             &.jsplumb-source-top-left {
-                top: -$source-radius;
-                left: -$source-radius;
+                top: -$jsplumb-source-radius;
+                left: -$jsplumb-source-radius;
             }
 
             &.jsplumb-source-top-right {
-                top: -$source-radius;
-                right: -$source-radius;
+                top: -$jsplumb-source-radius;
+                right: -$jsplumb-source-radius;
             }
 
             &.jsplumb-source-bottom-right {
-                bottom: -$source-radius;
-                right: -$source-radius;
+                bottom: -$jsplumb-source-radius;
+                right: -$jsplumb-source-radius;
             }
 
             &.jsplumb-source-bottom-left {
-                bottom: -$source-radius;
-                left: -$source-radius;
+                bottom: -$jsplumb-source-radius;
+                left: -$jsplumb-source-radius;
             }
         }
 
@@ -236,7 +242,7 @@
     }
 
     .workflow-transition-overlay {
-        opacity: 0.7;
+        opacity: .7;
 
         &._jsPlumb_hover,
         &._jsPlumb_source_hover,

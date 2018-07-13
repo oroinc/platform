@@ -1,42 +1,102 @@
 /* @theme: admin.oro; */
 
-$jstree-wrapper-position: relative !default;
-$jstree-wrapper-min-height: 200px !default;
-$jstree-wrapper-inner-offset: 10px 0 !default;
+$tree-link-color: #858585;
+$tree-link-bg-color: #fafafa;
+$tree-icon-color: #969696;
 
-$jstree-wrapper__title-display: flex !default;
-$jstree-wrapper__title-justify-content: space-between !default;
-$jstree-wrapper__title-offset-bottom: 10px !default;
+$jstree-wholerow-ul-width: 100% !default;
+$jstree-wholerow-ul-offset-bottom: 10px !default;
+$jstree-wholerow-ul-inner-offset-left: 8px !default;
 
-$jstree-wrapper__label-display: flex !default;
-$jstree-wrapper__label-offset-top: 6px !default;
-$jstree-wrapper__label-offset-bottom: 6px !default;
+$jstree-default-node-position: relative !default;
+$jstree-default-node-background: transparent !default;
 
-$jstree-wrapper__label-before-display: inline-block !default;
-$jstree-wrapper__label-before-width: 9px !default;
-$jstree-wrapper__label-before-offset-right: 5px !default;
-$jstree-wrapper__label-before-font-family: FontAwesome !default;
-$jstree-wrapper__label-before-font-size: 9px !default;
-$jstree-wrapper__label-before-font-weight: normal !default;
-$jstree-wrapper__label-before-font-style: normal !default;
-$jstree-wrapper__label-before-content: $fa-var-chevron-down !default;
-$jstree-wrapper__label-before-color: #969696 !default;
+$jstree-themeicon-display: none !default;
 
-$jstree-wrapper__label-expanded-before-content: $fa-var-chevron-right !default;
+$jstree-open-font-family: 'FontAwesome' !default;
+$jstree-open-font-size: 10px !default;
+$jstree-open-font-weight: normal !default;
+$jstree-open-font-style: normal !default;
+$jstree-open-color: $tree-icon-color !default;
 
-$jstree-wrapper__label-expanded-jstree-actions-before-display: inline-block !default;
+$jstree-open-jocl-content: '\f078' !default;
+$jstree-closed-jocl-content: '\f054' !default;
 
-$jstree-wrapper__text-font-weight: bold !default;
-$jstree-wrapper__text-cursor: pointer !default;
-$jstree-wrapper__text-text-transform: uppercase !default;
-$jstree-wrapper__text-color: #565656 !default;
+$jstree-icon-width: 26px !default;
+$jstree-icon-height: 36px !default;
+$jstree-icon-line-height: 36px !default;
 
-$jstree-wrapper__checkbox-display: none !default;
+$jstree-clicked-font-weight: bold !default;
 
-$jstree-wrapper__jstree-offset: 0 -10px -10px !default;
-$jstree-wrapper__jstree-outline: none !default;
+$jstree-wholerow-hovered-height: 35px !default;
+$jstree-wholerow-hovered-background: $tree-link-bg-color !default;
 
-$jstree-wrapper__jstree-search-no-results-width: auto !default;
-$jstree-wrapper__jstree-search-no-results-offset-top: -15px !default;
+$jstree-anchor-display: inline-block !default;
+$jstree-anchor-width: 90% !default;
+$jstree-anchor-height: 36px !default;
+$jstree-anchor-inner-offset: 0 8px 7px 8px !default;
+$jstree-anchor-line-height: 36px !default;
+$jstree-anchor-color: $tree-link-color !default;
+$jstree-anchor-border-radius: 0 !default;
+$jstree-anchor-box-shadow: none !default;
+$jstree-anchor-text-overflow: ellipsis !default;
+$jstree-anchor-overflow: hidden !default;
 
-$jstree-wrapper__jstree-wrapper-inner-offset: 0 10px !default;
+$jstree-anchor-active-color: #858585 !default;
+
+$jstree-wholerow-transition: none !default;
+
+$jstree-search-font-style: normal !default;
+$jstree-search-font-weight: normal !default;
+
+$jstree-icon-checkbox-display: inline-block !default;
+$jstree-icon-checkbox-height: 16px !default;
+$jstree-icon-checkbox-width: 16px !default;
+$jstree-icon-checkbox-border: 2px solid $primary-750 !default;
+$jstree-icon-checkbox-background: $primary-inverse !default;
+$jstree-icon-checkbox-border-radius: 3px !default;
+$jstree-icon-checkbox-cursor: pointer !default;
+$jstree-icon-checkbox-vertical-align: text-bottom !default;
+$jstree-icon-checkbox-position: relative !default;
+$jstree-icon-checkbox-color: $primary-inverse !default;
+$jstree-icon-checkbox-offset: 0 9px 0 -8px !default;
+
+$jstree-icon-checkbox-icon-position: absolute !default;
+$jstree-icon-checkbox-icon-top: 50% !default;
+$jstree-icon-checkbox-icon-left: 50% !default;
+$jstree-icon-checkbox-icon-transform: translate !default;
+$jstree-icon-checkbox-icon-offset-left: -1px !default;
+$jstree-icon-checkbox-icon-font-size: 10px !default;
+$jstree-icon-checkbox-icon-line-height: 1 !default;
+$jstree-icon-checkbox-icon-font-family: FontAwesome !default;
+
+$jstree-checked-background: $secondary !default;
+$jstree-checked-border-color: $secondary !default;
+$jstree-checked-content: "\f00c" !default;
+
+$jstree-search-component-position: relative !default;
+
+$jstree-search-component-clear-active-search-clear-display: block !default;
+$jstree-search-component-clear-active-search-search-display: none !default;
+
+$jstree-search-component-input-width: 100% !default;
+
+$jstree-search-component-clear-active-input-display: none !default;
+
+$jstree-search-component-clear-icon-display: none !default;
+$jstree-search-component-clear-icon-position: absolute !default;
+$jstree-search-component-clear-icon-top: 6px !default;
+$jstree-search-component-clear-icon-right: 8px !default;
+$jstree-search-component-clear-icon-font-size: 16px !default;
+$jstree-search-component-clear-icon-z-index: 10 !default;
+$jstree-search-component-clear-icon-color: $tree-icon-color !default;
+$jstree-search-component-clear-icon-cursor: pointer !default;
+
+$jstree-search-component-clear-icon-hover-color: darken($tree-icon-color, 10%) !default;
+
+$jstree-search-component-search-icon-display: block !default;
+$jstree-search-component-search-icon-pointer-events: none !default;
+
+$tree-empty-content-sidebar-text-align: center !default;
+$tree-empty-content-sidebar-inner-offset: 15px !default;
+$tree-empty-content-sidebar-background: #f1f1f1 !default;

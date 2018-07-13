@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+
 .select2 {
     &-container {
         margin: $select2-container-offset;
@@ -199,6 +200,7 @@
                     line-height: $select2-search-field-line-height;
                     background-color: $select2-search-field-background-color;
                     margin-bottom: $select2-search-field-offset-bottom;
+                    border: $select2-search-field-border;
                 }
             }
         }
@@ -338,6 +340,10 @@
 
             min-height: $select2-result-label-min-height;
 
+            -webkit-touch-callout: $select2-result-label-user-select;
+            -webkit-user-select: $select2-result-label-user-select;
+            -moz-user-select: $select2-result-label-user-select;
+            -ms-user-select: $select2-result-label-user-select;
             user-select: $select2-result-label-user-select;
 
             color: $select2-result-label-color;

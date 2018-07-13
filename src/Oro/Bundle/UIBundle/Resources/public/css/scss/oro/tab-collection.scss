@@ -1,18 +1,23 @@
+/* @theme: admin.oro; */
+
 .tab-collection {
-  border-bottom: 1px solid #ddd;
-  li {
-    > a {
-      padding-right: 7px;
+    border-bottom: 1px solid #ddd;
+
+    li {
+        > a {
+            padding-right: 7px;
+        }
+
+        > a:after {
+            visibility: hidden;
+            content: '*';
+            margin-left: 1px;
+        }
+
+        &.changed {
+            > a:after {
+                visibility: visible;
+            }
+        }
     }
-    > a:after {
-      visibility: hidden;
-      content: '*';
-      margin-left: 1px;
-    }
-    &.changed {
-      > a:after{
-        visibility: visible;
-      }
-    }
-  }
 }

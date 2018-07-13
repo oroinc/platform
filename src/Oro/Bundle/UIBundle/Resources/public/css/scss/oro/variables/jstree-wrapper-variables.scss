@@ -1,0 +1,42 @@
+/* @theme: admin.oro; */
+
+$jstree-wrapper-position: relative !default;
+$jstree-wrapper-min-height: 200px !default;
+$jstree-wrapper-inner-offset: 10px 0 !default;
+
+$jstree-wrapper__title-display: flex !default;
+$jstree-wrapper__title-justify-content: space-between !default;
+$jstree-wrapper__title-offset-bottom: 10px !default;
+
+$jstree-wrapper__label-display: flex !default;
+$jstree-wrapper__label-offset-top: 6px !default;
+$jstree-wrapper__label-offset-bottom: 6px !default;
+
+$jstree-wrapper__label-before-display: inline-block !default;
+$jstree-wrapper__label-before-width: 9px !default;
+$jstree-wrapper__label-before-offset-right: 5px !default;
+$jstree-wrapper__label-before-font-family: FontAwesome !default;
+$jstree-wrapper__label-before-font-size: 9px !default;
+$jstree-wrapper__label-before-font-weight: normal !default;
+$jstree-wrapper__label-before-font-style: normal !default;
+$jstree-wrapper__label-before-content: $fa-var-chevron-down !default;
+$jstree-wrapper__label-before-color: #969696 !default;
+
+$jstree-wrapper__label-expanded-before-content: $fa-var-chevron-right !default;
+
+$jstree-wrapper__label-expanded-jstree-actions-before-display: inline-block !default;
+
+$jstree-wrapper__text-font-weight: bold !default;
+$jstree-wrapper__text-cursor: pointer !default;
+$jstree-wrapper__text-text-transform: uppercase !default;
+$jstree-wrapper__text-color: #565656 !default;
+
+$jstree-wrapper__checkbox-display: none !default;
+
+$jstree-wrapper__jstree-offset: 0 -10px -10px !default;
+$jstree-wrapper__jstree-outline: none !default;
+
+$jstree-wrapper__jstree-search-no-results-width: auto !default;
+$jstree-wrapper__jstree-search-no-results-offset-top: -15px !default;
+
+$jstree-wrapper__jstree-wrapper-inner-offset: 0 10px !default;

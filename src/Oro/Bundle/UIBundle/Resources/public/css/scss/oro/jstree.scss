@@ -1,9 +1,5 @@
 /* @theme: admin.oro; */
 
-@import '../variables/oro/jstree-variables';
-@import "jstree-actions";
-@import "jstree-wrapper";
-
 .jstree-wholerow-ul {
     width: $jstree-wholerow-ul-width;
     margin-bottom: $jstree-wholerow-ul-offset-bottom;

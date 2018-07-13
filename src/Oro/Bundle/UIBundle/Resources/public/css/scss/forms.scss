@@ -1,0 +1,140 @@
+/* @theme: admin.oro; */
+
+.form-horizontal .control-label {
+    font-size: 13px;
+    text-align: left;
+    line-height: 1.2em;
+
+    &.header-tooltips {
+        display: inline;
+        float: none;
+        margin-left: -20px;
+
+        .oro-popover-content {
+            line-height: 20px;
+        }
+    }
+}
+
+.control-group .controls p.control-label {
+    width: auto;
+}
+
+.form-horizontal {
+    .control-group {
+        label.control-label {
+            float: left;
+            width: 160px;
+            padding-top: 7px;
+            font-weight: normal;
+            text-align: right;
+        }
+
+        .control-label.wrap {
+            float: left;
+            padding-top: 7px;
+            font-weight: normal;
+            line-height: 20px;
+            text-align: right;
+
+            .tooltip-icon {
+                margin-right: 5px;
+            }
+
+            label {
+                display: inline;
+            }
+        }
+
+        .controls {
+            margin-left: 170px;
+
+            &.autocomplete-box {
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            .control-label {
+                width: 100%;
+                word-wrap: break-word;
+                padding-left: 5px; // to get nice hover background
+                padding-top: 7px;
+
+                &.html-property {
+                    overflow: auto;
+                }
+            }
+
+            .control-subgroup {
+                .controls {
+                    margin-left: 0;
+                    float: left;
+                }
+            }
+
+            .control-label.wrap {
+                width: auto;
+                padding-left: 0;
+                padding-right: 5px;
+            }
+
+            label.control-label {
+                width: auto;
+            }
+        }
+
+        &.attribute-row label.control-label {
+            cursor: default;
+        }
+    }
+}
+
+.form-horizontal-large {
+    .control-group {
+        max-width: 100%;
+
+        .controls {
+            margin-left: 240px;
+
+            div.control-label {
+                text-align: left;
+            }
+        }
+
+        div.control-label,
+        label.control-label {
+            width: 230px;
+            text-align: right;
+        }
+    }
+}
+
+.user-fieldset {
+    margin-bottom: 22px;
+
+    span {
+        background-color: #fff;
+        padding: 0 20px 0 0;
+        display: inline-block;
+    }
+}
+
+input[type='radio'] + label,
+input[type='checkbox'] + label {
+    margin-bottom: 2px;
+    display: inline-block;
+}
+
+.form-pass-reset {
+    margin: 0 auto 20px;
+    max-width: 400px;
+    padding: 19px 29px 29px;
+    background: linear-gradient($navbarBackgroundHighlight, $navbarBackground);
+    border: 1px solid $navbarBorder;
+    border-radius: $baseBorderRadius;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
+}
+
+.form-row {
+    padding: 0 0 $margin-bottom-box/2;
+}

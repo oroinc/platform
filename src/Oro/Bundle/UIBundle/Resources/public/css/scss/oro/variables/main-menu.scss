@@ -6,13 +6,13 @@ $menu-background-color: $primary-300 !default;
 $menu-font-size: $base-font-size + 1 !default;
 $menu-background-color-active: $extra-200 !default;
 $menu-header-height: 48px !default;
+
 $menu-icon-left: $fa-var-angle-left !default;
 $menu-icon-right: $fa-var-angle-right !default;
 $menu-icon-up: $fa-var-angle-up !default;
 $menu-icon-down: $fa-var-angle-down !default;
 $menu-icon-toggler: $fa-var-arrow-left !default;
 $menu-placeholder-size: 17px !default;
-
 // Main menu full screen view
 $menu-full-screen-button-color: $primary-750 !default;
 $menu-full-screen-title-color: $primary-200 !default;
@@ -30,7 +30,6 @@ $menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
 $menu-dropdown-background-color-active: $primary-500 !default;
 $menu-dropdown-background-color-light-active: $primary-700 !default;
 
-
 // Main menu items
 $menu-accordion-icon-color: $primary-550 !default;
 
@@ -42,7 +41,6 @@ $menu-item-offset: 9px 18px 9px 16px !default;
 $menu-item-divider-color: $primary-800 !default;
 
 $menu-minimized-item-first-level-text-color-active: $primary-400 !default;
-
 
 // Main menu toggler
 $menu-toggler-color: $additional-lighten !default;

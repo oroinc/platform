@@ -1,10 +1,7 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins";
-@import "configuration-tree-view";
-
 .left-panel-container {
-    background-color: white;
+    background-color: #fff;
 
     & > .placeholder {
         margin-left: 334px;
@@ -48,7 +45,7 @@
         }
 
         input[type="checkbox"] {
-            margin: -4px 10px 0 0
+            margin: -4px 10px 0 0;
         }
     }
 

@@ -1,117 +1,143 @@
 /* @theme: admin.oro; */
 
-@import "email-variables";
-@import "oroui/css/scss/mixins";
-
 .short-emails-list {
-  .header {
-    padding: 2px 17px;
-    > a {
-      padding: 0 !important;
-      font-size: 12px;
-      line-height: 20px;
-    }
-  }
+    .header {
+        padding: 2px 17px;
 
-  .mark-as-read, .mark-visible-as-read {
-    cursor: pointer;
-    height: 19px;
-    padding: 0;
-    font-size: 12px;
-    line-height: 15px;
-    i {
-      float: left;
-      margin-top: 1px;
-      margin-right: 5px;
-      font-size: 13px;
+        > a {
+            padding: 0 !important;
+            font-size: 12px;
+            line-height: 20px;
+        }
     }
-  }
-  .items {
-    list-style-type: none;
-    margin: 0;
 
-    li {
-      border-top: 1px solid $primary-830;
-      padding: 11px 17px;
-      position: relative;
-      .mail-icon {
-        @include fa-icon($email-inactive-mail-icon);
-        color: $primary-400;
-        font-size: 16px;
-        font-style: normal;
+    .mark-as-read,
+    .mark-visible-as-read {
         cursor: pointer;
-        position: absolute;
-        right: 14px;
-        top: 9px;
-      }
-      .info {
-        min-height: 12px;
-        .title, .empty-subject {
-          cursor: pointer;
-        }
-      }
-      .body {
-        padding-right: 26px;
-      }
-      .title, .empty-subject {
-        color: $email-default-text-color;
-        line-height: 20px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .description {
-        color: $primary-550;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .footer {
+        height: 19px;
+        padding: 0;
         font-size: 12px;
-        a {
-          padding: 0;
+        line-height: 15px;
+
+        i {
+            float: left;
+            margin-top: 1px;
+            margin-right: 5px;
+            font-size: 13px;
         }
-        .reply-action, .reply-all-action, .forward-action {
-          display: none;
-          margin-left: 12px;
-        }
-      }
-      &.highlight {
-        background: $email-highlight-bg;
-        .title {
-          font-weight: bold;
-        }
-        .description {
-          color: $email-default-text-color;
-        }
-        .mail-icon {
-          @include fa-icon($email-active-mail-icon);
-          color: $extra;
-        }
-        .from-name {
-          max-width: 100%;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
     }
-  }
-  .notification, .more-unread {
-    display: none;
-  }
-  .empty {
-    text-align: center;
-    padding: 4px 0;
-    color: $primary-400;
-  }
+
+    .items {
+        list-style-type: none;
+        margin: 0;
+
+        li {
+            border-top: 1px solid $primary-830;
+            padding: 11px 17px;
+            position: relative;
+
+            .mail-icon {
+                @include fa-icon($email-inactive-mail-icon);
+
+                color: $primary-400;
+                font-size: 16px;
+                font-style: normal;
+                cursor: pointer;
+                position: absolute;
+                right: 14px;
+                top: 9px;
+            }
+
+            .info {
+                min-height: 12px;
+
+                .title,
+                .empty-subject {
+                    cursor: pointer;
+                }
+            }
+
+            .body {
+                padding-right: 26px;
+            }
+
+            .title,
+            .empty-subject {
+                color: $email-default-text-color;
+                line-height: 20px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .description {
+                color: $primary-550;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            .footer {
+                font-size: 12px;
+
+                a {
+                    padding: 0;
+                }
+
+                .reply-action,
+                .reply-all-action,
+                .forward-action {
+                    display: none;
+                    margin-left: 12px;
+                }
+            }
+
+            &.highlight {
+                background: $email-highlight-bg;
+
+                .title {
+                    font-weight: bold;
+                }
+
+                .description {
+                    color: $email-default-text-color;
+                }
+
+                .mail-icon {
+                    @include fa-icon($email-active-mail-icon);
+
+                    color: $extra;
+                }
+
+                .from-name {
+                    max-width: 100%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .notification,
+    .more-unread {
+        display: none;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 4px 0;
+        color: $primary-400;
+    }
 }
+
 .default-reply-action .items li .footer .reply-action,
 .default-reply-all-action .items li .footer .reply-all-action,
-.default-forward-action .items li .footer .forward-action{
-  display: inline;
+.default-forward-action .items li .footer .forward-action {
+    display: inline;
 }
+
 .widget-setup .recent-emails-setup {
-  padding: 15px 15px 15px 20px;
-  margin: -15px -15px -15px -20px;
+    padding: 15px 15px 15px 20px;
+    margin: -15px -15px -15px -20px;
 }

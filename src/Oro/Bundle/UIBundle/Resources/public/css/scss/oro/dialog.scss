@@ -1,4 +1,4 @@
-@import '../variables/oro/dialog-variables';
+/* @theme: admin.oro; */
 
 /* dialog jQuery ui  start */
 .ui-dialog {
@@ -44,6 +44,10 @@
         white-space: $dialog-title-white-space;
         overflow: $dialog-title-overflow;
         text-overflow: $dialog-title-text-overflow;
+
+        .lang-en & {
+            text-transform: capitalize;
+        }
     }
 
     &-content {
@@ -193,30 +197,6 @@
                     &:focus:before {
                         color: $primary-200;
                     }
-                }
-            }
-        }
-    }
-
-    /* Should be refactored in scope BB-14359 */
-    .form-horizontal {
-        .control-group {
-            margin-bottom: 10px;
-
-            .control-label {
-                width: 130px;
-                margin: 0 12px 0 0;
-            }
-
-            .controls {
-                margin-left: 142px;
-
-                .control-label {
-                    width: auto;
-                }
-
-                td > select {
-                    width: auto;
                 }
             }
         }

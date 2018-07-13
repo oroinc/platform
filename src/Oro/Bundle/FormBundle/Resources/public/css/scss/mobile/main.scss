@@ -7,7 +7,7 @@
     }
 
     .mce-tinymce.mce-fullscreen {
-        z-index: $oro-mobile-header-zindex + 20;
+        z-index: 10000;
         border-radius: 0;
 
         .mce-toolbar-grp {

@@ -4,6 +4,11 @@
 .navbar {
     .nav {
         > li {
+            a {
+                padding-top: 7px;
+                padding-bottom: 7px;
+            }
+
             > a {
                 color: $navbar-li-a-color;
                 text-shadow: $navbar-li-a-text-shadow;
@@ -24,6 +29,54 @@
                 &:focus {
                     color: $navbar-active-a-hover-color;
                 }
+            }
+        }
+
+        li {
+            &.dropdown {
+                &.open,
+                &.active {
+                    > .dropdown-toggle {
+                        background: none;
+                    }
+                }
+            }
+        }
+    }
+
+    .btn,
+    .btn-group {
+        margin-top: 0;
+    }
+
+    .small-divider {
+        background: url(../../img/vertical-divider-general.gif) repeat-y;
+        height: 22px;
+        margin: 10px 7px 0 0;
+        border: 0;
+        width: 2px;
+    }
+
+    &-extra {
+        padding: 0;
+        margin-bottom: 5px;
+
+        > .row > div {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+    }
+
+    &-extra-right {
+        padding-right: $content-padding;
+
+        .title-buttons-container {
+            .btn-group {
+                margin-left: 8px;
+            }
+
+            .btn-group .btn-group {
+                margin-left: 0;
             }
         }
     }

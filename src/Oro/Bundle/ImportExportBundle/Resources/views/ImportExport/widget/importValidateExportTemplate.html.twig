@@ -32,8 +32,8 @@
 
                 {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
-                <li {% if isActiveEntity %} class="active" {% endif %}>
-                    <a data-toggle="tab" href="#importExport{{ shortEntityName }}">{{ entityLabel }}</a>
+                <li class="nav-item{% if isActiveEntity %} active{% endif %}">
+                    <a data-toggle="tab" href="#importExport{{ shortEntityName }}" class="nav-link">{{ entityLabel }}</a>
                 </li>
             {% endfor %}
         </ul>

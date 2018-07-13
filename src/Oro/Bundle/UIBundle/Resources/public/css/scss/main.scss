@@ -3,11 +3,23 @@
 // add all lib
 @import "variables";
 @import "mixins";
+@import "font-awesome";
+@import "reset";
 @import "layout";
 @import "uniform";
+@import "dialog";
+@import "breadcrumb";
+@import "forms";
+@import "simplecolorpicker";
 @import "oro";
-@import "font-awesome";
+@import "tab";
+@import "entity";
+@import "create-select-entity";
+@import "application-menu";
+@import "nav-tabs-content";
+@import "more-bar-holder";
 @import "drag-and-drop-support";
+
 @import "oro/main";
 
 // desktop resolution

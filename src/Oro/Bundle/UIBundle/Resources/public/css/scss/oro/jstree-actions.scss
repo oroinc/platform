@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .jstree-actions {
     display: none;
 
@@ -13,6 +15,7 @@
         &--inline {
             margin: 0;
             list-style: none;
+
             li {
                 display: inline-block;
                 padding: 0 5px 0 0;
