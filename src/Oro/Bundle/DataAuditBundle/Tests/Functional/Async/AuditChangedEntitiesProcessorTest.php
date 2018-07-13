@@ -398,6 +398,227 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
         $this->assertStoredAuditCount(1);
     }
 
+    public function testShouldSkipAuditForInsertedEntityWithoutEntityClass()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [
+                [
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => null,
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => '',
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ]
+            ],
+            'entities_updated' => [],
+            'entities_deleted' => [],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
+    public function testShouldSkipAuditForInsertedEntityWithoutEntityId()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => null,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ]
+            ],
+            'entities_updated' => [],
+            'entities_deleted' => [],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
+    public function testShouldSkipAuditForUpdatedEntityWithoutEntityClass()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [
+                [
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => null,
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => '',
+                    'entity_id' => 123,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ]
+            ],
+            'entities_deleted' => [],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
+    public function testShouldSkipAuditForUpdatedEntityWithoutEntityId()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ],
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => null,
+                    'change_set' => [
+                        'stringProperty' => [null, 'aNewValue']
+                    ]
+                ]
+            ],
+            'entities_deleted' => [],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
+    public function testShouldSkipAuditForDeletedEntityWithoutEntityClass()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [],
+            'entities_deleted' => [
+                [
+                    'entity_id' => 123,
+                    'change_set' => []
+                ],
+                [
+                    'entity_class' => null,
+                    'entity_id' => 123,
+                    'change_set' => []
+                ],
+                [
+                    'entity_class' => '',
+                    'entity_id' => 123,
+                    'change_set' => []
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
+    public function testShouldSkipAuditForDeletedEntityWithoutEntityId()
+    {
+        $expectedLoggedAt = new \DateTime('2012-02-01 03:02:01+0000');
+
+        $message = $this->createMessage([
+            'timestamp' => $expectedLoggedAt->getTimestamp(),
+            'transaction_id' => 'aTransactionId',
+            'entities_inserted' => [],
+            'entities_updated' => [],
+            'entities_deleted' => [
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'change_set' => []
+                ],
+                [
+                    'entity_class' => TestAuditDataOwner::class,
+                    'entity_id' => null,
+                    'change_set' => []
+                ]
+            ],
+            'collections_updated' => []
+        ]);
+
+        /** @var AuditChangedEntitiesProcessor $processor */
+        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
+
+        $processor->process($message, new NullSession());
+
+        $this->assertStoredAuditCount(0);
+    }
+
     private function assertStoredAuditCount($expected)
     {
         $this->assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());

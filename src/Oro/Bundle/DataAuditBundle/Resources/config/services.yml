@@ -141,6 +141,8 @@ services:
             - '@oro_dataaudit.entity_name_provider'
             - '@oro_dataaudit.set_new_audit_version'
             - '@oro_dataaudit.converter.change_set_to_audit_fields'
+        calls:
+            - ['setLogger',  ["@logger"]]
 
     oro_dataaudit.async.audit_changed_entities:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor'
