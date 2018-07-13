@@ -3,14 +3,17 @@
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Consume messages from selected queue (or list of all available queues if queue is not defined) with own processor
+ */
 class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
 {
     /**

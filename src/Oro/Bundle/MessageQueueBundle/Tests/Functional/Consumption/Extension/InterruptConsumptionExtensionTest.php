@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Client;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
 use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
 use Oro\Bundle\TestFrameworkBundle\Async\ChangeConfigProcessor;
