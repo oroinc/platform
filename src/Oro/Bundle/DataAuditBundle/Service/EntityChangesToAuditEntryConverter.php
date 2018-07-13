@@ -366,7 +366,7 @@ class EntityChangesToAuditEntryConverter implements LoggerAwareInterface
                 ['audit_action' => $action, 'audit_record' => $record]
             );
             $isValid = false;
-        } elseif (!array_key_exists('entity_id', $record) || !$record['entity_id']) {
+        } elseif (!array_key_exists('entity_id', $record) || null === $record['entity_id']) {
             $this->logError(
                 'The "entity_id" must not be null.',
                 ['audit_action' => $action, 'audit_record' => $record]
