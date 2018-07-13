@@ -7,6 +7,8 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
+ * Handles all migrations logic executed during installation
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -17,7 +19,7 @@ class OroReportBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_2';
+        return 'v2_3';
     }
 
     /**

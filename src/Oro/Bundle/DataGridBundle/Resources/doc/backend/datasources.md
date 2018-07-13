@@ -19,7 +19,7 @@ OroPlatform gives you a wide variety of ways to prepare and supply data to a dat
  - [Search](../../../../SearchBundle/Resources/doc/configuration.md#datagrid-configuration)
 
 
-### Custom Types
+## Custom Types
 
 To implement your own datasource type:
 
@@ -97,7 +97,7 @@ datagrids:
             type: acme_custom
 ```
 
-### ACL
+## ACL
 
 You can protect a datasource with ACL by adding the `acl_resource` parameter under the `source` node in the datagrid configuration:
 

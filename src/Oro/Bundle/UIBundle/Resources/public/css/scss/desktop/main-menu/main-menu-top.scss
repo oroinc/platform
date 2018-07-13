@@ -274,9 +274,7 @@
 
             &-left {
                 > .unclickable {
-                    @include fa-icon($fa-var-angle-left, before);
-
-                    &:before {
+                    @include fa-icon($menu-icon-left, before, true) {
                         left: 16px;
                     }
 
@@ -288,9 +286,7 @@
 
             &-right {
                 > .unclickable {
-                    @include fa-icon($fa-var-angle-right, after);
-
-                    &::after {
+                    @include fa-icon($menu-icon-right, after, true) {
                         right: 16px;
                     }
 

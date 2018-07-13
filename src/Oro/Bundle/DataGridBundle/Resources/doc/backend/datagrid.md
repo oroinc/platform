@@ -207,22 +207,15 @@ Contains registered datasource type and extensions, also it performs check for d
 - Extension\AbstractExtension - basic empty implementation
 - Datasource\DatasourceInterface - link object between data and grid. Should provide results as array of ResultRecordInterface compatible objects
 - Provider\SystemAwareResolver - resolve specific grid YAML syntax expressions. For details [see](./references_in_configuration.md).
+
 ## Extendability
 #### Behavior customization
-For customization of grid behavior(e.g. dynamic columns, actions etc) event listeners could be used.
-Grid dispatches 4 event during preparing.
 
-- oro_datagrid.datagrid.build.before
-- oro_datagrid.datagrid.build.before.EVENT_NAME - named event
-- oro_datagrid.datagrid.build.after
-- oro_datagrid.datagrid.build.after.EVENT_NAME - named event
+In order to customize the datagrid (e.g. dynamically added columns, custom actions, add additional data, etc.), you can listen to one of the events dispatched in the datagrid component. 
+More information on events, including their full list, is available in the [events documentation](./events.md).
 
-Basically build.before event is intended to make changes of grid configuration before builder will process it.
-Single argument pass to listeners is BuildBefore event mediator object.
-
-build.after event is intended to make changes of datasource(e.g. take some parameters from request and do filtering based on it).
 #### Extending
-Grid could be extended in few ways:
+The grid can be extended in several ways:
 
 - create custom datasource if needed (e.g. already implemented SearchDatasource for working with search engine)
 - create custom extension ([ref](./extensions.md))
