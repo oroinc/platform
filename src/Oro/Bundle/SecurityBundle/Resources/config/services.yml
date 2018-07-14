@@ -2,7 +2,6 @@ parameters:
     twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
-    oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
     oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
@@ -79,15 +78,6 @@ parameters:
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
 
 services:
-    oro_security.security_facade:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        class: '%oro_security.security_facade.class%'
-        arguments:
-            - '@security.authorization_checker'
-            - '@oro_security.request_authorization_checker'
-            - '@oro_security.class_authorization_checker'
-            - '@security.token_storage'
-
     oro_security.request_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker
         arguments:
@@ -121,11 +111,6 @@ services:
     oro_security.entity_class_resolver.link:
         tags:
             - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
-
-    oro_security.security_facade.link:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link,  service: oro_security.security_facade }
 
     oro_security.acl.base_manager:
         class: '%oro_security.acl.base_manager.class%'
