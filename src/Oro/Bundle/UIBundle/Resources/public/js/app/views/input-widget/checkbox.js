@@ -50,11 +50,14 @@ define(function(require) {
          */
         _buildCustomCheckbox: function() {
             this.type = this.$el.attr('type');
-            var label = this.$el.parent().find('> label').html();
-            this.$el.parent().find('> label').remove();
+            var label = this.$el.parent().find('label');
+            var labelText = label.html();
+            var labelId = label.attr('for');
+            label.remove();
 
             this.$checkboxContainer = $(this.template({
-                label: label,
+                label: labelText,
+                labelId: labelId,
                 type: this.type
             }));
 

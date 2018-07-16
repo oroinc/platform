@@ -165,7 +165,7 @@
     .hint {
         text-transform: uppercase;
         margin: 5px 0 3px 0;
-        font-size: $base-font-size--m;
+        font-size: $base-font-size--s;
         text-align: center;
     }
 
@@ -360,6 +360,11 @@
             display: flex;
             width: 100%;
         }
+    }
+
+    .filter-start-date,
+    .filter-end-date {
+        display: inline-flex;
     }
 }
 
