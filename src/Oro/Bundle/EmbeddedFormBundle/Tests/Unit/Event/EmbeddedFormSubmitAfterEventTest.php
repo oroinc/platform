@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Event;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 
-class EmbeddedFormSubmitAfterEventTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormSubmitAfterEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetter()
     {

@@ -6,9 +6,9 @@ use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption;
 use Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection;
 use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
 
-class ConfigurationRepositoryTest extends \PHPUnit_Framework_TestCase
+class ConfigurationRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ConfigurationRepository */

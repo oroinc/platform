@@ -6,9 +6,9 @@ use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 
-class ConnectionCheckerTest extends \PHPUnit_Framework_TestCase
+class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $client;
 
     /** @var ConnectionChecker */

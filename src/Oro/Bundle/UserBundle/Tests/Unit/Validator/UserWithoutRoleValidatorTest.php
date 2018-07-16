@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
+class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UserWithoutRoleValidator
@@ -23,7 +23,7 @@ class UserWithoutRoleValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

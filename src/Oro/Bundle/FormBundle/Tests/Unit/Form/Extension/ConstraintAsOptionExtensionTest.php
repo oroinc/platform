@@ -7,7 +7,7 @@ use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ConstraintAsOptionExtensionTest extends \PHPUnit_Framework_TestCase
+class ConstraintAsOptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ConstraintAsOptionExtension

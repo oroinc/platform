@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Builder;
 use Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 
-class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
+class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Doctrine\ORM\EntityManager

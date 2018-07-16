@@ -19,21 +19,21 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
-class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
+class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
-    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $routeProvider;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var DestinationPageResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DestinationPageResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $destinationPageResolver;
 
-    /** @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
     /** @var DatagridStartTransitionButtonProviderExtension */
@@ -167,7 +167,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
     /**
      * @dataProvider isAvailableDataProvider
      *
-     * @param Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow
+     * @param Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow
      * @param ButtonSearchContext $searchContext
      * @param bool $expected
      */
@@ -215,7 +215,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
     /**
      * @param bool $isStartAvailable
      * @param bool $isStarted
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     public function createWorkflow($isStartAvailable, $isStarted)
     {
@@ -243,7 +243,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
      * @param $relatedEntity
      * @param array $datagrids
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|WorkflowDefinition
+     * @return \PHPUnit\Framework\MockObject\MockObject|WorkflowDefinition
      */
     private function createWorkflowDefinition($relatedEntity, array  $datagrids = [])
     {

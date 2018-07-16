@@ -5,15 +5,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 
-class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configCache;
 
     protected function setUp()

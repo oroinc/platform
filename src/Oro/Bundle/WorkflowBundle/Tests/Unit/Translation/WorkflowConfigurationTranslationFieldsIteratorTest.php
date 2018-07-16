@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\WorkflowBundle\Translation\WorkflowConfigurationTranslationFieldsIterator;
 
-class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framework_TestCase
+class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $workflowName

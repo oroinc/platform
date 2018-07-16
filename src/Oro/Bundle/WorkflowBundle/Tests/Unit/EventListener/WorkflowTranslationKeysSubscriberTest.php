@@ -10,9 +10,9 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTranslationKeysSubscriber;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
+class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $translationManager;
 
     /** @var WorkflowTranslationKeysSubscriber */

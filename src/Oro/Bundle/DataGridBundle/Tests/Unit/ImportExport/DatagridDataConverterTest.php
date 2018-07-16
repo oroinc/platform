@@ -9,21 +9,21 @@ use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class DatagridDataConverterTest extends \PHPUnit_Framework_TestCase
+class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridManager;
 
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ColumnsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ColumnsHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $columnsHelper;
 
     /** @var DatagridDataConverter */
     protected $datagridDataConverter;
 
-    /** @var Context|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
     public function setUp()

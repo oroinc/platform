@@ -1277,3 +1277,13 @@ services:
             - '@gos_web_socket.websocket.client_manipulator'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_email.acl.voter.email_template_voter:
+        class: Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setClassName, ['%oro_email.emailtemplate.entity.class%']]
+        tags:
+            - { name: security.voter }

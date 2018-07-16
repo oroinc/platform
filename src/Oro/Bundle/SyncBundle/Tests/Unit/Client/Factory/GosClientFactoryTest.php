@@ -5,7 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Client\Factory;
 use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
 use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactory;
 
-class GosClientFactoryTest extends \PHPUnit_Framework_TestCase
+class GosClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private const WS_HOST = 'testHost';
     private const WS_PORT = 'testPort';

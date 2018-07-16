@@ -7,17 +7,17 @@ use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CallbackFormHandlerTest extends \PHPUnit_Framework_TestCase
+class CallbackFormHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testInterface()
     {
         $data = (object)[];
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
-        /** @var CallableStub|\PHPUnit_Framework_MockObject_MockObject $callable */
+        /** @var CallableStub|\PHPUnit\Framework\MockObject\MockObject $callable */
         $callable = $this->createMock(CallableStub::class);
         $callable->expects($this->once())->method('__invoke')->with($data, $form, $request)->willReturn(true);
 

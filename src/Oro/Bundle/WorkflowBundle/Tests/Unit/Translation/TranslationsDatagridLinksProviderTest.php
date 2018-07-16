@@ -10,16 +10,16 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationsDatagridLinksProvider;
 
-class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
 {
     const NODE = 'test_node';
     const ATTRIBUTE_NAME = 'test_attr_name';
     const WORKFLOW_LABEL = 'test.workflow.label.key';
 
-    /** @var TranslationsDatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $routeHelper;
 
-    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $languageProvider;
 
     /** @var TranslationsDatagridLinksProvider */

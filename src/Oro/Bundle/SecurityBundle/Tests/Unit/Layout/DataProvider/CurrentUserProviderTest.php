@@ -5,9 +5,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\CurrentUserProvider;
 
-class CurrentUserProviderTest extends \PHPUnit_Framework_TestCase
+class CurrentUserProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var CurrentUserProvider */

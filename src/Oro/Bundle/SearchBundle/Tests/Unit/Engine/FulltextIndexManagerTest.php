@@ -7,13 +7,13 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\FulltextIndexManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
-class FulltextIndexManagerTest extends \PHPUnit_Framework_TestCase
+class FulltextIndexManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TABLE_NAME = 'oro_test_table';
     const INDEX_NAME = 'oro_test_table_value_idx';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $connection;
 

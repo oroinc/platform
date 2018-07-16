@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class EntityStructureOptionsEventTest extends \PHPUnit_Framework_TestCase
+class EntityStructureOptionsEventTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

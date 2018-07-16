@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Transport\Exception\Exception as ExceptionInterfa
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class InvalidDestinationExceptionTest extends \PHPUnit_Framework_TestCase
+class InvalidDestinationExceptionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
     

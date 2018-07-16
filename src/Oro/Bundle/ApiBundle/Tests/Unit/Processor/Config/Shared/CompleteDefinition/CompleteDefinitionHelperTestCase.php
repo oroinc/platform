@@ -10,11 +10,11 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class CompleteDefinitionHelperTestCase extends \PHPUnit_Framework_TestCase
+class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS_NAME   = 'Test\Class';
-    const TEST_VERSION      = '1.1';
-    const TEST_REQUEST_TYPE = RequestType::REST;
+    protected const TEST_CLASS_NAME   = 'Test\Class';
+    protected const TEST_VERSION      = '1.1';
+    protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
@@ -67,7 +67,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertConfig(array $expected, $actual)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->convertConfigObjectToArray($actual)
         );
@@ -76,18 +76,16 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param string|null $className
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected function getClassMetadataMock($className = null)
     {
         if ($className) {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
                 ->getMock();
         } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
+            $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
 

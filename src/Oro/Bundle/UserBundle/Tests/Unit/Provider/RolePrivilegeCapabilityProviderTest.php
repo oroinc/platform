@@ -16,20 +16,20 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class RolePrivilegeCapabilityProviderTest extends \PHPUnit_Framework_TestCase
+class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclRoleHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AclRoleHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $aclRoleHandler;
 
-    /** @var RolePrivilegeCategoryProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RolePrivilegeCategoryProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $categoryProvider;
 
-    /** @var RolePrivilegeCapabilityProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RolePrivilegeCapabilityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $capabilityProvider;
 
     protected function setUp()
     {
-        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $this->aclRoleHandler = $this->createMock(AclRoleHandler::class);
         $this->categoryProvider = $this->createMock(RolePrivilegeCategoryProvider::class);
@@ -49,7 +49,7 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCapabilities(array $categories, array $privileges, array $expected)
     {
-        /** @var AbstractRole||\PHPUnit_Framework_MockObject_MockObject $role */
+        /** @var AbstractRole||\PHPUnit\Framework\MockObject\MockObject $role */
         $role = $this->createMock(AbstractRole::class);
 
         $this->categoryProvider

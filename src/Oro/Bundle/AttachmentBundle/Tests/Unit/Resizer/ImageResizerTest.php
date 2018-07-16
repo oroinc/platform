@@ -11,7 +11,7 @@ use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFile
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Psr\Log\LoggerInterface;
 
-class ImageResizerTest extends \PHPUnit_Framework_TestCase
+class ImageResizerTest extends \PHPUnit\Framework\TestCase
 {
     const FILTER_NAME = 'filter';
     const MIME_TYPE = 'image/gif';
@@ -24,17 +24,17 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     private $resizer;
 
     /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fileManager;
 
     /**
-     * @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $imagineBinaryFactory;
 
     /**
-     * @var ImagineBinaryFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $imagineBinaryFilter;
 
@@ -142,7 +142,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createLoggerMock()
     {
@@ -150,7 +150,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return File|\PHPUnit_Framework_MockObject_MockObject
+     * @return File|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createFileMock()
     {
@@ -158,7 +158,7 @@ class ImageResizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return BinaryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return BinaryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createBinaryMock()
     {

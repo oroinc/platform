@@ -14,20 +14,20 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
+class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManagerBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var ConfigProviderMock */
     protected $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $generator;
 
     /** @var string */
@@ -36,7 +36,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendConfigDumper */
     protected $dumper;
 
-    /** @var ExtendEntityConfigProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendEntityConfigProvider;
 
     public function setUp()

@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 
-class SecurityFirewallContextListenerTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallContextListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID   = 'o595fqdg5214u4e4nfcs3uc923';

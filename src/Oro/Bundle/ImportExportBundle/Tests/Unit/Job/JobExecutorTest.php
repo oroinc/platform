@@ -12,30 +12,30 @@ use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class JobExecutorTest extends \PHPUnit_Framework_TestCase
+class JobExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $batchJobRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $batchJobRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $batchJobManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $contextAggregatorRegistry;
 
     /** @var JobExecutor */
@@ -146,11 +146,11 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             'import.test',
                             $jobExecution->getJobInstance()->getLabel()
                         );
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             $configuration,
                             $jobExecution->getJobInstance()->getRawConfiguration()
                         );
@@ -229,11 +229,11 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             'import.test',
                             $jobExecution->getJobInstance()->getLabel()
                         );
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             $configuration,
                             $jobExecution->getJobInstance()->getRawConfiguration()
                         );
@@ -309,11 +309,11 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function (JobExecution $jobExecution) use ($configuration, $stepExecution) {
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             'import.test',
                             $jobExecution->getJobInstance()->getLabel()
                         );
-                        \PHPUnit_Framework_Assert::assertEquals(
+                        \PHPUnit\Framework\Assert::assertEquals(
                             $configuration,
                             $jobExecution->getJobInstance()->getRawConfiguration()
                         );

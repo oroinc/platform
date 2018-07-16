@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Form\DataTransformer\AttributeRelationsTransformer;
 
-class AttributeRelationsTransformerTest extends \PHPUnit_Framework_TestCase
+class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttributeRelationsTransformer */
     private $dataTransformer;

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
-class PropertyConfigBagTest extends \PHPUnit_Framework_TestCase
+class PropertyConfigBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PropertyConfigBag */
     protected $propertyConfigBag;

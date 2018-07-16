@@ -6,7 +6,7 @@ use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
-class WidgetItemsLoadDataListenerTest extends \PHPUnit_Framework_TestCase
+class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
 {
     private $widgetItemsLoadDataListener;
 

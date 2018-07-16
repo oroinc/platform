@@ -11,15 +11,15 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
+class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var BuildCustomTypes */
@@ -74,7 +74,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'field1' => 'val1',
             'field2' => null,
-            'field3' => 'val3',
+            'field3' => 'val3'
         ];
         $config = new EntityDefinitionConfig();
         $config->addField('field1')->setExcluded();
@@ -113,7 +113,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'renamedField1' => 'val1',
             'renamedField2' => null,
-            'renamedField3' => 'val3',
+            'renamedField3' => 'val3'
         ];
         $config = new EntityDefinitionConfig();
         $field1 = $config->addField('renamedField1');
@@ -174,7 +174,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'targetEntityClass' => 'Test\TargetEntity',
-            'targetEntityId'    => 123,
+            'targetEntityId'    => 123
         ];
         $config = new EntityDefinitionConfig();
         $config->addField('targetEntityClass')->setExcluded();
@@ -207,7 +207,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'renamedTargetEntityClass' => 'Test\TargetEntity',
-            'renamedTargetEntityId'    => 123,
+            'renamedTargetEntityId'    => 123
         ];
         $config = new EntityDefinitionConfig();
         $targetEntityClassField = $config->addField('renamedTargetEntityClass');

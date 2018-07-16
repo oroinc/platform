@@ -4,7 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 
-class ConditionBuilderOptionsLoadEventTest extends \PHPUnit_Framework_TestCase
+class ConditionBuilderOptionsLoadEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersAndSetters()
     {

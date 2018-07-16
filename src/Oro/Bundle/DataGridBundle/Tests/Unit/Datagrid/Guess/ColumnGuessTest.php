@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Guess;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
-class ColumnGuessTest extends \PHPUnit_Framework_TestCase
+class ColumnGuessTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOptions()
     {

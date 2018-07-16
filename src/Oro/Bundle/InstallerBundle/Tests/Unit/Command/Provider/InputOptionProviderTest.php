@@ -9,23 +9,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class InputOptionProviderTest extends \PHPUnit_Framework_TestCase
+class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 {
     const OPTION_NAME = 'option-name';
     const MESSAGE = 'Question message';
 
     /**
-     * @var QuestionHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $questionHelper;
 
     /**
-     * @var InputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $input;
 
     /**
-     * @var OutputInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $output;
 

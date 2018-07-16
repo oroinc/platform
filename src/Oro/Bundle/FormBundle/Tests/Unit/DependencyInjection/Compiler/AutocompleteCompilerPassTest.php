@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AutocompleteCompilerPassTest extends \PHPUnit_Framework_TestCase
+class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {

@@ -10,12 +10,12 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
-class ConsoleCommandListenerTest extends \PHPUnit_Framework_TestCase
+class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsoleCommandListener */
     private $listener;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
     public function setUp()

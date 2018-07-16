@@ -4,7 +4,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ProcessorBagConfigProvider;
 
-class ProcessorBagConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ProcessorBagConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessorBagConfigProvider()
     {

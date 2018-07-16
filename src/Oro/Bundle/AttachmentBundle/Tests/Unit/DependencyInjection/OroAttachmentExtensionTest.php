@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroAttachmentExtensionTest extends \PHPUnit_Framework_TestCase
+class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContainerBuilder

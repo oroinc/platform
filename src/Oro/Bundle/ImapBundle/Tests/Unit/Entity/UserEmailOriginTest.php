@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
-class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
+class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetId()
     {

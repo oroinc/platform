@@ -165,7 +165,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -204,7 +204,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|two-factor-auth)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -565,10 +565,11 @@ class OroMainContext extends MinkContext implements
      */
     public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $router = $this->getContainer()->get('router');
+        //quick way to logout user (delete all cookies)
+        $driver = $this->getSession()->getDriver();
+        $driver->reset();
 
-        $this->visit($router->generate('oro_user_security_logout'));
-        $this->visit($router->generate('oro_default'));
+        $this->visit($this->getContainer()->get('router')->generate('oro_default'));
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
@@ -1308,8 +1309,25 @@ class OroMainContext extends MinkContext implements
      */
     public function buttonIsDisabled($button)
     {
-        $button = $this->getSession()->getPage()->findButton($button);
-        self::assertTrue($button->hasClass('disabled'));
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertTrue($element->hasClass('disabled'));
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is not disabled$/
+     */
+    public function buttonIsNotDisabled($button)
+    {
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertFalse($element->hasClass('disabled'));
     }
 
     /**
@@ -1962,5 +1980,29 @@ JS;
             self::fail('No new browser tabs detected after the current one');
         }
         $this->getSession()->switchToWindow($lastTab);
+    }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be checked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeChecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertTrue($element->isChecked());
+    }
+
+    /**
+     * Asserts that checkbox is checked
+     *
+     * @Then /^The "(?P<elementName>(?:[^"]|\\")*)" checkbox should be unchecked$/
+     * @param string $elementName
+     */
+    public function checkboxShouldBeUnchecked($elementName)
+    {
+        $element = $this->createElement($elementName);
+        self::assertFalse($element->isChecked());
     }
 }

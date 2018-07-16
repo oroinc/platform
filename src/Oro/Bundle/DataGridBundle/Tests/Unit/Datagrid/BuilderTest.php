@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class BuilderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_DATASOURCE_TYPE = 'array';
     const TEST_DATAGRID_NAME   = 'testGrid';
@@ -16,10 +16,10 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     const DEFAULT_DATAGRID_CLASS = 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid';
     const DEFAULT_ACCEPTOR_CLASS = 'Oro\Bundle\DataGridBundle\Extension\Acceptor';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Builder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Builder */
     protected $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
     protected function setUp()
@@ -261,7 +261,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $methods
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Builder
+     * @return \PHPUnit\Framework\MockObject\MockObject|Builder
      */
     protected function getBuilderMock($methods = ['build'])
     {
@@ -278,7 +278,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $returnValue
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getExtensionVisitorMock($returnValue = true)
     {

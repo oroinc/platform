@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 
-class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
     /** @var string */

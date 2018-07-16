@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\MatchApplicableChecker;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 
-class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
+class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

@@ -173,7 +173,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
                 $(content.get().reverse()).each(function(pos, el) {
                     el = $(el);
-                    el.height(anchorTop - el.position().top - footerHeight + fixContent);
+                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
                 });
 
                 scrollspy.adjust();

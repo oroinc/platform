@@ -66,7 +66,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder  = $this->getQueryBuilder($doctrine);
-        /** @var \PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $this->mockConnection($em);
@@ -154,7 +154,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder  = $this->getQueryBuilder($doctrine);
-        /** @var \PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var \PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
         $this->mockConnection($em);
@@ -173,11 +173,11 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $doctrine
+     * @param \PHPUnit\Framework\MockObject\MockObject $doctrine
      *
      * @return DynamicSegmentQueryBuilder
      */
-    protected function getQueryBuilder(\PHPUnit_Framework_MockObject_MockObject $doctrine = null)
+    protected function getQueryBuilder(\PHPUnit\Framework\MockObject\MockObject $doctrine = null)
     {
         $manager = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
             ->disableOriginalConstructor()

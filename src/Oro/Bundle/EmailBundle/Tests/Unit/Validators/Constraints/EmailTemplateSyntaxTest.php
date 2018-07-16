@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
 use Symfony\Component\Validator\Constraint;
 
-class EmailTemplateSyntaxTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateSyntaxTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailTemplateSyntax */
     protected $constraint;

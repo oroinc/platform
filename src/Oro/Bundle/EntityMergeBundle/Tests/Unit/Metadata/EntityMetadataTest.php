@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 
-class EntityMetadataTest extends \PHPUnit_Framework_TestCase
+class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     const FIELD_NAME = 'fieldName';
 
@@ -14,7 +14,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     protected $options;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineMetadata;
 

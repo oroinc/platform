@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit_Framework_TestCase
+class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const WAMP_SESSION_ID = 'sampleSessionId';
     private const TICKET = 'dGlja2V0RGlnZXN0O3NhbXBsZVVzZXJuYW1lO3NhbXBsZU5vbmNlOzIwMTgtMDEtMDFUMTAwOjAwOjAwKzAwOjAw';
@@ -23,7 +23,7 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit_Framework_Tes
     private const CREATED = '2018-01-01T100:00:00+00:00';
 
     /**
-     * @var AuthenticationProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var AuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ticketAuthenticationProvider;
 
@@ -143,7 +143,7 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit_Framework_Tes
     /**
      * @param string|null $ticket
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConnectionInterface
      */
     private function mockWebSocketRequest(?string $ticket)
     {

@@ -7,18 +7,18 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 
-class EntityWithFieldsProviderTest extends \PHPUnit_Framework_TestCase
+class EntityWithFieldsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityWithFieldsProvider */
     private $provider;
 
-    /** @var EntityProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityProvider;
 
-    /** @var EntityFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
-    /** @var EntityConfigHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $configHelper;
 
     /**

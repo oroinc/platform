@@ -17,17 +17,17 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySerializer */
-    protected $entitySerializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
+    private $entitySerializer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
-    protected $associationManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
+    private $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityTitleProvider */
-    protected $entityTitleProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityTitleProvider */
+    private $entityTitleProvider;
 
     /** @var LoadExtendedAssociation */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

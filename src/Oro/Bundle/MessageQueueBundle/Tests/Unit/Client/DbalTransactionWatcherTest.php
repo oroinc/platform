@@ -5,9 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Client\DbalTransactionWatcher;
 
-class DbalTransactionWatcherTest extends \PHPUnit_Framework_TestCase
+class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BufferedMessageProducer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject */
     private $bufferedProducer;
 
     /** @var DbalTransactionWatcher */
@@ -53,7 +53,7 @@ class DbalTransactionWatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $this->transactionWatcher->onTransactionCommited();
             self::fail('The exception should not be catched');
-        } catch (\PHPUnit_Framework_AssertionFailedError $e) {
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
             throw $e;
         } catch (\Exception $e) {
             self::assertSame($exception, $e);

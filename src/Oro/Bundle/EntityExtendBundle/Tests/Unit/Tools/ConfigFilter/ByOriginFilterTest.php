@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
 
-class ByOriginFilterTest extends \PHPUnit_Framework_TestCase
+class ByOriginFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider applyDataProvider

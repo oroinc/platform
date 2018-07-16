@@ -7,11 +7,11 @@ use Oro\Bundle\NavigationBundle\Menu\RoutingAwareMenuFactoryExtension;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
-class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
+class RoutingAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
     const INDEX_PHP_FILE = 'index.php';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
     /** @var MenuFactory */

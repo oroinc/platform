@@ -14,11 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompleteStatusCodesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var CompleteStatusCodes */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

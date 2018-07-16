@@ -27,14 +27,14 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'   => 123,
-            'name' => 'Name',
+            'name' => 'Name'
         ];
 
         $this->documentBuilder->setDataObject($object, $this->requestType);
         self::assertEquals(
             [
                 'id'   => 123,
-                'name' => 'Name',
+                'name' => 'Name'
             ],
             $this->documentBuilder->getDocument()
         );
@@ -63,7 +63,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'   => 123,
-            'name' => 'Name',
+            'name' => 'Name'
         ];
 
         $this->documentBuilder->setDataCollection([$object], $this->requestType);
@@ -71,7 +71,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 [
                     'id'   => 123,
-                    'name' => 'Name',
+                    'name' => 'Name'
                 ]
             ],
             $this->documentBuilder->getDocument()
@@ -126,7 +126,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             'roles'      => [
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
-            ],
+            ]
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -157,7 +157,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'roles'      => [
                     ['id' => 789, 'name' => 'Role1'],
                     ['id' => 780, 'name' => 'Role2']
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -322,7 +322,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     public function testMissingAssociationsAsFields()
     {
         $object = [
-            'id' => 123,
+            'id' => 123
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -351,7 +351,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -379,16 +379,16 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [123, 123],
             [
                 ['id' => 123],
-                ['id' => 123, 'name' => null],
+                ['id' => 123, 'name' => null]
             ],
             [
                 ['id' => 123, 'name' => 'name1'],
-                ['id' => 123, 'name' => 'name1'],
+                ['id' => 123, 'name' => 'name1']
             ],
             [
                 ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
-                ['id' => 123, 'name' => 'name1'],
-            ],
+                ['id' => 123, 'name' => 'name1']
+            ]
         ];
     }
 
@@ -399,7 +399,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -428,19 +428,19 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [[123, 124], [123, 124]],
             [
                 [['id' => 123], ['id' => 124]],
-                [['id' => 123, 'name' => null], ['id' => 124, 'name' => null]],
+                [['id' => 123, 'name' => null], ['id' => 124, 'name' => null]]
             ],
             [
                 [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
-                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']]
             ],
             [
                 [
                     ['id' => 123, 'name' => 'name1', 'other' => 'val1'],
                     ['id' => 124, 'name' => 'name2', 'other' => 'val1']
                 ],
-                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
-            ],
+                [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']]
+            ]
         ];
     }
 
@@ -451,7 +451,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -477,7 +477,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [null, null],
             [123, 123],
             [['id' => 123], 123],
-            [['id' => 123, 'name' => 'name1'], 123],
+            [['id' => 123, 'name' => 'name1'], 123]
         ];
     }
 
@@ -488,7 +488,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -521,7 +521,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [
                 [['id' => 123, 'name' => 'name1'], ['id' => 124, 'name' => 'name2']],
                 [123, 124]
-            ],
+            ]
         ];
     }
 
@@ -532,7 +532,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'       => 123,
-            'category' => $value,
+            'category' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -562,12 +562,12 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             ['name1', 'name1'],
             [
                 ['name' => 'name1'],
-                'name1',
+                'name1'
             ],
             [
                 ['name' => 'name1', 'other' => 'val1'],
-                'name1',
-            ],
+                'name1'
+            ]
         ];
     }
 
@@ -578,7 +578,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'         => 123,
-            'categories' => $value,
+            'categories' => $value
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -609,15 +609,15 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
             [['name1', 'name2'], ['name1', 'name2']],
             [
                 [['name' => 'name1'], ['name' => 'name2']],
-                ['name1', 'name2'],
+                ['name1', 'name2']
             ],
             [
                 [
                     ['name' => 'name1', 'other' => 'val1'],
                     ['name' => 'name2', 'other' => 'val1']
                 ],
-                ['name1', 'name2'],
-            ],
+                ['name1', 'name2']
+            ]
         ];
     }
 
@@ -640,8 +640,8 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                 'roles'      => [
                     ['id' => 789, 'name' => 'Role1'],
                     ['id' => 780, 'name' => 'Role2']
-                ],
-            ],
+                ]
+            ]
         ];
 
         $targetMetadata = $this->getEntityMetadata('Test\Target', ['id']);
@@ -685,7 +685,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                     ],
                     'missingToOne'  => null,
                     'missingToMany' => []
-                ],
+                ]
             ],
             $this->documentBuilder->getDocument()
         );
@@ -737,7 +737,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     {
         $object = [
             'id'    => 123,
-            'meta1' => 'Meta1',
+            'meta1' => 'Meta1'
         ];
 
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -749,7 +749,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         self::assertEquals(
             [
                 'id'          => '123',
-                'resultMeta1' => 'Meta1',
+                'resultMeta1' => 'Meta1'
             ],
             $this->documentBuilder->getDocument()
         );

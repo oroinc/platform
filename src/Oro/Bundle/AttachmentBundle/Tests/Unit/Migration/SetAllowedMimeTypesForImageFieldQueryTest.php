@@ -8,7 +8,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\AttachmentBundle\Migration\SetAllowedMimeTypesForImageFieldQuery;
 use Psr\Log\LoggerInterface;
 
-class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit_Framework_TestCase
+class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string
@@ -29,12 +29,12 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit_Framework_TestC
     ];
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject $logger
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger
      */
     private $logger;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connection;
 

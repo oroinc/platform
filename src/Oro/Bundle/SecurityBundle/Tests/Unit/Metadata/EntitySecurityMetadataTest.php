@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 
-class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
+class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntitySecurityMetadata */
     protected $entity;

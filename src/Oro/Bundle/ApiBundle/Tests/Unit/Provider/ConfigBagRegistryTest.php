@@ -8,18 +8,18 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ConfigBagRegistryTest extends \PHPUnit_Framework_TestCase
+class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $defaultConfigBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $firstConfigBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
     private $secondConfigBag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     protected function setUp()

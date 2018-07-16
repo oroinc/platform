@@ -8,15 +8,15 @@ use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Symfony\Component\Routing\RouterInterface;
 
-class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
+class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentManager  */
     protected $attachmentManager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|RouterInterface */
     protected $router;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     protected $associationManager;
 
     /** @var TestAttachment */

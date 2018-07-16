@@ -7,13 +7,13 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ResourcesCacheTest extends \PHPUnit_Framework_TestCase
+class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
-    protected $cache;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
+    private $cache;
 
     /** @var ResourcesCache */
-    protected $resourcesCache;
+    private $resourcesCache;
 
     protected function setUp()
     {

@@ -119,17 +119,14 @@ class FormCompilerPass implements CompilerPassInterface
      */
     private function decorateFormTypeFactory(ContainerBuilder $container)
     {
-        $factoryDef = new Definition(
-            ApiResolvedFormTypeFactory::class,
-            [
+        $container
+            ->register(self::API_FORM_TYPE_FACTORY_SERVICE_ID, ApiResolvedFormTypeFactory::class)
+            ->setArguments([
                 new Reference(self::API_FORM_TYPE_FACTORY_SERVICE_ID . '.inner'),
                 new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID)
-            ]
-        );
-        $factoryDef->setPublic(false);
-        $factoryDef->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
-
-        $container->setDefinition(self::API_FORM_TYPE_FACTORY_SERVICE_ID, $factoryDef);
+            ])
+            ->setPublic(false)
+            ->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
     }
 
     /**
@@ -143,44 +140,38 @@ class FormCompilerPass implements CompilerPassInterface
             $formRegistryClass = $container->getParameter(substr($formRegistryClass, 1, -1));
         }
         if (FormRegistry::class !== $formRegistryClass) {
-            throw new LogicException(
-                sprintf(
-                    'Expected class of the "%s" service is "%s", actual class is "%s".',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    FormRegistry::class,
-                    $formRegistryClass
-                )
-            );
+            throw new LogicException(sprintf(
+                'Expected class of the "%s" service is "%s", actual class is "%s".',
+                self::FORM_REGISTRY_SERVICE_ID,
+                FormRegistry::class,
+                $formRegistryClass
+            ));
         }
 
         $formExtensions = $formRegistryDef->getArgument(0);
         if (!is_array($formExtensions)) {
-            throw new LogicException(
-                sprintf(
-                    'Cannot register Data API form extension because it is expected'
-                    . ' that the first argument of "%s" service is array. "%s" given.',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
-                )
-            );
+            throw new LogicException(sprintf(
+                'Cannot register Data API form extension because it is expected'
+                . ' that the first argument of "%s" service is array. "%s" given.',
+                self::FORM_REGISTRY_SERVICE_ID,
+                is_object($formExtensions) ? get_class($formExtensions) : gettype($formExtensions)
+            ));
         } elseif (count($formExtensions) !== 1) {
-            throw new LogicException(
-                sprintf(
-                    'Cannot register Data API form extension because it is expected'
-                    . ' that the first argument of "%s" service is array contains only one element.'
-                    . ' Detected the following form extension: %s.',
-                    self::FORM_REGISTRY_SERVICE_ID,
-                    implode(
-                        ', ',
-                        array_map(
-                            function (Reference $ref) {
-                                return (string)$ref;
-                            },
-                            $formExtensions
-                        )
+            throw new LogicException(sprintf(
+                'Cannot register Data API form extension because it is expected'
+                . ' that the first argument of "%s" service is array contains only one element.'
+                . ' Detected the following form extension: %s.',
+                self::FORM_REGISTRY_SERVICE_ID,
+                implode(
+                    ', ',
+                    array_map(
+                        function (Reference $ref) {
+                            return (string)$ref;
+                        },
+                        $formExtensions
                     )
                 )
-            );
+            ));
         }
     }
 

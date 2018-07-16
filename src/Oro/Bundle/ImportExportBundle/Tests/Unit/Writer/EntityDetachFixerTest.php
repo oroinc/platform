@@ -11,15 +11,15 @@ use Oro\Bundle\ImportExportBundle\Tests\Unit\Writer\Stub\EntityStub;
 use Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
+class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FieldHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
     protected $fieldHelper;
 
     /** @var EntityDetachFixer */

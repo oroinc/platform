@@ -16,7 +16,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Strategy\UniteStrategy;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class UniteStrategyTest extends \PHPUnit_Framework_TestCase
+class UniteStrategyTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotSupports()
     {

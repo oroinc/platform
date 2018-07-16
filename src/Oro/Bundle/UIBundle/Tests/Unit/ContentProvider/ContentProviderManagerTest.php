@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 
-class ContentProviderManagerTest extends \PHPUnit_Framework_TestCase
+class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContentProviderManager

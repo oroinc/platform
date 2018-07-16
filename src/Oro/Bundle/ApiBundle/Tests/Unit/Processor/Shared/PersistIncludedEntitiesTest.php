@@ -11,19 +11,17 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class PersistIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var PersistIncludedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new PersistIncludedEntities($this->doctrineHelper);
     }
@@ -112,9 +110,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
             new IncludedEntityData('/included/0', 0, $isExistingEntity)
         );
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with(self::identicalTo($entity), false)

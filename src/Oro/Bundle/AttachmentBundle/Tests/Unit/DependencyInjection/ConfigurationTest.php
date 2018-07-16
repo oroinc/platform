@@ -4,7 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetConfigTreeBuilder()
     {

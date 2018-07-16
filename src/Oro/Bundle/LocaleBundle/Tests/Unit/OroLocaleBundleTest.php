@@ -10,7 +10,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\OroLocaleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroLocaleBundleTest extends \PHPUnit_Framework_TestCase
+class OroLocaleBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

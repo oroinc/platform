@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClientFactory;
 
-class GuzzleRestClientFactoryTest extends \PHPUnit_Framework_TestCase
+class GuzzleRestClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GuzzleRestClientFactory

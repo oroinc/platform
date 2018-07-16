@@ -5,9 +5,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Condition;
 use Oro\Bundle\ConfigBundle\Condition\IsSystemConfigEqual;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
-class IsSystemConfigEqualTest extends \PHPUnit_Framework_TestCase
+class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var IsSystemConfigEqual */

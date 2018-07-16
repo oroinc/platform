@@ -17,16 +17,16 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class SubresourceContextTest extends \PHPUnit_Framework_TestCase
+class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
+    private $metadataProvider;
 
     /** @var SubresourceContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -41,7 +41,7 @@ class SubresourceContextTest extends \PHPUnit_Framework_TestCase
      *
      * @return Config
      */
-    protected function getConfig(array $data = [])
+    private function getConfig(array $data = [])
     {
         $result = new Config();
         foreach ($data as $sectionName => $config) {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Token;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory;
 
-class UsernamePasswordOrganizationTokenFactoryTest extends \PHPUnit_Framework_TestCase
+class UsernamePasswordOrganizationTokenFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {

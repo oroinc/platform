@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\StringOptionValueBuilder;
 
-class StringOptionValueBuilderTest extends \PHPUnit_Framework_TestCase
+class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException

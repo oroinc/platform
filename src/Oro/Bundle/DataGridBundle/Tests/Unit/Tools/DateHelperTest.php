@@ -5,9 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
-class DateHelperTest extends \PHPUnit_Framework_TestCase
+class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
     private $localeSettings;
 
     /** @var DateHelper */

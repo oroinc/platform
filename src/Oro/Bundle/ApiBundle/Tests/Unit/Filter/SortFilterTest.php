@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class SortFilterTest extends \PHPUnit_Framework_TestCase
+class SortFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testApplyWithoutFilter()
     {
@@ -16,7 +16,7 @@ class SortFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria);
 
-        $this->assertEmpty($criteria->getOrderings());
+        self::assertEmpty($criteria->getOrderings());
     }
 
     public function testApplyWithFilter()
@@ -29,7 +29,7 @@ class SortFilterTest extends \PHPUnit_Framework_TestCase
 
         $filter->apply($criteria, $filterValue);
 
-        $this->assertNotEmpty($criteria->getOrderings());
-        $this->assertSame($orderingValue, $criteria->getOrderings());
+        self::assertNotEmpty($criteria->getOrderings());
+        self::assertSame($orderingValue, $criteria->getOrderings());
     }
 }

@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionInterface;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
 
-class QueryExpressionVisitorFactoryTest extends \PHPUnit_Framework_TestCase
+class QueryExpressionVisitorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateExpressionVisitor()
     {
@@ -21,7 +21,7 @@ class QueryExpressionVisitorFactoryTest extends \PHPUnit_Framework_TestCase
 
         $expressionVisitor = $factory->createExpressionVisitor();
 
-        $this->assertEquals(
+        self::assertEquals(
             new QueryExpressionVisitor($compositeExpressions, $comparisonExpressions),
             $expressionVisitor
         );

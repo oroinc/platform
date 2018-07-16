@@ -12,21 +12,21 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provide
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $securityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     /** @var EntitySecurityMetadata */

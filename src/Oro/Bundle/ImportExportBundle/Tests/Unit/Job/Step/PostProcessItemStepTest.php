@@ -9,7 +9,7 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\Step\PostProcessItemStep;
 
-class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
+class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PostProcessItemStep
@@ -20,21 +20,21 @@ class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
     {
         $this->itemStep = new PostProcessItemStep('step_name');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|JobExecutor $jobExecutor */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor $jobExecutor */
         $jobExecutor = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobExecutor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->itemStep->setJobExecutor($jobExecutor);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemReaderInterface $reader */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemReaderInterface $reader */
         $reader = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
         $this->itemStep->setReader($reader);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemProcessorInterface $processor */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemProcessorInterface $processor */
         $processor = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
         $this->itemStep->setProcessor($processor);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ItemWriterInterface $writer */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ItemWriterInterface $writer */
         $writer = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
         $this->itemStep->setWriter($writer);
 
@@ -49,7 +49,7 @@ class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
      */
     public function testDoExecute($jobName, $contextKeys)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|StepExecution $stepExecution */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|StepExecution $stepExecution */
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();

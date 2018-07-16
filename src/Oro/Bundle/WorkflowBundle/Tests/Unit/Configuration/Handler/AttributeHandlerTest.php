@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\AttributeHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class AttributeHandlerTest extends \PHPUnit_Framework_TestCase
+class AttributeHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AttributeHandler

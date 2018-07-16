@@ -13,7 +13,7 @@ class TwigRendererEngineTest extends RendererEngineTest
      */
     public function createRendererEngine()
     {
-        /** @var Environment|\PHPUnit_Framework_MockObject_MockObject $environment */
+        /** @var Environment|\PHPUnit\Framework\MockObject\MockObject $environment */
         $environment = $this->createMock(Environment::class);
 
         return new TwigRendererEngine([], $environment);

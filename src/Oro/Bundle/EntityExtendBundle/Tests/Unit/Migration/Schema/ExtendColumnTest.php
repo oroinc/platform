@@ -8,12 +8,12 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 
-class ExtendColumnTest extends \PHPUnit_Framework_TestCase
+class ExtendColumnTest extends \PHPUnit\Framework\TestCase
 {
     const TABLE_NAME = 'test_table';
     const COLUMN_NAME = 'test_name';
 
-    /** @var ExtendOptionsManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendOptionsManager;
 
     /** @var ExtendColumn */

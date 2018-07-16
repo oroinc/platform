@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\ErrorResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
+class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ErrorResponseProcessor */
     protected $processor;
@@ -18,7 +18,7 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildResponseFromDefinedFields()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('hasError')
@@ -42,7 +42,7 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildResponseFromError()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('hasError')
@@ -67,7 +67,7 @@ class ErrorResponseProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipHasNoErrors()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())->method('hasError')->willReturn(false);
         $context->expects($this->never())->method('setResult');

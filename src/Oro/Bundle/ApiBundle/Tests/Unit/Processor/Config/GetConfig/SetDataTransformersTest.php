@@ -12,14 +12,14 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerRegistry */
-    protected $dataTransformerRegistry;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerRegistry */
+    private $dataTransformerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var SetDataTransformers */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

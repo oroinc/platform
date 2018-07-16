@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
-class FallbackValueTransformerTest extends \PHPUnit_Framework_TestCase
+class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FallbackValueTransformer

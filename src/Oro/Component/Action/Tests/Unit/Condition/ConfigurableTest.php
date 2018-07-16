@@ -4,10 +4,10 @@ namespace Oro\Component\Action\Tests\Unit\Condition;
 
 use Oro\Component\Action\Condition\Configurable;
 
-class ConfigurableTest extends \PHPUnit_Framework_TestCase
+class ConfigurableTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $assembler;
 

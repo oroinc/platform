@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Symfony\Component\Form\Test\FormInterface;
 
-class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
+class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeFormDataContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -17,43 +18,43 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testRootClassName()
     {
-        $this->assertNull($this->context->getRootClassName());
+        self::assertNull($this->context->getRootClassName());
 
         $this->context->setRootClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getRootClassName());
+        self::assertEquals('Test\Class', $this->context->getRootClassName());
     }
 
     public function testClassName()
     {
-        $this->assertNull($this->context->getClassName());
+        self::assertNull($this->context->getClassName());
 
         $this->context->setClassName('Test\Class');
-        $this->assertEquals('Test\Class', $this->context->getClassName());
+        self::assertEquals('Test\Class', $this->context->getClassName());
     }
 
     public function testPropertyPath()
     {
-        $this->assertNull($this->context->getPropertyPath());
+        self::assertNull($this->context->getPropertyPath());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertEquals('field1.field11', $this->context->getPropertyPath());
+        self::assertEquals('field1.field11', $this->context->getPropertyPath());
     }
 
     public function testRootConfig()
     {
-        $this->assertNull($this->context->getRootConfig());
+        self::assertNull($this->context->getRootConfig());
 
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
-        $this->assertNull($this->context->getRootConfig());
+        self::assertNull($this->context->getRootConfig());
 
         $this->context->setPropertyPath('test');
-        $this->assertSame($config, $this->context->getRootConfig());
+        self::assertSame($config, $this->context->getRootConfig());
     }
 
     public function testConfigForKnownField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config
@@ -63,10 +64,10 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
             ->createAndSetTargetEntity();
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
+        self::assertSame(
             $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
             $this->context->getConfig()
         );
@@ -74,21 +75,21 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigForUnknownField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('unknownField.field11');
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
     }
 
     public function testConfigForExcludedField()
     {
-        $this->assertNull($this->context->getConfig());
+        self::assertNull($this->context->getConfig());
 
         $config = new EntityDefinitionConfig();
         $config
@@ -99,10 +100,10 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
         $config->getField('field1')->setExcluded();
 
         $this->context->setConfig($config);
-        $this->assertSame($config, $this->context->getConfig());
+        self::assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('field1.field11');
-        $this->assertSame(
+        self::assertSame(
             $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
             $this->context->getConfig()
         );
@@ -110,8 +111,8 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $this->context->setForm($form);
-        $this->assertSame($form, $this->context->getForm());
+        self::assertSame($form, $this->context->getForm());
     }
 }

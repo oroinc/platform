@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntityValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
+class SourceEntityValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SourceEntityValidator

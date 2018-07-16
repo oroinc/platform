@@ -7,10 +7,10 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
-class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
+class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldHelper;
 

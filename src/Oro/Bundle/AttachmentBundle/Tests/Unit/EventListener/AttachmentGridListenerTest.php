@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
-class AttachmentGridListenerTest extends \PHPUnit_Framework_TestCase
+class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentGridListener */
     protected $listener;

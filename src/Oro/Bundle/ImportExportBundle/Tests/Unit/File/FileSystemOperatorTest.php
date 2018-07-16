@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 
-class FileSystemOperatorTest extends \PHPUnit_Framework_TestCase
+class FileSystemOperatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $existingDir = 'existing';

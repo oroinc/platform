@@ -13,20 +13,20 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var JobRunner|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var AbstractIndexer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AbstractIndexer|\PHPUnit\Framework\MockObject\MockObject */
     private $indexer;
 
     /**

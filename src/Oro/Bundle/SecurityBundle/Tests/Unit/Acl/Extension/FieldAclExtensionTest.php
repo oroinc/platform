@@ -27,12 +27,12 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
+class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FieldAclExtension */
     protected $extension;
 
-    /** @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntitySecurityMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $securityMetadataProvider;
 
     /** @var OwnershipMetadataProviderStub */
@@ -95,10 +95,10 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EntityOwnershipDecisionMaker */
     protected $decisionMaker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp()
@@ -128,7 +128,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider $treeProviderMock */
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();

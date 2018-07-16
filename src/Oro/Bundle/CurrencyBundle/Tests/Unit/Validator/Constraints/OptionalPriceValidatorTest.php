@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
+class OptionalPriceValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Constraints\OptionalPrice
@@ -16,7 +16,7 @@ class OptionalPriceValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface
      */
     protected $context;
 

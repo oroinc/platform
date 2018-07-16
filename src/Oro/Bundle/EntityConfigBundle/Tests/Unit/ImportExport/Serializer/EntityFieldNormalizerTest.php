@@ -11,18 +11,18 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
-class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
+class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
     const FIELD_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var FieldTypeProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FieldTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $fieldTypeProvider;
 
     /** @var EntityFieldNormalizer */
@@ -95,7 +95,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider denormalizeExceptionDataProvider
      *
      * @@expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @expectedExceptionMessage Data does not contain required properties: type, fieldType or entity_id
+     * @expectedExceptionMessage Data doesn't contains entity id
      *
      * @param array $data
      */
@@ -114,10 +114,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                 'data' => ['type' => 'test', 'fieldName' => 'test']
             ],
             [
-                'data' => ['type' => 'test', 'entity' => ['id' => 1]]
-            ],
-            [
-                'data' => ['fieldName' => 'test', 'entity' => ['id' => null]]
+                'data' => ['type' => 'test', 'fieldName' => 'test', 'entity' => ['id' => null]]
             ],
             [
                 'data' => []
@@ -133,7 +130,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
-        /* @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $objectManager */
+        /* @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $objectManager */
         $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->registry->expects($this->once())
@@ -260,7 +257,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'data' => [
                         'type' => 'fieldType1',
-                        'fieldName' => 'fieldName1',
+                        'fieldName' => null,
                         'entity' => [
                             'id' => 11,
                         ],
@@ -344,7 +341,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-                'expected' => $this->getFieldConfigModel(null, 'fieldName1', 'fieldType1', [
+                'expected' => $this->getFieldConfigModel(null, null, 'fieldType1', [
                     'bool' => [
                         'code1' => false,
                         'code2' => false,
@@ -410,11 +407,11 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $scope
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProvider($scope)
     {
-        /* @var $provider ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $provider ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();

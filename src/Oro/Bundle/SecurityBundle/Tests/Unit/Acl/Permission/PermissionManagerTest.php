@@ -19,27 +19,27 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PermissionManagerTest extends \PHPUnit_Framework_TestCase
+class PermissionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PermissionManager */
     protected $manager;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var PermissionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PermissionRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityRepository;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityManager;
 
-    /** @var PermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
 
     /** @var PermissionConfigurationBuilder */
     protected $configurationBuilder;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
     /**
@@ -86,7 +86,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->with('OroSecurityBundle:Permission')
             ->willReturn($this->entityManager);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface $validator */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface $validator */
         $validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $validator->expects($this->any())
             ->method('validate')

@@ -9,7 +9,7 @@ use Oro\Bundle\LayoutBundle\EventListener\ThemeListener;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
+class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadDefaultConfig()
     {

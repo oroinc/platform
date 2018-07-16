@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\BeforeMapObjectEvent;
 
-class BeforeMapObjectEventTest extends \PHPUnit_Framework_TestCase
+class BeforeMapObjectEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testMappingConfig()
     {

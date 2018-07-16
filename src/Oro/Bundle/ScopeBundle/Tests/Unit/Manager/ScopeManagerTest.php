@@ -19,20 +19,20 @@ use Oro\Component\TestUtils\Mocks\ServiceLink;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ScopeManagerTest extends \PHPUnit_Framework_TestCase
+class ScopeManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $manager;
 
     /**
-     * @var ScopeEntityStorage|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeEntityStorage|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityStorage;
 
     /**
-     * @var EntityFieldProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityFieldProvider;
 
@@ -227,7 +227,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
                 ['name' => 'fieldName2'],
             ]
         );
-        /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        /** @var ScopeCriteriaProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider */
         $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')
             ->willReturn([]);
@@ -259,7 +259,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
                 ['name' => 'fieldName2'],
             ]
         );
-        /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        /** @var ScopeCriteriaProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider */
         $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')
             ->willReturn([]);
@@ -291,7 +291,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
                 ['name' => 'fieldName2'],
             ]
         );
-        /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        /** @var ScopeCriteriaProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider */
         $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')
             ->willReturn([]);

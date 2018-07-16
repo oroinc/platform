@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 
-class RecipientTest extends \PHPUnit_Framework_TestCase
+class RecipientTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $email

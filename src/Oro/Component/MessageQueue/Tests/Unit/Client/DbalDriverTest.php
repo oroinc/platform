@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 
-class DbalDriverTest extends \PHPUnit_Framework_TestCase
+class DbalDriverTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -208,7 +208,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
      */
     private function createSessionStub($message = null, $messageProducer = null)
     {
@@ -235,7 +235,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalMessageProducer
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageProducer
      */
     private function createMessageProducer()
     {
@@ -243,7 +243,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
      */
     private function createSessionMock()
     {

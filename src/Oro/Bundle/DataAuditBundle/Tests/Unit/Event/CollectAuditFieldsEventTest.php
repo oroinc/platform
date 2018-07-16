@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Event;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Event\CollectAuditFieldsEvent;
 
-class CollectAuditFieldsEventTest extends \PHPUnit_Framework_TestCase
+class CollectAuditFieldsEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters()
     {

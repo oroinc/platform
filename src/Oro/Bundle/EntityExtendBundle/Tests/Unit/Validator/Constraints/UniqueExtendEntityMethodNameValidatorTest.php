@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -12,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldV
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -20,7 +23,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValida
     const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
     const TEST_FIELD_NAME = 'testField';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $classMethodNameChecker;
 
     /** @var UniqueExtendEntityFieldValidator */
@@ -43,11 +46,15 @@ class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValida
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         return new UniqueExtendEntityMethodNameValidator(
-            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend'), $eventDispatcher),
+            new FieldNameValidationHelper(
+                new ConfigProviderMock($configManager, 'extend'),
+                $eventDispatcher,
+                new NewEntitiesHelper()
+            ),
             $this->classMethodNameChecker
         );
     }

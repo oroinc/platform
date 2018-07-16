@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
-class FullNameSearchHandlerTest extends \PHPUnit_Framework_TestCase
+class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ENTITY_CLASS = 'FooEntityClass';
 
@@ -19,7 +19,7 @@ class FullNameSearchHandlerTest extends \PHPUnit_Framework_TestCase
     protected $searchHandler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 

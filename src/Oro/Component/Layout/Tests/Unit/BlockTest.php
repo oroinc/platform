@@ -8,18 +8,18 @@ use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\RawLayout;
 
-class BlockTest extends \PHPUnit_Framework_TestCase
+class BlockTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
     protected $rawLayout;
 
-    /** @var BlockTypeHelperInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BlockTypeHelperInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
     /** @var LayoutContext */
     protected $context;
 
-    /** @var DataAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DataAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $data;
 
     /** @var Block */

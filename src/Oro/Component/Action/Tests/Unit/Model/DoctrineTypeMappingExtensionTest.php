@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Model;
 
 use Oro\Component\Action\Model\DoctrineTypeMappingExtension;
 
-class DoctrineTypeMappingExtensionTest extends \PHPUnit_Framework_TestCase
+class DoctrineTypeMappingExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineTypeMappingExtension */
     private $extension;

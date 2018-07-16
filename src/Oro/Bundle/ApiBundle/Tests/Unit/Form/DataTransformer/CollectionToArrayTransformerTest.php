@@ -4,25 +4,26 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
+use Symfony\Component\Form\DataTransformerInterface;
 
-class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
+class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $elementTransformer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $elementTransformer;
 
     /** @var CollectionToArrayTransformer */
-    protected $transformer;
+    private $transformer;
 
     protected function setUp()
     {
-        $this->elementTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $this->elementTransformer = $this->createMock(DataTransformerInterface::class);
 
         $this->transformer = new CollectionToArrayTransformer($this->elementTransformer);
     }
 
     public function testTransform()
     {
-        $this->assertNull($this->transformer->transform(new ArrayCollection()));
+        self::assertNull($this->transformer->transform(new ArrayCollection()));
     }
 
     /**
@@ -30,7 +31,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransform($value, $expected)
     {
-        $this->elementTransformer->expects($this->any())
+        $this->elementTransformer->expects(self::any())
             ->method('reverseTransform')
             ->willReturnCallback(
                 function ($element) {
@@ -38,7 +39,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->assertEquals($expected, $this->transformer->reverseTransform($value));
+        self::assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
     public function reverseTransformDataProvider()
@@ -47,7 +48,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
             [null, new ArrayCollection()],
             ['', new ArrayCollection()],
             [[], new ArrayCollection()],
-            [['element1', 'element2'], new ArrayCollection(['transformed_element1', 'transformed_element2'])],
+            [['element1', 'element2'], new ArrayCollection(['transformed_element1', 'transformed_element2'])]
         ];
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
-class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
+class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigUpdateEvent */
     protected $event;

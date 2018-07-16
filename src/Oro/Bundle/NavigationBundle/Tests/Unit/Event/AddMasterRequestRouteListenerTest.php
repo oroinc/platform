@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class AddMasterRequestRouteListenerTest extends \PHPUnit_Framework_TestCase
+class AddMasterRequestRouteListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AddMasterRequestRouteListener

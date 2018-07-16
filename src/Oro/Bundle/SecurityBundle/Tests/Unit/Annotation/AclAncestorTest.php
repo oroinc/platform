@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Annotation;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-class AclAncestorTest extends \PHPUnit_Framework_TestCase
+class AclAncestorTest extends \PHPUnit\Framework\TestCase
 {
     public function testAncestor()
     {

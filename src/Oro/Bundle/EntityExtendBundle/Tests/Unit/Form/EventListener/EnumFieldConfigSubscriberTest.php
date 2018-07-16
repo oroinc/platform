@@ -10,18 +10,18 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 
-class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $enumSynchronizer;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var EnumFieldConfigSubscriber */
@@ -562,8 +562,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed                                         $configModel
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $form
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEventMock($configModel, $form = null)
     {
@@ -590,7 +590,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

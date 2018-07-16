@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Provider;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 
-class MassActionProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class MassActionProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MassActionProviderRegistry */
     protected $registry;

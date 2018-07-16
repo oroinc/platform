@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress;
 
-class EmailAddressTest extends \PHPUnit_Framework_TestCase
+class EmailAddressTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddress */
     protected $constraint;

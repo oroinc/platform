@@ -11,15 +11,15 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class NavigationListenerTest extends \PHPUnit_Framework_TestCase
+class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NavigationListener */
     protected $navigationListener;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     protected function setUp()
@@ -38,7 +38,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $item = $this->createMock('Knp\Menu\ItemInterface');
         $menu = $this->createMock('Knp\Menu\ItemInterface');
 
-        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -63,7 +63,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $menu = $this->createMock('Knp\Menu\ItemInterface');
 
-        /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
             ->disableOriginalConstructor()
             ->getMock();

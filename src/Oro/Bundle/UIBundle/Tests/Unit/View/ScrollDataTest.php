@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\View;
 
 use Oro\Bundle\UIBundle\View\ScrollData;
 
-class ScrollDataTest extends \PHPUnit_Framework_TestCase
+class ScrollDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ScrollData

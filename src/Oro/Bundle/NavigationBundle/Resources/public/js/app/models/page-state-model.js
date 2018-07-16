@@ -1,10 +1,9 @@
-define([
-    'oroui/js/app/models/base/model',
-    'routing'
-], function(BaseModel, routing) {
+define(function(require) {
     'use strict';
 
     var PageStateModel;
+    var routing = require('routing');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     PageStateModel = BaseModel.extend({
         defaults: {

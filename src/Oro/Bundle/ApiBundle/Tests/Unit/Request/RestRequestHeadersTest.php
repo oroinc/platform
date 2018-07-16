@@ -5,13 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Symfony\Component\HttpFoundation\Request;
 
-class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
+class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request */
-    protected $request;
+    private $request;
 
     /** @var RestRequestHeaders */
-    protected $requestHeaders;
+    private $requestHeaders;
 
     protected function setUp()
     {
@@ -24,19 +24,19 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
 
     public function testHasWhenInternalStorageIsNotInitialized()
     {
-        $this->assertTrue($this->requestHeaders->has('prm1'));
-        $this->assertTrue($this->requestHeaders->has('prm_2'));
+        self::assertTrue($this->requestHeaders->has('prm1'));
+        self::assertTrue($this->requestHeaders->has('prm_2'));
     }
 
     public function testGetWhenInternalStorageIsNotInitialized()
     {
-        $this->assertEquals('val1', $this->requestHeaders->get('prm1'));
-        $this->assertEquals('val2', $this->requestHeaders->get('prm_2'));
+        self::assertEquals('val1', $this->requestHeaders->get('prm1'));
+        self::assertEquals('val2', $this->requestHeaders->get('prm_2'));
     }
 
     public function testToArrayWhenInternalStorageIsNotInitialized()
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['prm1' => 'val1', 'prm-2' => 'val2'],
             array_intersect_key($this->requestHeaders->toArray(), ['prm1' => null, 'prm-2' => null])
         );
@@ -44,7 +44,7 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
 
     public function testCountWhenInternalStorageIsNotInitialized()
     {
-        $this->assertEquals(
+        self::assertEquals(
             $this->request->headers->count(),
             $this->requestHeaders->count()
         );
@@ -53,21 +53,21 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
     public function testHasWhenInternalStorageIsInitialized()
     {
         $this->requestHeaders->set('prm1', 'new_val');
-        $this->assertTrue($this->requestHeaders->has('prm1'));
-        $this->assertTrue($this->requestHeaders->has('prm_2'));
+        self::assertTrue($this->requestHeaders->has('prm1'));
+        self::assertTrue($this->requestHeaders->has('prm_2'));
     }
 
     public function testGetWhenInternalStorageIsInitialized()
     {
         $this->requestHeaders->set('prm1', 'new_val');
-        $this->assertEquals('new_val', $this->requestHeaders->get('prm1'));
-        $this->assertEquals('val2', $this->requestHeaders->get('prm_2'));
+        self::assertEquals('new_val', $this->requestHeaders->get('prm1'));
+        self::assertEquals('val2', $this->requestHeaders->get('prm_2'));
     }
 
     public function testToArrayWhenInternalStorageIsInitialized()
     {
         $this->requestHeaders->set('prm1', 'new_val');
-        $this->assertEquals(
+        self::assertEquals(
             ['prm1' => 'new_val', 'prm-2' => 'val2'],
             array_intersect_key($this->requestHeaders->toArray(), ['prm1' => null, 'prm-2' => null])
         );
@@ -76,7 +76,7 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
     public function testCountWhenInternalStorageIsInitialized()
     {
         $this->requestHeaders->set('prm1', 'new_val');
-        $this->assertEquals(
+        self::assertEquals(
             $this->request->headers->count(),
             $this->requestHeaders->count()
         );
@@ -85,14 +85,14 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
     public function testReplaceExistingParam()
     {
         $this->requestHeaders->set('PRM-2', 'new_val');
-        $this->assertEquals('new_val', $this->requestHeaders->get('prm_2'));
+        self::assertEquals('new_val', $this->requestHeaders->get('prm_2'));
     }
 
     public function testAddNewParam()
     {
         $this->requestHeaders->set('PRM-3', 'new_val');
-        $this->assertEquals('new_val', $this->requestHeaders->get('prm_3'));
-        $this->assertEquals(
+        self::assertEquals('new_val', $this->requestHeaders->get('prm_3'));
+        self::assertEquals(
             ['prm1' => 'val1', 'prm-2' => 'val2', 'prm-3' => 'new_val'],
             array_intersect_key(
                 $this->requestHeaders->toArray(),
@@ -104,9 +104,9 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
     public function testRemoveParam()
     {
         $this->requestHeaders->remove('PRM-2');
-        $this->assertFalse($this->requestHeaders->has('prm_2'));
-        $this->assertNull($this->requestHeaders->get('prm_2'));
-        $this->assertEquals(
+        self::assertFalse($this->requestHeaders->has('prm_2'));
+        self::assertNull($this->requestHeaders->get('prm_2'));
+        self::assertEquals(
             ['prm1' => 'val1'],
             array_intersect_key(
                 $this->requestHeaders->toArray(),
@@ -118,7 +118,7 @@ class RestRequestHeadersTest extends \PHPUnit_Framework_TestCase
     public function testClear()
     {
         $this->requestHeaders->clear();
-        $this->assertEquals(
+        self::assertEquals(
             [],
             array_intersect_key(
                 $this->requestHeaders->toArray(),

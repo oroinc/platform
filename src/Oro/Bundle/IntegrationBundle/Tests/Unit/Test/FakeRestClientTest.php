@@ -10,7 +10,7 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
 /**
  * Class FakeRestClientTest is simple test for fake client just to ensure it's logic works
  */
-class FakeRestClientTest extends \PHPUnit_Framework_TestCase
+class FakeRestClientTest extends \PHPUnit\Framework\TestCase
 {
     const FAKE_RESOURCE = '/foo';
 

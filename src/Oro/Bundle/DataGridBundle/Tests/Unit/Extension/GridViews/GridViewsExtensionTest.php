@@ -21,20 +21,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
+class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject */
     protected $serviceLink;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var GridViewsExtension */
@@ -132,7 +132,7 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->tokenAccessor->expects($this->any())->method('getUser')->willReturn($user);
 
-        /** @var GridViewManager|\PHPUnit_Framework_MockObject_MockObject $gridViewManager */
+        /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject $gridViewManager */
         $gridViewManager = $this->createMock(GridViewManager::class);
         $gridViewManager->expects($this->any())
             ->method('getDefaultView')

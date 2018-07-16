@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CreateDateTest extends \PHPUnit_Framework_TestCase
+class CreateDateTest extends \PHPUnit\Framework\TestCase
 {
     const TIMEZONE = 'Europe/London';
 
@@ -24,7 +24,7 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings
+     * @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings
      */
     protected $localeSettings;
 

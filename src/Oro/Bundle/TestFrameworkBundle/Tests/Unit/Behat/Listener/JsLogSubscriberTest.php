@@ -12,7 +12,7 @@ use Behat\Testwork\Tester\Setup\Teardown;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\JsLogSubscriber;
 use WebDriver\Session;
 
-class JsLogSubscriberTest extends \PHPUnit_Framework_TestCase
+class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider logProvider
@@ -21,7 +21,7 @@ class JsLogSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testLog(array $logs, $expectedContent)
     {
-        /** @var JsLogSubscriber|\PHPUnit_Framework_MockObject_MockObject $jsLogSubscriber */
+        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
         $jsLogSubscriber = $this
             ->getMockBuilder(JsLogSubscriber::class)
             ->setConstructorArgs([new Mink(), sys_get_temp_dir()])
@@ -38,7 +38,7 @@ class JsLogSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyLog()
     {
-        /** @var JsLogSubscriber|\PHPUnit_Framework_MockObject_MockObject $jsLogSubscriber */
+        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
         $jsLogSubscriber = $this
             ->getMockBuilder(JsLogSubscriber::class)
             ->setConstructorArgs([new Mink(), sys_get_temp_dir()])

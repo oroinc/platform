@@ -28,7 +28,7 @@ class EmailQueryFactoryTest extends OrmTestCase
     /** @var EmailQueryFactory */
     protected $factory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
     /** @var MailboxManager */

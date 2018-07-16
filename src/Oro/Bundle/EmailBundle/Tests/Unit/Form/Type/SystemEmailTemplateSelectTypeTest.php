@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 
-class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
+class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SystemEmailTemplateSelectType
@@ -16,17 +16,17 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
     protected $type;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityRepository;
 
     /**
-     * @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $queryBuilder;
 

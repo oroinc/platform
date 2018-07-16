@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\Re
  * Class RelationGuesserTest
  * @package Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption
  */
-class RelationGuesserTest extends \PHPUnit_Framework_TestCase
+class RelationGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationGuesser */
     protected $guesser;

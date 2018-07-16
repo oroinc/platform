@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker\Condition;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 
-class JoinAssociationConditionTest extends \PHPUnit_Framework_TestCase
+class JoinAssociationConditionTest extends \PHPUnit\Framework\TestCase
 {
     public function testJoinAssociationCondition()
     {

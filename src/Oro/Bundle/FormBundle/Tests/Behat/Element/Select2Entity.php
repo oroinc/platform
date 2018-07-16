@@ -168,7 +168,14 @@ class Select2Entity extends Element implements ClearableInterface
                     return $element->isVisible();
                 });
                 if ($openArrow->isVisible()) {
-                    $openArrow->click();
+                    try {
+                        $openArrow->click();
+                    } catch (\Exception $e) {
+                        // Some elements on the page may be covered by sticky panel.
+                        // We should scroll up to the page logo. I will allow to click on the element.
+                        $this->getPage()->find('css', '.logo')->mouseOver();
+                        $openArrow->click();
+                    }
                 }
             }
         }

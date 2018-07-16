@@ -7,12 +7,12 @@ use Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExte
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 
-class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
+class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $filePath;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheState */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheState */
     protected $cacheState;
 
     protected function setUp()
@@ -169,7 +169,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Context
+     * @return \PHPUnit\Framework\MockObject\MockObject|Context
      */
     protected function createContextMock()
     {
@@ -177,7 +177,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerMock()
     {

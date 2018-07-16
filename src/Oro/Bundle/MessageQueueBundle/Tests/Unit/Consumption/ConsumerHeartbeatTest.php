@@ -5,9 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
 
-class ConsumerHeartbeatTest extends \PHPUnit_Framework_TestCase
+class ConsumerHeartbeatTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $driver;
 
     /** @var ConsumerHeartbeat */

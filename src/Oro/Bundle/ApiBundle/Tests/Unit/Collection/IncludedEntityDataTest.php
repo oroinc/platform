@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
-class IncludedEntityDataTest extends \PHPUnit_Framework_TestCase
+class IncludedEntityDataTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeMarkedAsNewByDefault()
     {

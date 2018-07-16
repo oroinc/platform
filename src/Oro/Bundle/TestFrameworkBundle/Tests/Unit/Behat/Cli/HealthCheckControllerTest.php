@@ -15,7 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class HealthCheckControllerTest extends \PHPUnit_Framework_TestCase
+class HealthCheckControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $checkers = ['cs', 'fixtures'];
 

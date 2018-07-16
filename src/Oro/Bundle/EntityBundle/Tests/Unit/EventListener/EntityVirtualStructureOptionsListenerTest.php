@@ -10,14 +10,14 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityVirtualStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityVirtualStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var EntityVirtualStructureOptionsListener */
     protected $listener;
 
-    /** @var ChainVirtualFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ChainVirtualFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $virtualFieldProvider;
 
     /**

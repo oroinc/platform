@@ -237,6 +237,17 @@ define(function(require) {
                     modules[helpers.customType(type)] = module;
                 }
             });
+
+            // preload all action confirmation modules
+            _.each(this.data.data, function(model) {
+                _.each(model.action_configuration, function(config) {
+                    var module = config.confirmation && config.confirmation.component;
+                    if (module) {
+                        // the key does not matter, the module just added to list to have it preloaded
+                        modules[module] = module;
+                    }
+                });
+            });
         },
 
         /**

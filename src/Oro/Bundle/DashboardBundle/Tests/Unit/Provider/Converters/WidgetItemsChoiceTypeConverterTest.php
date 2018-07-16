@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter;
 
-class WidgetItemsChoiceTypeConverterTest extends \PHPUnit_Framework_TestCase
+class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetItemsChoiceTypeConverter */
     protected $converter;

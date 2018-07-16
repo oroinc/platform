@@ -4,19 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 
-class ValidationHelperTest extends \PHPUnit_Framework_TestCase
+class ValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactoryInterface */
+    private $metadataFactory;
 
     /** @var ValidationHelper */
-    protected $validationHelper;
+    private $validationHelper;
 
     protected function setUp()
     {
-        $this->metadataFactory = $this
-            ->createMock('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface');
+        $this->metadataFactory = $this->createMock(MetadataFactoryInterface::class);
 
         $this->validationHelper = new ValidationHelper($this->metadataFactory);
     }
@@ -25,31 +28,31 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(false);
-        $this->metadataFactory->expects($this->never())
+        $this->metadataFactory->expects(self::never())
             ->method('getMetadataFor');
 
-        $this->assertNull($this->validationHelper->getValidationMetadataForClass($className));
+        self::assertNull($this->validationHelper->getValidationMetadataForClass($className));
     }
 
     public function testGetValidationMetadataForClassWhenMetadataExists()
     {
         $className = 'Test\Class';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
 
-        $this->assertSame(
+        self::assertSame(
             $classMetadata,
             $this->validationHelper->getValidationMetadataForClass($className)
         );
@@ -60,14 +63,14 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Test\Class';
         $propertyName = 'test';
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(false);
-        $this->metadataFactory->expects($this->never())
+        $this->metadataFactory->expects(self::never())
             ->method('getMetadataFor');
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->validationHelper->getValidationMetadataForProperty($className, $propertyName)
         );
@@ -77,50 +80,50 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
         $propertyName = 'test';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
+        $propertyMetadata = $this->createMock(PropertyMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
             ->method('getPropertyMetadata')
             ->with($propertyName)
             ->willReturn([$propertyMetadata]);
 
         $result = $this->validationHelper->getValidationMetadataForProperty($className, $propertyName);
-        $this->assertCount(1, $result);
-        $this->assertSame($propertyMetadata, $result[0]);
+        self::assertCount(1, $result);
+        self::assertSame($propertyMetadata, $result[0]);
     }
 
     public function testHasValidationConstraintForClassWhenNoExpectedConstraint()
     {
         $className = 'Test\Class';
         $group = 'Test';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
             ->method('findConstraints')
             ->with($group)
             ->willReturn([new NotBlank()]);
 
-        $this->assertFalse(
+        self::assertFalse(
             $this->validationHelper->hasValidationConstraintForClass(
                 $className,
-                'Symfony\Component\Validator\Constraints\NotNull',
+                NotNull::class,
                 $group
             )
         );
@@ -130,25 +133,25 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
         $group = 'Test';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
             ->method('findConstraints')
             ->with($group)
             ->willReturn([new NotBlank()]);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->validationHelper->hasValidationConstraintForClass(
                 $className,
-                'Symfony\Component\Validator\Constraints\NotBlank',
+                NotBlank::class,
                 $group
             )
         );
@@ -159,31 +162,31 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Test\Class';
         $propertyName = 'test';
         $group = 'Test';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
+        $propertyMetadata = $this->createMock(PropertyMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
             ->method('getPropertyMetadata')
             ->with($propertyName)
             ->willReturn([$propertyMetadata]);
-        $propertyMetadata->expects($this->once())
+        $propertyMetadata->expects(self::once())
             ->method('findConstraints')
             ->with($group)
             ->willReturn([new NotBlank()]);
 
-        $this->assertFalse(
+        self::assertFalse(
             $this->validationHelper->hasValidationConstraintForProperty(
                 $className,
                 $propertyName,
-                'Symfony\Component\Validator\Constraints\NotNull',
+                NotNull::class,
                 $group
             )
         );
@@ -194,31 +197,31 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Test\Class';
         $propertyName = 'test';
         $group = 'Test';
-        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock(ClassMetadataInterface::class);
+        $propertyMetadata = $this->createMock(PropertyMetadataInterface::class);
 
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('hasMetadataFor')
             ->with($className)
             ->willReturn(true);
-        $this->metadataFactory->expects($this->once())
+        $this->metadataFactory->expects(self::once())
             ->method('getMetadataFor')
             ->with($className)
             ->willReturn($classMetadata);
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
             ->method('getPropertyMetadata')
             ->with($propertyName)
             ->willReturn([$propertyMetadata]);
-        $propertyMetadata->expects($this->once())
+        $propertyMetadata->expects(self::once())
             ->method('findConstraints')
             ->with($group)
             ->willReturn([new NotBlank()]);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->validationHelper->hasValidationConstraintForProperty(
                 $className,
                 $propertyName,
-                'Symfony\Component\Validator\Constraints\NotBlank',
+                NotBlank::class,
                 $group
             )
         );

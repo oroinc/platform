@@ -12,26 +12,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
+class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var WindowsExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|\Twig_Environment */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Twig_Environment */
     protected $environment;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManager */
     protected $stateManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateManagerRegistry */
     protected $stateManagerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
     protected $requestStateManager;
 
-    /** @var  FragmentHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     protected $fragmentHandler;
 
     protected function setUp()

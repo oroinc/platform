@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\OrganizationBundle\Event\FormListener;
 
-class FormListenerTest extends \PHPUnit_Framework_TestCase
+class FormListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOwnerField()
     {

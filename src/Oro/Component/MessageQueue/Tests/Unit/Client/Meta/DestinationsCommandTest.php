@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
-class DestinationsCommandTest extends \PHPUnit_Framework_TestCase
+class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DestinationsCommand */
     private $command;
@@ -16,7 +16,7 @@ class DestinationsCommandTest extends \PHPUnit_Framework_TestCase
     /** @var Container */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     protected function setUp()

@@ -13,7 +13,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -217,12 +217,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $locale = 'en';
         $container  = $this->createMock(ContainerInterface::class);
-        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $strategyProvider = $this->getStrategyProvider($locale);
         $strategyProviderLink = new ServiceLink($strategyProvider);
 
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
                 $container,
@@ -254,7 +254,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $container = $this->createMock(ContainerInterface::class);
-        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translationDomainProvider->expects($this->once())
             ->method('getAvailableDomainsForLocales')
@@ -262,10 +262,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $strategyProvider = $this->getStrategyProvider($locale);
         $strategyProviderLink = new ServiceLink($strategyProvider);
 
-        /** @var DynamicTranslationMetadataCache|\PHPUnit_Framework_MockObject_MockObject $databaseCache */
+        /** @var DynamicTranslationMetadataCache|\PHPUnit\Framework\MockObject\MockObject $databaseCache */
         $databaseCache = $this->createMock(DynamicTranslationMetadataCache::class);
 
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
+        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->getMockBuilder(Translator::class)
             ->setConstructorArgs([
                 $container,
@@ -301,7 +301,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn($strategyName);
 
-        /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
+        /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->createMock(TranslationStrategyProvider::class);
         $strategyProvider->expects($this->any())
             ->method('getStrategy')
@@ -339,19 +339,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $firstStrategyName = 'first';
         $secondStrategyName = 'second';
 
-        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $firstStrategy */
+        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $firstStrategy */
         $firstStrategy = $this->createMock(TranslationStrategyInterface::class);
         $firstStrategy->expects($this->any())
             ->method('getName')
             ->willReturn($firstStrategyName);
 
-        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $secondStrategy */
+        /** @var TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject $secondStrategy */
         $secondStrategy = $this->createMock(TranslationStrategyInterface::class);
         $secondStrategy->expects($this->any())
             ->method('getName')
             ->willReturn($secondStrategyName);
 
-        /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
+        /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
             ->disableOriginalConstructor()
             ->setMethods(['getAllFallbackLocales', 'getFallbackLocales'])
@@ -394,7 +394,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     ) {
         $strategyProviderServiceLink = new ServiceLink($strategyProvider);
 
-        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
 
         $translator = new Translator(
@@ -423,7 +423,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      * Creates a mock of Container
      *
      * @param LoaderInterface $loader
-     * @return ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getContainer($loader)
     {
@@ -439,7 +439,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates a mock of Loader
      *
-     * @return LoaderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return LoaderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getLoader()
     {
@@ -476,7 +476,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $locale
      * @param array  $fallbackLocales
-     * @return TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getStrategyProvider($locale, array $fallbackLocales = [])
     {

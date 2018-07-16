@@ -7,7 +7,7 @@ use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlankValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
+class HtmlNotBlankValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider validItemsDataProvider
@@ -15,7 +15,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateValid($value)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext $context */
         $context = $this->getMockBuilder(ExecutionContext::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -46,7 +46,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalid($value)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext $context */
         $context = $this->getMockBuilder(ExecutionContext::class)
             ->disableOriginalConstructor()
             ->getMock();

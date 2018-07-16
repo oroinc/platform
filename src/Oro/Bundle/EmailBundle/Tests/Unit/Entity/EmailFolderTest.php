@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class EmailFolderTest extends \PHPUnit_Framework_TestCase
+class EmailFolderTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

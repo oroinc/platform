@@ -5,7 +5,7 @@ namespace Oro\Component\Testing\Assert;
 /**
  * Constraint that asserts that the array contains an expected array.
  */
-class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
+class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     /** @var array */
     private $expected;
@@ -114,79 +114,75 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
      */
     private function matchIndexedArray(array $expected, array $actual, array $path)
     {
-        $processedKeys = [];
+        $processedKeys = []; // [found key => expected key, ...]
         $lastPathIndex = count($path);
         $expectedPath = $path;
-        foreach ($expected as $expectedKey => $expectedValue) {
-            if (in_array($expectedKey, $processedKeys, true)) {
-                continue;
-            }
-            $expectedPath[$lastPathIndex] = $expectedKey;
-            if (!$this->isArrayHasKey($expectedKey, $actual, $expectedPath)) {
-                $processedKeys[] = $expectedKey;
-                continue;
-            }
 
-            $initialErrorCount = count($this->errors);
-            $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
-            if (count($this->errors) === $initialErrorCount) {
-                $processedKeys[] = $expectedKey;
-            } else {
-                $this->tryMatchIndexedElement(
-                    $expectedKey,
-                    $expectedValue,
-                    $actual,
-                    $path,
-                    $initialErrorCount,
-                    $processedKeys
-                );
+        // 1. try to match expected and actual elements with the same index
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (array_key_exists($expectedKey, $actual)) {
+                $expectedPath[$lastPathIndex] = $expectedKey;
+                $errors = $this->errors;
+                $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
+                if (count($errors) === count($this->errors)) {
+                    $processedKeys[$expectedKey] = $expectedKey;
+                } else {
+                    $this->errors = $errors;
+                }
+            }
+        }
+
+        // 2. try to match expected elements that do not have appropriate actual elements with the same index
+        // this is required because the order of elements should not be matter
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (array_key_exists($expectedKey, $actual) && !in_array($expectedKey, $processedKeys, true)) {
+                $key = $this->tryMatchIndexedElement($expectedValue, $actual, $path, $processedKeys);
+                if (null !== $key) {
+                    $processedKeys[$key] = $expectedKey;
+                }
+            }
+        }
+
+        // 3. add errors for unmatched elements, including extra elements in expected data
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (!in_array($expectedKey, $processedKeys, true)) {
+                $expectedPath[$lastPathIndex] = $expectedKey;
+                if ($this->isArrayHasKey($expectedKey, $actual, $expectedPath)) {
+                    $this->matchArrayElement($expectedValue, $actual[$expectedKey], $expectedPath);
+                }
+                $processedKeys[$expectedKey] = $expectedKey;
             }
         }
     }
 
     /**
-     * @param int   $expectedKey
      * @param mixed $expectedValue
      * @param array $actual
      * @param array $path
-     * @param int   $initialErrorCount
      * @param int[] $processedKeys
+     *
+     * @return int|null
      */
-    private function tryMatchIndexedElement(
-        $expectedKey,
-        $expectedValue,
-        array $actual,
-        array $path,
-        $initialErrorCount,
-        array &$processedKeys
-    ) {
-        $isElementFound = false;
+    private function tryMatchIndexedElement($expectedValue, array $actual, array $path, array $processedKeys)
+    {
+        $foundKey = null;
         $elementPath = $path;
-        $elementErrorCount = count($this->errors);
-        $elementErrors = array_slice($this->errors, $initialErrorCount, $elementErrorCount - $initialErrorCount);
-        $this->errors = array_slice($this->errors, 0, $initialErrorCount);
         $lastPathIndex = count($path);
         foreach ($actual as $key => $value) {
-            if ($key === $expectedKey || in_array($key, $processedKeys, true)) {
+            if (isset($processedKeys[$key])) {
                 continue;
             }
+            $errors = $this->errors;
             $elementPath[$lastPathIndex] = $key;
             $this->matchArrayElement($expectedValue, $value, $elementPath);
-            $errorCount = count($this->errors);
-            if ($errorCount === $initialErrorCount) {
-                $processedKeys[] = $key;
-                $isElementFound = true;
+            if (count($errors) === count($this->errors)) {
+                $foundKey = $key;
                 break;
             }
-            if ($errorCount < $elementErrorCount) {
-                $elementErrorCount = $errorCount;
-                $elementErrors = array_slice($this->errors, $initialErrorCount, $errorCount - $initialErrorCount);
-            }
-            $this->errors = array_slice($this->errors, 0, -$initialErrorCount);
+            $this->errors = $errors;
         }
-        if (!$isElementFound) {
-            $this->errors = array_merge($this->errors, $elementErrors);
-        }
+
+        return $foundKey;
     }
 
     /**
@@ -213,8 +209,8 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
     private function isInternalType($expectedType, $value, array $path)
     {
         try {
-            \PHPUnit_Framework_Assert::assertInternalType($expectedType, $value);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            \PHPUnit\Framework\Assert::assertInternalType($expectedType, $value);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;
@@ -233,8 +229,8 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
     private function isArrayHasKey($key, $array, array $path)
     {
         try {
-            \PHPUnit_Framework_Assert::assertArrayHasKey($key, $array);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+            \PHPUnit\Framework\Assert::assertArrayHasKey($key, $array);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;
@@ -255,16 +251,16 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
         try {
             if (is_string($actual) && is_string($expected)) {
                 if ($actual !== $expected) {
-                    throw new \PHPUnit_Framework_ExpectationFailedException(sprintf(
+                    throw new \PHPUnit\Framework\ExpectationFailedException(sprintf(
                         'Failed asserting that \'%s\' is identical to \'%s\'.',
                         $actual,
                         $expected
                     ));
                 }
             } else {
-                \PHPUnit_Framework_Assert::assertSame($expected, $actual);
+                \PHPUnit\Framework\Assert::assertSame($expected, $actual);
             }
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
 
             return false;

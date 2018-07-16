@@ -12,24 +12,24 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 
-class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
+class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /* @var AttributeGuesser */
     protected $guesser;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|FormRegistry */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|FormRegistry */
     protected $formRegistry;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $entityConfigProvider;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /* @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $formConfigProvider;
 
-    /* @var DoctrineTypeMappingProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /* @var DoctrineTypeMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineTypeMappingProvider;
 
     protected function setUp()

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Event;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 
-class ValidateBeforeRemoveFieldEventTest extends \PHPUnit_Framework_TestCase
+class ValidateBeforeRemoveFieldEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetterSetters()
     {

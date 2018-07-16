@@ -7,21 +7,21 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
-class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
+class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $parameters;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SecurityProvider */
     protected $securityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $datagrid;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
     protected $entityAliasResolver;
 
     /** @var TagSearchResultsGridListener */
@@ -54,7 +54,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testOnBuildAfterDataProvider
+     * @dataProvider onBuildAfterDataProvider
      *
      * @param string                       $alias
      * @param string|null                  $entityClass
@@ -113,7 +113,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onBuildAfter($this->event);
     }
 
-    public function testOnBuildAfterDataProvider()
+    public function onBuildAfterDataProvider()
     {
         return [
             'empty parameter' => [''],

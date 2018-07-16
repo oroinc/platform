@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter;
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestVoterTest extends \PHPUnit_Framework_TestCase
+class RequestVoterTest extends \PHPUnit\Framework\TestCase
 {
     public function testUriVoterConstruct()
     {

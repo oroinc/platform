@@ -9,21 +9,21 @@ use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Component\Routing\Router;
 
-class BreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
+class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BreadcrumbManager */
     protected $manager;
 
-    /** @var Matcher|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $matcher;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var BuilderChainProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $provider;
 
-    /** @var MenuFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MenuFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
     /**

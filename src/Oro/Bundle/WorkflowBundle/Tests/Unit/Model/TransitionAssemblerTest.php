@@ -22,20 +22,20 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FormOptionsAssembler|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $formOptionsAssembler;
 
     /**
-     * @var ExpressionFactory|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $conditionFactory;
 
     /**
-     * @var ActionFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $actionFactory;
 
@@ -81,7 +81,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         ]
     ];
 
-    /** @var FormOptionsConfigurationAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormOptionsConfigurationAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $formConfigurationAssembler;
 
     protected function setUp()
@@ -99,7 +99,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['assemble'])
             ->getMock();
 
-        /** @var TransitionOptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        /** @var TransitionOptionsResolver|\PHPUnit\Framework\MockObject\MockObject $optionsResolver */
         $optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->assembler = new TransitionAssembler(
@@ -1006,7 +1006,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Step
+     * @return \PHPUnit\Framework\MockObject\MockObject|Step
      */
     protected function createStep()
     {
@@ -1014,7 +1014,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Attribute
+     * @return \PHPUnit\Framework\MockObject\MockObject|Attribute
      */
     protected function createAttribute()
     {
@@ -1022,7 +1022,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExpressionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExpressionInterface
      */
     protected function createCondition()
     {
@@ -1030,7 +1030,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ActionInterface
      */
     protected function createAction()
     {

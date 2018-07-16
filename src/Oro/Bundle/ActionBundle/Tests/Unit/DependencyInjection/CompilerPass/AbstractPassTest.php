@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-abstract class AbstractPassTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockBuilder */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder */
     protected $definitionBuilder;
 
     /** @var AbstractPass */
@@ -96,7 +96,7 @@ abstract class AbstractPassTest extends \PHPUnit_Framework_TestCase
     abstract protected function getTag();
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Definition
+     * @return \PHPUnit\Framework\MockObject\MockObject|Definition
      */
     protected function createServiceDefinition()
     {

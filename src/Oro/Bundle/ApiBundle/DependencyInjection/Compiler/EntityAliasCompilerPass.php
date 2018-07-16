@@ -73,9 +73,7 @@ class EntityAliasCompilerPass implements CompilerPassInterface
             $aliasProviders[DependencyInjectionUtil::getPriority($attributes[0])][] = new Reference($id);
         }
         if (!empty($aliasProviders)) {
-            // sort by priority and flatten
-            krsort($aliasProviders);
-            $aliasProviders = call_user_func_array('array_merge', $aliasProviders);
+            $aliasProviders = DependencyInjectionUtil::sortByPriorityAndFlatten($aliasProviders);
         }
 
         return $aliasProviders;

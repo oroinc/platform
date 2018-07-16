@@ -12,10 +12,10 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class DatagridExportConnectorTest extends \PHPUnit_Framework_TestCase
+class DatagridExportConnectorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
+     * @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject
      */
     private $gridManagerLink;
 
@@ -39,13 +39,13 @@ class DatagridExportConnectorTest extends \PHPUnit_Framework_TestCase
 
         $config = DatagridConfiguration::create(['columns' => ['id']]);
 
-        /** @var ResultsObject|\PHPUnit_Framework_MockObject_MockObject $resultObject */
+        /** @var ResultsObject|\PHPUnit\Framework\MockObject\MockObject $resultObject */
         $resultObject = $this->createMock(ResultsObject::class);
 
-        /** @var DatasourceInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
+        /** @var DatasourceInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(DatasourceInterface::class);
 
-        /** @var Datagrid|\PHPUnit_Framework_MockObject_MockObject $dataGrid */
+        /** @var Datagrid|\PHPUnit\Framework\MockObject\MockObject $dataGrid */
         $dataGrid = $this->createMock(Datagrid::class);
         $dataGrid->expects($this->once())
             ->method('getConfig')
@@ -60,7 +60,7 @@ class DatagridExportConnectorTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->willReturn($resultObject);
 
-        /** @var Manager|\PHPUnit_Framework_MockObject_MockObject $gridManager */
+        /** @var Manager|\PHPUnit\Framework\MockObject\MockObject $gridManager */
         $gridManager = $this->createMock(Manager::class);
         $gridManager->expects($this->once())
             ->method('getDatagrid')

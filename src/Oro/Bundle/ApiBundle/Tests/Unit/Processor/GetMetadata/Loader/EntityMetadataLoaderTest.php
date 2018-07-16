@@ -22,26 +22,26 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataFactory */
-    protected $metadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactory */
+    private $metadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    private $objectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityMetadataFactory */
-    protected $entityMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataFactory */
+    private $entityMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNestedObjectMetadataFactory */
-    protected $nestedObjectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedObjectMetadataFactory */
+    private $nestedObjectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityNestedAssociationMetadataFactory */
-    protected $nestedAssociationMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNestedAssociationMetadataFactory */
+    private $nestedAssociationMetadataFactory;
 
     /** @var EntityMetadataLoader */
-    protected $entityMetadataLoader;
+    private $entityMetadataLoader;
 
     protected function setUp()
     {

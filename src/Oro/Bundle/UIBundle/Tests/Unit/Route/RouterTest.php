@@ -13,18 +13,18 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RouterTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
-    /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestQuery;
 
-    /** @var SymfonyRouter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SymfonyRouter|\PHPUnit\Framework\MockObject\MockObject */
     protected $symfonyRouter;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     /** @var Router */
@@ -36,7 +36,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->request = $this->createMock(Request::class);
         $this->request->query = $this->requestQuery;
 
-        /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+        /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack */
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
 
@@ -392,7 +392,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param int $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEntityStub($id)
     {

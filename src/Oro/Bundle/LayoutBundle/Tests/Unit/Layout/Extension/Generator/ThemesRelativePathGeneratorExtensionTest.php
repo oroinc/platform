@@ -6,7 +6,7 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ThemesRelativePathGenerat
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
-class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ThemesRelativePathGeneratorExtension

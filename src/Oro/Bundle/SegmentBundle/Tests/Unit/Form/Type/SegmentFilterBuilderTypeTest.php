@@ -26,12 +26,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
     /**
-     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tokenStorage;
 
@@ -255,6 +255,49 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($segmentType, $submittedData->getType());
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
+        $this->assertContains($segmentName, $submittedData->getName());
+        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+    }
+
+    /**
+     * @dataProvider formDataProvider
+     *
+     * @param array $data
+     * @param array $expectedDefinition
+     * @param $segmentName
+     */
+    public function testSubmitNewWhenNoUserInStorage(array $data, array $expectedDefinition, $segmentName)
+    {
+        $entityClass = \stdClass::class;
+        $options = [
+            'segment_entity' => $entityClass,
+            'add_name_field' => true
+        ];
+        $this->assertNormalizersCalls($entityClass);
+        $segmentType = new SegmentType(SegmentType::TYPE_DYNAMIC);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityReference')
+            ->with(SegmentType::class, SegmentType::TYPE_DYNAMIC)
+            ->willReturn($segmentType);
+
+        $user = new \stdClass();
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $form = $this->factory->create(SegmentFilterBuilderType::class, null, $options);
+
+        $form->submit($data);
+        /** @var Segment $submittedData */
+        $submittedData = $form->getData();
+        $this->assertInstanceOf(Segment::class, $submittedData);
+        $this->assertEquals($segmentType, $submittedData->getType());
+        $this->assertNull($submittedData->getOwner());
+        $this->assertNull($submittedData->getOrganization());
         $this->assertContains($segmentName, $submittedData->getName());
         $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
     }

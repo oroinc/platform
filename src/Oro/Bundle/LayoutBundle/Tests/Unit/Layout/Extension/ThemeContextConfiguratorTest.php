@@ -7,7 +7,7 @@ use Oro\Component\Layout\LayoutContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class ThemeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeContextConfigurator */
     protected $contextConfigurator;

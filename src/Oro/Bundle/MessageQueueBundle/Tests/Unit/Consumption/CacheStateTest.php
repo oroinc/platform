@@ -5,9 +5,9 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption;
 use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
 
-class CacheStateTest extends \PHPUnit_Framework_TestCase
+class CacheStateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|StateDriverInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|StateDriverInterface */
     private $driver;
 
     /** @var CacheState */

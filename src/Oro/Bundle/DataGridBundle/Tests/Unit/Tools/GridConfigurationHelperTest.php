@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 
-class GridConfigurationHelperTest extends \PHPUnit_Framework_TestCase
+class GridConfigurationHelperTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity';
     const ENTITY_ALIAS = 'c';
@@ -13,7 +13,7 @@ class GridConfigurationHelperTest extends \PHPUnit_Framework_TestCase
     /** @var GridConfigurationHelper */
     protected $gridConfigurationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassResolver;
 
     protected function setUp()

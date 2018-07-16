@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\OroWorkflowExtension;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
+class OroWorkflowExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array

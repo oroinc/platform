@@ -8,18 +8,18 @@ use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 use Oro\Component\Layout\Templating\TextHelper;
 
-class LayoutHelperTest extends \PHPUnit_Framework_TestCase
+class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormRendererInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $renderer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TextHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TextHelper */
     protected $textHelper;
 
     /** @var LayoutHelper */
     protected $helper;
 
-    /** @var FormRendererEngineInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormRendererEngineInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRenderer;
 
     protected function setUp()

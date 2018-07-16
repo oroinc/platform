@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormView;
 class TemplatingRendererEngineTest extends RendererEngineTest
 {
     /**
-     * @var EngineInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $phpEngine;
 
@@ -33,7 +33,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
         $firstTheme = 'MyBundle:layouts/first_theme/php';
         $secondTheme = 'MyBundle:layouts/second_theme/php';
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
@@ -75,7 +75,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
             $secondTheme,
         ]);
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = '_customer_role_datagrid';
 

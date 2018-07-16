@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 
-class CollectSubresourcesContextTest extends \PHPUnit_Framework_TestCase
+class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CollectSubresourcesContext */
-    protected $context;
+    private $context;
 
     protected function setUp()
     {
@@ -17,30 +18,27 @@ class CollectSubresourcesContextTest extends \PHPUnit_Framework_TestCase
 
     public function testResultShouldBeInitialized()
     {
-        $this->assertInstanceOf(
-            'Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection',
-            $this->context->getResult()
-        );
+        self::assertInstanceOf(ApiResourceSubresourcesCollection::class, $this->context->getResult());
     }
 
     public function testResources()
     {
-        $this->assertEquals([], $this->context->getResources());
-        $this->assertFalse($this->context->hasResource('Test\Class'));
-        $this->assertNull($this->context->getResource('Test\Class'));
+        self::assertEquals([], $this->context->getResources());
+        self::assertFalse($this->context->hasResource('Test\Class'));
+        self::assertNull($this->context->getResource('Test\Class'));
 
         $resource = new ApiResource('Test\Class');
         $this->context->setResources([$resource]);
-        $this->assertEquals(['Test\Class' => $resource], $this->context->getResources());
-        $this->assertTrue($this->context->hasResource('Test\Class'));
-        $this->assertSame($resource, $this->context->getResource('Test\Class'));
+        self::assertEquals(['Test\Class' => $resource], $this->context->getResources());
+        self::assertTrue($this->context->hasResource('Test\Class'));
+        self::assertSame($resource, $this->context->getResource('Test\Class'));
     }
 
     public function testAccessibleResources()
     {
-        $this->assertEquals([], $this->context->getAccessibleResources());
+        self::assertEquals([], $this->context->getAccessibleResources());
 
         $this->context->setAccessibleResources(['Test\Class']);
-        $this->assertEquals(['Test\Class'], $this->context->getAccessibleResources());
+        self::assertEquals(['Test\Class'], $this->context->getAccessibleResources());
     }
 }

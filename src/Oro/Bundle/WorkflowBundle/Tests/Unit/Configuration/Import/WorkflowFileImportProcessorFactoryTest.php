@@ -6,12 +6,12 @@ use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 
-class WorkflowFileImportProcessorFactoryTest extends \PHPUnit_Framework_TestCase
+class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowFileImportProcessorFactory */
     private $factory;
 
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
     protected function setUp()

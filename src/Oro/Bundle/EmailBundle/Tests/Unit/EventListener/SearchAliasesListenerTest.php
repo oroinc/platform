@@ -6,7 +6,7 @@ use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\EventListener\SearchAliasesListener;
 
-class SearchAliasesListenerTest extends \PHPUnit_Framework_TestCase
+class SearchAliasesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchAliasesListener */
     protected $listener;

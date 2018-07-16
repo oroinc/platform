@@ -3,15 +3,15 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\AsseticBundle\Twig\AsseticExtension;
 
-class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
+class AsseticExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $assetsConfiguration;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $assetFactory;
 

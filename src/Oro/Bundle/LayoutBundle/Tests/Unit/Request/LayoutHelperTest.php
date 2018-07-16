@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class LayoutHelperTest extends \PHPUnit_Framework_TestCase
+class LayoutHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LayoutHelper
@@ -16,7 +16,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
+     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $requestStack;
 
@@ -29,12 +29,12 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
+     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
     public function testGetLayoutAnnotation(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null
+        \PHPUnit\Framework\MockObject\MockObject $request = null,
+        \PHPUnit\Framework\MockObject\MockObject $annotation = null
     ) {
         $this->setUpRequestStack($request, $annotation);
         $this->assertEquals($annotation, $this->helper->getLayoutAnnotation($request));
@@ -67,12 +67,12 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
+     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
     public function testIsLayoutRequest(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null
+        \PHPUnit\Framework\MockObject\MockObject $request = null,
+        \PHPUnit\Framework\MockObject\MockObject $annotation = null
     ) {
         $this->setUpRequestStack($request, $annotation);
         $this->assertEquals((bool)$annotation, $this->helper->isLayoutRequest($request));
@@ -80,19 +80,19 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider layoutHelperDataProvider
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
+     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      */
     public function testIsTemplateRequest(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null
+        \PHPUnit\Framework\MockObject\MockObject $request = null,
+        \PHPUnit\Framework\MockObject\MockObject $annotation = null
     ) {
         $this->setUpRequestStack($request, $annotation);
         $this->assertEquals(!(bool)$annotation, $this->helper->isTemplateRequest($request));
     }
 
     /**
-     * @return LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject
+     * @return LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLayoutAnnotationMock()
     {
@@ -101,13 +101,13 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject|null $request
-     * @param LayoutAnnotation|\PHPUnit_Framework_MockObject_MockObject|null $annotation
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject|null $request
+     * @param LayoutAnnotation|\PHPUnit\Framework\MockObject\MockObject|null $annotation
      * @param bool $isTemplate
      */
     protected function setUpRequestStack(
-        \PHPUnit_Framework_MockObject_MockObject $request = null,
-        \PHPUnit_Framework_MockObject_MockObject $annotation = null,
+        \PHPUnit\Framework\MockObject\MockObject $request = null,
+        \PHPUnit\Framework\MockObject\MockObject $annotation = null,
         $isTemplate = false
     ) {
         if ($request) {
@@ -120,7 +120,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($request);
         }
 
-        /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject $attributes */
+        /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject $attributes */
         $attributes = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
         $request->attributes = $attributes;
         $attributes->expects($this->at(0))

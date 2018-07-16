@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory;
 
-class IterableResultFactoryTest extends \PHPUnit_Framework_TestCase
+class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var IterableResultFactory
@@ -37,7 +37,7 @@ class IterableResultFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateIterableResultWhenDatasourceNotSupported()
     {
-        /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfiguration **/
+        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);
 

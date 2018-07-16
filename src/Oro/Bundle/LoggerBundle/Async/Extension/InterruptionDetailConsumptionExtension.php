@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LoggerBundle\Async\Extension;
 
-use Oro\Bundle\MessageQueueBundle\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

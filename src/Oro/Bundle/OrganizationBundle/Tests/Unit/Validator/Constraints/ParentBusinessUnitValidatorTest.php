@@ -11,7 +11,7 @@ use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 class ParentBusinessUnitValidatorTest extends AbstractConstraintValidatorTest
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $ownerTree;
 
     protected function setUp()

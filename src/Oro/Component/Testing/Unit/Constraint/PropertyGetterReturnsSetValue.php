@@ -6,7 +6,7 @@ namespace Oro\Component\Testing\Unit\Constraint;
  * Constraint that asserts that a get*() or is*() getter returns the value
  * set by a corresponding set*() setter.
  */
-class PropertyGetterReturnsSetValue extends \PHPUnit_Framework_Constraint
+class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constraint
 {
 
     /**
@@ -89,7 +89,7 @@ class PropertyGetterReturnsSetValue extends \PHPUnit_Framework_Constraint
                 'is' . ucfirst($this->propertyName),
                 $this->propertyName
             );
-            throw new \PHPUnit_Framework_Exception($message);
+            throw new \PHPUnit\Framework\Exception($message);
         }
 
         return call_user_func_array([$other, $this->getterName], []) === $this->testValue;

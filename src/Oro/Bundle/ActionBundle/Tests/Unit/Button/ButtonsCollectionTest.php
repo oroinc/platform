@@ -7,12 +7,12 @@ use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
-class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
+class ButtonsCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ButtonsCollection */
     protected $collection;
 
-    /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchContext;
 
     protected function setUp()
@@ -132,7 +132,7 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $order
-     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getButtonMock($order = 1)
     {
@@ -145,7 +145,7 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ButtonInterface[] $buttons
      *
-     * @return ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getExtensionMock(array $buttons = [])
     {

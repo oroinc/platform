@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 
-class EmailBodyAddedTest extends \PHPUnit_Framework_TestCase
+class EmailBodyAddedTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstruct()
     {

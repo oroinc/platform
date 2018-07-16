@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Assert;
 
 use Oro\Bundle\MessageQueueBundle\Test\Assert\SentMessageConstraint;
 
-class SentMessageConstraintTest extends \PHPUnit_Framework_TestCase
+class SentMessageConstraintTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeEvaluatedToFalseIfValueIsNotArray()
     {
@@ -67,7 +67,7 @@ TEXT;
         $constraint = new SentMessageConstraint($expectedMessage);
         try {
             $constraint->evaluate($allMessages, 'additional description');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             self::assertEquals($expectedExceptionMessage, $e->getMessage());
         }
     }

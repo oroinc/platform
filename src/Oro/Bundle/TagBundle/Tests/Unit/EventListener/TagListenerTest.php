@@ -6,7 +6,7 @@ use Oro\Bundle\TagBundle\Entity\Taggable as TaggableInterface;
 use Oro\Bundle\TagBundle\EventListener\TagListener;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
 
-class TagListenerTest extends \PHPUnit_Framework_TestCase
+class TagListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_ID = 1;
 

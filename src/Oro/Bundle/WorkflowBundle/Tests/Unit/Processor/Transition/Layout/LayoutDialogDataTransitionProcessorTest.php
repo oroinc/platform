@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\Layout\LayoutDialogDataTransi
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class LayoutDialogDataTransitionProcessorTest extends \PHPUnit_Framework_TestCase
+class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutDialogDataTransitionProcessor */
     private $processor;
@@ -23,17 +23,17 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testData()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $formView */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
@@ -62,7 +62,7 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testSkipUnsupportedResultTypeContext()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')

@@ -9,15 +9,15 @@ use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener;
 
-class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
+class FulltextIndexListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LoadClassMetadataEventArgs|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $event;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadataInfo
+     * @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadataInfo
      */
     protected $metadata;
 

@@ -19,25 +19,25 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\Action\Exception\AssemblerException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
+class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var WorkflowVariableNormalizer|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $variableNormalizer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $variableGuesser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Oro\Bundle\WorkflowBundle\Model\Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflow;
 
@@ -111,7 +111,7 @@ class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflowDefinition()
     {

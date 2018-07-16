@@ -8,7 +8,7 @@ use Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 
-class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
+class LocalizationListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LocalizationListener
@@ -16,12 +16,12 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
 
     /**
-     * @var LocalizationFallbackStrategy|\PHPUnit_Framework_MockObject_MockObject
+     * @var LocalizationFallbackStrategy|\PHPUnit\Framework\MockObject\MockObject
      */
     private $strategy;
 
     /**
-     * @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $localizationManager;
 
@@ -61,7 +61,7 @@ class LocalizationListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject
+     * @return LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLifecycleEventArgsMock()
     {

@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class SegmentTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SegmentType

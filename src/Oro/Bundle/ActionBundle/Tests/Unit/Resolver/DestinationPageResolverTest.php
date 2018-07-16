@@ -9,15 +9,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
-class DestinationPageResolverTest extends \PHPUnit_Framework_TestCase
+class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var EntityConfigHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigHelper;
 
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
     /** @var DestinationPageResolver */

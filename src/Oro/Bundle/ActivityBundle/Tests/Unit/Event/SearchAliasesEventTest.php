@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 
-class SearchAliasesEventTest extends \PHPUnit_Framework_TestCase
+class SearchAliasesEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

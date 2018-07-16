@@ -19,7 +19,7 @@ use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 
-class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'stdClass';
     const ENTITY_ID = 42;
@@ -34,16 +34,16 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var OperationButtonProviderExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationRegistry */
     protected $operationRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
     protected $routeProvider;
 
-    /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $optionsResolver;
 
     /**
@@ -209,7 +209,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertContextHelperCalled(1);
 
         $button = $this->createOperationButton();
-        /** @var Operation|\PHPUnit_Framework_MockObject_MockObject $operation */
+        /** @var Operation|\PHPUnit\Framework\MockObject\MockObject $operation */
         $operation = $button->getOperation();
         $definition = $operation->getDefinition();
         $definition->setFrontendOptions(['frontend' => 'not resolved'])->setButtonOptions(['button' => 'not resolved']);
@@ -268,7 +268,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param bool $isAvailable
      * @param bool $withForm
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createOperationMock($name, $isAvailable = false, $withForm = false)
     {

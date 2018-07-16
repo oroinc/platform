@@ -6,9 +6,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\ConfigFinderFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 use Symfony\Component\Finder\Finder;
 
-class WorkflowConfigFinderFactoryTest extends \PHPUnit_Framework_TestCase
+class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigFinderFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $finderFactory;
 
     /** @var WorkflowConfigFinderBuilder */
@@ -16,7 +16,7 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        /** @var ConfigFinderFactory|\PHPUnit_Framework_MockObject_MockObject $finderFactory */
+        /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject $finderFactory */
         $this->finderFactory = $this->createMock(ConfigFinderFactory::class);
 
         $this->workflowConfigFinderBuilder = new WorkflowConfigFinderBuilder($this->finderFactory);

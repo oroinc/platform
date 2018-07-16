@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Specifica
 
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Statistic\FilesystemStatisticRepository;
 
-class FilesystemStatisticRepositoryTest extends \PHPUnit_Framework_TestCase
+class FilesystemStatisticRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string

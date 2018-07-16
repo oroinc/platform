@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Model\RecipientEntity;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\SearchBundle\Query\Result;
 
-class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
+class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
     protected $aclHelper;
     protected $dqlNameFormatter;

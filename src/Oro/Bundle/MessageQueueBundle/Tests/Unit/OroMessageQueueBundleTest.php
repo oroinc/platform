@@ -19,12 +19,12 @@ use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 
-class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
+class OroMessageQueueBundleTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OroMessageQueueBundle */
     private $bundle;
 
-    /** @var Kernel|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Kernel|\PHPUnit\Framework\MockObject\MockObject */
     private $kernel;
 
     protected function setUp()

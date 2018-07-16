@@ -6,10 +6,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelDisableActionHandler;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class ChannelDisableActionHandlerTest extends \PHPUnit_Framework_TestCase
+class ChannelDisableActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityManager;
 

@@ -6,7 +6,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SearchEnumFilterTypeTest extends \PHPUnit_Framework_TestCase
+class SearchEnumFilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchEnumFilterType */
     protected $type;

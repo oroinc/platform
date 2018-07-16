@@ -7,7 +7,7 @@ use Oro\Bundle\SearchBundle\Query\Factory\QueryFactory;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class QueryFactoryTest extends \PHPUnit_Framework_TestCase
+class QueryFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testFactory()
     {

@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @package Oro\Bundle\EmailBundle\Tests\Unit\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailAttachmentManager
@@ -33,55 +33,55 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     protected $emailAttachmentManager;
 
     /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fileManager;
 
     /**
-     * @var EmailCacheManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailCacheManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailCacheManager;
 
     /**
-     * @var Filesystem|\PHPUnit_Framework_MockObject_MockObject
+     * @var Filesystem|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $filesystem;
 
     /**
-     * @var Registry|\PHPUnit_Framework_MockObject_MockObject
+     * @var Registry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 
     /**
-     * @var ConfigFileValidator|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configFileValidator;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
     /**
-     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $om;
 
     /**
-     * @var EmailActivityListProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $activityListProvider;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var Attachment|\PHPUnit_Framework_MockObject_MockObject
+     * @var Attachment|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $attachment;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $attachmentAssociationHelper;
 
@@ -241,7 +241,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param EmailAttachment $emailAttachment
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEmailMock(EmailAttachment $emailAttachment)
     {

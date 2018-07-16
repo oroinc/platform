@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 use Oro\Bundle\EmailBundle\EventListener\ReplaceEmbeddedAttachmentsListener;
 
-class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit_Framework_TestCase
+class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReplaceEmbeddedAttachmentsListener */
     protected $listener;

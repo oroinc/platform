@@ -4,10 +4,10 @@ namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\AsseticBundle\AssetsConfiguration;
 use Oro\Bundle\AsseticBundle\Event\Events;
 
-class AssetsConfigurationTest extends \PHPUnit_Framework_TestCase
+class AssetsConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 

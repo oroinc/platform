@@ -6,6 +6,9 @@ parameters:
     database_name: oro_db
     database_user: oro_db_user
     database_password: oro_db_pass
+    database_driver_options:
+        !php/const PHP_INT_MAX: const_as_key
+        const_as_value: !php/const PHP_INT_MAX
     mailer_transport: null
     mailer_host: null
     mailer_port: null

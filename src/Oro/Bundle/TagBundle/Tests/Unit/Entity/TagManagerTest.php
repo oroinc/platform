@@ -9,7 +9,7 @@ use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class TagManagerTest extends \PHPUnit_Framework_TestCase
+class TagManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_TAG_NAME     = 'testName';
     const TEST_NEW_TAG_NAME = 'testAnotherName';
@@ -24,19 +24,19 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     /** @var TagManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $user;
 
     protected function setUp()

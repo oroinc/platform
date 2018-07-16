@@ -11,12 +11,12 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class FileManagerTest extends \PHPUnit_Framework_TestCase
+class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
     const TEST_PROTOCOL         = 'testProtocol';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Filesystem */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Filesystem */
     protected $filesystem;
 
     /** @var FileManager */

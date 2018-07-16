@@ -13,7 +13,7 @@ use Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
-class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
+class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommandWithArgsFilter */
     protected $filter;

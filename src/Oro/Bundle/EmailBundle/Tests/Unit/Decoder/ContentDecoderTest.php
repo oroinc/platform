@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Decoder;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 
-class ContentDecoderTest extends \PHPUnit_Framework_TestCase
+class ContentDecoderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $str

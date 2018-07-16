@@ -13,10 +13,10 @@ class SortingValidatorTest extends AbstractConstraintValidatorTest
     /** @var SortingConstraint */
     protected $sortingConstraint;
 
-    /** @var Segment|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Segment|\PHPUnit\Framework\MockObject\MockObject */
     protected $segment;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /**

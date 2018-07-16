@@ -5,7 +5,7 @@ namespace Oro\Component\Config\Tests\Unit;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 
-class CumulativeResourceManagerTest extends \PHPUnit_Framework_TestCase
+class CumulativeResourceManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetAndSetBundles()
     {

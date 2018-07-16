@@ -9,15 +9,15 @@ use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class MandatoryFieldProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MandatoryFieldProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MandatoryFieldProviderInterface */
     private $provider1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|MandatoryFieldProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MandatoryFieldProviderInterface */
     private $provider2;
 
     /** @var MandatoryFieldProviderRegistry */

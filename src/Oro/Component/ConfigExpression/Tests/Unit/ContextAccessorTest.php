@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class ContextAccessorTest extends \PHPUnit_Framework_TestCase
+class ContextAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor

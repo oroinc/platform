@@ -14,7 +14,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FallbackPropertyTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected $translator;
 
@@ -142,7 +142,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $localizationCode = 'en_US';
         $parentCode = 'en';
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form */
         $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();

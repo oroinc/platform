@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 
-class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
+class SendProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 {
     const FOO_METHOD = 'foo';
     const FOO_LABEL  = 'foo_label';
@@ -12,7 +12,7 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     const BAR_LABEL  = 'bar_label';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     * @var \PHPUnit\Framework\MockObject\MockObject[]
      */
     protected $processors;
 

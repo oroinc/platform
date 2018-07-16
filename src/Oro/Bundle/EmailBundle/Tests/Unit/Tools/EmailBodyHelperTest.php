@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
-class EmailBodyHelperTest extends \PHPUnit_Framework_TestCase
+class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;

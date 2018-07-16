@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 
-class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
+class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetIdentifier()
     {

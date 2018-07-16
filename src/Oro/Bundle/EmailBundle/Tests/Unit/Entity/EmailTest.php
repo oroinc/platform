@@ -17,7 +17,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class EmailTest extends \PHPUnit_Framework_TestCase
+class EmailTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

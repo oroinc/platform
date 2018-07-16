@@ -24,7 +24,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     /** @var EntityManagerMock */
     private $em;
 
-    /** @var RelationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RelationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $relationHelper;
 
     protected function setUp()

@@ -4,10 +4,10 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Config\Definition\Builder;
 
 use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuNodeDefinition;
 
-class MenuNodeDefinitionTest extends \PHPUnit_Framework_TestCase
+class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $builder;
 

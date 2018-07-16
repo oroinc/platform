@@ -11,9 +11,9 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class SearchFilterDatasourceAdapterTest extends \PHPUnit_Framework_TestCase
+class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchQueryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchQuery;
 
     protected function setUp()

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 class TestConfigSection implements ConfigExtraSectionInterface
 {
     /** @var string */
-    protected $name;
+    private $name;
 
     /**
      * @param string $name

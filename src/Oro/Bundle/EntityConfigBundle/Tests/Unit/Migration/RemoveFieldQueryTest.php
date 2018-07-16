@@ -7,18 +7,18 @@ use Doctrine\DBAL\Driver\Statement;
 use Oro\Bundle\EntityConfigBundle\Migration\RemoveFieldQuery;
 use Psr\Log\LoggerInterface;
 
-class RemoveFieldQueryTest extends \PHPUnit_Framework_TestCase
+class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
-    /** @var  LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var  Connection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connector;
 
-    /** @var  Statement|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  Statement|\PHPUnit\Framework\MockObject\MockObject */
     protected $statement;
 
     protected function setUp()

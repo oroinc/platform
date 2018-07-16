@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 
-class EntityMergerTest extends \PHPUnit_Framework_TestCase
+class EntityMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityMerger
@@ -14,12 +14,12 @@ class EntityMergerTest extends \PHPUnit_Framework_TestCase
     protected $merger;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $eventDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     * @var \PHPUnit\Framework\MockObject\MockObject[]
      */
     protected $steps;
 

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 class CompleteDisableInclusionTest extends ConfigProcessorTestCase
 {
     /** @var CompleteDisableInclusion */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

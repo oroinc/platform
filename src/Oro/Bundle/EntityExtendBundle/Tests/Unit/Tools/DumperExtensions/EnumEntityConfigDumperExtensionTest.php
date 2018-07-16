@@ -15,12 +15,12 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $relationBuilder;
 
     /** @var ExtendDbIdentifierNameGenerator */
@@ -29,7 +29,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var EnumEntityConfigDumperExtension */
     protected $extension;
 
-    /** @var ExtendEntityConfigProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendEntityConfigProvider;
 
     public function setUp()

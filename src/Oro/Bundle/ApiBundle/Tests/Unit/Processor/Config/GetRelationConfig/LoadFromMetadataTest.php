@@ -5,22 +5,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetRelationConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class LoadFromMetadataTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var LoadFromMetadata */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new LoadFromMetadata($this->doctrineHelper);
     }
@@ -33,7 +32,7 @@ class LoadFromMetadataTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $this->context->setResult($this->createConfigObject($config));
@@ -42,7 +41,7 @@ class LoadFromMetadataTest extends ConfigProcessorTestCase
 
     public function testProcessForNotManageableEntity()
     {
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -50,21 +49,21 @@ class LoadFromMetadataTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject([]));
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->getResult()->hasFields());
+        self::assertFalse($this->context->getResult()->hasFields());
     }
 
     public function testProcessForManageableEntity()
     {
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($metadata);
@@ -88,15 +87,15 @@ class LoadFromMetadataTest extends ConfigProcessorTestCase
     {
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($metadata);

@@ -14,17 +14,17 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadata
 
 class ObjectMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
+    private $objectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectNestedObjectMetadataFactory */
-    protected $nestedObjectMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNestedObjectMetadataFactory */
+    private $nestedObjectMetadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectNestedAssociationMetadataFactory */
-    protected $nestedAssociationMetadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNestedAssociationMetadataFactory */
+    private $nestedAssociationMetadataFactory;
 
     /** @var ObjectMetadataLoader */
-    protected $objectMetadataLoader;
+    private $objectMetadataLoader;
 
     protected function setUp()
     {

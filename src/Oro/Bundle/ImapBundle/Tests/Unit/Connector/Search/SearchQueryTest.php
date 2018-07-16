@@ -6,7 +6,7 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExpr;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 
-class SearchQueryTest extends \PHPUnit_Framework_TestCase
+class SearchQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider valueProviderForInvalidArguments

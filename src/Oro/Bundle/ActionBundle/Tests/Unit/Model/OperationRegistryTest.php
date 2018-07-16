@@ -17,30 +17,30 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class OperationRegistryTest extends \PHPUnit_Framework_TestCase
+class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
 
     /** @var OperationAssembler */
     protected $assembler;
 
-    /** @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
     protected $actionFactory;
 
-    /** @var ConditionFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConditionFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $conditionFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler */
     protected $attributeAssembler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
 
     /** @var OperationRegistry */

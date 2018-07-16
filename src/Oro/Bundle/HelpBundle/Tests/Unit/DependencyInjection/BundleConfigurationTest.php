@@ -5,7 +5,7 @@ namespace Oro\Bundle\HelpBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\HelpBundle\DependencyInjection\BundleConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
-class BundleConfigurationTest extends \PHPUnit_Framework_TestCase
+class BundleConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider processConfigurationDataProvider

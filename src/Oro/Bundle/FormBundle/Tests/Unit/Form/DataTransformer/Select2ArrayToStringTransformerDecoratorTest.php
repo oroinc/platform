@@ -5,10 +5,10 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\DataTransformer\Select2ArrayToStringTransformerDecorator;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit_Framework_TestCase
+class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DataTransformerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $transformer;
 

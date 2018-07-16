@@ -11,14 +11,14 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
+class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ScheduleManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ScheduleManager|\PHPUnit\Framework\MockObject\MockObject */
     private $scheduleManager;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /** @var string */
@@ -27,10 +27,10 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
     /** @var DeferredScheduler */
     private $deferredScheduler;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $objectManager;
 
-    /** @var SchedulesByArgumentsFilterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SchedulesByArgumentsFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $schedulesByArgumentsFilter;
 
     protected function setUp()

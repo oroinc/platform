@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 
-class GenderProviderTest extends \PHPUnit_Framework_TestCase
+class GenderProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GenderProvider

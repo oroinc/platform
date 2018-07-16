@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\EventManager;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -10,10 +12,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class DefaultRelationFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class DefaultRelationFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
 
@@ -26,7 +29,7 @@ class DefaultRelationFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $extendConfigProvider = new ConfigProviderMock(
@@ -76,7 +79,7 @@ class DefaultRelationFieldValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->validator = new DefaultRelationFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher)
+            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
         );
     }
 

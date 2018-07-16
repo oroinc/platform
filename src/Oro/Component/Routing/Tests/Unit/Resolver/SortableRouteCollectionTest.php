@@ -5,7 +5,7 @@ namespace Oro\Component\Routing\Tests\Unit\Resolver;
 use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Symfony\Component\Routing\Route;
 
-class SortableRouteCollectionTest extends \PHPUnit_Framework_TestCase
+class SortableRouteCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testSortByPriority()
     {

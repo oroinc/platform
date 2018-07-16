@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
+class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddressHelper */
     protected $helper;

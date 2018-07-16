@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\MigrationBundle\Event\MigrationEvent;
 
-class MigrationEventTest extends \PHPUnit_Framework_TestCase
+class MigrationEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MigrationEvent

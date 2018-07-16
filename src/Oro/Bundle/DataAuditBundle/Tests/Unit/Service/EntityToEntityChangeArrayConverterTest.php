@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\EntityAdditionalFields;
 
-class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
+class EntityToEntityChangeArrayConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityToEntityChangeArrayConverter */
     private $converter;
@@ -121,7 +121,7 @@ class EntityToEntityChangeArrayConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEntityManager()
     {

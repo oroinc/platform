@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
 
-class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeFilterConfigHelper */
-    protected $mergeFilterConfigHelper;
+    private $mergeFilterConfigHelper;
 
     protected function setUp()
     {
@@ -37,7 +37,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'filter2' => [
                         'description' => 'description 2'
-                    ],
+                    ]
                 ]
             ]
         ];
@@ -49,7 +49,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'filter3' => [
                     'description' => 'filter description 3'
-                ],
+                ]
             ]
         ];
 
@@ -63,7 +63,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                         ],
                         'filter3' => [
                             'description' => 'filter description 3'
-                        ],
+                        ]
                     ]
                 ]
             ],
@@ -81,7 +81,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'filter2' => [
                         'description' => 'description 2'
-                    ],
+                    ]
                 ]
             ]
         ];
@@ -92,7 +92,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'filter3' => [
                     'description' => 'filter description 3'
-                ],
+                ]
             ]
         ];
 
@@ -108,7 +108,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit_Framework_TestCase
                         ],
                         'filter3' => [
                             'description' => 'filter description 3'
-                        ],
+                        ]
                     ]
                 ]
             ],

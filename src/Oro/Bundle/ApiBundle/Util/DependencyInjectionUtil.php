@@ -128,7 +128,7 @@ class DependencyInjectionUtil
     {
         krsort($services);
 
-        return call_user_func_array('array_merge', $services);
+        return array_merge(...$services);
     }
 
     /**

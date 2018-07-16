@@ -13,16 +13,16 @@ use Oro\Bundle\ApiBundle\Util\EntityLoader;
 
 class LoadEntityTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityLoader */
     private $entityLoader;
 
     /** @var LoadEntity */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

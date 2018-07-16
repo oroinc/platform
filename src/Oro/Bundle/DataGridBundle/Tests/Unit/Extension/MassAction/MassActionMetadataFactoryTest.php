@@ -6,9 +6,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
 
-class MassActionMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class MassActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $actionMetadataFactory;
 
     /** @var MassActionMetadataFactory */

@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Exception\InvalidArgumentException;
 
-class ArrayOptionValueBuilderTest extends \PHPUnit_Framework_TestCase
+class ArrayOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildWithDefaultOptions()
     {

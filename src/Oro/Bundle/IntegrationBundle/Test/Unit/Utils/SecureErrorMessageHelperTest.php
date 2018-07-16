@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Test\Unit\Utils;
 
 use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
 
-class SecureErrorMessageHelperTest extends \PHPUnit_Framework_TestCase
+class SecureErrorMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
 
     /**

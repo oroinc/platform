@@ -13,32 +13,32 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 
-class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationBuilder;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var string|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
     protected $triggerEntityClass;
 
-    /** @var ProcessTriggerCronScheduler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProcessTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
     protected $processCronScheduler;
 
     /** @var ProcessTriggersConfigurator */
     protected $processTriggersConfigurator;
 
-    /** @var ProcessTriggerRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $objectManager;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     protected function setUp()
@@ -93,7 +93,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertManagerRegistryCalled($this->triggerEntityClass);
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
 
-        /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockExistentTrigger */
+        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $mockExistentTrigger */
         $mockExistentTrigger = $this->createMock($this->triggerEntityClass);
 
         $nonExistentNewTrigger->setDefinition($definition)->setCron('42 * * * *');

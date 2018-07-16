@@ -7,7 +7,7 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-abstract class AbstractSearchMappingProviderTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractSearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     protected $testMapping = [

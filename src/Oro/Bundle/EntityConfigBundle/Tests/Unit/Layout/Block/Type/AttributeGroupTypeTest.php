@@ -21,10 +21,10 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     /** @var AttributeRenderRegistry */
     protected $attributeRenderRegistry;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject $attributeManager */
     protected $attributeManager;
 
-    /** @var AttributeBlockTypeMapperInterface|\PHPUnit_Framework_MockObject_MockObject $blockTypeMapper */
+    /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject $blockTypeMapper */
     protected $blockTypeMapper;
 
     /**

@@ -7,7 +7,7 @@ use Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\Layout\Tests\Unit\Loader\Stubs\StubConditionVisitor;
 
-class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
+class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PhpLayoutUpdateGenerator */
     protected $generator;

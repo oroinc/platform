@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\DTO;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
 
-class SelectedItemsTest extends \PHPUnit_Framework_TestCase
+class SelectedItemsTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmptyWhenEmpty()
     {

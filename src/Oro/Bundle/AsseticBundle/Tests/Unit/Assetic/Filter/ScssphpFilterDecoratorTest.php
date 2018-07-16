@@ -6,12 +6,12 @@ use Assetic\Asset\AssetInterface;
 use Assetic\Factory\AssetFactory;
 use Assetic\Filter\ScssphpFilter;
 
-class ScssphpFilterDecoratorTest extends \PHPUnit_Framework_TestCase
+class ScssphpFilterDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ScssphpFilterDecorator */
     protected $scssphpFilterDecorator;
 
-    /** @var ScssphpFilter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ScssphpFilter|\PHPUnit\Framework\MockObject\MockObject */
     protected $scssphpFilter;
 
     /**
@@ -106,7 +106,7 @@ class ScssphpFilterDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChildren()
     {
-        /** @var AssetFactory|\PHPUnit_Framework_MockObject_MockObject $factory */
+        /** @var AssetFactory|\PHPUnit\Framework\MockObject\MockObject $factory */
         $factory = $this->getMockBuilder(AssetFactory::class)->disableOriginalConstructor()->getMock();
         $content = '';
         $loadPath = 'load/path';
@@ -122,7 +122,7 @@ class ScssphpFilterDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterLoad()
     {
-        /** @var AssetInterface|\PHPUnit_Framework_MockObject_MockObject $asset */
+        /** @var AssetInterface|\PHPUnit\Framework\MockObject\MockObject $asset */
         $asset = $this->getMockBuilder(AssetInterface::class)->getMock();
 
         $this->scssphpFilter
@@ -135,7 +135,7 @@ class ScssphpFilterDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function filterDump()
     {
-        /** @var AssetInterface|\PHPUnit_Framework_MockObject_MockObject $asset */
+        /** @var AssetInterface|\PHPUnit\Framework\MockObject\MockObject $asset */
         $asset = $this->getMockBuilder(AssetInterface::class)->getMock();
 
         $this->scssphpFilter

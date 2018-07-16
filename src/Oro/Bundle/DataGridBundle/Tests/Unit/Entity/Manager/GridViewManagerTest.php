@@ -19,7 +19,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class GridViewManagerTest extends \PHPUnit_Framework_TestCase
+class GridViewManagerTest extends \PHPUnit\Framework\TestCase
 {
     const GRID_VIEW_CLASS_NAME = 'GridViewClassName';
     const GRID_VIEW_USER_CLASS_NAME = 'GridViewUserClassName';
@@ -27,19 +27,19 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
     /** @var GridViewManager */
     protected $gridViewManager;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridViewRepository;
 
-    /** @var EntityRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridViewUserRepository;
 
     /** @var  User */
     protected $user;
 
-    /** @var Manager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
     protected $dataGridManager;
 
-    /** @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $restrictionManager;
 
     /** @var  GridViewApiEntityManager */
@@ -50,13 +50,13 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
         $this->user = new User();
         $this->user->setUsername('username');
 
-        /** @var AclHelper|\PHPUnit_Framework_MockObject_MockObject $aclHelper */
+        /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $aclHelper */
         $aclHelper = $this->createMock(AclHelper::class);
 
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->gridViewUserRepository = $this->createMock(GridViewUserRepository::class);
 
-        /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject $manager */
+        /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject $manager */
         $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
             ->method('getRepository')
@@ -67,7 +67,7 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        /** @var Registry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var Registry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(Registry::class);
         $registry->expects($this->any())->method('getManagerForClass')->willReturn($manager);
 

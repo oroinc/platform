@@ -1,15 +1,15 @@
-define([
-    'underscore',
-    'oroui/js/mediator',
-    './base/bookmark-component',
-    '../views/bookmark-button-view',
-    '../views/pin-bar-view',
-    '../views/pin-dropdown-view',
-    '../views/pin-item-view'
-], function(_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
+define(function(require) {
     'use strict';
 
     var PinComponent;
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var PageStateView = require('oronavigation/js/app/views/page-state-view');
+    var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
+    var PinBarView = require('oronavigation/js/app/views/pin-bar-view');
+    var DropdownView = require('oronavigation/js/app/views/pin-dropdown-view');
+    var ItemView = require('oronavigation/js/app/views/pin-item-view');
+    var BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
 
     PinComponent = BaseBookmarkComponent.extend({
         typeName: 'pinbar',
@@ -32,6 +32,7 @@ define([
             this._createButtonView();
             this._createBarView();
             this._createDropdownView();
+            this._createPageStateView();
         },
 
         /**
@@ -44,6 +45,7 @@ define([
             var collection = this.collection;
 
             _.extend(options, {
+                el: this._options._sourceElement,
                 autoRender: true,
                 collection: collection
             });
@@ -59,14 +61,11 @@ define([
         _createBarView: function() {
             var options = this._options.barOptions || {};
             var collection = this.collection;
-            var BarItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
-                template: this._options.barItemTemplate
-            });
 
             _.extend(options, {
                 autoRender: true,
                 collection: collection,
-                itemView: BarItemView
+                itemView: ItemView
             });
 
             this.pinBar = new PinBarView(options);
@@ -81,14 +80,11 @@ define([
             var options = this._options.dropdownOptions || {};
             var collection = this.collection;
             var pinBar = this.pinBar;
-            var DropdownItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
-                template: this._options.dropdownItemTemplate
-            });
 
             _.extend(options, {
                 autoRender: true,
                 collection: collection,
-                itemView: DropdownItemView,
+                itemView: ItemView,
                 filterer: function(item) {
                     return !pinBar.isVisibleItem(item);
                 },
@@ -104,6 +100,16 @@ define([
             });
 
             this.dropdown = new DropdownView(options);
+        },
+
+        _createPageStateView: function() {
+            var options = this._options.pageStateOptions || {};
+
+            _.extend(options, {
+                collection: this.collection
+            });
+
+            this.pageState = new PageStateView(options);
         },
 
         actualizeAttributes: function(model) {

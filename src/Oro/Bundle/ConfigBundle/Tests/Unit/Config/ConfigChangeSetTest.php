@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 
-class ConfigChangeSetTest extends \PHPUnit_Framework_TestCase
+class ConfigChangeSetTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetChanges()
     {

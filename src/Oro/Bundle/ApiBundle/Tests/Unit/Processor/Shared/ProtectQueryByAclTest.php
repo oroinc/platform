@@ -6,33 +6,35 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ProtectQueryByAclTest extends OrmRelatedTestCase
 {
     /** @var ProtectQueryByAcl */
-    protected $processor;
+    private $processor;
 
     /** @var Context */
-    protected $context;
+    private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
+    private $aclHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclAnnotationProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclAnnotationProvider */
+    private $aclAnnotationProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclAnnotationProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->aclAnnotationProvider = $this->createMock(AclAnnotationProvider::class);
         $this->processor = new ProtectQueryByAcl(
             $this->doctrineHelper,
             $this->aclHelper,
@@ -40,12 +42,8 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
             'VIEW'
         );
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\MetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $metadataProvider = $this->createMock(MetadataProvider::class);
 
         $this->context = new Context($configProvider, $metadataProvider);
     }
@@ -53,23 +51,19 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
     /**
      * @return Criteria
      */
-    protected function getCriteria()
+    private function getCriteria()
     {
-        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new Criteria($resolver);
+        return new Criteria($this->createMock(EntityClassResolver::class));
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
+        $className = Product::class;
         $this->context->setClassName($className);
         $query = new \stdClass();
         $this->context->setQuery($query);
 
-        $this->aclHelper->expects($this->never())
+        $this->aclHelper->expects(self::never())
             ->method('applyAclToCriteria');
 
         $this->processor->process($this->context);
@@ -79,19 +73,19 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
     {
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getCriteria());
+        self::assertNull($this->context->getCriteria());
     }
 
     public function testProcessWithoutConfig()
     {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
+        $className = Product::class;
         $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
         $criteria = $this->getCriteria();
         $this->context->setCriteria($criteria);
 
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('applyAclToCriteria')
             ->with($className, $criteria, 'VIEW');
 
@@ -100,7 +94,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
 
     public function testProcessWithConfig()
     {
-        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
+        $className = Product::class;
         $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
         $aclResource = 'acme_test_delete_resource';
@@ -118,12 +112,12 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
             ]
         );
 
-        $this->aclAnnotationProvider->expects($this->once())
+        $this->aclAnnotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with($aclResource)
             ->willReturn($aclAnnotation);
 
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('applyAclToCriteria')
             ->with($className, $criteria, 'DELETE');
 

@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class EntityMapperTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityOverrideProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
     private $entityOverrideProvider;
 
     /** @var EntityMapper */

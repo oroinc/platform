@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class EntityIdTransformerCompilerPassTest extends \PHPUnit_Framework_TestCase
+class EntityIdTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityIdTransformerCompilerPass */
     private $compiler;

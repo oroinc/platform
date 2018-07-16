@@ -14,21 +14,21 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider;
 
-class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
+class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowDataProvider */
     private $workflowDataProvider;
 
-    /** @var TransitionDataProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionDataProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $transitionDataProvider;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
 
-    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $systemWorkflowManager;
 
-    /** @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManagerRegistry;
 
     /**
@@ -161,10 +161,10 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param null|\PHPUnit_Framework_MockObject_MockObject|WorkflowDefinition $workflowDefinition
-     * @param null|\PHPUnit_Framework_MockObject_MockObject|StepManager $stepManager
+     * @param null|\PHPUnit\Framework\MockObject\MockObject|WorkflowDefinition $workflowDefinition
+     * @param null|\PHPUnit\Framework\MockObject\MockObject|StepManager $stepManager
      *
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getWorkflow($workflowDefinition = null, $stepManager = null)
     {
@@ -180,7 +180,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return Collection|\PHPUnit_Framework_MockObject_MockObject
+     * @return Collection|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getCollections()
     {

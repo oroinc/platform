@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Generator;
 
 use Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator;
 
-class RandomTokenGeneratorTest extends \PHPUnit_Framework_TestCase
+class RandomTokenGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RandomTokenGenerator

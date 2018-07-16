@@ -8,7 +8,7 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
-class TaggableDatagridExtensionTest extends \PHPUnit_Framework_TestCase
+class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TaggableDatagridExtension */
     protected $extension;

@@ -7,7 +7,7 @@ use Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes;
 use Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypesValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueAddressTypesValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
@@ -131,7 +131,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $addressTypes
      * @param bool $isEmpty
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTypedAddressMock(array $addressTypes, $isEmpty = false)
     {

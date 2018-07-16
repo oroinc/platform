@@ -18,7 +18,7 @@ class WorkflowNotificationHandlerTest extends WebTestCase
 {
     const ENTITY_NAME = WorkflowAwareEntity::class;
 
-    /** @var WorkflowNotificationHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowNotificationHandler|\PHPUnit\Framework\MockObject\MockObject */
     protected $notificationHandler;
 
     protected function setUp()
@@ -134,7 +134,7 @@ class WorkflowNotificationHandlerTest extends WebTestCase
      * @param string $transitionName
      * @param WorkflowAwareEntity $entity
      *
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
+     * @throws \PHPUnit\Framework\MockObject\RuntimeException
      */
     private function assertNotificationHandlerCalled($transitionName, WorkflowAwareEntity $entity = null)
     {

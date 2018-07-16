@@ -9,18 +9,18 @@ use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
+class IntegrationIconProviderTest extends \PHPUnit\Framework\TestCase
 {
     const CHANNEL_TYPE = 'channel_type_1';
     const ICON = 'bundles/icon-uri.png';
 
     /**
-     * @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $typesRegistry;
 
     /**
-     * @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $typesRegistryLink;
 
@@ -99,7 +99,7 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $channelType
      *
-     * @return Channel|\PHPUnit_Framework_MockObject_MockObject
+     * @return Channel|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createChannel($channelType)
     {
@@ -115,7 +115,7 @@ class IntegrationIconProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $iconUri
      *
-     * @return IntegrationInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return IntegrationInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createIconAwareIntegration($iconUri)
     {

@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CustomizeLoadedDataProcessor */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CustomizeLoadedDataProcessor */
     private $customizationProcessor;
 
     /** @var SetDataCustomizationHandler */

@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
 
-class TransitionTriggersUpdateDeciderTest extends \PHPUnit_Framework_TestCase
+class TransitionTriggersUpdateDeciderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $expected

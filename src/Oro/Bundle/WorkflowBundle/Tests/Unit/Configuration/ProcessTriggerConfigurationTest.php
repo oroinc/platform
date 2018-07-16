@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggerConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
+class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessTriggerConfiguration

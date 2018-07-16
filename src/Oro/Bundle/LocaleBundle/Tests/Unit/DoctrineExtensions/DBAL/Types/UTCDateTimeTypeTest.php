@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
-class UTCDateTimeTypeTest extends \PHPUnit_Framework_TestCase
+class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UTCTimeType

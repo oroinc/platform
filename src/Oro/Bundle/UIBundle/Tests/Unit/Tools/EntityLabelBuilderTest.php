@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 
-class EntityLabelBuilderTest extends \PHPUnit_Framework_TestCase
+class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetEntityLabelTranslationKey()
     {

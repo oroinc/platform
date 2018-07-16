@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CopyValuesTest extends \PHPUnit_Framework_TestCase
+class CopyValuesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CopyValues

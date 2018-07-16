@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
-class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
+class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
     protected $configuration;

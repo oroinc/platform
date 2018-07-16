@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
+class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string $expected

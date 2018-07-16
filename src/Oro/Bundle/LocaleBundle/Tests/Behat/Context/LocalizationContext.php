@@ -7,6 +7,7 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LocalizationContext extends OroFeatureContext implements KernelAwareContext
 {
@@ -17,11 +18,14 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
      */
     public function loadFixtures()
     {
+        /** @var ContainerInterface $container */
+        $container = $this->getContainer();
+
         /* @var $configManager ConfigManager */
-        $configManager = $this->getContainer()->get('oro_config.global');
+        $configManager = $container->get('oro_config.global');
 
         /* @var $localizations Localization[] */
-        $localizations = $this->getContainer()
+        $localizations = $container
             ->get('oro_entity.doctrine_helper')
             ->getEntityRepository(Localization::class)
             ->findAll();
@@ -32,9 +36,11 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
                 return $item->getId();
             }, $localizations)
         );
-
-        $this->getContainer()->get('oro_translation.js_dumper')->dumpTranslations();
-
         $configManager->flush();
+
+        $container->get('oro_translation.provider.translation_domain')->clearCache();
+        $container->get('translator.default')->rebuildCache();
+        $container->get('oro_translation.js_dumper')->dumpTranslations();
+        $container->get('oro_ui.dynamic_asset_version_manager')->updateAssetVersion('translations');
     }
 }

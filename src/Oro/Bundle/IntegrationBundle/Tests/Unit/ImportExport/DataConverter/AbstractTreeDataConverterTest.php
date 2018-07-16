@@ -4,10 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\DataConverter;
 
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\AbstractTreeDataConverter;
 
-class AbstractTreeDataConverterTest extends \PHPUnit_Framework_TestCase
+class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var AbstractTreeDataConverter|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractTreeDataConverter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dataConverter;
 

@@ -7,20 +7,20 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
-class EntityReaderTest extends \PHPUnit_Framework_TestCase
+class EntityReaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $managerRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $ownershipMetadataProvider;
 
@@ -388,7 +388,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $context
-     * @return \PHPUnit_Framework_MockObject_MockObject+
+     * @return \PHPUnit\Framework\MockObject\MockObject+
      */
     protected function getMockStepExecution($context)
     {

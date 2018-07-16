@@ -9,11 +9,11 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\User;
 
-class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
+class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
 {
     const ATTRIBUTE_NAME = 'some_attribute';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenStorage;
 
     /** @var AssignActiveUser */

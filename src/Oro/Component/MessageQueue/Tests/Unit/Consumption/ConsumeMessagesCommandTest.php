@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 
-class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
+class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumeMessagesCommand */
     private $command;
@@ -18,7 +18,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     /** @var Container */
     private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $consumer;
 
     protected function setUp()

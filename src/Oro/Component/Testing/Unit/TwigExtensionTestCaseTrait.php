@@ -42,7 +42,7 @@ trait TwigExtensionTestCaseTrait
         }
 
         if (null === $callable) {
-            \PHPUnit_Framework_TestCase::fail(sprintf('The "%s" function was not found.', $name));
+            \PHPUnit\Framework\TestCase::fail(sprintf('The "%s" function was not found.', $name));
         }
 
         return call_user_func_array($callable, $params);
@@ -76,7 +76,7 @@ trait TwigExtensionTestCaseTrait
         }
 
         if (null === $callable) {
-            \PHPUnit_Framework_TestCase::fail(sprintf('The "%s" filter was not found.', $name));
+            \PHPUnit\Framework\TestCase::fail(sprintf('The "%s" filter was not found.', $name));
         }
 
         return call_user_func_array($callable, $params);

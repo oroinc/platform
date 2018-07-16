@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
+class TransitionHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TransitionHandler

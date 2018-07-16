@@ -6,11 +6,11 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SessionIdProviderTest extends \PHPUnit_Framework_TestCase
+class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
     /** @var SessionIdProvider */

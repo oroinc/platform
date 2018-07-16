@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser;
 
-class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit_Framework_TestCase
+class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultColumnFilteringOptionsGuesser */
     protected $guesser;

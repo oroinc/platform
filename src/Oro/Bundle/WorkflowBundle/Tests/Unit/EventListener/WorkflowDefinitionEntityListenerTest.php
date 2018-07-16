@@ -16,18 +16,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowDefinitionEntityListener */
     protected $listener;
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowRegistry;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $entitiesWithWorkflowsCache;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()
@@ -135,7 +135,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreUpdateChangedRelatedEntity()
     {
-        /** @var PreUpdateEventArgs|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var PreUpdateEventArgs|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder(PreUpdateEventArgs::class)->disableOriginalConstructor()->getMock();
 
         $event->expects($this->any())
@@ -154,7 +154,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreUpdateChangedIsActive()
     {
-        /** @var PreUpdateEventArgs|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var PreUpdateEventArgs|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder(PreUpdateEventArgs::class)->disableOriginalConstructor()->getMock();
 
         $event->expects($this->any())
@@ -180,7 +180,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreUpdateChangedNotTrackedProperty()
     {
-        /** @var PreUpdateEventArgs|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var PreUpdateEventArgs|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder(PreUpdateEventArgs::class)->disableOriginalConstructor()->getMock();
 
         $event->expects($this->any())
@@ -229,7 +229,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreRemoveSystemWorkflowException()
     {
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definitionMock */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definitionMock */
         $definitionMock = $this->createMock(WorkflowDefinition::class);
         $definitionMock->expects($this->once())->method('isSystem')->willReturn(true);
         $definitionMock->expects($this->once())->method('getName')->willReturn('workflow1');
@@ -239,7 +239,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreRemoveSystemWorkflow()
     {
-        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definitionMock */
+        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definitionMock */
         $definitionMock = $this->createMock(WorkflowDefinition::class);
         $definitionMock->expects($this->once())->method('isSystem')->willReturn(false);
         $definitionMock->expects($this->never())->method('getName');
@@ -252,7 +252,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param array $groups
-     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createWorkflow($name, array $groups)
     {
@@ -267,7 +267,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $name
      * @param array $groups
-     * @return WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createDefinition($name, array $groups)
     {

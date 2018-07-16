@@ -5,15 +5,15 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\LayoutFactory;
 
-class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
+class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $rendererRegistry;
 
-    /** @var ExpressionProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $expressionProcessor;
 
     /** @var LayoutFactory */

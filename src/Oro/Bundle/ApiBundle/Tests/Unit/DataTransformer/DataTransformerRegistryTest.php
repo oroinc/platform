@@ -7,19 +7,19 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 
-class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
+class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerInterface */
-    protected $transformer1;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $transformer1;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerInterface */
-    protected $transformer2;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $transformer2;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DataTransformerInterface */
-    protected $transformer3;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $transformer3;
 
     /** @var DataTransformerRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp()
     {
@@ -35,7 +35,7 @@ class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
                 ],
                 'dataType2' => [
                     [$this->transformer3, 'rest']
-                ],
+                ]
             ],
             new RequestExpressionMatcher()
         );

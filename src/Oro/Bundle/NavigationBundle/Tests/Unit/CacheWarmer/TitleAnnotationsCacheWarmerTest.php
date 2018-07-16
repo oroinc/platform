@@ -5,9 +5,9 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\CacheWarmer;
 use Oro\Bundle\NavigationBundle\CacheWarmer\TitleAnnotationsCacheWarmer;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 
-class TitleAnnotationsCacheWarmerTest extends \PHPUnit_Framework_TestCase
+class TitleAnnotationsCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AnnotationsReader|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AnnotationsReader|\PHPUnit\Framework\MockObject\MockObject */
     protected $reader;
 
     /** @var TitleAnnotationsCacheWarmer */

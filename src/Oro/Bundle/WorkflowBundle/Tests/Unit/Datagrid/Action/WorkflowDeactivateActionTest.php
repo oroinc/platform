@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Action;
 
 use Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowDeactivateAction;
 
-class WorkflowDeactivateActionTest extends \PHPUnit_Framework_TestCase
+class WorkflowDeactivateActionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOptions()
     {

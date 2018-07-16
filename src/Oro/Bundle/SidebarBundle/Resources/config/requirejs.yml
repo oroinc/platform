@@ -15,6 +15,3 @@ config:
         'orosidebar/widget/sticky-note': 'bundles/orosidebar/sidebar_widgets/sticky_note/js/widget.js'
 
         'orosidebar/js/app/components/sidebar-component': 'bundles/orosidebar/js/app/components/sidebar-component.js'
-        'orosidebar/js/app/modules/sidebar-module': 'bundles/orosidebar/js/app/modules/sidebar-module.js'
-    appmodules:
-        - orosidebar/js/app/modules/sidebar-module

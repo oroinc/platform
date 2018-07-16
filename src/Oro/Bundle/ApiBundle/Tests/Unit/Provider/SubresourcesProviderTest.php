@@ -3,36 +3,33 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
+use Oro\Bundle\ApiBundle\Processor\CollectSubresourcesProcessor;
+use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class SubresourcesProviderTest extends \PHPUnit_Framework_TestCase
+class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $processor;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CollectSubresourcesProcessor */
+    private $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesCache;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
+    private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCache */
+    private $resourcesCache;
 
     /** @var SubresourcesProvider */
-    protected $subresourcesProvider;
+    private $subresourcesProvider;
 
     protected function setUp()
     {
-        $this->processor = $this->getMockBuilder('Oro\Bundle\ApiBundle\Processor\CollectSubresourcesProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->resourcesCache = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesCache')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processor = $this->createMock(CollectSubresourcesProcessor::class);
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
+        $this->resourcesCache = $this->createMock(ResourcesCache::class);
 
         $this->subresourcesProvider = new SubresourcesProvider(
             $this->processor,
@@ -49,54 +46,53 @@ class SubresourcesProviderTest extends \PHPUnit_Framework_TestCase
 
         $resources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $accessibleResources = ['Test\Entity1'];
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresources->addSubresource('test');
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectSubresourcesContext $context) use (
                     $version,
                     $requestType,
-                    $resources,
                     $accessibleResources
                 ) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
-                    $this->assertEquals(
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals(
                         [
                             'Test\Entity1' => new ApiResource('Test\Entity1'),
-                            'Test\Entity3' => new ApiResource('Test\Entity3'),
+                            'Test\Entity3' => new ApiResource('Test\Entity3')
                         ],
                         $context->getResources()
                     );
-                    $this->assertEquals($accessibleResources, $context->getAccessibleResources());
+                    self::assertEquals($accessibleResources, $context->getAccessibleResources());
 
                     $subresources1 = new ApiResourceSubresources('Test\Entity');
                     $subresources1->addSubresource('test');
                     $context->getResult()->add($subresources1);
                 }
             );
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($resources);
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($accessibleResources);
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getSubresources')
-            ->with($entityClass, $version, $this->identicalTo($requestType))
+            ->with($entityClass, $version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('saveSubresources')
-            ->with($version, $this->identicalTo($requestType), [$expectedSubresources]);
+            ->with($version, self::identicalTo($requestType), [$expectedSubresources]);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedSubresources,
             $this->subresourcesProvider->getSubresources($entityClass, $version, $requestType)
         );
@@ -110,54 +106,53 @@ class SubresourcesProviderTest extends \PHPUnit_Framework_TestCase
 
         $resources = [
             new ApiResource('Test\Entity1'),
-            new ApiResource('Test\Entity3'),
+            new ApiResource('Test\Entity3')
         ];
         $accessibleResources = ['Test\Entity1'];
         $subresources = new ApiResourceSubresources('Test\Entity2');
         $subresources->addSubresource('test');
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
             ->willReturnCallback(
                 function (CollectSubresourcesContext $context) use (
                     $version,
                     $requestType,
-                    $resources,
                     $accessibleResources
                 ) {
-                    $this->assertEquals($version, $context->getVersion());
-                    $this->assertEquals($requestType, $context->getRequestType());
-                    $this->assertEquals(
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals(
                         [
                             'Test\Entity1' => new ApiResource('Test\Entity1'),
-                            'Test\Entity3' => new ApiResource('Test\Entity3'),
+                            'Test\Entity3' => new ApiResource('Test\Entity3')
                         ],
                         $context->getResources()
                     );
-                    $this->assertEquals($accessibleResources, $context->getAccessibleResources());
+                    self::assertEquals($accessibleResources, $context->getAccessibleResources());
 
                     $subresources2 = new ApiResourceSubresources('Test\Entity2');
                     $subresources2->addSubresource('test');
                     $context->getResult()->add($subresources2);
                 }
             );
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($resources);
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getAccessibleResources')
-            ->with($version, $this->identicalTo($requestType))
+            ->with($version, self::identicalTo($requestType))
             ->willReturn($accessibleResources);
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getSubresources')
-            ->with($entityClass, $version, $this->identicalTo($requestType))
+            ->with($entityClass, $version, self::identicalTo($requestType))
             ->willReturn(null);
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('saveSubresources')
-            ->with($version, $this->identicalTo($requestType), [$subresources]);
+            ->with($version, self::identicalTo($requestType), [$subresources]);
 
-        $this->assertNull(
+        self::assertNull(
             $this->subresourcesProvider->getSubresources($entityClass, $version, $requestType)
         );
     }
@@ -171,20 +166,20 @@ class SubresourcesProviderTest extends \PHPUnit_Framework_TestCase
         $expectedSubresources = new ApiResourceSubresources($entityClass);
         $expectedSubresources->addSubresource('test');
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
-        $this->resourcesProvider->expects($this->never())
+        $this->resourcesProvider->expects(self::never())
             ->method('getResources');
-        $this->resourcesProvider->expects($this->never())
+        $this->resourcesProvider->expects(self::never())
             ->method('getAccessibleResources');
-        $this->resourcesCache->expects($this->once())
+        $this->resourcesCache->expects(self::once())
             ->method('getSubresources')
-            ->with($entityClass, $version, $this->identicalTo($requestType))
+            ->with($entityClass, $version, self::identicalTo($requestType))
             ->willReturn($expectedSubresources);
-        $this->resourcesCache->expects($this->never())
+        $this->resourcesCache->expects(self::never())
             ->method('saveSubresources');
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedSubresources,
             $this->subresourcesProvider->getSubresources($entityClass, $version, $requestType)
         );

@@ -196,7 +196,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
      */
     protected function getFilterDatasourceAdapter(QueryBuilder $qb)
     {
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
             ->setMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])

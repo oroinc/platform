@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared\MergeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 
-class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
+class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MergeActionConfigHelper */
-    protected $mergeActionConfigHelper;
+    private $mergeActionConfigHelper;
 
     protected function setUp()
     {
@@ -50,18 +50,18 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'key1' => 'value 1',
-            'key2' => 'value 2',
+            'key2' => 'value 2'
         ];
         $actionConfig = [
             'key1' => 'action value 1',
-            'key3' => 'action value 3',
+            'key3' => 'action value 3'
         ];
 
         self::assertEquals(
             [
                 'key1' => 'action value 1',
                 'key2' => 'value 2',
-                'key3' => 'action value 3',
+                'key3' => 'action value 3'
             ],
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
         );
@@ -78,7 +78,7 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'description' => 'description 2'
                 ],
                 'action3' => null,
-                'action4' => null,
+                'action4' => null
             ]
         ];
         $actionConfig = [
@@ -90,7 +90,7 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
                 'action3' => [
                     'description' => 'action description 3'
                 ],
-                'action5' => null,
+                'action5' => null
             ]
         ];
 
@@ -107,7 +107,7 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
                         'description' => 'action description 3'
                     ],
                     'action4' => null,
-                    'action5' => null,
+                    'action5' => null
                 ]
             ],
             $this->mergeActionConfigHelper->mergeActionConfig($config, $actionConfig, true)
@@ -183,7 +183,7 @@ class MergeActionConfigHelperTest extends \PHPUnit_Framework_TestCase
                 ],
                 'code3' => [
                     'description' => 'action code 3'
-                ],
+                ]
             ]
         ];
 

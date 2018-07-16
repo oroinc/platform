@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 
-class EntityOverrideProviderTest extends \PHPUnit_Framework_TestCase
+class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityOverrideProvider */
     private $entityOverrideProvider;

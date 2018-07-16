@@ -10,7 +10,7 @@ use Oro\Bundle\ReminderBundle\Model\Email\EmailNotification;
 use Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
+class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
 {
     const EXCEPTION_MESSAGE = 'message';
 
@@ -20,17 +20,17 @@ class EmailSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected $processor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EmailNotificationManager
+     * @var \PHPUnit\Framework\MockObject\MockObject | EmailNotificationManager
      */
     protected $emailNotificationManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EmailNotification
+     * @var \PHPUnit\Framework\MockObject\MockObject | EmailNotification
      */
     protected $emailNotification;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject | EventDispatcher
      */
     protected $eventDispatcher;
 

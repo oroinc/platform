@@ -6,18 +6,18 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 
-class SmtpSettingsCheckerTest extends \PHPUnit_Framework_TestCase
+class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SmtpSettings */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettings */
     protected $smtpSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SmtpSettingsChecker */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SmtpSettingsChecker */
     protected $smtpSettingsChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DirectMailer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DirectMailer */
     protected $directMailer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailerTransport;
 
     public function setUp()

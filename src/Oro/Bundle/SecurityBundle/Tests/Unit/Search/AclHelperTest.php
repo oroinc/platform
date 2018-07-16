@@ -10,24 +10,24 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
-class AclHelperTest extends \PHPUnit_Framework_TestCase
+class AclHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mappingProvider;
 
-    /** @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var OwnershipConditionDataBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipConditionDataBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipDataBuilder;
 
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipMetadataProvider;
 
-    /** @var OwnershipMetadataInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnershipMetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipMetadata;
 
     /** @var array */

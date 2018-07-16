@@ -16,21 +16,21 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
-class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|BusinessUnitRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitRepository */
     protected $buRepo;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     protected $userRepo;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
     protected $aclHelper;
 
     /** @var BusinessUnitManager */
@@ -267,7 +267,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         $this->addUserInfoToTree($tree, $currentUser);
         $this->addUserInfoToTree($tree, $newUser);
 
-        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
         $treeProvider = $this->createMock(OwnerTreeProvider::class);
         $treeProvider->expects($this->any())
             ->method('getTree')
@@ -423,7 +423,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         $this->addUserInfoToTree($tree, $currentUser);
         $this->addBusinessUnitInfoToTree($tree, $newBusinessUnit);
 
-        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
         $treeProvider = $this->createMock(OwnerTreeProvider::class);
         $treeProvider->expects($this->any())
             ->method('getTree')

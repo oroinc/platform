@@ -15,13 +15,13 @@ class EntityReaderByIdTest extends OrmTestCase
 {
     const TEST_ENTITY_ID = 11;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextRegistry;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
     /** @var EntityReaderById */
@@ -101,7 +101,7 @@ class EntityReaderByIdTest extends OrmTestCase
     /**
      * @param mixed $context
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject+
+     * @return \PHPUnit\Framework\MockObject\MockObject+
      */
     protected function getMockStepExecution($context)
     {

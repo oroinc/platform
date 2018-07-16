@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass;
 
-class EmbeddedFormPassTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @test
@@ -107,7 +107,7 @@ class EmbeddedFormPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createContainerBuilderMock()
     {

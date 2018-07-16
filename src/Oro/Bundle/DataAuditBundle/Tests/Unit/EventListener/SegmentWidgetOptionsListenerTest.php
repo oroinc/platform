@@ -7,9 +7,9 @@ use Oro\Bundle\DataAuditBundle\SegmentWidget\ContextChecker;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class SegmentWidgetOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
     /** @var SegmentWidgetOptionsListener */

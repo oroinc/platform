@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LinkProperty;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration;
 
-class LinkPropertyTest extends \PHPUnit_Framework_TestCase
+class LinkPropertyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LinkProperty
@@ -14,12 +14,12 @@ class LinkPropertyTest extends \PHPUnit_Framework_TestCase
     protected $property;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $twig;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 

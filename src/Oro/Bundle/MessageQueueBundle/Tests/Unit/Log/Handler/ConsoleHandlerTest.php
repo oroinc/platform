@@ -3,8 +3,8 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Handler;
 
 use Monolog\Logger;
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -12,12 +12,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
+class ConsoleHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsumerState */
     private $consumerState;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OutputInterface */
     private $output;
 
     /** @var ConsoleHandler */
@@ -67,18 +67,22 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('<fg=white>DEBUG    :</> test message ["processor" => "Test\Processor"] ["key" => "value"]' . "\n");
+            ->with(
+                '2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message '
+                . '["key" => "value"] ["processor" => "Test\Processor"]'
+                . "\n"
+            );
 
         $this->consumerState->startConsumption();
         self::assertFalse(
             $this->handler->handle([
+                'datetime' => new \DateTime('2018-07-06 09:16:05'),
                 'message' => 'test message',
                 'level'   => Logger::DEBUG,
                 'level_name' => 'DEBUG',
                 'channel' => 'app',
                 'context' => ['key' => 'value'],
                 'extra'   => ['processor' => 'Test\Processor'],
-                'datetime' => new \DateTime()
             ])
         );
     }
@@ -110,16 +114,16 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(OutputInterface::VERBOSITY_DEBUG);
         $this->output->expects(self::once())
             ->method('write')
-            ->with('<fg=white>DEBUG    :</> test message  ' . "\n");
+            ->with('2018-07-06 09:16:05 <fg=white>app.DEBUG</>: test message [] []' . "\n");
         self::assertFalse(
             $this->handler->handle([
+                'datetime' => new \DateTime('2018-07-06 09:16:05'),
                 'message' => 'test message',
                 'level'   => Logger::DEBUG,
                 'level_name' => 'DEBUG',
                 'channel' => 'app',
                 'context' => [],
                 'extra'   => [],
-                'datetime' => new \DateTime()
             ])
         );
 

@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class EqualToTest extends \PHPUnit_Framework_TestCase
+class EqualToTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\EqualTo */
     protected $condition;

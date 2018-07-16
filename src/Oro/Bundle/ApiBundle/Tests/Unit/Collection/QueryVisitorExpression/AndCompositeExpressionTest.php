@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
 
-class AndCompositeExpressionTest extends \PHPUnit_Framework_TestCase
+class AndCompositeExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkCompositeExpression()
     {

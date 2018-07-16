@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 
-class DataFixtureTest extends \PHPUnit_Framework_TestCase
+class DataFixtureTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DataFixture

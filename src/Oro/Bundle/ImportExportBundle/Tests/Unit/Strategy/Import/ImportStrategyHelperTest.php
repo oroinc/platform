@@ -13,30 +13,30 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
+class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $managerRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | ValidatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | ValidatorInterface */
     protected $validator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | TranslatorInterface */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | FieldHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | FieldHelper */
     protected $fieldHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | ConfigProvider  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigProvider  */
     protected $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | ConfigurableTableDataConverter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigurableTableDataConverter */
     protected $configurableDataConverter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject | TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | TokenAccessorInterface */
     protected $tokenAccessor;
 
     /** @var ImportStrategyHelper */

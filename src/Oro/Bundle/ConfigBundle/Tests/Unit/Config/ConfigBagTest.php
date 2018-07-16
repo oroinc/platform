@@ -5,9 +5,9 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
-class ConfigBagTest extends \PHPUnit_Framework_TestCase
+class ConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     public function setUp()

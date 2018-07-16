@@ -10,13 +10,13 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ResettableExtensionWrapperTest extends \PHPUnit_Framework_TestCase
+class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
     const EXTENSION_SERVICE_ID = 'service_id';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     /** @var ResettableExtensionWrapper */

@@ -8,19 +8,17 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class ActionAvailabilityCheckTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $resourcesProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
+    private $resourcesProvider;
 
     /** @var ActionAvailabilityCheck */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->resourcesProvider = $this->getMockBuilder(ResourcesProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
 
         $this->processor = new ActionAvailabilityCheck($this->resourcesProvider);
     }
@@ -32,7 +30,7 @@ class ActionAvailabilityCheckTest extends GetListProcessorTestCase
     {
         $entityClass = 'Test\Class';
 
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(['action1', 'action2']);
@@ -46,7 +44,7 @@ class ActionAvailabilityCheckTest extends GetListProcessorTestCase
     {
         $entityClass = 'Test\Class';
 
-        $this->resourcesProvider->expects($this->once())
+        $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([]);

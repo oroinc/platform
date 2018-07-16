@@ -109,8 +109,9 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
         }
 
         $listenerId = 'oro_security.context_listener.' . $contextKey;
-        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
-        $listener->replaceArgument(2, $contextKey);
+        $container
+            ->setDefinition($listenerId, new ChildDefinition('security.context_listener'))
+            ->replaceArgument(2, $contextKey);
 
         $this->contextListeners[$contextKey] = $listenerId;
 

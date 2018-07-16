@@ -30,25 +30,25 @@ use Symfony\Component\Validator\Constraint;
  */
 class OwnerValidatorTest extends AbstractConstraintValidatorTest
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenAccessorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface */
     private $tokenAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider */
     private $ownerTreeProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclVoter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclVoter */
     private $aclVoter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|BusinessUnitManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager */
     private $businessUnitManager;
 
     /** @var Entity */
