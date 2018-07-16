@@ -120,12 +120,12 @@ class ImportExportControllerTest extends WebTestCase
                 ProcessorRegistry::TYPE_EXPORT_TEMPLATE
             );
 
-        $chains = explode('/', $result['url']);
+        //$chains = explode('/', $result['url']);
+
         return $this
             ->getContainer()
-            ->get('oro_importexport.file.file_system_operator')
-            ->getTemporaryFile(end($chains))
-            ->getRealPath();
+            ->get('oro_importexport.file.file_manager')
+            ->writeToTmpLocalStorage($result['file']);
     }
 
     /**
