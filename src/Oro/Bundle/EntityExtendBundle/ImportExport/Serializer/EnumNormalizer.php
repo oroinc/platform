@@ -54,7 +54,8 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
         $reflection  = new \ReflectionClass($class);
 
         $args = [
-            'id' => empty($data['id']) ? null : $data['id'],
+            // isset is used instead of empty as $data['id'] could be "0"
+            'id' => !isset($data['id']) ? null : $data['id'],
             'name' => empty($data['name']) ? '' : $data['name'],
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
             'default' => !empty($data['default'])
