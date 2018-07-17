@@ -3,6 +3,7 @@ define(function(require) {
 
     var CheckboxInputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    var _ = require('underscore');
     var $ = require('jquery');
     var defaultTemplate = require('tpl!oroui/templates/checkbox/default-template.html');
 
@@ -50,7 +51,7 @@ define(function(require) {
          */
         _buildCustomCheckbox: function() {
             this.type = this.$el.attr('type');
-            var label = this.$el.parent().find('label');
+            var label = this.$el.parent().find('> label');
             var labelText = label.html();
             var labelId = label.attr('for');
             label.remove();
@@ -61,7 +62,7 @@ define(function(require) {
                 type: this.type
             }));
 
-            this.$checkboxContainer.toggleClass('empty-label', _.isEmpty(label));
+            this.$checkboxContainer.toggleClass('empty-label', _.isEmpty(labelText));
             this.$el.after(this.$checkboxContainer);
             this.$el
                 .addClass('checkbox-view__input')

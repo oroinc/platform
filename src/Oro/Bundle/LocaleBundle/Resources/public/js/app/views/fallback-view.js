@@ -50,11 +50,11 @@ define(function(require) {
                     event: 'expandChildItems'
                 },
                 'edited': {
-                    html: '<i class="fa-folder"></i>',
+                    html: '<i class="fa-language"></i>',
                     event: 'expandChildItems'
                 },
                 'save': {
-                    html: '<i class="fa-folder-open"></i>',
+                    html: '<i class="fa-language"></i>',
                     event: 'collapseChildItems'
                 }
             }

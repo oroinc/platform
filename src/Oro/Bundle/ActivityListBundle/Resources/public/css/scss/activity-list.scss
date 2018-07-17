@@ -104,6 +104,7 @@
                 .vertical-actions .dropdown-menu {
                     right: 30px;
                     top: -5px;
+                    z-index: 900;
 
                     &.pull-right:before {
                         position: absolute;
