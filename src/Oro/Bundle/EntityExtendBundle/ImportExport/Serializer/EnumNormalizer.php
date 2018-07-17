@@ -8,6 +8,9 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
+/**
+ * Normalizer for enum entities.
+ */
 class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     /**
