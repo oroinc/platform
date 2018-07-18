@@ -2,7 +2,6 @@
 
 .select2-container.select2-tree-autocomplete {
     &.select2-container-multi {
-        border: none;
         background: #fff;
 
         &.hide-all-tree-related-ui {
@@ -22,7 +21,6 @@
 
                 .select2-input {
                     padding: 4px 6px;
-                    margin-bottom: 10px;
                     font-size: 14px;
                     line-height: 20px;
                     color: #555;

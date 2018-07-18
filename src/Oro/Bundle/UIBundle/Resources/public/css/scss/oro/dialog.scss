@@ -13,7 +13,6 @@
     flex-direction: $dialog-flex-direction;
 
     &-titlebar {
-        margin: $dialog-titlebar-outer-offset;
         background: $primary-300;
         border-radius: $dialog-border-radius $dialog-border-radius 0 0;
 
