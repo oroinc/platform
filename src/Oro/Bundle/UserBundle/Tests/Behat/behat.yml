@@ -20,10 +20,10 @@ oro_behat_extension:
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
           First Role:
-            locator: '//label[text()[contains(.,"First Role")]]/../input'
+            locator: '//label[text()[contains(.,"First Role")]]//input'
             type: xpath
           Second Role:
-            locator: '//label[text()[contains(.,"Second Role")]]/../input'
+            locator: '//label[text()[contains(.,"Second Role")]]//input'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
