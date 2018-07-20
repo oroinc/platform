@@ -25,24 +25,24 @@
             text-transform: capitalize;
         }
     }
-}
 
-.breadcrumb-pin {
-    border-bottom: 1px solid #f2f2f2;
-    padding: 0;
-    background-color: #fff;
+    &-pin {
+        border-bottom: 1px solid #f2f2f2;
+        padding: 0;
+        background-color: #fff;
 
-    #bookmark-buttons {
-        float: right;
-    }
+        #bookmark-buttons {
+            float: right;
+        }
 
-    #breadcrumb {
-        float: left;
-    }
+        #breadcrumb {
+            float: left;
+        }
 
-    &:after {
-        display: block;
-        content: '';
-        clear: both;
+        &:after {
+            display: block;
+            content: '';
+            clear: both;
+        }
     }
 }

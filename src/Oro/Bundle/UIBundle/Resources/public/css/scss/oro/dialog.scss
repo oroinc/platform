@@ -265,3 +265,8 @@
     cursor: $dialog-buttons-inner-cursor;
     border: $dialog-buttons-inner-border;
 }
+
+.ui-widget-overlay {
+    z-index: $ui-widget-overlay-z-index;
+}
+

@@ -26,9 +26,9 @@
 }
 
 .fa-search-plus:before {
-    content: "\f00e";
+    content: $fa-var-search-plus;
 }
 
 .fa-search-minus:before {
-    content: "\f010";
+    content: $fa-var-search-minus;
 }
