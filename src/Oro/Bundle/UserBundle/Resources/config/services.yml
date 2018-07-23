@@ -550,3 +550,11 @@ services:
             - '@security.token_storage'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_user.event_listener.authentication_failure:
+        class: Oro\Bundle\UserBundle\EventListener\AuthenticationFailureListener
+        arguments:
+            - 'main'
+            - 'oro_user.login.errors.bad_credentials'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
