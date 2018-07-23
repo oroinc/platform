@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
@@ -13,12 +14,18 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * Block type for showing text attributes.
+ */
 class AttributeTextType extends AbstractType
 {
     const NAME = 'attribute_text';
 
     /** @var AttributeManager */
     protected $attributeManager;
+
+    /** @var AttributeConfigurationProvider */
+    protected $attributeConfigurationProvider;
 
     /**
      * @param AttributeManager $attributeManager
@@ -29,12 +36,20 @@ class AttributeTextType extends AbstractType
     }
 
     /**
+     * @param AttributeConfigurationProvider $attributeConfigurationProvider
+     */
+    public function setAttributeConfigurationProvider(AttributeConfigurationProvider $attributeConfigurationProvider)
+    {
+        $this->attributeConfigurationProvider = $attributeConfigurationProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $attributeProxy = $this->createAttributeProxy($options);
-        $view->vars['label'] = $this->attributeManager->getAttributeLabel($attributeProxy);
+        $view->vars['label'] = $this->attributeConfigurationProvider->getAttributeLabel($attributeProxy);
 
         BlockUtils::setViewVarsFromOptions($view, $options, ['entity', 'value', 'fieldName', 'className']);
     }

@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\ExpressionLanguage\Expression;
-
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeTextType;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeTextTypeTest extends BlockTypeTestCase
 {
     /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
     protected $attributeManager;
+
+    /** @var AttributeConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
+    protected $attributeConfigurationProvider;
 
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
@@ -28,7 +30,13 @@ class AttributeTextTypeTest extends BlockTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->attributeConfigurationProvider = $this->getMockBuilder(AttributeConfigurationProvider::class)
+            ->setMethods(['getAttributeLabel'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $attributeTextType = new AttributeTextType($this->attributeManager);
+        $attributeTextType->setAttributeConfigurationProvider($this->attributeConfigurationProvider);
 
         $layoutFactoryBuilder
             ->addType($attributeTextType);
@@ -42,7 +50,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         $attribute->setEntity(new EntityConfigModel('attributeClassName'));
 
 
-        $this->attributeManager->expects($this->once())
+        $this->attributeConfigurationProvider->expects($this->once())
             ->method('getAttributeLabel')
             ->with($this->isInstanceOf(FieldConfigModel::class))
             ->willReturn('attribute_label');
