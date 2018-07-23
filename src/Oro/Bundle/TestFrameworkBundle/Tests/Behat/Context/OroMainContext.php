@@ -164,7 +164,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
@@ -203,7 +203,7 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        if (1 === preg_match('/[\S]*\/user\/login\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
+        if (1 === preg_match('/[\S]*\/user\/(login|reset-request)\/?(\?_rand=[0-9\.]+)?$/i', $url)) {
             return;
         } elseif (0 === preg_match('/^https?:\/\//', $url)) {
             return;
