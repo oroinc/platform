@@ -168,6 +168,8 @@
             list-style: $select2-search-multi-choices-list-style;
             margin: $select2-search-multi-choices-offset;
             padding: $select2-search-multi-choices-inner-offset;
+            height: $select2-search-multi-choices-height;
+            overflow: $select2-search-multi-choices-overflow;
 
             .select2-search-choice {
                 background: $select2-search-choice-background;
@@ -180,6 +182,10 @@
                 box-sizing: $select2-search-choice-box-sizing;
                 float: $select2-search-choice-float;
                 list-style: $select2-search-choice-list-style;
+
+                &.select2-locked {
+                    padding: $select2-search-choice-select2-locked-inner-offset;
+                }
 
                 img {
                     margin-top: $select2-search-choice-img-offset-top;
@@ -196,6 +202,7 @@
                 white-space: $select2-search-field-white-space;
 
                 input {
+                    float: $select2-search-field-float;
                     height: $select2-search-field-height;
                     line-height: $select2-search-field-line-height;
                     background-color: $select2-search-field-background-color;

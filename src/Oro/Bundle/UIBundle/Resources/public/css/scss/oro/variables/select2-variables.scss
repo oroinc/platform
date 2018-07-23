@@ -84,6 +84,8 @@ $select2-search-choice-box-sizing: border-box !default;
 $select2-search-choice-float: left !default;
 $select2-search-choice-list-style: none !default;
 
+$select2-search-choice-select2-locked-inner-offset: 4px 8px !default;
+
 $select2-search-choice-img-offset-top: -2px !default;
 $select2-search-choice-img-offset-bottom: -2px !default;
 $select2-search-choice-img-offset-vertical-align: top !default;
@@ -91,6 +93,7 @@ $select2-search-choice-img-offset-width: 16px !default;
 $select2-search-choice-img-offset-height: 16px !default;
 
 $select2-search-field-inner-offset: 0 !default;
+$select2-search-field-float: left !default;
 $select2-search-field-height: 28px !default;
 $select2-search-field-line-height: 28px !default;
 $select2-search-field-background-color: transparent !default;
@@ -117,6 +120,8 @@ $select2-search-choice-close-z-index: 1 !default;
 $select2-search-multi-choices-list-style: none !default;
 $select2-search-multi-choices-offset: 0 !default;
 $select2-search-multi-choices-inner-offset: 0 !default;
+$select2-search-multi-choices-height: auto !default;
+$select2-search-multi-choices-overflow: hidden !default;
 
 $select2-search-multi-choice-close-display: block !default;
 $select2-search-multi-choice-close-width: 12px !default;
