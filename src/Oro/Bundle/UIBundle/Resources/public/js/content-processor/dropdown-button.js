@@ -107,7 +107,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             $button
                 .attr(this.options.moreButtonAttrs)
                 .attr({'data-toggle': 'dropdown'})
-                .addClass('btn dropdown-toggle')
+                .addClass('btn dropdown-toggle dropdown-toggle-split')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel)
                 .append('<span class="caret"></span>');

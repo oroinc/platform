@@ -1,0 +1,53 @@
+/* @theme: admin.oro; */
+
+$oro-quarter-width: auto  !default;
+$oro-quarter-min-width: 60px !default;
+$oro-quarter-float: left !default;
+$oro-quarter-offset-left: 3px !default;
+$oro-quarter-span-width: auto  !default;
+$oro-quarter-select-width: auto  !default;
+$oro-quarter-select-min-width: 50px !default;
+
+$fallback-container-vertical-align: top !default;
+$fallback-container-line-height: 29px !default;
+$fallback-container-status-width: 36px !default;
+$fallback-container-status-text-align: center !default;
+$fallback-container-status-line-height: 32px !default;
+$fallback-container-status-height: 32px !default;
+$fallback-container-input-offset-top: 0 !default;
+$fallback-container-select-width: auto  !default;
+$fallback-container-select-float: left !default;
+$fallback-container-select-span-inner-offset-right: 18px !default;
+$fallback-container-select-span-min-width: 300px !default;
+
+$mce-tinymce-opacity: .4 !default;
+$mce-tinymce-disabled-overlay-position: absolute !default;
+$mce-tinymce-disabled-overlay-top: 0 !default;
+$mce-tinymce-disabled-overlay-left: 0 !default;
+$mce-tinymce-disabled-overlay-width: 100% !default;
+$mce-tinymce-disabled-overlay-height: 100% !default;
+$mce-tinymce-disabled-overlay-background: #eee !default;
+$mce-tinymce-disabled-overlay-opacity: .4 !default;
+
+$fallback-item-top-inner-offset-top: 10px !default;
+$fallback-item-value-top-inner-offset-top: 5px !default;
+$fallback-item-label-max-width: 160px !default;
+$fallback-item-label-inner-offset-right: 10px !default;
+$fallback-item-label-white-space: nowrap !default;
+
+$fallback-item-use-fallback-width: 1px !default;
+$fallback-item-use-fallback-white-space: nowrap !default;
+
+$fallback-status-font-size: 16px !default;
+$fallback-status-cursor: pointer !default;
+$fallback-status-position: relative !default;
+$fallback-status-left: 6px !default;
+$fallback-status-width: 0 !default;
+$fallback-status-inner-offset: 0 !default;
+
+$fallback-item-value--first-display: inline-flex !default;
+$fallback-item-value--first-flex-wrap: wrap !default;
+$fallback-item-value--first-width: auto !default;
+$fallback-item-value--first-validation-width: 100% !default;
+$fallback-item-value--first-validation-order: 1 !default;
+$fallback-item-value--first-input-width: 258px !default;

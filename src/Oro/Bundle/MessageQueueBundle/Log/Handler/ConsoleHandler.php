@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Log\Handler;
 
-use Oro\Bundle\MessageQueueBundle\Log\ConsumerState;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler as BaseConsoleHandler;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 /**
  * Writes message queue consumer related logs to the console output depending on its verbosity setting.
  * It is disabled by default and gets activated as soon as ConsumerState::startConsumption is called.
- * @see \Oro\Bundle\MessageQueueBundle\Log\ConsumerState::startConsumption
+ * @see \Oro\Component\MessageQueue\Log\ConsumerState::startConsumption
  */
 class ConsoleHandler extends BaseConsoleHandler
 {

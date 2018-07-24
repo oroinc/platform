@@ -41,13 +41,11 @@ $enable-safe-area: true;
 @mixin accordion-toggle() {
     font-weight: bold;
     padding-left: 15px;
-    background: $accordionHeadingBackgroundColor;
-    border-bottom: 1px solid darken($accordionHeadingBackgroundColor, 5%);
-    border-top: 1px solid lighten($accordionHeadingBackgroundColor, 5%);
+    background: $accordion-heading-background-color;
 }
 
 @mixin accordion-toggle-before() {
-    content: "\f0d7";
+    content: "\f107";
     font-family: FontAwesome;
     margin: 0 7px 0 -7px;
     width: 10px;
@@ -55,7 +53,7 @@ $enable-safe-area: true;
 }
 
 @mixin accordion-toggle-collapsed-before() {
-    content: "\f0da";
+    content: "\f105";
     margin: 0 5px 0 -5px;
 }
 
@@ -63,6 +61,27 @@ $enable-safe-area: true;
     border-radius: 0;
     margin-bottom: 0;
     border: none;
+}
+
+@mixin header-cell-dropdown() {
+    > .dropdown {
+        margin-left: -5px;
+
+        > .dropdown-toggle {
+            padding: 4px;
+            line-height: 12px;
+            height: 22px;
+        }
+
+        .dropdown-menu {
+            min-width: 60px;
+            padding-bottom: 5px;
+        }
+    }
+
+    .btn .caret {
+        margin-top: 5px;
+    }
 }
 
 @mixin horizontal-icon-menu() {
@@ -169,13 +188,13 @@ $enable-safe-area: true;
         margin-top: -38px;
         left: 10px;
         border-style: solid;
-        border-color: lighten($errorText, 20%) transparent;
+        border-color: lighten($error-text, 20%) transparent;
         border-width: 8px 4px 0;
     }
 
     > span {
         position: fixed;
-        width: $widthInput;
+        width: $width-input;
         margin-top: -37px;
 
         > span {
@@ -183,7 +202,7 @@ $enable-safe-area: true;
             bottom: 0;
             padding: 5px 5px 5px 20px;
             border-radius: 4px;
-            background-color: $errorMessageBalloonBackground;
+            background-color: $error-message-balloon-background;
             color: #fff;
 
             &:before {
@@ -307,7 +326,7 @@ $enable-safe-area: true;
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
-            font-family: 'FontAwesome', $baseFontFamily;
+            font-family: 'FontAwesome', $base-font-family;
 
             @if ($extra-rules) {
                 @content;
@@ -325,4 +344,11 @@ $enable-safe-area: true;
     @keyframes $animation-name {
         @content;
     }
+}
+
+@mixin placeholder {
+    &::-webkit-input-placeholder {@content}
+    &:-moz-placeholder           {@content}
+    &::-moz-placeholder          {@content}
+    &:-ms-input-placeholder      {@content}
 }

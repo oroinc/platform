@@ -1,0 +1,61 @@
+/* @theme: admin.oro; */
+
+.scrollspy {
+    position: $scrollspy-position;
+    overflow: $scrollspy-overflow;
+
+    &-nav {
+        background: $scrollspy-nav-background;
+        margin: $scrollspy-nav-offset;
+        border-radius: $scrollspy-nav-border-radius;
+
+        &-target {
+            height: $scrollspy-nav-target-height;
+        }
+
+        .navbar-inner {
+            padding: $scrollspy-nav-navbar-inner-inner-offset;
+            border: $scrollspy-nav-navbar-inner-border;
+            background: $scrollspy-nav-navbar-inner-background;
+            box-shadow: $scrollspy-nav-navbar-inner-box-shadow;
+
+            .container-fluid {
+                padding: $scrollspy-nav-navbar-inner-container-fluid-inner-offset;
+            }
+
+            .nav {
+                li,
+                &-item {
+                    &.active {
+                        a {
+                            background: $scrollspy-nav-navbar-inner-nav-link-active-background;
+                            font-weight: $scrollspy-nav-navbar-inner-nav-link-active-font-weight;
+                        }
+                    }
+
+                    a {
+                        border-radius: $scrollspy-nav-navbar-inner-nav-link-border-radius;
+
+                        &:hover {
+                            background: $scrollspy-nav-navbar-inner-nav-link-active-background;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &-title {
+        background: $scrollspy-title-background;
+        font-size: $scrollspy-title-font-size;
+        font-weight: $scrollspy-title-font-weight;
+        color: $scrollspy-title-color;
+        margin: $scrollspy-title-offset;
+        padding: $scrollspy-title-inner-offset;
+        border-radius: $scrollspy-title-border-radius;
+    }
+}
+
+[data-scroll-focus] {
+    outline: $scrollspy-data-scroll-focus-outline;
+}

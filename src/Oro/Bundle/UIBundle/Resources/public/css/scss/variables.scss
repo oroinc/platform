@@ -6,119 +6,117 @@
 @import "colors";
 
 // Oro variables
-$enable-safe-area:                true;
-$contentPadding:                  12px;
-$horizontalPadding:               $contentPadding;
-$verticalPadding:                 $contentPadding;
-$topPadding:                      $contentPadding;
-$bottomPadding:                   $contentPadding;
-$marginBottomBox:                 $contentPadding;
-$generalBorderColor:              #ddd;
-$widthBodyPage:                   980px;
-$widthPopup:                      480px;
-$widthClosePanel:                 25px;
-$widthLeftPanel:                  230px;
-$widthLeftPanel2:                 210;
-$widthInput:                      280px;
-$baseBtnBorderRadius:             3px;
-$iconSpritePath:                  "../../img/glyphicons-halflings.png";
-$iconWhiteSpritePath:             "../../img/glyphicons-halflings-white.png";
-$bodyColor:                       #444;
-$bodyBackground:                  #3e434a;
-$wellBackground:                  #f8f8f8;
-$baseGradientColorStart:          #39464f;
-$baseGradientColorEnd:            #333e48;
-$baseGradientColorBorder:         #1e2833;
-$logoBackgroundColor:             #2d333b;
-$titleBackgroundStart:            #47505a;
-$titleBackgroundEnd:              #353d45;
-$headerIconButtonColorStart:      #58626e;
-$headerIconButtonColorEnd:        #454f58;
-$headerIconButtonTextColor:       #2a313a;
-$headerTextColor:                 #cad2da;
-$inlineActionColor:               #94b4c9;
-$inlineActionBackground:          #edf5fb;
-$cellSelectedBackground:          $inlineActionBackground;
-$rowSelectedBackground:           #fdf8e4;
-$rowHighlightBackground:          lighten($rowSelectedBackground, 2%);
-$cellSuccessBackground:           #f1f8dc;
-$cellSuccessColor:                #96b76d;
-$cellErrorBackground:             #fcd4d3;
-$cellLoadingBackground:           #f5f5f5;
-$sideBarClosedWidth:              33px;
-$sideBarOpenedWidth:              200px;
+$enable-safe-area:                      true;
+$content-padding:                       12px;
+$horizontal-padding:                    $content-padding;
+$vertical-padding:                      $content-padding;
+$top-padding:                           $content-padding;
+$bottom-padding:                        $content-padding;
+$margin-bottom-box:                     $content-padding;
+$general-border-color:                  #ddd;
+$width-page:                            960px;
+$width-body-page:                       980px;
+$width-popup:                           480px;
+$width-close-panel:                     25px;
+$width-left-panel:                      230px;
+$width-left-panel2:                     210;
+$width-input:                           280px;
+$base-btn-border-radius:                16px;
+$icon-sprite-path:                      "../../img/glyphicons-halflings.png";
+$icon-white-sprite-path:                "../../img/glyphicons-halflings-white.png";
+$body-color:                            $primary-200;
+$body-background:                       #3e434a;
+$well-background:                       #f8f8f8;
+$base-gradient-color-start:             #39464f;
+$base-gradient-color-end:               #333e48;
+$base-gradient-color-border:            #1e2833;
+$logo-background-color:                 #2d333b;
+$title-background-start:                #47505a;
+$title-background-end:                  #353d45;
+$header-icon-button-color-start:        #58626e;
+$header-icon-button-color-end:          #454f58;
+$header-icon-button-text-color:         #2a313a;
+$header-text-color:                     #cad2da;
+$inline-action-color:                   #94b4c9;
+$inline-action-background:              #edf5fb;
+$cell-selected-background:              $inline-action-background;
+$row-selected-background:               $extra-300;
+$row-highlight-background:              darken($row-selected-background, 2%);
+$cell-success-background:               #f1f8dc;
+$cell-success-color:                    #96b76d;
+$cell-error-background:                 #fcd4d3;
+$cell-loading-background:               #f5f5f5;
+$side-bar-closed-width:                 33px;
+$side-bar-opened-width:                 200px;
 
-$progressBarGradientStart:        #dcdcdc;
-$progressBarGradientEnd:          #d3d3d3;
+$progress-bar-gradient-start:           #dcdcdc;
+$progress-bar-gradient-end:             #d3d3d3;
 
-$pageBorderColor:                 #ccc;
-$navigationBackgroundColor:       #f8f8f8;
-$pageSidebarBackgroundColor:      $navigationBackgroundColor;
+$page-border-color:                     #ccc;
+$navigation-background-color:           #f8f8f8;
+$page-sidebar-background-color:         $navigation-background-color;
 
-$baseFontFamily:                  Helvetica, Arial, sans-serif;
-$baseFontSize:                    13px;
-$baseLineHeight:                  20px;
+$base-font-family:                      Helvetica, Arial, sans-serif;
+$base-line-height:                      1.57;
 
-$fontSizeLarge:                   $baseFontSize * 1.25; // ~16px
-$fontSizeSmall:                   $baseFontSize * .85; // ~11px
-$fontSizeMini:                    $baseFontSize * .75; // ~10px
+$base-font-size:                        14px;
+$base-font-size--xxl:                   32px;
+$base-font-size--xl:                    24px;
+$base-font-size--l:                     18px;
+$base-font-size--m:                     16px;
+$base-font-size--s:                     12px;
+$base-font-size--xs:                    11px;
 
-$inputBorderRadius:               3px;
-$WindowBorderRadius:              3px;
+$input-border-radius:                   3px;
+$window-border-radius:                  3px;
 
-$baseTextColor:                   #444;
-$btnTextColor:                    #666;
+$base-text-color:                       $primary-200;
+$btn-text-color:                        $primary-400;
 
-$accordionHeadingBackgroundColor: #eaeaea;
+$accordion-heading-background-color:    #eaeaea;
 
-$successBackground:               #e3f3c3;
-$successBorder:                   #89a86d;
-$successText:                     #3d7c04;
-$successClose:                    #bfd78f;
+$success-background:                    $success-ultra-light;
+$success-border:                        $success-ultra-light;
+$success-text:                          $success-darken;
+$success-close:                         $success-darken;
 
-$errorBackground:                 #fdcece;
-$errorBorder:                     #b48d8d;
-$errorText:                       #c81717;
-$errorClose:                      #e5acac;
+$error-background:                      $danger-ultra-light;
+$error-border:                          $danger-ultra-light;
+$error-text:                            $danger-ultra-dark;
+$error-close:                           $danger-darken;
 
-$warningBackground:               #fff8d7;
-$warningBorder:                   #b4a68d;
-$warningText:                     #444;
-$warningClose:                    #e2d59a;
+$warning-background:                    $warning-light;
+$warning-border:                        $warning-light;
+$warning-text:                          $warning-darken;
+$warning-close:                         $warning-dark;
 
-$infoText:                        #447fe9;
-$infoBackground:                  #d9edf7;
-$infoBorder:                      #bce8f1;
-$infoClose:                       #b6d0dc;
+$info-text:                             $info-ultra-dark;
+$info-background:                       $info-lighten;
+$info-border:                           $info-lighten;
+$info-close:                            $info-dark;
 
-$tagItemColor:                    #fff;
-$tagItemBackground:               #aaa;
-$tagMyItemBackground:             #ccc;
+$tag-item-color:                        $secondary;
+$tag-item-background:                   $secondary-300;
+$tag-my-item-background:                $secondary;
 
-$errorMessageBalloonBackground:   lighten($errorText, 20%);
+$error-message-balloon-background:      lighten($error-text, 20%);
 
 // Links
-$linkColor:                       #0d729b;
-$linkColorHover:                  darken($linkColor, 10%);
-$menuItemColor:                   #444;
+$link-color:                            $secondary;
+$link-color-hover:                      darken($link-color, 10%);
+$menu-item-color:                       $primary-200;
 
 // Screen sizes
-$smallScreen:                     1024px;
-$mediumScreen:                    1340px;
-$largeScreen:                     1920px;
+$small-screen:                          1024px;
+$medium-screen:                         1340px;
+$large-screen:                          1920px;
 
 // Screen sizes
-$sideBarClosedWidth:              33px;
-$sideBarOpenedWidth:              200px;
+$side-bar-closed-width:                 33px;
+$side-bar-opened-width:                 200px;
 
 // Z-indexs
-$oroZindexDropdown:               900;
-$oroMobileHeaderZindex:           99999;
+$oro-zindex-dropdown:                   900;
 
-// highlight variables
-$highlightTextColor: #ffefa5;
-
-// Jstree variables
-$treeLinkColor: #858585;
-$treeLinkBgColor: #fafafa;
-$treeIconColor: #969696;
+$dot-menu-dropdown-min-height:          168px;
+$dot-menu-dropdown-max-height:          330px;

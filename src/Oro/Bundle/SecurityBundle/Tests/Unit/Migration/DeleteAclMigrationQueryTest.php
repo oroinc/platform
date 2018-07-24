@@ -31,7 +31,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->container->expects($this->once())
             ->method('get')
-            ->with('security.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+            ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->will($this->returnValue($this->aclProvider));
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
@@ -46,7 +46,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->container->expects($this->once())
             ->method('get')
-            ->with('security.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+            ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->will($this->returnValue(null));
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
@@ -58,7 +58,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->container->expects($this->once())
             ->method('get')
-            ->with('security.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+            ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->will($this->returnValue($this->aclProvider));
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
@@ -78,7 +78,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->container->expects($this->once())
             ->method('get')
-            ->with('security.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
+            ->with('oro_security.alias.acl.dbal.provider', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->will($this->returnValue(null));
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);

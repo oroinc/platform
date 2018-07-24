@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 @mixin sub-widget-with-separator($width: 100%) {
     &:after {
         position: absolute;

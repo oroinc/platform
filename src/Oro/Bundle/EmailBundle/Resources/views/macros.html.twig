@@ -1,23 +1,27 @@
 {% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
     <script type="text/template" id="oro-email-template-variables-template">
         <div class="emailtemplate-variables oro-tabs tabbable">
-            <ul class="nav nav-tabs">
-                <li class="active" id="oro-email-template-variables-system-tab">
-                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-system" data-toggle="tab">
-                        {{ 'oro.email.emailtemplate.variables.system' | trans }}
-                    </a>
-                </li>
-                <li id="oro-email-template-variables-entity-tab">
-                    <a href="javascript:void(0);" data-target="#oro-email-template-variables-entity" data-toggle="tab">
-                        {{ 'oro.email.emailtemplate.variables.entity' | trans }}
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="variables tab-pane active" id="oro-email-template-variables-system">
-                    <%= variables.system %>
-                </div>
-                <div class="variables tab-pane" id="oro-email-template-variables-entity">
+            <div class="oro-tabs__head">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item active" id="oro-email-template-variables-system-tab">
+                        <a href="javascript:void(0);" class="nav-link" data-target="#oro-email-template-variables-system" data-toggle="tab">
+                            {{ 'oro.email.emailtemplate.variables.system' | trans }}
+                        </a>
+                    </li>
+                    <li id="oro-email-template-variables-entity-tab" class="nav-item">
+                        <a href="javascript:void(0);" class="nav-link" data-target="#oro-email-template-variables-entity" data-toggle="tab">
+                            {{ 'oro.email.emailtemplate.variables.entity' | trans }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="oro-tabs__content">
+                <div class="tab-content">
+                    <div class="variables tab-pane active" id="oro-email-template-variables-system">
+                        <%= variables.system %>
+                    </div>
+                    <div class="variables tab-pane" id="oro-email-template-variables-entity">
+                    </div>
                 </div>
             </div>
         </div>

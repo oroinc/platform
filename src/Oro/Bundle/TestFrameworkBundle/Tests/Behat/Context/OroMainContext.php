@@ -1317,8 +1317,25 @@ class OroMainContext extends MinkContext implements
      */
     public function buttonIsDisabled($button)
     {
-        $button = $this->getSession()->getPage()->findButton($button);
-        self::assertTrue($button->hasClass('disabled'));
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertTrue($element->hasClass('disabled'));
+    }
+
+    /**
+     * @Then /^"([^"]*)" button is not disabled$/
+     */
+    public function buttonIsNotDisabled($button)
+    {
+        $element = $this->getSession()->getPage()->findButton($button);
+        //Try to find link element with such name if no button found
+        if ($element === null) {
+            $element = $this->getSession()->getPage()->findLink($button);
+        }
+        self::assertFalse($element->hasClass('disabled'));
     }
 
     /**

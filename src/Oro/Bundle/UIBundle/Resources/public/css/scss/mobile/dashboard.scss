@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .dashboard-container-wrapper {
     background-color: #f1f1f1;
     min-height: 100%;
@@ -53,11 +55,11 @@
 }
 
 .box-type1 {
-    margin: 0 $contentPadding $contentPadding;
+    margin: 0 $content-padding $content-padding;
     border-radius: 3px;
 
     .title {
-        padding: $contentPadding $contentPadding $contentPadding 0;
+        padding: $content-padding $content-padding $content-padding 0;
     }
 
     .calendar-container {

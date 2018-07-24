@@ -1,54 +1,74 @@
+/* @theme: admin.oro; */
+
 .grid-toolbar {
-  .pagination-container {
-    margin: 0 auto;
-    width: 270px;
-    @media only screen and (max-width: 600px) {
-      margin: 0;
-      width: auto;
-    }
-    .page-size {
-      margin-left: 16px;
-      label {
-        display: inline-block;
+    .pagination-container {
+        margin: 0 auto;
+        width: 270px;
+
         @media only screen and (max-width: 600px) {
-          display: none;
+            margin: 0;
+            width: auto;
         }
-      }
-    }
-    .pagination {
-      .fa-chevron-left:before, .fa-chevron-right:before {
-        line-height: 18px;
-      }
-      @media only screen and (max-width: 600px) {
-        margin: 0;
-      }
-      .dib {
-        @media only screen and (max-width: 600px) {
-          display: none;
+
+        .page-size {
+            margin-left: 16px;
+
+            label {
+                display: inline-block;
+
+                @media only screen and (max-width: 600px) {
+                    display: none;
+                }
+            }
         }
-      }
-    }
-  }
-  .actions-panel {
-    margin-left: 16px;
-    .action.btn {
-      height: 32px;
-      margin-right: 5px;
-      padding: 0 7px;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-    a.action.btn {
-      @media only screen and (max-width: 400px) {
-        display: none;
-      }
-      i {
-        &:before {
-          font-size: 14px;
-          line-height: 30px;
+
+        .pagination {
+            ul {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .fa-chevron-left:before,
+            .fa-chevron-right:before {
+                line-height: 18px;
+            }
+
+            @media only screen and (max-width: 600px) {
+                margin: 0;
+            }
+
+            .dib {
+                @media only screen and (max-width: 600px) {
+                    display: none;
+                }
+            }
         }
-      }
     }
-  }
+
+    .actions-panel {
+        margin-left: 16px;
+
+        .action.btn {
+            height: 32px;
+            margin-right: 5px;
+            padding: 0 7px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        a.action.btn {
+            @media only screen and (max-width: 400px) {
+                display: none;
+            }
+
+            i {
+                &:before {
+                    font-size: 14px;
+                    line-height: 30px;
+                }
+            }
+        }
+    }
 }
