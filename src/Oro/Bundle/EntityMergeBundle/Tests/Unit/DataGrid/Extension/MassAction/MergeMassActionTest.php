@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
 
-class MergeMassActionTest extends \PHPUnit_Framework_TestCase
+class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 {
     const MAX_ENTITIES_COUNT = 1;
 

@@ -8,9 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ValidationExtensionTest extends \PHPUnit_Framework_TestCase
+class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface */
     private $validator;
 
     /** @var ValidationExtension */

@@ -1,0 +1,15 @@
+/* @theme: admin.oro; */
+
+$board-dark-border-color: #ccc !default;
+
+$board-border: 1px solid #e7e7e7 !default;
+
+$board-column-border-right: 1px solid $board-dark-border-color !default;
+$board-column-header-border-right: 1px solid $board-dark-border-color !default;
+
+$board-card-placeholder-border: 2px dashed $board-dark-border-color !default;
+$board-card-placeholder-offset: 2px 6px 0 !default;
+$board-card-placeholder-inner-offset: 10px 13px !default;
+
+$board-column-card-view-offset: 2px 6px 0 !default;
+$board-column-card-view-inner-offset: 10px 13px !default;

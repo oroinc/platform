@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var InitializeConfigExtras */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -28,7 +28,7 @@ class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
         $this->context->setAction('test_action');
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [new EntityDefinitionConfigExtra()],
             $this->context->getConfigExtras()
         );
@@ -44,7 +44,7 @@ class InitializeConfigExtrasTest extends ChangeRelationshipProcessorTestCase
         $this->context->setAssociationName('test_association');
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new TestConfigExtra('test'),
                 new EntityDefinitionConfigExtra(

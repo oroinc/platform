@@ -6,7 +6,11 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Provides a set of methods to help loading of Data API metadata.
+ */
 class MetadataHelper
 {
     /**
@@ -19,14 +23,12 @@ class MetadataHelper
     public function assertDataType($dataType, $entityClass, $fieldName)
     {
         if (!$dataType) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" configuration attribute should be specified for the "%s" field of the "%s" entity.',
-                    EntityDefinitionFieldConfig::DATA_TYPE,
-                    $fieldName,
-                    $entityClass
-                )
-            );
+            throw new RuntimeException(\sprintf(
+                'The "%s" configuration attribute should be specified for the "%s" field of the "%s" entity.',
+                ConfigUtil::DATA_TYPE,
+                $fieldName,
+                $entityClass
+            ));
         }
 
         return $dataType;
@@ -41,9 +43,9 @@ class MetadataHelper
     public function getFormPropertyPath(EntityDefinitionFieldConfig $field, $targetAction)
     {
         $propertyPath = null;
-        if (in_array($targetAction, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
+        if (\in_array($targetAction, [ApiActions::CREATE, ApiActions::UPDATE], true)) {
             $formOptions = $field->getFormOptions();
-            if (!empty($formOptions) && array_key_exists('property_path', $formOptions)) {
+            if (!empty($formOptions) && \array_key_exists('property_path', $formOptions)) {
                 $propertyPath = $formOptions['property_path'];
             }
         }

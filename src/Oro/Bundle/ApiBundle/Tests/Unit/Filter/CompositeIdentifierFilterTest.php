@@ -14,9 +14,9 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class CompositeIdentifierFilterTest extends \PHPUnit_Framework_TestCase
+class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
     /** @var CompositeIdentifierFilter */

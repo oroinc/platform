@@ -4,23 +4,21 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var SetMaxRelatedEntities */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new SetMaxRelatedEntities(
             $this->doctrineHelper
@@ -31,7 +29,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
     {
         $config = [];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $configObject = $this->createConfigObject($config);
@@ -44,13 +42,12 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
     public function testProcessForNotCompletedConfig()
     {
         $config = [
-            'exclusion_policy' => 'none',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $configObject = $this->createConfigObject($config);
@@ -88,7 +85,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
         $configObject = $this->createConfigObject($config);
@@ -121,9 +118,9 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -172,9 +169,9 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -245,9 +242,9 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -301,9 +298,9 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(false);
@@ -346,33 +343,33 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['field1', true]]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('field1')
             ->willReturn('Test\Field1Target');
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('field1')
             ->willReturn(true);
 
         $field1TargetEntityMetadata = $this->getClassMetadataMock('Test\Field1Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(2))
+        $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field1Target', true, $field1TargetEntityMetadata],
+                    ['Test\Field1Target', true, $field1TargetEntityMetadata]
                 ]
             );
 
@@ -428,47 +425,47 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['field2', true]]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('field2')
             ->willReturn('Test\Field2Target');
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('field2')
             ->willReturn(true);
 
         $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['field22', true], ['field23', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('getAssociationTargetClass')
             ->willReturnMap([['field22', 'Test\Field22Target'], ['field23', 'Test\Field23Target']]);
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
             ->willReturnMap([['field22', true], ['field23', true]]);
 
         $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
         $field23TargetEntityMetadata = $this->getClassMetadataMock('Test\Field23Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(4))
+        $this->doctrineHelper->expects(self::exactly(4))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Field2Target', true, $field2TargetEntityMetadata],
                     ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                    ['Test\Field23Target', true, $field23TargetEntityMetadata],
+                    ['Test\Field23Target', true, $field23TargetEntityMetadata]
                 ]
             );
 
@@ -528,47 +525,47 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['field2', true]]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('field2')
             ->willReturn('Test\Field2Target');
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('field2')
             ->willReturn(false);
 
         $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['field22', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('getAssociationTargetClass')
             ->with('field22')
             ->willReturn('Test\Field22Target');
-        $field2TargetEntityMetadata->expects($this->once())
+        $field2TargetEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('field22')
             ->willReturn(true);
 
         $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects(self::exactly(3))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
+                    ['Test\Field22Target', true, $field22TargetEntityMetadata]
                 ]
             );
 
@@ -626,47 +623,47 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
-        $rootEntityMetadata->expects($this->any())
+        $rootEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['realField2', true]]);
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('getAssociationTargetClass')
             ->with('realField2')
             ->willReturn('Test\Field2Target');
-        $rootEntityMetadata->expects($this->once())
+        $rootEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('realField2')
             ->willReturn(true);
 
         $field2TargetEntityMetadata = $this->getClassMetadataMock('Test\Field2Target');
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('hasAssociation')
             ->willReturnMap([['realField22', true]]);
-        $field2TargetEntityMetadata->expects($this->any())
+        $field2TargetEntityMetadata->expects(self::any())
             ->method('getAssociationTargetClass')
             ->with('realField22')
             ->willReturn('Test\Field22Target');
-        $field2TargetEntityMetadata->expects($this->once())
+        $field2TargetEntityMetadata->expects(self::once())
             ->method('isCollectionValuedAssociation')
             ->with('realField22')
             ->willReturn(true);
 
         $field22TargetEntityMetadata = $this->getClassMetadataMock('Test\Field22Target');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects(self::exactly(3))
             ->method('getEntityMetadataForClass')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
                     ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
+                    ['Test\Field22Target', true, $field22TargetEntityMetadata]
                 ]
             );
 
@@ -722,15 +719,15 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ]
         ];
-        $limit  = 100;
+        $limit = 100;
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);

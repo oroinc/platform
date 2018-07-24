@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class NullTransportFactoryTest extends \PHPUnit_Framework_TestCase
+class NullTransportFactoryTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

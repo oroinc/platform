@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
- * Provide exclude logic to filter entities and fields based on exclude rules
+ * Provides exclude logic to filter entities and fields based on exclude rules.
  */
 class ConfigExclusionProvider implements ExclusionProviderInterface
 {
@@ -28,7 +28,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredEntity($className)
     {
-        return $this->matcher->isMatched($this->getEntityProperties($className));
+        return $this->matcher->isEntityMatched($className);
     }
 
     /**
@@ -36,7 +36,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        return $this->matcher->isMatched($this->getFieldProperties($metadata, $fieldName));
+        return $this->matcher->isFieldMatched($metadata->name, $fieldName, $metadata->getTypeOfField($fieldName));
     }
 
     /**
@@ -44,35 +44,6 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        return $this->matcher->isMatched($this->getFieldProperties($metadata, $associationName));
-    }
-
-    /**
-     * Returns properties for entity object
-     *
-     * @param string $className
-     * @return array
-     */
-    protected function getEntityProperties($className)
-    {
-        return [
-            'entity' => $className
-        ];
-    }
-
-    /**
-     * Returns properties for entity field object
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     * @return array
-     */
-    protected function getFieldProperties(ClassMetadata $metadata, $fieldName)
-    {
-        return [
-            'entity' => $metadata->name,
-            'field'  => $fieldName,
-            'type'   => $metadata->getTypeOfField($fieldName)
-        ];
+        return $this->matcher->isFieldMatched($metadata->name, $associationName);
     }
 }

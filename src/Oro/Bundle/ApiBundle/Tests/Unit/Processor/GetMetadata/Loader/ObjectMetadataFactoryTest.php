@@ -12,17 +12,15 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class ObjectMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $associationManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
+    private $associationManager;
 
     /** @var ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    private $objectMetadataFactory;
 
     protected function setUp()
     {
-        $this->associationManager = $this->getMockBuilder(AssociationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->associationManager = $this->createMock(AssociationManager::class);
 
         $this->objectMetadataFactory = new ObjectMetadataFactory(
             new MetadataHelper(),
@@ -431,7 +429,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with('Test\Class', null, 'manyToOne', null)
             ->willReturn(['Test\Association1Target' => 'field1']);
@@ -471,7 +469,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with('Test\Class', null, 'manyToMany', null)
             ->willReturn(['Test\Association1Target' => 'field1']);
@@ -510,7 +508,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects($this->once())
+        $this->associationManager->expects(self::once())
             ->method('getAssociationTargets')
             ->with('Test\Class', null, 'manyToOne', null)
             ->willReturn([]);

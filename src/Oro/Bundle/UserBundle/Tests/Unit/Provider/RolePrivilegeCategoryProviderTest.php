@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class RolePrivilegeCategoryProviderTest extends \PHPUnit_Framework_TestCase
+class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 

@@ -6,21 +6,21 @@ use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
-class PreviousFilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
+class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PreviousFilterDateRangeConverter */
     protected $converter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dateCompiler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dateHelper;
 
     public function setUp()

@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
-class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailAttachmentType
@@ -15,12 +15,12 @@ class EmailAttachmentTypeTest extends \PHPUnit_Framework_TestCase
     protected $emailAttachmentType;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var EmailAttachmentTransformer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailAttachmentTransformer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailAttachmentTransformer;
 

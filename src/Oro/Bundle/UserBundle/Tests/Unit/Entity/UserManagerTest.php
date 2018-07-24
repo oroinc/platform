@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-class UserManagerTest extends \PHPUnit_Framework_TestCase
+class UserManagerTest extends \PHPUnit\Framework\TestCase
 {
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
@@ -24,22 +24,22 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
     protected $userManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager
      */
     protected $om;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EncoderFactoryInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|EncoderFactoryInterface
      */
     protected $ef;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected $metadata;
 

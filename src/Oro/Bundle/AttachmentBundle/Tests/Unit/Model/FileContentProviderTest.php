@@ -4,11 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Model;
 
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
 
-class FileContentProviderTest extends \PHPUnit_Framework_TestCase
+class FileContentProviderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_FILE_NAME = 'some_file.txt';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
     /** @var FileContentProvider */

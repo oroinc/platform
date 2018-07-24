@@ -9,12 +9,12 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-class RouteExistsTest extends \PHPUnit_Framework_TestCase
+class RouteExistsTest extends \PHPUnit\Framework\TestCase
 {
     const PROPERTY_PATH_NAME = 'testPropertyPath';
 
     /**
-     * @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 
@@ -29,7 +29,7 @@ class RouteExistsTest extends \PHPUnit_Framework_TestCase
     protected $propertyPath;
 
     /**
-     * @var RouteCollection|\PHPUnit_Framework_MockObject_MockObject
+     * @var RouteCollection|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $routeCollection;
 
@@ -82,7 +82,7 @@ class RouteExistsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetContextAccessor()
     {
-        /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject $contextAccessor **/
+        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
         $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -106,7 +106,7 @@ class RouteExistsTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($route);
 
-        /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject $contextAccessor **/
+        /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $contextAccessor **/
         $contextAccessor = $this->getMockBuilder(ContextAccessorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();

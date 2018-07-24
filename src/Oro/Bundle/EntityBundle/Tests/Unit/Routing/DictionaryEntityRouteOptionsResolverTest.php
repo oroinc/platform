@@ -10,15 +10,15 @@ use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Route;
 
-class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dictionaryProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityAliasResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var SortableRouteCollection */

@@ -1,45 +1,57 @@
+/* @theme: admin.oro; */
+
 .inline-editable-wrapper:not(:hover) {
-  &.save-success .inline-actions-element {
-    background: $cellSuccessBackground;
-    @include inline-actions-element-outline($cellSuccessBackground);
-    &:after {
-      position: relative;
-      font-family: 'FontAwesome';
-      content: '\f00c';
-      font-size: 15px;
-      line-height: 22px;
-      height: 22px;
-      padding: 0 4px;
-      color: $cellSuccessColor;
+    &.save-success .inline-actions-element {
+        background: $cell-success-background;
+
+        @include inline-actions-element-outline($cell-success-background);
+
+        &:after {
+            position: relative;
+            font-family: 'FontAwesome';
+            content: '\f00c';
+            font-size: 15px;
+            line-height: 22px;
+            height: 22px;
+            padding: 0 4px;
+            color: $cell-success-color;
+        }
+
+        .inline-actions-element_actions {
+            display: none;
+        }
     }
-    .inline-actions-element_actions {
-      display: none;
+
+    &.save-fail .inline-actions-element {
+        background: $cell-error-background;
+
+        @include inline-actions-element-outline($cell-error-background);
+
+        .inline-actions-element_actions {
+            display: none;
+        }
     }
-  }
-  &.save-fail .inline-actions-element {
-    background: $cellErrorBackground;
-    @include inline-actions-element-outline($cellErrorBackground);
-    .inline-actions-element_actions {
-      display: none;
-    }
-  }
 }
+
 .inline-editable-wrapper {
-  &.loading .inline-actions-element {
-    background: $cellLoadingBackground;
-    @include inline-actions-element-outline($cellLoadingBackground);
-    &:after {
-      background: url('../../../../bundles/oroui/img/loader-16.gif') no-repeat center center transparent;
-      display: block !important;
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 1px;
-      width: 24px;
-      height: 24px;
+    &.loading .inline-actions-element {
+        background: $cell-loading-background;
+
+        @include inline-actions-element-outline($cell-loading-background);
+
+        &:after {
+            background: url(../../../../bundles/oroui/img/loader-16.gif) no-repeat center center transparent;
+            display: block !important;
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 1px;
+            width: 24px;
+            height: 24px;
+        }
+
+        &:hover .inline-actions-element_actions {
+            visibility: hidden !important;
+        }
     }
-    &:hover .inline-actions-element_actions {
-      visibility: hidden !important;
-    }
-  }
 }

@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
-class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
+class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasProvider */
-    protected $entityAliasProvider;
+    private $entityAliasProvider;
 
     protected function setUp()
     {
@@ -16,7 +16,7 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'Test\Entity1' => [
                     'alias'        => 'entity1',
-                    'plural_alias' => 'entity1_plural',
+                    'plural_alias' => 'entity1_plural'
                 ]
             ],
             ['Test\Entity2']
@@ -25,7 +25,7 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassNames()
     {
-        $this->assertEquals(
+        self::assertEquals(
             ['Test\Entity1'],
             $this->entityAliasProvider->getClassNames()
         );
@@ -33,7 +33,7 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityAliasForExistingEntity()
     {
-        $this->assertEquals(
+        self::assertEquals(
             new EntityAlias('entity1', 'entity1_plural'),
             $this->entityAliasProvider->getEntityAlias('Test\Entity1')
         );
@@ -41,14 +41,14 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityAliasForExcludedEntity()
     {
-        $this->assertFalse(
+        self::assertFalse(
             $this->entityAliasProvider->getEntityAlias('Test\Entity2')
         );
     }
 
     public function testGetEntityAliasForNotExistingEntity()
     {
-        $this->assertNull(
+        self::assertNull(
             $this->entityAliasProvider->getEntityAlias('Test\Entity3')
         );
     }

@@ -5,83 +5,20 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\EntityConfig;
-use Oro\Component\EntitySerializer\FieldConfig;
+use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents the configuration of an entity.
  *
  * @method EntityDefinitionFieldConfig[] getFields()
  * @method EntityDefinitionFieldConfig|null getField($fieldName)
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterface
 {
-    use Traits\ConfigTrait;
-    use Traits\FindFieldTrait;
-    use Traits\DescriptionTrait;
-    use Traits\DocumentationTrait;
-    use Traits\AclResourceTrait;
-    use Traits\MaxResultsTrait;
-    use Traits\PageSizeTrait;
-    use Traits\SortingTrait;
-    use Traits\InclusionTrait;
-    use Traits\FieldsetTrait;
-    use Traits\MetaPropertyTrait;
-    use Traits\FormTrait;
-    use Traits\FormEventSubscriberTrait;
-    use Traits\StatusCodesTrait;
-
-    /** a short, human-readable description of API resource */
-    const DESCRIPTION = 'description';
-
-    /** a detailed documentation of API resource or link to a .md file that will be used to retrieve a documentation */
-    const DOCUMENTATION = 'documentation';
-
-    /** resource link to a .md file that will be used to retrieve a documentation */
-    const DOCUMENTATION_RESOURCE = 'documentation_resource';
-
-    /** the name of ACL resource that should be used to protect the entity */
-    const ACL_RESOURCE = 'acl_resource';
-
-    /** the default page size */
-    const PAGE_SIZE = 'page_size';
-
-    /** a flag indicates whether a sorting is disabled */
-    const DISABLE_SORTING = 'disable_sorting';
-
-    /** a flag indicates whether an inclusion of related entities is disabled */
-    const DISABLE_INCLUSION = 'disable_inclusion';
-
-    /** a flag indicates whether a requesting of a restricted set of fields is disabled */
-    const DISABLE_FIELDSET = 'disable_fieldset';
-
-    /** a flag indicates whether a requesting of additional meta properties is disabled */
-    const DISABLE_META_PROPERTIES = 'disable_meta_properties';
-
-    /** a handler that should be used to delete the entity */
-    const DELETE_HANDLER = 'delete_handler';
-
-    /** the form type that should be used for the entity */
-    const FORM_TYPE = 'form_type';
-
-    /** the form options that should be used for the entity */
-    const FORM_OPTIONS = 'form_options';
-
-    /** event subscriber that should be used for the entity form */
-    const FORM_EVENT_SUBSCRIBER = 'form_event_subscriber';
-
-    /** the names of identifier fields of the entity */
-    const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
-
-    /** a human-readable description of the API resource identifier */
-    const IDENTIFIER_DESCRIPTION = 'identifier_description';
-
-    /** response status codes */
-    const STATUS_CODES = 'status_codes';
-
-    /** the class name of a parent API resource */
-    const PARENT_RESOURCE_CLASS = 'parent_resource_class';
-
     /**
      * A string that unique identify this instance of entity definition config.
      * This value is set by config providers and is used by a metadata provider
@@ -93,7 +30,10 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      *
      * @var string|null
      */
-    protected $key;
+    private $key;
+
+    /** @var string[] */
+    private $identifierFieldNames = [];
 
     /**
      * Gets a string that unique identify this instance of entity definition config.
@@ -118,59 +58,47 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Gets the class name of a parent API resource.
-     *
-     * @return string|null
-     */
-    public function getParentResourceClass()
-    {
-        if (!array_key_exists(self::PARENT_RESOURCE_CLASS, $this->items)) {
-            return null;
-        }
-
-        return $this->items[self::PARENT_RESOURCE_CLASS];
-    }
-
-    /**
-     * Sets the class name of a parent API resource.
-     *
-     * @param string|null $parentResourceClass
-     */
-    public function setParentResourceClass($parentResourceClass)
-    {
-        if (!empty($parentResourceClass)) {
-            $this->items[self::PARENT_RESOURCE_CLASS] = $parentResourceClass;
-        } else {
-            unset($this->items[self::PARENT_RESOURCE_CLASS]);
-        }
-    }
-
-    /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function toArray()
     {
         $result = parent::toArray();
-        $this->removeItemWithDefaultValue($result, self::EXCLUSION_POLICY, self::EXCLUSION_POLICY_NONE);
-        $this->removeItemWithDefaultValue($result, self::DISABLE_META_PROPERTIES);
-        $this->removeItemWithDefaultValue($result, self::DISABLE_INCLUSION);
-        $this->removeItemWithDefaultValue($result, self::DISABLE_FIELDSET);
-        $this->removeItemWithDefaultValue($result, self::DISABLE_SORTING);
-        $this->removeItemWithDefaultValue($result, FieldConfig::COLLAPSE);
+        if ($this->identifierFieldNames) {
+            $result[ConfigUtil::IDENTIFIER_FIELD_NAMES] = $this->identifierFieldNames;
+        }
+        if (isset($result[ConfigUtil::DISABLE_META_PROPERTIES])
+            && false === $result[ConfigUtil::DISABLE_META_PROPERTIES]
+        ) {
+            unset($result[ConfigUtil::DISABLE_META_PROPERTIES]);
+        }
+        if (isset($result[ConfigUtil::DISABLE_INCLUSION]) && false === $result[ConfigUtil::DISABLE_INCLUSION]) {
+            unset($result[ConfigUtil::DISABLE_INCLUSION]);
+        }
+        if (isset($result[ConfigUtil::DISABLE_FIELDSET]) && false === $result[ConfigUtil::DISABLE_FIELDSET]) {
+            unset($result[ConfigUtil::DISABLE_FIELDSET]);
+        }
+        if (isset($result[ConfigUtil::DISABLE_SORTING]) && false === $result[ConfigUtil::DISABLE_SORTING]) {
+            unset($result[ConfigUtil::DISABLE_SORTING]);
+        }
+        if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
+            unset($result[ConfigUtil::COLLAPSE]);
+        }
 
-        $keys = array_keys($result);
+        $keys = \array_keys($result);
         foreach ($keys as $key) {
             $value = $result[$key];
-            if (is_object($value) && method_exists($value, 'toArray')) {
+            if (\is_object($value) && \method_exists($value, 'toArray')) {
                 $result[$key] = $value->toArray();
             }
         }
 
-        if (isset($result[self::FIELDS])) {
-            $fieldNames = array_keys($result[self::FIELDS]);
+        if (isset($result[ConfigUtil::FIELDS])) {
+            $fieldNames = \array_keys($result[ConfigUtil::FIELDS]);
             foreach ($fieldNames as $fieldName) {
-                if (empty($result[self::FIELDS][$fieldName])) {
-                    $result[self::FIELDS][$fieldName] = null;
+                if (empty($result[ConfigUtil::FIELDS][$fieldName])) {
+                    $result[ConfigUtil::FIELDS][$fieldName] = null;
                 }
             }
         }
@@ -199,7 +127,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function findField($fieldName, $findByPropertyPath = false)
     {
-        return $this->doFindField($fieldName, $findByPropertyPath);
+        return FindFieldUtil::doFindField($this->fields, $fieldName, $findByPropertyPath);
     }
 
     /**
@@ -213,7 +141,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function findFieldNameByPropertyPath($propertyPath)
     {
-        return $this->doFindFieldNameByPropertyPath($propertyPath);
+        return FindFieldUtil::doFindFieldNameByPropertyPath($this->fields, $propertyPath);
     }
 
     /**
@@ -228,10 +156,10 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function findFieldByPath($path, $findByPropertyPath = false)
     {
         $targetConfig = $this;
-        if (!is_array($path)) {
+        if (!\is_array($path)) {
             $path = ConfigUtil::explodePropertyPath($path);
         }
-        $pathCount = count($path);
+        $pathCount = \count($path);
         for ($i = 0; $i < $pathCount - 1; $i++) {
             $fieldConfig = $targetConfig->findField($path[$i], $findByPropertyPath);
             if (null === $fieldConfig) {
@@ -281,21 +209,125 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value)
+    {
+        if (null !== $value) {
+            $this->items[$key] = $value;
+        } else {
+            unset($this->items[$key]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keys()
+    {
+        return \array_keys($this->items);
+    }
+
+    /**
      * Indicates whether the exclusion policy is set explicitly.
      *
      * @return bool
      */
     public function hasExclusionPolicy()
     {
-        return array_key_exists(self::EXCLUSION_POLICY, $this->items);
+        return null !== $this->exclusionPolicy;
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the class name of a parent API resource.
+     *
+     * @return string|null
      */
-    public function setExclusionPolicy($exclusionPolicy)
+    public function getParentResourceClass()
     {
-        $this->items[self::EXCLUSION_POLICY] = $exclusionPolicy;
+        return $this->get(ConfigUtil::PARENT_RESOURCE_CLASS);
+    }
+
+    /**
+     * Sets the class name of a parent API resource.
+     *
+     * @param string|null $parentResourceClass
+     */
+    public function setParentResourceClass($parentResourceClass)
+    {
+        if ($parentResourceClass) {
+            $this->items[ConfigUtil::PARENT_RESOURCE_CLASS] = $parentResourceClass;
+        } else {
+            unset($this->items[ConfigUtil::PARENT_RESOURCE_CLASS]);
+        }
+    }
+
+    /**
+     * Indicates whether the description attribute exists.
+     *
+     * @return bool
+     */
+    public function hasDescription()
+    {
+        return $this->has(ConfigUtil::DESCRIPTION);
+    }
+
+    /**
+     * Gets the value of the description attribute.
+     *
+     * @return string|Label|null
+     */
+    public function getDescription()
+    {
+        return $this->get(ConfigUtil::DESCRIPTION);
+    }
+
+    /**
+     * Sets the value of the description attribute.
+     *
+     * @param string|Label|null $description
+     */
+    public function setDescription($description)
+    {
+        if ($description) {
+            $this->items[ConfigUtil::DESCRIPTION] = $description;
+        } else {
+            unset($this->items[ConfigUtil::DESCRIPTION]);
+        }
+    }
+
+    /**
+     * Indicates whether the documentation attribute exists.
+     *
+     * @return bool
+     */
+    public function hasDocumentation()
+    {
+        return $this->has(ConfigUtil::DOCUMENTATION);
+    }
+
+    /**
+     * Gets a detailed documentation of API resource.
+     *
+     * @return string|null
+     */
+    public function getDocumentation()
+    {
+        return $this->get(ConfigUtil::DOCUMENTATION);
+    }
+
+    /**
+     * Sets a detailed documentation of API resource.
+     *
+     * @param string|null $documentation
+     */
+    public function setDocumentation($documentation)
+    {
+        if ($documentation) {
+            $this->items[ConfigUtil::DOCUMENTATION] = $documentation;
+        } else {
+            unset($this->items[ConfigUtil::DOCUMENTATION]);
+        }
     }
 
     /**
@@ -305,11 +337,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getIdentifierFieldNames()
     {
-        if (!array_key_exists(self::IDENTIFIER_FIELD_NAMES, $this->items)) {
-            return [];
-        }
-
-        return $this->items[self::IDENTIFIER_FIELD_NAMES];
+        return $this->identifierFieldNames;
     }
 
     /**
@@ -319,11 +347,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function setIdentifierFieldNames(array $fields)
     {
-        if (empty($fields)) {
-            unset($this->items[self::IDENTIFIER_FIELD_NAMES]);
-        } else {
-            $this->items[self::IDENTIFIER_FIELD_NAMES] = $fields;
-        }
+        $this->identifierFieldNames = $fields;
     }
 
     /**
@@ -335,11 +359,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function isCollapsed()
     {
-        if (!array_key_exists(FieldConfig::COLLAPSE, $this->items)) {
-            return false;
-        }
-
-        return $this->items[FieldConfig::COLLAPSE];
+        return $this->get(ConfigUtil::COLLAPSE, false);
     }
 
     /**
@@ -352,10 +372,40 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function setCollapsed($collapse = true)
     {
         if ($collapse) {
-            $this->items[FieldConfig::COLLAPSE] = $collapse;
+            $this->items[ConfigUtil::COLLAPSE] = $collapse;
         } else {
-            unset($this->items[FieldConfig::COLLAPSE]);
+            unset($this->items[ConfigUtil::COLLAPSE]);
         }
+    }
+
+    /**
+     * Indicates whether the name of ACL resource is set explicitly.
+     *
+     * @return string
+     */
+    public function hasAclResource()
+    {
+        return $this->has(ConfigUtil::ACL_RESOURCE);
+    }
+
+    /**
+     * Gets the name of ACL resource that should be used to protect the entity.
+     *
+     * @return string|null
+     */
+    public function getAclResource()
+    {
+        return $this->get(ConfigUtil::ACL_RESOURCE);
+    }
+
+    /**
+     * Sets the name of ACL resource that should be used to protect the entity.
+     *
+     * @param string|null $aclResource
+     */
+    public function setAclResource($aclResource = null)
+    {
+        $this->items[ConfigUtil::ACL_RESOURCE] = $aclResource;
     }
 
     /**
@@ -365,10 +415,10 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function setHints($hints = null)
     {
-        if (!empty($hints)) {
-            $this->items[self::HINTS] = $hints;
+        if ($hints) {
+            $this->items[ConfigUtil::HINTS] = $hints;
         } else {
-            unset($this->items[self::HINTS]);
+            unset($this->items[ConfigUtil::HINTS]);
         }
     }
 
@@ -379,11 +429,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getDeleteHandler()
     {
-        if (!array_key_exists(self::DELETE_HANDLER, $this->items)) {
-            return null;
-        }
-
-        return $this->items[self::DELETE_HANDLER];
+        return $this->get(ConfigUtil::DELETE_HANDLER);
     }
 
     /**
@@ -393,11 +439,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function setDeleteHandler($handler = null)
     {
-        if (null !== $handler) {
-            $this->items[self::DELETE_HANDLER] = $handler;
-        } else {
-            unset($this->items[self::DELETE_HANDLER]);
-        }
+        $this->set(ConfigUtil::DELETE_HANDLER, $handler);
     }
 
     /**
@@ -407,7 +449,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function hasDocumentationResources()
     {
-        return array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items);
+        return $this->has(ConfigUtil::DOCUMENTATION_RESOURCE);
     }
 
     /**
@@ -417,11 +459,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getDocumentationResources()
     {
-        if (!array_key_exists(self::DOCUMENTATION_RESOURCE, $this->items)) {
-            return [];
-        }
-
-        return $this->items[self::DOCUMENTATION_RESOURCE];
+        return $this->get(ConfigUtil::DOCUMENTATION_RESOURCE, []);
     }
 
     /**
@@ -431,10 +469,10 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function setDocumentationResources($resource)
     {
-        if (!empty($resource)) {
-            $this->items[self::DOCUMENTATION_RESOURCE] = (array)$resource;
+        if ($resource) {
+            $this->items[ConfigUtil::DOCUMENTATION_RESOURCE] = (array)$resource;
         } else {
-            unset($this->items[self::DOCUMENTATION_RESOURCE]);
+            unset($this->items[ConfigUtil::DOCUMENTATION_RESOURCE]);
         }
     }
 
@@ -445,7 +483,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function hasIdentifierDescription()
     {
-        return array_key_exists(self::IDENTIFIER_DESCRIPTION, $this->items);
+        return $this->has(ConfigUtil::IDENTIFIER_DESCRIPTION);
     }
 
     /**
@@ -455,11 +493,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function getIdentifierDescription()
     {
-        if (!array_key_exists(self::IDENTIFIER_DESCRIPTION, $this->items)) {
-            return null;
-        }
-
-        return $this->items[self::IDENTIFIER_DESCRIPTION];
+        return $this->get(ConfigUtil::IDENTIFIER_DESCRIPTION);
     }
 
     /**
@@ -470,9 +504,375 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     public function setIdentifierDescription($description)
     {
         if ($description) {
-            $this->items[self::IDENTIFIER_DESCRIPTION] = $description;
+            $this->items[ConfigUtil::IDENTIFIER_DESCRIPTION] = $description;
         } else {
-            unset($this->items[self::IDENTIFIER_DESCRIPTION]);
+            unset($this->items[ConfigUtil::IDENTIFIER_DESCRIPTION]);
         }
+    }
+
+    /**
+     * Gets the form type.
+     *
+     * @return string|null
+     */
+    public function getFormType()
+    {
+        return $this->get(ConfigUtil::FORM_TYPE);
+    }
+
+    /**
+     * Sets the form type.
+     *
+     * @param string|null $formType
+     */
+    public function setFormType($formType)
+    {
+        if ($formType) {
+            $this->items[ConfigUtil::FORM_TYPE] = $formType;
+        } else {
+            unset($this->items[ConfigUtil::FORM_TYPE]);
+        }
+    }
+
+    /**
+     * Gets the form options.
+     *
+     * @return array|null
+     */
+    public function getFormOptions()
+    {
+        return $this->get(ConfigUtil::FORM_OPTIONS);
+    }
+
+    /**
+     * Sets the form options.
+     *
+     * @param array|null $formOptions
+     */
+    public function setFormOptions($formOptions)
+    {
+        if ($formOptions) {
+            $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
+        } else {
+            unset($this->items[ConfigUtil::FORM_OPTIONS]);
+        }
+    }
+
+    /**
+     * Sets a form option. If an option is already exist its value will be replaced with new value.
+     *
+     * @param string $name  The name of an option
+     * @param mixed  $value The value of an option
+     */
+    public function setFormOption($name, $value)
+    {
+        $formOptions = $this->getFormOptions();
+        $formOptions[$name] = $value;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Gets existing validation constraints from the form options.
+     *
+     * @return Constraint[]|null
+     */
+    public function getFormConstraints()
+    {
+        $formOptions = $this->getFormOptions();
+        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
+            return null;
+        }
+
+        return $formOptions['constraints'];
+    }
+
+    /**
+     * Adds a validation constraint to the form options.
+     *
+     * @param Constraint $constraint
+     */
+    public function addFormConstraint(Constraint $constraint)
+    {
+        $formOptions = $this->getFormOptions();
+        $formOptions['constraints'][] = $constraint;
+        $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Gets the form event subscribers.
+     *
+     * @return string[]|null Each element in the array is the name of a service implements EventSubscriberInterface
+     */
+    public function getFormEventSubscribers()
+    {
+        return $this->get(ConfigUtil::FORM_EVENT_SUBSCRIBER);
+    }
+
+    /**
+     * Sets the form event subscribers.
+     *
+     * @param string[]|null $eventSubscribers Each element in the array should be
+     *                                        the name of a service implements EventSubscriberInterface
+     */
+    public function setFormEventSubscribers(array $eventSubscribers = null)
+    {
+        if ($eventSubscribers) {
+            $this->items[ConfigUtil::FORM_EVENT_SUBSCRIBER] = $eventSubscribers;
+        } else {
+            unset($this->items[ConfigUtil::FORM_EVENT_SUBSCRIBER]);
+        }
+    }
+
+    /**
+     * Adds the form event subscriber.
+     *
+     * @param string $eventSubscriber The name of a service implements EventSubscriberInterface
+     */
+    public function addFormEventSubscriber($eventSubscriber)
+    {
+        $eventSubscribers = $this->getFormEventSubscribers();
+        $eventSubscribers[] = $eventSubscriber;
+        $this->setFormEventSubscribers($eventSubscribers);
+    }
+
+    /**
+     * Indicates whether the "disable_meta_properties" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableMetaProperties()
+    {
+        return $this->has(ConfigUtil::DISABLE_META_PROPERTIES);
+    }
+
+    /**
+     * Indicates whether a requesting of additional meta properties is enabled.
+     *
+     * @return bool
+     */
+    public function isMetaPropertiesEnabled()
+    {
+        return !$this->get(ConfigUtil::DISABLE_META_PROPERTIES, false);
+    }
+
+    /**
+     * Enables a requesting of additional meta properties.
+     */
+    public function enableMetaProperties()
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = false;
+    }
+
+    /**
+     * Disables a requesting of additional meta properties.
+     */
+    public function disableMetaProperties()
+    {
+        $this->items[ConfigUtil::DISABLE_META_PROPERTIES] = true;
+    }
+
+    /**
+     * Indicates whether the "disable_fieldset" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableFieldset()
+    {
+        return $this->has(ConfigUtil::DISABLE_FIELDSET);
+    }
+
+    /**
+     * Indicates whether indicates whether a requesting of a restricted set of fields is enabled.
+     *
+     * @return bool
+     */
+    public function isFieldsetEnabled()
+    {
+        return !$this->get(ConfigUtil::DISABLE_FIELDSET, false);
+    }
+
+    /**
+     * Enables a requesting of a restricted set of fields.
+     */
+    public function enableFieldset()
+    {
+        $this->items[ConfigUtil::DISABLE_FIELDSET] = false;
+    }
+
+    /**
+     * Disables a requesting of a restricted set of fields.
+     */
+    public function disableFieldset()
+    {
+        $this->items[ConfigUtil::DISABLE_FIELDSET] = true;
+    }
+
+    /**
+     * Indicates whether the "disable_inclusion" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableInclusion()
+    {
+        return $this->has(ConfigUtil::DISABLE_INCLUSION);
+    }
+
+    /**
+     * Indicates whether an inclusion of related entities is enabled.
+     *
+     * @return bool
+     */
+    public function isInclusionEnabled()
+    {
+        return !$this->get(ConfigUtil::DISABLE_INCLUSION, false);
+    }
+
+    /**
+     * Enables an inclusion of related entities.
+     */
+    public function enableInclusion()
+    {
+        $this->items[ConfigUtil::DISABLE_INCLUSION] = false;
+    }
+
+    /**
+     * Disables an inclusion of related entities.
+     */
+    public function disableInclusion()
+    {
+        $this->items[ConfigUtil::DISABLE_INCLUSION] = true;
+    }
+
+    /**
+     * Indicates whether the "disable_sorting" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasDisableSorting()
+    {
+        return $this->has(ConfigUtil::DISABLE_SORTING);
+    }
+
+    /**
+     * Indicates whether a sorting is enabled.
+     *
+     * @return bool
+     */
+    public function isSortingEnabled()
+    {
+        return !$this->get(ConfigUtil::DISABLE_SORTING, false);
+    }
+
+    /**
+     * Enables a sorting.
+     */
+    public function enableSorting()
+    {
+        $this->items[ConfigUtil::DISABLE_SORTING] = false;
+    }
+
+    /**
+     * Disables a sorting.
+     */
+    public function disableSorting()
+    {
+        $this->items[ConfigUtil::DISABLE_SORTING] = true;
+    }
+
+    /**
+     * Indicates whether the default page size is set.
+     *
+     * @return bool
+     */
+    public function hasPageSize()
+    {
+        return $this->has(ConfigUtil::PAGE_SIZE);
+    }
+
+    /**
+     * Gets the default page size.
+     *
+     * @return int|null A positive number
+     *                  NULL if the default page size should be set be a processor
+     *                  -1 if the pagination should be disabled
+     */
+    public function getPageSize()
+    {
+        return $this->get(ConfigUtil::PAGE_SIZE);
+    }
+
+    /**
+     * Sets the default page size.
+     * Set NULL if the default page size should be set be a processor.
+     * Set -1 if the pagination should be disabled.
+     * Set a positive number to set own page size that should be used as a default one.
+     *
+     * @param int|null $pageSize A positive number, NULL or -1
+     */
+    public function setPageSize($pageSize = null)
+    {
+        if (null === $pageSize) {
+            unset($this->items[ConfigUtil::PAGE_SIZE]);
+        } else {
+            $pageSize = (int)$pageSize;
+            $this->items[ConfigUtil::PAGE_SIZE] = $pageSize >= 0 ? $pageSize : -1;
+        }
+    }
+
+    /**
+     * Indicates whether the maximum number of items is set.
+     *
+     * @return bool
+     */
+    public function hasMaxResults()
+    {
+        return $this->has(ConfigUtil::MAX_RESULTS);
+    }
+
+    /**
+     * Gets the maximum number of items in the result.
+     *
+     * @return int|null The requested maximum number of items, NULL or -1 if not limited
+     */
+    public function getMaxResults()
+    {
+        return $this->get(ConfigUtil::MAX_RESULTS);
+    }
+
+    /**
+     * Sets the maximum number of items in the result.
+     * Set NULL to use a default limit.
+     * Set -1 (it means unlimited), zero or positive number to set own limit.
+     *
+     * @param int|null $maxResults The maximum number of items, NULL or -1 to set unlimited
+     */
+    public function setMaxResults($maxResults = null)
+    {
+        if (null === $maxResults) {
+            unset($this->items[ConfigUtil::MAX_RESULTS]);
+        } else {
+            $maxResults = (int)$maxResults;
+            $this->items[ConfigUtil::MAX_RESULTS] = $maxResults >= 0 ? $maxResults : -1;
+        }
+    }
+
+    /**
+     * Gets response status codes.
+     *
+     * @return StatusCodesConfig|null
+     */
+    public function getStatusCodes()
+    {
+        return $this->get(ConfigUtil::STATUS_CODES);
+    }
+
+    /**
+     * Sets response status codes.
+     *
+     * @param StatusCodesConfig|null $statusCodes
+     */
+    public function setStatusCodes(StatusCodesConfig $statusCodes = null)
+    {
+        $this->set(ConfigUtil::STATUS_CODES, $statusCodes);
     }
 }

@@ -9,7 +9,7 @@ use Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
-class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
+class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DefinitionQueryValidator
@@ -17,7 +17,7 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     protected $validator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldsProvider;
 
@@ -27,7 +27,7 @@ class DefinitionQueryValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 

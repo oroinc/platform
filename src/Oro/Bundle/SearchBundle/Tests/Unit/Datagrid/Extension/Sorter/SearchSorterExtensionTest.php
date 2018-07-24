@@ -11,7 +11,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
-class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
+class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SearchSorterExtension

@@ -6,12 +6,12 @@ use Oro\Component\MessageQueue\Job\ChainExtension;
 use Oro\Component\MessageQueue\Job\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 
-class ChainExtensionTest extends \PHPUnit_Framework_TestCase
+class ChainExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainExtension */
     protected $chainExtension;
 
-    /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $subExtension;
 
     protected function setUp()

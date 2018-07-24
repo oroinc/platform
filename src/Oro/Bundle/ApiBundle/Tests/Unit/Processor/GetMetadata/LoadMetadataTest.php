@@ -12,16 +12,16 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class LoadMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectMetadataLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataLoader */
     private $objectMetadataLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityMetadataLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataLoader */
     private $entityMetadataLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationMetadataLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationMetadataLoader */
     private $associationMetadataLoader;
 
     /** @var LoadMetadata */

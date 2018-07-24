@@ -38,7 +38,8 @@
         "bower-asset/bootstrap": "2.3.0",
         "bower-asset/json2": "dev-master",
         "bower-asset/text": "2.0.*",
-        "bower-asset/base64": "1.0.*"
+        "bower-asset/base64": "1.0.*",
+        "twbs/bootstrap": "4.1.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\UIBundle": "" }

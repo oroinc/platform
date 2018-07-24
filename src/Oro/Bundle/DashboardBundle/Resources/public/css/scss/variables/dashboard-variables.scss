@@ -1,0 +1,19 @@
+/* @theme: admin.oro; */
+
+$dashboard-wrapper-bg: $primary-900 !default; // #f8f8f8
+$dashboard-widget-bg: $primary-inverse !default; // #ffffff
+$dashboard-widget-border-color: $primary-inverse !default; // #ffffff
+$dashboard-widget-title-color: $primary-400 !default; // #68686a
+
+$dashboard-big-numbers-separator-color: $primary-830 !default; // #eeeeee
+$dashboard-big-numbers-positive-color: $success-dark !default; // #457d0c
+$dashboard-big-numbers-negative-color: $danger-dark !default; // #c7361a
+$dashboard-big-numbers-one-column-gate: 400px !default;
+$dashboard-big-numbers-two-column-gate: 600px !default;
+
+$dashboard-launchpad-icon-bg: $primary-900 !default; // #f8f8f8
+$dashboard-launchpad-icon-color: $primary-600 !default; // #919193
+$dashboard-launchpad-icon-active-color: $primary-400 !default; // #68686a
+$dashboard-launchpad-active-underline-color: $secondary !default; // #0c84a3
+$dashboard-launchpad-label-color: $primary-200 !default;  // #565656
+$dashboard-launchpad-bold-label-color: $primary-300 !default;  // #5e5e60

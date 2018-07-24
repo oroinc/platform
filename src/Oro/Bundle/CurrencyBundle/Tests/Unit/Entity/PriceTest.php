@@ -5,7 +5,7 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Entity;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class PriceTest extends \PHPUnit_Framework_TestCase
+class PriceTest extends \PHPUnit\Framework\TestCase
 {
     const VALUE = 100;
     const CURRENCY = 'USD';

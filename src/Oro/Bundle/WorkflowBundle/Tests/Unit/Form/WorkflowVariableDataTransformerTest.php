@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 
-class WorkflowVariableDataTransformerTest extends \PHPUnit_Framework_TestCase
+class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $options

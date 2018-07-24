@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -19,6 +22,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  *  addressName: { property_path: address.name }
  * the "addressName" field should be added to the metadata.
  * The metadata of this field should be based on metadata of the "name" field of the "address" association.
+ * Updates overridden entity class names in the acceptable target class names for associations
+ * that has the target class name equal to "Oro\Bundle\ApiBundle\Model\EntityIdentifier".
  * By performance reasons all these actions are done in one processor.
  */
 class NormalizeMetadata implements ProcessorInterface
@@ -32,19 +37,25 @@ class NormalizeMetadata implements ProcessorInterface
     /** @var MetadataProvider */
     protected $metadataProvider;
 
+    /** @var EntityOverrideProviderRegistry */
+    protected $entityOverrideProviderRegistry;
+
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param EntityMetadataFactory $entityMetadataFactory
-     * @param MetadataProvider      $metadataProvider
+     * @param DoctrineHelper                 $doctrineHelper
+     * @param EntityMetadataFactory          $entityMetadataFactory
+     * @param MetadataProvider               $metadataProvider
+     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityMetadataFactory $entityMetadataFactory,
-        MetadataProvider $metadataProvider
+        MetadataProvider $metadataProvider,
+        EntityOverrideProviderRegistry $entityOverrideProviderRegistry
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityMetadataFactory = $entityMetadataFactory;
         $this->metadataProvider = $metadataProvider;
+        $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
     /**
@@ -65,6 +76,10 @@ class NormalizeMetadata implements ProcessorInterface
             $context->getConfig(),
             $this->doctrineHelper->isManageableEntityClass($context->getClassName()),
             $context
+        );
+        $this->normalizeAcceptableTargetClassNames(
+            $entityMetadata,
+            $this->entityOverrideProviderRegistry->getEntityOverrideProvider($context->getRequestType())
         );
     }
 
@@ -120,6 +135,33 @@ class NormalizeMetadata implements ProcessorInterface
             );
             foreach ($toRemoveFieldNames as $fieldName) {
                 $entityMetadata->removeProperty($fieldName);
+            }
+        }
+    }
+
+    /**
+     * @param EntityMetadata                  $entityMetadata
+     * @param EntityOverrideProviderInterface $entityOverrideProvider
+     */
+    protected function normalizeAcceptableTargetClassNames(
+        EntityMetadata $entityMetadata,
+        EntityOverrideProviderInterface $entityOverrideProvider
+    ) {
+        $associations = $entityMetadata->getAssociations();
+        foreach ($associations as $association) {
+            if (EntityIdentifier::class === $association->getTargetClassName()) {
+                $acceptableTargetClassNames = $association->getAcceptableTargetClassNames();
+                foreach ($acceptableTargetClassNames as $i => $acceptableClass) {
+                    $substituteAcceptableClass = $entityOverrideProvider->getSubstituteEntityClass($acceptableClass);
+                    if ($substituteAcceptableClass) {
+                        $acceptableTargetClassNames[$i] = $substituteAcceptableClass;
+                    }
+                }
+                $association->setAcceptableTargetClassNames($acceptableTargetClassNames);
+            }
+            $targetMetadata = $association->getTargetMetadata();
+            if (null !== $targetMetadata) {
+                $this->normalizeAcceptableTargetClassNames($targetMetadata, $entityOverrideProvider);
             }
         }
     }

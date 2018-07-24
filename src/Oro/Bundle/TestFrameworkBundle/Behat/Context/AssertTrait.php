@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
-use \PHPUnit_Framework_Assert as Assert;
+use \PHPUnit\Framework\Assert as Assert;
 
 /**
  * This trait allows to use PHPUnit assertions in Behat tests in the same way
@@ -1224,13 +1224,13 @@ trait AssertTrait
     }
 
     /**
-     * Evaluates a PHPUnit_Framework_Constraint matcher object.
+     * Evaluates a PHPUnit\Framework\Constraint\Constraint matcher object.
      *
      * @param mixed                         $value
-     * @param \PHPUnit_Framework_Constraint $constraint
+     * @param \PHPUnit\Framework\Constraint\Constraint $constraint
      * @param string                        $message
      */
-    public static function assertThat($value, \PHPUnit_Framework_Constraint $constraint, $message = '')
+    public static function assertThat($value, \PHPUnit\Framework\Constraint\Constraint $constraint, $message = '')
     {
         Assert::assertThat($value, $constraint, $message);
     }

@@ -144,12 +144,12 @@ system_configuration:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.encryption.label
                 choices:
-                    oro.email.system_configuration.smtp_settings.encryption.none.label: ~
+                    oro.email.system_configuration.smtp_settings.encryption.none.label: ''
                     oro.email.system_configuration.smtp_settings.encryption.ssl.label: ssl
                     oro.email.system_configuration.smtp_settings.encryption.tls.label: tls
                 constraints:
                     - Choice:
-                        choices: [~, ssl, tls]
+                        choices: ['', ssl, tls]
                 required: true
 
         oro_email.smtp_settings_username:

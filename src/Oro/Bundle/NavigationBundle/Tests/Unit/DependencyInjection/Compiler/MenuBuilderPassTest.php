@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
 use Symfony\Component\DependencyInjection\Reference;
 
-class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
+class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessSkip()
     {

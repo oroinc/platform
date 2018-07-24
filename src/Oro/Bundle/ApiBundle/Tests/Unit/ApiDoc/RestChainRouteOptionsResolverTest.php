@@ -8,13 +8,13 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
 
-class RestChainRouteOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RestDocViewDetector */
-    protected $docViewDetector;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
+    private $docViewDetector;
 
     /** @var RestChainRouteOptionsResolver */
-    protected $chainRouteOptionsResolver;
+    private $chainRouteOptionsResolver;
 
     protected function setUp()
     {

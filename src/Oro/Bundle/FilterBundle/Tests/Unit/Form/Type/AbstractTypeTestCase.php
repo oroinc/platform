@@ -68,7 +68,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @return TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockTranslator()
     {
@@ -82,7 +82,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @return OptionsResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @return OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createMockOptionsResolver()
     {

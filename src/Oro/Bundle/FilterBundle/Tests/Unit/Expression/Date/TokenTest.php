@@ -4,7 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 
-class TokenTest extends \PHPUnit_Framework_TestCase
+class TokenTest extends \PHPUnit\Framework\TestCase
 {
     protected $testType;
     protected $testValue;

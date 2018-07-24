@@ -13,21 +13,21 @@ use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
+class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OrmDatasource */
     protected $datasource;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var YamlProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var YamlProcessor|\PHPUnit\Framework\MockObject\MockObject */
     protected $processor;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var ParameterBinderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBinderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $parameterBinder;
 
     protected function setUp()

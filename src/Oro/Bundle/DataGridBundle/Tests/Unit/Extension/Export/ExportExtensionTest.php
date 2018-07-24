@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ExportExtensionTest extends \PHPUnit_Framework_TestCase
+class ExportExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldBeConstructedWithRequiredAttributes()
     {

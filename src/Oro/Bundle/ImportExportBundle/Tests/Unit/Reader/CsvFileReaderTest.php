@@ -6,7 +6,7 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 
-class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
+class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CsvFileReader
@@ -14,7 +14,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     protected $reader;
 
     /**
-     * @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextRegistry;
 
@@ -253,8 +253,8 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $context
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @param \PHPUnit\Framework\MockObject\MockObject $context
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution($context)
     {

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
-use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -39,8 +38,8 @@ class FiltersConfiguration extends AbstractConfigurationSection
             $parentNode,
             $sectionName,
             function ($value) {
-                if (empty($value[FiltersConfig::FIELDS])) {
-                    unset($value[FiltersConfig::FIELDS]);
+                if (empty($value[ConfigUtil::FIELDS])) {
+                    unset($value[ConfigUtil::FIELDS]);
                 }
 
                 return $value;
@@ -48,10 +47,10 @@ class FiltersConfiguration extends AbstractConfigurationSection
         );
 
         $fieldNode = $node
-            ->enumNode(FiltersConfig::EXCLUSION_POLICY)
-                ->values([FiltersConfig::EXCLUSION_POLICY_ALL, FiltersConfig::EXCLUSION_POLICY_NONE])
+            ->enumNode(ConfigUtil::EXCLUSION_POLICY)
+                ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
             ->end()
-            ->arrayNode(FiltersConfig::FIELDS)
+            ->arrayNode(ConfigUtil::FIELDS)
                 ->useAttributeAsKey('name')
                 ->normalizeKeys(false)
                 ->prototype('array')
@@ -79,16 +78,16 @@ class FiltersConfiguration extends AbstractConfigurationSection
         );
 
         $node
-            ->booleanNode(FilterFieldConfig::EXCLUDE)->end()
-            ->scalarNode(FilterFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
-            ->scalarNode(FilterFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
-            ->scalarNode(FilterFieldConfig::TYPE)->cannotBeEmpty()->end()
-            ->arrayNode(FilterFieldConfig::OPTIONS)
+            ->booleanNode(ConfigUtil::EXCLUDE)->end()
+            ->scalarNode(ConfigUtil::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
+            ->scalarNode(ConfigUtil::FILTER_TYPE)->cannotBeEmpty()->end()
+            ->arrayNode(ConfigUtil::FILTER_OPTIONS)
                 ->useAttributeAsKey('name')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
-            ->arrayNode(FilterFieldConfig::OPERATORS)
+            ->arrayNode(ConfigUtil::FILTER_OPERATORS)
                 ->validate()
                     ->always(function ($value) {
                         if (\is_array($value) && !empty($value)) {
@@ -104,9 +103,9 @@ class FiltersConfiguration extends AbstractConfigurationSection
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
-            ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
-            ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end()
-            ->booleanNode(FilterFieldConfig::ALLOW_RANGE)->end();
+            ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()
+            ->booleanNode(ConfigUtil::ALLOW_ARRAY)->end()
+            ->booleanNode(ConfigUtil::ALLOW_RANGE)->end();
     }
 
     /**
@@ -116,11 +115,11 @@ class FiltersConfiguration extends AbstractConfigurationSection
      */
     protected function postProcessFieldConfig(array $config): array
     {
-        if (empty($config[FilterFieldConfig::OPTIONS])) {
-            unset($config[FilterFieldConfig::OPTIONS]);
+        if (empty($config[ConfigUtil::FILTER_OPTIONS])) {
+            unset($config[ConfigUtil::FILTER_OPTIONS]);
         }
-        if (empty($config[FilterFieldConfig::OPERATORS])) {
-            unset($config[FilterFieldConfig::OPERATORS]);
+        if (empty($config[ConfigUtil::FILTER_OPERATORS])) {
+            unset($config[ConfigUtil::FILTER_OPERATORS]);
         }
 
         return $config;

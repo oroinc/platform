@@ -9,7 +9,7 @@ use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class FindEntitiesTest extends \PHPUnit_Framework_TestCase
+class FindEntitiesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FindEntities
@@ -17,7 +17,7 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
     protected $function;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -38,7 +38,7 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PropertyPath
+     * @return \PHPUnit\Framework\MockObject\MockObject|PropertyPath
      */
     protected function getPropertyPath()
     {

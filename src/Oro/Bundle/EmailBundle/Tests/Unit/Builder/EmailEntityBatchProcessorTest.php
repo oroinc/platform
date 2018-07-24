@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
+class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailEntityBatchProcessor
@@ -25,7 +25,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private $addrManager;
 
-    /** @var EmailOwnerProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $ownerProvider;
 
     /** @var EventDispatcher */

@@ -7,10 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class TaggedServicesCompilerPassTraitTest extends \PHPUnit_Framework_TestCase
+class TaggedServicesCompilerPassTraitTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TaggedServicesCompilerPassTrait|\PHPUnit_Framework_MockObject_MockObject
+     * @var TaggedServicesCompilerPassTrait|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $trait;
 

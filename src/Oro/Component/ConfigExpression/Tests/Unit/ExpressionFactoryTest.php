@@ -7,15 +7,15 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\ConfigExpression\Extension\ExtensionInterface;
 
-class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
+class ExpressionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionFactory */
     protected $factory;
 
-    /** @var ContextAccessorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextAccessor;
 
-    /** @var ExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
     protected function setUp()
@@ -131,7 +131,7 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypes()
     {
         $types = ['test_name' => 'test_service_id'];
-        /** @var DependencyInjectionExtension|\PHPUnit_Framework_MockObject_MockObject $newExtension */
+        /** @var DependencyInjectionExtension|\PHPUnit\Framework\MockObject\MockObject $newExtension */
         $newExtension = $this->getMockBuilder(DependencyInjectionExtension::class)
             ->disableOriginalConstructor()
             ->getMock();

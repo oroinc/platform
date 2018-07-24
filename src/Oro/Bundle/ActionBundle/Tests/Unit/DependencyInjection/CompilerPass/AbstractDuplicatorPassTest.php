@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-abstract class AbstractDuplicatorPassTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractDuplicatorPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CompilerPassInterface
@@ -14,12 +14,12 @@ abstract class AbstractDuplicatorPassTest extends \PHPUnit_Framework_TestCase
     protected $compilerPass;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
      */
     protected $container;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     * @var \PHPUnit\Framework\MockObject\MockBuilder
      */
     protected $definitionBuilder;
 

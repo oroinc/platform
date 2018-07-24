@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
+class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SmtpSettingsProvider */
     protected $provider;
@@ -18,10 +18,10 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager */
     protected $manager;
 
-    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $globalScopeManager;
 
-    /** @var Mcrypt|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Mcrypt|\PHPUnit\Framework\MockObject\MockObject */
     protected $mcrypt;
 
     /**

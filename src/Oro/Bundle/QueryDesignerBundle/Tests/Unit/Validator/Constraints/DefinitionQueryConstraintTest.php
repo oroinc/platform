@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
 
-class DefinitionQueryConstraintTest extends \PHPUnit_Framework_TestCase
+class DefinitionQueryConstraintTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefinitionQueryConstraint */
     protected $constraint;

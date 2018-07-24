@@ -4,23 +4,13 @@ namespace Oro\Component\EntitySerializer;
 
 use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
+/**
+ * Represents the configuration of an entity field.
+ */
 class FieldConfig
 {
-    /** a flag indicates whether the field should be excluded */
-    const EXCLUDE = 'exclude';
-
-    /**
-     * a flag indicates whether the target entity should be collapsed;
-     * it means that target entity should be returned as a value, instead of an array with values of entity fields;
-     * usually it is used to get identifier of the related entity
-     */
-    const COLLAPSE = 'collapse';
-
-    /** the path of the field value */
-    const PROPERTY_PATH = 'property_path';
-
-    /** the data transformer to be applies to the field value */
-    const DATA_TRANSFORMER = 'data_transformer';
+    /** @var bool|null */
+    protected $exclude;
 
     /** @var array */
     protected $items = [];
@@ -38,9 +28,11 @@ class FieldConfig
     public function toArray($excludeTargetEntity = false)
     {
         $result = $this->items;
-
+        if (true === $this->exclude) {
+            $result[ConfigUtil::EXCLUDE] = $this->exclude;
+        }
         if (!$excludeTargetEntity && null !== $this->targetEntity) {
-            $result = array_merge($result, $this->targetEntity->toArray());
+            $result = \array_merge($result, $this->targetEntity->toArray());
         }
 
         return $result;
@@ -54,7 +46,8 @@ class FieldConfig
     public function isEmpty()
     {
         return
-            empty($this->items)
+            null === $this->exclude
+            && empty($this->items)
             && (null === $this->targetEntity || $this->targetEntity->isEmpty());
     }
 
@@ -101,25 +94,21 @@ class FieldConfig
      */
     public function isExcluded()
     {
-        if (!array_key_exists(self::EXCLUDE, $this->items)) {
+        if (null === $this->exclude) {
             return false;
         }
 
-        return $this->items[self::EXCLUDE];
+        return $this->exclude;
     }
 
     /**
      * Sets a flag indicates whether the field should be excluded.
      *
-     * @param bool $exclude
+     * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
     public function setExcluded($exclude = true)
     {
-        if ($exclude) {
-            $this->items[self::EXCLUDE] = $exclude;
-        } else {
-            unset($this->items[self::EXCLUDE]);
-        }
+        $this->exclude = $exclude;
     }
 
     /**
@@ -129,11 +118,11 @@ class FieldConfig
      */
     public function isCollapsed()
     {
-        if (!array_key_exists(self::COLLAPSE, $this->items)) {
+        if (!\array_key_exists(ConfigUtil::COLLAPSE, $this->items)) {
             return false;
         }
 
-        return $this->items[self::COLLAPSE];
+        return $this->items[ConfigUtil::COLLAPSE];
     }
 
     /**
@@ -144,9 +133,9 @@ class FieldConfig
     public function setCollapsed($collapse = true)
     {
         if ($collapse) {
-            $this->items[self::COLLAPSE] = $collapse;
+            $this->items[ConfigUtil::COLLAPSE] = $collapse;
         } else {
-            unset($this->items[self::COLLAPSE]);
+            unset($this->items[ConfigUtil::COLLAPSE]);
         }
     }
 
@@ -159,11 +148,11 @@ class FieldConfig
      */
     public function getPropertyPath($defaultValue = null)
     {
-        if (empty($this->items[self::PROPERTY_PATH])) {
+        if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
             return $defaultValue;
         }
 
-        return $this->items[self::PROPERTY_PATH];
+        return $this->items[ConfigUtil::PROPERTY_PATH];
     }
 
     /**
@@ -174,9 +163,9 @@ class FieldConfig
     public function setPropertyPath($propertyPath = null)
     {
         if ($propertyPath) {
-            $this->items[self::PROPERTY_PATH] = $propertyPath;
+            $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;
         } else {
-            unset($this->items[self::PROPERTY_PATH]);
+            unset($this->items[ConfigUtil::PROPERTY_PATH]);
         }
     }
 
@@ -192,11 +181,11 @@ class FieldConfig
      */
     public function getDataTransformers()
     {
-        if (!array_key_exists(self::DATA_TRANSFORMER, $this->items)) {
+        if (!\array_key_exists(ConfigUtil::DATA_TRANSFORMER, $this->items)) {
             return [];
         }
 
-        return $this->items[self::DATA_TRANSFORMER];
+        return $this->items[ConfigUtil::DATA_TRANSFORMER];
     }
 
     /**
@@ -216,7 +205,6 @@ class FieldConfig
     {
         $transformers = $this->getDataTransformers();
         $transformers[] = $dataTransformer;
-
-        $this->items[self::DATA_TRANSFORMER] = $transformers;
+        $this->items[ConfigUtil::DATA_TRANSFORMER] = $transformers;
     }
 }

@@ -158,14 +158,11 @@ class ObjectNormalizer
     protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config, $context)
     {
         if (!$config->isExcludeAll()) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" must be "%s". Object type: "%s".',
-                    EntityDefinitionConfig::EXCLUSION_POLICY,
-                    EntityDefinitionConfig::EXCLUSION_POLICY_ALL,
-                    ClassUtils::getClass($object)
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The exclusion policy must be "%s". Object type: "%s".',
+                ConfigUtil::EXCLUSION_POLICY_ALL,
+                ClassUtils::getClass($object)
+            ));
         }
 
         $result = [];

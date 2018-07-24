@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
-class ArrayDatasourceTest extends \PHPUnit_Framework_TestCase
+class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayDatasource */
     protected $arrayDatasource;
@@ -53,7 +53,7 @@ class ArrayDatasourceTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $grid * */
+        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $grid * */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())->method('setDatasource')->with(clone $this->arrayDatasource);
         $this->arrayDatasource->process($grid, []);

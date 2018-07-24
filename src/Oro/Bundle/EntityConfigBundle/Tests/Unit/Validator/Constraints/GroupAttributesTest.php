@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributes;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributesValidator;
 
-class GroupAttributesTest extends \PHPUnit_Framework_TestCase
+class GroupAttributesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GroupAttributes

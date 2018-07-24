@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit;
 
 use Oro\Bundle\ReminderBundle\OroReminderBundle;
 
-class OroReminderBundleTest extends \PHPUnit_Framework_TestCase
+class OroReminderBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

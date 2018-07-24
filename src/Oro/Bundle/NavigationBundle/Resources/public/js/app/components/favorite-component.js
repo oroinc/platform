@@ -1,13 +1,13 @@
-define([
-    'underscore',
-    './base/bookmark-component',
-    '../views/bookmark-button-view',
-    'oroui/js/app/views/base/collection-view',
-    '../views/bookmark-item-view'
-], function(_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
+define(function(require) {
     'use strict';
 
     var FavoriteComponent;
+    var _ = require('underscore');
+    var BaseBookmarkComponent = require('oronavigation/js/app/components/base/bookmark-component');
+    var CollectionView = require('oroui/js/app/views/base/collection-view');
+    var ButtonView = require('oronavigation/js/app/views/bookmark-button-view');
+    var ItemView = require('oronavigation/js/app/views/bookmark-item-view');
+    var favoriteItemTemplate = require('tpl!oronavigation/templates/favorite-item.html');
 
     FavoriteComponent = BaseBookmarkComponent.extend({
         typeName: 'favorite',
@@ -15,8 +15,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function FavoriteComponent() {
-            FavoriteComponent.__super__.constructor.apply(this, arguments);
+        constructor: function FavoriteComponent(options) {
+            FavoriteComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -37,6 +37,7 @@ define([
             var collection = this.collection;
 
             _.extend(options, {
+                el: this._options._sourceElement,
                 autoRender: true,
                 collection: collection
             });
@@ -53,7 +54,7 @@ define([
             var options = this._options.tabOptions || {};
             var collection = this.collection;
             var TabItemView = ItemView.extend({// eslint-disable-line oro/named-constructor
-                template: this._options.tabItemTemplate
+                template: favoriteItemTemplate
             });
 
             _.extend(options, {

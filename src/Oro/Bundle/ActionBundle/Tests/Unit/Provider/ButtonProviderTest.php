@@ -15,18 +15,18 @@ use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ButtonProviderTest extends \PHPUnit_Framework_TestCase
+class ButtonProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ButtonProvider */
     protected $buttonProvider;
 
-    /** @var ButtonProviderExtensionInterface[]|\PHPUnit_Framework_MockObject_MockObject[] */
+    /** @var ButtonProviderExtensionInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $extensions = [];
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
     private $searchContext;
 
     /**
@@ -100,7 +100,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $identifier
-     * @return ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function extension($identifier)
     {
@@ -214,7 +214,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $order
-     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getButton($order = 1)
     {

@@ -12,12 +12,12 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var EntityClassResolver */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var InitializeCriteria */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setResult([]);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getCriteria());
+        self::assertNull($this->context->getCriteria());
     }
 
     public function testProcessWhenCriteriaIsAlreadyInitialized()
@@ -44,7 +44,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
-        $this->assertSame($criteria, $this->context->getCriteria());
+        self::assertSame($criteria, $this->context->getCriteria());
     }
 
     public function testProcessForNotManageableEntity()
@@ -56,7 +56,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getCriteria());
+        self::assertNull($this->context->getCriteria());
     }
 
     public function testProcessForManageableEntity()
@@ -64,9 +64,10 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $entityClass = Entity\Product::class;
 
         $this->context->setClassName($entityClass);
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             new Criteria($this->entityClassResolver),
             $this->context->getCriteria()
         );
@@ -85,7 +86,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             new Criteria($this->entityClassResolver),
             $this->context->getCriteria()
         );
@@ -104,6 +105,6 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getCriteria());
+        self::assertNull($this->context->getCriteria());
     }
 }

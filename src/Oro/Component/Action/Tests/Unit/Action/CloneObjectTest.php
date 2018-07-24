@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class CloneObjectTest extends \PHPUnit_Framework_TestCase
+class CloneObjectTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CloneObject */
     protected $action;

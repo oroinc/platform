@@ -6,8 +6,9 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     group_sequence: [FieldConfigModel, Sql, UniqueField, UniqueMethod]
     constraints:
         - oro_entity_extend:UniqueExtendEntityField: {groups: UniqueField}
-        - oro_entity_extend:DefaultRelationField: {groups: UniqueField}
-        - oro_entity_extend:MultiEnumSnapshotField: {groups: UniqueField}
+        - oro_entity_extend:ChangeTypeExtendEntityField: {groups: ChangeTypeField}
+        - oro_entity_extend:DefaultRelationField: {groups: [UniqueField, ChangeTypeField]}
+        - oro_entity_extend:MultiEnumSnapshotField: {groups: [UniqueField, ChangeTypeField]}
         - oro_entity_extend:UniqueExtendEntityMethodName: {groups: UniqueMethod}
     properties:
         fieldName:

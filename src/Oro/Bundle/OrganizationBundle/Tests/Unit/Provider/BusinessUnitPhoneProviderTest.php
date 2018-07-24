@@ -5,7 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider;
 
-class BusinessUnitPhoneProviderTest extends \PHPUnit_Framework_TestCase
+class BusinessUnitPhoneProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BusinessUnitPhoneProvider */
     protected $provider;

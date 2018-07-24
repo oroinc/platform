@@ -27,7 +27,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /** @var RegisterDynamicFilters */
     private $processor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FilterFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterFactoryInterface */
     private $filterFactory;
 
     protected function setUp()
@@ -122,7 +122,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @param $queryString
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getRequest($queryString)
     {
@@ -390,7 +390,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
-    public function testProcessForRelatedEntityFieldForModelInheritedFromEntity()
+    public function testProcessForRelatedEntityFieldForModelInheritedFromManageableEntity()
     {
         $this->notManageableClassNames = [Entity\UserProfile::class];
 

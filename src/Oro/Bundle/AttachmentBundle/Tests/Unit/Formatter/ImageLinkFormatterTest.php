@@ -5,15 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter;
 
-class ImageLinkFormatterTest extends \PHPUnit_Framework_TestCase
+class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImageLinkFormatter */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     protected function setUp()

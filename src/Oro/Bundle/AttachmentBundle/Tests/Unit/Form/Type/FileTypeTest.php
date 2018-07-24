@@ -6,7 +6,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
 use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 
-class FileTypeTest extends \PHPUnit_Framework_TestCase
+class FileTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileType */
     protected $type;

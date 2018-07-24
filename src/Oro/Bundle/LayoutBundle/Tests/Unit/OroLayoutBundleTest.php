@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit;
 
 use Oro\Bundle\LayoutBundle\OroLayoutBundle;
 
-class OroLayoutBundleTest extends \PHPUnit_Framework_TestCase
+class OroLayoutBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

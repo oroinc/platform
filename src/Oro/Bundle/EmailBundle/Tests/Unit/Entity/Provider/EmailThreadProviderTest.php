@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
-class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
+class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailThreadProvider */
     protected $provider;

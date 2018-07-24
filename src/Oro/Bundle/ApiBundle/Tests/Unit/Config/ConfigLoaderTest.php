@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
+class ConfigLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProvider

@@ -12,16 +12,16 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 
 class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
     private $subresourcesProvider;
 
     /** @var SetHttpAllowHeaderForSubresource */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

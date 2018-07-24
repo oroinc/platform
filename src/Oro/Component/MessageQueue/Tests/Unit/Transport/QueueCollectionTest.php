@@ -5,7 +5,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Transport;
 use Oro\Component\MessageQueue\Transport\QueueCollection;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
 
-class QueueCollectionTest extends \PHPUnit_Framework_TestCase
+class QueueCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var QueueCollection */
     private $collection;

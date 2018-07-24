@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
@@ -87,14 +88,30 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
+    protected function convertCollectionToArray($collection, RequestType $requestType, EntityMetadata $metadata = null)
     {
-        if (null === $metadata) {
-            throw new \InvalidArgumentException('The metadata should be provided.');
+        if (null !== $metadata) {
+            return parent::convertCollectionToArray($collection, $requestType, $metadata);
         }
 
+        $items = [];
+        foreach ($collection as $object) {
+            $item = $this->convertObjectToArray($object, $requestType);
+            $items[] = $item[self::META];
+        }
+
+        return [self::META => [self::DATA => $items]];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function convertObjectToArray($object, RequestType $requestType, EntityMetadata $metadata = null)
+    {
         $data = $this->objectAccessor->toArray($object);
-        if ($metadata->hasIdentifierFields()) {
+        if (null === $metadata) {
+            $result = [self::META => $data];
+        } elseif ($metadata->hasIdentifierFields()) {
             $result = $this->getResourceIdObject(
                 $this->getEntityTypeForObject($object, $requestType, $metadata),
                 $this->entityIdAccessor->getEntityId($object, $metadata, $requestType)

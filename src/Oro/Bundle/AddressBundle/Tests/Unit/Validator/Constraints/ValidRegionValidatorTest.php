@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
+class ValidRegionValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ValidRegion
@@ -18,7 +18,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 
@@ -62,7 +62,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRegionValidNoRegion()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Country $country */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
         $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
             ->getMock();
@@ -80,7 +80,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRegionValid()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Country $country */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
         $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
             ->getMock();
@@ -114,7 +114,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int|null $id
-     * @return AbstractAddress|\PHPUnit_Framework_MockObject_MockObject
+     * @return AbstractAddress|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createAddress($id = null)
     {

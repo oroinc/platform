@@ -13,18 +13,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * * to avoid overriding of "NelmioApiDocBundle:layout.html.twig"
  *   template that uses "nelmio_api_doc_index" directly
  * * to allow introduce new controllers for REST API sandbox with different views
+ * Also makes sure that "view" request attribute contains the correct default API view
+ * in case if a view was not requested explicitly.
  */
 class ValidateApiDocViewListener
 {
     /** @var string[] */
     private $views;
 
+    /** @var string|null */
+    private $defaultView;
+
     /**
-     * @param string[] $views
+     * @param string[]    $views
+     * @param string|null $defaultView
      */
-    public function __construct(array $views)
+    public function __construct(array $views, ?string $defaultView)
     {
         $this->views = $views;
+        $this->defaultView = $defaultView;
     }
 
     /**
@@ -36,12 +43,19 @@ class ValidateApiDocViewListener
         if (\is_array($controller)
             && $controller[0] instanceof ApiDocController
             && 'indexAction' === $controller[1]
-            && !$this->isValidView($event->getRequest())
         ) {
-            throw new NotFoundHttpException(sprintf(
-                'Invalid API view "%s".',
-                $this->getView($event->getRequest())
-            ));
+            $request = $event->getRequest();
+            if (!$this->isValidView($request)) {
+                throw new NotFoundHttpException(\sprintf('Invalid API view "%s".', $this->getView($request)));
+            }
+
+            $defaultView = $this->getDefaultView($request);
+            if ($defaultView
+                && $request->attributes->get('view') !== $defaultView
+                && $this->isDefaultViewRequested($request)
+            ) {
+                $request->attributes->set('view', $defaultView);
+            }
         }
     }
 
@@ -65,5 +79,28 @@ class ValidateApiDocViewListener
     protected function getView(Request $request): ?string
     {
         return $request->attributes->get('view');
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return string|null
+     */
+    protected function getDefaultView(Request $request): ?string
+    {
+        return $this->defaultView;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return bool
+     */
+    protected function isDefaultViewRequested(Request $request): bool
+    {
+        $pathInfo = $request->getPathInfo();
+        $pos = \strpos($pathInfo, '/api/doc');
+
+        return false === $pos || !\substr($pathInfo, $pos + 9);
     }
 }

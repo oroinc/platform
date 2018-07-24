@@ -9,7 +9,7 @@ use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
 use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
 
-class FolderContentsCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
+class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CopyFixturesToTemp */
     private $copier;

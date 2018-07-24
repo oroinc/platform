@@ -9,12 +9,12 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
-class ColumnConfigListenerTest extends \PHPUnit_Framework_TestCase
+class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY = 'Test:Entity';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityClassResolver;
 

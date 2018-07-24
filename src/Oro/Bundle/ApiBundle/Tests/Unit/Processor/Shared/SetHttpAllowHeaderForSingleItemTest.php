@@ -10,13 +10,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class SetHttpAllowHeaderForSingleItemTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
     /** @var SetHttpAllowHeaderForSingleItem */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

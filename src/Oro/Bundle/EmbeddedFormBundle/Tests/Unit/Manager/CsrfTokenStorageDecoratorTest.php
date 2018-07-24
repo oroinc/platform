@@ -8,20 +8,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-class CsrfTokenStorageDecoratorTest extends \PHPUnit_Framework_TestCase
+class CsrfTokenStorageDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_FIELD_NAME = '_test_sid';
     const TEST_PHP_SESSION_NAME   = 'test_php_sid';
     const TEST_ROUTE_NAME         = 'test_route';
     const TEST_CSRF_TOKEN_ID      = 'test_token_id';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $mainTokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $embeddedFormTokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
     /** @var CsrfTokenStorageDecorator */

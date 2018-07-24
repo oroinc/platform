@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadata;
 
-class ActionMetadataTest extends \PHPUnit_Framework_TestCase
+class ActionMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionMetadata */
     protected $metadata;

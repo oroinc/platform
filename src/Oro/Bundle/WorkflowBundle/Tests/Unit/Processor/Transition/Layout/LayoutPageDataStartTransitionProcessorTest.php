@@ -14,9 +14,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_TestCase
+class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $helper;
 
     /** @var LayoutPageDataStartTransitionProcessor */
@@ -31,22 +31,22 @@ class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_Test
 
     public function testResultData()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->once())->method('getLabel')->willReturn('workflow.label');
 
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $request = new Request(['entityId' => 42, 'originalUrl' => '///url']);
 
-        /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $formView */
+        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
@@ -86,7 +86,7 @@ class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit_Framework_Test
 
     public function testSkipByResultType()
     {
-        /** @var TransitionContext|\PHPUnit_Framework_MockObject_MockObject $context */
+        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')

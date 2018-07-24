@@ -65,7 +65,7 @@ class EntityTypeSecurityCheck implements ProcessorInterface
         $config = $context->getConfig();
 
         $isGranted = true;
-        if ($config && $config->hasAclResource()) {
+        if (null !== $config && $config->hasAclResource()) {
             $aclResource = $config->getAclResource();
             if ($aclResource) {
                 if ($this->forcePermissionUsage) {

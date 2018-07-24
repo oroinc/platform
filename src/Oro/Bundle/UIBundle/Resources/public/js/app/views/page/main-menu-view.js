@@ -59,6 +59,7 @@ define([
             // Local cache of route to menu item
             this.routeMatchedMenuItemsCache = {};
 
+            this.initRouteMatches();
             PageMainMenuView.__super__.initialize.call(this, options);
         },
 
@@ -81,12 +82,8 @@ define([
             var data = this.getTemplateData();
             var currentRoute = this.getCurrentRoute(data);
 
-            if (data) {
-                if (!_.isUndefined(data.mainMenu)) {
-                    PageMainMenuView.__super__.render.call(this);
-                    this.initRouteMatches();
-                }
-            } else {
+            if (data && !_.isUndefined(data.mainMenu)) {
+                PageMainMenuView.__super__.render.call(this);
                 this.initRouteMatches();
             }
 

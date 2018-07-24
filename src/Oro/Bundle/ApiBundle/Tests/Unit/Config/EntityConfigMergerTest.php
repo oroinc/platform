@@ -6,13 +6,13 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 
-class EntityConfigMergerTest extends \PHPUnit_Framework_TestCase
+class EntityConfigMergerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigExtensionRegistry */
-    protected $configExtensionRegistry;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigExtensionRegistry */
+    private $configExtensionRegistry;
 
     /** @var EntityConfigMerger */
-    protected $entityConfigMerger;
+    private $entityConfigMerger;
 
     protected function setUp()
     {

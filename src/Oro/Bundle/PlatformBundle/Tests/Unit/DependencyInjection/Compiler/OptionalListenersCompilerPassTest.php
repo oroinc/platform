@@ -8,7 +8,7 @@ use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class OptionalListenersCompilerPassTest extends \PHPUnit_Framework_TestCase
+class OptionalListenersCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess()
     {

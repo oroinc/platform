@@ -66,17 +66,17 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function notAccessibleResourceActionsProvider()
     {
         return [
-            ['GET', 'oro_rest_api_item', ['id' => 123]],
-            ['GET', 'oro_rest_api_list'],
-            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
-            ['POST', 'oro_rest_api_list'],
-            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
-            ['DELETE', 'oro_rest_api_list'],
-            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
+            ['GET', $this->getItemRouteName(), ['id' => 123]],
+            ['GET', $this->getListRouteName()],
+            ['PATCH', $this->getItemRouteName(), ['id' => 123]],
+            ['POST', $this->getListRouteName()],
+            ['DELETE', $this->getItemRouteName(), ['id' => 123]],
+            ['DELETE', $this->getListRouteName()],
+            ['GET', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']]
         ];
     }
 
@@ -114,30 +114,30 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     public function unknownResourceActionsProvider()
     {
         return [
-            ['HEAD', 'oro_rest_api_item', ['id' => 123]],
-            ['HEAD', 'oro_rest_api_list'],
-            ['HEAD', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['HEAD', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['OPTIONS', 'oro_rest_api_item', ['id' => 123]],
-            ['OPTIONS', 'oro_rest_api_list'],
-            ['OPTIONS', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['OPTIONS', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_item', ['id' => 123]],
-            ['GET', 'oro_rest_api_list'],
-            ['GET', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['GET', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_item', ['id' => 123]],
-            ['POST', 'oro_rest_api_list'],
-            ['POST', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['POST', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_item', ['id' => 123]],
-            ['PATCH', 'oro_rest_api_list'],
-            ['PATCH', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['PATCH', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_item', ['id' => 123]],
-            ['DELETE', 'oro_rest_api_list'],
-            ['DELETE', 'oro_rest_api_subresource', ['id' => 123, 'association' => 'test']],
-            ['DELETE', 'oro_rest_api_relationship', ['id' => 123, 'association' => 'test']]
+            ['HEAD', $this->getItemRouteName(), ['id' => 123]],
+            ['HEAD', $this->getListRouteName()],
+            ['HEAD', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['HEAD', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', $this->getItemRouteName(), ['id' => 123]],
+            ['OPTIONS', $this->getListRouteName()],
+            ['OPTIONS', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['OPTIONS', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getItemRouteName(), ['id' => 123]],
+            ['GET', $this->getListRouteName()],
+            ['GET', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['GET', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getItemRouteName(), ['id' => 123]],
+            ['POST', $this->getListRouteName()],
+            ['POST', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['POST', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getItemRouteName(), ['id' => 123]],
+            ['PATCH', $this->getListRouteName()],
+            ['PATCH', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['PATCH', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getItemRouteName(), ['id' => 123]],
+            ['DELETE', $this->getListRouteName()],
+            ['DELETE', $this->getSubresourceRouteName(), ['id' => 123, 'association' => 'test']],
+            ['DELETE', $this->getRelationshipRouteName(), ['id' => 123, 'association' => 'test']]
         ];
     }
 
@@ -187,9 +187,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledGetListWhenGetIsDisabled()
@@ -238,9 +237,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledCreateWhenGetIsDisabled()
@@ -289,9 +287,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledUpdateWhenGetIsDisabled()
@@ -340,9 +337,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteWhenGetIsDisabled()
@@ -391,9 +387,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteListWhenGetIsDisabled()
@@ -523,9 +518,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('PATCH', $response->headers->get('Allow'));
     }
 
     public function testDisabledGetRelationshipWhenAllGetRelationshipsAreDisabled()
@@ -543,9 +537,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('PATCH', $response->headers->get('Allow'));
     }
 
     public function testDisabledGetRelationshipWhenAllSubresourcesAreDisabled()
@@ -625,9 +618,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testDisabledUpdateRelationshipWhenAllUpdateRelationshipsAreDisabled()
@@ -645,9 +637,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testDisabledUpdateRelationshipWhenAllSubresourcesAreDisabled()
@@ -727,9 +718,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledAddRelationshipWhenAllAddRelationshipsAreDisabled()
@@ -747,9 +737,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testDisabledAddRelationshipWhenAllSubresourcesAreDisabled()
@@ -829,9 +818,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteRelationshipWhenAllAddRelationshipsAreDisabled()
@@ -849,9 +837,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST', $response->headers->get('Allow'));
     }
 
     public function testDisabledDeleteRelationshipWhenAllSubresourcesAreDisabled()
@@ -975,9 +962,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testDeleteRelationshipToOneAssociation()
@@ -989,9 +975,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH', $response->headers->get('Allow'));
     }
 
     public function testPostMethodForSingleItemPrimaryResourceRoute()
@@ -1000,13 +985,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'POST',
             $this->getUrl(
-                'oro_rest_api_item',
+                $this->getItemRouteName(),
                 self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForSingleItemPrimaryResourceRoute()
@@ -1015,13 +999,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_item',
+                $this->getItemRouteName(),
                 self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testHeadMethodForSingleItemPrimaryResourceRoute()
@@ -1030,13 +1013,12 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_item',
+                $this->getItemRouteName(),
                 self::processTemplateData(['entity' => $entityType, 'id' => '@test_department->id'])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, DELETE', $response->headers->get('Allow'));
     }
 
     public function testPatchMethodForListPrimaryResourceRoute()
@@ -1044,11 +1026,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'PATCH',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForListPrimaryResourceRoute()
@@ -1056,11 +1037,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'OPTIONS',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testHeadMethodForListPrimaryResourceRoute()
@@ -1068,11 +1048,10 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->request(
             'HEAD',
-            $this->getUrl('oro_rest_api_list', ['entity' => $entityType])
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType])
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForRelationshipRoute()
@@ -1081,7 +1060,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_relationship',
+                $this->getRelationshipRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_department->id',
@@ -1089,9 +1068,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testHeadMethodForRelationshipRoute()
@@ -1100,7 +1078,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_relationship',
+                $this->getRelationshipRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_department->id',
@@ -1108,9 +1086,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET, PATCH, POST, DELETE');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET, PATCH, POST, DELETE', $response->headers->get('Allow'));
     }
 
     public function testPostMethodForSubresourceRoute()
@@ -1122,9 +1099,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testPatchMethodForSubresourceRoute()
@@ -1136,9 +1112,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testDeleteMethodForSubresourceRoute()
@@ -1150,9 +1125,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testOptionsMethodForSubresourceRoute()
@@ -1161,7 +1135,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_subresource',
+                $this->getSubresourceRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_department->id',
@@ -1169,9 +1143,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testHeadMethodForSubresourceRoute()
@@ -1180,7 +1153,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_subresource',
+                $this->getSubresourceRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_department->id',
@@ -1188,9 +1161,8 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
                 ])
             )
         );
-        self::assertResponseStatusCodeEquals($response, 405);
+        self::assertMethodNotAllowedResponse($response, 'GET');
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals('GET', $response->headers->get('Allow'));
     }
 
     public function testGetSubresourceWithUnacessibleTarget()
@@ -1407,7 +1379,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'OPTIONS',
             $this->getUrl(
-                'oro_rest_api_subresource',
+                $this->getSubresourceRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_product->id',
@@ -1438,7 +1410,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         $response = $this->request(
             'HEAD',
             $this->getUrl(
-                'oro_rest_api_subresource',
+                $this->getSubresourceRouteName(),
                 self::processTemplateData([
                     'entity'      => $entityType,
                     'id'          => '@test_product->id',

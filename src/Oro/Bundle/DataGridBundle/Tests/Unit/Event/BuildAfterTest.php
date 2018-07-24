@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
-class BuildAfterTest extends \PHPUnit_Framework_TestCase
+class BuildAfterTest extends \PHPUnit\Framework\TestCase
 {
     public function testEventCreation()
     {

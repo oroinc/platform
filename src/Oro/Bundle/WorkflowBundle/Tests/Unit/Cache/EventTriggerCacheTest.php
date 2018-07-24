@@ -11,12 +11,12 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 
-class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
+class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
 {
     const TRIGGER_CLASS_NAME = 'stdClass';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $registry;
 
@@ -141,7 +141,7 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $calls
-     * @return \PHPUnit_Framework_MockObject_MockObject|CacheProvider
+     * @return \PHPUnit\Framework\MockObject\MockObject|CacheProvider
      */
     protected function prepareProvider(array $calls)
     {

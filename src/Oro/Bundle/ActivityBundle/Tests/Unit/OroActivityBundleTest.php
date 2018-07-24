@@ -3,7 +3,7 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit;
 
 use Oro\Bundle\ActivityBundle\OroActivityBundle;
 
-class OroActivityBundleTest extends \PHPUnit_Framework_TestCase
+class OroActivityBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

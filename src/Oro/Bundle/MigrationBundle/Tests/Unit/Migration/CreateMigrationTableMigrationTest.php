@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class CreateMigrationTableMigrationTest extends \PHPUnit_Framework_TestCase
+class CreateMigrationTableMigrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testUp()
     {

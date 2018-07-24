@@ -19,7 +19,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
     /** @var EnumValueCollectionType */
     protected $type;
 
-    /** @var EnumTypeHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
     protected function setUp()

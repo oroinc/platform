@@ -13,7 +13,6 @@
                 color: $pin-item-outdated-hover-color;
             }
         }
-
     }
 
     .btn-close {
@@ -86,8 +85,10 @@
     }
 
     li {
-        &.active a {
-            font-weight: bold;
+        &.active {
+            a {
+                font-weight: bold;
+            }
         }
 
         a {
@@ -106,6 +107,7 @@
         list-style: none;
         display: block;
         white-space: nowrap;
+
         &:empty {
             display: none;
         }

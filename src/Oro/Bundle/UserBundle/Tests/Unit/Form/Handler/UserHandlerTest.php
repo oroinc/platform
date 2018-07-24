@@ -14,35 +14,35 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class UserHandlerTest extends \PHPUnit_Framework_TestCase
+class UserHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
-    /** @var UserManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    /** @var DelegatingEngine|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DelegatingEngine|\PHPUnit\Framework\MockObject\MockObject */
     protected $templating;
 
-    /** @var \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \Swift_Mailer|\PHPUnit\Framework\MockObject\MockObject */
     protected $mailer;
 
-    /** @var FlashBagInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $flashBag;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var UserHandler */

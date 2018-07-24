@@ -10,7 +10,7 @@ use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslatorDependen
 use Oro\Bundle\TranslationBundle\OroTranslationBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroTranslationBundleTest extends \PHPUnit_Framework_TestCase
+class OroTranslationBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {
@@ -36,7 +36,7 @@ class OroTranslationBundleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getContainerBuilder()
     {

@@ -5,9 +5,9 @@ namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage\Encoder;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderInterface;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 
-class ExpressionEncoderRegistryTest extends \PHPUnit_Framework_TestCase
+class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExpressionEncoderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExpressionEncoderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $encoder;
 
     /** @var ExpressionEncoderRegistry */

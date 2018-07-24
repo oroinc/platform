@@ -10,7 +10,7 @@ use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -20,7 +20,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandle()
     {
         $entity = $this->createMock(\stdClass::class);
-        /** @var NotificationEvent | \PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var NotificationEvent | \PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->getMockBuilder(NotificationEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -40,7 +40,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             new EmailNotificationAdapter($entity, $notification, $em, $this->getPropertyAccessor())
         ];
 
-        /** @var EmailNotificationManager | \PHPUnit_Framework_MockObject_MockObject $manager */
+        /** @var EmailNotificationManager | \PHPUnit\Framework\MockObject\MockObject $manager */
         $manager = $this->getMockBuilder(EmailNotificationManager::class)
             ->disableOriginalConstructor()
             ->getMock();

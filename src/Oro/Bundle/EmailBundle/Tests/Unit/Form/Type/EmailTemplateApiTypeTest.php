@@ -4,17 +4,17 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateApiType;
 
-class EmailTemplateApiTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateApiTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailTemplateApiType
      */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp()

@@ -11,12 +11,12 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
 
-class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NameFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameFormatter;
 
-    /** @var DQLNameFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DQLNameFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $dqlNameFormatter;
 
     /** @var EntityNameProvider */
@@ -26,7 +26,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->nameFormatter = $this->createMock(NameFormatter::class);
 
-        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $nameFormatterLink */
+        /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject $nameFormatterLink */
         $nameFormatterLink = $this->createMock(ServiceLink::class);
         $nameFormatterLink->expects($this->any())
             ->method('getService')
@@ -34,7 +34,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->dqlNameFormatter = $this->createMock(DQLNameFormatter::class);
 
-        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $dqlNameFormatterLink */
+        /** @var ServiceLink|\PHPUnit\Framework\MockObject\MockObject $dqlNameFormatterLink */
         $dqlNameFormatterLink = $this->createMock(ServiceLink::class);
         $dqlNameFormatterLink->expects($this->any())
             ->method('getService')

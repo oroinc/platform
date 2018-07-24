@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType as BaseCollectionT
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionTypeTest extends \PHPUnit_Framework_TestCase
+class CollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CollectionType

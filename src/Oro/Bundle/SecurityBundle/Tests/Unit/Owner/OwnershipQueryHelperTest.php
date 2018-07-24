@@ -17,10 +17,10 @@ class OwnershipQueryHelperTest extends OrmTestCase
     /** @var EntityManager */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
     /** @var OwnershipQueryHelper */
@@ -63,7 +63,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
      * @param string|null $organizationFieldName
      * @param string|null $ownerFieldName
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|OwnershipMetadataInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataInterface
      */
     protected function getOwnershipMetadata($organizationFieldName = null, $ownerFieldName = null)
     {

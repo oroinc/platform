@@ -5,7 +5,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullTopic;
 use Oro\Component\MessageQueue\Transport\TopicInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class NullTopicTest extends \PHPUnit_Framework_TestCase
+class NullTopicTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

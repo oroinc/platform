@@ -18,24 +18,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
-class ExecuteOperationHandlerTest extends \PHPUnit_Framework_TestCase
+class ExecuteOperationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /** @var FormProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $formProvider;
 
-    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $contextHelper;
 
-    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var Operation|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
     protected $operation;
 
-    /** @var ActionData|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ActionData|\PHPUnit\Framework\MockObject\MockObject */
     protected $actionData;
 
     /** @var ExecuteOperationHandler */

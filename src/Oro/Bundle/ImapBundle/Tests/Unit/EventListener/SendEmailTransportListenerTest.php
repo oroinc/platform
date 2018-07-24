@@ -7,12 +7,12 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 
-class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
+class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UserEmailOrigin */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UserEmailOrigin */
     protected $userEmailOrigin;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ImapEmailGoogleOauth2Manager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ImapEmailGoogleOauth2Manager */
     protected $imapEmailGoogleOauth2Manager;
 
     protected function setUp()
@@ -33,7 +33,7 @@ class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendWithSmtpConfigured($host, $port, $username, $encryption, $authMode, $password)
     {
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
@@ -91,7 +91,7 @@ class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
         $username = 'test';
         $password = 'pass';
 
-        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit_Framework_MockObject_MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
@@ -114,7 +114,7 @@ class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $password
-     * @return \Oro\Bundle\SecurityBundle\Encoder\Mcrypt|\PHPUnit_Framework_MockObject_MockObject
+     * @return \Oro\Bundle\SecurityBundle\Encoder\Mcrypt|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEncoderMock($password)
     {

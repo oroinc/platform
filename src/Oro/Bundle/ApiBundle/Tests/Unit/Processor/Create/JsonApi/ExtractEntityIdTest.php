@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class ExtractEntityIdTest extends FormProcessorTestCase
 {
     /** @var ExtractEntityId */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
@@ -34,7 +34,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertEquals($entityId, $this->context->getId());
+        self::assertEquals($entityId, $this->context->getId());
     }
 
     public function testProcessWhenEntityIdDoesNotExistInContext()
@@ -48,7 +48,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertEquals(456, $this->context->getId());
+        self::assertEquals(456, $this->context->getId());
     }
 
     public function testProcessForEmptyRequestData()
@@ -58,7 +58,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getId());
+        self::assertNull($this->context->getId());
     }
 
     public function testProcessForEmptyRequestDataWithoutEntityIdButEntityHasIdGenerator()
@@ -73,8 +73,8 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getId());
-        $this->assertFalse($this->context->hasErrors());
+        self::assertNull($this->context->getId());
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForEmptyRequestDataWithoutEntityIdAndEntityDoesNotHaveIdGenerator()
@@ -89,8 +89,8 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $this->assertNull($this->context->getId());
-        $this->assertEquals(
+        self::assertNull($this->context->getId());
+        self::assertEquals(
             [
                 Error::createValidationError(Constraint::ENTITY_ID, 'The identifier is mandatory')
                     ->setSource(ErrorSource::createByPropertyPath('id'))

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 
-class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
+class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendOptionsManager */
     private $manager;

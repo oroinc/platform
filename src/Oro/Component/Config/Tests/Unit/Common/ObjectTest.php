@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 
 use Oro\Component\Config\Common\ConfigObject;
 
-class ObjectTest extends \PHPUnit_Framework_TestCase
+class ObjectTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @return ConfigObject

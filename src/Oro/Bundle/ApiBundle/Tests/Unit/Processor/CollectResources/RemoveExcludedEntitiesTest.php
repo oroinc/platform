@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
-class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
+class RemoveExcludedEntitiesTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
 
     /** @var RemoveExcludedEntities */

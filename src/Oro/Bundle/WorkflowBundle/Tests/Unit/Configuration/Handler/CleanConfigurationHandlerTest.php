@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CleanConfigurationHandlerTest extends \PHPUnit_Framework_TestCase
+class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */
     protected $requestStack;

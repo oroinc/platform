@@ -6,7 +6,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
-class OroConfigExtensionTest extends \PHPUnit_Framework_TestCase
+class OroConfigExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContainerBuilder

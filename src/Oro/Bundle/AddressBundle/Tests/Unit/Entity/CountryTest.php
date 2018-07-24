@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Entity;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
-class CountryTest extends \PHPUnit_Framework_TestCase
+class CountryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provider

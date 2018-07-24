@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Owner\ChainEntityOwnershipDecisionMaker;
 
-class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
+class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit\Framework\TestCase
 {
     public function testPassOwnershipDecisionMakersThroughConstructor()
     {
@@ -19,7 +19,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOwnershipDecisionMaker()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
         $maker = $this->createMock(
             'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
         );
@@ -52,7 +52,7 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsOwnerEntity($levelMethod, $result)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
         $maker = $this->createMock(
             'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
         );
@@ -173,11 +173,11 @@ class ChainEntityOwnershipDecisionMakerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $supports
-     * @return AccessLevelOwnershipDecisionMakerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return AccessLevelOwnershipDecisionMakerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getOwnershipDecisionMakerMock($supports = true)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|AccessLevelOwnershipDecisionMakerInterface $maker */
         $maker = $this->createMock(
             'Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface'
         );

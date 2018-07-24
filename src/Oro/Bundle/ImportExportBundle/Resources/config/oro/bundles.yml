@@ -1,3 +1,3 @@
 bundles:
-    - Oro\Bundle\ImportExportBundle\OroImportExportBundle
-    - Liuggio\ExcelBundle\LiuggioExcelBundle
+    - { name: Oro\Bundle\ImportExportBundle\OroImportExportBundle, priority: -1 }
+    - { name: Liuggio\ExcelBundle\LiuggioExcelBundle, priority: -1 }

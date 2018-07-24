@@ -33,7 +33,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * Class PreparingHttpImportMessageProcessorTest
  * @package Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import
  */
-class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class PreHttpImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
@@ -574,7 +574,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|HttpImportHandler
+     * @return \PHPUnit\Framework\MockObject\MockObject|HttpImportHandler
      */
     protected function createHttpImportHandlerMock()
     {
@@ -582,7 +582,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|WriterChain
+     * @return \PHPUnit\Framework\MockObject\MockObject|WriterChain
      */
     protected function createWriterChainMock()
     {
@@ -590,7 +590,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     protected function createJobRunnerMock()
     {
@@ -598,7 +598,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     protected function createMessageProducerInterfaceMock()
     {
@@ -606,7 +606,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected function createLoggerInterfaceMock()
     {
@@ -614,7 +614,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
      */
     protected function createDoctrineMock()
     {
@@ -622,7 +622,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
      */
     protected function createDependentJobMock()
     {
@@ -630,7 +630,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
      */
     private function createMessageMock()
     {
@@ -638,7 +638,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -646,7 +646,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
@@ -654,7 +654,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
      */
     private function createFileManagerMock()
     {
@@ -662,7 +662,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FileStreamWriter
+     * @return \PHPUnit\Framework\MockObject\MockObject|FileStreamWriter
      */
     private function createWriterMock()
     {
@@ -670,7 +670,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
      */
     private function createManagerRegistry()
     {
@@ -678,7 +678,7 @@ class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
      */
     private function createConfigManagerStub()
     {

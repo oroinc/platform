@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 
-class MetadataTest extends \PHPUnit_Framework_TestCase
+class MetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetExistingStrict()
     {

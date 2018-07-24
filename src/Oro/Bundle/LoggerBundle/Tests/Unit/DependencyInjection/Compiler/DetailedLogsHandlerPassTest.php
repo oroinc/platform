@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
+class DetailedLogsHandlerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DetailedLogsHandlerPass
@@ -16,7 +16,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
     protected $compilerPass;
 
     /**
-     * @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $containerBuilder;
 

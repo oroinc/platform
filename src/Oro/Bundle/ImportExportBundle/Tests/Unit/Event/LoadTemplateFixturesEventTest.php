@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 
-class LoadTemplateFixturesEventTest extends \PHPUnit_Framework_TestCase
+class LoadTemplateFixturesEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

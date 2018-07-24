@@ -8,12 +8,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
-class RelationBuilderTest extends \PHPUnit_Framework_TestCase
+class RelationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     const SOURCE_CLASS = 'Test\SourceEntity';
     const TARGET_CLASS = 'Test\TargetEntity';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     /** @var RelationBuilder */
@@ -893,7 +893,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {

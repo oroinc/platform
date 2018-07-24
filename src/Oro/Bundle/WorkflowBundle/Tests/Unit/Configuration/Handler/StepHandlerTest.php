@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Handler;
 use Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class StepHandlerTest extends \PHPUnit_Framework_TestCase
+class StepHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var StepHandler

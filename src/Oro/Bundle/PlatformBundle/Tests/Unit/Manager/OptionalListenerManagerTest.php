@@ -5,7 +5,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Manager;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures\TestListener;
 
-class OptionalListenerManagerTest extends \PHPUnit_Framework_TestCase
+class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OptionalListenerManager
@@ -13,7 +13,7 @@ class OptionalListenerManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 

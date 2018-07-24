@@ -9,15 +9,15 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class WindowsStateManagerTest extends \PHPUnit_Framework_TestCase
+class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
     protected $tokenStorage;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
     protected $requestStateManager;
 
     /** @var WindowsStateManager */

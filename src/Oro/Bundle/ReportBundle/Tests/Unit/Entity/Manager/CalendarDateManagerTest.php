@@ -8,9 +8,9 @@ use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 
-class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
+class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     /** @var CalendarDateManager */

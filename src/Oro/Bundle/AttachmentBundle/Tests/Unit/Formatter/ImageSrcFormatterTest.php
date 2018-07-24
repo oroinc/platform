@@ -5,12 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter;
 
-class ImageSrcFormatterTest extends \PHPUnit_Framework_TestCase
+class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImageSrcFormatter */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     protected function setUp()

@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * This class is a clone of Doctrine\Tests\OrmTestCase that is excluded from doctrine package since v2.4.
  */
-abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
+abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * The metadata cache that is shared between all ORM tests (except functional tests).
@@ -116,7 +116,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array $params
      * @param array $types
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
@@ -124,7 +124,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
-                new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
+                new \PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls(
                     array_merge($records, [false])
                 )
             );
@@ -156,7 +156,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param EntityManagerMock $em
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
@@ -171,7 +171,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param int $numberOfRecords
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCountStatementMock($numberOfRecords)
     {
@@ -183,14 +183,14 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param string                                   $sql    SQL that run in database
      * @param array                                    $result data that will return after SQL execute
      * @param array                                    $params
      * @param array                                    $types
      */
     protected function setQueryExpectation(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $sql,
         $result,
         $params = [],
@@ -212,7 +212,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param \PHPUnit\Framework\MockObject\MockObject $conn
      * @param int                                      $expectsAt
      * @param string                                   $sql
      * @param array                                    $result
@@ -220,7 +220,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array                                    $types
      */
     protected function setQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
+        \PHPUnit\Framework\MockObject\MockObject $conn,
         $expectsAt,
         $sql,
         $result,

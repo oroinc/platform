@@ -16,15 +16,15 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\FormEvents;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var ConfigTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
 
     /** @var ConfigSubscriber */
@@ -590,8 +590,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array                                    $data
      * @param ConfigModel                              $model
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEvent($data, $model, $form = null)
     {
@@ -625,7 +625,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      * @param string $scope
      * @param array  $configs
      * @param bool   $isGetPropertyConfigExpected
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProvider($scope, $configs, $isGetPropertyConfigExpected)
     {

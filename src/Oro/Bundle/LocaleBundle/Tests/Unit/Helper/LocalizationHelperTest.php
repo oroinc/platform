@@ -10,14 +10,14 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\FallbackTrait;
 
-class LocalizationHelperTest extends \PHPUnit_Framework_TestCase
+class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
 {
     use FallbackTrait;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var CurrentLocalizationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $currentLocalizationProvider;
 
     /** @var LocalizationHelper */

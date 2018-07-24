@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
-class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
+class ProcessDefinitionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessDefinition

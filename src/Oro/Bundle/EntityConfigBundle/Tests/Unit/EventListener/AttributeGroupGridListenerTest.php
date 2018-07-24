@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\EventListener\AttributeGroupGridListener;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributeGroupGridListenerTest extends \PHPUnit_Framework_TestCase
+class AttributeGroupGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -19,7 +19,7 @@ class AttributeGroupGridListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $listener;
 
-    /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeManager;
 
     /**

@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartInitDataProcessor;
 
-class StartInitDataProcessorTest extends \PHPUnit_Framework_TestCase
+class StartInitDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ButtonSearchContextProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $buttonContextProvider;
 
     /** @var StartInitDataProcessor */
@@ -25,7 +25,7 @@ class StartInitDataProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSkipContextWithoutInitOptions()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(true);
         $transition->expects($this->never())->method('getInitContextAttribute');
@@ -38,7 +38,7 @@ class StartInitDataProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function addInitContextAttributeToInitData()
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('isEmptyInitOptions')->willReturn(false);
         $transition->expects($this->once())->method('getInitContextAttribute')->willReturn('attribute');
@@ -47,7 +47,7 @@ class StartInitDataProcessorTest extends \PHPUnit_Framework_TestCase
         $context->setTransition($transition);
         $context->set(TransitionContext::INIT_DATA, ['other data' => 42, 'attribute' => 'will be another']);
 
-        /** @var ButtonSearchContext|\PHPUnit_Framework_MockObject_MockObject $buttonSearchContext */
+        /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject $buttonSearchContext */
         $buttonSearchContext = $this->createMock(ButtonSearchContext::class);
 
         $this->buttonContextProvider->expects($this->once())

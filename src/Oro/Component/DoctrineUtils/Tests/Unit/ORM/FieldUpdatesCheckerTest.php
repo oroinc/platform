@@ -10,7 +10,7 @@ use Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
+class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
 {
     const RELATION_FIELD = 'relationEntity';
     const RELATION_COLLECTION_FIELD = 'relationEntityCollection';
@@ -119,7 +119,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit_Framework_TestCase
      * @param array $updatedEntities
      * @param array $deletedEntities
      *
-     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getManagerRegistry(
         array $updatedEntities = [],

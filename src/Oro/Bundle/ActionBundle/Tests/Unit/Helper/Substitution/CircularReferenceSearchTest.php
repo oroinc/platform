@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper\Substitution;
 
 use Oro\Bundle\ActionBundle\Helper\Substitution\CircularReferenceSearch;
 
-class CircularReferenceSearchTest extends \PHPUnit_Framework_TestCase
+class CircularReferenceSearchTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssert()
     {

@@ -12,7 +12,7 @@ use Oro\Component\DependencyInjection\ServiceLink;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
+class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 {
     protected $owners;
 
@@ -162,7 +162,7 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
      * @param integer $id
      * @param integer $thread
 
-     * @return Email|\PHPUnit_Framework_MockObject_MockObject
+     * @return Email|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getEmailEntity($id = null, $thread = null)
     {

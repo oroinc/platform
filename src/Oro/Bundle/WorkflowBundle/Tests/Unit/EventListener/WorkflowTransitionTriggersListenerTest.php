@@ -13,17 +13,17 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowTransitionTriggersAssembler;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class WorkflowTransitionTriggersListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionTriggersListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var WorkflowTransitionTriggersListener */
     private $listener;
 
-    /** @var TransitionTriggersUpdater|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionTriggersUpdater|\PHPUnit\Framework\MockObject\MockObject */
     private $updater;
 
-    /** @var WorkflowTransitionTriggersAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTransitionTriggersAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
     protected function setUp()

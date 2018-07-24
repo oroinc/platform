@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
-class StripHtmlTagsTest extends \PHPUnit_Framework_TestCase
+class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var StripHtmlTags */
     protected $action;

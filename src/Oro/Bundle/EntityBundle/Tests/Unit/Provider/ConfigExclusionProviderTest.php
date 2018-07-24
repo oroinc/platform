@@ -4,35 +4,32 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
-class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigExclusionProvider */
-    protected $provider;
+    private $provider;
 
     public function setUp()
     {
-        $hierarchyProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
-        $hierarchyProvider->expects($this->any())
+        $hierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
+        $hierarchyProvider->expects(self::any())
             ->method('getHierarchyForClassName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test\Entity\Entity1', ['Test\Entity\BaseEntity1']],
-                        ['Test\Entity\Entity2', []],
-                        ['Test\Entity\Entity3', []],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Test\Entity\Entity1', ['Test\Entity\BaseEntity1']],
+                ['Test\Entity\Entity2', []],
+                ['Test\Entity\Entity3', []],
+                ['Test\Entity\Entity4', []]
+            ]);
 
         $this->provider = new ConfigExclusionProvider(
             $hierarchyProvider,
             [
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],
                 ['entity' => 'Test\Entity\BaseEntity1', 'field' => 'field2'],
-                ['entity' => 'Test\Entity\BaseEntity1', 'type' => 'float'],
                 ['type' => 'date'],
-                ['entity' => 'Test\Entity\Entity3'],
+                ['entity' => 'Test\Entity\Entity3']
             ]
         );
     }
@@ -42,7 +39,7 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsIgnoredEntity($className, $expected)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->provider->isIgnoredEntity($className)
         );
@@ -53,9 +50,23 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsIgnoredField($metadata, $fieldName, $expected)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->provider->isIgnoredField($metadata, $fieldName)
+        );
+    }
+
+    public function testIsIgnoredFieldByDataType()
+    {
+        $metadata = $this->getEntityMetadata(
+            'Test\Entity\Entity2',
+            [
+                'field1' => 'date'
+            ]
+        );
+
+        self::assertTrue(
+            $this->provider->isIgnoredField($metadata, 'field1')
         );
     }
 
@@ -64,7 +75,7 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsIgnoredRelation($metadata, $associationName, $expected)
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->provider->isIgnoredRelation($metadata, $associationName)
         );
@@ -73,104 +84,83 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
     public function entityProvider()
     {
         return [
-            ['Test\Entity\Entity1', false],
-            ['Test\Entity\Entity3', true],
+            'excluded'                                    => ['Test\Entity\Entity3', true],
+            'not excluded, has excluded fields'           => ['Test\Entity\Entity1', false],
+            'not excluded, does not have excluded fields' => ['Test\Entity\Entity4', false]
         ];
     }
 
     public function fieldProvider()
     {
         return [
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field1', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field2', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field3', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field4', false],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field5', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity1',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'string',
-                    'field3' => 'date',
-                    'field4' => 'text',
-                    'field5' => 'date',
-                    'field6' => 'float',
-                ]
-            ), 'field6', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity2',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'date',
-                ]
-            ), 'field1', false],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity2',
-                [
-                    'field1' => 'integer',
-                    'field2' => 'date',
-                ]
-            ), 'field2', true],
-            [$this->getEntityMetadata(
-                'Test\Entity\Entity3',
-                [
-                    'field1' => 'integer',
-                ]
-            ), 'field1', true],
+            'excluded'                                               => [
+                $this->getEntityMetadata(
+                    'Test\Entity\Entity1',
+                    [
+                        'field1' => 'integer',
+                        'field2' => 'string',
+                        'field3' => 'date'
+                    ]
+                ),
+                'field1',
+                true
+            ],
+            'excluded in parent class'                               => [
+                $this->getEntityMetadata(
+                    'Test\Entity\Entity1',
+                    [
+                        'field1' => 'integer',
+                        'field2' => 'string',
+                        'field3' => 'date'
+                    ]
+                ),
+                'field2',
+                true
+            ],
+            'not excluded, but entity has other excluded fields'     => [
+                $this->getEntityMetadata(
+                    'Test\Entity\Entity1',
+                    [
+                        'field1' => 'integer',
+                        'field2' => 'string',
+                        'field3' => 'date',
+                        'field4' => 'text'
+                    ]
+                ),
+                'field4',
+                false
+            ],
+            'not excluded, entity does not have any excluded fields' => [
+                $this->getEntityMetadata(
+                    'Test\Entity\Entity2',
+                    [
+                        'field1' => 'integer',
+                        'field2' => 'date'
+                    ]
+                ),
+                'field1',
+                false
+            ],
+            'excluded, because whole entity is excluded'             => [
+                $this->getEntityMetadata(
+                    'Test\Entity\Entity3',
+                    [
+                        'field1' => 'integer'
+                    ]
+                ),
+                'field1',
+                true
+            ]
         ];
     }
 
-    protected function getEntityMetadata($className, $fields = [])
+    /**
+     * @param string $className
+     * @param array  $fields
+     *
+     * @return ClassMetadata
+     */
+    private function getEntityMetadata(string $className, array $fields = []): ClassMetadata
     {
         $metadata = new ClassMetadata($className);
 

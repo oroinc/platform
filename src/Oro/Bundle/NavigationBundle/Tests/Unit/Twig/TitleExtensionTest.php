@@ -8,14 +8,14 @@ use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class TitleExtensionTest extends \PHPUnit_Framework_TestCase
+class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TitleServiceInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TitleServiceInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $titleService;
 
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
     /** @var TitleExtension */

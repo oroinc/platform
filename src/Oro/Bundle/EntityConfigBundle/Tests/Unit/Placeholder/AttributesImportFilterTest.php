@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
+class AttributesImportFilterTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -24,17 +24,17 @@ class AttributesImportFilterTest extends \PHPUnit_Framework_TestCase
     const TOPIC = 'Topic';
 
     /**
-     * @var EntityAliasResolver|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityAliasResolver|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityAliasResolver;
 
     /**
-     * @var AttributesImportTopicSender|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $topicSender;
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 

@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteAsso
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteCustomAssociationHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition\CompleteEntityDefinitionHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
@@ -22,16 +24,19 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
+    private $entityOverrideProvider;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CompleteCustomAssociationHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomAssociationHelper */
     private $customAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExclusionProviderRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderRegistry */
     private $exclusionProviderRegistry;
 
     /** @var CompleteEntityDefinitionHelper */
@@ -42,12 +47,19 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->customAssociationHelper = $this->createMock(CompleteCustomAssociationHelper::class);
         $this->exclusionProviderRegistry = $this->createMock(ExclusionProviderRegistry::class);
 
+        $entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
+        $entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->willReturn($this->entityOverrideProvider);
+
         $this->completeEntityDefinitionHelper = new CompleteEntityDefinitionHelper(
             $this->doctrineHelper,
+            $entityOverrideProviderRegistry,
             new EntityIdHelper(),
             new CompleteAssociationHelper($this->configProvider),
             $this->customAssociationHelper,
@@ -1122,7 +1134,98 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                     'association1' => [
                         'data_type'    => 'some_custom_association',
                         'target_class' => 'Test\Association1Target',
-                        'target_type'  => 'to-one',
+                        'target_type'  => 'to-one'
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteDefinitionForAssociationToOverriddenEntity()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+
+        $this->entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Association1Target')
+            ->willReturn('Test\Association1SubstituteTarget');
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1SubstituteTarget', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1SubstituteTarget',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
                     ]
                 ]
             ],

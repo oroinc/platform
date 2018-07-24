@@ -9,10 +9,10 @@ use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class AppearanceExtensionTest extends \PHPUnit_Framework_TestCase
+class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 

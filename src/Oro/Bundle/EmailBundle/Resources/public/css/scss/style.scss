@@ -1,9 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins";
-@import "./short-emails-list";
-@import "./sidebar-widget";
-
 .auto-response-rules {
     .select-all-header-cell__dropdown-menu .all-visible {
         display: none;
@@ -161,12 +157,14 @@
             width: 100%;
             max-width: 542px;
         }
+
         .tab-pane {
             input,
             textarea {
                 width: 100%;
                 box-sizing: border-box;
             }
+
             input {
                 height: 32px;
             }
@@ -299,7 +297,8 @@
     top: 5px;
     right: 0;
 
-    .showCc, .showBcc {
+    .showCc,
+    .showBcc {
         cursor: pointer;
         padding: 0 5px;
 
@@ -338,7 +337,7 @@ span.icon.grid .fa-paperclip {
 }
 
 .thread-view {
-    padding-left: $horizontalPadding;
+    padding-left: $horizontal-padding;
 
     .email-load-more {
         border-bottom: 1px solid #e5e5e5;
@@ -656,6 +655,7 @@ span.icon.grid .fa-paperclip {
         }
     }
 }
+
 .accordion-body .email-info {
     &:last-child .email-content {
         padding-bottom: 0;
@@ -979,10 +979,11 @@ a.sync-btn span.dots {
         margin-bottom: 20px;
     }
 }
+
 .grid-body-cell-subject {
     .email-body {
         display: inline;
-        
+
         &:before {
             content: '-';
             display: inline;

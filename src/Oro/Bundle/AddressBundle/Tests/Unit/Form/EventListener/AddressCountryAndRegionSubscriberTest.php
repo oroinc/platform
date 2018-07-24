@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
 use Symfony\Component\Form\FormEvents;
 
-class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
+class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_COUNTRY_NAME = 'testCountry';
 

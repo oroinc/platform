@@ -7,7 +7,7 @@ use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggl
 use Oro\Bundle\FeatureToggleBundle\OroFeatureToggleBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroFeatureToggleBundleTest extends \PHPUnit_Framework_TestCase
+class OroFeatureToggleBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {

@@ -15,21 +15,21 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDe
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 
-class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
+class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionTriggersUpdater */
     private $updater;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**@var TransitionTriggersUpdateDecider|\PHPUnit_Framework_MockObject_MockObject */
+    /**@var TransitionTriggersUpdateDecider|\PHPUnit\Framework\MockObject\MockObject */
     private $updateDecider;
 
-    /** @var TransitionTriggerCronScheduler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
     private $cronScheduler;
 
-    /** @var EventTriggerCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     protected function setUp()
@@ -198,7 +198,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManager
      */
     public function emRetrieval()
     {
@@ -211,7 +211,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityRepository
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityRepository
      */
     public function repositoryRetrieval()
     {

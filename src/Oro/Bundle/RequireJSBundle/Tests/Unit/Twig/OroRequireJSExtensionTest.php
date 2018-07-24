@@ -9,17 +9,17 @@ use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
+class OroRequireJSExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var OroRequireJSExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     protected function setUp()

@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 
-class CompilerTest extends \PHPUnit_Framework_TestCase
+class CompilerTest extends \PHPUnit\Framework\TestCase
 {
     public function testCompile()
     {

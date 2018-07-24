@@ -9,14 +9,14 @@ use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\Form\FormView;
 
-class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
+class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var TwigRendererInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TwigRendererInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $renderer;
 
-    /** @var TextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TextHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $textHelper;
 
     /** @var LayoutExtension */

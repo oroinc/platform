@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 use Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider;
 use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 
-class OrmEntityClassProviderTest extends \PHPUnit_Framework_TestCase
+class OrmEntityClassProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetClassNames()
     {

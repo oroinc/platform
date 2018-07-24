@@ -1,86 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins";
-
-/* TODO: remove after main page element are redesigned */
-
-.collapsed .widget-header .collapse-expand-action-container .collapse-action:before {
-    content: normal;
-}
-
-.dashboard-widget {
-    .widget-header {
-        [class^="fa-"], [class*=" fa-"] {
-            font-size: 16px;
-        }
-
-        .btn-link {
-            color: $primary-700;
-
-            &:hover, &:active, &:focus {
-                color: $primary-400;
-
-                outline: none;
-            }
-        }
-        .dropdown-menu {
-            &:before {
-                border-bottom: 7px solid rgba(0, 0, 0, .2);
-                border-left: 7px solid transparent;
-                border-right: 7px solid transparent;
-                content: "";
-                display: inline-block;
-                left: 13px;
-                position: absolute;
-                top: -7px;
-            }
-
-            &:after {
-                border-bottom: 6px solid $primary-inverse;
-                border-left: 6px solid transparent;
-                border-right: 6px solid transparent;
-                content: "";
-                display: inline-block;
-                left: 14px;
-                position: absolute;
-                top: -6px;
-            }
-        }
-        .dropdown.pull-right .dropdown-menu,
-        .dropup.pull-right .dropdown-menu {
-            &:before {
-                left: auto;
-                right: 13px;
-            }
-
-            &:after {
-                left: auto;
-                right: 14px;
-            }
-        }
-
-        .dropup.pull-right .dropdown-menu {
-            &:before {
-                border-top: 7px solid rgba(0, 0, 0, .2);
-                border-bottom: none;
-                top: auto;
-                bottom: -7px;
-            }
-
-            &:after {
-                border-top: 6px solid $primary-inverse;
-                border-bottom: none;
-                top: auto;
-                bottom: -6px;
-            }
-        }
-    }
-}
-html body {
-    font-size: 14px;
-}
-/* end TODO block */
-
 .dashboard-selector-container {
     label {
         padding-top: 4px;
@@ -604,25 +523,6 @@ html body {
 
         .action-cell .btn {
             padding: 0 4px;
-        }
-    }
-}
-
-#dashboard_selector,
-#uniform-dashboard_selector {
-    height: 28px;
-
-    &.selector {
-        line-height: 28px;
-
-        span {
-            height: 28px;
-
-            line-height: 28px;
-
-            &:after {
-                margin: 1px 2px 0 0;
-            }
         }
     }
 }

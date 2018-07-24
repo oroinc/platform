@@ -11,21 +11,21 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
+class DefaultLocalizationValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Constraints\DefaultLocalization */
     protected $constraint;
 
-    /** @var ConstraintViolationBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConstraintViolationBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $violationBuilder;
 
-    /** @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    /** @var LocalizationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationManager;
 
-    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     /** @var DefaultLocalizationValidator */

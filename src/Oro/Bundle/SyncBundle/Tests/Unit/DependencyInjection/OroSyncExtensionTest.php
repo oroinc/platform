@@ -5,7 +5,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
+class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadDataProvider

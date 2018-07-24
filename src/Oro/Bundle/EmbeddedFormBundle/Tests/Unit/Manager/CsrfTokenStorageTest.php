@@ -6,16 +6,16 @@ use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EmbeddedFormBundle\Manager\CsrfTokenStorage;
 use Oro\Bundle\EmbeddedFormBundle\Manager\SessionIdProviderInterface;
 
-class CsrfTokenStorageTest extends \PHPUnit_Framework_TestCase
+class CsrfTokenStorageTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SESSION_ID          = 'test_sid';
     const TEST_CSRF_TOKEN_ID       = 'test_token_id';
     const TEST_CSRF_TOKEN_LIFETIME = 123;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenCache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $sessionIdProvider;
 
     /** @var CsrfTokenStorage */

@@ -8,7 +8,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendConfigMigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
 
-class UpdateExtendConfigMigrationTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testUp()
     {

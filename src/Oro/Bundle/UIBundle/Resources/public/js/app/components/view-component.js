@@ -26,7 +26,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var subPromises = _.values(options._subPromises);
-            var viewOptions = _.extend(
+            var viewOptions = _.defaults(
                 _.omit(options, '_sourceElement', '_subPromises', 'view'),
                 {el: options._sourceElement}
             );

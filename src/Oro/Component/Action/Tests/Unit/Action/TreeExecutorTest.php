@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\TreeExecutor;
 
-class TreeExecutorTest extends \PHPUnit_Framework_TestCase
+class TreeExecutorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TreeExecutor
@@ -12,7 +12,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
     protected $listAction;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder
+     * @var \PHPUnit\Framework\MockObject\MockBuilder
      */
     protected $actionBuilder;
 
@@ -136,7 +136,7 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getActionMock()
     {

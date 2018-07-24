@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid;
 
-class CustomEntityDatagridTest extends \PHPUnit_Framework_TestCase
+class CustomEntityDatagridTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitialize()
     {

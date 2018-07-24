@@ -1,12 +1,10 @@
 /* @theme: admin.oro; */
 
-@import "email-variables";
-@import "oroui/css/scss/mixins";
-
 .email-notification-menu {
     .oro-dropdown-toggle {
         .mail-icon {
             @include fa-icon($email-inactive-mail-icon);
+
             position: relative;
             padding-top: 3px;
             display: inline-block;
@@ -14,18 +12,19 @@
             font-weight: normal;
             font-size: 16px;
             line-height: 16px;
+
             .item-counter {
-                display: none;
-                color: $primary-inverse;
-                background-color: $extra;
-                color: $email-item-counter-text-color;
                 background-color: $email-item-counter-bg;
+                display: none;
+                color: $email-item-counter-text-color;
             }
+
             &.has-icon-counter {
                 .item-counter {
                     display: inline-block;
                 }
             }
+
             &.highlight {
                 @include fa-icon($email-active-mail-icon);
             }
@@ -47,8 +46,7 @@
     .new-email-notification {
         position: absolute;
         top: 100%;
-        right: 0;
-        margin-top: 6px;
+        right: -18px;
         display: none;
         width: 160px;
         padding: 8px 12px;

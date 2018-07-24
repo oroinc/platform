@@ -3,7 +3,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 
-class TopicMetaTest extends \PHPUnit_Framework_TestCase
+class TopicMetaTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithNameOnly()
     {

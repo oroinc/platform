@@ -35,7 +35,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $referenceRepository->set('berlin', $berlin);
 
         /** @var Region $florida */
-        $florida = $repository->findOneBy(['name' => 'Florida']);
+        $florida = $repository->findOneBy(['name' => 'Florida', 'country' => $us]);
         $referenceRepository->set('florida', $florida);
 
         /** @var AddressTypeRepository $repository */

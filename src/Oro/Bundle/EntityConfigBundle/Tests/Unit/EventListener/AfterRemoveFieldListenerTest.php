@@ -10,13 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
 use Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AfterRemoveFieldListenerTest extends \PHPUnit_Framework_TestCase
+class AfterRemoveFieldListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     public function testOnAfterRemove()
     {
-        /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject $doctrineHelper */
+        /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper */
         $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();

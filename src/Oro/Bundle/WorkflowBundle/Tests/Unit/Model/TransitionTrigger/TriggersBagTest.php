@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
 
-class TriggersBagTest extends \PHPUnit_Framework_TestCase
+class TriggersBagTest extends \PHPUnit\Framework\TestCase
 {
     public function testBag()
     {

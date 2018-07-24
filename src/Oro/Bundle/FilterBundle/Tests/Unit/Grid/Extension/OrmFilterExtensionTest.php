@@ -8,9 +8,9 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
-class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
+class OrmFilterExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var OrmFilterExtension */

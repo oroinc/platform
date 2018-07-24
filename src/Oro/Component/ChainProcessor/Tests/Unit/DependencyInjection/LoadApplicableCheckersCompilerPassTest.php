@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class LoadApplicableCheckersCompilerPassTest extends \PHPUnit_Framework_TestCase
+class LoadApplicableCheckersCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessWithoutProcessorBag()
     {

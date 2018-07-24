@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Forms;
 
-class DataBlockBuilderTest extends \PHPUnit_Framework_TestCase
+class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormFactory

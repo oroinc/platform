@@ -43,9 +43,7 @@ abstract class ApiTestCase extends WebTestCase
      */
     protected function setUp()
     {
-        /** @var ContainerInterface $container */
         $container = self::getContainer();
-
         $this->valueNormalizer = $container->get('oro_api.value_normalizer');
         $this->doctrineHelper = $container->get('oro_api.doctrine_helper');
     }
@@ -359,8 +357,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -390,8 +388,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -426,14 +424,14 @@ abstract class ApiTestCase extends WebTestCase
                     if (!empty($message)) {
                         $failureMessage = $message . "\n" . $failureMessage;
                     }
-                    throw new \PHPUnit_Framework_ExpectationFailedException($failureMessage);
+                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
                 }
             } else {
-                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+                \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
-                $e = new \PHPUnit_Framework_ExpectationFailedException(
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
                 );
@@ -443,13 +441,30 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
+     * Asserts response status code equals to 405 (Method Not Allowed)
+     * and "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    public static function assertMethodNotAllowedResponse(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ) {
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_METHOD_NOT_ALLOWED, $message);
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
+    }
+
+    /**
      * Asserts an array contains the expected array.
      *
      * @param array  $expected
      * @param mixed  $actual
      * @param string $message
      */
-    protected static function assertArrayContains(array $expected, $actual, $message = '')
+    protected static function assertArrayContains(array $expected, $actual, string $message = '')
     {
         self::assertThat($actual, new ArrayContainsConstraint($expected, false), $message);
     }

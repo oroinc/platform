@@ -9,7 +9,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
 
 class LoadConfigurationSectionTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configRepository;
 
     /** @var LoadConfigurationSection */

@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
+class SwiftMailerHandlerPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SwiftMailerHandlerPass

@@ -8,7 +8,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ActivityOwnerTest extends \PHPUnit_Framework_TestCase
+class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ActivityOwner

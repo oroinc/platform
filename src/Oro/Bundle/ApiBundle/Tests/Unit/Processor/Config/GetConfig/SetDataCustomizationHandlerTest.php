@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CustomizeLoadedDataProcessor */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CustomizeLoadedDataProcessor */
     private $customizationProcessor;
 
     /** @var SetDataCustomizationHandler */
@@ -47,8 +47,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     public function testProcessForNotCompletedConfig()
     {
         $config = [
-            'exclusion_policy' => 'none',
-            'fields'           => [
+            'fields' => [
                 'field1' => null
             ]
         ];

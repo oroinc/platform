@@ -5,7 +5,7 @@ use Oro\Bundle\UIBundle\ContentProvider\CurrentRouteContentProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CurrentRouteContentProviderTest extends \PHPUnit_Framework_TestCase
+class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Request

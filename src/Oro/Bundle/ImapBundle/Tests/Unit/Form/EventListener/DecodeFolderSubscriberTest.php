@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 
-class DecodeFolderSubscriberTest extends \PHPUnit_Framework_TestCase
+class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  DecodeFolderSubscriber */
     protected $listener;

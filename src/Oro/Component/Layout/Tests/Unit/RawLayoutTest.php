@@ -12,7 +12,7 @@ use Oro\Component\Layout\RawLayout;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RawLayoutTest extends \PHPUnit_Framework_TestCase
+class RawLayoutTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayout */
     protected $rawLayout;

@@ -10,10 +10,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 
-class ConstraintsProviderTest extends \PHPUnit_Framework_TestCase
+class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $metadataFactory;
 

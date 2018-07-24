@@ -6,7 +6,7 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
-class BlockUtilsTest extends \PHPUnit_Framework_TestCase
+class BlockUtilsTest extends \PHPUnit\Framework\TestCase
 {
     public function testRegisterPlugin()
     {

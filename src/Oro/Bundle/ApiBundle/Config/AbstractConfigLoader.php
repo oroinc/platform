@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
+/**
+ * A base class for configuration section loaders.
+ */
 abstract class AbstractConfigLoader implements ConfigLoaderInterface
 {
     /**
@@ -11,7 +14,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
      */
     protected function callSetter($config, $method, $value)
     {
-        if (is_array($method)) {
+        if (\is_array($method)) {
             $config->{$method[$value ? 0 : 1]}();
         } else {
             $config->{$method}($value);
@@ -43,7 +46,7 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
 
         $setter = 'set' . $this->camelize($key);
 
-        return method_exists($config, $setter)
+        return \method_exists($config, $setter)
             ? $setter
             : null;
     }
@@ -71,6 +74,6 @@ abstract class AbstractConfigLoader implements ConfigLoaderInterface
      */
     protected function camelize($string)
     {
-        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+        return strtr(\ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 }

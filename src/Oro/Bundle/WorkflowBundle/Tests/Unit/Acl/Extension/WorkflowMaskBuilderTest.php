@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder;
 
-class WorkflowMaskBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testViewWorkflowGroup()
     {

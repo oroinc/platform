@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\SettingsConverter;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
-class SettingsConverterTest extends \PHPUnit_Framework_TestCase
+class SettingsConverterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderForConverter

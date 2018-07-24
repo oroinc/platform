@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
 
-class CustomizeLoadedDataConfigExtraTest extends \PHPUnit_Framework_TestCase
+class CustomizeLoadedDataConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -16,16 +16,16 @@ class CustomizeLoadedDataConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(CustomizeLoadedDataConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(CustomizeLoadedDataConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isPropagable());
+        self::assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(CustomizeLoadedDataConfigExtra::NAME, $this->extra->getCacheKeyPart());
+        self::assertEquals(CustomizeLoadedDataConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }
 }

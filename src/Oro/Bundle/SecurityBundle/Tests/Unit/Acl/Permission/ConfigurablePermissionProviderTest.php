@@ -7,15 +7,15 @@ use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
-class ConfigurablePermissionProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurablePermissionProvider */
     protected $provider;
 
-    /** @var ConfigurablePermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configurationProvider;
 
-    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheProvider;
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 
-class ActionGroupNotFoundExceptionTest extends \PHPUnit_Framework_TestCase
+class ActionGroupNotFoundExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class AttachmentEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class AttachmentEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttachmentEntityGeneratorExtension */
     protected $extension;

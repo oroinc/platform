@@ -7,7 +7,7 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouteCollectionAccessorTest extends \PHPUnit_Framework_TestCase
+class RouteCollectionAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EnhancedRouteCollection */
     protected $collection;

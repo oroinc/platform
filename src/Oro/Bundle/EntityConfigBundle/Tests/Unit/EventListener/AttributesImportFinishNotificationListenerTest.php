@@ -10,19 +10,16 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExpo
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
-use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Oro\Bundle\SyncBundle\Content\TopicSender;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class AttributesImportFinishNotificationListenerTest extends \PHPUnit_Framework_TestCase
+class AttributesImportFinishNotificationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     const ENTITY_ID = 27;
 
     /**
-     * @var AttributesImportTopicSender|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttributesImportTopicSender|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $topicSender;
 

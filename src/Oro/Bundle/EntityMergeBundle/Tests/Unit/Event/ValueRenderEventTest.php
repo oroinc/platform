@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 
-class ValueRenderEventTest extends \PHPUnit_Framework_TestCase
+class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ValueRenderEvent
@@ -17,7 +17,7 @@ class ValueRenderEventTest extends \PHPUnit_Framework_TestCase
     protected $originalValue;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $metadata;
 

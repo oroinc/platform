@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationNameGenerator;
 
-class AssociationNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class AssociationNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getMethodNamesProvider

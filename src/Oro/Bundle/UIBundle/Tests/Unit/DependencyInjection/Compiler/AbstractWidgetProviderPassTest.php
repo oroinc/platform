@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AbstractWidgetProviderPassTest extends \PHPUnit_Framework_TestCase
+class AbstractWidgetProviderPassTest extends \PHPUnit\Framework\TestCase
 {
     const SERVICE_ID = 'test_service';
     const TAG_NAME   = 'test_tag';

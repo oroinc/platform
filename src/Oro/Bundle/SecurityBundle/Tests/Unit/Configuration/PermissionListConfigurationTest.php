@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
 
-class PermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
+class PermissionListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PermissionListConfiguration

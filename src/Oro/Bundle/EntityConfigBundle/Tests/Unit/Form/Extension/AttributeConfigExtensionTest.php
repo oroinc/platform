@@ -19,13 +19,13 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class AttributeConfigExtensionTest extends TypeTestCase
 {
-    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeConfigProvider;
 
-    /** @var SerializedFieldProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $serializedFieldProvider;
 
-    /** @var AttributeTypeRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $attributeTypeRegistry;
 
     /** @var AttributeConfigExtension */
@@ -196,7 +196,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
     public function testOnPostSetData()
     {
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->getMockBuilder(FormInterface::class)
             ->getMock();
         $form->expects($this->once())

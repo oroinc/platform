@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -52,12 +51,12 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
             ->useAttributeAsKey('name')
             ->normalizeKeys(false)
             ->prototype('array')
-                ->treatFalseLike([SubresourceConfig::EXCLUDE => true])
-                ->treatTrueLike([SubresourceConfig::EXCLUDE => false])
-                ->treatNullLike([SubresourceConfig::EXCLUDE => false])
+                ->treatFalseLike([ConfigUtil::EXCLUDE => true])
+                ->treatTrueLike([ConfigUtil::EXCLUDE => false])
+                ->treatNullLike([ConfigUtil::EXCLUDE => false])
                 ->children();
         $subresourceNode
-            ->booleanNode(SubresourceConfig::EXCLUDE)->end();
+            ->booleanNode(ConfigUtil::EXCLUDE)->end();
         $this->configureSubresourceNode($subresourceNode);
     }
 
@@ -89,13 +88,13 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         );
 
         $node
-            ->scalarNode(SubresourceConfig::TARGET_CLASS)->end()
-            ->enumNode(SubresourceConfig::TARGET_TYPE)
+            ->scalarNode(ConfigUtil::TARGET_CLASS)->end()
+            ->enumNode(ConfigUtil::TARGET_TYPE)
                 ->values(['to-many', 'to-one', 'collection'])
             ->end();
 
         $this->actionsConfiguration->configure(
-            $node->arrayNode(SubresourceConfig::ACTIONS)->children()
+            $node->arrayNode(ConfigUtil::ACTIONS)->children()
         );
         $this->filtersConfiguration->configure(
             $node->arrayNode(ConfigUtil::FILTERS)->children()
@@ -109,15 +108,15 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
      */
     protected function postProcessSubresourceConfig(array $config): array
     {
-        if (!empty($config[SubresourceConfig::TARGET_TYPE])) {
-            if ('collection' === $config[SubresourceConfig::TARGET_TYPE]) {
-                $config[SubresourceConfig::TARGET_TYPE] = 'to-many';
+        if (!empty($config[ConfigUtil::TARGET_TYPE])) {
+            if ('collection' === $config[ConfigUtil::TARGET_TYPE]) {
+                $config[ConfigUtil::TARGET_TYPE] = 'to-many';
             }
-        } elseif (!empty($config[SubresourceConfig::TARGET_CLASS])) {
-            $config[SubresourceConfig::TARGET_TYPE] = 'to-one';
+        } elseif (!empty($config[ConfigUtil::TARGET_CLASS])) {
+            $config[ConfigUtil::TARGET_TYPE] = 'to-one';
         }
-        if (empty($config[SubresourceConfig::ACTIONS])) {
-            unset($config[SubresourceConfig::ACTIONS]);
+        if (empty($config[ConfigUtil::ACTIONS])) {
+            unset($config[ConfigUtil::ACTIONS]);
         }
         if (empty($config[ConfigUtil::FILTERS])) {
             unset($config[ConfigUtil::FILTERS]);

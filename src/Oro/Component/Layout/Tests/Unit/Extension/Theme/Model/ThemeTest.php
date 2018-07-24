@@ -9,7 +9,7 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ThemeTest extends \PHPUnit_Framework_TestCase
+class ThemeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Theme */
     protected $theme;

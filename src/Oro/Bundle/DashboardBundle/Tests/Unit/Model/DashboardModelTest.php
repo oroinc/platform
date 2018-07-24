@@ -9,10 +9,10 @@ use Oro\Bundle\DashboardBundle\Model\DashboardModel;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class DashboardModelTest extends \PHPUnit_Framework_TestCase
+class DashboardModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dashboardEntity;
 

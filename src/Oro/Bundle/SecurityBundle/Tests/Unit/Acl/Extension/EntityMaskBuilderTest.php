@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 
-class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
+class EntityMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var int */
     protected $identity;

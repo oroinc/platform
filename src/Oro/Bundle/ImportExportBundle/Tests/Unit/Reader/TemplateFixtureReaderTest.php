@@ -4,15 +4,15 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader;
 
-class TemplateFixtureReaderTest extends \PHPUnit_Framework_TestCase
+class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $templateManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextRegistry;
 

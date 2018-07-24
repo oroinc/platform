@@ -16,10 +16,10 @@ class EntityHierarchyProviderTest extends OrmTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\Hierarchy';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emMock;
 
     protected function setUp()
@@ -93,10 +93,10 @@ class EntityHierarchyProviderTest extends OrmTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $emMock
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $emMock
      * @param boolean                                       $isReturnManager
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getDoctrineMock($emMock = null, $isReturnManager = true)
     {
@@ -112,7 +112,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getExtendConfigMock()
     {

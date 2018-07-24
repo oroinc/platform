@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 
-class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
+class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityAliasStorage */
     protected $storage;

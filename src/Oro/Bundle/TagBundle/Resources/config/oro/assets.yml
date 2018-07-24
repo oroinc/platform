@@ -1,4 +1,4 @@
 assets:
     css:
       'orotag':
-          - 'bundles/orotag/css/main.scss'
+          - 'bundles/orotag/css/scss/main.scss'

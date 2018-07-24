@@ -10,7 +10,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
-abstract class AttributeTypeTestCase extends \PHPUnit_Framework_TestCase
+abstract class AttributeTypeTestCase extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = Item::class;
     const FIELD_NAME = 'test_field_name';
@@ -22,7 +22,7 @@ abstract class AttributeTypeTestCase extends \PHPUnit_Framework_TestCase
     /** @var Localization */
     protected $localization;
 
-    /** @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityNameResolver;
 
     protected function setUp()

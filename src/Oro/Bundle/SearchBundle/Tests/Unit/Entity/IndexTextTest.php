@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item;
 
-class IndexTextTest extends \PHPUnit_Framework_TestCase
+class IndexTextTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\IndexText

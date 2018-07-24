@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 class TestFilterValueAccessor implements FilterValueAccessorInterface
 {
     /** @var FilterValue[] */
-    protected $values = [];
+    private $values = [];
 
     /**
      * {@inheritdoc}

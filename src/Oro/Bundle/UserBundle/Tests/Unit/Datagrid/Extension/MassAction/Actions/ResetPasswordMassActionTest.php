@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Datagrid\Extension\MassAction\Actions
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\Actions\ResetPasswordMassAction;
 
-class ResetPasswordMassActionTest extends \PHPUnit_Framework_TestCase
+class ResetPasswordMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResetPasswordMassAction */
     protected $resetAction;

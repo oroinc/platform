@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlPersisterTest extends \PHPUnit_Framework_TestCase
+class YamlPersisterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     protected $temporaryDir;
@@ -46,10 +46,12 @@ class YamlPersisterTest extends \PHPUnit_Framework_TestCase
 
         self::assertSame(
             Yaml::parse(
-                file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'parameters_base.yml')
+                file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'parameters_base.yml'),
+                Yaml::PARSE_CONSTANT
             ),
             Yaml::parse(
-                file_get_contents($this->temporaryDir.DIRECTORY_SEPARATOR.'parameters_dump.yml')
+                file_get_contents($this->temporaryDir.DIRECTORY_SEPARATOR.'parameters_dump.yml'),
+                Yaml::PARSE_CONSTANT
             )
         );
     }

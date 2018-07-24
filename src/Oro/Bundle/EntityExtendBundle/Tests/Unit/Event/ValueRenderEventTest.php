@@ -5,20 +5,20 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Event;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 
-class ValueRenderEventTest extends \PHPUnit_Framework_TestCase
+class ValueRenderEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $entity;
 
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldValue;
 
     /**
-     * @var FieldConfigId|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldConfigId|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldConfigId;
 

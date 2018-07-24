@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FeatureToggleablePassTest extends \PHPUnit_Framework_TestCase
+class FeatureToggleablePassTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FeatureToggleablePass
@@ -20,7 +20,7 @@ class FeatureToggleablePassTest extends \PHPUnit_Framework_TestCase
     }
     public function testSkipProcess()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container **/
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,7 +47,7 @@ class FeatureToggleablePassTest extends \PHPUnit_Framework_TestCase
 
         $checker = new Reference('oro_featuretoggle.checker.feature_checker');
 
-        /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $featureChecker */
+        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $featureChecker */
         $service = $this->getMockBuilder(Definition::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -55,7 +55,7 @@ class FeatureToggleablePassTest extends \PHPUnit_Framework_TestCase
         $service->expects($this->at(0))->method('addMethodCall')->with('addFeature', [$featureName]);
         $service->expects($this->at(1))->method('addMethodCall')->with('setFeatureChecker', [$checker]);
 
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container **/
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
         $container = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();

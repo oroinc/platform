@@ -7,7 +7,7 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
+class PopulateIntegrationOwnerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor
@@ -15,7 +15,7 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $defaultOwnerHelper;
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionConfiguration;
 
-class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
+class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ProcessDefinitionConfiguration

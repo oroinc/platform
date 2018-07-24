@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class AttributeGroupRelationTest extends \PHPUnit_Framework_TestCase
+class AttributeGroupRelationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

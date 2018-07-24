@@ -1,0 +1,6 @@
+<label class="checkbox-view" <% if (labelId) { %> for="<%= labelId %>" <% } %>>
+    <span class="checkbox-view__icon <%= type === 'radio' ? 'checkbox-view__icon--circle' : '' %>"></span>
+    <% if (label) { %>
+        <span class="checkbox-view__text"><%= label %></span>
+    <% } %>
+</label>

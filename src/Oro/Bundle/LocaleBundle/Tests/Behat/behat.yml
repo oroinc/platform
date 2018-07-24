@@ -23,7 +23,7 @@ oro_behat_extension:
           Title Use: 'oro_localization[titles][values][localizations][1][use_fallback]'
 
     Fallback Status:
-      selector: '.fallback-status [class^="fa-folder"]'
+      selector: '.fallback-status [class^="fa-language"]'
 
   suites:
       OroLocaleBundle:

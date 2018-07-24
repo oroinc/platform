@@ -7,9 +7,9 @@ use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 
-class FormHandlerRegistryTest extends \PHPUnit_Framework_TestCase
+class FormHandlerRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ServiceLinkRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ServiceLinkRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $serviceLinkRegistry;
 
     /** @var FormHandlerRegistry */
@@ -73,7 +73,7 @@ class FormHandlerRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormHandlerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormHandlerInterface
      */
     protected function getHandlerMock()
     {

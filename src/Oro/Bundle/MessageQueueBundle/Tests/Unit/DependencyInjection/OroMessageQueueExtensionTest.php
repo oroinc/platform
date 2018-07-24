@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
+class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SegmentFiltersPurifier;
 
-class SegmentFiltersPurifierTest extends \PHPUnit_Framework_TestCase
+class SegmentFiltersPurifierTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SegmentFiltersPurifier

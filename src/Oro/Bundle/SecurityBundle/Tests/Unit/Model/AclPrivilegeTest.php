@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 
-class AclPrivilegeTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersAndSetters()
     {

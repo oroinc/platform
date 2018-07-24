@@ -7,22 +7,22 @@ use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
+class PlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_PLACEHOLDER = 'test_placeholder';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ResolverInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ResolverInterface
      */
     protected $resolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface
      */
     protected $authorizationChecker;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker
+     * @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker
      */
     protected $featureChecker;
 

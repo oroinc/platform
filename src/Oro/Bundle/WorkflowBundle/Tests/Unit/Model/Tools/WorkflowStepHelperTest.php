@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowStepHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -97,7 +97,7 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Workflow
+     * @return \PHPUnit\Framework\MockObject\MockObject|Workflow
      */
     protected function getWorkflowMock()
     {
@@ -130,7 +130,7 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param Step $stepTo
-     * @return Transition|\PHPUnit_Framework_MockObject_MockObject
+     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransition($name, Step $stepTo)
     {

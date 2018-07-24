@@ -12,12 +12,12 @@ use Oro\Bundle\WorkflowBundle\EventListener\ProcessButtonsStaticTranslations;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 
-class ProcessButtonsStaticTranslationsTest extends \PHPUnit_Framework_TestCase
+class ProcessButtonsStaticTranslationsTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TransitionTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TransitionTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
 
-    /** @var ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ButtonProviderExtensionInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $extension;
 
     /** @var ButtonProvider */

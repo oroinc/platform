@@ -7,14 +7,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
 
-class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
+class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $extendConfigProvider;
     /**
-     * @var SerializedFieldProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializedFieldProvider;
 

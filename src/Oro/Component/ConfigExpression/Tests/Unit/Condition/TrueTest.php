@@ -4,7 +4,7 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 
 use Oro\Component\ConfigExpression\Condition;
 
-class TrueTest extends \PHPUnit_Framework_TestCase
+class TrueTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Condition\TrueCondition */
     protected $condition;

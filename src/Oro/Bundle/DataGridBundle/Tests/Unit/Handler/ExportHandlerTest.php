@@ -9,15 +9,15 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Psr\Log\LoggerInterface;
 
-class ExportHandlerTest extends \PHPUnit_Framework_TestCase
+class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fileManager;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 

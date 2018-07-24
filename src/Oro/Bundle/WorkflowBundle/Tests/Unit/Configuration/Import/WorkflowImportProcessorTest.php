@@ -14,12 +14,12 @@ use Symfony\Component\Finder\Finder;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class WorkflowImportProcessorTest extends \PHPUnit_Framework_TestCase
+class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowConfigFinderBuilder|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $finderBuilder;
 
-    /** @var ConfigFileReaderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $reader;
 
     /** @var WorkflowImportProcessor */
@@ -154,7 +154,7 @@ class WorkflowImportProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->configureProcessor('one', 'two', ['steps.step_b']);
 
-        /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject $parent */
+        /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $parent */
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
         $this->processor->setParent($parent);
 
@@ -202,10 +202,10 @@ class WorkflowImportProcessorTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var ConfigImportProcessorInterface|\PHPUnit_Framework_MockObject_MockObject $parent */
+        /** @var ConfigImportProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $parent */
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
 
-        /** @var Finder|\PHPUnit_Framework_MockObject_MockObject $finderMock */
+        /** @var Finder|\PHPUnit\Framework\MockObject\MockObject $finderMock */
         $finderMock = $this->createMock(Finder::class);
 
         $currentFile = new \SplFileInfo(__FILE__);
@@ -243,12 +243,12 @@ class WorkflowImportProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ArrayCollection $expected
      * @param ArrayCollection $files
-     * @return \PHPUnit_Framework_Constraint_Callback
+     * @return \PHPUnit\Framework\Constraint\Callback
      */
     protected function callbackShouldFilterCurrentFile(
         ArrayCollection $expected,
         ArrayCollection $files
-    ): \PHPUnit_Framework_Constraint_Callback {
+    ): \PHPUnit\Framework\Constraint\Callback {
         //callback constraint for argument
         return $this->callback(function (callable $filter) use ($files, $expected) {
             $this->assertEquals(
@@ -340,7 +340,7 @@ class WorkflowImportProcessorTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        /** @var Finder|\PHPUnit_Framework_MockObject_MockObject $finderMock */
+        /** @var Finder|\PHPUnit\Framework\MockObject\MockObject $finderMock */
         $finderMock = $this->createMock(Finder::class);
 
         $currentFile = new \SplFileInfo(__FILE__);

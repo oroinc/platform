@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class ChainExtensionTest extends \PHPUnit_Framework_TestCase
+class ChainExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -124,7 +124,7 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Context
+     * @return \PHPUnit\Framework\MockObject\MockObject|Context
      */
     protected function createContext()
     {
@@ -132,7 +132,7 @@ class ChainExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ExtensionInterface
      */
     protected function createExtension()
     {

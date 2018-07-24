@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UserApiKeyGenKeyTypeTest extends \PHPUnit_Framework_TestCase
+class UserApiKeyGenKeyTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserApiKeyGenKeyType */
     protected $type;

@@ -1,58 +1,142 @@
 /* @theme: admin.oro; */
 
 &.login-page {
-  height: 100%;
-  position: absolute;
-  .app-page {
     height: 100%;
-    &__central-panel {
-      padding-top: 0;
-      height: 100%;
+    overflow: visible;
+
+    .app-page {
+        &__central-panel {
+            padding-top: 0;
+            height: 100%;
+        }
     }
-  }
+
+    .btn,
+    .btn.disabled,
+    .btn[disabled],
+    .btn.disabled:active,
+    .btn[disabled]:active,
+    .ui-datepicker .ui-datepicker-buttonpane button {
+        font-size: 14px;
+        line-height: 38px;
+        height: 40px;
+        border-radius: 20px;
+    }
 }
+
+.form-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 0 30px;
+
+    &__title {
+        background: #5e5e60;
+        font-size: 17px;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+    }
+
+    &__inner {
+        margin-top: 0;
+        padding: 25px 15px;
+        max-width: 575px;
+        min-width: inherit;
+    }
+}
+
 .form-signin {
-  max-width: 320px;
-  fieldset {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-  .add-on {
-    & + input[type="text"],
-    & + input[type="email"],
-    & + input[type="password"] {
-      width: 152px;
+    margin: 0 auto;
+
+    &__info {
+        margin: 16px 0;
+
+        .alert {
+            padding: 8px;
+        }
     }
-    & + select {
-      width: 174px;
-      height: 36px;
-      box-sizing: border-box;
+
+    &__footer {
+        padding-left: 0;
     }
-  }
-  .oro-forgot-password {
-    input {
-      width: 256px;
+
+    &__oauth {
+        padding-left: 0;
     }
-  }
-  .oro-hint,
-  .alert {
-    width: 278px;
-  }
-  span.validation-failed {
-    font-size: 13px;
-  }
+
+    &__roles-item {
+        display: block;
+    }
+
+    .title-box {
+        margin: 0 0 5px;
+
+        .title {
+            font-size: 20px;
+            line-height: 1.5;
+        }
+    }
+
+    .add-on {
+        height: auto;
+        line-height: normal;
+        text-align: left;
+
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: 100%;
+        }
+
+        & + select {
+            width: 174px;
+            height: 36px;
+            box-sizing: border-box;
+        }
+    }
+
+    .oro-remember-me {
+        padding-left: 0;
+    }
+
+    span.validation-failed {
+        font-size: 13px;
+    }
+
+    .input-field-group {
+        margin-bottom: 15px;
+    }
+
+    .input-append,
+    .input-prepend {
+        white-space: normal;
+    }
 }
 
 .form-reset {
-  max-width: 320px !important;
-  .add-on {
-    width: 120px;
-    font-size: 12px;
+    max-width: 320px !important;
 
-    & + input[type="text"],
-    & + input[type="email"],
-    & + input[type="password"] {
-      width: 138px;
+    .add-on {
+        width: 120px;
+        font-size: 12px;
+
+        & + input[type="text"],
+        & + input[type="email"],
+        & + input[type="password"] {
+            width: 138px;
+        }
     }
-  }
+}
+
+@media only screen and (min-width: 600px) {
+    .form-signin {
+        &__roles {
+            display: flex;
+            justify-content: space-around;
+        }
+    }
 }

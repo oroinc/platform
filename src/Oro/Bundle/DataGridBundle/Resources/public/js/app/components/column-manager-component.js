@@ -143,6 +143,7 @@ define(function(require) {
                 addSorting: this.addSorting,
                 orderShift: orderShift
             });
+
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
         },
 

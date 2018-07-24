@@ -7,7 +7,7 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IifTest extends \PHPUnit_Framework_TestCase
+class IifTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Func\Iif */
     protected $function;

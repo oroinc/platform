@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SearchBundle\Entity\Query;
 
-class QueryTest extends \PHPUnit_Framework_TestCase
+class QueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \Oro\Bundle\SearchBundle\Entity\Query

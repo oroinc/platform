@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 
-class SortersConfigExtraTest extends \PHPUnit_Framework_TestCase
+class SortersConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SortersConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -16,21 +16,21 @@ class SortersConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(SortersConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(SortersConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isPropagable());
+        self::assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(SortersConfigExtra::NAME, $this->extra->getCacheKeyPart());
+        self::assertEquals(SortersConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }
 
     public function testConfigType()
     {
-        $this->assertEquals('sorters', $this->extra->getConfigType());
+        self::assertEquals('sorters', $this->extra->getConfigType());
     }
 }

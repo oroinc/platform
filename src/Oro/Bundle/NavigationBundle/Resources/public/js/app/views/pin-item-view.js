@@ -1,14 +1,15 @@
-define([
-    'orotranslation/js/translator',
-    'oroui/js/mediator',
-    './bookmark-item-view'
-], function(__, mediator, BookmarkItemView) {
+define(function(require) {
     'use strict';
 
     var PinItemView;
+    var mediator = require('oroui/js/mediator');
+    var __ = require('orotranslation/js/translator');
+    var BookmarkItemView = require('oronavigation/js/app/views/bookmark-item-view');
 
     PinItemView = BookmarkItemView.extend({
         className: 'pin-holder',
+
+        template: require('tpl!oronavigation/templates/pin-item.html'),
 
         /**
          * @inheritDoc

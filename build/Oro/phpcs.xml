@@ -7,5 +7,8 @@
         <exclude-pattern>*/DependencyInjection/*Extension.php</exclude-pattern>
         <exclude-pattern>*/DependencyInjection/*Configuration.php</exclude-pattern>
     </rule>
+    <rule ref="Generic.Commenting.Todo">
+        <type>error</type>
+    </rule>
     <exclude-pattern>*/Acme/*</exclude-pattern>
 </ruleset>

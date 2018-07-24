@@ -9,7 +9,7 @@ use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFile
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory;
 
-class ThumbnailFactoryTest extends \PHPUnit_Framework_TestCase
+class ThumbnailFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ThumbnailFactory
@@ -17,17 +17,17 @@ class ThumbnailFactoryTest extends \PHPUnit_Framework_TestCase
     private $thumbnailFactory;
 
     /**
-     * @var FilterConfiguration|\PHPUnit_Framework_MockObject_MockObject
+     * @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject
      */
     private $filterConfig;
 
     /**
-     * @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $imagineBinaryFactory;
 
     /**
-     * @var ImagineBinaryFilterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $imagineBinaryFilter;
 
@@ -90,7 +90,7 @@ class ThumbnailFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return BinaryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return BinaryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function createBinaryMock()
     {

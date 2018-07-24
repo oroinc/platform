@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener\Cache;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 
-abstract class EnumValueListenerTestCase extends \PHPUnit_Framework_TestCase
+abstract class EnumValueListenerTestCase extends \PHPUnit\Framework\TestCase
 {
     const ENUM_VALUE_CLASS = StubEnumValue::class;
 
-    /** @var EnumTranslationCache|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
     public function setUp()

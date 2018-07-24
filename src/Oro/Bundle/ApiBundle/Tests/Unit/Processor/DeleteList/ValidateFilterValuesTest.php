@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 {
     /** @var ValidateFilterValues */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {

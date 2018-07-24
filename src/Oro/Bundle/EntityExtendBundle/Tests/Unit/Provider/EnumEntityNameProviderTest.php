@@ -6,7 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
-class EnumEntityNameProviderTest extends \PHPUnit_Framework_TestCase
+class EnumEntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EnumEntityNameProvider

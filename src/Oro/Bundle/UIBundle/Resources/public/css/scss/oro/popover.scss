@@ -1,0 +1,92 @@
+/* @theme: admin.oro; */
+// Bootstrap - Popover
+
+#container .popover {
+    // prevent menu and loading wrapper overlapping
+    z-index: $popover-z-index;
+}
+
+.popover {
+    position: $popover-position;
+    max-width: $popover-max-width;
+    border-radius: $popover-border-radius;
+    box-shadow: $popover-box-shadow;
+    border: $popover-border;
+
+    .arrow {
+        border: $popover-arrow-border;
+        width: $popover-arrow-container-size;
+
+        &:after {
+            border: $popover-arrow-border;
+            background-color: $popover-arrow-color;
+            width: $popover-arrow-size;
+            height: $popover-arrow-size;
+            display: block;
+            transform: rotate(45deg);
+        }
+    }
+
+    &.top {
+        .arrow {
+            &:after {
+                bottom: $popover-arrow-position-x;
+                box-shadow: $popover-arrow-top-shadow;
+            }
+        }
+    }
+
+    &.bottom {
+        .arrow {
+            &:after {
+                top: $popover-arrow-position-x;
+                box-shadow: $popover-arrow-bottom-shadow;
+            }
+        }
+    }
+
+    &.left {
+        .arrow {
+            &:after {
+                box-shadow: $popover-arrow-left-shadow;
+                bottom: $popover-arrow-position-y;
+                right: $popover-arrow-position-x;
+            }
+        }
+    }
+
+    &.right {
+        .arrow {
+            &:after {
+                box-shadow: $popover-arrow-right-shadow;
+                bottom: $popover-arrow-position-y;
+                left: $popover-arrow-position-x;
+            }
+        }
+    }
+
+    .oro-popover-content {
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    &-content {
+        padding-top: $popover-content-offset-top;
+        padding-right: $popover-content-offset-right;
+        padding-bottom: $popover-content-offset-bottom;
+        padding-left: $popover-content-offset-left;
+        height: $popover-content-height;
+
+        &.popover-no-close-button {
+            padding-right: $popover-content-offset-right-no-close;
+        }
+    }
+
+    &-close {
+        position: $popover-close-position;
+        top: $popover-close-position-y;
+        right: $popover-close-position-x;
+        cursor: $popover-close-cursor;
+        color: $popover-close-color;
+    }
+}

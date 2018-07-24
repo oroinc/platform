@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\LocaleExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
+class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     const TEST_TYPE = 'test_format_type';
     const TEST_FORMAT = 'MMM, d y t';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
     /** @var LocaleExtension */

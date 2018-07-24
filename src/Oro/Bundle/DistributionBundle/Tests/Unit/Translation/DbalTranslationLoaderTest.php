@@ -10,12 +10,12 @@ use Doctrine\DBAL\Statement;
 use Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class DbalTranslationLoaderTest extends \PHPUnit_Framework_TestCase
+class DbalTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var DbalTranslationLoader */

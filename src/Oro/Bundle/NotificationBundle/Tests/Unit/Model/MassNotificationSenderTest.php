@@ -13,31 +13,31 @@ use Oro\Bundle\NotificationBundle\Model\MassNotification;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
-class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
+class MassNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_SENDER_EMAIL = 'admin@example.com';
     const TEST_SENDER_NAME  = 'sender name';
     const TEMPLATE_NAME     = 'test template';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|UserRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UserRepository */
     protected $userRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailTemplateRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailTemplateRepository */
     protected $templateRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityPool */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityPool */
     protected $entityPool;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $cm;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailNotificationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailNotificationManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DQLNameFormatter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DQLNameFormatter */
     protected $dqlNameFormatter;
 
     /** @var MassNotificationSender */

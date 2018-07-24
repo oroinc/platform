@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Entity;
 
-abstract class AbstractEntityTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractEntityTestCase extends \PHPUnit\Framework\TestCase
 {
     const TEST_ID = 123;
 

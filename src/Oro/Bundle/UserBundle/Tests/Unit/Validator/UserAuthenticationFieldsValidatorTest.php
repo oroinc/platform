@@ -10,10 +10,10 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
+class UserAuthenticationFieldsValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|UserManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|UserManager
      */
     protected $userManager;
 
@@ -23,12 +23,12 @@ class UserAuthenticationFieldsValidatorTest extends \PHPUnit_Framework_TestCase
     protected $constraint;
 
     /**
-     * @var ExecutionContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $context;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConstraintViolationBuilderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ConstraintViolationBuilderInterface
      */
     protected $violation;
 

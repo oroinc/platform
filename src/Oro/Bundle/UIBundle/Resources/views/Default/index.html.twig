@@ -1,3 +1,4 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
     <html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
@@ -46,6 +47,20 @@
         {% endblock %}
     </head>
     <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version lang-{{ oro_language()|slice(0,2) }} {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/app-loading-mask-component',
+        options: {showOnStartup: true}
+    }) }}></div>
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'oroui/js/app/components/app-loading-bar-component',
+        options: {viewOptions: {container: '#oroplatform-header'}}
+    }) }}></div>
+    {% if isMobileVersion() %}
+        <div {{ UI.renderPageComponentAttributes({
+            view: 'oroui/js/app/views/swipeable-view',
+            options: {_sourceElement: 'body'}
+        }) }}></div>
+    {% endif %}
     {% placeholder after_body_start %}
     <div id="progressbar">
         <h3>{% trans %}Loading...{% endtrans %}</h3>
@@ -54,9 +69,11 @@
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">
-        <div class="app-page__content-side">
-            {% include 'OroUIBundle:Default/navbar:sided.html.twig' %}
-        </div>
+        {% block content_side %}
+            <div class="app-page__content-side">
+                {% include 'OroUIBundle:Default/navbar:sided.html.twig' %}
+            </div>
+        {% endblock content_side %}
         <div class="app-page__content">
             {% block header %}
                 <header class="navbar app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
@@ -64,10 +81,11 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
-                            <ul class="nav pull-right user-menu">
+                            <ul class="nav pull-right user-menu"
+                                {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
                                 {{ block('user_menu') }}
                             </ul>
-                            <div class="nav top-search shortcuts" data-layout="separate">
+                            <div class="nav top-search shortcuts">
                                 {{ block('navbar') }}
                             </div>
                             {% placeholder pin_tabs_list %}
@@ -90,32 +108,31 @@
                         {% block before_content %}
                         <div id="flash-messages">
                             {% block messages %}
+                                {% set flashMessages = [] %}
+                                {% if app.session.flashbag.peekAll|length > 0 %}
+                                    {% for type, messages in app.session.flashbag.all %}
+                                        {% for message in messages %}
+                                            {% set flashMessages = flashMessages|merge([{ type: type, message: message|trans}]) %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
                                 <div class="flash-messages-frame">
-                                    <div class="flash-messages-holder"></div>
+                                    <div class="flash-messages-holder"
+                                         {{ UI.renderPageComponentAttributes({
+                                             view: 'oroui/js/app/views/page/messages-view',
+                                             options: {
+                                                 autoRender: true,
+                                                 initializeMessenger: true,
+                                                 messages: flashMessages
+                                             }
+                                         }) }}></div>
                                 </div>
-                                <script type="text/javascript">
-                                    require(['jquery', 'oroui/js/messenger', 'tpl!oroui/templates/message-item.html'],
-                                        function($, messenger, template) {
-                                            messenger.setup({
-                                                container: '#flash-messages .flash-messages-holder',
-                                                template: template
-                                            });
-                                            {% if app.session.flashbag.peekAll|length > 0 %}
-                                            $(function() {
-                                                {% for type, messages in app.session.flashbag.all %}
-                                                {% for message in messages %}
-                                                messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
-                                                {% endfor %}
-                                                {% endfor %}
-                                            });
-                                            {% endif %}
-                                        });
-                                </script>
                             {% endblock messages %}
                         </div>
                         <div class="breadcrumb-pin">
                             {% placeholder breadcrumb_pin_before %}
-                            <div id="breadcrumb">
+                            <div id="breadcrumb"
+                                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/breadcrumb-view'}) }}>
                                 {% block breadcrumb %}
                                     {% placeholder breadcrumb %}
                                 {% endblock breadcrumb %}
@@ -123,13 +140,15 @@
                             {% block pin_button %}
                                 {% placeholder pin_button %}
                             {% endblock pin_button %}
-                            <div id="before-content-addition" data-layout="separate">
+                            <div id="before-content-addition" data-layout="separate"
+                                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/before-content-addition-view'}) }}>
                                 {% block before_content_addition %}{% endblock before_content_addition %}
                             </div>
                             {% placeholder breadcrumb_pin_after %}
                         </div>
                         {% endblock before_content %}
-                        <div id="container"{% if isDesktopVersion() %} class="scrollable-container"{% endif %} data-layout="separate">
+                        <div id="container"{% if isDesktopVersion() %} class="scrollable-container"{% endif %} data-layout="separate"
+                             {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
                             {% block page_container %}
                                 {% placeholder content_before %}
                                 {% block content %}

@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
 
-class HtmlPurifierTelValidatorTest extends \PHPUnit_Framework_TestCase
+class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HtmlPurifierTelValidator */
     protected $validator;

@@ -23,7 +23,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AttributeManagerTest extends \PHPUnit_Framework_TestCase
+class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -31,17 +31,17 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     const ATTRIBUTE_FIELD_NAME = 'attribute_field_name';
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var Translator|\PHPUnit_Framework_MockObject_MockObject
+     * @var Translator|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
@@ -82,7 +82,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return FieldConfigModelRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return FieldConfigModelRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetFieldConfigModelRepository()
     {
@@ -98,7 +98,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         return $repository;
     }
     /**
-     * @return AttributeFamilyRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetAttributeFamilyRepository()
     {
@@ -287,7 +287,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         $attributeFieldName = 'attributeFieldName';
         $entityClassName = 'entityClassName';
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -322,7 +322,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->with('label')
             ->willReturn($attributeLabel);
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -370,7 +370,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->with('label')
             ->willReturn($attributeLabel);
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -441,7 +441,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return AttributeGroupRelationRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @return AttributeGroupRelationRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetAttributeGroupRelationRepository()
     {
@@ -585,7 +585,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         $attributeFieldName = 'attributeFieldName';
         $entityClassName = 'entityClassName';
 
-        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
         $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
+class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -431,7 +431,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
     private function createEntityManagerStub()
     {
@@ -455,7 +455,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|RegistryInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
      */
     private function createRegistryStub($entityManager = null)
     {
@@ -470,7 +470,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractSyncProcessor
+     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractSyncProcessor
      */
     private function createSyncProcessorMock()
     {
@@ -487,7 +487,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SyncProcessorRegistry
+     * @return \PHPUnit\Framework\MockObject\MockObject|SyncProcessorRegistry
      */
     private function createSyncProcessorRegistryStub($syncProcessor)
     {
@@ -502,7 +502,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
      */
     private function createTokenStorageMock()
     {
@@ -510,7 +510,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Transport
+     * @return \PHPUnit\Framework\MockObject\MockObject|Transport
      */
     private function createTransportStub()
     {
@@ -526,7 +526,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     private function createLoggerMock()
     {

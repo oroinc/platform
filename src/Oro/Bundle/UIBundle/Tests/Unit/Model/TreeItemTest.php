@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Model;
 
 use Oro\Bundle\UIBundle\Model\TreeItem;
 
-class TreeItemTest extends \PHPUnit_Framework_TestCase
+class TreeItemTest extends \PHPUnit\Framework\TestCase
 {
     public function testKey()
     {

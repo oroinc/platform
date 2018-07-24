@@ -4,7 +4,7 @@
     position: relative;
 
     float: left;
-    width: 230px;
+    width: $menu-side-width;
     height: 100%;
     padding-bottom: 45px;
 
@@ -23,6 +23,7 @@
     }
 
     .accordion-group {
+        width: $menu-side-width;
         margin-bottom: 0;
 
         border: none;
@@ -56,9 +57,7 @@
             .accordion-toggle {
                 font-weight: bold;
 
-                @include fa-icon($fa-var-angle-right);
-
-                &::before {
+                @include fa-icon($menu-icon-right, before, true) {
                     transform: rotate(90deg);
                 }
 
@@ -73,7 +72,7 @@
 
             .title {
                 display: block;
-                padding: 7px 15px;
+                padding: 8px 15px;
 
                 &:hover {
                     background-color: $menu-background-color-active;
@@ -116,7 +115,6 @@
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-
         padding: 12px 22px 12px 24px;
 
         background-color: $menu-dropdown-background-color-active;
@@ -140,21 +138,15 @@
     }
 
     .scroller {
+        position: relative;
+
         height: calc(100% - #{$menu-header-height});
 
-        box-sizing: content-box;
-
-        overflow: auto;
-
-        direction: rtl;
-
-        > * {
-            direction: ltr;
-        }
+        overflow: hidden;
     }
 
     &.minimized {
-        width: 80px;
+        width: $menu-side-width-minimized;
 
         .unclickable {
             display: block;
@@ -167,6 +159,8 @@
         // First level
         .dropdown-level-1 {
             text-align: center;
+
+            width: $menu-side-width-minimized;
 
             .dropdown-menu {
 
@@ -211,7 +205,54 @@
         }
     }
 
+    .main-menu {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+
+        width: 100%;
+        padding-right: 25px;
+
+        box-sizing: content-box;
+
+        overflow-y: auto;
+    }
+
     .menu-icon {
         display: none;
+    }
+
+    &__scroll {
+        position: absolute;
+        left: 0;
+        z-index: 1;
+
+        width: 100%;
+        height: $menu-placeholder-size;
+
+        background-color: $menu-dropdown-background-color-active;
+
+        opacity: .85;
+
+        @extend %main-menu-trigger;
+
+        &:first-child {
+            top: 0;
+
+            @include fa-icon($menu-icon-up);
+        }
+
+        &:last-child {
+            bottom: 0;
+
+            @include fa-icon($menu-icon-down);
+        }
+
+        &:hover,
+        &:focus {
+            background-color: $menu-dropdown-background-color-light-active;
+
+            opacity: 1;
+        }
     }
 }

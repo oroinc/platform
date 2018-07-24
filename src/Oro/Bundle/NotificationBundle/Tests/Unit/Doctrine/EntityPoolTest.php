@@ -4,10 +4,10 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Doctrine;
 
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
-class EntityPoolTest extends \PHPUnit_Framework_TestCase
+class EntityPoolTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityManager;
 

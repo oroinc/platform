@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class DbIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class DbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider generateIndexNameProvider

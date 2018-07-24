@@ -8,7 +8,7 @@ use Oro\Bundle\ThemeBundle\Tests\Unit\Fixtures;
 use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroThemeExtensionTest extends \PHPUnit_Framework_TestCase
+class OroThemeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadDataProvider

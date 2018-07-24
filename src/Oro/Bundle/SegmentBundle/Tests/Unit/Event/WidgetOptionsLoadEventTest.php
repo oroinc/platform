@@ -4,7 +4,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 
-class WidgetOptionsLoadEventTest extends \PHPUnit_Framework_TestCase
+class WidgetOptionsLoadEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersAndSetters()
     {

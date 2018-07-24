@@ -9,23 +9,24 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class BuildListResultDocumentTest extends GetListProcessorTestCase
 {
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentBuilderFactory */
+    private $documentBuilderFactory;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterRegistry */
+    private $errorCompleterRegistry;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    private $logger;
+
     /** @var BuildListResultDocument */
-    protected $processor;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $documentBuilderFactory;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $errorCompleterRegistry;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $logger;
+    private $processor;
 
     protected function setUp()
     {
@@ -44,6 +45,9 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
     public function testProcessContextWithoutErrorsOnEmptyResult()
     {
+        $result = [];
+        $metadata = new EntityMetadata();
+
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $this->documentBuilderFactory->expects(self::once())
             ->method('createDocumentBuilder')
@@ -54,11 +58,12 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
         $documentBuilder->expects(self::once())
             ->method('setDataCollection')
-            ->with(null, $this->context->getRequestType());
+            ->with($result, $this->context->getRequestType(), $metadata);
         $documentBuilder->expects(self::never())
             ->method('getDocument');
 
-        $this->context->setResult(null);
+        $this->context->setResult($result);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
         self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
         self::assertFalse($this->context->hasResult());
@@ -66,7 +71,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
 
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
     {
-        $result   = [new \stdClass()];
+        $result = [new \stdClass()];
         $metadata = new EntityMetadata();
 
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
@@ -124,7 +129,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
             ->method('setErrorCollection')
             ->with([$error]);
 
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->context->setClassName(User::class);
         $this->context->addError($error);
         $this->context->setResult([]);
         $this->processor->process($this->context);

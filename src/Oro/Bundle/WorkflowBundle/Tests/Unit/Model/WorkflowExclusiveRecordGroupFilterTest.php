@@ -12,10 +12,10 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
-class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
+class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     protected $doctrineHelper;
 
@@ -189,7 +189,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $workflowName
      * @param array $exclusiveRecordGroups
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflow($workflowName, array $exclusiveRecordGroups)
     {
@@ -208,7 +208,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $workflowName
      * @param array $exclusiveRecordGroups
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getWorkflowItem($workflowName, array $exclusiveRecordGroups)
     {

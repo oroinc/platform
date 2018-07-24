@@ -11,11 +11,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class EnumExtensionTest extends \PHPUnit_Framework_TestCase
+class EnumExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var EnumValueProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $enumValueProvider;
 
     /** @var EnumExtension */

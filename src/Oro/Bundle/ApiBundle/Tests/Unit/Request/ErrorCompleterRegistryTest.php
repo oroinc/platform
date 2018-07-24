@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ErrorCompleterRegistryTest extends \PHPUnit_Framework_TestCase
+class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
 
     protected function setUp()
     {

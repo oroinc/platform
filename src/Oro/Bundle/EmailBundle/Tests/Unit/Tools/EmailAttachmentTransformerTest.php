@@ -11,15 +11,15 @@ use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 
-class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Filesystem|\PHPUnit_Framework_MockObject_MockObject
+     * @var Filesystem|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $filesystem;
 
     /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fileManager;
 
@@ -29,12 +29,12 @@ class EmailAttachmentTransformerTest extends \PHPUnit_Framework_TestCase
     protected $factory;
 
     /**
-     * @var AttachmentManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $manager;
 
     /**
-     * @var AttachmentManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailAttachmentManager;
 

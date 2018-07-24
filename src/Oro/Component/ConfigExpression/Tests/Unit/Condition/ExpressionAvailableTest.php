@@ -6,12 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition\ExpressionAvailable;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 
-class ExpressionAvailableTest extends \PHPUnit_Framework_TestCase
+class ExpressionAvailableTest extends \PHPUnit\Framework\TestCase
 {
     const NAME = 'test_condition_name';
     const TEST_TYPE = 'test_type';
 
-    /** @var FactoryWithTypesInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FactoryWithTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $factory;
 
     /** @var ExpressionAvailable */

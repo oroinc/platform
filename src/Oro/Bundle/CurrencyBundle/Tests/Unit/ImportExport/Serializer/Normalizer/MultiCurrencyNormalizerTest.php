@@ -6,10 +6,10 @@ use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter;
 use Oro\Bundle\CurrencyBundle\ImportExport\Serializer\Normalizer\MultiCurrencyNormalizer;
 
-class MultiCurrencyNormalizerTest extends \PHPUnit_Framework_TestCase
+class MultiCurrencyNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var NumberFormatter|\PHPUnit_Framework_MockObject_MockObject
+     * @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject
      */
     private $formatter;
 

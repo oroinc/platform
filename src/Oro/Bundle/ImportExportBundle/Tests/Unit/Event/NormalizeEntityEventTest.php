@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class NormalizeEntityEventTest extends \PHPUnit_Framework_TestCase
+class NormalizeEntityEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

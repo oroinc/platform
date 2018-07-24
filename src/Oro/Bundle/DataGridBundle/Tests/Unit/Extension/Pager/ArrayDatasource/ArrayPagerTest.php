@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Pager\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\ArrayDatasource\ArrayPager;
 
-class ArrayPagerTest extends \PHPUnit_Framework_TestCase
+class ArrayPagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayPager */
     protected $arrayPager;

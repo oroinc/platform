@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
 use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
 
-class ChainPathProviderTest extends \PHPUnit_Framework_TestCase
+class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChainPathProvider */
     protected $provider;

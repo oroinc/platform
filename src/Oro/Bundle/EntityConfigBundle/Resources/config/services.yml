@@ -458,7 +458,8 @@ services:
         class: 'Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender'
         lazy: true
         arguments:
-            - '@oro_wamp.publisher'
+            - '@oro_sync.websocket_client'
+            - '@oro_sync.client.connection_checker'
             - '@oro_security.token_accessor'
 
     oro_entity_config.provider.entity_field_state_checker:
@@ -467,3 +468,18 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@form.factory'
+
+    oro_entity_config.topic.attribute_import:
+        class: Oro\Bundle\SyncBundle\Topic\SecuredTopic
+        arguments:
+            - 'oro_entity_config.attribute_import'
+            - '@gos_web_socket.websocket.client_manipulator'
+        tags:
+            - { name: gos_web_socket.topic }
+
+    oro_entity_config.event_listener.invalidate_translation_cache:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }

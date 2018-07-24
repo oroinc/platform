@@ -7,12 +7,12 @@ use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
 use Oro\Component\DependencyInjection\ServiceLinkRegistry;
 
-class FormTemplateDataProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormTemplateDataProviderRegistry */
     private $registry;
 
-    /** @var ServiceLinkRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ServiceLinkRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $serviceLinkRegistry;
 
     protected function setUp()
@@ -24,7 +24,7 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGet()
     {
-        /** @var FormTemplateDataProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
+        /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider */
         $provider = $this->createMock(FormTemplateDataProviderInterface::class);
 
         $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($provider);

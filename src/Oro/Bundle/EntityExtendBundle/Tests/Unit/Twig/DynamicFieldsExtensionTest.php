@@ -21,7 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
+class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
@@ -37,16 +37,16 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigProviderMock */
     protected $viewConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fieldTypeHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
     protected $featureChecker;
 
     protected function setUp()

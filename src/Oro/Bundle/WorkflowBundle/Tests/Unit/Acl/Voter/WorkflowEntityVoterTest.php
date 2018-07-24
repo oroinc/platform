@@ -15,7 +15,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter\Stub\WorkflowEntity;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
+class WorkflowEntityVoterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowEntityVoter
@@ -23,17 +23,17 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
     protected $voter;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry
      */
     protected $workflowRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WorkflowPermissionRegistry
+     * @var \PHPUnit\Framework\MockObject\MockObject|WorkflowPermissionRegistry
      */
     protected $permissionRegistry;
 

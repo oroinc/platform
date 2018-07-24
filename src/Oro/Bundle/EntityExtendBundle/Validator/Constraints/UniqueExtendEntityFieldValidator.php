@@ -27,9 +27,9 @@ class UniqueExtendEntityFieldValidator extends AbstractFieldValidator
             $this->addDuplicateFieldViolation($fieldName, 'id', $constraint);
         } else {
             // other fields
-            $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $fieldName);
-            if ($fieldConfig && $this->validationHelper->hasFieldNameConflict($fieldName, $fieldConfig)) {
-                $this->addDuplicateFieldViolation($fieldName, $fieldConfig->getId()->getFieldName(), $constraint);
+            $existingFieldName = $this->validationHelper->getSimilarExistingFieldData($className, $fieldName);
+            if ($existingFieldName) {
+                $this->addDuplicateFieldViolation($fieldName, $existingFieldName[0], $constraint);
             }
         }
     }

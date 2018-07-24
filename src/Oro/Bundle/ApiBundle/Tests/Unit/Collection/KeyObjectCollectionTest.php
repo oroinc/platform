@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 
-class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
+class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */
-    protected $collection;
+    private $collection;
 
     protected function setUp()
     {
@@ -84,7 +84,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [''],
-            [' '],
+            [' ']
         ];
     }
 
@@ -101,7 +101,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
         return [
             ['test'],
             [123],
-            [1.23],
+            [1.23]
         ];
     }
 

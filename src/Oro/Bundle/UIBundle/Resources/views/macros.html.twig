@@ -436,7 +436,7 @@
         class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
         title="{{ title }}"
     >
-        {{ label }}
+        {{- label -}}
     </a>
 {% endmacro %}
 
@@ -1244,4 +1244,12 @@
 {% macro app_logo(organization_name) %}
     {% set organization_name = organization_name|default('') %}
     <a href="{{ path('oro_default') }}" class="app-logo" title="{{- organization_name|trim -}}">{{- organization_name|trim -}}</a>
+{% endmacro %}
+
+{% macro insertIcon(classNames) %}
+    {% set classNames = classNames|default('') %}
+
+    {% if classNames %}
+        <i class="{{- classNames -}}" aria-hidden="true"></i>
+    {% endif %}
 {% endmacro %}

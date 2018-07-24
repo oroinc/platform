@@ -1,12 +1,4 @@
-$sidebarHeaderHeight: 31px;
-$sidebarHorizontalPadding: 12px;
-$sidebarWidth: 320px;
-$sidebarMinimizedWidth: 33px;
-$sidebarBorderColor: #f2f2f2;
-$sidebaResizableAreaColor: #ddd;
-$sidebarMinHeight: 90vh;
-
-$sidebarContentMinWidth: 288px;
+/* @theme: admin.oro; */
 
 .content-with-sidebar {
     &--sidebar {
@@ -131,16 +123,16 @@ $sidebarContentMinWidth: 288px;
             background-color: #f1f1f1;
 
             .content {
-                padding: $contentPadding $contentPadding 0;
+                padding: $content-padding $content-padding 0;
             }
         }
 
         .responsive-section {
-            margin: 0 -#{$contentPadding};
-            padding-right: $contentPadding;
+            margin: 0 -#{$content-padding};
+            padding-right: $content-padding;
 
             .form-horizontal {
-                padding: $contentPadding 0;
+                padding: $content-padding 0;
             }
         }
     }

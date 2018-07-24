@@ -9,15 +9,8 @@ define(function(require) {
     var routing = require('routing');
     require('bootstrap');
 
-    /**
-     * @export  oronavigation/js/app/views/shortcuts-view
-     * @class   oronavigation.shortcuts.View
-     * @extends BaseView
-     */
     ShortcutsView = BaseView.extend({
-        options: {
-            el: '.shortcuts .input-large'
-        },
+        autoRender: true,
 
         events: {
             change: 'onChange'
@@ -42,15 +35,35 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
+            this.options = options || {};
+
+            var $input = this.getTypeaheadInput();
+            this.sourceUrl = $input.data('source-url') ? $input.data('source-url') : null;
+            this.entityClass = $input.data('entity-class') ? $input.data('entity-class') : null;
+            this.entityId = $input.data('entity-id') ? $input.data('entity-id') : null;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            var $input = this.getTypeaheadInput();
+
+            if (!$input.data('typeahead')) {
+                this.initTypeahead();
+            }
+            this.initLayout();
+
+            return this;
+        },
+
+        getTypeaheadInput: function() {
+            return this.$('.input');
+        },
+
+        initTypeahead: function() {
             var self = this;
-            this.options = _.defaults(options || {}, this.options);
-            this.sourceUrl = this.$el.data('source-url') ? this.$el.data('source-url') : null;
-            this.entityClass = this.$el.data('entity-class') ? this.$el.data('entity-class') : null;
-            this.entityId = this.$el.data('entity-id') ? this.$el.data('entity-id') : null;
-
-            this.$el.val('');
-
-            this.$el.typeahead({
+            this.getTypeaheadInput().typeahead({
                 source: _.bind(this.source, this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
@@ -134,8 +147,6 @@ define(function(require) {
                     }
                 }
             });
-            this.$form = this.$el.closest('form');
-            this.render();
         },
 
         source: function(query, process) {
@@ -165,26 +176,18 @@ define(function(require) {
         },
 
         onChange: function() {
-            var key = this.$el.val();
+            var $input = this.getTypeaheadInput();
+            var key = $input.val();
             var dataItem;
-            this.$el.val('');
+            $input.val('');
             if (!_.isUndefined(this.data[key])) {
                 dataItem = this.data[key];
                 if (!dataItem.dialog) {
-                    this.$form.attr('action', dataItem.url).submit();
+                    $input.closest('form').attr('action', dataItem.url).submit();
                 } else {
-                    this.$el.parent().find('li.active > a').click();
+                    $input.parent().find('li.active > a').click();
                 }
             }
-        },
-
-        getLayoutElement: function() {
-            return this.$el.closest('.shortcuts');
-        },
-
-        render: function() {
-            this.initLayout();
-            return this;
         }
     });
 

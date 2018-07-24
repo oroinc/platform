@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\Handler\FilterHandler;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class FilterHandlerTest extends \PHPUnit_Framework_TestCase
+class FilterHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider handleProvider

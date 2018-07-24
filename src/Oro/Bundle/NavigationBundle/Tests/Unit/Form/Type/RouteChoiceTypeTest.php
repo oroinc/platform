@@ -17,22 +17,22 @@ use Symfony\Component\Routing\RouterInterface;
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $router;
 
     /**
-     * @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private $readerRegistry;
 
     /**
-     * @var TitleTranslator|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 
     /**
-     * @var TitleService|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleService|\PHPUnit\Framework\MockObject\MockObject
      */
     private $titleService;
 

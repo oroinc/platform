@@ -7,7 +7,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
-class ConfigurationLoaderTest extends \PHPUnit_Framework_TestCase
+class ConfigurationLoaderTest extends \PHPUnit\Framework\TestCase
 {
     const BUNDLE1 = 'Oro\Bundle\CacheBundle\Tests\Unit\Loader\Stub\Bundles\TestBundle1\TestBundle1';
     const BUNDLE2 = 'Oro\Bundle\CacheBundle\Tests\Unit\Loader\Stub\Bundles\TestBundle2\TestBundle2';

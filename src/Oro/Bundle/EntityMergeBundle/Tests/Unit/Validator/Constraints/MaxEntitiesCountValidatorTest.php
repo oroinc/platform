@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
+class MaxEntitiesCountValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MaxEntitiesCountValidator

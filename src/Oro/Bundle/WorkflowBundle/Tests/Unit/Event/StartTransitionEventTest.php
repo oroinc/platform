@@ -4,10 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
 
-class StartTransitionEventTest extends \PHPUnit_Framework_TestCase
+class StartTransitionEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $transition;
 
@@ -17,7 +17,7 @@ class StartTransitionEventTest extends \PHPUnit_Framework_TestCase
     protected $routeParameters;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflow;
 

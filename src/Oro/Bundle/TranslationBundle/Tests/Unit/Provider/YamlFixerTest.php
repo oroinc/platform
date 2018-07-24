@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Oro\Bundle\TranslationBundle\Provider\YamlFixer;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlFixerTest extends \PHPUnit_Framework_TestCase
+class YamlFixerTest extends \PHPUnit\Framework\TestCase
 {
     public function testFixStrings()
     {

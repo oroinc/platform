@@ -7,7 +7,7 @@ use Liuggio\ExcelBundle\Factory;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\XlsxFileWriter;
 
-class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
+class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var XlsxFileWriter */
     protected $writer;
@@ -15,7 +15,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $filePath;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextRegistry */
     protected $contextRegistry;
 
     /** @var Factory */
@@ -183,7 +183,7 @@ class XlsxFileWriterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $jobInstanceRawConfiguration
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|StepExecution
+     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
      */
     protected function getMockStepExecution(array $jobInstanceRawConfiguration)
     {

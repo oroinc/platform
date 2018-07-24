@@ -21,19 +21,19 @@ class EmailSyncCommandTest extends WebTestCase
 {
     use EmailFeatureTrait;
 
-    /** @var ImapConnectorFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ImapConnectorFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $imapConnectorFactory;
 
-    /** @var ImapServicesFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ImapServicesFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $serviceFactory;
 
-    /** @var ImapServices|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ImapServices|\PHPUnit\Framework\MockObject\MockObject */
     protected $imapServices;
 
-    /** @var Imap|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Imap|\PHPUnit\Framework\MockObject\MockObject */
     protected $imap;
 
-    /** @var SearchStringManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var SearchStringManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchStringManager;
 
     protected function setUp()

@@ -43,6 +43,14 @@ trait MessageQueueAssertTrait
         return self::$messageCollector;
     }
 
+    public function clearMessageCollector()
+    {
+        if (!isset(self::$messageCollector)) {
+            return;
+        }
+        self::getMessageCollector()->clear();
+    }
+
     /**
      * Gets the message producer.
      * Use this alias for "getMessageCollector" method in case if it makes your tests more intuitive.

@@ -6,13 +6,13 @@ use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
+class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var BuildTemplateFormSubscriber */
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $tokenStorage;
 

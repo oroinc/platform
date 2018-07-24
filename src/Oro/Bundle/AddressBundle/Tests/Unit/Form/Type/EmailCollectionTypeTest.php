@@ -4,7 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AddressBundle\Form\Type\EmailCollectionType;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
-class EmailCollectionTypeTest extends \PHPUnit_Framework_TestCase
+class EmailCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailCollectionType

@@ -55,13 +55,13 @@ class BuildSingleItemQuery implements ProcessorInterface
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        $entityClass = $this->doctrineHelper->getManageableEntityClass(
+            $context->getClassName(),
+            $context->getConfig()
+        );
+        if (!$entityClass) {
             // only manageable entities or resources based on manageable entities are supported
-            $entityClass = $context->getConfig()->getParentResourceClass();
-            if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-                return;
-            }
+            return;
         }
 
         $metadata = $context->getMetadata();

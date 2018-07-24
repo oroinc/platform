@@ -30,9 +30,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class WorkflowTest extends \PHPUnit_Framework_TestCase
+class WorkflowTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     protected function setUp()
@@ -549,7 +549,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
-        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+        /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
         $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
             ->setMethods(['assemble'])
             ->disableOriginalConstructor()
@@ -558,7 +558,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('assemble')
             ->willReturn($variables);
 
-        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+        /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
         $variableManager = $this->getMockBuilder(VariableManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -575,7 +575,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $variables = new ArrayCollection([$this->createMock(Variable::class)]);
 
-        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+        /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
         $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
             ->setMethods(['assemble'])
             ->disableOriginalConstructor()
@@ -584,7 +584,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('assemble')
             ->willReturn($variables);
 
-        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+        /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
         $variableManager = $this->getMockBuilder(VariableManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -602,7 +602,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     /**
      * @param WorkflowStep $step
      * @param string $expectedTransitionName
-     * @return Transition|\PHPUnit_Framework_MockObject_MockObject
+     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function assertTransitionCalled(WorkflowStep $step, $expectedTransitionName)
     {
@@ -621,7 +621,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $name
-     * @return Step|\PHPUnit_Framework_MockObject_MockObject
+     * @return Step|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getStepMock($name)
     {
@@ -639,7 +639,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param bool $isStart
      * @param null $step
-     * @return Transition|\PHPUnit_Framework_MockObject_MockObject
+     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionMock($name, $isStart = false, $step = null)
     {
@@ -704,7 +704,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testIsTransitionAvailable()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
+        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
@@ -887,7 +887,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $stepToName
-     * @return WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getTransitionRecordMock($stepToName)
     {
@@ -906,7 +906,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $workflowName
-     * @param AclManager|\PHPUnit_Framework_MockObject_MockObject $aclManager
+     * @param AclManager|\PHPUnit\Framework\MockObject\MockObject $aclManager
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
      * @param $variableManager $variableManager
@@ -925,13 +925,13 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         }
 
-        /** @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
+        /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject $restrictionManager */
         $restrictionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         if (!$variableManager) {
-            /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+            /** @var VariableAssembler|\PHPUnit\Framework\MockObject\MockObject $variableAssembler */
             $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
                 ->setMethods(['assemble'])
                 ->disableOriginalConstructor()
@@ -940,7 +940,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ->method('assemble')
                 ->willReturn(new ArrayCollection());
 
-            /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+            /** @var VariableManager|\PHPUnit\Framework\MockObject\MockObject $variableManager */
             $variableManager = $this->getMockBuilder(VariableManager::class)
                 ->disableOriginalConstructor()
                 ->getMock();

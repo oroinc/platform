@@ -24,10 +24,10 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
     private const TEST_ASSOCIATION_NAME  = 'testAssociation';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     /** @var BuildFormBuilder */
@@ -149,7 +149,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                 FormType::class,
                 $parentEntity,
                 [
-                    'data_class'           => $parentBaseEntityClass,
+                    'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'    => false

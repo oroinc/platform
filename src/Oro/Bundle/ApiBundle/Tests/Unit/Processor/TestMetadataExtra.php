@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 class TestMetadataExtra implements MetadataExtraInterface
 {
     /** @var string */
-    protected $name;
+    private $name;
 
     /**
      * @param string $name
