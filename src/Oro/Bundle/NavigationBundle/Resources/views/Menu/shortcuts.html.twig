@@ -3,12 +3,12 @@
 {% block list %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-            <div class="dropdown header-dropdown-shortcut header-utility-dropdown" data-layout="separate"
+            <div class="dropdown header-dropdown-shortcut" data-layout="separate"
                 {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></a>
+                <button class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></button>
                 <ul class="dropdown-menu">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
-                    <li class="dark">
+                    <li class="nav-content">
                         <form>
                             <input type="text"
                                    placeholder="{{ 'oro.navigation.shortcuts.placeholder'|trans }}"
@@ -23,7 +23,7 @@
                             </div>
                         </form>
                     </li>
-                    <div class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</div>
+                    <li class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</li>
                     {{ block('children') }}
                 </ul>
             </div>

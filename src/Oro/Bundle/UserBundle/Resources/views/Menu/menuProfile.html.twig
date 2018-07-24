@@ -1,6 +1,6 @@
 {% if app.user %}
     <li class="dropdown user-menu-dropdown" id="user-menu">
-        <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+        <button class="dropdown-toggle" data-toggle="dropdown">
             {% if isMobileVersion() %}
                 <i class="fa-user-circle"></i>
             {% else %}
@@ -10,7 +10,7 @@
                 {%  endif %}
                 <i class="fa-caret-down"></i>
             {% endif %}
-        </a>
+        </button>
         {{ oro_menu_render('usermenu') }}
     </li>
 {% else %}

@@ -513,7 +513,7 @@ body .select2-container {
 
 .dropdown-menu {
     .divider {
-        border-bottom-color: #eee;
+        border-bottom-color: $dropdown-menu-divider-color;
         margin: 4px 0;
     }
 }
@@ -688,6 +688,7 @@ footer {
 .nav-header {
     color: $bodyColor;
     font-size: 12px;
+    text-transform: none;
 }
 
 .nav-header-title {

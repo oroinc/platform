@@ -8,10 +8,10 @@ Feature: Application search
 
   Scenario: Search all
     Given I login as administrator
-    And I follow "Search"
+    And I click "Search"
     And type "Common" in "search"
     And I should see 3 search suggestions
-    When I press "Go"
+    When I click "Search Submit"
     Then I should be on Search Result page
     And I should see following search entity types:
       | Type            | N | isSelected |
@@ -27,9 +27,9 @@ Feature: Application search
       | Common Business Unit | Business Unit |
 
   Scenario: Search in search page
-    Given I follow "Search"
+    Given I click "Search"
     And type "Alice" in "search"
-    When I press "Go"
+    When I click "Search Submit"
     Then I should see following search entity types:
       | Type            | N | isSelected |
       | All             |15 | yes        |
@@ -43,11 +43,11 @@ Feature: Application search
     And records in current grid should be 5
 
   Scenario: Search by Business Units
-    Given I follow "Search"
+    Given I click "Search"
     And I select "Business Unit" from search types
     And I type "Common" in "search"
     And I should see 1 search suggestion
-    When I press "Go"
+    When I click "Search Submit"
     Then I should see following search entity types:
       | Type            | N | isSelected |
       | All             | 3 |            |
@@ -64,16 +64,16 @@ Feature: Application search
     Then I should be on Business Unit View page
 
   Scenario: View entity from search suggestion
-    Given I follow "Search"
-    And I select "All" from search types
+    Given I click "Search"
+    And I clear search type select
     And I type "Alice2" in "search"
     And I should see 1 search suggestion
     And I follow "Alice2 Williams2"
     And I should be on User View page
 
   Scenario: No results search
-    Given I follow "Search"
+    Given I click "Search"
     And I type "This line does not make sense" in "search"
-    When I press "Go"
+    When I click "Search Submit"
     Then I should see "No results were found to match your search."
     And I should see "Try modifying your search criteria or creating a new"

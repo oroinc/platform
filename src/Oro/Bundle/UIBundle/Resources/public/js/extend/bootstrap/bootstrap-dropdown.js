@@ -3,6 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     require('bootstrap');
@@ -358,6 +359,35 @@ define(function(require) {
                     $dropdownMenu.parents().add(window).off('.floating-dropdown');
                 }
             });
+
+        if (tools.isMobile()) {
+            /** When a dropdown occupies the whole screen like modal dialog we need to lock page scroll
+             * to avoid moving elements behind this dropdown
+             */
+            $(document).on('shown.bs.dropdown', '.dropdown, .dropup', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any shown events)
+                    return;
+                }
+                var isPageScrollLocked;
+                var $html = $('html');
+                var $dropdownMenu = $('>.dropdown-menu', this);
+
+                if ($dropdownMenu.css('position') === 'fixed' && $dropdownMenu.outerWidth() === $html.width()) {
+                    isPageScrollLocked = $html.hasClass('lock-page-scroll');
+                    mediator.execute('layout:disablePageScroll', $dropdownMenu);
+                    if (!isPageScrollLocked) {
+                        $html.addClass('lock-page-scroll');
+                    }
+                    $(this).one('hide.bs.dropdown', function() {
+                        mediator.execute('layout:enablePageScroll');
+                        if (!isPageScrollLocked) {
+                            $html.removeClass('lock-page-scroll');
+                        }
+                    });
+                }
+            });
+        }
     })();
 
     /**

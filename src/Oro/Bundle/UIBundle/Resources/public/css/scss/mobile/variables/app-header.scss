@@ -1,7 +1,13 @@
 /* @theme: admin.oro; */
 
-$app-header-height:                        48px !default;
-$app-header-bg-color:                      $primary !default;
-$app-header-logo-text-color:               $primary-inverse !default;
-$app-header-text-color:                    $primary-800 !default;
-$app-header-icon-font-size:                24px !default;
+$app-header-height:                       48px !default;
+$app-header-z-index:                      110 !default; // to prevent visibility mCSB scroll through header popup
+$app-header-bg-color:                     $primary !default;
+$app-header-logo-text-color:              $primary-inverse !default;
+$app-header-text-color:                   $primary-800 !default;
+$app-header-icon-font-size:               24px !default;
+
+$app-header-dropdown-menu-color:          $primary-200 !default;
+$app-header-dropdown-search-icon:         $fa-var-search !default;
+$app-header-dropdown-close-icon:          $fa-var-times !default;
+$app-header-dropdown-close-icon-color:    $primary-700 !default;

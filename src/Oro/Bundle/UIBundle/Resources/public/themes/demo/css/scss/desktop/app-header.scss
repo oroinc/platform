@@ -9,7 +9,7 @@
   }
 
   .nav.top-search {
-    a.dropdown-toggle {
+    .dropdown-toggle {
       &:hover,
       &:active {
         color: $app-header-text-hover-color;
@@ -19,7 +19,9 @@
 
   .nav.user-menu {
     > li {
-      > a {
+      > .dropdown-toggle,
+      > .oro-dropdown-toggle,
+      > .help {
         &:hover {
           color: $app-header-text-hover-color;
         }

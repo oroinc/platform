@@ -3,9 +3,13 @@
 $app-header-height:                  32px !default;
 $app-header-thick-height:            48px !default;
 $app-header-font-size:               14px !default;
+$app-header-title-font-size:         16px !default;
 $app-header-icon-font-size:          16px !default;
+$app-header-color:                   $primary !default;
 $app-header-bg-color:                $primary-900 !default;
 $app-header-logo-text-color:         $primary !default;
 $app-header-text-color:              $primary-500 !default;
 $app-header-text-hover-color:        $primary-400 !default;
 $app-header-divider-color:           $primary-800 !default;
+$app-header-search-input-min-width: 220px !default;
+$app-header-search-select-max-width: 200px !default;

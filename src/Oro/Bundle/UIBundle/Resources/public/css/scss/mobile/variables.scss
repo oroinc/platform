@@ -1,8 +1,10 @@
 /* @theme: admin.oro; */
 
 @import "../colors";
+@import "bowerassets/font-awesome/scss/_variables";
 @import "variables/app-header";
 @import "variables/form-description";
+@import "variables/layout";
 
 $accordionHeadingBackgroundColor:          #eaeaea;
 $contentPadding:                           10px;

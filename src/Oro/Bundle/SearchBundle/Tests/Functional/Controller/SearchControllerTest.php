@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
  * @group search
@@ -51,14 +52,13 @@ class SearchControllerTest extends SearchBundleWebTestCase
             $request
         );
 
-        $result = $this->client->getResponse();
+        $actualResponse = $this->client->getResponse();
 
-        $this->assertResponseStatusCodeEquals($result, 200);
-        $content = $result->getContent();
+        $this->assertResponseStatusCodeEquals($actualResponse, 200);
 
-        foreach ($response['rest']['data'] as $item) {
-            $this->assertContains($item['record_url'], $content);
-        }
+        $actualContent = self::jsonToArray($actualResponse->getContent());
+
+        self::assertThat($actualContent['data'], new ArrayContainsConstraint($response['rest']['data'], false));
     }
 
     /**

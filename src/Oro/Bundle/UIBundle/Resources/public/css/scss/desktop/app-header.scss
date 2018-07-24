@@ -8,6 +8,7 @@
 }
 
 .navbar.app-header {
+    font-size: $app-header-font-size;
     color: $app-header-text-color;
     background-color: $app-header-bg-color;
     position: relative;
@@ -79,11 +80,12 @@
             margin: 0 5px;
         }
 
-        a.dropdown-toggle {
+        .dropdown-toggle {
             color: inherit;
             text-align: center;
-            position: relative;
-            top: 1px;
+            border: 0 none;
+            background-color: transparent;
+            padding: 0;
 
             &:hover,
             &:active {
@@ -99,6 +101,52 @@
 
         .dropdown-menu {
             left: -5px;
+
+            &:before {
+                border-bottom: 7px solid rgba(0, 0, 0, .2);
+                border-left: 7px solid transparent;
+                border-right: 7px solid transparent;
+                content: "";
+                display: inline-block;
+                left: 9px;
+                position: absolute;
+                top: -7px;
+            }
+        }
+
+        .nav-header { /* Dropdown smaller section title */
+            padding: 4px 14px 5px;
+
+            color: $app-header-color;
+            font-size: $app-header-title-font-size;
+            line-height: 1.5;
+        }
+
+        .nav-header-title { /* Dropdown main title */
+            text-transform: none;
+            display: block;
+        }
+
+        .nav-content {
+            padding: 0 15px;
+            margin: 6px 0 10px;
+        }
+
+        .select2-container {
+            width: auto;
+            max-width: $app-header-search-select-max-width;
+        }
+
+        .search-field-container {
+            min-width: $app-header-search-input-min-width;
+        }
+
+        .search-suggestion-list {
+            font-size: 13px;
+
+            .description {
+                font-size: 14px;
+            }
         }
     }
 
@@ -119,11 +167,16 @@
                 margin-right: -3px;
             }
 
-            > a {
+            > .dropdown-toggle,
+            > .oro-dropdown-toggle,
+            > .help {
                 padding: 0;
                 color: inherit;
+                border: 0 none;
+                background-color: transparent;
                 text-shadow: none;
                 font-size: $app-header-font-size;
+
                 [class^="fa-"],
                 [class*=" fa-"] {
                     font-size: $app-header-icon-font-size;
