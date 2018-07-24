@@ -82,7 +82,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one action exists.
      *
      * @return bool
      */
@@ -92,7 +92,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Gets the configuration for all fields.
+     * Gets the configuration for all actions.
      *
      * @return ActionFieldConfig[] [field name => config, ...]
      */
@@ -102,7 +102,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Checks whether the configuration of the field exists.
+     * Indicates whether the configuration of the action exists.
      *
      * @param string $fieldName
      *
@@ -114,7 +114,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Gets the configuration of the field.
+     * Gets the configuration of the action.
      *
      * @param string $fieldName
      *
@@ -130,7 +130,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Gets the configuration of existing field or adds new field.
+     * Gets the configuration of existing action or adds new action.
      *
      * @param string $fieldName
      *
@@ -147,7 +147,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Adds the configuration of the field.
+     * Adds the configuration of the action.
      *
      * @param string                 $fieldName
      * @param ActionFieldConfig|null $field
@@ -166,7 +166,7 @@ class ActionConfig implements ConfigBagInterface
     }
 
     /**
-     * Removes the configuration of the field.
+     * Removes the configuration of the action.
      *
      * @param string $fieldName
      */
@@ -328,7 +328,7 @@ class ActionConfig implements ConfigBagInterface
     /**
      * Indicates whether the name of ACL resource is set explicitly.
      *
-     * @return string
+     * @return bool
      */
     public function hasAclResource()
     {

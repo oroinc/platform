@@ -11,6 +11,7 @@ class FiltersConfigLoader extends AbstractConfigLoader
 {
     private const FIELD_METHOD_MAP = [
         ConfigUtil::EXCLUDE     => 'setExcluded',
+        ConfigUtil::COLLECTION  => 'setIsCollection',
         ConfigUtil::ALLOW_ARRAY => 'setArrayAllowed',
         ConfigUtil::ALLOW_RANGE => 'setRangeAllowed'
     ];

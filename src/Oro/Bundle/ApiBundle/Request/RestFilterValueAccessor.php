@@ -79,7 +79,7 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         $this->operators = [];
         $this->operatorShortNameMap = [];
         foreach ($operatorNameMap as $name => $shortName) {
-            if ($shortName) {
+            if ($shortName && !\array_key_exists($shortName, $this->operatorShortNameMap)) {
                 $this->operators[] = $shortName;
                 $this->operatorShortNameMap[$shortName] = $name;
             }

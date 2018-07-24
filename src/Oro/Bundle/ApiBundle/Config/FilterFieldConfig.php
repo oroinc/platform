@@ -7,6 +7,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Represents the configuration of a field that can be used to filter data.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FilterFieldConfig implements FieldConfigInterface
 {
@@ -32,6 +34,9 @@ class FilterFieldConfig implements FieldConfigInterface
         }
         if (null !== $this->dataType) {
             $result[ConfigUtil::DATA_TYPE] = $this->dataType;
+        }
+        if (isset($result[ConfigUtil::COLLECTION]) && false === $result[ConfigUtil::COLLECTION]) {
+            unset($result[ConfigUtil::COLLECTION]);
         }
         if (isset($result[ConfigUtil::ALLOW_ARRAY]) && false === $result[ConfigUtil::ALLOW_ARRAY]) {
             unset($result[ConfigUtil::ALLOW_ARRAY]);
@@ -170,7 +175,7 @@ class FilterFieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath()
     {
@@ -205,6 +210,36 @@ class FilterFieldConfig implements FieldConfigInterface
         } else {
             unset($this->items[ConfigUtil::PROPERTY_PATH]);
         }
+    }
+
+    /**
+     * Indicates whether the "collection" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasCollection()
+    {
+        return $this->has(ConfigUtil::COLLECTION);
+    }
+
+    /**
+     * Indicates whether the filter represents a collection valued association.
+     *
+     * @return bool
+     */
+    public function isCollection()
+    {
+        return (bool)$this->get(ConfigUtil::COLLECTION);
+    }
+
+    /**
+     * Sets a flag indicates whether the filter represents a collection valued association.
+     *
+     * @param bool $value
+     */
+    public function setIsCollection($value)
+    {
+        $this->set(ConfigUtil::COLLECTION, $value);
     }
 
     /**

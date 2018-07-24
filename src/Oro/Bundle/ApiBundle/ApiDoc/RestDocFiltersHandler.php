@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;
@@ -14,6 +15,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
+/**
+ * Adds filters to ApiDoc annotation.
+ */
 class RestDocFiltersHandler
 {
     /** @var RestDocViewDetector */
@@ -108,8 +112,8 @@ class RestDocFiltersHandler
         if ($filter instanceof FieldAwareFilterInterface) {
             $options['type'] = $this->getFilterType($dataType, $isArrayAllowed, $isRangeAllowed);
         }
-        $operators = $filter->getSupportedOperators();
-        if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
+        $operators = $this->getFilterOperators($filter);
+        if (!empty($operators)) {
             $options['operators'] = implode(',', $operators);
         }
         if ($filter instanceof StandaloneFilterWithDefaultValue) {
@@ -196,5 +200,23 @@ class RestDocFiltersHandler
             $this->docViewDetector->getRequestType(),
             false
         );
+    }
+
+    /**
+     * @param StandaloneFilter $filter
+     *
+     * @return string[]
+     */
+    private function getFilterOperators(StandaloneFilter $filter)
+    {
+        $operators = $filter->getSupportedOperators();
+        if (empty($operators)) {
+            return $operators;
+        }
+        if (count($operators) === 1 && $operators[0] === StandaloneFilter::EQ) {
+            return [];
+        }
+
+        return $operators;
     }
 }

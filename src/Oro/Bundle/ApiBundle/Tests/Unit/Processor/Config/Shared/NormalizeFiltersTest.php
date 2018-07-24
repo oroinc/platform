@@ -431,7 +431,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         ];
     }
 
-    public function testFiltersByRenamedIdField()
+    public function testFiltersByRenamedField()
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -442,6 +442,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 ],
                 'renamedIdField' => [
                     'property_path' => 'field2'
+                ],
+                'renamedField'   => [
+                    'property_path' => 'field3'
                 ],
                 'field10'        => [
                     'property_path' => 'realField10'
@@ -458,6 +461,9 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                     'data_type' => 'string'
                 ],
                 'field2'  => [
+                    'data_type' => 'string'
+                ],
+                'field3'  => [
                     'data_type' => 'string'
                 ],
                 'field10' => [
@@ -486,6 +492,10 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                     'renamedIdField' => [
                         'data_type'     => 'string',
                         'property_path' => 'field2'
+                    ],
+                    'renamedField'   => [
+                        'data_type'     => 'string',
+                        'property_path' => 'field3'
                     ],
                     'field10'        => [
                         'data_type'     => 'string',
