@@ -205,7 +205,7 @@ class ActionFieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath()
     {

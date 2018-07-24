@@ -10,17 +10,19 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 interface ComparisonExpressionInterface
 {
     /**
-     * Builds a comparison expression.
+     * Builds a comparison expression for a specific field.
      *
-     * @param QueryExpressionVisitor $visitor
-     * @param string                 $expression
-     * @param string                 $parameterName
-     * @param mixed                  $value
+     * @param QueryExpressionVisitor $visitor       The visitor that is used to buils a query
+     * @param string                 $field         The unique name of a field
+     * @param string                 $expression    The DQL expression for a field, e.g. LOWER(field)
+     * @param string                 $parameterName The name of parameter unique for each field
+     * @param mixed                  $value         The value of a field
      *
      * @return mixed
      */
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
+        string $field,
         string $expression,
         string $parameterName,
         $value

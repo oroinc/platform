@@ -56,10 +56,22 @@ oro_api:
         lt:  '<'  # less than
         gte: '>=' # greater than or equal to
         lte: '<=' # less than or equal to
-        exists: '*' # exists (IS NOT NULL) and not exists (IS NULL), value is true = exists, value is false = not exists
-        neq_or_null:     '!*' # not equal to or IS NULL
-        contains:        '~'  # contains (LIKE %value%)
-        not_contains:    '!~' # not contains (NOT LIKE %value%)
+        exists: '*' # exists (IS NOT NULL for fields and to-one associations and check whether a collection
+                    # is not empty for to-many associations)
+                    # and not exists (IS NULL for fields and to-one associations and check whether a collection
+                    # is empty for to-many associations),
+                    # value is true = exists, value is false = not exists
+        neq_or_null:     '!*' # not equal to or IS NULL for fields and to-one associations
+                              # for to-many associations checks wherher a collection
+                              # does not contain any of specific values or a collection is empty
+        contains:        '~'  # contains (LIKE %value%) for string fields
+                              # and to-one associations with string identifier,
+                              # for to-many associations checks wherher a collection
+                              # contains all of specific values
+        not_contains:    '!~' # not contains (NOT LIKE %value%) for string fields
+                              # and to-one associations with string identifier,
+                              # for to-many associations checks wherher a collection
+                              # does not contain all of specific values
         starts_with:     '^'  # starts with (LIKE value%)
         not_starts_with: '!^' # not starts with (NOT LIKE value%)
         ends_with:       '$'  # ends with (LIKE %value)
