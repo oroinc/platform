@@ -53,6 +53,12 @@ services:
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
 
+    oro_address.extension.js_valdation.constraints_provider_decorator:
+        class: Oro\Bundle\AddressBundle\Extension\JsValidation\ConstraintsProviderDecorator
+        decorates: oro_form.extension.js_validation.constraints_provider
+        arguments:
+            - '@oro_address.extension.js_valdation.constraints_provider_decorator.inner'
+
     oro_address.twig.extension.phone:
         class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
         public: false
