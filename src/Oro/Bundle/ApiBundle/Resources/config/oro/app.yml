@@ -62,15 +62,15 @@ oro_api:
                     # is empty for to-many associations),
                     # value is true = exists, value is false = not exists
         neq_or_null:     '!*' # not equal to or IS NULL for fields and to-one associations
-                              # for to-many associations checks wherher a collection
+                              # for to-many associations checks whether a collection
                               # does not contain any of specific values or a collection is empty
         contains:        '~'  # contains (LIKE %value%) for string fields
                               # and to-one associations with string identifier,
-                              # for to-many associations checks wherher a collection
+                              # for to-many associations checks whether a collection
                               # contains all of specific values
         not_contains:    '!~' # not contains (NOT LIKE %value%) for string fields
                               # and to-one associations with string identifier,
-                              # for to-many associations checks wherher a collection
+                              # for to-many associations checks whether a collection
                               # does not contain all of specific values
         starts_with:     '^'  # starts with (LIKE value%)
         not_starts_with: '!^' # not starts with (NOT LIKE value%)

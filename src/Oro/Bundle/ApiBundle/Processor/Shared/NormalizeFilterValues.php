@@ -20,8 +20,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Converts values of all requested filters according to the type of a filter.
- * Validated that all requested filters are supported.
+ * Converts values of all requested filters according to the type of the filters.
+ * Validates that all requested filters are supported.
  */
 class NormalizeFilterValues implements ProcessorInterface
 {

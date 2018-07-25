@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\NamedValueFilterInterface;

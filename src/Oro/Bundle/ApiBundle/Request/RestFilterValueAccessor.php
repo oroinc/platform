@@ -9,7 +9,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Extracts filters from REST API HTTP Request.
+ * Extracts values of filters from REST API HTTP request.
  * Filters can be sent in the query string or the request body.
  * If a filter exists in both the query string and the request body,
  * the filter from the query string will override the filter from the request body.

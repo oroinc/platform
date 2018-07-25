@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+/**
+ * A set of reusable utility methods that can be used to get filter values.
+ */
 class FilterHelper
 {
     const PAGE_NUMBER_FIELD_NAME = '__page_number__';

@@ -24,12 +24,12 @@ use Oro\Bundle\ApiBundle\Model\Range;
  * * not exists (is null for fields and to-one associations
  *   and check whether a collection is empty for to-many associations)
  * * not equal to or is null for fields and to-one associations,
- *   for to-many associations checks wherher a collection does not contain any of specific values
+ *   for to-many associations checks whether a collection does not contain any of specific values
  *   or a collection is empty
  * * contains for string fields and to-one associations with string identifier,
- *   for to-many associations checks wherher a collection contains all of specific values
+ *   for to-many associations checks whether a collection contains all of specific values
  * * not contains for string fields and to-one associations with string identifier,
- *   for to-many associations checks wherher a collection does not contain all of specific values
+ *   for to-many associations checks whether a collection does not contain all of specific values
  * * starts with
  * * not starts with
  * * ends with
@@ -61,20 +61,20 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     public const EXISTS = 'exists';
     /**
      * @var string "not equal to or IS NULL" operator for fields and to-one associations,
-     * for to-many associations checks wherher a collection does not contain any of specific values
+     * for to-many associations checks whether a collection does not contain any of specific values
      * or a collection is empty
      */
     public const NEQ_OR_NULL = 'neq_or_null';
     /**
      * @var string "contains" (LIKE %value%) operator for string fields
      * and to-one associations with string identifier,
-     * for to-many associations checks wherher a collection contains all of specific values
+     * for to-many associations checks whether a collection contains all of specific values
      */
     public const CONTAINS = 'contains';
     /**
      * @var string "not contains" (NOT LIKE %value%) operator for string fields
      * and to-one associations with string identifier,
-     * for to-many associations checks wherher a collection does not contain all of specific values
+     * for to-many associations checks whether a collection does not contain all of specific values
      */
     public const NOT_CONTAINS = 'not_contains';
     /** @var string "starts with" (LIKE value%) operator */

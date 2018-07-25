@@ -22,8 +22,8 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Registers all allowed dynamic filters and
- * in case if the filter group is specified, encloses filters keys
+ * Registers all allowed nested filters and
+ * if the filter group is specified, encloses filters keys
  * by the "{filter group}[%s]" pattern, e.g. "filter[%s]".
  */
 class RegisterDynamicFilters extends RegisterFilters

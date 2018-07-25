@@ -18,8 +18,8 @@ use Oro\Component\EntitySerializer\QueryResolver;
 
 /**
  * Calculates the total number of records and sets it
- * to "X-Include-Total-Count" response header,
- * in case if it was requested by "X-Include: totalCount" request header.
+ * to "X-Include-Total-Count" response header
+ * if it was requested by "X-Include: totalCount" request header.
  */
 class SetTotalCountHeader implements ProcessorInterface
 {
