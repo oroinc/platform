@@ -1,10 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'backgrid',
-    'module'
-], function($, _, Backgrid, module) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Backgrid = require('backgrid');
+    var module = require('module');
 
     var config = module.config();
     config = _.extend({
@@ -47,21 +48,24 @@ define([
         actionsState: '',
 
         /** @property */
-        baseMarkup:
+        baseMarkup: _.template(
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
-                    '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
+                    '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
+                        'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">...</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
+                        'aria-labelledby="<%- togglerId %>" ' +
                         'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
                 '</div>' +
-            '</div>',
+            '</div>'
+        ),
 
         /** @property */
-        simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
+        simpleBaseMarkup: _.template('<div class="more-bar-holder action-row"></div>'),
 
         /** @property */
         closeButtonTemplate: _.template(
-            '<li class="dropdown-close"><i class="fa-close hide-text">' + _.__('Close') + '</i></li>'
+            '<li class="dropdown-close"><i class="fa-close hide-text">' + __('Close') + '</i></li>'
         ),
 
         /** @property */
@@ -96,6 +100,13 @@ define([
             'mouseover .dropdown-toggle': '_showDropdown',
             'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown',
             'click .dropdown-close .fa-close': '_hideDropdown'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionCell() {
+            ActionCell.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -223,7 +234,7 @@ define([
                 this.launchersContainerSelector = '.more-bar-holder';
             }
 
-            this.$el.html(this.baseMarkup);
+            this.$el.html(this.baseMarkup(this.getTemplateData()));
             this.isLauncherListFilled = false;
 
             if (isSimplifiedMarkupApplied) {
@@ -231,6 +242,13 @@ define([
             }
 
             return this;
+        },
+
+        getTemplateData: function() {
+            return {
+                togglerId: 'actions-cell-dropdown-' + this.cid,
+                label: __('oro.datagrid.row_actions.label')
+            };
         },
 
         fillLauncherList: function() {

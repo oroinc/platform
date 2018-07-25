@@ -13,10 +13,7 @@ define(function(require) {
 
         autoRender: true,
 
-        template: function() {
-            return '<a data-toggle="dropdown" ' +
-                'class="dropdown-toggle role-permissions-action-launcher" href="javascript:void(0);">...</a>';
-        },
+        template: require('tpl!orouser/templates/datagrid/role-permissions-action-view.html'),
 
         /**
          * @type {AccessLevelsCollection}
@@ -70,11 +67,26 @@ define(function(require) {
             }
         },
 
+        getTemplateData: function() {
+            var data = RolePermissionsActionView.__super__.getTemplateData.call(this);
+            _.extend(data, {
+                togglerId: this.getTogglerId()
+            });
+            return data;
+        },
+
+        getTogglerId: function() {
+            return 'dropdown-' + this.cid;
+        },
+
         onDropdownOpen: function(e) {
             var dropdown = this.subview('dropdown');
             var accessLevels = this.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
+                    attributes: {
+                        'aria-labelledby': this.getTogglerId()
+                    },
                     className: [
                         'dropdown-menu',
                         'dropdown-menu-collection',

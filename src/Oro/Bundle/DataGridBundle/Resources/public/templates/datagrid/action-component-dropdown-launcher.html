@@ -3,6 +3,7 @@ _.each(attributes, function(attribute, name) { %>
 <%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %>
 <% });
 } %>
+<% var togglerId = _.uniqueId('dropdown-') %>
 <div class="<%= wrapperClassName %> dropdown">
     <a href="#" class="action btn
             <%= launcherMode == 'icon-only' ? 'btn-icon' : "" %>
@@ -12,16 +13,17 @@ _.each(attributes, function(attribute, name) { %>
             dropdown-toggle"
         <%= attributesTemplate(attributes) %>
         title="<%= title %>"
-        data-toggle="dropdown">
+        role="button" id="<%- togglerId %>" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">
         <% if (launcherMode == 'icon-text') { %>
-            <i class="fa-<%= icon %> hide-text"></i>
+            <span class="fa-<%= icon %> hide-text" aria-hidden="true"></span>
             <%= label %>
         <% } else if (launcherMode == 'icon-only') { %>
-            <i class="fa-<%= icon %> hide-text"></i>
+            <span class="fa-<%= icon %> hide-text" aria-hidden="true"></span>
         <% } else if (launcherMode == 'text-only') { %>
-            <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
+            <% if (iconClassName) { %><span class="<%= iconClassName %>" aria-hidden="true"></span><% } %>
             <%= label %>
         <% } %>
     </a>
-    <div class="dropdown-menu"></div>
+    <div class="dropdown-menu" aria-labelledby="<%- togglerId %>"></div>
 </div>

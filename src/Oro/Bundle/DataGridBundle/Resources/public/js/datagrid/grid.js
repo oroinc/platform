@@ -707,7 +707,8 @@ define(function(require) {
                 var action = new SelectDataAppearanceAction({
                     datagrid: this,
                     launcherOptions: {
-                        items: this.toolbarOptions.availableApperances,
+                        label: __('oro_datagrid.action.appearance'),
+                        items: this.toolbarOptions.availableAppearances,
                         attributes: {
                             'data-drop-secondary-location': 'left'
                         }

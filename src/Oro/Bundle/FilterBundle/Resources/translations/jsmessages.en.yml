@@ -12,6 +12,7 @@
 "from": "from"
 "to": "to"
 "and": "and"
+"Filter criteria": "Filter criteria"
 oro:
     filter:
         reset.label: Clear All Filters

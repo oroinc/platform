@@ -114,6 +114,10 @@ define(function(require) {
                 this.template = opts.template;
             }
 
+            if (opts.label) {
+                this.label = opts.label;
+            }
+
             if (opts.attributes) {
                 this.attributes = opts.attributes;
             }

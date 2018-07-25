@@ -263,15 +263,17 @@
         ]
 #}
 {% macro dropdownButton(parameters) %}
+    {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false">
             {% if parameters.iCss is defined %}
-                <i class="{{ parameters.iCss }}"></i>
+                <span class="{{ parameters.iCss }}" aria-hidden="true"></span>
             {% endif %}
             {{ parameters.label }}
-            <span class="caret"></span>
+            <span class="caret" aria-hidden="true"></span>
         </a>
-        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
+        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}" role="menu" aria-labelledby="{{ togglerId }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
                     {{ _self.dropdownItem(item) }}
@@ -1250,6 +1252,6 @@
     {% set classNames = classNames|default('') %}
 
     {% if classNames %}
-        <i class="{{- classNames -}}" aria-hidden="true"></i>
+        <span class="{{ classNames }}" aria-hidden="true"></span>
     {% endif %}
 {% endmacro %}

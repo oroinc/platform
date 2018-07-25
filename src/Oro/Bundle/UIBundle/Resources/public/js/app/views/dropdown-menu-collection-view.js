@@ -77,7 +77,7 @@ define(function(require) {
         template: _.template([
             '<div class="dropdown-menu-collection__fallback" data-name="fallback"><%= fallbackText %></div>',
             '<div class="dropdown-menu-collection__loading" data-name="loading"><%= loadingText %></div>',
-            '<ul class="dropdown-menu-collection__list" data-name="list"></ul>'
+            '<ul class="dropdown-menu-collection__list" data-name="list" role="menu"></ul>'
         ].join('')),
 
         initialize: function(options) {

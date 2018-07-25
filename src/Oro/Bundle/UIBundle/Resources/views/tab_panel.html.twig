@@ -60,8 +60,9 @@
             {% endfor %}
             {% if options.useDropdown %}
                 <li class="nav-item dropdown" style="display: none">
-                    <a href="#" id="{{ containerAlias }}-dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                        <span>{{ 'View more...'|trans }}</span> <b class="caret"></b>
+                    <a href="#" role=button id="{{ containerAlias }}-dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                        <span>{{ 'View more...'|trans }}</span> <span class="caret" aria-hidden="true"></span>
                     </a>
                     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="{{ containerAlias }}-dropdown"></ul>
                 </li>

@@ -3,6 +3,7 @@
         <%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %>
     <% });
 } %>
+<% var togglerId = _.uniqueId('dropdown-') %>
 
 <% if (links) { %><div class="btn-group"><% } %>
 
@@ -17,34 +18,35 @@
     "
     <% attributesTemplate(attributes) %>
     title="<%- title %>"
-    <% if (links) { %> data-toggle="dropdown"<% } %>>
+    <% if (links) { %> data-toggle="dropdown" role="button" id="<%- togglerId %>"
+        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
 
     <% if (launcherMode == 'icon-text') { %>
-        <i class="fa-<%- icon %> hide-text"></i>
+        <span class="fa-<%- icon %> hide-text" aria-hidden="true"></span>
         <%- label %>
     <% } else if (launcherMode == 'icon-only') { %>
-        <i class="fa-<%- icon %> hide-text"></i>
+        <span class="fa-<%- icon %> hide-text" aria-hidden="true"></span>
     <% } else if (launcherMode == 'text-only') { %>
-        <% if (iconClassName) { %><i class="<%- iconClassName %>"></i><% } %>
+        <% if (iconClassName) { %><span class="<%- iconClassName %>" aria-hidden="true"></span><% } %>
         <%- label %>
     <% } %>
 
-    <% if (links) { %><i class="caret"></i><% } %>
+    <% if (links) { %><span class="caret" aria-hidden="true"></span><% } %>
 </<%= tagName %>>
 
 <% if (links) { %>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">
     <% _.each(links, function(item, index) { %>
         <li><a href="<%= link %>" data-index="<%- index %>" title="<%- item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%= item.key %>">
             <% if (launcherMode == 'icon-text') { %>
-                <i class="fa-<%- icon %> hide-text"></i>
+                <span class="fa-<%- icon %> hide-text" aria-hidden="true"></span>
                 <%- item.label %>
             <% } else if (launcherMode == 'icon-only') { %>
-                <i class="fa-<%- icon %> hide-text"></i>
+                <span class="fa-<%- icon %> hide-text" aria-hidden="true"></span>
             <% } else if (launcherMode == 'text-only') { %>
-                <% if (iconClassName) { %><i class="<%- iconClassName %>"></i><% } %>
+                <% if (iconClassName) { %><span class="<%- iconClassName %>" aria-hidden="true"></span><% } %>
                 <%- item.label %>
             <% } %>
         </a></li>

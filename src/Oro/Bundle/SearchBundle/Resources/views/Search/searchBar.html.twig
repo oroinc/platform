@@ -1,17 +1,20 @@
 {% if is_granted('oro_search') %}
+{% set searchTogglerId = 'dropdown-'|uniqid %}
 <div class="dropdown header-dropdown-search header-utility-dropdown">
-    <a href="javascript:void(0);" class="dropdown-toggle oro-dropdown-toggle" title="{% trans %}Search{% endtrans %}"><i class="fa-search"></i></a>
-    <ul class="dropdown-menu">
+    <a id="{{ searchTogglerId }}" href="#" role="button" class="dropdown-toggle oro-dropdown-toggle"
+       title="{{ 'Search'|trans }}" aria-haspopup="true" aria-expanded="false"><span class="fa-search" aria-hidden="true"></span></a>
+    <ul class="dropdown-menu" aria-labelledby="{{ searchTogglerId }}">
         <li class="nav-header nav-header-title">{% trans %}Search{% endtrans %}</li>
         <li class="dark">
             <form method="get" action="{{ path('oro_search_results') }}" style="margin: 0" id="top-search-form" class="search-form">
                 <div id="search-div" class="input-append input-prepend pull-left header-search">
                     <div class="btn-group btn-block">
-                        <button data-toggle="dropdown" class="btn dropdown-toggle" id="search-bar-button">
-                            <span class="search-bar-type">{% trans %}All{% endtrans %}</span>
-                            <span class="fa-caret-down"></span>
+                        <button data-toggle="dropdown" class="btn dropdown-toggle" id="search-bar-button"
+                                aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.search.result.entity_filter'|trans }}">
+                            <span class="search-bar-type">{{ 'All'|trans }}</span>
+                            <span class="fa-caret-down" aria-hidden="true"></span>
                         </button>
-                        <ul class="dropdown-menu" id="search-bar-dropdown">
+                        <ul class="dropdown-menu" id="search-bar-dropdown" role="menu" aria-labelledby="search-bar-button">
                             <li data-alias="">
                                 <a href="javascript: void(0);">{% trans %}All{% endtrans %}</a>
                             </li>

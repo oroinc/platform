@@ -1,5 +1,7 @@
 <div
-    data-toggle="dropdown"
+    data-toggle="dropdown" role="button" id="<%- togglerId %>"
+    aria-label="<%- _.__('oro.role.permission.edit_label', {label: label}) %>"
+    aria-haspopup="true" aria-expanded="false"
     data-target="<%= dropdownTarget %>"
     class="dropdown-toggle action-permissions__item-wrapper<% if (isAccessLevelChanged) {%> action-permissions__item-wrapper_changed<% } %>">
     <span class="action-permissions__label"

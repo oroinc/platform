@@ -35,8 +35,11 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = PermissionView.__super__.getTemplateData.call(this);
-            data.dropdownTarget = '#' + _.result(this, 'id');
-            data.isAccessLevelChanged = this.model.isAccessLevelChanged();
+            _.extend(data, {
+                dropdownTarget: '#' + _.result(this, 'id'),
+                isAccessLevelChanged: this.model.isAccessLevelChanged(),
+                togglerId: this.getTogglerId()
+            });
             return data;
         },
 
@@ -52,11 +55,18 @@ define(function(require) {
             }
         },
 
+        getTogglerId: function() {
+            return 'dropdown-' + this.cid;
+        },
+
         onDropdownOpen: function(e) {
             var dropdown = this.subview('dropdown');
             var accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
+                    attributes: {
+                        'aria-labelledby': this.getTogglerId()
+                    },
                     className: [
                         'dropdown-menu',
                         'dropdown-menu-collection',

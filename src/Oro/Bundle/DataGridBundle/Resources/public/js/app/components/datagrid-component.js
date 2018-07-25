@@ -465,7 +465,7 @@ define(function(require) {
                     break;
                 default:
                     metadata.options.toolbarOptions.addAppearanceSwitcher = true;
-                    metadata.options.toolbarOptions.availableApperances = appearances.map(function(item) {
+                    metadata.options.toolbarOptions.availableAppearances = appearances.map(function(item) {
                         return {
                             key: item.type,
                             id: item.id || 'by_type',

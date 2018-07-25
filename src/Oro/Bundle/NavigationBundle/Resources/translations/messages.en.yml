@@ -23,6 +23,7 @@ oro:
         pins:
             button: Minimize
             button.title: Pin/unpin the page
+            more_tabs.label: More pintabs
         menuitem:
             name.label: Name
         menuupdate:

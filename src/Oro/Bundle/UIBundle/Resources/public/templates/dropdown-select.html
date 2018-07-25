@@ -1,13 +1,15 @@
+<% var togglerId = _.uniqueId('dropdown-') %>
 <% if (useButtonGroup) { %>
     <div class="dropdown btn-group">
 <% } %>
-        <a href="#" class="<%= buttonClass %> dropdown-toggle" data-toggle="dropdown">
-            <span class="current-label"><%= selectedLabel %></span><% if (useCaret) { %> <span class="caret"></span><% } %>
+        <a href="#" role="button" id="<%- togglerId %>" class="<%= buttonClass %> dropdown-toggle" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false"<% if (label) { %> aria-label="<%- label %>"<% } %>>
+            <span class="current-label"><%= selectedLabel %></span><% if (useCaret) { %> <span class="caret" aria-hidden="true"></span><% } %>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(options, function (option) { %>
                 <li<% if (option.selected) { %> class="selected"<% } %>>
-                    <a href="#" data-value="<%- option.value %>"><%- option.label %></a>
+                    <a href="#" data-value="<%- option.value %>"<% if (option.selected) { %> aria-selected="true"<% } %>><%- option.label %></a>
                 </li>
             <% }); %>
         </ul>

@@ -133,7 +133,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionHeadCheckbox:
-      selector: 'th.grid-header-cell-massAction div.btn-group .btn i'
+      selector: 'th.grid-header-cell-massAction div.btn-group .btn .caret'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionButton:
