@@ -69,7 +69,7 @@ datagrids:
                 usage:
                     data_name: usage
                 taxonomyName:
-                    data_name: tagTaxonomy.name
+                    data_name: taxonomyName
             default:
                 name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
