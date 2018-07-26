@@ -22,7 +22,7 @@
     i {
       float: left;
       margin-top: 1px;
-      margin-right: 5px;
+      margin-#{$end}: 5px;
       font-size: 13px;
     }
   }
@@ -41,7 +41,7 @@
         font-style: normal;
         cursor: pointer;
         position: absolute;
-        right: 14px;
+        #{$end}: 14px;
         top: 9px;
       }
       .info {
@@ -51,7 +51,7 @@
         }
       }
       .body {
-        padding-right: 26px;
+        padding-#{$end}: 26px;
       }
       .title, .empty-subject {
         color: $email-default-text-color;
@@ -73,7 +73,7 @@
         }
         .reply-action, .reply-all-action, .forward-action {
           display: none;
-          margin-left: 12px;
+          margin-#{$start}: 12px;
         }
       }
       &.highlight {
@@ -105,6 +105,16 @@
     padding: 4px 0;
     color: $primary-400;
   }
+
+  .my-emails,
+  .from-name {
+    float: #{$start};
+  }
+  .mark-as-read,
+  .mark-visible-as-read,
+  .forward-action-wrapper {
+    float: #{$end};
+  }
 }
 .default-reply-action .items li .footer .reply-action,
 .default-reply-all-action .items li .footer .reply-all-action,
@@ -112,6 +122,6 @@
   display: inline;
 }
 .widget-setup .recent-emails-setup {
-  padding: 15px 15px 15px 20px;
-  margin: -15px -15px -15px -20px;
+  padding: side-values(15px 15px 15px 20px);
+  margin: side-values(-15px -15px -15px -20px);
 }

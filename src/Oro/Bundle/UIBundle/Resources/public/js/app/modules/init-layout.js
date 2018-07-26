@@ -150,7 +150,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
             var initializeContent = function() {
                 if (!content) {
-                    content = $('.scrollable-container').filter(':parents(.ui-widget)');
+                    content = $('.scrollable-container').filter(':parents(.ui-widget)').add('.app-page__main');
                     if (!tools.isMobile()) {
                         content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                         content.filter('.overflow-y').css('overflow-y', 'auto');
