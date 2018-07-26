@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import "oroui/css/scss/mixins";
 
 .app-logo {
     display: inline-block;
@@ -17,6 +18,7 @@
         padding: 0 25px;
 
         .container {
+            display: flex;
             position: relative;
             line-height: $app-header-height;
             height: $app-header-height;
@@ -34,7 +36,7 @@
                 max-height: 30px;
                 max-width: 30px;
                 border-radius: 50%;
-                margin: 0 3px 0 7px;
+                margin: side-values(0 3px 0 7px);
             }
         }
 
@@ -45,12 +47,13 @@
 
     .app-logo {
         width: 16px;
-        margin-right: 8px
+        margin-#{$end}: 8px
     }
 
     .logo-wrapper {
         display: flex;
-        margin-right: 10px;
+        margin-#{$start}: 0;
+        margin-#{$end}: 10px;
     }
 
     .logo {
@@ -74,6 +77,8 @@
     .nav.top-search {
         padding: 0 5px 0 5px;
         margin: 0;
+        flex-shrink: 0;
+        order: if-ltr(0, auto);
 
         > .dropdown {
             margin: 0 5px;
@@ -98,13 +103,22 @@
         }
 
         .dropdown-menu {
-            left: -5px;
+            #{$start}: -5px;
+
+            @include if-rtl() {
+                #{$end}: auto;
+            }
         }
     }
 
     .nav.user-menu {
+        display: flex;
+        order: 1;
+        flex-shrink: 0;
+        float: none;
         background-color: inherit;
-        margin-left: 15px;
+        margin-#{$start}: 15px;
+        margin-#{$end}: 0;
         height: 100%;
 
         .avatar {
@@ -116,7 +130,7 @@
             margin: 0 8px;
 
             &:last-of-type {
-                margin-right: -3px;
+                margin-#{$end}: -3px;
             }
 
             > a {
@@ -137,8 +151,15 @@
 
         .dropdown {
             > .dropdown-menu {
-                right: -12px;
+                #{$end}: -12px;
+                #{$start}: auto;
                 z-index: $zindexDropdown;
+
+                &:before,
+                &:after {
+                    #{$end}: 12px;
+                    #{$start}: auto;
+                }
             }
         }
     }
@@ -147,13 +168,13 @@
         &:before {
             content: '';
             display: inline-block;
-            border-left: 1px solid $app-header-divider-color;
+            border-#{$start}: 1px solid $app-header-divider-color;
             height: 1em;
         }
 
         > .dropdown-toggle {
             display: inline-block;
-            margin-left: 15px;
+            margin-#{$start}: 15px;
         }
     }
 }

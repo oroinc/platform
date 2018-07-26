@@ -22,7 +22,7 @@ $main-menu-mobile-width: 320px;
     &:after {
         position: absolute;
         top: 5px;
-        left: $main-menu-mobile-width - 36px;
+        #{$start}: $main-menu-mobile-width - 36px;
 
         width: 32px;
         height: 32px;
@@ -47,18 +47,18 @@ $main-menu-mobile-width: 320px;
 
         margin-bottom: 0;
 
-        margin-left: 0;
+        margin-#{$start}: 0;
         /* iOS 11 */
-        margin-left: constant(safe-area-inset-left);
+        margin-#{$start}: constant(safe-area-inset-left);
         /* iOS 11.2+ */
-        margin-left: env(safe-area-inset-left);
+        margin-#{$start}: env(safe-area-inset-left);
 
         padding-top: 8px;
 
         width: $main-menu-mobile-width;
         background-color: $menu-background-color;
 
-        box-shadow:0 2px 10px 0 rgba(0, 0, 0, 0.19);
+        box-shadow: $menu-mobile-box-shadow;
 
         overflow: auto;
     }
@@ -92,7 +92,7 @@ $main-menu-mobile-width: 320px;
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
-                    margin-right: 8px;
+                    margin-#{$end}: 8px;
 
                     font-weight: normal;
                     line-height: 1;
@@ -135,7 +135,7 @@ $main-menu-mobile-width: 320px;
                     $selector: '&-level-' + $i;
 
                     #{$selector} {
-                        padding-left: $menu-mobile-title-offset * 1px;
+                        padding-#{$start}: $menu-mobile-title-offset * 1px;
                     }
 
                     $menu-mobile-title-offset: $menu-mobile-title-offset + 22;
@@ -164,15 +164,15 @@ $main-menu-mobile-width: 320px;
     .accordion-toggle.title-level-1 {
         position: relative;
 
-        padding: 14px 22px 14px 24px;
+        padding: side-values(14px 22px 14px 24px);
 
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
             min-width: 16px;
-            margin-right: 8px;
-            margin-left: 0;
+            margin-#{$end}: 8px;
+            margin-#{$start}: 0;
 
             text-align: center;
         }

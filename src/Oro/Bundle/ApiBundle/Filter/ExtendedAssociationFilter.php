@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;

@@ -23,7 +23,7 @@
 
     .nav.top-search { // Includes Shortcuts and Search
         .dropdown {
-            float: left;
+            float: #{$start};
 
             .dropdown-menu {
                 &:before {
@@ -32,7 +32,7 @@
                     border-right: 7px solid transparent;
                     content: "";
                     display: inline-block;
-                    left: 9px;
+                    #{$start}: 9px;
                     position: absolute;
                     top: -7px;
                 }
@@ -43,7 +43,7 @@
                     border-right: 6px solid transparent;
                     content: "";
                     display: inline-block;
-                    left: 10px;
+                    #{$start}: 10px;
                     position: absolute;
                     top: -6px;
                 }
@@ -78,7 +78,7 @@
             &.header-dropdown-search {
                 .dark {
                     border-bottom: none;
-                    border-radius: 0 0 3px 3px;
+                    border-radius: corner-values(0 0 3px 3px);
                 }
 
                 .dropdown-menu {
@@ -101,25 +101,25 @@
                         width: 100%;
 
                         #search-bar-search {
-                            border-left: 0;
+                            border-#{$start}: 0;
                         }
 
                         .btn-group.btn-block {
                             width: auto;
-                            float: left;
+                            float: #{$start};
                         }
 
                         .header-search-frame {
                             position: relative;
                             vertical-align: top;
-                            margin-left: 50px;
-                            margin-right: 56px;
+                            margin-#{$start}: 50px;
+                            margin-#{$end}: 56px;
                             width: auto;
 
                             input[type='text'] {
                                 width: 100%;
                                 height: 30px;
-                                border-left-color: #ccc;
+                                border-#{$start}-color: #ccc;
                                 border-radius: 0;
                                 box-sizing: border-box;
                             }
@@ -142,8 +142,8 @@
 
                         .btn-search {
                             position: relative;
-                            margin-left: -1px;
-                            border-radius: 0 3px 3px 0;
+                            margin-#{$start}: -1px;
+                            border-radius: corner-values(0 3px 3px 0);
                             border-color: #4978c2;
                             min-width: 42px;
                         }
@@ -151,13 +151,13 @@
                         .custom-dropdown {
                             position: absolute;
                             top: 28px;
-                            left: 1px;
+                            #{$start}: 1px;
                             border: 1px solid #ccc;
                             background: #fff;
                             width: 211px;
                             z-index: 105;
                             color: #777;
-                            border-radius: 0 0 3px 3px;
+                            border-radius: corner-values(0 0 3px 3px);
                             font: 12px/14px $baseFontFamily;
                             display: none;
 
@@ -234,14 +234,16 @@
                 #search-bar-button {
                     width: 100%;
                     min-width: 0;
-                    padding: 0 5px 0 9px;
-                    text-align: right;
+                    padding: side-values(0 5px 0 9px);
+                    text-align: #{$end};
+                    border-radius: corner-values(4px 0 0 4px);
+
                     .search-bar-type {
-                        float: left;
+                        float: #{$start};
                     }
 
                     .fa-caret-down {
-                        margin-left: 8px;
+                        margin-#{$start}: 8px;
                     }
                 }
                 #search-bar-dropdown {
@@ -249,7 +251,7 @@
                     width: auto;
                     margin-top: -1px;
                     border-top-color: #ccc;
-                    border-radius: 0 0 4px 4px;
+                    border-radius: corner-values(0 0 4px 4px);
 
                     &:before,
                     &:after {
@@ -270,15 +272,15 @@
                         margin: 0;
 
                         input[type='text'] {
-                            border-radius: 3px 0 0 3px;
+                            border-radius: corner-values(3px 0 0 3px);
                             width: 239px;
-                            margin-right: -4px;
+                            margin-#{$end}: -4px;
                         }
 
                         .btn {
                             position: relative;
                             border-color: #4978c2;
-                            border-radius: 0 3px 3px 0;
+                            border-radius: corner-values(0 3px 3px 0);
                         }
 
                         .typeahead {
@@ -293,6 +295,5 @@
                 }
             }
         } // Ends .dropdown
-
     } // Ends .top-search
 }

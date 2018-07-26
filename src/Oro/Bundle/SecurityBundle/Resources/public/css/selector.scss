@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import "oroui/css/scss/mixins";
 
 .logo-wrapper span.selected{
   display: block;
@@ -21,7 +22,7 @@
     font-size: 17px;
     cursor: pointer;
     line-height: inherit;
-    margin-left: 6px;
+    margin-#{$start}: 6px;
   }
 }
 
@@ -33,11 +34,12 @@
     line-height: inherit;
     vertical-align: top;
     position: relative;
-    left: -20px;
+    #{$start}: -20px;
   }
 
   .organization-switcher .dropdown-menu {
-    left: auto;
+    #{$start}: auto;
+    #{$end}: unset;
   }
 }
 
@@ -61,7 +63,7 @@ table.acl-table {
 .security-row {
   > .span8 {
     max-width: calc(100% - 116px);
-    margin-right: 0;
+    margin-#{$end}: 0;
   }
   .select2-container {
     width: 100px;

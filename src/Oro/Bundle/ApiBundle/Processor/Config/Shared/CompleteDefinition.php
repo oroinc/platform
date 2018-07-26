@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Makes sure that identifier field names are set for ORM entities.
  * Updates configuration to ask the EntitySerializer that the entity class should be returned
- * together with related entity data in case if the entity implemented using Doctrine table inheritance.
+ * together with related entity data if the entity implemented using Doctrine table inheritance.
  * If "identifier_fields_only" config extra does not exist:
  * * Adds fields and associations which were not configured yet based on an entity metadata.
  * * Marks all not accessible fields and associations as excluded.

@@ -402,6 +402,12 @@ api:
                         operators: ['=']
 ```
 
+Please note that filters for fields that have a database index are enabled automatically. Filters by all other fields
+should be enabled explicitly, if necessary.
+
+See [Filters](./filters.md) for more information on the existing filter types and instructions on how to create
+custom filters.
+
 ## sorters Configuration Section
 
 This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.
@@ -424,6 +430,9 @@ api:
                     field2:
                         exclude: true
 ```
+
+Please note that sorters for fields that have a database index are enabled automatically. Sorters by all other fields
+should be enabled explicitly, if necessary.
 
 ## actions Configuration Section
 

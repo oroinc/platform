@@ -390,7 +390,7 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * Returns true in case if the given action receives resource data.
+     * Returns true if the given action receives resource data.
      *
      * @param string $action
      *
@@ -415,7 +415,7 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * Returns true in case if the given ApiDoc annotation has at least one sucsess status code
+     * Returns true if the given ApiDoc annotation has at least one sucsess status code
      * indicates that the resource data should be returned in the response.
      *
      * @param ApiDoc $annotation

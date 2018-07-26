@@ -104,6 +104,10 @@ This action has the following processor groups:
 | finalize | Final validation of loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/get.png "The data flow diagram")
+
 For examples of usage, see the `handleGet` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## get_list Action
@@ -137,6 +141,10 @@ This action has the following processor groups:
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if a processor of one of the previous groups throws an exception. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/get_list.png "The data flow diagram")
+
 For examples of usage, see the `handleGetList` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## delete Action
@@ -168,6 +176,10 @@ This action has the following processor groups:
 | delete_data | Deleting the entity stored in the `result` property of the context. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/delete.png "The data flow diagram")
 
 For examples of usage, see the `handleDelete` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
@@ -208,6 +220,10 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/delete_list.png "The data flow diagram")
+
 For examples of usage, see the `handleDeleteList` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## create Action
@@ -241,6 +257,10 @@ This action has the following processor groups:
 | normalize_data | Converting created entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/create.png "The data flow diagram")
 
 For examples of usage, see the `handleCreate` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
@@ -276,6 +296,10 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/update.png "The data flow diagram")
+
 For examples of usage, see the `handleUpdate` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## get_subresource Action
@@ -308,6 +332,10 @@ This action has the following processor groups:
 | normalize_data | Converting loaded data into an array. | In most cases the processors from this group are skipped because most of the entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadEntityByEntitySerializer](../../Processor/Shared/LoadEntityByEntitySerializer.php) and [LoadEntitiesByEntitySerializer](../../Processor/Shared/LoadEntitiesByEntitySerializer.php). |
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/get_subresource.png "The data flow diagram")
 
 For examples of usage, see the `handleGetSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
@@ -347,6 +375,10 @@ This action has the following processor groups:
 | normalize_data | Converting the result entity into an array. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/update_subresource.png "The data flow diagram")
 
 For examples of usage, see the `handleUpdateSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
@@ -398,6 +430,10 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/add_subresource.png "The data flow diagram")
+
 For examples of usage, see the `handleAddSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 An example how to register a processor to buld a form builder:
@@ -448,6 +484,10 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/delete_subresource.png "The data flow diagram")
+
 For examples of usage, see the `handleDeleteSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 An example how to register a processor to buld a form builder:
@@ -492,6 +532,10 @@ This action has the following processor groups:
 | finalize | Final validation of the loaded data and adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/get_relationship.png "The data flow diagram")
+
 For examples of usage, see the `handleGetRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## update_relationship Action
@@ -524,6 +568,10 @@ This action has the following processor groups:
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/update_relationship.png "The data flow diagram")
 
 For examples of usage, see the `handleUpdateRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
@@ -558,6 +606,10 @@ This action has the following processor groups:
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
 
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/add_relationship.png "The data flow diagram")
+
 For examples of usage, see the `handleAddRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## delete_relationship Action
@@ -590,6 +642,10 @@ This action has the following processor groups:
 | save_data | Validating and persisting the entity. | |
 | finalize | Adding the required response headers. | |
 | normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+The following diagram shows the main data flow for this action:
+
+![Data flow diagram](./actions/delete_relationship.png "The data flow diagram")
 
 For examples of usage, see the `handleDeleteRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 

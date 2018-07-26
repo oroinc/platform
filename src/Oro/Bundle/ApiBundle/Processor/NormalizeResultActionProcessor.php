@@ -83,7 +83,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * @param string                 $processorId
      * @param string|null            $group
      *
-     * @throws \Exception if soft errors handling was not requested
+     * @throws \Exception if the soft handling of errors was not requested
      */
     protected function handleErrors(NormalizeResultContext $context, $processorId, $group)
     {
@@ -111,7 +111,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
      * @param string                 $processorId
      * @param string|null            $group
      *
-     * @throws \Exception if soft errors handling was not requested
+     * @throws \Exception if the soft handling of errors was not requested
      */
     protected function handleException(\Exception $e, NormalizeResultContext $context, $processorId, $group)
     {
@@ -126,7 +126,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             if (!$context->isSoftErrorsHandling()) {
                 throw $e;
             }
-            // in case if soft errors handling is enabled just add an error to the context
+            // if the soft handling of errors is enabled, just add an error to the context
             $context->addError(Error::createByException($e));
         } else {
             // add an error to the context

@@ -230,8 +230,8 @@ interface ContextInterface extends ComponentContextInterface
      * Marks a work as already done.
      * In the most cases this method is useless because it is easy to determine
      * when a work is already done just checking a state of a context.
-     * But in case if a processor does a complex work, it might be required
-     * to mark a work as already done directly.
+     * But if a processor does a complex work, it might be required
+     * to directly mark the work as already done.
      *
      * @param string $operationName The name of an operation that represents some work
      */
