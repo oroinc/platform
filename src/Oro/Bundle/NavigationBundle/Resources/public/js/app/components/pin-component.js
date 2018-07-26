@@ -91,7 +91,9 @@ define(function(require) {
                 position: function() {
                     if (pinBar.el) {
                         return {
-                            left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                            left: _.isRTL()
+                                ? Math.ceil(pinBar.el.offsetLeft)
+                                : Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
                         };
                     } else {
                         return null;

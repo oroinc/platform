@@ -17,14 +17,14 @@
         <% } %>
     </div>
     <div class="footer row-fluid">
-        <span class="pull-left from-name">
+        <span class="from-name">
             <% if (linkFromName) { %>
                 <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
         </span>
-        <span class="pull-right">
+        <span class="forward-action-wrapper">
             <span class="forward-action">
                 {{- UI.clientLink({
                     'dataUrlRaw': "<%= forwardRoute %>",
@@ -111,7 +111,7 @@
     {% if isDesktopVersion() %}
     <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>
     {% endif %}
-    <div class="dropdown-menu pull-right" tabindex="0"></div>
+    <div class="dropdown-menu" tabindex="0"></div>
     <div class="new-email-notification" {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/new-email-message-component'
     }) }}> {{ 'oro.email.notification.new_email'|trans }}</div>

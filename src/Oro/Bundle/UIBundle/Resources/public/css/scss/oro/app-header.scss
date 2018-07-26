@@ -23,7 +23,7 @@
 
     .nav.top-search { // Includes Shortcuts and Search
         .dropdown {
-            float: left;
+            float: #{$start};
 
             .dropdown-menu {
                 &:before {
@@ -32,7 +32,7 @@
                     border-right: 7px solid transparent;
                     content: "";
                     display: inline-block;
-                    left: 9px;
+                    #{$start}: 9px;
                     position: absolute;
                     top: -7px;
                 }
@@ -43,7 +43,7 @@
                     border-right: 6px solid transparent;
                     content: "";
                     display: inline-block;
-                    left: 10px;
+                    #{$start}: 10px;
                     position: absolute;
                     top: -6px;
                 }
@@ -73,7 +73,7 @@
             &.header-dropdown-search {
                 .dark {
                     border-bottom: none;
-                    border-radius: 0 0 3px 3px;
+                    border-radius: corner-values(0 0 3px 3px);
                 }
 
                 .dropdown-menu {
@@ -97,14 +97,14 @@
 
                         .btn-group.btn-block {
                             width: auto;
-                            float: left;
+                            float: #{$start};
                         }
 
                         .header-search-frame {
                             position: relative;
                             vertical-align: top;
-                            margin-left: 50px;
-                            margin-right: 56px;
+                            margin-#{$start}: 50px;
+                            margin-#{$end}: 56px;
                             width: auto;
 
                             input[type='text'] {
@@ -129,13 +129,13 @@
                         .custom-dropdown {
                             position: absolute;
                             top: 28px;
-                            left: 1px;
+                            #{$start}: 1px;
                             border: 1px solid #ccc;
                             background: #fff;
                             width: 211px;
                             z-index: 105;
                             color: #777;
-                            border-radius: 0 0 3px 3px;
+                            border-radius: corner-values(0 0 3px 3px);
                             font: 12px/14px $base-font-family;
                             display: none;
 
@@ -213,11 +213,11 @@
                     width: 100%;
 
                     .search-bar-type {
-                        float: left;
+                        float: #{$start};
                     }
 
                     .fa-caret-down {
-                        margin-left: 8px;
+                        margin-#{$start}: 8px;
                     }
                 }
                 #search-bar-dropdown {
@@ -225,7 +225,7 @@
                     width: auto;
                     margin-top: -1px;
                     border-top-color: #ccc;
-                    border-radius: 0 0 4px 4px;
+                    border-radius: corner-values(0 0 4px 4px);
 
                     &:before,
                     &:after {
@@ -246,15 +246,15 @@
                         margin: 0;
 
                         input[type='text'] {
-                            border-radius: 3px 0 0 3px;
+                            border-radius: corner-values(3px 0 0 3px);
                             width: 239px;
-                            margin-right: -4px;
+                            margin-#{$end}: -4px;
                         }
 
                         .btn {
                             position: relative;
                             border-color: #4978c2;
-                            border-radius: 0 3px 3px 0;
+                            border-radius: corner-values(0 3px 3px 0);
                         }
 
                         .typeahead {
@@ -269,6 +269,5 @@
                 }
             }
         } // Ends .dropdown
-
     } // Ends .top-search
 }

@@ -11,6 +11,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * The base class for processors that do normalization of filters and sorters, such as:
+ * * remove all elements marked as excluded
+ * * update the property path attribute for existing elements
+ * * extract elements from the definitions of related entities
+ * * remove duplicated elements
+ */
 abstract class NormalizeSection implements ProcessorInterface
 {
     /** @var DoctrineHelper */
@@ -64,7 +71,7 @@ abstract class NormalizeSection implements ProcessorInterface
                     }
                 } else {
                     $definitionFieldName = $definition->findFieldNameByPropertyPath($fieldName);
-                    if (in_array($definitionFieldName, $definition->getIdentifierFieldNames(), true)) {
+                    if ($definitionFieldName) {
                         $propertyPath = $definition->getField($definitionFieldName)->getPropertyPath();
                         if ($propertyPath) {
                             $field->setPropertyPath($propertyPath);

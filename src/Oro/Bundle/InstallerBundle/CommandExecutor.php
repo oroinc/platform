@@ -125,12 +125,15 @@ class CommandExecutor
             $this->lastCommandLine = $process->getCommandLine();
 
             $output = $this->output;
-            $process->run(
-                function ($type, $data) use ($output) {
-                    $output->write($data);
-                }
-            );
-            $this->lastCommandExitCode = $process->getExitCode();
+            try {
+                $process->run(
+                    function ($type, $data) use ($output) {
+                        $output->write($data);
+                    }
+                );
+            } finally {
+                $this->lastCommandExitCode = $process->getExitCode();
+            }
 
             // synchronize all data caches
             if ($this->dataCacheManager) {

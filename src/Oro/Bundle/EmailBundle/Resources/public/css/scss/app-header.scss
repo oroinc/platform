@@ -2,7 +2,7 @@
 
 .desktop-version {
     .app-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
-        right: -7px;
+        #{$end}: -7px;
     }
 }
 

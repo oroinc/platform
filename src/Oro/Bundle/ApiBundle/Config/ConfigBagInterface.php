@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 interface ConfigBagInterface
 {
     /**
-     * Checks whether the configuration attribute exists.
+     * Indicates whether the configuration attribute exists.
      *
      * @param string $key
      *
