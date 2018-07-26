@@ -2,6 +2,7 @@
 
 .organization-switcher {
     .dropdown-menu {
-        left: auto;
+        #{$start}: auto;
+        #{$end}: unset;
     }
 }

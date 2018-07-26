@@ -58,21 +58,26 @@
     &__resize {
         position: absolute;
         height: inherit;
-        width: 2px;
         z-index: 1;
+        border: 0 solid transparent;
         background-color: transparent;
+        cursor: pointer;
 
         &:hover {
-            background-color: #0c84a3;
+          border-color: $sidebar-resize-border-color-hover;
         }
     }
 
     .sidebar.sidebar-right &__resize {
-        left: -1px;
+        #{$start}: -1px;
+        padding-#{$start}: 4px;
+        border-#{$start}-width: 2px;
     }
 
     .sidebar.sidebar-left &__resize {
-        right: -1px;
+        #{$end}: -1px;
+        padding-#{$end}: 4px;
+        border-#{$end}-width: 2px;
     }
 
     // add-widget and toggle elements, common styles
@@ -83,6 +88,7 @@
         line-height: 16px;
         width: 100%;
         padding: 14px 0;
+        color: $sidebar-color;
 
         &:hover {
             background-color: $sidebar-active-color;
@@ -96,17 +102,17 @@
 
     &.sidebar-right &__add-widget,
     &.sidebar-right &__toggle {
-        left: 0;
+        #{$start}: 0;
     }
 
     &.sidebar-left &__add-widget,
     &.sidebar-left &__toggle {
-        right: 0;
+        #{$end}: 0;
     }
 
     // add-widget element
     &__add-widget {
-        @include fa-icon($fa-var-plus);
+        @include fa-icon($sidebar-icon-add-widget);
 
         margin-top: -44px;
     }
@@ -117,36 +123,41 @@
     }
 
     &.sidebar-right &__toggle {
-        @include fa-icon($fa-var-arrow-left);
+        @include fa-icon($sidebar-icon-left);
     }
 
     &.sidebar-left &__toggle {
-        @include fa-icon($fa-var-arrow-right);
+        @include fa-icon($sidebar-icon-right);
     }
 
     &.sidebar-right.maximized &__toggle {
-        @include fa-icon($fa-var-arrow-right);
+        @include fa-icon($sidebar-icon-right);
     }
 
     &.sidebar-left.maximized &__toggle {
-        @include fa-icon($fa-var-arrow-left);
+        @include fa-icon($sidebar-icon-left);
     }
 
     .mCSB_container {
-        margin-right: 0;
+        margin-#{$end}: 0;
+    }
+
+    @include if-rtl() {
+        .mCS-dir-rtl > .mCSB_inside > .mCSB_container {
+            margin-#{$end}: 0;
+        }
     }
 
     .mCSB_scrollTools {
         width: 10px;
-
         .mCSB_dragger {
             .mCSB_dragger_bar {
                 margin: 2px !important;
-                background-color: rgba($primary-400, .2) !important;
+                background-color: $sidebar-scroll-bar-background-color !important;
             }
 
             &:hover .mCSB_dragger_bar {
-                background-color: rgba($primary-400, .7) !important;
+                background-color: $sidebar-scroll-bar-background-color-hover !important;
             }
         }
 
@@ -188,11 +199,11 @@
     }
 
     .sidebar.minimized.sidebar-right &.poppedup &__popup_wrapper {
-        margin-left: -10px;
+        margin-#{$start}: -10px;
     }
 
     .sidebar.minimized.sidebar-left &.poppedup &__popup_wrapper {
-        margin-left: $sidebar-minimized-width + 10;
+        margin-#{$start}: $sidebar-minimized-width + 10;
     }
 
     .sidebar.minimized &.poppedup &__popup {
@@ -211,20 +222,20 @@
     }
 
     .sidebar.minimized.sidebar-right &.poppedup &__popup {
-        right: 0;
+        #{$end}: 0;
 
         &:before {
-            transform: rotate(135deg);
-            right: -5px;
+            transform: rotate($sidebar-right-popup-corner-transform);
+            #{$end}: -5px;
         }
     }
 
     .sidebar.minimized.sidebar-left &.poppedup &__popup {
-        left: 0;
+        #{$start}: 0;
 
         &:before {
-            transform: rotate(-45deg);
-            left: -5px;
+            transform: rotate($sidebar-left-popup-corner-transform);
+            #{$start}: -5px;
         }
     }
 
@@ -279,25 +290,32 @@
                 background-color: inherit;
             }
         }
+
+        @include if-rtl() {
+            @at-root .sidebar-right .dropdown-menu {
+                right: auto;
+                left: 0;
+            }
+        }
     }
 
     &__header-icon {
         color: $sidebar-widget-title-color;
         background-color: inherit;
-        padding-right: 4px;
+        padding-#{$end}: 4px;
     }
 
     &__header-toggle {
         width: 20px;
         font-size: 18px;
 
-        @include fa-icon($fa-var-angle-right);
+        @include fa-icon($sidebar-icon-toggle);
 
         background-color: inherit;
     }
 
     &.expanded &__header-toggle {
-        @include fa-icon($fa-var-angle-down);
+        @include fa-icon($sidebar-icon-toggle-expanded);
     }
 
     &__header-title {
@@ -311,7 +329,7 @@
         width: 20px;
         font-size: 16px;
 
-        @include fa-icon($fa-var-ellipsis-h);
+        @include fa-icon($sidebar-icon-actions-widget);
 
         background-color: inherit;
         color: $sidebar-widget-actions-color;
@@ -351,7 +369,7 @@
 
     &.highlight,
     &.highlight:before {
-        color: #fabb18;
+        color: $sidebar-icon-highlight-color;
     }
 
     .loading-icon {
@@ -364,12 +382,12 @@
         }
 
         .loading-icon {
-            @include fa-icon($fa-var-refresh);
+            @include fa-icon($sidebar-icon-loading);
 
             display: inline-block;
             position: absolute;
             top: -4px;
-            right: -9px;
+            #{$end}: -9px;
             margin: 0;
             padding: 0;
             border-radius: 8px;
@@ -386,13 +404,13 @@
     .sidebar.minimized & {
         .loading-icon {
             top: -7px;
-            right: 0;
+            #{$end}: 0;
         }
 
         .item-counter {
             top: -11px;
-            margin-left: -20px;
-            margin-right: 0;
+            margin-#{$start}: -20px;
+            margin-#{$end}: 0;
         }
     }
 }

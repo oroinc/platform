@@ -14,6 +14,7 @@ class EndsWithComparisonExpression implements ComparisonExpressionInterface
      */
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
+        string $field,
         string $expression,
         string $parameterName,
         $value

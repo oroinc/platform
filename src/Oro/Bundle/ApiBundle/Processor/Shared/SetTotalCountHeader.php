@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
-use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -18,8 +18,8 @@ use Oro\Component\EntitySerializer\QueryResolver;
 
 /**
  * Calculates the total number of records and sets it
- * to "X-Include-Total-Count" response header,
- * in case if it was requested by "X-Include: totalCount" request header.
+ * to "X-Include-Total-Count" response header
+ * if it was requested by "X-Include: totalCount" request header.
  */
 class SetTotalCountHeader implements ProcessorInterface
 {
@@ -141,7 +141,10 @@ class SetTotalCountHeader implements ProcessorInterface
             ));
         }
 
-        return QueryCountCalculator::calculateCount($countQuery);
+        $paginator = new Paginator($countQuery);
+        $paginator->setUseOutputWalkers(false);
+
+        return $paginator->count();
     }
 
     /**
