@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
+ * A set of reusable static methods to help building of queries.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class QueryBuilderUtil
@@ -401,6 +402,20 @@ class QueryBuilderUtil
             self::checkIdentifier($field);
         } else {
             self::checkIdentifier($str);
+        }
+    }
+
+    /**
+     * Check that passed path is safe for usage in dynamic DQL. Path may be in format (?alias.)field(.?field)...
+     *
+     * @param string $str
+     * @throws \InvalidArgumentException
+     */
+    public static function checkPath($str)
+    {
+        $items = explode('.', $str);
+        foreach ($items as $item) {
+            self::checkIdentifier($item);
         }
     }
 

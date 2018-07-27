@@ -110,7 +110,7 @@
         "npm-asset/xregexp": "3.2.*",
         "robloach/component-installer": "0.2.*",
         "jms/cg": "1.2.*",
-        "oro/redis-config": "2.x-dev",
+        "oro/redis-config": "3.1.*",
         "brick/math": "0.5.*",
         "bower-asset/fuse": "3.2.*",
         "twbs/bootstrap": "4.1.*"
@@ -141,7 +141,7 @@
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "3.1-dev"
         }
     },
     "autoload": {

@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
@@ -28,59 +30,75 @@ class CompleteSorters extends CompleteSection
      */
     protected function completeFields(
         EntityConfigInterface $section,
-        $entityClass,
+        string $entityClass,
         EntityDefinitionConfig $definition
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-        $this->completeSorters(
-            $section,
-            $definition,
-            $definition->getIdentifierFieldNames()
-        );
-        $this->completeSortersByPropertyPath(
-            $section,
-            $definition,
-            array_keys($this->doctrineHelper->getIndexedFields($metadata))
-        );
-        $this->completeSortersByPropertyPath(
-            $section,
-            $definition,
-            array_keys($this->doctrineHelper->getIndexedAssociations($metadata))
-        );
+        $this->completeSortersForIdentifierFields($section, $definition);
+        $this->completeSortersForFields($section, $metadata, $definition);
+        $this->completeSortersForAssociations($section, $metadata, $definition);
     }
 
     /**
-     * @param EntityConfigInterface  $section
+     * @param EntityConfigInterface  $sorters
      * @param EntityDefinitionConfig $definition
-     * @param string[]               $fields
      */
-    protected function completeSorters(
-        EntityConfigInterface $section,
-        EntityDefinitionConfig $definition,
-        array $fields
+    protected function completeSortersForIdentifierFields(
+        EntityConfigInterface $sorters,
+        EntityDefinitionConfig $definition
     ) {
-        foreach ($fields as $fieldName) {
+        $idFieldNames = $definition->getIdentifierFieldNames();
+        foreach ($idFieldNames as $fieldName) {
             if ($definition->hasField($fieldName)) {
-                $section->getOrAddField($fieldName);
+                $sorters->getOrAddField($fieldName);
             }
         }
     }
 
     /**
-     * @param EntityConfigInterface  $section
+     * @param EntityConfigInterface  $sorters
+     * @param ClassMetadata          $metadata
      * @param EntityDefinitionConfig $definition
-     * @param string[]               $fields
      */
-    protected function completeSortersByPropertyPath(
-        EntityConfigInterface $section,
-        EntityDefinitionConfig $definition,
-        array $fields
+    protected function completeSortersForFields(
+        EntityConfigInterface $sorters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
     ) {
-        foreach ($fields as $propertyPath) {
+        $indexedFields = $this->doctrineHelper->getIndexedFields($metadata);
+        foreach ($indexedFields as $propertyPath => $dataType) {
             $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
-            if ($fieldName) {
-                $section->getOrAddField($fieldName);
+            if ($fieldName && !$sorters->hasField($fieldName)) {
+                $sorters->addField($fieldName);
+            }
+        }
+    }
+
+    /**
+     * @param EntityConfigInterface  $sorters
+     * @param ClassMetadata          $metadata
+     * @param EntityDefinitionConfig $definition
+     */
+    protected function completeSortersForAssociations(
+        EntityConfigInterface $sorters,
+        ClassMetadata $metadata,
+        EntityDefinitionConfig $definition
+    ) {
+        $indexedAssociations = $this->doctrineHelper->getIndexedAssociations($metadata);
+        foreach ($indexedAssociations as $propertyPath => $dataType) {
+            $sorter = $sorters->findField($propertyPath, true);
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            if ($fieldName && (null !== $sorter || !$sorters->hasField($fieldName))) {
+                if (null === $sorter) {
+                    $sorter = $sorters->addField($fieldName);
+                }
+                if ($metadata->isCollectionValuedAssociation($propertyPath)) {
+                    $targetIdIdFieldName = $this->doctrineHelper
+                        ->getEntityMetadataForClass($metadata->getAssociationTargetClass($propertyPath))
+                        ->getSingleIdentifierFieldName();
+                    $sorter->setPropertyPath($propertyPath . ConfigUtil::PATH_DELIMITER . $targetIdIdFieldName);
+                }
             }
         }
     }

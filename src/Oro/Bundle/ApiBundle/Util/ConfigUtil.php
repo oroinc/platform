@@ -140,6 +140,9 @@ class ConfigUtil extends BaseConfigUtil
     /** a flag indicates whether the filter value can be a pair of "from" and "to" values */
     public const ALLOW_RANGE = 'allow_range';
 
+    /** a flag indicates whether the filter represents a collection valued association */
+    public const COLLECTION = 'collection';
+
     /**
      * Gets a native PHP array representation of each object in a given array.
      *

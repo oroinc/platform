@@ -7,7 +7,7 @@ use Doctrine\ORM\ORMException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
- * Criteria for filtering data requrned by ORM queries.
+ * Criteria for filtering data returned by ORM queries.
  */
 class Criteria extends BaseCriteria
 {

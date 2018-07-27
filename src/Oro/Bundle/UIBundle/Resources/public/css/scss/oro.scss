@@ -1268,8 +1268,8 @@ label .popover-content {
         display: inline-block;
         border-radius: 8px;
         position: relative;
-        margin-left: -10px;
-        margin-right: -5px;
+        margin-#{$start}: -10px;
+        margin-#{$end}: -5px;
         top: -7px;
         line-height: 15px;
         text-align: center;

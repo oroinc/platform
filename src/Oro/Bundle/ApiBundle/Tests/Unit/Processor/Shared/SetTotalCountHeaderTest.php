@@ -98,6 +98,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     {
         $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
+        $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
@@ -113,15 +114,19 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
             ->with(self::isInstanceOf(Query::class), self::identicalTo($config));
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(DISTINCT g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
 
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setQuery($query);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        // mocked fetchColumn method in StatementMock returns null value (0 records in db)
         self::assertEquals(
-            0,
+            $totalCount,
             $this->context->getResponseHeaders()->get('X-Include-Total-Count')
         );
     }
@@ -130,21 +135,26 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     {
         $entityClass = Group::class;
         $config = new EntityDefinitionConfig();
+        $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
             ->with(self::isInstanceOf(Query::class), self::identicalTo($config));
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(DISTINCT g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
 
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setQuery($query->getQuery());
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        // mocked fetchColumn method in StatementMock returns null value (0 records in db)
         self::assertEquals(
-            0,
+            $totalCount,
             $this->context->getResponseHeaders()->get('X-Include-Total-Count')
         );
     }

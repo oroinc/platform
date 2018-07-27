@@ -310,7 +310,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath()
     {
@@ -406,7 +406,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Whether at least one data transformer exists.
+     * Indicates whether at least one data transformer exists.
      *
      * @return bool
      */

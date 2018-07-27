@@ -5,5 +5,5 @@
     line-height: inherit;
     vertical-align: top;
     position: relative;
-    left: -20px;
+    #{$start}: -20px;
 }

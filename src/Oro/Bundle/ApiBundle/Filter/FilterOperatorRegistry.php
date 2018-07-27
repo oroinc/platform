@@ -21,7 +21,7 @@ class FilterOperatorRegistry
         $this->operators = $operators;
         $this->shortOperators = [];
         foreach ($operators as $name => $shortName) {
-            if ($shortName) {
+            if ($shortName && !\array_key_exists($shortName, $this->shortOperators)) {
                 $this->shortOperators[$shortName] = $name;
             }
         }
