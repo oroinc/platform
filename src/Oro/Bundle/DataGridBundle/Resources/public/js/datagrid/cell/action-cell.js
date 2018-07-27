@@ -79,7 +79,7 @@ define([
         /** @property */
         simpleLaunchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
-                '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
+                '<ul class="nav nav--block nav-pills icons-holder launchers-list"></ul>' +
             '<% } else { %>' +
                 '<ul class="unstyled launchers-list"></ul>' +
             '<% } %>'

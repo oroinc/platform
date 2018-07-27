@@ -577,9 +577,17 @@
             {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
                 {{ _self.renderAttributes(parameters.dataAttributes) }}
             {%- endif -%}>
-            {%- set labelInIcon = parameters.labelInIcon|default(true) -%}
+            {%- if (parameters.labelInIcon is defined) -%}
+                {%- set labelInIcon = parameters.labelInIcon -%}
+            {%- else -%}
+                {%- set labelInIcon = true -%}
+            {%- endif %}
             {%- if (parameters.iCss is defined) -%}
-                <i class="{{ parameters.iCss }}{% if labelInIcon %} hide-text{% endif %}">{{ (parameters.label is defined and labelInIcon) ? parameters.label : '' }}</i>
+                <i class="{{ parameters.iCss }}">
+                    {%- if (parameters.label is defined and labelInIcon) -%}
+                        <span class="sr-only">{{- parameters.label -}}</span>
+                    {%- endif -%}
+                </i>
             {%- endif %}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>
