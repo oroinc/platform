@@ -18,6 +18,8 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroWebDriverCurlService;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -366,6 +368,16 @@ class OroTestFrameworkExtension implements TestworkExtension
                 $requiredOptionalListeners,
                 $processedConfiguration['optional_listeners']['required_for_fixtures'] ?? []
             );
+        }
+
+        $configLoader = new CumulativeConfigLoader(
+            'oro_behat_isolators',
+            new YamlCumulativeFileLoader('Tests/Behat/isolators.yml')
+        );
+
+        foreach (array_reverse($configLoader->load()) as $resource) {
+            $loader = new YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'isolators.yml')));
+            $loader->load('isolators.yml');
         }
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
