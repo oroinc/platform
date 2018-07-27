@@ -16,6 +16,9 @@
 #### UIBundle
 * All global JS Views and Components are defined in the HTML through data attributes.
 
+## 3.0.0 (2018-07-27)
+[Show detailed list of changes](incompatibilities-3-0.md)
+
 ## 3.0.0-rc (2018-05-31)
 [Show detailed list of changes](incompatibilities-3-0-rc.md)
 
