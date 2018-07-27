@@ -13,6 +13,9 @@
 * Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](./src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
 
 ### Changed
+#### ApiBundle
+* By default processors for `customize_loaded_data` action are executed only for primary and included entities. Use `identifier_only: true` tag attribute if your processor should be executed for relationships.
+
 #### UIBundle
 * All global JS Views and Components are defined in the HTML through data attributes.
 

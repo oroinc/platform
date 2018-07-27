@@ -14,6 +14,11 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
+/**
+ * The base execution context for processors for subresources and relationships related actions,
+ * such as "get_subresource", "update_subresource", "add_subresource", "delete_subresource",
+ * "get_relationship", "update_relationship", "add_relationship" and "delete_relationship".
+ */
 class SubresourceContext extends Context
 {
     /** FQCN of the parent entity */

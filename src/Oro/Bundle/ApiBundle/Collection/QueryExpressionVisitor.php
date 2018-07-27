@@ -186,13 +186,13 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * )
      * </code>
      *
-     * @param string $field            The unique name of a field corresponds an association
-     *                                 for which the subquery should be created
-     * @param bool   $disalowJoinUsage Whether the usage of existing join to the association itself is disalowed
+     * @param string $field             The unique name of a field corresponds an association
+     *                                  for which the subquery should be created
+     * @param bool   $disallowJoinUsage Whether the usage of existing join to the association itself is disallowed
      *
      * @return QueryBuilder
      */
-    public function createSubquery(string $field, bool $disalowJoinUsage = false): QueryBuilder
+    public function createSubquery(string $field, bool $disallowJoinUsage = false): QueryBuilder
     {
         if (null === $this->query) {
             throw new QueryException('No query is set before invoking createSubquery().');
@@ -205,7 +205,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         }
 
         try {
-            return $this->createSubqueryByPath($this->getSubqueryPath($field), $disalowJoinUsage);
+            return $this->createSubqueryByPath($this->getSubqueryPath($field), $disallowJoinUsage);
         } catch (\Throwable $e) {
             throw new QueryException(\sprintf(
                 'Cannot build subquery for the field "%s". Reason: %s',
@@ -375,13 +375,13 @@ class QueryExpressionVisitor extends ExpressionVisitor
 
     /**
      * @param string $path
-     * @param bool   $disalowJoinUsage
+     * @param bool   $disallowJoinUsage
      *
      * @return QueryBuilder
      */
-    private function createSubqueryByPath(string $path, bool $disalowJoinUsage): QueryBuilder
+    private function createSubqueryByPath(string $path, bool $disallowJoinUsage): QueryBuilder
     {
-        if (!$disalowJoinUsage && isset($this->queryJoinMap[$path])) {
+        if (!$disallowJoinUsage && isset($this->queryJoinMap[$path])) {
             return $this->createSubqueryByJoin($this->queryJoinMap[$path]);
         }
 

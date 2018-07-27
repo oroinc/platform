@@ -26,7 +26,7 @@ use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * The base execution context for Data API processors for public action.
+ * The base execution context for Data API processors for public actions.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)

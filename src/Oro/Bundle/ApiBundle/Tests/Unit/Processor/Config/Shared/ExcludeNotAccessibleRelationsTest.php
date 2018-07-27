@@ -618,7 +618,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssocciationToOverriddenEntity()
+    public function testProcessForAssociationToOverriddenEntity()
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -736,7 +736,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssocciationToOverriddenEntityInTableInheritanceSubClass()
+    public function testProcessForAssociationToOverriddenEntityInTableInheritanceSubClass()
     {
         $config = [
             'exclusion_policy' => 'all',
