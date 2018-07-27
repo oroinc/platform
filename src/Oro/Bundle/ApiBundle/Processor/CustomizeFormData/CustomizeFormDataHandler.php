@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
@@ -67,15 +69,22 @@ class CustomizeFormDataHandler
 
         /** @var FormContext $formContext */
         $formContext = $rootFormConfig->getAttribute(self::API_CONTEXT);
+        $config = $formContext->getConfig();
         $context->setVersion($formContext->getVersion());
         $context->getRequestType()->set($formContext->getRequestType());
-        $context->setConfig($formContext->getConfig());
         $context->setClassName($form->getConfig()->getDataClass());
         $context->setParentAction($formContext->getAction());
         $context->setForm($form);
-        if (null !== $form->getParent()) {
+        if (null === $form->getParent()) {
+            $context->setConfig($config);
+        } else {
             $context->setRootClassName($rootFormConfig->getDataClass());
-            $context->setPropertyPath($this->getPropertyPath($form));
+            $propertyPath = $this->getPropertyPath($form);
+            $context->setPropertyPath($propertyPath);
+            $context->setRootConfig($config);
+            if (null !== $config) {
+                $context->setConfig($this->getAssociationConfig($config, $propertyPath));
+            }
         }
 
         return $context;
@@ -101,5 +110,31 @@ class CustomizeFormDataHandler
         }
 
         return \implode('.', \array_reverse($path));
+    }
+
+    /**
+     * @param EntityDefinitionConfig $config
+     * @param string                 $propertyPath
+     *
+     * @return EntityDefinitionConfig|null
+     */
+    private function getAssociationConfig(
+        EntityDefinitionConfig $config,
+        string $propertyPath
+    ): ?EntityDefinitionConfig {
+        $currentConfig = $config;
+        $path = ConfigUtil::explodePropertyPath($propertyPath);
+        foreach ($path as $fieldName) {
+            $fieldConfig = $currentConfig->getField($fieldName);
+            $currentConfig = null;
+            if (null !== $fieldConfig) {
+                $currentConfig = $fieldConfig->getTargetEntity();
+            }
+            if (null === $currentConfig) {
+                break;
+            }
+        }
+
+        return $currentConfig;
     }
 }

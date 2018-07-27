@@ -275,9 +275,9 @@ class ConfigurationLoader
                     $allAliases[$entityClass] = $alias;
                 }
             }
-            foreach ($fileConfig['substitutions'] as $overriddedEntityClass => $entityClass) {
-                if (!isset($allSubstitutions[$overriddedEntityClass])) {
-                    $allSubstitutions[$overriddedEntityClass] = $entityClass;
+            foreach ($fileConfig['substitutions'] as $overriddenEntityClass => $entityClass) {
+                if (!isset($allSubstitutions[$overriddenEntityClass])) {
+                    $allSubstitutions[$overriddenEntityClass] = $entityClass;
                 }
             }
             foreach ($fileConfig['exclusions'] as $exclusion) {

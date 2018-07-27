@@ -16,9 +16,14 @@ $datagrid-header-cell-caret-offset: 0 0 0 5px !default;
 $datagrid-header-cell-caret-color: get-color('additional', 'dark') !default;
 $datagrid-header-cell-caret-size: 4px !default;
 
+$datagrid-header-cell-caret-position: absolute !default;
+$datagrid-header-cell-caret-top: 50% !default;
+$datagrid-header-cell-caret-right: -15px !default;
+
 $datagrid-header-cell-link-font-size: $base-font-size !default;
 $datagrid-header-cell-link-font-weight: 600 !default;
 $datagrid-header-cell-link-line-height: 1 !default;
 $datagrid-header-cell-link-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-link-position: relative !default;
 $datagrid-header-cell-link-hover-color: get-color('additional', 'dark') !default;
 $datagrid-header-cell-link-hover-text-decoration: none !default;

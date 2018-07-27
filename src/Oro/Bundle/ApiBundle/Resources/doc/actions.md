@@ -382,7 +382,7 @@ The following diagram shows the main data flow for this action:
 
 For examples of usage, see the `handleUpdateSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
-An example how to register a processor to buld a form builder:
+An example how to register a processor to build a form builder:
 
 ```yaml
     acme.api.items.build_form_builder:
@@ -436,7 +436,7 @@ The following diagram shows the main data flow for this action:
 
 For examples of usage, see the `handleAddSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
-An example how to register a processor to buld a form builder:
+An example how to register a processor to build a form builder:
 
 ```yaml
     acme.api.items.build_form_builder:
@@ -490,7 +490,7 @@ The following diagram shows the main data flow for this action:
 
 For examples of usage, see the `handleDeleteSubresource` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
-An example how to register a processor to buld a form builder:
+An example how to register a processor to build a form builder:
 
 ```yaml
     acme.api.items.build_form_builder:
@@ -657,7 +657,20 @@ The context class: [CustomizeLoadedDataContext](../../Processor/CustomizeLoadedD
 
 The main processor class: [CustomizeLoadedDataProcessor](../../Processor/CustomizeLoadedDataProcessor.php).
 
-As example of a processor used to modify the loaded data: [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php). Run `php bin/console oro:api:debug customize_loaded_data` to display other processors registered in this action.
+As example of a processor used to modify the loaded data: [ComputePrimaryField](../../Processor/CustomizeLoadedData/ComputePrimaryField.php) or [Add a Computed Field](./how_to.md#add-a-computed-field). Run `php bin/console oro:api:debug customize_loaded_data` to display other processors registered in this action.
+
+Please none that all processors for this action has `identifier_only` tag attribute set to `false`. It means that such
+processors are not executed during loading of relationships. If your processor should be executed
+during loading of relationships set `identifier_only` tag attribute to `true`. If your processor should be executed
+during loading of relationships, primary and included entities, set `identifier_only` tag attribute to `null`. E.g.:
+
+```yaml
+services:
+    acme.api.compute_my_field:
+        class: Acme\Bundle\AppBundle\Api\Processor\ComputeMyField
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\MyEntity, identifier_only: true }
+```
 
 ## customize_form_data Action
 

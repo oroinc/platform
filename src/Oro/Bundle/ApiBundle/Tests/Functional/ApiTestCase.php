@@ -70,7 +70,7 @@ abstract class ApiTestCase extends WebTestCase
         /**
          * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
          * This is needed to prevent unexpected exceptions
-         * if some database related exception occurrs during handling of API request
+         * if some database related exception occurs during handling of API request
          * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
          * As functional tests work inside a database transaction, any query to the database
          * after such exception can raise "current transaction is aborted,
@@ -279,13 +279,13 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * Replaces all values in the given expected response content
-     * with correxponding value from the actual response content
+     * with corresponding value from the actual response content
      * when the key of an element is equal to the given key
      * and the value of this element is equal to the given placeholder.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response        The response object
-     * @param string       $key             The key for with a value shoul be updated
+     * @param string       $key             The key for with a value should be updated
      * @param string       $placeholder     The marker value
      *
      * @return array
@@ -499,7 +499,7 @@ abstract class ApiTestCase extends WebTestCase
              * Suppress database related exceptions during the clearing of the entity manager,
              * if it was requested for safe handling of "kernel.terminate" event.
              * This is needed to prevent unexpected exceptions
-             * if some database related exception occurrs during handling of API request
+             * if some database related exception occurs during handling of API request
              * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
              * As functional tests work inside a database transaction, any query to the database
              * after such exception can raise "current transaction is aborted,

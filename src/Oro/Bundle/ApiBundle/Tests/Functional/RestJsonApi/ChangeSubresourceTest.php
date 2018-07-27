@@ -335,7 +335,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -363,7 +363,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -393,7 +393,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -457,7 +457,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -487,7 +487,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -515,7 +515,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -543,7 +543,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);
@@ -571,7 +571,7 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
 
         $expectedError = [
             'title'  => 'runtime exception',
-            'detail' => 'The form builded was not created.'
+            'detail' => 'The form builder was not created.'
         ];
         self::assertResponseStatusCodeEquals($response, 500);
         $this->assertResponseContains(['errors' => [$expectedError]], $response);

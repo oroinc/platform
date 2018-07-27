@@ -32,7 +32,7 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
 
     /**
      * @param string[]   $expectedEntities The list of expected entity reference names
-     * @param Collection $association      The associaation value
+     * @param Collection $association      The association value
      */
     private function assertToManyAssociation(array $expectedEntities, Collection $association)
     {

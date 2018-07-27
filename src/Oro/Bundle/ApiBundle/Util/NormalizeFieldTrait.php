@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 
 /**
- * Provides a method to replace a placeholder in a field path with corresponsing object names.
+ * Provides a method to replace a placeholder in a field path with corresponding object names.
  */
 trait NormalizeFieldTrait
 {

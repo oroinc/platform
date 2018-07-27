@@ -246,7 +246,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['title'], $titleParameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedidentifierFields()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedIdentifierFields()
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];

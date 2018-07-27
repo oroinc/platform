@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 /**
  * This class is used to testing EntityInstantiator for a model inherited from an entity
- * and when a moden has a constructor with required parameters.
+ * and when a model has a constructor with required parameters.
  */
 class UserProfileWithConstructor extends User
 {

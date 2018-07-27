@@ -531,7 +531,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithAssocciationToOverriddenEntity()
+    public function testProcessForManageableEntityWithAssociationToOverriddenEntity()
     {
         $this->context->setExtras([new ExpandRelatedEntitiesConfigExtra(['association1'])]);
 

@@ -25,6 +25,12 @@ oro_behat_extension:
     WYSIWYG editor:
       selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
 
+    WYSIWYG Source code button:
+      selector: 'div.mce-container-body div[aria-label="Source code"] button'
+
+    WYSIWYG textarea:
+      selector: 'textarea.mce-textbox'
+
     Entity pagination:
       selector: '#entity-pagination'
 

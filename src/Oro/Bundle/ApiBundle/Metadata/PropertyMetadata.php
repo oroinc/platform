@@ -129,7 +129,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Indicates whetner the request data can contain this property.
+     * Indicates whether the request data can contain this property.
      *
      * @return bool
      */
@@ -139,7 +139,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Indicates whetner the response data can contain this property.
+     * Indicates whether the response data can contain this property.
      *
      * @return bool
      */
@@ -149,7 +149,7 @@ abstract class PropertyMetadata extends ParameterBag
     }
 
     /**
-     * Sets a value indicates whetner the request data and the response data can contain this property.
+     * Sets a value indicates whether the request data and the response data can contain this property.
      *
      * @param bool $input
      * @param bool $output

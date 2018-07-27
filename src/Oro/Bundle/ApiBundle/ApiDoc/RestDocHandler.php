@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
 /**
- * Populates ApiDoc annotation based on the confoguration of Data API resource.
+ * Populates ApiDoc annotation based on the configuration of Data API resource.
  */
 class RestDocHandler implements HandlerInterface
 {
@@ -415,7 +415,7 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * Returns true if the given ApiDoc annotation has at least one sucsess status code
+     * Returns true if the given ApiDoc annotation has at least one success status code
      * indicates that the resource data should be returned in the response.
      *
      * @param ApiDoc $annotation

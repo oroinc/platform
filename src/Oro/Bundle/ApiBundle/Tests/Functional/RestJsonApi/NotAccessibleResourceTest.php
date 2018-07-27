@@ -1165,7 +1165,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
     }
 
-    public function testGetSubresourceWithUnacessibleTarget()
+    public function testGetSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->getSubresource(
@@ -1191,7 +1191,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testPostSubresourceWithUnacessibleTarget()
+    public function testPostSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->postSubresource(
@@ -1217,7 +1217,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testPatchSubresourceWithUnacessibleTarget()
+    public function testPatchSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->patchSubresource(
@@ -1243,7 +1243,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testDeleteSubresourceWithUnacessibleTarget()
+    public function testDeleteSubresourceWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->deleteSubresource(
@@ -1269,7 +1269,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGetRelationshipWithUnacessibleTarget()
+    public function testGetRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->getRelationship(
@@ -1295,7 +1295,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testPostRelationshipWithUnacessibleTarget()
+    public function testPostRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->postRelationship(
@@ -1321,7 +1321,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testPatchRelationshipWithUnacessibleTarget()
+    public function testPatchRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->patchRelationship(
@@ -1347,7 +1347,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testDeleteRelationshipWithUnacessibleTarget()
+    public function testDeleteRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->deleteRelationship(
@@ -1373,7 +1373,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testOptionsRelationshipWithUnacessibleTarget()
+    public function testOptionsRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->request(
@@ -1404,7 +1404,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    public function testHeadRelationshipWithUnacessibleTarget()
+    public function testHeadRelationshipWithUnaccessibleTarget()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->request(
