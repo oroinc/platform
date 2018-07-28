@@ -392,28 +392,6 @@
                 }
             });
 
-            {% if not enableFormatParameter -%}
-            /**
-             * Remove "_format" parameter
-             */
-            if (options.url.indexOf('?') !== -1) {
-                options.url = options.url.replace(/([?&])(_format=&?)/, "$1");
-            }
-            if (!jQuery.isEmptyObject(options.data) && options.data !== '{}') {
-                if (options.data.lastIndexOf('{"', 0) === 0) {
-                    // json
-                    var data = JSON.parse(options.data);
-                    if (data.hasOwnProperty('_format')) {
-                        delete data['_format'];
-                        options.data = JSON.stringify(data);
-                    }
-                } else {
-                    // uri string
-                    options.data = options.data.replace(/(&?)(_format=&?)/, "$1");
-                }
-            }
-            {% endif %}
-
             /**
              * Remove "Content-type" header if both "Content-type" and "Content-Type" headers exist
              */

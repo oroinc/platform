@@ -60,9 +60,6 @@ class HtmlFormatter extends AbstractFormatter
     /** @var bool */
     protected $defaultSectionsOpened;
 
-    /** @var bool */
-    protected $enableFormatParameter = true;
-
     /** @var string */
     protected $rootRoute;
 
@@ -193,14 +190,6 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param bool $enableFormatParameter
-     */
-    public function setEnableFormatParameter($enableFormatParameter)
-    {
-        $this->enableFormatParameter = $enableFormatParameter;
-    }
-
-    /**
      * @param string $rootRoute
      */
     public function setRootRoute($rootRoute)
@@ -256,17 +245,12 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function getGlobalVars()
     {
-        $requestFormatMethod = $this->requestFormatMethod;
-        if (!$this->enableFormatParameter && 'format_param' === $requestFormatMethod) {
-            $requestFormatMethod = '';
-        }
-
         return [
             'apiName'               => $this->apiName,
             'authentication'        => $this->authentication,
             'endpoint'              => $this->endpoint,
             'enableSandbox'         => $this->enableSandbox,
-            'requestFormatMethod'   => $requestFormatMethod,
+            'requestFormatMethod'   => $this->requestFormatMethod,
             'acceptType'            => $this->acceptType,
             'bodyFormats'           => $this->bodyFormats,
             'defaultBodyFormat'     => $this->defaultBodyFormat,
@@ -277,7 +261,6 @@ class HtmlFormatter extends AbstractFormatter
             'js'                    => $this->getJs(),
             'motdTemplate'          => $this->motdTemplate,
             'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'enableFormatParameter' => $this->enableFormatParameter,
             'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
             'views'                 => $this->getViews(),
             'defaultView'           => $this->getDefaultView(),
