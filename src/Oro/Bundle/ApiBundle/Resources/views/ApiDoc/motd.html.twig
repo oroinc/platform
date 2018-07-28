@@ -432,6 +432,17 @@
             } else {
                 $requestBodyHeader.append('&nbsp;<small>[<a href="" class="toggle-request-body">Show</a>]</small>');
             }
+
+            /**
+             * Update "Curl Command Line" section
+             */
+            displayCurl(
+                options.type,
+                decodeURIComponent(options.url),
+                options.headers,
+                options.data,
+                $('.curl-command', $result)
+            );
         });
 
         /**
