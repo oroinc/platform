@@ -15,17 +15,6 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         $config = [];
         foreach (['metadata', 'entities', 'relations'] as $section) {
             $config[$section] = [
-                /* @todo: API version is not supported for now
-                'Test\Class1' => [
-                    '0' => ['fields' => ['class1_v0' => []]]
-                ],
-                'Test\Class2' => [
-                    '0'   => ['fields' => ['class2_v0' => []]],
-                    '1.0' => ['fields' => ['class2_v1.0' => []]],
-                    '1.5' => ['fields' => ['class2_v1.5' => []]],
-                    '2.0' => ['fields' => ['class2_v2.0' => []]]
-                ],
-                */
                 'Test\Class1' => [
                     'fields' => ['class1_v0' => []]
                 ],
@@ -52,11 +41,6 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     public function getClassNamesProvider()
     {
         return [
-            /* @todo: API version is not supported for now. Add data to test versioning here */
-            [
-                '1.0',
-                ['Test\Class1', 'Test\Class2']
-            ],
             [
                 Version::LATEST,
                 ['Test\Class1', 'Test\Class2']
@@ -116,20 +100,6 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     public function getConfigProvider()
     {
         return [
-            /* @todo: API version is not supported for now
-            ['Test\Class1', '0', ['fields' => ['class1_v0' => []]]],
-            ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],
-            ['Test\Class1', Version::LATEST, ['fields' => ['class1_v0' => []]]],
-            ['Test\Class2', '0', ['fields' => ['class2_v0' => []]]],
-            ['Test\Class2', '0.5', ['fields' => ['class2_v0' => []]]],
-            ['Test\Class2', '1.0', ['fields' => ['class2_v1.0' => []]]],
-            ['Test\Class2', '1.4', ['fields' => ['class2_v1.0' => []]]],
-            ['Test\Class2', '1.5', ['fields' => ['class2_v1.5' => []]]],
-            ['Test\Class2', '1.6', ['fields' => ['class2_v1.5' => []]]],
-            ['Test\Class2', '2.0', ['fields' => ['class2_v2.0' => []]]],
-            ['Test\Class2', '2.1', ['fields' => ['class2_v2.0' => []]]],
-            ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]],
-            */
             ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],
             ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]]
         ];

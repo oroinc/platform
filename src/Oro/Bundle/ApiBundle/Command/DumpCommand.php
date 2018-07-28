@@ -37,13 +37,6 @@ class DumpCommand extends AbstractDebugCommand
                 InputArgument::OPTIONAL,
                 'The entity class or entity type'
             )
-            // @todo: API version is not supported for now
-            //->addArgument(
-            //    'version',
-            //    InputArgument::OPTIONAL,
-            //    'API version',
-            //    Version::LATEST
-            //)
             ->addOption(
                 'sub-resources',
                 null,
@@ -79,8 +72,7 @@ class DumpCommand extends AbstractDebugCommand
     public function dumpNotAccessibleEntities(InputInterface $input, OutputInterface $output)
     {
         $requestType = $this->getRequestType($input);
-        // @todo: API version is not supported for now
-        //$version = $input->getArgument('version');
+        // API version is not supported for now
         $version = Version::normalizeVersion(null);
 
         /** @var ResourcesProvider $resourcesProvider */
@@ -125,8 +117,7 @@ class DumpCommand extends AbstractDebugCommand
     public function dumpResources(InputInterface $input, OutputInterface $output)
     {
         $requestType = $this->getRequestType($input);
-        // @todo: API version is not supported for now
-        //$version = $input->getArgument('version');
+        // API version is not supported for now
         $version = Version::normalizeVersion(null);
         $entityClass = $this->resolveEntityClass($input->getArgument('entity'), $version, $requestType);
         $isSubresourcesRequested = $input->getOption('sub-resources');
