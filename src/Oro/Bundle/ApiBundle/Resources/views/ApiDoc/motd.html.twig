@@ -360,29 +360,34 @@
                     operator = $('.operator', $(this)).val(),
                     value = $('.value', $(this)).val(),
                     data, obj, keyPair;
-                if (value !== '' && operator !== undefined && operator !== '=' && !jQuery.isEmptyObject(options.data)) {
-                    if (operator === 'eq') {
-                        operator = '=';
-                    } else if (options.data.lastIndexOf('{"', 0) === 0) {
-                        // json
-                        data = JSON.parse(options.data);
-                        keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
-                        obj = {};
-                        if(keyPair) {
-                            if (data.hasOwnProperty(keyPair[1]) && data[keyPair[1]].hasOwnProperty(keyPair[2])) {
-                                obj[operator] = data[keyPair[1]][keyPair[2]];
-                                data[keyPair[1]][keyPair[2]] = obj;
-                            }
-                        } else if (data.hasOwnProperty(key)) {
-                            obj[operator] = data[key];
-                            data[key] = obj;
-                        }
-                        options.data = JSON.stringify(data);
-                    } else {
-                        // uri string
-                        options.data = options.data.replace(
-                            new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2[" + operator + ']='
+                if (value !== '' && operator !== undefined && operator !== '=' && operator !== 'eq') {
+                    if (options.url.indexOf('?') !== -1) {
+                        options.url = options.url.replace(
+                            new RegExp("([\?&])?(" + key.replace(/[\[\]]/g, "\\$&") + ")="), "$1$2[" + operator + ']='
                         );
+                    }
+                    if (!jQuery.isEmptyObject(options.data) && options.data !== '{}') {
+                        if (options.data.lastIndexOf('{"', 0) === 0) {
+                            // json
+                            data = JSON.parse(options.data);
+                            keyPair = key.match(/^(.+)\[([^\]]+)\]$/);
+                            obj = {};
+                            if(keyPair) {
+                                if (data.hasOwnProperty(keyPair[1]) && data[keyPair[1]].hasOwnProperty(keyPair[2])) {
+                                    obj[operator] = data[keyPair[1]][keyPair[2]];
+                                    data[keyPair[1]][keyPair[2]] = obj;
+                                }
+                            } else if (data.hasOwnProperty(key)) {
+                                obj[operator] = data[key];
+                                data[key] = obj;
+                            }
+                            options.data = JSON.stringify(data);
+                        } else {
+                            // uri string
+                            options.data = options.data.replace(
+                                new RegExp("([\?&])?(" + encodeURIComponent(key) + ")="), "$1$2[" + operator + ']='
+                            );
+                        }
                     }
                 }
             });
@@ -391,21 +396,21 @@
             /**
              * Remove "_format" parameter
              */
-            options.url = options.url.replace(
-                new RegExp("([\?&])(_format=&?)"), "$1"
-            );
-            if (options.data.lastIndexOf('{"', 0) === 0) {
-                // json
-                var data = JSON.parse(options.data);
-                if (data.hasOwnProperty('_format')) {
-                    delete data['_format'];
-                    options.data = JSON.stringify(data);
+            if (options.url.indexOf('?') !== -1) {
+                options.url = options.url.replace(/([?&])(_format=&?)/, "$1");
+            }
+            if (!jQuery.isEmptyObject(options.data) && options.data !== '{}') {
+                if (options.data.lastIndexOf('{"', 0) === 0) {
+                    // json
+                    var data = JSON.parse(options.data);
+                    if (data.hasOwnProperty('_format')) {
+                        delete data['_format'];
+                        options.data = JSON.stringify(data);
+                    }
+                } else {
+                    // uri string
+                    options.data = options.data.replace(/(&?)(_format=&?)/, "$1");
                 }
-            } else {
-                // uri string
-                options.data = options.data.replace(
-                    new RegExp("([&]?)(_format=&?)"), "$1"
-                );
             }
             {% endif %}
 
@@ -435,11 +440,9 @@
             /**
              * Update "Request URL" section
              */
-            if (options.type == 'GET') {
-                $('.url', $result).text(
-                    options.type + ' ' + decodeURIComponent(options.url)
-                );
-            }
+            $('.url', $result).text(
+                options.type + ' ' + decodeURIComponent(options.url)
+            );
 
             /**
              * Hide the request body and add a button to display it
@@ -451,17 +454,6 @@
             } else {
                 $requestBodyHeader.append('&nbsp;<small>[<a href="" class="toggle-request-body">Show</a>]</small>');
             }
-
-            /**
-             * Update "Curl Command Line" section
-             */
-            displayCurl(
-                options.type,
-                decodeURIComponent(options.url),
-                options.headers,
-                options.data,
-                $('.curl-command', $result)
-            );
         });
 
         /**

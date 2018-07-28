@@ -256,12 +256,17 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function getGlobalVars()
     {
+        $requestFormatMethod = $this->requestFormatMethod;
+        if (!$this->enableFormatParameter && 'format_param' === $requestFormatMethod) {
+            $requestFormatMethod = '';
+        }
+
         return [
             'apiName'               => $this->apiName,
             'authentication'        => $this->authentication,
             'endpoint'              => $this->endpoint,
             'enableSandbox'         => $this->enableSandbox,
-            'requestFormatMethod'   => $this->requestFormatMethod,
+            'requestFormatMethod'   => $requestFormatMethod,
             'acceptType'            => $this->acceptType,
             'bodyFormats'           => $this->bodyFormats,
             'defaultBodyFormat'     => $this->defaultBodyFormat,
