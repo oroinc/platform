@@ -3,7 +3,9 @@
 namespace Oro\Bundle\SearchBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
@@ -20,6 +22,8 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *            | Business Units  | 1 |            |
      *            | Calendar Events | 1 |            |
      *            | Organizations   | 1 |            |
+     *
+     * @param TableNode $table
      *
      * @Then /^(?:|I )should see following search entity types:$/
      */
@@ -69,6 +73,8 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *            | Common Event         | Calendar      |
      *            | Common Business Unit | Business Unit |
      *
+     * @param TableNode $table
+     *
      * @Then /^(?:|I )should see following search results:$/
      */
     public function iShouldSeeFollowingSearchResults(TableNode $table)
@@ -102,6 +108,8 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      * Filter search results by entity type
      * Example: Given I filter result by "Calendar" type
      *
+     * @param string $type
+     *
      * @Given /^(?:|I )filter result by "(?P<type>[^"]+)" type$/
      */
     public function iFilterResultByEntityType($type)
@@ -117,6 +125,8 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Given I follow "Search"
      *          And I select "Business Unit" from search types
      *          And I type "Some kind of Business Unit" in "search"
+     *
+     * @param string $type
      *
      * @Given /^(?:|I )select "(?P<type>[^"]+)" from search types$/
      */
@@ -140,6 +150,8 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *          And type "Common" in "search"
      *          And I should see 3 search suggestions
      *
+     * @param int $number
+     *
      * @Given /^(?:|I )should see (?P<number>\d+) search suggestion(?:|s)$/
      */
     public function iShouldSeeSearchSuggestion($number)
@@ -153,5 +165,53 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
             (int) $number,
             $suggestions->findAll('css', 'li')
         );
+    }
+
+    /**
+     * Assert search suggestions
+     * Example: When I type "Com" in "Search Field"
+     * Example: And I should see following search suggestions:
+     *            | Common Organization  |
+     *            | Common Event         |
+     *            | Common Business Unit |
+     *
+     * @param TableNode $table
+     *
+     * @Then /^(?:|I )should see following search suggestions:$/
+     */
+    public function iShouldSeeFollowingSearchSuggestions(TableNode $table)
+    {
+        $elements = $this->getPage()
+            ->findAll('xpath', '//div[contains(@class, "select2-drop")]/ul[contains(@class, "select2-results")]');
+
+        /** @var NodeElement $dropDown */
+        $dropDown = null;
+        $this->spin(function () use ($elements, &$dropDown) {
+            /** @var NodeElement $element */
+            foreach ($elements as $element) {
+                if ($element->isVisible() && !$element->has('xpath', '//li[contains(@class, "select2-searching")]')) {
+                    $dropDown = $element;
+
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        self::assertNotNull($dropDown, 'Search suggestion drop-down not found in the page.');
+
+        $crawler = new Crawler($dropDown->getHtml());
+        $results = [];
+        $crawler->filter('li')->each(function (Crawler $li) use (&$results) {
+            $results[] = trim(strip_tags($li->filter('.select2-result-label')->first()->html()));
+        });
+
+        foreach ($table as $row) {
+            $label = current($row);
+            $isExist = in_array($label, $results, true);
+
+            self::assertTrue($isExist, sprintf('Result "%s" not found', $label));
+        }
     }
 }

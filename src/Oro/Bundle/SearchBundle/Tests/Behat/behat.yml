@@ -12,6 +12,14 @@ oro_behat_extension:
       selector: '#search-dropdown ul'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
+    Search Suggestions Field:
+      selector: '#select2-drop .select2-search input'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Search Suggestions Results:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+        selector: '#select2-drop ul.select2-results li.select2-result .select2-result-label'
+
     Search Form:
       selector: '#oro_website_search_search'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
