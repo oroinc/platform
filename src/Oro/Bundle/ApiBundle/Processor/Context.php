@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\ConfigExtraCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\NullFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -39,14 +40,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
 
-    /** a list of requests for configuration data */
-    const CONFIG_EXTRAS = 'configExtras';
-
     /** metadata of an entity */
     const METADATA = 'metadata';
-
-    /** a list of requests for additional metadata info */
-    const METADATA_EXTRAS = 'metadataExtras';
 
     /** a query is used to get result data */
     const QUERY = 'query';
@@ -84,6 +79,12 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** @var DocumentBuilderInterface|null */
     private $responseDocumentBuilder;
 
+    /** @var ConfigExtraCollection */
+    private $configExtras;
+
+    /** @var MetadataExtraCollection|null */
+    private $metadataExtras;
+
     /**
      * @param ConfigProvider   $configProvider
      * @param MetadataProvider $metadataProvider
@@ -91,6 +92,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
         parent::__construct();
+        $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
@@ -284,9 +286,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getConfigExtras()
     {
-        $extras = $this->get(self::CONFIG_EXTRAS);
-
-        return $extras ?? [];
+        return $this->configExtras->getConfigExtras();
     }
 
     /**
@@ -294,19 +294,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setConfigExtras(array $extras)
     {
-        foreach ($extras as $configExtra) {
-            if (!$configExtra instanceof ConfigExtraInterface) {
-                throw new \InvalidArgumentException(
-                    'Expected an array of "Oro\Bundle\ApiBundle\Config\ConfigExtraInterface".'
-                );
-            }
-        }
-
-        if (empty($extras)) {
-            $this->remove(self::CONFIG_EXTRAS);
-        } else {
-            $this->set(self::CONFIG_EXTRAS, $extras);
-        }
+        $this->configExtras->setConfigExtras($extras);
     }
 
     /**
@@ -314,14 +302,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasConfigExtra($extraName)
     {
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra->getName() === $extraName) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->configExtras->hasConfigExtra($extraName);
     }
 
     /**
@@ -329,14 +310,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getConfigExtra($extraName)
     {
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra->getName() === $extraName) {
-                return $configExtra;
-            }
-        }
-
-        return null;
+        return $this->configExtras->getConfigExtra($extraName);
     }
 
     /**
@@ -344,14 +318,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function addConfigExtra(ConfigExtraInterface $extra)
     {
-        if ($this->hasConfigExtra($extra->getName())) {
-            throw new \InvalidArgumentException(
-                sprintf('The "%s" config extra already exists.', $extra->getName())
-            );
-        }
-        $extras = $this->getConfigExtras();
-        $extras[] = $extra;
-        $this->setConfigExtras($extras);
+        $this->configExtras->addConfigExtra($extra);
     }
 
     /**
@@ -359,14 +326,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function removeConfigExtra($extraName)
     {
-        $configExtras = $this->getConfigExtras();
-        $keys = array_keys($configExtras);
-        foreach ($keys as $key) {
-            if ($configExtras[$key]->getName() === $extraName) {
-                unset($configExtras[$key]);
-            }
-        }
-        $this->setConfigExtras(array_values($configExtras));
+        $this->configExtras->removeConfigExtra($extraName);
     }
 
     /**
@@ -374,15 +334,7 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getConfigSections()
     {
-        $sections = [];
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface) {
-                $sections[] = $configExtra->getName();
-            }
-        }
-
-        return $sections;
+        return $this->configExtras->getConfigSections();
     }
 
     /**
@@ -583,13 +535,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     protected function ensureAllConfigSectionsSet()
     {
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface) {
-                $key = self::CONFIG_PREFIX . $configExtra->getName();
-                if (!$this->has($key)) {
-                    $this->set($key, null);
-                }
+        $configSections = $this->getConfigSections();
+        foreach ($configSections as $name) {
+            $key = self::CONFIG_PREFIX . $name;
+            if (!$this->has($key)) {
+                $this->set($key, null);
             }
         }
     }
@@ -599,13 +549,11 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     protected function removeAllConfigSections()
     {
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface) {
-                $key = self::CONFIG_PREFIX . $configExtra->getName();
-                if ($this->has($key)) {
-                    $this->remove($key);
-                }
+        $configSections = $this->getConfigSections();
+        foreach ($configSections as $name) {
+            $key = self::CONFIG_PREFIX . $name;
+            if ($this->has($key)) {
+                $this->remove($key);
             }
         }
     }
@@ -614,20 +562,10 @@ class Context extends NormalizeResultContext implements ContextInterface
      * @param string $configSection
      *
      * @return bool
-     * @throws \InvalidArgumentException if undefined configuration section is specified
      */
     protected function isKnownConfigSection($configSection)
     {
-        $result = false;
-        $configExtras = $this->getConfigExtras();
-        foreach ($configExtras as $configExtra) {
-            if ($configExtra instanceof ConfigExtraSectionInterface && $configSection === $configExtra->getName()) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
+        return $this->configExtras->hasConfigSection($configSection);
     }
 
     /**
@@ -635,15 +573,9 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function getMetadataExtras()
     {
-        $extras = $this->get(self::METADATA_EXTRAS);
-        $extras = $extras ?? [];
-        $action = $this->getAction();
-        if ($action && (empty($extras) || !$this->hasActionMetadataExtra($extras))) {
-            $extras[] = new ActionMetadataExtra($action);
-            $this->set(self::METADATA_EXTRAS, $extras);
-        }
+        $this->ensureMetadataExtrasInitialized();
 
-        return $extras;
+        return $this->metadataExtras->getMetadataExtras();
     }
 
     /**
@@ -651,18 +583,13 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function setMetadataExtras(array $extras)
     {
-        foreach ($extras as $metadataExtra) {
-            if (!$metadataExtra instanceof MetadataExtraInterface) {
-                throw new \InvalidArgumentException(
-                    'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
-                );
-            }
-        }
-
         if (empty($extras)) {
-            $this->remove(self::METADATA_EXTRAS);
+            $this->metadataExtras = null;
         } else {
-            $this->set(self::METADATA_EXTRAS, $extras);
+            if (null === $this->metadataExtras) {
+                $this->metadataExtras = new MetadataExtraCollection();
+            }
+            $this->metadataExtras->setMetadataExtras($extras);
         }
     }
 
@@ -671,14 +598,19 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function hasMetadataExtra($extraName)
     {
-        $metadataExtras = $this->getMetadataExtras();
-        foreach ($metadataExtras as $metadataExtra) {
-            if ($metadataExtra->getName() === $extraName) {
-                return true;
-            }
-        }
+        $this->ensureMetadataExtrasInitialized();
 
-        return false;
+        return $this->metadataExtras->hasMetadataExtra($extraName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadataExtra($extraName)
+    {
+        $this->ensureMetadataExtrasInitialized();
+
+        return $this->metadataExtras->getMetadataExtra($extraName);
     }
 
     /**
@@ -686,14 +618,8 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function addMetadataExtra(MetadataExtraInterface $extra)
     {
-        if ($this->hasMetadataExtra($extra->getName())) {
-            throw new \InvalidArgumentException(
-                sprintf('The "%s" metadata extra already exists.', $extra->getName())
-            );
-        }
-        $extras = $this->getMetadataExtras();
-        $extras[] = $extra;
-        $this->setMetadataExtras($extras);
+        $this->ensureMetadataExtrasInitialized();
+        $this->metadataExtras->addMetadataExtra($extra);
     }
 
     /**
@@ -701,14 +627,8 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     public function removeMetadataExtra($extraName)
     {
-        $metadataExtras = $this->getMetadataExtras();
-        $keys = array_keys($metadataExtras);
-        foreach ($keys as $key) {
-            if ($metadataExtras[$key]->getName() === $extraName) {
-                unset($metadataExtras[$key]);
-            }
-        }
-        $this->setMetadataExtras(array_values($metadataExtras));
+        $this->ensureMetadataExtrasInitialized();
+        $this->metadataExtras->removeMetadataExtra($extraName);
     }
 
     /**
@@ -744,19 +664,22 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     /**
-     * @param MetadataExtraInterface[] $extras
-     *
-     * @return bool
+     * Makes sure that a list of requests for additional metadata info is initialized.
      */
-    protected function hasActionMetadataExtra(array $extras)
+    private function ensureMetadataExtrasInitialized()
     {
-        foreach ($extras as $extra) {
-            if ($extra->getName() === ActionMetadataExtra::NAME) {
-                return true;
-            }
+        if (null === $this->metadataExtras) {
+            $this->metadataExtras = new MetadataExtraCollection();
         }
-
-        return false;
+        $action = $this->getAction();
+        if ($action
+            && (
+                $this->metadataExtras->isEmpty()
+                || !$this->metadataExtras->hasMetadataExtra(ActionMetadataExtra::NAME)
+            )
+        ) {
+            $this->metadataExtras->addMetadataExtra(new ActionMetadataExtra($action));
+        }
     }
 
     /**
