@@ -180,9 +180,7 @@ class RestDocHandler implements HandlerInterface
             /** @var SubresourceContext $context */
             $context->setParentClassName($entityClass);
             $context->setAssociationName($associationName);
-            $parentConfigExtras = $context->getParentConfigExtras();
-            $parentConfigExtras[] = new DescriptionsConfigExtra();
-            $context->setParentConfigExtras($parentConfigExtras);
+            $context->addParentConfigExtra(new DescriptionsConfigExtra());
         } else {
             $context->setClassName($entityClass);
         }

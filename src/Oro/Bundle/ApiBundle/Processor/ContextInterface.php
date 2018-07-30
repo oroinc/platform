@@ -431,6 +431,15 @@ interface ContextInterface extends ComponentContextInterface
     public function hasMetadataExtra($extraName);
 
     /**
+     * Gets a request for some additional metadata info by its name.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getMetadataExtra($extraName);
+
+    /**
      * Adds a request for some additional metadata info.
      *
      * @param MetadataExtraInterface $extra
