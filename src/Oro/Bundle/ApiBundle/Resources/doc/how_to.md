@@ -896,7 +896,7 @@ MARKDOWN;
             - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User }
 ```
 
-In case if a predefined identifier should be available only for a specific request type
+If a predefined identifier should be available only for a specific request type
 the [requestType](./request_type.md) attribute of the tag can be used, e.g.:
 
 ```yaml

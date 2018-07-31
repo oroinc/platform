@@ -1,314 +1,337 @@
 /* @theme: admin.oro; */
 
 %header-button {
-  line-height: $app-header-height;
-  font-size: $app-header-icon-font-size;
-  color: $app-header-text-color;
-  padding: 0 6px;
-  text-shadow: none;
-  border: 0 none;
-  background-color: transparent;
+    line-height: $app-header-height;
+    font-size: $app-header-icon-font-size;
+    color: $app-header-text-color;
+    padding: 0 6px;
+    text-shadow: none;
 }
 
 .app-header {
-  background-color: $app-header-bg-color;
-  color: $app-header-text-color;
-  position: fixed;
-  z-index: $app-header-z-index;
-  width: 100%;
-  height: $app-header-height;
-  max-height: $app-header-height;
-  top: 0;
-  left: 0;
-
-  .navbar .nav {
-    position: static;
-  }
-
-  .navbar-inner {
-    border-bottom: none;
-    @include safe-area-offset(padding, 0);
-
-    .container {
-      position: relative;
-      line-height: $app-header-height;
-      height: $app-header-height;
-    }
-
-    .nav-content {
-      padding: 0 13px;
-    }
-
-    .dropdown-menu {
-      left: 0;
-
-      max-width: 320px;
-      min-width: 200px;
-
-      color: $app-header-dropdown-menu-color;
-
-      .nav-header {
-        padding-left: 13px;
-        padding-right: 13px;
-        margin-right: 30px;
-        margin-bottom: 11px;
-
-        font-size: 20px;
-        text-transform: none;
-
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      li {
-        margin: 5px 3px;
-
-        font-size: 16px;
-
-        > a {
-          padding-top: 7px;
-          padding-bottom: 7px;
-        }
-      }
-
-      .divider {
-        margin: 16px;
-      }
-
-      @include fa-icon($app-header-dropdown-close-icon);
-
-      &:before {
-        position: absolute;
-        top: 0;
-        right: 0;
-        z-index: $zindexDropdown + 1;
-
-        margin: 10px;
-        padding: 0;
-
-        font-size: 18px;
-        line-height: 18px;
-        color: $app-header-dropdown-close-icon-color;
-
-        background-color: transparent;
-        background-image: none;
-        border: 0 none;
-
-        display: block;
-        box-shadow: none;
-      }
-    }
-  }
-
-  .main-menu-toggler {
-    @extend %header-button;
-    float: left;
-    padding: 0 13px;
-    color: $app-header-logo-text-color;
-  }
-
-  .organization-logo-wrapper {
-    margin-left: 54px;
-    margin-right: 138px;
-
-    .organization-switcher,
-    .organization-switcher > * {
-      max-width: 100%;
-    }
-
-    .logo {
-      font-size: 17px;
-      color: $app-header-logo-text-color;
-      margin: 0;
-      line-height: $app-header-height;
-      height: $app-header-height;
-      white-space: nowrap;
-      max-width: 100%;
-      float: left;
-
-      > a {
-        color: inherit;
-        padding: 0 20px 0 0;
-        display: inline-block;
-        max-width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    li.dropdown.open > .logo {
-      color: $app-header-logo-text-color;
-    }
-  }
-
-  .nav.top-search.shortcuts {
-    margin: 0;
+    background-color: $app-header-bg-color;
+    color: $app-header-text-color;
+    position: fixed;
+    z-index: $app-header-z-index;
+    width: 100%;
     height: $app-header-height;
+    max-height: $app-header-height;
+    top: 0;
+    left: 0;
 
-    float: right;
-
-    .dropdown{
-      > .dropdown-toggle {
-        @extend %header-button;
-      }
+    .navbar .nav {
+        position: static;
     }
 
-    .header-dropdown-shortcut {
-      .dropdown-menu {
-        left: auto;
-        right: 0;
+    .navbar-inner {
+        border-bottom: none;
 
-        .nav-content {
-          margin-bottom: 18px;
+        @include safe-area-offset(padding, 0);
+
+        .container {
+            position: relative;
+            line-height: $app-header-height;
+            height: $app-header-height;
         }
 
-        &:after {
-          left: auto;
-          right: 53px;
-        }
-      }
-    }
-
-    .header-dropdown-search {
-      .dropdown-menu {
-        left: auto;
-        right: 0;
-        max-width: none;
-
         .nav-content {
-          margin-bottom: 15px;
+            padding: 0 13px;
         }
 
         .dropdown-menu {
-          left: 0;
-          right: auto;
-          max-height: 185px;
-          overflow-y: auto;
-          overflow-x: visible;
-        }
+            left: 0;
 
-        &:after {
-          left: auto;
-          right: 16px;
-        }
+            max-width: 320px;
+            min-width: 200px;
 
-        .search-suggestion-list {
-          .description {
-            font-size: 16px;
-          }
+            color: $app-header-dropdown-menu-color;
 
-          .entity-label {
-            font-size: 12px;
-          }
-        }
+            .nav-header {
+                padding-#{$start}: 13px;
+                padding-#{$end}: 13px;
+                margin-#{$end}: 30px;
+                margin-bottom: 11px;
 
-        .header-search {
-          flex-wrap: wrap;
+                font-size: 20px;
+                text-transform: none;
 
-          .select2-container {
-            width: 100%;
-            margin-bottom: 15px;
-          }
-
-          .btn-search {
-            width: 30px;
-            min-width: 0;
-            padding: 0;
-
-            @include fa-icon($app-header-dropdown-search-icon);
-
-            span {
-              display: none;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
-          }
+
+            li {
+                margin: 5px 3px;
+
+                font-size: 16px;
+
+                > a {
+                    padding-top: 7px;
+                    padding-bottom: 7px;
+                }
+            }
+
+            .divider {
+                margin: 16px;
+            }
+
+            @include fa-icon($app-header-dropdown-close-icon);
+
+            &:before {
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: $zindexDropdown + 1;
+
+                margin: 10px;
+                padding: 0;
+
+                font-size: 18px;
+                line-height: 18px;
+                color: $app-header-dropdown-close-icon-color;
+
+                background-color: transparent;
+                background-image: none;
+                border: 0 none;
+
+                display: block;
+                box-shadow: none;
+            }
         }
-      }
-
-      input[type='text'] {
-        width: 100%;
-      }
     }
-  }
 
-  .nav.user-menu {
-    .dropdown {
-      > .dropdown-toggle {
+    .main-menu-toggler {
         @extend %header-button;
-        padding-right: 13px;
-      }
 
-      .dropdown-menu {
-        left: auto;
-        right: 8px;
-      }
-
-      .dropdown-menu-close {
-        right: 8px;
-      }
+        float: #{$start};
+        padding: 0 13px;
+        color: $app-header-logo-text-color;
     }
-  }
 
-  @media only screen and (max-width: $small-devices-media-breakpoint) {
-    .nav.top-search.shortcuts,
-    .nav.user-menu {
-      > .dropdown > .dropdown-menu {
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: $app-header-height;
-        bottom: 0;
+    .organization-logo-wrapper {
+        margin-#{$start}: 54px;
+        margin-#{$end}: 138px;
 
-        max-width: none;
-        min-width: 0;
-        width: auto;
-
-        &:before {
-          position: fixed;
-          top: $app-header-height;
+        .organization-switcher,
+        .organization-switcher > * {
+            max-width: 100%;
         }
-      }
+
+        .organization-switcher {
+            margin: 0;
+            float: $start;
+        }
+
+        .logo {
+            font-size: 17px;
+            color: $app-header-logo-text-color;
+            margin: 0;
+            line-height: $app-header-height;
+            height: $app-header-height;
+            white-space: nowrap;
+            max-width: 100%;
+            float: #{$start};
+
+            > a {
+                color: inherit;
+                padding: side-values(0 20px 0 0);
+                display: inline-block;
+                max-width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        li.dropdown.open > .logo {
+            color: $app-header-logo-text-color;
+        }
     }
 
-    .nav.user-menu .dropdown-menu {
-      &:after {
-        right: 20px;
-      }
+    .dropdown-menu {
+        #{$start}: 0;
+        max-width: 320px;
     }
 
     .nav.top-search.shortcuts {
-      .header-dropdown-search .dropdown-menu {
-        &:after {
-          right: 63px;
-        }
-      }
+        float: #{$end};
+        margin: 0;
+        height: $app-header-height;
 
-      .header-dropdown-shortcut .dropdown-menu {
-        &:after {
-          right: 101px;
+        .dropdown {
+            > .dropdown-toggle {
+                @extend %header-button;
+            }
+
+            .dropdown-menu {
+                .nav-header {
+                    padding-#{$start}: 10px;
+                    padding-#{$end}: 10px;
+                }
+            }
         }
 
-        input[type="text"] {
-          width: 100%;
-          height: 30px;
+        .header-dropdown-shortcut {
+            .dropdown-menu {
+                #{$start}: auto;
+                #{$end}: 0;
 
-          box-sizing: border-box;
+                .nav-content {
+                    margin-bottom: 18px;
+                }
+
+                &:after {
+                    #{$start}: auto;
+                    #{$end}: 53px;
+                }
+            }
         }
-      }
+
+        .header-dropdown-search {
+            .dropdown-menu {
+                #{$start}: auto;
+                #{$end}: 0;
+                max-width: none;
+
+                .nav-content {
+                    margin-bottom: 15px;
+                }
+
+                .dropdown-menu {
+                    #{$start}: 0;
+                    #{$end}: auto;
+                    max-height: 185px;
+                    overflow-y: auto;
+                    overflow-x: visible;
+                }
+
+                &:after {
+                    #{$start}: auto;
+                    #{$end}: 16px;
+                }
+
+                .search-suggestion-list {
+                    .description {
+                        font-size: 16px;
+                    }
+
+                    .entity-label {
+                        font-size: 12px;
+                    }
+                }
+
+                .header-search {
+                    flex-wrap: wrap;
+
+                    .select2-container {
+                        width: 100%;
+                        margin-bottom: 15px;
+                    }
+
+                    .btn-search {
+                        width: 30px;
+                        min-width: 0;
+                        padding: 0;
+
+                        @include fa-icon($app-header-dropdown-search-icon);
+
+                        span {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            input[type='text'] {
+                width: 100%;
+            }
+        }
     }
-  }
 
-  li {
-    .help {
-      display: none;
+    .nav.user-menu {
+        float: $end;
+        margin: 0;
+
+        .dropdown {
+            > .dropdown-toggle {
+                @extend %header-button;
+                padding-#{$end}: 13px;
+            }
+
+            .dropdown-menu {
+                #{$start}: auto;
+                #{$end}: 8px;
+            }
+
+            .dropdown-menu-close {
+                #{$end}: 8px;
+            }
+        }
     }
-  }
 
-  .dropup, .dropdown {
-    position: static;
-  }
 
-  input, textarea, .uneditable-input {
-    width: 275px;
-  }
+    @media only screen and (max-width: $small-devices-media-breakpoint) {
+        .nav.top-search.shortcuts,
+        .nav.user-menu {
+            > .dropdown > .dropdown-menu {
+                position: fixed;
+                left: 0;
+                right: 0;
+                top: $app-header-height;
+                bottom: 0;
+
+                max-width: none;
+                min-width: 0;
+                width: auto;
+
+                &:before {
+                    position: fixed;
+                    top: $app-header-height;
+                }
+            }
+        }
+
+        .nav.user-menu .dropdown-menu {
+            &:after {
+                #{$end}: 20px;
+            }
+        }
+
+        .nav.top-search.shortcuts {
+            .header-dropdown-search .dropdown-menu {
+                &:after {
+                    #{$end}: 63px;
+                }
+            }
+
+            .header-dropdown-shortcut .dropdown-menu {
+                &:after {
+                    #{$end}: 101px;
+                }
+
+                input[type="text"] {
+                    width: 100%;
+                    height: 30px;
+
+                    box-sizing: border-box;
+                }
+            }
+        }
+    }
+
+    li {
+        .help {
+            display: none;
+        }
+    }
+
+    .dropup,
+    .dropdown {
+        position: static;
+    }
+
+    input,
+    textarea,
+    .uneditable-input {
+        width: 275px;
+    }
 }

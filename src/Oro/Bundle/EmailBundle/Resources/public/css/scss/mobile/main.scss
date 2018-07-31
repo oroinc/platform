@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-  @import "oroui/css/scss/mobile/variables";
-  @import "./thread-view";
-  @import "./user-emails";
+    @import "./thread-view";
+    @import "./user-emails";
 }

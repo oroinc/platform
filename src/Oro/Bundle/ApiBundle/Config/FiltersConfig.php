@@ -60,7 +60,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one filter exists.
      *
      * @return bool
      */
@@ -70,7 +70,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Gets the configuration for all fields.
+     * Gets the configuration for all filters.
      *
      * @return FilterFieldConfig[] [field name => config, ...]
      */
@@ -80,7 +80,7 @@ class FiltersConfig implements EntityConfigInterface
     }
 
     /**
-     * Checks whether the configuration of the filter exists.
+     * Indicates whether the configuration of the filter exists.
      *
      * @param string $fieldName
      *

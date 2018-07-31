@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
+ * The execution context for processors for "get_config" action.
  * @method EntityDefinitionConfig|null getResult()
  */
 class ConfigContext extends ApiContext
@@ -24,10 +25,10 @@ class ConfigContext extends ApiContext
     /** a flag indicates whether a configuration is requested for a list of entities or a single entity */
     const COLLECTION = 'collection';
 
-    /** FQCN of the parent entity in case if a configuration is requested for a sub-resource */
+    /** FQCN of the parent entity if a configuration is requested for a sub-resource */
     const PARENT_CLASS_NAME = 'parentClass';
 
-    /** the association name in case if a configuration is requested for a sub-resource */
+    /** the association name if a configuration is requested for a sub-resource */
     const ASSOCIATION = 'association';
 
     /** the maximum number of related entities that can be retrieved */
@@ -113,7 +114,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets FQCN of the parent entity in case if a configuration is requested for a sub-resource.
+     * Gets FQCN of the parent entity if a configuration is requested for a sub-resource.
      *
      * @return string
      */
@@ -123,7 +124,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Sets FQCN of the parent entity in case if a configuration is requested for a sub-resource.
+     * Sets FQCN of the parent entity if a configuration is requested for a sub-resource.
      *
      * @param string $parentClassName
      */
@@ -133,7 +134,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets the association name in case if a configuration is requested for a sub-resource.
+     * Gets the association name if a configuration is requested for a sub-resource.
      *
      * @return string
      */
@@ -143,7 +144,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Sets the association name in case if a configuration is requested for a sub-resource.
+     * Sets the association name if a configuration is requested for a sub-resource.
      *
      * @param string $associationName
      */

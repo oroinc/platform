@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
@@ -81,16 +80,10 @@ class CriteriaConnector
      *
      * @param QueryBuilder $qb
      * @param Criteria     $criteria
-     *
-     * @throws QueryException
      */
     private function addCriteria(QueryBuilder $qb, Criteria $criteria): void
     {
         $aliases = $qb->getAllAliases();
-        if (!isset($aliases[0])) {
-            throw new QueryException('No aliases are set before invoking addCriteria().');
-        }
-
         $this->processWhere($qb, $criteria, $aliases);
         $this->processOrderings($qb, $criteria, $aliases);
 
@@ -112,11 +105,12 @@ class CriteriaConnector
      */
     private function processWhere(QueryBuilder $qb, Criteria $criteria, array $aliases): void
     {
-        $expressionVisitor = $this->expressionVisitorFactory->createExpressionVisitor();
-        $expressionVisitor->setQueryAliases($aliases);
-
         $whereExpression = $criteria->getWhereExpression();
         if (null !== $whereExpression) {
+            $expressionVisitor = $this->expressionVisitorFactory->createExpressionVisitor();
+            $expressionVisitor->setQueryAliases($aliases);
+            $expressionVisitor->setQueryJoinMap($this->getJoinMap($criteria));
+            $expressionVisitor->setQuery($qb);
             $qb->andWhere($expressionVisitor->dispatch($whereExpression));
             $parameters = $expressionVisitor->getParameters();
             foreach ($parameters as $parameter) {
@@ -149,5 +143,21 @@ class CriteriaConnector
             QueryBuilderUtil::checkField($sort);
             $qb->addOrderBy($sort, QueryBuilderUtil::getSortOrder($order));
         }
+    }
+
+    /**
+     * @param Criteria $criteria
+     *
+     * @return array [path => join alias, ...]
+     */
+    private function getJoinMap(Criteria $criteria): array
+    {
+        $map = [];
+        $joins = $criteria->getJoins();
+        foreach ($joins as $path => $join) {
+            $map[$path] = $join->getAlias();
+        }
+
+        return $map;
     }
 }

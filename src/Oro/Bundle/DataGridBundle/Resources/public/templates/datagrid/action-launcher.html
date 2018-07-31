@@ -10,6 +10,7 @@
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
     class="action
         <%= className ? " " + className : "" %>
+        <%= launcherMode == 'icon-only' || launcherMode == 'text-only' ? 'btn-icon' : "" %>
         <%= !enabled ? " disabled" : "" %>
         <%= launcherMode != '' ? 'mode-' +  launcherMode : "" %>
         <% if (links) { %> dropdown-toggle<% } %>

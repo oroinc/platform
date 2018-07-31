@@ -20,10 +20,10 @@ oro_behat_extension:
           Last Name: 'oro_user_user_form[lastName]'
           Primary Email: 'oro_user_user_form[email]'
           First Role:
-            locator: '//label[text()[contains(.,"First Role")]]/../input'
+            locator: '//label[contains(.,"First Role")]//input'
             type: xpath
           Second Role:
-            locator: '//label[text()[contains(.,"Second Role")]]/../input'
+            locator: '//label[contains(.,"Second Role")]//input'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'
@@ -64,6 +64,10 @@ oro_behat_extension:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
       route: 'oro_user_security_login'
+
+    User Forgot Password:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserForgotPassword
+      route: 'oro_user_reset_request'
 
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
@@ -108,6 +112,7 @@ oro_behat_extension:
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
         - OroSecurityBundle::PermissionContext
+        - OroLocaleBundle::LocalizationContext
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
       paths:

@@ -73,7 +73,7 @@ Feature: Application search
 
   Scenario: No results search
     Given I click "Search"
-    And I type "This line does not make sense" in "search"
+    And I type "Unsearchable" in "search"
     When I click "Search Submit"
     Then I should see "No results were found to match your search."
     And I should see "Try modifying your search criteria or creating a new"

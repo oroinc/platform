@@ -49,7 +49,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of an entity exists.
+     * Indicates whether the configuration of an entity exists.
      *
      * @return bool
      */
@@ -79,7 +79,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of filters exists.
+     * Indicates whether the configuration of filters exists.
      *
      * @return bool
      */
@@ -109,7 +109,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of sorters exists.
+     * Indicates whether the configuration of sorters exists.
      *
      * @return bool
      */
@@ -139,7 +139,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of actions.
+     * Indicates whether the configuration of actions.
      *
      * @return bool
      */
@@ -169,7 +169,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of sub-resources.
+     * Indicates whether the configuration of sub-resources.
      *
      * @return bool
      */

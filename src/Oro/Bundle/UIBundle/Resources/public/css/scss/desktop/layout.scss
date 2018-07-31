@@ -3,59 +3,64 @@
 &,
 .app-page,
 .app-page__central-panel {
-  height: 100%;
-  overflow: hidden; // prevents scroll bar appearance
+    height: 100%;
+    overflow: hidden; // prevents scroll bar appearance
 }
 
 & {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
-.responsive-block{
-  min-width: 340px;
-  padding-right: 5px;
-  &.border-right {
-    border-right: 2px solid #f4f4f4;
-  }
+.responsive-block {
+    min-width: 340px;
+    padding-right: 5px;
+
+    &.border-right {
+        border-right: 2px solid #f4f4f4;
+    }
 }
 
 .app-page {
-  box-sizing: border-box;
-  display: flex;
-  &__content-side {
-    flex-shrink: 0;
-  }
-  &__content {
-    flex-grow: 1;
-    overflow: inherit;
-  }
-
-  &__main {
+    box-sizing: border-box;
     display: flex;
-    width: 100%;
-  }
-  &__left-panel,
-  &__right-panel {
-    overflow: visible;
-  }
-  &__central-panel {
-    flex-grow: 1;
-  }
+
+    &__content-side {
+        flex-shrink: 0;
+    }
+
+    &__content {
+        flex-grow: 1;
+        overflow: inherit;
+    }
+
+    &__main {
+        display: flex;
+        width: 100%;
+    }
+
+    &__left-panel,
+    &__right-panel {
+        overflow: visible;
+    }
+
+    &__central-panel {
+        flex-grow: 1;
+    }
 }
 
 .oro-page {
-  &.collapsible-sidebar {
-    .oro-page-sidebar {
-      > .dropdown-menu {
-        display: block !important;
-        z-index: inherit;
-        width: 100%;
-      }
+    &.collapsible-sidebar {
+        .oro-page-sidebar {
+            > .dropdown-menu {
+                display: block !important;
+                z-index: inherit;
+                width: 100%;
+            }
+        }
     }
-  }
 }
 
 .container-fluid {
-  padding-right: $contentPadding;
-  padding-left: $contentPadding;
+    padding-right: $content-padding;
+    padding-left: $content-padding;
 }

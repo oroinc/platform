@@ -250,7 +250,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestEmployee::class);
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter' => ['department.name' => 'TestDepartment2']]
+            ['filter' => ['department.title' => 'TestDepartment2']]
         );
 
         $this->assertResponseContains(

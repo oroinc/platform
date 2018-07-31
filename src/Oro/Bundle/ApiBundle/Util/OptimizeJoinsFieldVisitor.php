@@ -13,15 +13,26 @@ use Doctrine\Common\Collections\Expr\Value;
  */
 class OptimizeJoinsFieldVisitor extends ExpressionVisitor
 {
+    /** @var OptimizeJoinsDecisionMakerInterface */
+    private $decisionMaker;
+
     /** @var array */
     private $fields = [];
+
+    /**
+     * @param OptimizeJoinsDecisionMakerInterface $decisionMaker
+     */
+    public function __construct(OptimizeJoinsDecisionMakerInterface $decisionMaker)
+    {
+        $this->decisionMaker = $decisionMaker;
+    }
 
     /**
      * Gets all fields are used in a visited expression graph and allow optimization of joins.
      *
      * @return string[]
      */
-    public function getFields()
+    public function getFields(): array
     {
         $fields = [];
         foreach ($this->fields as $field => $value) {
@@ -72,15 +83,9 @@ class OptimizeJoinsFieldVisitor extends ExpressionVisitor
      */
     private function isOptimizationSupported(Comparison $comparison): bool
     {
-        $operator = $comparison->getOperator();
-
-        if ('EXISTS' === $operator) {
-            return $this->walkValue($comparison->getValue());
-        }
-        if ('NEQ_OR_NULL' === $operator) {
-            return false;
-        }
-
-        return true;
+        return $this->decisionMaker->isOptimizationSupported(
+            $comparison,
+            $this->walkValue($comparison->getValue())
+        );
     }
 }
