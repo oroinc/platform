@@ -4,6 +4,7 @@
 * Enable filters for to-many associations. The following operators are implemented: `=` (`eq`), `!=` (`neq`), `*` (`exists`), `!*` (`neq_or_null`), `~` (`contains`) and `!~` (`not_contains`).
 * Added [documentation about filters](./src/Oro/Bundle/ApiBundle/Resources/doc/filters.md).
 * Added data flow diagrams for public actions. See [Actions](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md).
+* Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
 
 #### UIBundle
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
