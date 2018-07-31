@@ -523,7 +523,7 @@ An example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_api_get_my_resource:
-    path: /api/myresources/{id}
+    path: '%oro_api.rest.prefix%myresources/{id}'
     methods: [GET]
     defaults:
         _controller: AcmeAppBundle:Api\MyResource:get
@@ -552,13 +552,13 @@ Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:
-    path: /api/userprofile
+    path: '%oro_api.rest.prefix%userprofile'
     defaults:
         _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
-        override_path: /api/userprofile/{id}
+        override_path: '%oro_api.rest.prefix%userprofile/{id}'
 ```
 
 ## Using a Non-primary Key to Identify an Entity
@@ -654,7 +654,7 @@ The following steps describes how to create such API resources:
 
   ```yml
   acme_rest_api_register_account:
-      path: /api/registeraccount
+      path: '%oro_api.rest.prefix%registeraccount'
       defaults:
           _controller: OroApiBundle:RestApi:itemWithoutId
           entity: registeraccount

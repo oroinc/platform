@@ -16,7 +16,7 @@ nelmio_api_doc:
 security:
     firewalls:
         api_wsse_secured:
-            pattern: ^/api/(?!(rest|doc)($|/.*))
+            pattern: '%oro_api.rest.pattern%'
             stateless:  true
             wsse:
                 lifetime: 3600

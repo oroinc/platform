@@ -571,6 +571,14 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
 
+    oro_api.rest.routing_options_resolver.prefix:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: routing.options_resolver, priority: -255 }
+
     oro_api.rest.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
@@ -712,6 +720,7 @@ services:
     oro_api.api_doc.validate_view_listener:
         class: Oro\Bundle\ApiBundle\EventListener\ValidateApiDocViewListener
         arguments:
+            - '%oro_api.rest.prefix%doc'
             - '%oro_api.api_doc.views%'
             - '%oro_api.api_doc.default_view%'
         tags:

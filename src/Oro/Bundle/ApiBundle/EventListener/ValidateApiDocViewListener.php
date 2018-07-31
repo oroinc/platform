@@ -18,6 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ValidateApiDocViewListener
 {
+    /** @var string */
+    private $basePath;
+
     /** @var string[] */
     private $views;
 
@@ -25,11 +28,13 @@ class ValidateApiDocViewListener
     private $defaultView;
 
     /**
+     * @param string      $basePath
      * @param string[]    $views
      * @param string|null $defaultView
      */
-    public function __construct(array $views, ?string $defaultView)
+    public function __construct(string $basePath, array $views, ?string $defaultView)
     {
+        $this->basePath = $basePath;
         $this->views = $views;
         $this->defaultView = $defaultView;
     }
@@ -99,7 +104,7 @@ class ValidateApiDocViewListener
     protected function isDefaultViewRequested(Request $request): bool
     {
         $pathInfo = $request->getPathInfo();
-        $pos = \strpos($pathInfo, '/api/doc');
+        $pos = \strpos($pathInfo, $this->basePath);
 
         return false === $pos || !\substr($pathInfo, $pos + 9);
     }
