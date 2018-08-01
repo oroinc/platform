@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 
+/**
+ * The execution context for processors for "get_subresource" action.
+ */
 class GetSubresourceContext extends SubresourceContext
 {
     /** a callback that can be used to calculate the total number of related records */

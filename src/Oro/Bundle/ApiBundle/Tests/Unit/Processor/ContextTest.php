@@ -684,14 +684,12 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testConfigExtras()
     {
         self::assertSame([], $this->context->getConfigExtras());
-        self::assertNull($this->context->get(Context::CONFIG_EXTRAS));
 
         $configExtra = new TestConfigExtra('test');
 
         $configExtras = [$configExtra];
         $this->context->setConfigExtras($configExtras);
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         self::assertTrue($this->context->hasConfigExtra('test'));
         self::assertSame($configExtra, $this->context->getConfigExtra('test'));
@@ -702,22 +700,18 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $configExtras[]     = $anotherConfigExtra;
         $this->context->addConfigExtra($anotherConfigExtra);
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         unset($configExtras[0]);
         $configExtras = array_values($configExtras);
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeConfigExtra('test');
         self::assertEquals($configExtras, $this->context->getConfigExtras());
-        self::assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->context->setConfigExtras([]);
         self::assertSame([], $this->context->getConfigExtras());
-        self::assertNull($this->context->get(Context::CONFIG_EXTRAS));
     }
 
     /**
@@ -939,36 +933,33 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testMetadataExtras()
     {
         self::assertSame([], $this->context->getMetadataExtras());
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
 
         $metadataExtras = [new TestMetadataExtra('test')];
         $this->context->setMetadataExtras($metadataExtras);
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         self::assertTrue($this->context->hasMetadataExtra('test'));
         self::assertFalse($this->context->hasMetadataExtra('another'));
 
+        self::assertSame($metadataExtras[0], $this->context->getMetadataExtra('test'));
+        self::assertNull($this->context->getMetadataExtra('another'));
+
         $anotherMetadataExtra = new TestMetadataExtra('another');
-        $metadataExtras[]     = $anotherMetadataExtra;
+        $metadataExtras[] = $anotherMetadataExtra;
         $this->context->addMetadataExtra($anotherMetadataExtra);
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         unset($metadataExtras[0]);
         $metadataExtras = array_values($metadataExtras);
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         // test remove of non existing extra
         $this->context->removeMetadataExtra('test');
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
-        self::assertEquals($metadataExtras, $this->context->get(Context::METADATA_EXTRAS));
 
         $this->context->setMetadataExtras([]);
         self::assertSame([], $this->context->getMetadataExtras());
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
     }
 
     public function testMetadataExtrasWhenActionExistsInContext()
@@ -976,15 +967,9 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $action = 'test_action';
         $this->context->setAction($action);
 
-        self::assertNull($this->context->get(Context::METADATA_EXTRAS));
-
         self::assertEquals(
             [new ActionMetadataExtra($action)],
             $this->context->getMetadataExtras()
-        );
-        self::assertEquals(
-            [new ActionMetadataExtra($action)],
-            $this->context->get(Context::METADATA_EXTRAS)
         );
 
         // test that ActionMetadataExtra is not added twice

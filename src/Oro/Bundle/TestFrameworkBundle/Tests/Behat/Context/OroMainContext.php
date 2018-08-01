@@ -262,44 +262,19 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
-        $actualFlashMessages = [];
-        /** @var Element|null $flashMessage */
-        $flashMessage = $this->spin(
-            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
-                $flashMessages = $context->findAllElements($flashMessageElement);
+        $this->assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit);
+    }
 
-                foreach ($flashMessages as $flashMessage) {
-                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                        $actualFlashMessageText = $flashMessage->getText();
-                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
-
-                        if (false !== stripos($actualFlashMessageText, $title)) {
-                            return $flashMessage;
-                        }
-                    }
-                }
-
-                return null;
-            },
-            $timeLimit
-        );
-
-        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
-        self::assertNotNull($flashMessage, sprintf(
-            'Expected "%s" message but got "%s" messages',
-            $title,
-            implode(',', array_keys($actualFlashMessages))
-        ));
-
-        try {
-            /** @var NodeElement $closeButton */
-            $closeButton = $flashMessage->find('css', 'button.close');
-            $closeButton->press();
-        } catch (\Throwable $e) {
-            //No worries, flash message can disappeared till time next call
-        } catch (\Exception $e) {
-            //No worries, flash message can disappeared till time next call
-        }
+    /**
+     * Example: Then I should not see "Attachment created successfully" flash message
+     * Example: Then I should not see "The email was sent" flash message
+     *
+     * @Then /^(?:|I )should not see "(?P<title>[^"]+)" flash message$/
+     * @Then /^(?:|I )should not see '(?P<title>[^']+)' flash message$/
+     */
+    public function iShouldNotSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $this->assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit, false);
     }
 
     /**
@@ -1808,6 +1783,41 @@ JS;
     }
 
     /**
+     * Example: Then I should see "Map container" element inside "Default Addresses" iframe
+     *
+     * @Then I should see :childElementName element inside :iframeName iframe
+     * @param string $iframeName
+     * @param string $childElementName
+     */
+    public function iShouldSeeElementInsideIframe($childElementName, $iframeName)
+    {
+        $iframeElement = $this->createElement($iframeName);
+        self::assertTrue($iframeElement->isIsset() && $iframeElement->isVisible(), sprintf(
+            'Iframe element "%s" not found on page',
+            $iframeName
+        ));
+
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $driver->switchToIFrameByElement($iframeElement);
+
+        $iframeBody = $this->getSession()->getPage()->find('css', 'body');
+        $childElement = $this->elementFactory->createElement($childElementName, $iframeBody);
+        self::assertTrue($childElement->isIsset(), sprintf(
+            'Element "%s" not found inside iframe',
+            $childElementName,
+            $iframeName
+        ));
+        self::assertTrue($childElement->isVisible(), sprintf(
+            'Element "%s" found inside iframe, but it\'s not visible',
+            $childElementName,
+            $iframeName
+        ));
+
+        $driver->switchToWindow();
+    }
+
+    /**
      * Example: Then I should see "Map container" element with text "Address" inside "Default Addresses" element
      *
      * @Then I should see :childElementName element with text :text inside :parentElementName element
@@ -2004,5 +2014,89 @@ JS;
     {
         $element = $this->createElement($elementName);
         self::assertFalse($element->isChecked());
+    }
+
+    /**
+     * Checks, that form field specified by the element has specified value
+     * Example: Then the "username" field element should contain "bwayne"
+     * Example: And the "username" field element should contain "bwayne"
+     *
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field element should contain "(?P<value>(?:[^"]|\\")*)"$/
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field element should contain:$/
+     */
+    public function assertFieldElementContains($fieldName, $value)
+    {
+        $fieldName = $this->fixStepArgument($fieldName);
+        $value = $this->fixStepArgument($value);
+
+        $field = $this->createElement($fieldName);
+        self::assertTrue($field->isIsset(), sprintf(
+            'Element "%s" not found on page',
+            $fieldName
+        ));
+
+        $actual = $field->getValue();
+        $regex = '/^'.preg_quote($value, '/').'$/ui';
+
+        $message = sprintf('The field "%s" value is "%s", but "%s" expected.', $fieldName, $actual, $value);
+
+        self::assertTrue((bool) preg_match($regex, $actual), $message);
+    }
+
+    /**
+     * @param string $title
+     * @param string $flashMessageElement
+     * @param string $timeLimit
+     * @param bool $assertExist
+     */
+    protected function assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit, $assertExist = true)
+    {
+        $actualFlashMessages = [];
+        /** @var Element|null $flashMessage */
+        $flashMessage = $this->spin(
+            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
+                $flashMessages = $context->findAllElements($flashMessageElement);
+
+                foreach ($flashMessages as $flashMessage) {
+                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                        $actualFlashMessageText = $flashMessage->getText();
+                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
+
+                        if (false !== stripos($actualFlashMessageText, $title)) {
+                            return $flashMessage;
+                        }
+                    }
+                }
+
+                return null;
+            },
+            $timeLimit
+        );
+
+        if ($assertExist) {
+            self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
+            self::assertNotNull($flashMessage, sprintf(
+                'Expected "%s" message but got "%s" messages',
+                $title,
+                implode(',', array_keys($actualFlashMessages))
+            ));
+        } else {
+            self::assertNull($flashMessage, sprintf(
+                'Expected that message "%s" won\'t appear.',
+                $title
+            ));
+        }
+
+        if ($flashMessage) {
+            try {
+                /** @var NodeElement $closeButton */
+                $closeButton = $flashMessage->find('css', 'button.close');
+                $closeButton->press();
+            } catch (\Throwable $e) {
+                //No worries, flash message can disappeared till time next call
+            } catch (\Exception $e) {
+                //No worries, flash message can disappeared till time next call
+            }
+        }
     }
 }

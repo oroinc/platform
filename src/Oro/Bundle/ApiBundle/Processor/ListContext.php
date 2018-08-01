@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 /**
- * A base implementation of the context for actions work with a list of entities.
+ * The base execution context for processors for actions work with a list of entities,
+ * such as "get_list" and "delete_list".
  */
 class ListContext extends Context
 {

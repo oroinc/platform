@@ -33,4 +33,17 @@ class FeatureContext extends OroFeatureContext
             600
         );
     }
+
+    /**
+     * @Given /^(?:|I )should see that the page does not contain untranslated labels$/
+     */
+    public function iShouldSeeThatThePageDoesNotContainUntranslatedLabels()
+    {
+        // Using 'substring' + 'string-length' function because 'matches' or 'ends-with' functions requires xpath2.0+
+        $xpath = <<<EOF
+//*[starts-with(text(), 'oro.') and substring(text(), string-length(text()) - string-length('.label') +1) = '.label']
+EOF;
+        $hasUntranslated = $this->getSession()->getPage()->has('xpath', $xpath);
+        static::assertFalse($hasUntranslated);
+    }
 }

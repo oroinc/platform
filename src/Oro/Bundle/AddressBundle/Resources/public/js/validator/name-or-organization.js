@@ -9,8 +9,15 @@ define(function(require) {
         payload: null
     };
 
-    var getField = function(name) {
-        return $('[name*="[' + name + ']"]');
+    var getField = function(name, element, params) {
+        var namePart = '[' + name + ']';
+
+        // Take into account parent's form name to distinguish between two different addresses for the same form
+        if (params.parentFormName) {
+            namePart = '[' + params.parentFormName + ']' + namePart;
+        }
+
+        return $(element).closest('form').find('[name*="' + namePart + '"]');
     };
 
     var updateValidationData = function(fields, params, silent) {
@@ -48,11 +55,11 @@ define(function(require) {
     return [
         'Oro\\Bundle\\AddressBundle\\Validator\\Constraints\\NameOrOrganization',
         function(value, element, params) {
-            var event = 'change.NameOrOrganization';
+            var event = 'change.NameOrOrganization' + (params.parentFormName ? params.parentFormName : '');
             var fields = {
-                firstName: getField('firstName'),
-                lastName: getField('lastName'),
-                organization: getField('organization')
+                firstName: getField('firstName', element, params),
+                lastName: getField('lastName', element, params),
+                organization: getField('organization', element, params)
             };
 
             _.each(fields, function($field) {
@@ -66,3 +73,4 @@ define(function(require) {
         }
     ];
 });
+

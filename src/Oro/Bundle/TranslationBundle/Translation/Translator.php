@@ -9,12 +9,14 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
-use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
+ * Decorates Symfony translator by extending it, adds loading of dynamic resources for translations and ability to
+ * select different translation strategies.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Translator extends BaseTranslator
@@ -54,7 +56,7 @@ class Translator extends BaseTranslator
     protected $strategyName;
 
     /** @var MessageFormatter */
-    protected $formatter;
+    protected $messageFormatter;
 
     /** @var array */
     protected $originalOptions;
@@ -84,18 +86,8 @@ class Translator extends BaseTranslator
     ) {
         parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
 
-        // BC 3.x, to be removed in 4.0 along with the $defaultLocale default value
-        if (is_array($defaultLocale) || 3 > func_num_args()) {
-            if (!$container instanceof SymfonyContainerInterface) {
-                throw new \InvalidArgumentException('Missing third $defaultLocale argument.');
-            }
-
-            $options = $loaderIds;
-        }
-
-        $this->formatter = $formatter;
-        $this->originalOptions = $options;
-        $this->resourceFiles = $options['resource_files'];
+        $this->messageFormatter = $formatter;
+        $this->originalOptions = $this->options;
     }
 
     /**
@@ -260,9 +252,12 @@ class Translator extends BaseTranslator
 
         $this->applyCurrentStrategy();
 
-        // load catalogues only for needed locales
+        // load catalogues only for needed locales. We cannot call parent::warmUp() because it would load catalogues
+        // for all resources found in filesystem
         $locales = array_unique($this->getFallbackLocales());
         foreach ($locales as $locale) {
+            // no need to reset catalogue like it is done in parent::warmUp() because all catalogues are already cleared
+            // in applyCurrentStrategy(), so we are just loading new catalogue
             $this->loadCatalogue($locale);
         }
     }
@@ -291,15 +286,17 @@ class Translator extends BaseTranslator
 
         $provider = $this->getStrategyProvider();
 
+        // save current translation strategy
         $currentStrategy = $provider->getStrategy();
 
+        // build translation cache for each translation strategy in tmp cache directory
         foreach ($provider->getStrategies() as $strategy) {
             $provider->setStrategy($strategy);
 
             /* @var $translator Translator */
             $translator = new static(
                 $this->container,
-                $this->formatter,
+                $this->messageFormatter,
                 $this->getLocale(),
                 $this->loaderIds,
                 $options
@@ -313,8 +310,7 @@ class Translator extends BaseTranslator
             $translator->warmUp($tmpDir);
         }
 
-        $provider->setStrategy($currentStrategy);
-
+        // replace current cache with new cache
         $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
         foreach ($iterator as $path) {
             if (!$path->isFile()) {
@@ -326,10 +322,9 @@ class Translator extends BaseTranslator
 
         rmdir($tmpDir);
 
-        $this->setFallbackLocales($provider->getAllFallbackLocales($currentStrategy));
-
-        // cleanup local cache
-        $this->catalogues = [];
+        // restore translation strategy and apply it to make use of new cache
+        $provider->setStrategy($currentStrategy);
+        $this->applyCurrentStrategy();
     }
 
     /**
@@ -362,10 +357,9 @@ class Translator extends BaseTranslator
 
         // use current set of fallback locales to build translation cache
         $fallbackLocales = $strategyProvider->getAllFallbackLocales($strategy);
-        $this->setFallbackLocales($fallbackLocales);
 
-        // clear catalogs to generate new ones for new strategy
-        $this->catalogues = [];
+        // set new fallback locales and clear catalogues to generate new ones for new strategy
+        $this->setFallbackLocales($fallbackLocales);
     }
 
     /**
@@ -393,11 +387,18 @@ class Translator extends BaseTranslator
      */
     protected function initialize()
     {
+        // save already loaded catalogues which are used as fallbacks to prevent their reloading second time
+        // it change Symfony`s translator behavior and allows us to apply only already dumped catalogues in fallbacks
+        $loadedCatalogues = array_intersect_key($this->catalogues, array_flip($this->getFallbackLocales()));
+
         // add dynamic resources just before the initialization
         // to be sure that they overrides static translations
         $this->registerDynamicResources();
 
         parent::initialize();
+
+        // restore already loaded catalogues
+        $this->catalogues = array_merge($this->catalogues, array_diff_key($loadedCatalogues, $this->catalogues));
     }
 
     /**
@@ -462,25 +463,14 @@ class Translator extends BaseTranslator
      */
     protected function registerDynamicResources()
     {
-        $defaultLocale = isset($this->catalogues[Translator::DEFAULT_LOCALE])
-            ? $this->catalogues[Translator::DEFAULT_LOCALE]
-            : null;
-
-        if (!$defaultLocale) {
-            foreach ($this->dynamicResources as $items) {
-                foreach ($items as $item) {
-                    if (in_array($item, $this->registeredResources, true)) {
-                        continue;
-                    }
-                    $this->registeredResources[] = $item;
-                    $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
+        foreach ($this->dynamicResources as $items) {
+            foreach ($items as $item) {
+                if (in_array($item, $this->registeredResources, true)) {
+                    continue;
                 }
+                $this->registeredResources[] = $item;
+                $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
             }
-        }
-
-        // prevents loading default locale many times (Default locale should be in default fallback locale)
-        if ($defaultLocale && !isset($this->catalogues[Translator::DEFAULT_LOCALE])) {
-            $this->catalogues[Translator::DEFAULT_LOCALE] = $defaultLocale;
         }
     }
 
@@ -501,7 +491,7 @@ class Translator extends BaseTranslator
                     }
                 }
             }
-            if (!$hasDatabaseResources && $this->isApplicationInstalled()) {
+            if (!$hasDatabaseResources) {
                 $locales = $this->getFallbackLocales();
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);

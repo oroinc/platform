@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Extension\JsValidation;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Symfony\Component\Form\AbstractTypeExtension;
@@ -16,18 +16,18 @@ use Symfony\Component\Form\FormView;
  */
 class PasswordComplexityExtension extends AbstractTypeExtension
 {
-    /** @var ConstraintsProvider */
+    /** @var ConstraintsProviderInterface */
     protected $constraintsProvider;
 
     /** @var PasswordComplexityConfigProvider */
     protected $configProvider;
 
     /**
-     * @param ConstraintsProvider $constraintsProvider
+     * @param ConstraintsProviderInterface $constraintsProvider
      * @param PasswordComplexityConfigProvider $configProvider
      */
     public function __construct(
-        ConstraintsProvider $constraintsProvider,
+        ConstraintsProviderInterface $constraintsProvider,
         PasswordComplexityConfigProvider $configProvider
     ) {
         $this->constraintsProvider = $constraintsProvider;

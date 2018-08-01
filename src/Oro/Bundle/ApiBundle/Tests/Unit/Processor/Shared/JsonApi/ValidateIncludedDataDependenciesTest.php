@@ -38,7 +38,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage The "data" section must exist in the request data.
      */
-    public function testProcessIncludedDataWithoutPrimatyData()
+    public function testProcessIncludedDataWithoutPrimaryData()
     {
         $requestData = [
             'included' => [

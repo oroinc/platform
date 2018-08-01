@@ -109,6 +109,7 @@
    - [Enable API for an Entity Without Identifier](./how_to.md#enable-api-for-an-entity-without-identifier)
    - [Enable Custom API](./how_to.md#enable-custom-api)
    - [Add a Predefined Identifier for API Resource](./how_to.md#add-a-predefined-identifier-for-api-resource)
+   - [Add a Computed Field](./how_to.md#add-a-computed-field)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)
    - [Load Fixtures](./testing.md#load-fixtures)

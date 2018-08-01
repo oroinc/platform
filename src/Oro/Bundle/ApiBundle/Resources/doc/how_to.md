@@ -19,7 +19,8 @@
  - [Using a Non-primary Key to Identify an Entity](#using-a-non-primary-key-to-identify-an-entity)
  - [Enable API for an Entity Without Identifier](#enable-api-for-an-entity-without-identifier)
  - [Enable Custom API](#enable-custom-api)
- - [Add a Predefined Identifier for API Resource](./how_to.md#add-a-predefined-identifier-for-api-resource)
+ - [Add a Predefined Identifier for API Resource](#add-a-predefined-identifier-for-api-resource)
+ - [Add a Computed Field](#add-a-computed-field)
 
 
 ## Turn on API for an Entity
@@ -101,7 +102,7 @@ api:
                             case_insensitive: true
 ```
 
-**Please note** that the `LOWER` function will be used in this case and it can impact performace
+**Please note** that the `LOWER` function will be used in this case and it can impact performance
 if there is no [proper index](https://use-the-index-luke.com/sql/where-clause/functions/case-insensitive-search).
 
 Also sometimes data in the database are already converted to lowercase or uppercase, in this case you can use
@@ -522,7 +523,7 @@ An example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_api_get_my_resource:
-    path: /api/myresources/{id}
+    path: '%oro_api.rest.prefix%myresources/{id}'
     methods: [GET]
     defaults:
         _controller: AcmeAppBundle:Api\MyResource:get
@@ -537,7 +538,7 @@ Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to 
 
 ## Add a Custom Route
 
-As desctibed in [Add a Custom Controller](#add-a-custom-controller), [RestApiController](../../Controller/RestApiController.php) handles all registered REST API resources, and in the most cases you do not need to change this.
+As described in [Add a Custom Controller](#add-a-custom-controller), [RestApiController](../../Controller/RestApiController.php) handles all registered REST API resources, and in the most cases you do not need to change this.
 But sometimes you need to change default mapping between URI and an action of this controller for some
 REST API resources.
 For example, imagine REST API resource for a profile of the logged in user. Let's imagine that URI of this
@@ -551,13 +552,13 @@ Here is an example of the `Resources/config/oro/routing.yml` configuration file:
 
 ```yaml
 acme_rest_api_user_profile:
-    path: /api/userprofile
+    path: '%oro_api.rest.prefix%userprofile'
     defaults:
         _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
-        override_path: /api/userprofile/{id}
+        override_path: '%oro_api.rest.prefix%userprofile/{id}'
 ```
 
 ## Using a Non-primary Key to Identify an Entity
@@ -592,7 +593,7 @@ can be resources for registering a new account or logging in a user.
 
 The following steps describes how to create such API resources:
 
-- Create a PHP class that will represent API resource. Usualy such classes are named as models and located in
+- Create a PHP class that will represent API resource. Usually such classes are named as models and located in
   `Api/Model` directory. For example:
 
   ```php
@@ -623,7 +624,7 @@ The following steps describes how to create such API resources:
   }
   ```
 
-- Desctibe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
+- Describe the model via `Resources/config/oro/api.yml` configuration file in your bundle, e.g.:
 
   ```yaml
   api:
@@ -653,7 +654,7 @@ The following steps describes how to create such API resources:
 
   ```yml
   acme_rest_api_register_account:
-      path: /api/registeraccount
+      path: '%oro_api.rest.prefix%registeraccount'
       defaults:
           _controller: OroApiBundle:RestApi:itemWithoutId
           entity: registeraccount
@@ -687,7 +688,7 @@ The following steps describes how to create such API resources:
   }
   ```
 
-- Register a processor in the depencency injection container, e.g.:
+- Register a processor in the dependency injection container, e.g.:
 
   ```yaml
   services:
@@ -902,4 +903,90 @@ the [requestType](./request_type.md) attribute of the tag can be used, e.g.:
 ```yaml
         tags:
             - { name: oro.api.entity_id_resolver, id: mine, class: Oro\Bundle\UserBundle\Entity\User, requestType: json_api }
+```
+
+## Add a Computed Field
+
+Sometimes it is required to add to API a field that does not exist in an entity for which API is created.
+In this case such field should be added to API via
+[Resources/config/oro/api.yml](./configuration.md#fields-configuration-section) and
+the [customize_loaded_data](./actions.md#customize_loaded_data-action) action should be used to set a value
+of this field.
+
+For example, imagine that a "price" field need to be added to a product API. The following steps show how to do this:
+
+- add the "price" field to the product API via `Resources/config/oro/api.yml`
+
+```yaml
+api:
+    entities:
+        Acme\Bundle\AppBundle\Entity\Product:
+            fields:
+                price:
+                    data_type: money
+```
+
+- create a processor for `customize_loaded_data` action that will set a value for the "price" field
+
+```php
+<?php
+
+namespace Acme\Bundle\AppBundle\Api\Processor;
+
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+
+class ComputeProductPriceField implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        /** @var CustomizeLoadedDataContext $context */
+
+        $data = $context->getResult();
+        if (!is_array($data)) {
+            return;
+        }
+
+        $priceFieldName = $context->getResultFieldName('price');
+        if (!$context->isFieldRequested($priceFieldName, $data)) {
+            return;
+        }
+
+        $productIdFieldName = $context->getResultFieldName('id');
+        if (!$productIdFieldName || empty($data[$productIdFieldName])) {
+            return;
+        }
+
+        $data[$priceFieldName] = $this->loadProductPrice($data[$productIdFieldName]);
+        $context->setResult($data);
+    }
+
+    /**
+     * @param int $productId
+     *
+     * @return float|null
+     */
+    private function loadProductPrice($productId)
+    {
+        // load the product price in this method
+    }
+}
+```
+
+- register the processor in the dependency injection container
+
+```yamp
+services:
+    acme.api.compute_product_price_field:
+        class: Acme\Bundle\AppBundle\Api\Processor\ComputeProductPriceField
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, class: Acme\Bundle\AppBundle\Entity\Product }
 ```

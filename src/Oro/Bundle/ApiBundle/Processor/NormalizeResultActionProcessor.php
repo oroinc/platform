@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * The base processor for actions with "normalize_result" group.
- * Processors from this group are intended to prepare valid response ant they are executed
- * regardless whether an error occurred or not.
+ * Processors from this group are intended to prepare a valid response
+ * and they are executed regardless whether an error occurred or not.
  */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -168,7 +168,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
     /**
      * Indicates whether the given exception represents an error
      * that is properly handled and the current API action response contains information about this error.
-     * Actualy such exceptions are an alternative for adding an error to the action context.
+     * Actually such exceptions are an alternative for adding an error to the action context.
      * Examples of safe exceptions:
      * * invalid request data
      * * requesting not existing resource
