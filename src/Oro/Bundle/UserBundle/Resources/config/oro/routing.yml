@@ -86,10 +86,10 @@ oro_api_post_group_deprecated:
         version:     latest|v1
 
 oro_rest_api_user_profile:
-    path: /api/userprofile
+    path: '%oro_api.rest.prefix%userprofile'
     defaults:
         _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
-        override_path: /api/userprofile/{id}
+        override_path: '%oro_api.rest.prefix%userprofile/{id}'

@@ -1,27 +1,31 @@
 /* @theme: admin.oro; */
 
 .modal {
-    top: $modal-top-offset;
-
     &-header {
         padding: $modal-header-inner-offset;
+
         border-radius: $modal-border-radius $modal-border-radius 0 0;
         background-color: $primary-300;
         border: $modal-header-border;
 
         .close {
-            font-size: $base-font-size--l;
             height: $modal-close-size;
             width: $modal-close-size;
-            color: $primary-inverse;
+            margin: $modal-close-top-outer-offset;
+            float: #{$end};
+
+            font-size: $base-font-size--l;
             text-align: $modal-close-align;
             line-height: $modal-close-size;
-            margin: $modal-close-top-outer-offset 0 0 0;
+
+            color: $primary-inverse;
+
             opacity: $modal-close-opacity;
 
             &:hover,
             &:focus {
                 color: $primary-inverse;
+
                 opacity: $modal-close-hover-opacity;
             }
         }
@@ -30,24 +34,31 @@
             font-size: $modal-title-font-size;
             font-weight: $modal-title-font-weight;
             line-height: $modal-title-font-size;
+            text-align: #{$start};
         }
     }
 
     &-body {
-        text-align: $modal-content-align;
         padding: $modal-content-inner-offset;
+
+        text-align: $modal-content-align;
     }
 
     &-footer {
+        padding: $modal-footer-inner-offset;
+
+        text-align: #{$end};
+
         background-color: $primary-900;
         border-radius: 0 0 $modal-border-radius $modal-border-radius;
         border: $modal-footer-border;
-        padding: $modal-footer-inner-offset;
     }
 }
 
 // Normal mode
 .oro-modal-normal {
+    width: auto;
+
     background-color: $primary-inverse;
 
     .modal-header {

@@ -505,4 +505,149 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
             $handledData
         );
     }
+
+    public function testConfigForKnownField()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner';
+        $entityClass = Entity\User::class;
+        $rootConfig = new EntityDefinitionConfig();
+        $config = $rootConfig->addField($propertyPath)->createAndSetTargetEntity();
+        $data = ['key' => 'value'];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $rootConfig
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                    self::assertSame($rootConfig, $context->getRootConfig());
+                    self::assertSame($config, $context->getConfig());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testConfigForUnknownField()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner';
+        $entityClass = Entity\User::class;
+        $rootConfig = new EntityDefinitionConfig();
+        $data = ['key' => 'value'];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $rootConfig
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use ($rootConfig) {
+                    self::assertSame($rootConfig, $context->getRootConfig());
+                    self::assertNull($context->getConfig());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testConfigForExcludedField()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner';
+        $entityClass = Entity\User::class;
+        $rootConfig = new EntityDefinitionConfig();
+        $config = $rootConfig->addField($propertyPath)->createAndSetTargetEntity();
+        $rootConfig->getField($propertyPath)->setExcluded();
+        $data = ['key' => 'value'];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $rootConfig
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                    self::assertSame($rootConfig, $context->getRootConfig());
+                    self::assertSame($config, $context->getConfig());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
+
+    public function testConfigForNestedAssociationField()
+    {
+        $version = '1.2';
+        $requestType = new RequestType(['test']);
+        $rootEntityClass = Entity\Product::class;
+        $propertyPath = 'owner.organization';
+        $entityClass = Entity\User::class;
+        $rootConfig = new EntityDefinitionConfig();
+        $associationConfig = $rootConfig->addField('owner')->createAndSetTargetEntity();
+        $config = $associationConfig->addField('organization')->createAndSetTargetEntity();
+        $data = ['key' => 'value'];
+
+        $handler = new AssociationHandler(
+            $this->customizationProcessor,
+            $version,
+            $requestType,
+            $rootEntityClass,
+            $propertyPath,
+            $entityClass,
+            $rootConfig
+        );
+
+        $this->customizationProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn(new CustomizeLoadedDataContext());
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CustomizeLoadedDataContext $context) use ($rootConfig, $config) {
+                    self::assertSame($rootConfig, $context->getRootConfig());
+                    self::assertSame($config, $context->getConfig());
+                }
+            );
+
+        \call_user_func($handler, $data);
+    }
 }

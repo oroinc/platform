@@ -1004,7 +1004,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @expectedExceptionMessage Invalid configuration for path "oro_api.config_files": The "request_type" options for "test1" and "test2" are duplicated.
      */
     // @codingStandardsIgnoreEnd
-    public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfugurationsWithSameRequestType()
+    public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -1034,7 +1034,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @expectedExceptionMessage Invalid configuration for path "oro_api.config_files": The "request_type" options for "test2" and "default" are duplicated.
      */
     // @codingStandardsIgnoreEnd
-    public function testLoadApiConfigurationShouldThrowExceptionIfExistConfugurationsWithSameRequestTypeAsDefailtOne()
+    public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

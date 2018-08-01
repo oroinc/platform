@@ -19,7 +19,7 @@
         padding: $dialog-titlebar-inner-offset;
         width: $dialog-titlebar-width;
         top: $dialog-titlebar-top;
-        left: $dialog-titlebar-left;
+        #{$start}: $dialog-titlebar-start;
         flex-shrink: $dialog-titlebar-flex-shrink;
 
         cursor: $dialog-titlebar-cursor;
@@ -30,7 +30,7 @@
 
         .ui-dialog-titlebar-close {
             position: $dialog-titlebar-close-position;
-            right: $dialog-titlebar-close-right;
+            #{$end}: $dialog-titlebar-close-end;
             top: $dialog-titlebar-close-top;
         }
     }
@@ -105,21 +105,21 @@
     }
 
     .ui-dialog-titlebar-buttonpane {
-        right: $dialog-titlebar-buttonpane-right;
+        #{$end}: $dialog-titlebar-buttonpane-end;
 
         /* iOS 11 */
-        right: $dialog-titlebar-buttonpane-right-ios11 !important;
+        #{$end}: $dialog-titlebar-buttonpane-end-ios11 !important;
 
         /* iOS 11.2+ */
-        right: $dialog-titlebar-buttonpane-right-ios11-2 !important;
+        #{$end}: $dialog-titlebar-buttonpane-end-ios11-2 !important;
         top: $dialog-titlebar-buttonpane-top;
         margin: $dialog-titlebar-buttonpane-outer-offset;
         height: $dialog-titlebar-buttonpane-height;
         min-width: $dialog-titlebar-buttonpane-min-width;
 
         [class*='ui-dialog-titlebar-'] {
-            margin-right: 13px;
-            margin-left: 0;
+            margin-#{$end}: 13px;
+            margin-#{$start}: 0;
             padding: 0;
 
             .ui-icon {
@@ -159,6 +159,11 @@
         .ui-dialog-titlebar-restore:before {
             content: $dialog-titlebar-restore-icon;
         }
+
+        // Override library styles
+        > a {
+            float: $dialog-buttons-float;
+        }
     }
 
     &.ui-dialog-minimized {
@@ -179,14 +184,14 @@
             .ui-dialog-titlebar-buttonpane {
                 background: $dialog-titlebar-min-background;
                 border: $dialog-titlebar-min-border;
-                right: $dialog-titlebar-min-right;
+                #{$end}: $dialog-titlebar-min-end;
                 top: $dialog-titlebar-min-top;
 
                 [class*='ui-dialog-titlebar-'] {
-                    margin-right: $dialog-titlebar-min-button-outer-offset;
+                    margin-#{$end}: $dialog-titlebar-min-button-outer-offset;
 
                     &:before {
-                        border-right: none;
+                        border-#{$end}: none;
                         color: $primary-700;
                         font-size: $base-font-size;
                     }
@@ -213,11 +218,11 @@
         flex-shrink: $dialog-buttonpane-flex-shrink;
 
         .widget-actions-section {
-            margin-left: $dialog-buttonpane-widget-actions-section-offset-left;
+            margin-#{$start}: $dialog-buttonpane-widget-actions-section-offset-left;
         }
 
         .action-wrapper {
-            margin-left: $dialog-buttonpane-action-wrapper-offset-left;
+            margin-#{$start}: $dialog-buttonpane-action-wrapper-offset-left;
         }
     }
 }
@@ -228,7 +233,7 @@
     margin: $dialog-resizable-se-outer-offset;
     position: $dialog-resizable-se-position;
     bottom: $dialog-resizable-se-bottom;
-    right: $dialog-resizable-se-right;
+    #{$end}: $dialog-resizable-se-end;
     cursor: $dialog-resizable-se-cursor;
 
     &:before,
@@ -238,9 +243,9 @@
         display: $dialog-resizable-se-presudo-display;
         position: $dialog-resizable-se-presudo-position;
         top: $dialog-resizable-se-presudo-top;
-        right: $dialog-resizable-se-presudo-right;
+        #{$end}: $dialog-resizable-se-presudo-end;
         bottom: $dialog-resizable-se-presudo-bottom;
-        left: $dialog-resizable-se-presudo-left;
+        #{$start}: $dialog-resizable-se-presudo-start;
         height: $dialog-resizable-se-presudo-height;
         margin: $dialog-resizable-se-presudo-margin;
         transform: $dialog-resizable-se-presudo-transform;
@@ -256,7 +261,7 @@
 .ui-dialog .ui-dialog-titlebar-maximize,
 .ui-dialog .ui-dialog-titlebar-minimize,
 .ui-dialog .ui-dialog .minimized {
-    float: $dialog-buttons-float;
+    float: $dialog-buttons-minimized-float;
     margin: $dialog-buttons-outer-offset;
     padding: $dialog-buttons-inner-offset;
     font-size: $dialog-buttons-inner-font-size;

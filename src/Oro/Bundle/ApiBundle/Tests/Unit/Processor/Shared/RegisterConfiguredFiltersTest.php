@@ -384,8 +384,8 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         ]);
         $filtersConfig->addField('owner', $filterConfig);
 
-        $existinAssociationFilter = new ComparisonFilter('string');
-        $existinAssociationFilter->setDataType('integer');
+        $existingAssociationFilter = new ComparisonFilter('string');
+        $existingAssociationFilter->setDataType('integer');
 
         $this->filterFactory->expects(self::once())
             ->method('createFilter')

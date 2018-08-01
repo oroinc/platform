@@ -26,7 +26,7 @@ api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
-If an auto-generated alias for your entity does not look good enaough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
+If an auto-generated alias for your entity does not look good enough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
 **Important:**
 Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API. If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it. 

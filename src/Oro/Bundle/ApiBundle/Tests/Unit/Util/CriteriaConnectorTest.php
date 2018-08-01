@@ -203,7 +203,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForNeqOrEmpry()
+    public function testShouldNotOptimizeJoinForNeqOrEmpty()
     {
         $this->criteria->andWhere(
             $this->criteria::expr()->andX(

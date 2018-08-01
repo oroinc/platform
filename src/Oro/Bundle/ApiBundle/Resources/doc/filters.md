@@ -269,7 +269,7 @@ Consider checking out the list of other classes below as they can provide insigh
 - [FieldsFilter](../../Request/FieldsFilter.php) - a filter that is used to filter entity fields.
 - [AddFieldsFilter](../../Processor/Shared/JsonApi/AddFieldsFilter.php) - a processor that adds "fields" filters that are used to filter entity fields.
 - [HandleFieldsFilter](../../Processor/Shared/JsonApi/HandleFieldsFilter.php) - a processor that handles "fields" filters.
-- [FilterFieldsByExtra](../../Processor/Config/Shared/FilterFieldsByExtra.php) - a processor that modifies configuration of entities accorting to "fields" filters.
+- [FilterFieldsByExtra](../../Processor/Config/Shared/FilterFieldsByExtra.php) - a processor that modifies configuration of entities according to "fields" filters.
 - [IncludeFilter](../../Request/IncludeFilter.php) - a filter that is used to request information about related entities.
 - [AddIncludeFilter](../../Processor/Shared/JsonApi/AddIncludeFilter.php) - a processor that adds "include" filter that is used to request information about related entities.
 - [HandleIncludeFilter](../../Processor/Shared/JsonApi/HandleIncludeFilter.php) - a processor that handles "include" filter.

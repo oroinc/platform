@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * An interfase for classes that can provide the request type based on some context.
+ * An interface for classes that can provide the request type based on some context.
  */
 interface RequestTypeProviderInterface
 {

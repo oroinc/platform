@@ -17,7 +17,7 @@ class BuildFormBuilderThrowException implements ProcessorInterface
         /** @var FormContext $context */
 
         if (!$context->hasFormBuilder()) {
-            throw new RuntimeException('The form builded was not created');
+            throw new RuntimeException('The form builder was not created');
         }
     }
 }

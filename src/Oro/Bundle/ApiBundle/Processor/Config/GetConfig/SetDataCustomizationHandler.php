@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Registers a post loading handler for the entity and all assiciated entities.
+ * Registers a post loading handler for the entity and all associated entities.
  * It allows to customize loaded data by registering own processors for the "customize_loaded_data" action.
  */
 class SetDataCustomizationHandler implements ProcessorInterface

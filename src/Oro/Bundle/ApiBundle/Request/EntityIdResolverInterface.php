@@ -17,7 +17,7 @@ interface EntityIdResolverInterface
     public function getDescription(): string;
 
     /**
-     * Gets an entity identifier correspons to a predefined identifier this resolvers is responsible for.
+     * Gets an entity identifier corresponds to a predefined identifier this resolvers is responsible for.
      *
      * A composite entity identifier is returned as an array in the following format:
      * [field => value, ...]

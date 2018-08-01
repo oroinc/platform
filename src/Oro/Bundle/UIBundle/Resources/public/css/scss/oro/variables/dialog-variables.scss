@@ -18,10 +18,10 @@ $dialog-buttonpane-flex-shrink: 0 !default;
 $dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
 $dialog-buttonpane-action-wrapper-offset-left: 8px !default;
 
-$dialog-titlebar-inner-offset: 16px 45px 14px 15px !default;
+$dialog-titlebar-inner-offset: side-values(16px 45px 14px 15px) !default;
 $dialog-titlebar-width: 100% !default;
 $dialog-titlebar-cursor: move !default;
-$dialog-titlebar-left: 1px !default;
+$dialog-titlebar-start: 1px !default;
 $dialog-titlebar-top: 1px !default;
 $dialog-titlebar-flex-shrink: 0 !default;
 
@@ -34,7 +34,7 @@ $dialog-titlebar-restore-icon: '\f2d2' !default;
 
 $dialog-titlebar-min-background: none !default;
 $dialog-titlebar-min-border: none !default;
-$dialog-titlebar-min-right: 11px !default;
+$dialog-titlebar-min-end: 11px !default;
 $dialog-titlebar-min-top: 5px !default;
 
 $dialog-titlebar-min-button-outer-offset: 8px !default;
@@ -42,7 +42,7 @@ $dialog-titlebar-min-button-outer-offset: 8px !default;
 $dialog-minimized-outer-offset: 0 4px !default;
 $dialog-minimized-box-shadow: none !default;
 
-$dialog-minimized-titlebar-inner-offset: 3px 80px 3px 12px !default;
+$dialog-minimized-titlebar-inner-offset: side-values(3px 80px 3px 12px) !default;
 $dialog-minimized-titlebar-outer-bottom-offset: -2px !default;
 
 $dialog-title-font-weight: bold !default;
@@ -54,16 +54,16 @@ $dialog-title-text-overflow: ellipsis !default;
 $dialog-titlebar-minimize-position: relative !default;
 
 $dialog-titlebar-close-position: absolute !default;
-$dialog-titlebar-close-right: 10px !default;
+$dialog-titlebar-close-end: 10px !default;
 $dialog-titlebar-close-top: 10px !default;
 
 $dialog-titlebar-buttonpane-outer-offset: 0 !default;
 $dialog-titlebar-buttonpane-height: auto !default;
 $dialog-titlebar-buttonpane-min-width: 18px !default;
 $dialog-titlebar-buttonpane-top: 16px !default;
-$dialog-titlebar-buttonpane-right: 16px !default;
-$dialog-titlebar-buttonpane-right-ios11: calc(constant(safe-area-inset-right) + 16px) !default;
-$dialog-titlebar-buttonpane-right-ios11-2: calc(env(safe-area-inset-right) + 16px) !default;
+$dialog-titlebar-buttonpane-end: 16px !default;
+$dialog-titlebar-buttonpane-end-ios11: if-ltr(calc(constant(safe-area-inset-right) + 16px), calc(constant(safe-area-inset-left) + 16px)) !default;
+$dialog-titlebar-buttonpane-end-ios11-2: if-ltr(calc(env(safe-area-inset-right) + 16px), calc(env(safe-area-inset-left) + 16px)) !default;
 
 $dialog-content-inner-offset: 40px 48px !default;
 $dialog-content-outer-offset: 0 auto !default;
@@ -90,16 +90,16 @@ $dialog-resizable-se-size: 10px !default;
 $dialog-resizable-se-outer-offset: 2px !default;
 $dialog-resizable-se-position: absolute !default;
 $dialog-resizable-se-bottom: -1px !default;
-$dialog-resizable-se-right: 0 !default;
+$dialog-resizable-se-end: 0 !default;
 $dialog-resizable-se-cursor: se-resize !default;
 
 $dialog-resizable-se-presudo-border-top: 2px solid $primary-700 !default;
 $dialog-resizable-se-presudo-display: block !default;
 $dialog-resizable-se-presudo-position: absolute !default;
 $dialog-resizable-se-presudo-top: 0 !default;
-$dialog-resizable-se-presudo-right: -4px !default;
+$dialog-resizable-se-presudo-end: -4px !default;
 $dialog-resizable-se-presudo-bottom: 0 !default;
-$dialog-resizable-se-presudo-left: -4px !default;
+$dialog-resizable-se-presudo-start: -4px !default;
 $dialog-resizable-se-presudo-height: 0 !default;
 $dialog-resizable-se-presudo-margin: auto !default;
 $dialog-resizable-se-presudo-transform: rotate(-45deg) !default;
@@ -112,7 +112,8 @@ $dialog-widget-actions-border: none !default;
 
 $dialog-bottom-action-overflow: hidden !default;
 
-$dialog-buttons-float: right !default;
+$dialog-buttons-float: #{$end} !default;
+$dialog-buttons-minimized-float: #{$end} !default;
 $dialog-buttons-outer-offset: 0 0 0 7px !default;
 $dialog-buttons-inner-offset: 0 !default;
 $dialog-buttons-inner-font-size: 0 !default;

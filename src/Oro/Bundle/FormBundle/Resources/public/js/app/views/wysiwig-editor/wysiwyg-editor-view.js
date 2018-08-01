@@ -29,7 +29,10 @@ define(function(require) {
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
             browser_spellcheck: true,
-            paste_data_images: true // to avoid of a paste plugin restriction
+            paste_data_images: true, // to avoid a paste plugin restriction
+            images_dataimg_filter: function() {
+                return false;
+            }
         },
 
         events: {

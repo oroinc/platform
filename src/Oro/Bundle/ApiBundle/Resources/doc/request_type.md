@@ -1,10 +1,10 @@
 # The Request Type
 
-The request type is key concept of the ApiBulndle. It is very simple, but very important for understanding
+The request type is key concept of the ApiBundle. It is very simple, but very important for understanding
 how this bundle works and how to extend its functionality.
 
 Each API request is processed by a set of processors, each processor does its own small piece of work to reach the
-requested result. Some processors analize and validate the request data, other processors update the database
+requested result. Some processors analyze and validate the request data, other processors update the database
 and prepare a correct response. It is easy to imagine that if you need to process different types of
 API request, e.g. REST API and REST API that conforms [JSON.API](http://jsonapi.org/) specification,
 you need to have a different set of processors. Some of them may work for all request types, but others only
