@@ -396,6 +396,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,
             'The entity should have a relationship with the primary entity'
+            . ' and this should be explicitly specified in the request'
         );
         $error->setSource(
             ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))
