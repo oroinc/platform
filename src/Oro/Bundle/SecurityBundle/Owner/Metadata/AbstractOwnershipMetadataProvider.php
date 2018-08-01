@@ -38,6 +38,10 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
      */
     public function getMetadata($className)
     {
+        if ($className === null) {
+            return $this->getNoOwnershipMetadata();
+        }
+
         $className = ClassUtils::getRealClass($className);
         $this->ensureMetadataLoaded($className);
 
