@@ -1,7 +1,8 @@
 @regression
 @ticket-BAP-16397
 @ticket-BB-14555
-
+# Unskip after BAP-17458
+@skip
 Feature: Import extend entity fields
   In order to effectively manage extend fields for entities
   As an Administrator
