@@ -1757,7 +1757,7 @@ TEXT;
     }
 
     /**
-     * Example: I should see next rows in "Discounts" table:
+     * Example: I should see next rows in "Discounts" table
      *   | Description | Discount |
      *   | Amount      | -$2.00   |
      *
