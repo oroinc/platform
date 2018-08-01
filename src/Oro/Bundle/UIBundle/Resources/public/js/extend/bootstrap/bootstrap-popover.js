@@ -3,7 +3,8 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    require('bootstrap');
+
+    require('bootstrap-popover');
     require('./bootstrap-tooltip');
 
     var Tooltip = $.fn.tooltip.Constructor;

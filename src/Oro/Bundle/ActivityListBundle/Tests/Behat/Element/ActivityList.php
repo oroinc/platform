@@ -24,7 +24,7 @@ class ActivityList extends Element
      */
     public function getCollapsedItem()
     {
-        $item = $this->find('css', 'div.accordion-body.in');
+        $item = $this->find('css', 'div.accordion-body.show');
         self::assertNotNull($item, 'Not found collapsed items in activity list');
 
         return $this->elementFactory->wrapElement('ActivityListItem', $item);

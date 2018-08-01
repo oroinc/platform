@@ -78,24 +78,37 @@ define(function(require) {
             $spy.removeAttr('data-spy').addClass('accordion');
 
             $spy.find('.scrollspy-title').each(function(i) {
+                // first is opened, rest are closed
+                var collapsed = i > 0;
                 var $header = $(this);
-                var targetSelector = '#' + $header.next().attr('id') + '+';
-                var $target = $(targetSelector);
+                var $target = $header.next().next();
+                var targetId = _.uniqueId('collapse-');
+                var headerId = targetId + '-trigger';
+
                 $header
                     .removeClass('scrollspy-title')
                     .addClass('accordion-toggle')
+                    .toggleClass('collapsed', collapsed)
                     .attr({
+                        'id': headerId,
                         'data-toggle': 'collapse',
-                        'data-target': targetSelector
+                        'data-target': '#' + targetId,
+                        'aria-controls': targetId,
+                        'aria-expanded': !collapsed
+                    })
+                    .parent().addClass('accordion-group');
+                $header.wrap('<div class="accordion-heading"/>');
+
+                $target.addClass('accordion-body collapse')
+                    .toggleClass('show', !collapsed)
+                    .attr({
+                        'id': targetId,
+                        'role': 'region',
+                        'aria-labelledby': headerId
                     });
-                $header.parent().addClass('accordion-group');
-                $target.addClass('accordion-body collapse');
-                $header.wrap('<div class="accordion-heading"></div>');
-                // first is opened, rest are closed
-                if (i > 0) {
-                    $header.addClass('collapsed');
-                } else {
-                    $target.addClass('in').data('toggle', false);
+
+                if (!collapsed) {
+                    $target.data('toggle', false);
                 }
                 $target.on('focusin', function() {
                     $target.collapse('show');

@@ -7,8 +7,6 @@ oro:
       title: Dashboard Widgets
       adding: Adding...
     widget:
-      collapse: Collapse
-      expand: Expand
       move: Move
       remove: Delete
       configure: Configure

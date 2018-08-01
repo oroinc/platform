@@ -45,6 +45,7 @@ config:
         'bootstrap-collapse':
             deps:
                 - 'jquery'
+                - 'bootstrap-util'
         'bootstrap-dropdown':
             deps:
                 - 'jquery'
@@ -137,7 +138,7 @@ config:
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
         'bootstrap-util': 'components/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
-        'bootstrap-collapse': 'bowerassets/bootstrap/js/bootstrap-collapse.js'
+        'bootstrap-collapse': 'components/bootstrap/js/dist/collapse.js'
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
         'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
         'bootstrap-popover': 'bowerassets/bootstrap/js/bootstrap-popover.js'

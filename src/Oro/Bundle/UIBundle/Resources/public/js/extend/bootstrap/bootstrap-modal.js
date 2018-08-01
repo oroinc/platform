@@ -2,7 +2,8 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
-    require('bootstrap');
+
+    require('bootstrap-modal');
 
     /**
      * fix endless loop

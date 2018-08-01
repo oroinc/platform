@@ -72,8 +72,6 @@
     }
 
     .fields-list {
-        display: none;
-
         & > :first-child {
             margin-top: 8px;
         }
@@ -87,10 +85,6 @@
 .collapse-expand-action-container .collapse-action {
     .field-less & {
         visibility: hidden;
-    }
-
-    .collapsed &:before {
-        content: '+';
     }
 }
 

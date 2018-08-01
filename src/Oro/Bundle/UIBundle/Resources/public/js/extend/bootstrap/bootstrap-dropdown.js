@@ -5,8 +5,9 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
-    require('bootstrap');
     var toggleDropdown = '[data-toggle=dropdown]';
+
+    require('bootstrap-dropdown');
 
     function getParent($this) {
         var selector = $this.attr('data-target');

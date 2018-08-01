@@ -36,6 +36,7 @@ config:
         'bootstrap-collapse':
             deps:
                 - 'jquery'
+                - 'bootstrap-util'
         'bootstrap-dropdown':
             deps:
                 - 'jquery'
@@ -66,7 +67,7 @@ config:
             'chaplin': 'oroui/js/extend/chaplin'
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
-            'bootstrap': 'oroui/js/extend/bootstrap'
+            'bootstrap': 'oroui/blank/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery.timepicker': 'oroui/js/extend/jquery.timepicker'
         'oroui/js/extend/jquery':
@@ -87,7 +88,7 @@ config:
             'underscore': 'underscore'
         'oroui/js/extend/backbone':
             'backbone': 'backbone'
-        'oroui/js/extend/bootstrap':
+        'oroui/blank/js/extend/bootstrap':
             'bootstrap': 'bootstrap'
         'oroui/js/jquery-ui-datepicker-l10n':
             'jquery-ui': 'oroui/js/extend/jquery-ui'
@@ -121,7 +122,6 @@ config:
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'bootstrap-util': 'components/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
-        'bootstrap-collapse': 'bowerassets/bootstrap/js/bootstrap-collapse.js'
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
         'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
         'bootstrap-popover': 'bowerassets/bootstrap/js/bootstrap-popover.js'
@@ -130,7 +130,7 @@ config:
         'bootstrap-tooltip': 'bowerassets/bootstrap/js/bootstrap-tooltip.js'
         'bootstrap-transition': 'bowerassets/bootstrap/js/bootstrap-transition.js'
         'bootstrap-typeahead': 'bundles/oroui/lib/bootstrap/bootstrap-typeahead.js'
-        'bootstrap': 'bundles/oroui/lib/bootstrap.js'
+        'bootstrap': 'bundles/oroui/blank/lib/bootstrap.js'
         'underscore': 'bundles/bowerassets/underscore/underscore.js'
         'backbone': 'bundles/bowerassets/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
@@ -143,6 +143,7 @@ config:
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'oroui/blank/js/extend/bootstrap': 'bundles/oroui/blank/js/extend/bootstrap.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'

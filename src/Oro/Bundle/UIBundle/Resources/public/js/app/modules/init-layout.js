@@ -106,12 +106,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             var $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
             $target.find('.collapse').collapse({toggle: false}).collapse(method);
         });
-        $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
-            var $toggle = $(this);
-            var target = $toggle.attr('data-target') || $toggle.attr('href');
-            $toggle = $toggle.add('[data-target="' + target + '"], [href="' + target + '"]');
-            $toggle.toggleClass('collapsed', !$(target).hasClass('in'));
-        });
         $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.accordion-body', function(e) {
             if (e.target === e.currentTarget) { // prevent processing if an event comes from child element
                 var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]:first');
