@@ -3,7 +3,7 @@
 .dashboard-selector-container {
     label {
         padding-top: 4px;
-        padding-right: 10px;
+        padding-#{$end}: 10px;
     }
 
     select {
@@ -13,14 +13,14 @@
     label,
     select,
     .selector {
-        float: left;
+        float: #{$start};
     }
 }
 
 .ui-dialog .form-horizontal {
     .widget-sort-by {
         .control-group .controls {
-            margin-left: 0;
+            margin-#{$start}: 0;
 
             select {
                 max-width: 280px;
@@ -39,17 +39,17 @@
     background-color: $dashboard-wrapper-bg;
 
     .page-title {
-        border-bottom: 1px solid #f2f2f2;
+        border-bottom: $dashboard-container-border;
     }
 
     .responsive-section {
         padding-top: 13px;
-        padding-left: 13px;
+        padding-#{$start}: 13px;
 
         background: $dashboard-wrapper-bg;
 
         .responsive-cell > div {
-            padding-right: 13px;
+            padding-#{$end}: 13px;
             padding-bottom: 13px;
         }
     }
@@ -78,7 +78,7 @@
         position: relative;
 
         border-radius: 1px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+        box-shadow: $dashboard-widget-box-shadow;
 
         .widget-header {
             min-height: 44px;
@@ -90,45 +90,24 @@
                 margin-top: -3px;
                 min-width: 100px;
 
-                > li > a {
-                    padding-left: 8px;
-                    padding-right: 8px;
-
-                    i[class^="fa-"] {
-                        min-width: 14px;
-                    }
+                @include if-ltr() {
+                    #{$start}: auto;
+                    #{$end}: 0;
                 }
             }
         }
 
         .actions-container {
-            margin-top: 9px;
+            margin-top: 4px;
 
             .collapse-action {
                 .collapse-action-icon {
-                    @include fa-icon($fa-var-minus-square-o);
+                    @include fa-icon($dashboard-action-icon);
                 }
 
                 &.collapsed .collapse-action-icon {
-                    @include fa-icon($fa-var-plus-square-o);
+                    @include fa-icon($dashboard-action-icon-collapsed);
                 }
-            }
-        }
-
-        .pull-left.actions-container {
-            float: none;
-            order: 1;
-        }
-
-        .pull-right {
-            &.widget-actions-container {
-                float: none;
-                order: 80;
-            }
-
-            &.actions-container {
-                float: none;
-                order: 99;
             }
         }
 
@@ -139,10 +118,6 @@
         .widget-actions-container,
         .default-actions-container {
             white-space: nowrap;
-
-            .action-wrapper {
-                padding: 3px 13px;
-            }
         }
 
         .default-actions-container {
@@ -156,11 +131,12 @@
         }
 
         .widget-actions-container {
-            margin: 10px -1px 8px 0;
-        }
+            margin: side-values(10px 0 8px 0);
 
-        .dashboard-btn {
-            margin-top: -3px;
+            .action-wrapper {
+                padding: 0 2px;
+                margin-#{$start}: 14px;
+            }
         }
 
         .move-action {
@@ -169,7 +145,7 @@
 
         .default-actions-container {
             .action-wrapper:last-child {
-                border-right: none;
+                border-#{$end}: none;
             }
         }
 
@@ -182,7 +158,6 @@
             white-space: nowrap;
 
             flex: 1;
-            order: 50;
             overflow: hidden;
 
             &:before {
@@ -194,27 +169,25 @@
         }
 
         .row-fluid {
-            border-top: 1px solid $primary-860;
+            padding: 22px 24px;
+
+            border-top: $dashboard-container-border;
         }
 
         .dashboard-widget-content {
             margin-top: 0;
 
             .other-scroll-container {
-                margin: 10px;
-            }
-
-            > .tab-container {
-                margin: -1px 0 0 -1px;
-                padding-top: 0;
+                margin: 10px 0;
             }
         }
 
         .widget-config-data {
-            margin-left: 10px;
-            margin-bottom: 5px;
+            margin-#{$end}: 10px;
 
-            color: #9d9d9d;
+            font-size: $base-font-size - 1px;
+
+            color: $dashboard-widget-config-data-color;
         }
     }
 
@@ -231,9 +204,9 @@
         min-height: 200px;
         padding: 20px;
 
-        background: #f5f5f5;
-        border: 2px dashed #ccc;
-        color: #aaa;
+        background: $dashboard-widget-placeholder-background;
+        border: $dashboard-widget-placeholder-border;
+        color: $dashboard-widget-placeholder-color;
         font-size: 24px;
         text-align: center;
 
@@ -249,17 +222,7 @@
     }
 
     .collapse-expand-action-container {
-        padding: 0 2px 0 5px;
-    }
-}
-
-.responsive-cell .box-type1 {
-    .dashboard-widget-content {
-        .tab-content {
-            .no-data {
-                background-color: #f9f9f9;
-            }
-        }
+        padding: side-values(0 2px 0 6px);
     }
 }
 
@@ -295,7 +258,7 @@
                 bottom: 0;
                 right: 0;
 
-                margin: auto 0 auto 30px;
+                margin: side-values(auto 0 auto 30px);
                 width: 90%;
                 height: auto;
 
@@ -336,7 +299,7 @@
     }
 
     .flotr-legend-label {
-        padding-left: 10px;
+        padding-#{$start}: 10px;
     }
 }
 
@@ -349,7 +312,7 @@
 .funnel-data {
     h5 {
         margin-bottom: 5px;
-        margin-left: 25px;
+        margin-#{$start}: 25px;
 
         &:first-letter {
             text-transform: uppercase;
@@ -361,67 +324,19 @@
     }
 }
 
-.dashboard-widget-content {
-    .tab-container {
-        position: relative;
-
-        .nav-tabs > li {
-            & > a {
-                height: 38px;
-                margin-left: -1px;
-                margin-right: 0;
-                padding: 8px 12px;
-
-                color: #555;
-                line-height: 20px;
-
-                background-color: #fafafa;
-                border: 1px solid #ddd;
-
-                border-radius: 0;
-
-                &:focus {
-                    outline: none;
-                }
-            }
-
-            &.active > a,
-            &.active > a:hover,
-            &.active > a:focus {
-                color: #444;
-                text-decoration: none;
-
-                background: #fff;
-                border: 1px solid #ddd;
-                border-bottom-color: #fff;
-
-                box-shadow: none;
-            }
-
-            &:first-child > a,
-            &:first-child > a:hover,
-            &:first-child > a:focus {
-                border-left: 1px solid #ccc;
-            }
-        }
-    }
-}
-
-.navigation {
-    .dashboard-widgets-add {
-        margin: 0 0 0 11px;
-    }
+.dashboard-widgets-add {
+    margin-left: 10px;
 }
 
 .widget-configuration {
     .items-selector-widget {
-        margin-right: 20px;
+        margin-#{$end}: 20px;
     }
 
     .widget-title-widget {
-        margin-right: 20px;
+        margin-#{$end}: 20px;
 
-        float: left;
+        float: #{$start};
     }
 
     .date-range-filter {
@@ -467,7 +382,7 @@
             tbody {
                 height: 120px;
 
-                border-left: 1px solid #ddd;
+                border-#{$start}: $dashboard-widget-configuration-border;
 
                 display: block;
             }
@@ -481,13 +396,13 @@
             }
 
             &.table-bordered td:first-child {
-                border-left: none;
+                border-#{$start}: none;
             }
         }
     }
 
     .widget-date-widget {
-        margin: 4px 0 10px;
+        margin: side-values(4px 0 10px);
     }
 
     .widget-date-input-widget {
@@ -499,7 +414,7 @@
 
 .widget-content.widget-configuration {
     .table input[type="checkbox"] {
-        margin: 0 0 1px 0;
+        margin: side-values(0 0 1px 0);
     }
 }
 
@@ -528,5 +443,5 @@
 }
 
 .ui-dialog .form-horizontal .control-group .conditions-group .controls {
-    margin-left: 0;
+    margin-#{$start}: 0;
 }

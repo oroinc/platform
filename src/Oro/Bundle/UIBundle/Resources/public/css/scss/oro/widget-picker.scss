@@ -2,6 +2,8 @@
 
 .widget-picker {
     &__modal {
+        width: $widget-picker-width;
+
         .modal-body {
             padding: 48px;
         }
@@ -14,13 +16,18 @@
     }
 
     &__container {
-        max-height: 264px;
+        max-height: 260px;
+        width: 100%;
+
+        text-align: #{$start};
+
         overflow: auto;
     }
 
     &__filter {
-        display: inline-block;
         position: relative;
+
+        text-align: #{$start};
 
         &.empty {
             @include fa-icon($widget-picker-filter-search-icon, after);
@@ -29,10 +36,10 @@
                 display: block;
                 position: absolute;
                 top: 0;
-                right: 0;
-                width: 32px;
-                height: 32px;
-                line-height: 30px;
+                #{$start}: $widget-picker-search-width - $widget-picker-icon-size;
+                width: $widget-picker-icon-size;
+                height: $widget-picker-icon-size;
+                line-height: $widget-picker-icon-size - 2px;
                 text-align: center;
             }
         }
@@ -42,7 +49,7 @@
         @include fa-icon($widget-picker-filter-clear-icon);
         position: absolute;
         top: 0;
-        right: 0;
+        #{$start}: $widget-picker-search-width - $widget-picker-icon-size;
 
         .widget-picker__filter.empty & {
             display: none;
@@ -50,8 +57,8 @@
     }
 
     input&__filter-search {
-        width: 178px;
-        padding-right: 32px;
+        width: $widget-picker-search-width;
+        padding-#{$end}: $widget-picker-icon-size;
     }
 
     &__no-results-found {
@@ -101,6 +108,8 @@
 
     &__description-cell {
         margin: 0;
+
+        color: $widget-picker-description-cell-color;
     }
 
     &__toggler-column {
@@ -113,26 +122,30 @@
     }
 
     &__info-column {
-        padding: 15px 24px 15px 5px;
+        padding: side-values(15px 24px 15px 5px);
     }
 
     &__actions-column {
         width: 74px;
-        padding-right: 20px;
+        padding-#{$end}: 20px;
     }
 
     &__description-toggler {
-        @include fa-icon($widget-picker-description-collapse-icon);
+        @include fa-icon($widget-picker-description-collapse-icon, before, true) {
+            font-size: $base-font-size;
+        };
 
         &.collapsed {
-            @include fa-icon($widget-picker-description-expand-icon);
+            @include fa-icon($widget-picker-description-expand-icon, before, true) {
+                font-size: $base-font-size;
+            };
         }
     }
 
     &__new-badge,
     &__added-badge {
         font-weight: bold;
-        margin-left: 5px;
+        margin-#{$start}: 5px;
     }
 
     &__new-badge {

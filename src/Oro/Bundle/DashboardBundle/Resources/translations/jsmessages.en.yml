@@ -13,3 +13,4 @@ oro:
       remove: Delete
       configure: Configure
       delete_confirmation: Are you sure you want to remove this widget?
+    show_more_actions: show more actions

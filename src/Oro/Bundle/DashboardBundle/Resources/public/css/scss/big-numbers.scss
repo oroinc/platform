@@ -14,20 +14,20 @@
 
         width: 33.3%;
         padding: 0 15px;
-        margin: 15px 0 15px -1px;
+        margin: side-values(15px 0 15px -1px);
 
         text-align: center;
 
         background: none;
-        border-left: 1px solid $dashboard-big-numbers-separator-color;
+        border-#{$start}: 1px solid $dashboard-big-numbers-separator-color;
 
-        float: left;
+        float: #{$start};
         display: block;
         vertical-align: middle;
 
         &:after {
             position: absolute;
-            right: 15px;
+            #{$end}: 15px;
             bottom: -15px;
 
             width: calc(300% - 30px);
@@ -55,7 +55,7 @@
             padding: 0;
 
             font-weight: normal;
-            text-align: left;
+            text-align: #{$start};
 
             display: inherit;
         }
@@ -63,7 +63,7 @@
         & > .value {
             margin-bottom: 0;
 
-            text-align: left;
+            text-align: #{$start};
             font-weight: normal;
         }
 
@@ -73,7 +73,7 @@
             overflow: hidden;
 
             & > .deviation {
-                float: left;
+                float: #{$start};
 
                 &.positive {
                     color: $dashboard-big-numbers-positive-color;
@@ -90,7 +90,7 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
 
-                float: right;
+                float: #{$end};
                 overflow: hidden;
             }
         }

@@ -1,28 +1,5 @@
 /* @theme: admin.oro; */
 
-.dashboard-selector-container {
-    label {
-        display: none;
-    }
-
-    div.selector {
-        height: 34px;
-
-        border-color: #ccc #ccc #b3b3b3;
-
-        select,
-        span {
-            height: 32px;
-
-            line-height: 32px;
-
-            &:after {
-                top: 3px;
-            }
-        }
-    }
-}
-
 .dashboard-container-wrapper {
     min-height: 100%;
 

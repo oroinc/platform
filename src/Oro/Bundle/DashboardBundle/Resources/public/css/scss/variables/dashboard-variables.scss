@@ -1,19 +1,29 @@
 /* @theme: admin.oro; */
 
-$dashboard-wrapper-bg: $primary-900 !default; // #f8f8f8
-$dashboard-widget-bg: $primary-inverse !default; // #ffffff
-$dashboard-widget-border-color: $primary-inverse !default; // #ffffff
-$dashboard-widget-title-color: $primary-400 !default; // #68686a
+$dashboard-container-border: 1px solid $primary-860 !default;
 
-$dashboard-big-numbers-separator-color: $primary-830 !default; // #eeeeee
-$dashboard-big-numbers-positive-color: $success-dark !default; // #457d0c
-$dashboard-big-numbers-negative-color: $danger-dark !default; // #c7361a
+$dashboard-action-icon: $fa-var-minus-square-o !default;
+$dashboard-action-icon-collapsed: $fa-var-plus-square-o !default;
+$dashboard-wrapper-bg: $primary-900 !default;
+$dashboard-widget-bg: $primary-inverse !default;
+$dashboard-widget-border-color: $primary-inverse !default;
+$dashboard-widget-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05) !default;
+$dashboard-widget-title-color: $primary-400 !default;
+$dashboard-widget-config-data-color: $primary-600 !default;
+$dashboard-widget-placeholder-background: $primary-860 !default;
+$dashboard-widget-placeholder-border: 2px dashed $primary-700 !default;
+$dashboard-widget-placeholder-color: $primary-600 !default;
+$dashboard-widget-configuration-border: 1px solid $primary-750 !default;
+
+$dashboard-big-numbers-separator-color: $primary-830 !default;
+$dashboard-big-numbers-positive-color: $success-dark !default;
+$dashboard-big-numbers-negative-color: $danger-dark !default;
 $dashboard-big-numbers-one-column-gate: 400px !default;
 $dashboard-big-numbers-two-column-gate: 600px !default;
 
-$dashboard-launchpad-icon-bg: $primary-900 !default; // #f8f8f8
-$dashboard-launchpad-icon-color: $primary-600 !default; // #919193
-$dashboard-launchpad-icon-active-color: $primary-400 !default; // #68686a
-$dashboard-launchpad-active-underline-color: $secondary !default; // #0c84a3
-$dashboard-launchpad-label-color: $primary-200 !default;  // #565656
-$dashboard-launchpad-bold-label-color: $primary-300 !default;  // #5e5e60
+$dashboard-launchpad-icon-bg: $primary-900 !default;
+$dashboard-launchpad-icon-color: $primary-600 !default;
+$dashboard-launchpad-icon-active-color: $primary-400 !default;
+$dashboard-launchpad-active-underline-color: $secondary !default;
+$dashboard-launchpad-label-color: $primary-200 !default;
+$dashboard-launchpad-bold-label-color: $primary-300 !default;

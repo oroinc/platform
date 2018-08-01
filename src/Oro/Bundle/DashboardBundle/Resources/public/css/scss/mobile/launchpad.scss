@@ -32,7 +32,7 @@
 
       font-size: 20px;
 
-      float: left;
+      float: #{$start};
     }
 
     &__label-wrapper {

@@ -34,7 +34,7 @@
   }
 
   &__label {
-    padding: 14px 8px 10px;
+    padding: side-values(14px 8px 10px);
 
     color: $dashboard-launchpad-label-color;
     text-align: center;
