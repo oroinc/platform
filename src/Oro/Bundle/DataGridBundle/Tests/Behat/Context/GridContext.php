@@ -1081,11 +1081,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            // Grid Row will assert us if action does not exists
-            $row->getActionLink(reset($item));
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertContains($item, $actions);
         }
     }
 
@@ -1103,6 +1112,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iShouldSeeOnlyFollowingActionsForRow($number, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByNumber($number);
 
         $actions = array_map(
@@ -1128,11 +1138,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowNotExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            $action = $row->findActionLink(ucfirst(reset($item)));
-            self::assertNull($action, "$action still exists for $content row");
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertNotContains($item, $actions);
         }
     }
 
