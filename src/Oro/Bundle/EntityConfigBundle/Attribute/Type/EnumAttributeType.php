@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Entity attribute type for enum field type
+ */
 class EnumAttributeType implements AttributeTypeInterface
 {
     /**
