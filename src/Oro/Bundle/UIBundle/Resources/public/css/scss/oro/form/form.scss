@@ -168,7 +168,7 @@ input[type="color"],
             font-size: $base-font-size--m;
             font-family: $selector-uniform-arrow-font-family;
             position: $selector-uniform-arrow-position;
-            right: $selector-uniform-arrow-right;
+            #{$end}: $selector-uniform-arrow-right;
             color: $selector-uniform-arrow-color;
             line-height: $selector-uniform-line-height;
         }

@@ -18,7 +18,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * Provides an interface for base execution context for Data API processors.
+ * Represents an execution context for Data API processors.
  */
 interface ContextInterface extends ComponentContextInterface
 {
@@ -429,6 +429,15 @@ interface ContextInterface extends ComponentContextInterface
      * @return bool
      */
     public function hasMetadataExtra($extraName);
+
+    /**
+     * Gets a request for some additional metadata info by its name.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getMetadataExtra($extraName);
 
     /**
      * Adds a request for some additional metadata info.

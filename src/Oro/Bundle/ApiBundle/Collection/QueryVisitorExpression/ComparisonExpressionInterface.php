@@ -12,7 +12,7 @@ interface ComparisonExpressionInterface
     /**
      * Builds a comparison expression for a specific field.
      *
-     * @param QueryExpressionVisitor $visitor       The visitor that is used to buils a query
+     * @param QueryExpressionVisitor $visitor       The visitor that is used to build a query
      * @param string                 $field         The unique name of a field
      * @param string                 $expression    The DQL expression for a field, e.g. LOWER(field)
      * @param string                 $parameterName The name of parameter unique for each field

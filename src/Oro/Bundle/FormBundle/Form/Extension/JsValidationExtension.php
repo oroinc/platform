@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
-use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * This extensions provides validation constraints data for js validation via html attributes.
+ */
 class JsValidationExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    /** @var ConstraintsProvider */
+    /** @var ConstraintsProviderInterface */
     protected $constraintsProvider;
 
     /**
-     * @param ConstraintsProvider $constraintsProvider
+     * @param ConstraintsProviderInterface $constraintsProvider
      */
-    public function __construct(ConstraintsProvider $constraintsProvider)
+    public function __construct(ConstraintsProviderInterface $constraintsProvider)
     {
         $this->constraintsProvider = $constraintsProvider;
     }

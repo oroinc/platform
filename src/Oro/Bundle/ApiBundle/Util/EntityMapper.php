@@ -28,7 +28,7 @@ class EntityMapper
     private $entityOverrideProvider;
 
     /** @var EntityOverrideProvider|null */
-    private $additinalEntityOverrideProvider;
+    private $additionalEntityOverrideProvider;
 
     /** @var \SplObjectStorage */
     private $entityMap;
@@ -126,13 +126,13 @@ class EntityMapper
      */
     public function mapEntity(string $entityClass, string $modelClass): void
     {
-        if (null === $this->additinalEntityOverrideProvider) {
-            $this->additinalEntityOverrideProvider = new EntityOverrideProvider([]);
+        if (null === $this->additionalEntityOverrideProvider) {
+            $this->additionalEntityOverrideProvider = new EntityOverrideProvider([]);
             $this->entityOverrideProvider = new ChainEntityOverrideProvider(
-                [$this->additinalEntityOverrideProvider, $this->entityOverrideProvider]
+                [$this->additionalEntityOverrideProvider, $this->entityOverrideProvider]
             );
         }
-        $this->additinalEntityOverrideProvider->addSubstitution($entityClass, $modelClass);
+        $this->additionalEntityOverrideProvider->addSubstitution($entityClass, $modelClass);
     }
 
     /**

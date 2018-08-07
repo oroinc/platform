@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
+ * The execution context for processors for "get_metadata" action.
  * @method EntityMetadata|null getResult()
  */
 class MetadataContext extends ApiContext

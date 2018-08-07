@@ -13,7 +13,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 class EntityHandler
 {
     /** @var ActionProcessorInterface */
-    protected $customizationProcessor;
+    private $customizationProcessor;
 
     /** @var string */
     private $version;
@@ -69,6 +69,9 @@ class EntityHandler
 
         $customizationContext = $this->createCustomizationContext();
         $customizationContext->setResult($data);
+        $customizationContext->setIdentifierOnly(
+            $this->isIdentifierOnly($customizationContext->getConfig())
+        );
         $this->customizationProcessor->process($customizationContext);
 
         return $customizationContext->getResult();
@@ -131,5 +134,35 @@ class EntityHandler
         }
 
         return $result;
+    }
+
+    /**
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return bool
+     */
+    private function isIdentifierOnly(?EntityDefinitionConfig $config): bool
+    {
+        if (null === $config) {
+            return false;
+        }
+        $idFieldNames = $config->getIdentifierFieldNames();
+        if (empty($idFieldNames)) {
+            return false;
+        }
+        $fields = $config->getFields();
+        if (\count($fields) !== \count($idFieldNames)) {
+            return false;
+        }
+
+        $isIdentifierOnly = true;
+        foreach ($idFieldNames as $idFieldName) {
+            if (!isset($fields[$idFieldName])) {
+                $isIdentifierOnly = false;
+                break;
+            }
+        }
+
+        return $isIdentifierOnly;
     }
 }

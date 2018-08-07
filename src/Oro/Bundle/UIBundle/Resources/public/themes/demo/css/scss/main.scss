@@ -1,12 +1,16 @@
 /* @theme: admin.demo; */
 
 @import "../../../../css/scss/mixins";
-@import "variables";
-@import "footer";
+
+@import "colors";
+@import "../../../../css/scss/variables";
+@import "../../../../css/scss/oro/variables";
+
 @import "dashboard";
 @import "error-page";
-@import "buttons";
 @import "loading-bar";
+@import "loading-mask";
+@import "widget-picker";
 
 // desktop resolution
 @import "desktop/main";

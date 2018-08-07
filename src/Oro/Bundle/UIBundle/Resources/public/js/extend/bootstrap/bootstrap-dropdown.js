@@ -511,7 +511,7 @@ define(function(require) {
 
                 $dropdown.on('shown.autoflip-dropdown', null, {preferCurrentState: true}, handlePositionChange);
                 $dropdown.closest('.ui-dialog').on(dialogEvents.join(' '), handlePositionChange);
-                $dropdown.parents().on('scroll.autoflip-dropdown', handlePositionChange);
+                $dropdown.parents().add(window).on('scroll.autoflip-dropdown', handlePositionChange);
                 $dropdown.on('content:changed.autoflip-dropdown', handlePositionChange);
                 $(window).on('resize.autoflip-dropdown', handlePositionChange);
                 handlePositionChange();

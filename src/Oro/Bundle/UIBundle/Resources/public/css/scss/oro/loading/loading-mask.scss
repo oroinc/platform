@@ -1,17 +1,5 @@
 /* @theme admin.oro; */
 
-@-webkit-keyframes spin-loading {
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
-}
-
-@keyframes spin-loading {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 .view-loading {
     height: $loading-view-height;
 }
@@ -31,15 +19,10 @@
     background-color: rgba($loading-mask-background-color, .5);
 
     .loader-frame {
+        @extend %loader;
+
         width: $loading-mask-icon-size;
         height: $loading-mask-icon-size;
-
-        border: $loading-mask-icon-size-width solid $loading-mask-icon-color;
-        border-bottom-color: transparent;
-        border-left-color: transparent;
-
-        border-radius: 50%;
-        animation: spin-loading .85s linear infinite;
     }
 
     .loader-content {

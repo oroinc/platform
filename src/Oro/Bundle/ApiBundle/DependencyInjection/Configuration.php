@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_api');
 
         $node = $rootNode->children();
-        $this->appendConfigOptions($node);
+        $this->appendOptions($node);
         $this->appendConfigFilesNode($node);
         $this->appendApiDocViewsNode($node);
         $this->appendConfigExtensionsNode($node);
@@ -37,9 +37,19 @@ class Configuration implements ConfigurationInterface
     /**
      * @param NodeBuilder $node
      */
-    private function appendConfigOptions(NodeBuilder $node)
+    private function appendOptions(NodeBuilder $node)
     {
         $node
+            ->scalarNode('rest_api_prefix')
+                ->info('The prefix of REST API URLs.')
+                ->cannotBeEmpty()
+                ->defaultValue('/api/')
+            ->end()
+            ->scalarNode('rest_api_pattern')
+                ->info('The regular expression pattern to which REST API URLs are matched.')
+                ->cannotBeEmpty()
+                ->defaultValue('^/api/(?!(rest|doc)($|/.*))')
+            ->end()
             ->integerNode('config_max_nesting_level')
                 ->info(
                     'The maximum number of nesting target entities'

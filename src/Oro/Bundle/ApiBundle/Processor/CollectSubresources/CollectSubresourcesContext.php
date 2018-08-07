@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 
 /**
+ * The execution context for processors for "collect_subresources" action.
  * @method ApiResourceSubresourcesCollection|ApiResourceSubresources[] getResult()
  */
 class CollectSubresourcesContext extends ApiContext

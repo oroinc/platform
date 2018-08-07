@@ -54,7 +54,7 @@ class ScopeManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityFieldProvider->expects($this->once())
             ->method('getRelations')
-            ->with(Scope::class)
+            ->with(Scope::class, false, true, false)
             ->willReturn([['name' => 'relation']]);
         $expectedCriteria = new ScopeCriteria(['relation' => null], [['name' => 'relation']]);
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();

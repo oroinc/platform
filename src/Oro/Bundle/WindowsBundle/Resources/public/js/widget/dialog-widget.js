@@ -312,7 +312,8 @@ define(function(require) {
 
         getActionsElement: function() {
             if (!this.actionsEl) {
-                this.actionsEl = $('<div class="pull-right"/>').appendTo(
+                var className = _.isRTL() ? 'pull-left' : 'pull-right';
+                this.actionsEl = $('<div />', {'class': className}).appendTo(
                     $('<div class="form-actions widget-actions"/>').appendTo(
                         this.widget.dialog('actionsContainer')
                     )

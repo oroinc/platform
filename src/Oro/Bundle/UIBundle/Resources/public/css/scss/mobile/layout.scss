@@ -120,6 +120,19 @@
     }
 }
 
+.box-type1 {
+    margin: 0 $content-padding $content-padding;
+    border-radius: 3px;
+
+    .title {
+        padding: $content-padding $content-padding $content-padding 0;
+    }
+
+    .calendar-container {
+        padding: 0;
+    }
+}
+
 .dashboard-container {
     .responsive-cell {
         .box-type1 {

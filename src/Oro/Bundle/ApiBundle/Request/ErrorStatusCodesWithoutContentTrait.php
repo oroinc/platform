@@ -12,7 +12,7 @@ trait ErrorStatusCodesWithoutContentTrait
 {
     /**
      * Indicates whether HTTP response with the given status code should not have a content.
-     * It is suppossed that this method will be used only for status codes greater or equal to 400 (Bad Request).
+     * It is supposed that this method will be used only for status codes greater or equal to 400 (Bad Request).
      *
      * @param int $statusCode
      *

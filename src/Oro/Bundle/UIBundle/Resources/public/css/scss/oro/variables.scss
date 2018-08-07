@@ -1,19 +1,19 @@
 /* @theme: admin.oro; */
 
-@import "../colors";
 @import "variables/alert-variables";
 @import "variables/button-variables";
+@import "variables/checkbox-variables";
 @import "variables/content-sidebar-variables";
 @import "variables/dialog-variables";
 @import "variables/dropdown-variables";
 @import "variables/error-page";
 @import "variables/form-description";
-@import "variables/header";
+@import "variables/form-variables";
 @import "variables/highlight-text-variables";
-@import "variables/jstree-wrapper-variables";
 @import "variables/jstree-variables";
+@import "variables/jstree-wrapper-variables";
 @import "variables/loading-bar";
-@import "variables/loading-mask-variables";
+@import "variables/loading-mask";
 @import "variables/main-menu";
 @import "variables/modal-variables";
 @import "variables/nav-variables";
@@ -21,5 +21,4 @@
 @import "variables/popover-variables";
 @import "variables/scrollspy-variables";
 @import "variables/select2-variables";
-@import "variables/checkbox-variables";
-@import "variables/form-variables";
+@import "variables/widget-picker";

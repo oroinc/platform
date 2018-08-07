@@ -139,7 +139,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'users' => 'username,firstName,middleName,lastName,email,enabled,owner'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'          => 'users',
@@ -162,11 +162,11 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
-        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($expectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
         self::assertFalse(isset($data['data']['included']));
     }
 
@@ -178,7 +178,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'users' => 'phone, title, username,email,middleName.lastName,enabled'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'       => 'users',
@@ -193,10 +193,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
         self::assertFalse(isset($data['data'][0]['relationships']));
         self::assertFalse(isset($data['data']['included']));
     }
@@ -210,7 +210,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'users' => 'username,owner'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'          => 'users',
@@ -228,11 +228,11 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
-        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($expectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
         self::assertFalse(isset($data['data']['included']));
     }
 
@@ -242,7 +242,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             'page'    => ['size' => 1],
             'include' => 'owner,organization'
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -264,12 +264,12 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
         self::assertTrue(count($data['data'][0]['attributes']) > 0);
         self::assertTrue(count($data['data'][0]['relationships']) > 0);
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
         self::assertTrue(count($data['included'][0]['attributes']) > 0);
         self::assertTrue(count($data['included'][0]['relationships']) > 0);
         self::assertTrue(count($data['included'][1]['attributes']) > 0);
@@ -287,7 +287,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'organizations' => 'enabled'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -331,16 +331,16 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
-        self::assertCount(count($extectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($expectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
 
         $firstIncludedIndex = -1;
         $secondIncludedIndex = -1;
-        foreach ($extectedResponse['included'] as $index => $item) {
+        foreach ($expectedResponse['included'] as $index => $item) {
             if ('businessunits' === $item['type']) {
                 $firstIncludedIndex = $index;
             }
@@ -350,15 +350,15 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         }
 
         self::assertCount(
-            count($extectedResponse['included'][0]['attributes']),
+            count($expectedResponse['included'][0]['attributes']),
             $data['included'][$firstIncludedIndex]['attributes']
         );
         self::assertCount(
-            count($extectedResponse['included'][0]['relationships']),
+            count($expectedResponse['included'][0]['relationships']),
             $data['included'][$firstIncludedIndex]['relationships']
         );
         self::assertCount(
-            count($extectedResponse['included'][0]['attributes']),
+            count($expectedResponse['included'][0]['attributes']),
             $data['included'][$secondIncludedIndex]['attributes']
         );
         self::assertFalse(
@@ -375,7 +375,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'users' => 'username'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'       => 'users',
@@ -388,10 +388,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
+        self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
         self::assertFalse(isset($data['data'][0]['relationships']));
         self::assertFalse(isset($data['data']['included']));
     }
@@ -402,7 +402,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             'page'    => ['size' => 1],
             'include' => 'owner.organization'
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -429,10 +429,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 
     public function testIncludeFilterForSecondLevelRelatedEntityWhenIncludeFieldsExistInFieldsFilter()
@@ -445,7 +445,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'organization'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -472,10 +472,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 
     public function testIncludeFilterForSecondLevelRelatedEntityWhenIncludeFieldsDoNotExistInFieldsFilter()
@@ -488,7 +488,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'name'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'       => 'users',
@@ -501,7 +501,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
         self::assertFalse(isset($data['included']));
@@ -517,7 +517,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'name'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -535,10 +535,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 
     public function testIncludeFilterForFirstAndSecondLevelRelatedEntity()
@@ -547,7 +547,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
             'page'    => ['size' => 1],
             'include' => 'owner,owner.organization'
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -574,10 +574,10 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 
     public function testIncludeFilterForFirstAndSecondLevelRelatedEntityWhenIncludeFieldsExistInFieldsFilter()
@@ -590,7 +590,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'organization'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -617,13 +617,13 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 
-    public function testIncludeFilterFoFirstAndrSecondLevelRelatedEntityWhenIncludeFieldsDoNotExistInFieldsFilter()
+    public function testIncludeFilterFoFirstAndSecondLevelRelatedEntityWhenIncludeFieldsDoNotExistInFieldsFilter()
     {
         $params = [
             'page'    => ['size' => 1],
@@ -633,7 +633,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'name'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data' => [
                 [
                     'type'       => 'users',
@@ -646,7 +646,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
         self::assertFalse(isset($data['included']));
@@ -662,7 +662,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
                 'businessunits' => 'name'
             ]
         ];
-        $extectedResponse = [
+        $expectedResponse = [
             'data'     => [
                 [
                     'type'          => 'users',
@@ -680,9 +680,9 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         ];
 
         $response = $this->cget(['entity' => 'users'], $params);
-        $this->assertResponseContains($extectedResponse, $response);
+        $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertCount(count($extectedResponse['included']), $data['included']);
+        self::assertCount(count($expectedResponse['included']), $data['included']);
     }
 }

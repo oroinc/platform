@@ -1,59 +1,60 @@
 /* @theme: admin.oro; */
 
-@import "./variables";
-@import "./app-page";
-@import "./application-menu";
-@import "./drag-and-drop-support";
-@import "./create-select-entity";
-@import "./entity";
-@import "./ui-sortable";
-@import "./more-bar-holder";
-@import "./form/form";
-@import "./loading/loading-mask";
-@import "./loading/loading-dots";
-@import "./loading/loading-bar";
-@import "./dropdown/dropdown-mask";
-@import "./zoomable-area";
-@import "./select2";
-@import "./button";
-@import "./datepicker";
-@import "./simplecolorpicker";
-@import "./dropdown/dropdown";
-@import "./dialog";
-@import "./modal";
+@import "variables";
+@import "extends";
 
-@import "./breadcrumb";
-@import "./app-header";
+@import "app-page";
+@import "application-menu";
+@import "drag-and-drop-support";
+@import "create-select-entity";
+@import "entity";
+@import "ui-sortable";
+@import "more-bar-holder";
+@import "form/form";
+@import "loading/loading-mask";
+@import "loading/loading-dots";
+@import "loading/loading-bar";
+@import "dropdown/dropdown-mask";
+@import "zoomable-area";
+@import "select2";
+@import "button";
+@import "datepicker";
+@import "simplecolorpicker";
+@import "dropdown/dropdown";
+@import "dialog";
+@import "modal";
 
-@import "./form/form-description";
-@import "./form/form-signin";
-@import "./form/forms";
+@import "breadcrumb";
+@import "app-header";
 
-@import "./datagrid";
-@import "./footer";
-@import "./fs-toolbar";
-@import "./flash-messages";
-@import "./alert";
-@import "./inline-actions";
-@import "./dropdown/dropdown-menu-collection";
-@import "./error-page";
-@import "./nav";
+@import "form/form-description";
+@import "form/form-signin";
+@import "form/forms";
 
-@import "./tab/tab";
-@import "./tab/nav-tabs-content";
-@import "./tab/oro-tabs";
-@import "./tab/tab-collection";
+@import "datagrid";
+@import "footer";
+@import "fs-toolbar";
+@import "flash-messages";
+@import "alert";
+@import "inline-actions";
+@import "dropdown/dropdown-menu-collection";
+@import "error-page";
+@import "nav";
 
-@import "./checkbox";
+@import "tab/tab";
+@import "tab/nav-tabs-content";
+@import "tab/oro-tabs";
+@import "tab/tab-collection";
 
-@import "./jstree/jstree-actions";
-@import "./jstree/jstree-wrapper";
-@import "./jstree/jstree";
+@import "checkbox";
 
-@import "./content-sidebar";
-@import "./highlight-text";
-@import "./scrollspy";
+@import "jstree/jstree-actions";
+@import "jstree/jstree-wrapper";
+@import "jstree/jstree";
+
+@import "content-sidebar";
+@import "highlight-text";
+@import "scrollspy";
 
 @import "popover";
 @import "widget-picker";
-

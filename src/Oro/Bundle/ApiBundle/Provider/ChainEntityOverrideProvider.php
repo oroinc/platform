@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 /**
- * Delegates the returning of entity substitutution to child providers.
+ * Delegates the returning of entity substitution to child providers.
  */
 class ChainEntityOverrideProvider implements EntityOverrideProviderInterface
 {

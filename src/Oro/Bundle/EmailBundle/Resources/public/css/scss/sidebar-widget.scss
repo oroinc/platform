@@ -1,5 +1,10 @@
 /* @theme: admin.oro; */
 
+.widget-picker__icon.mail-icon {
+      @include fa-icon($email-inactive-mail-icon);
+      font-style: normal;
+}
+
 .sidebar-widget-icon.mail-icon {
     @include fa-icon($email-inactive-mail-icon);
 
