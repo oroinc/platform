@@ -68,7 +68,7 @@ class FieldDirectionTest extends RestJsonApiTestCase
         );
     }
 
-    public function testOutputOnlyFieldhouldBeInResponseData()
+    public function testOutputOnlyFieldShouldBeInResponseData()
     {
         $this->appendEntityConfig(
             TestResourceWithoutIdentifier::class,
@@ -104,7 +104,7 @@ class FieldDirectionTest extends RestJsonApiTestCase
         );
     }
 
-    public function testOutputOnlyFieldShoulNotBeAcceptedInRequestData()
+    public function testOutputOnlyFieldShouldNotBeAcceptedInRequestData()
     {
         $this->appendEntityConfig(
             TestResourceWithoutIdentifier::class,

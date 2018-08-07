@@ -347,7 +347,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                         'subresource1' => [
                             'target_class' => $targetEntityClass,
                             'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['descriprion' => 'test']]
+                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
                         ]
                     ]
                 ]
@@ -557,7 +557,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                         'subresource1' => [
                             'target_class' => $targetEntityClass,
                             'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['desctiption' => 'test']]
+                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
                         ]
                     ]
                 ]
@@ -620,7 +620,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
                         'subresource1' => [
                             'target_class' => $targetEntityClass,
                             'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['desctiption' => 'test']]
+                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
                         ]
                     ]
                 ]

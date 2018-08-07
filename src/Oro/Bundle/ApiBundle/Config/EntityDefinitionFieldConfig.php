@@ -222,7 +222,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Indicates whetner the request data can contain this field.
+     * Indicates whether the request data can contain this field.
      *
      * @return bool
      */
@@ -240,7 +240,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Indicates whetner the response data can contain this field.
+     * Indicates whether the response data can contain this field.
      *
      * @return bool
      */

@@ -7,6 +7,7 @@ oro_behat_extension:
         mapping:
           Username: '_username'
           Password: '_password'
+          Remember me on this computer: '_remember_me'
 
     User Form:
       selector: 'form[name="oro_user_user_form"]'

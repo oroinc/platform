@@ -163,7 +163,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->contains($entityClass, $entityId));
     }
 
-    public function testShouldBeIteratable()
+    public function testShouldBeIterable()
     {
         $entity = new \stdClass();
         $entityClass = 'Test\Class';

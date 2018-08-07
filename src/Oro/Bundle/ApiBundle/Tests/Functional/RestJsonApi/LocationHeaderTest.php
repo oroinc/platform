@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class LocationHeaderTest extends RestJsonApiTestCase
 {
-    public function testPostShouldRerurnLocationHeader()
+    public function testPostShouldReturnLocationHeader()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->post(
@@ -27,7 +27,7 @@ class LocationHeaderTest extends RestJsonApiTestCase
         self::assertEquals($locationUrl, $response->headers->get('Location'));
     }
 
-    public function testPostShouldNotRerurnLocationHeaderIfNotSuccess()
+    public function testPostShouldNotReturnLocationHeaderIfNotSuccess()
     {
         $entityType = $this->getEntityType(TestProduct::class);
         $response = $this->post(

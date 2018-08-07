@@ -1793,7 +1793,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'documentation_resource' => ['documentation.md']
         ];
-        $subresourceDocumentation = 'subresurce description';
+        $subresourceDocumentation = 'subresource description';
 
         $this->resourceDocParser->expects(self::once())
             ->method('registerDocumentationResource')

@@ -258,19 +258,19 @@ Consider checking out the list of other classes below as they can provide insigh
 - [FilterValue](../../Filter/FilterValue.php) - represents a filter value.
 - [FilterValueAccessorInterface](../../Filter/FilterValueAccessorInterface.php) - represents a collection of the FilterValue objects.
 - [RestFilterValueAccessor](../../Request/RestFilterValueAccessor.php) - extracts values of filters from REST API HTTP request.
-- [FilterHelper](../../Request/FilterHelper.php) - reusable utility methods that can be used to get filter values.
+- [FilterHelper](../../Filter/FilterHelper.php) - reusable utility methods that can be used to get filter values.
 - [FilterCollection](../../Filter/FilterCollection.php) - a collection of filters.
-- [SimpleFilterFactory](../../Request/SimpleFilterFactory.php) - the default implementation of a factory to create filters.
-- [FilterOperatorRegistry](../../Request/FilterOperatorRegistry.php) - the container for all registered operators for filters.
-- [MetaPropertyFilter](../../Request/MetaPropertyFilter.php) - a filter that is used to request meta properties.
+- [SimpleFilterFactory](../../Filter/SimpleFilterFactory.php) - the default implementation of a factory to create filters.
+- [FilterOperatorRegistry](../../Filter/FilterOperatorRegistry.php) - the container for all registered operators for filters.
+- [MetaPropertyFilter](../../Filter/MetaPropertyFilter.php) - a filter that is used to request meta properties.
 - [AddMetaPropertyFilter](../../Processor/Shared/AddMetaPropertyFilter.php) - a processor that adds "meta" filter that is used to request meta properties.
 - [HandleMetaPropertyFilter](../../Processor/Shared/HandleMetaPropertyFilter.php) - a processor that handles "meta" filter.
 - [AddMetaProperties](../../Processor/Config/GetConfig/AddMetaProperties.php) - a processor that adds configuration of meta properties requested via "meta" filter.
-- [FieldsFilter](../../Request/FieldsFilter.php) - a filter that is used to filter entity fields.
+- [FieldsFilter](../../Filter/FieldsFilter.php) - a filter that is used to filter entity fields.
 - [AddFieldsFilter](../../Processor/Shared/JsonApi/AddFieldsFilter.php) - a processor that adds "fields" filters that are used to filter entity fields.
 - [HandleFieldsFilter](../../Processor/Shared/JsonApi/HandleFieldsFilter.php) - a processor that handles "fields" filters.
-- [FilterFieldsByExtra](../../Processor/Config/Shared/FilterFieldsByExtra.php) - a processor that modifies configuration of entities accorting to "fields" filters.
-- [IncludeFilter](../../Request/IncludeFilter.php) - a filter that is used to request information about related entities.
+- [FilterFieldsByExtra](../../Processor/Config/Shared/FilterFieldsByExtra.php) - a processor that modifies configuration of entities according to "fields" filters.
+- [IncludeFilter](../../Filter/IncludeFilter.php) - a filter that is used to request information about related entities.
 - [AddIncludeFilter](../../Processor/Shared/JsonApi/AddIncludeFilter.php) - a processor that adds "include" filter that is used to request information about related entities.
 - [HandleIncludeFilter](../../Processor/Shared/JsonApi/HandleIncludeFilter.php) - a processor that handles "include" filter.
 - [ExpandRelatedEntities](../../Processor/Config/Shared/ExpandRelatedEntities.php) - a processor that adds configuration of related entities requested via "include" filter.

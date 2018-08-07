@@ -167,7 +167,7 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * Indicates whetner the request data can contain this field.
+     * Indicates whether the request data can contain this field.
      *
      * @return bool
      */
@@ -185,7 +185,7 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * Indicates whetner the response data can contain this field.
+     * Indicates whether the response data can contain this field.
      *
      * @return bool
      */

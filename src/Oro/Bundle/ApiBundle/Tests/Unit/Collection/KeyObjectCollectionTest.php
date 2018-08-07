@@ -187,7 +187,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$key1 => $object1, $key2 => $object2], $this->collection->getAll());
     }
 
-    public function testShouldBeIteratable()
+    public function testShouldBeIterable()
     {
         $object = new \stdClass();
         $key = 'key';
