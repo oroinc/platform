@@ -4,8 +4,10 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -482,5 +484,18 @@ class Translator extends BaseTranslator
     {
         // can't inject strategy provider directly because container creates new instances for each injected service
         return $this->container->get('oro_translation.strategy.provider');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dumpCatalogue($locale, ConfigCacheInterface $cache)
+    {
+        parent::dumpCatalogue($locale, $cache);
+
+        if ($this->isInstalled()) {
+            $dispatcher = $this->container->get('event_dispatcher');
+            $dispatcher->dispatch(AfterCatalogueDump::NAME, new AfterCatalogueDump($this->catalogues[$locale]));
+        }
     }
 }

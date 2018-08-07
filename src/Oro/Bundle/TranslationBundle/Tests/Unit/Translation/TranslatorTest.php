@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageSelector;
@@ -394,6 +397,112 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->getCatalogue('ru');
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
+    }
+
+    public function testDumpCatalogue()
+    {
+        $locale = 'en';
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                AfterCatalogueDump::NAME,
+                new AfterCatalogueDump(
+                    new MessageCatalogue(
+                        $locale,
+                        [
+                            'jsmessages' => [
+                                'foo' => 'foo (EN)',
+                                'bar' => 'bar (EN)',
+                                'baz' => 'baz (EN)',
+                            ],
+                            'messages' => [
+                                'foo' => 'foo messages (EN)',
+                            ],
+                            'validators' => [
+                                'choice' => '{0} choice 0 (EN)|{1} choice 1 (EN)|]1,Inf] choice inf (EN)'
+                            ],
+                        ]
+                    )
+                )
+            );
+
+        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+
+        /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->any())
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['loader', $exceptionFlag, $this->getLoader()],
+                    ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider($locale)],
+                    ['event_dispatcher', $exceptionFlag, $eventDispatcher]
+                ]
+            );
+        $container->expects($this->any())
+            ->method('hasParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container->expects($this->any())
+            ->method('getParameter')
+            ->willReturnMap([['installed', true]]);
+
+        $translator = new Translator(
+            $container,
+            new MessageSelector(),
+            ['loader' => ['loader']],
+            ['resource_files' => []]
+        );
+        $translator->addResource('loader', 'foo', 'en');
+
+        /** @var ConfigCacheInterface $configCache */
+        $configCache = $this->createMock(ConfigCacheInterface::class);
+
+        $translator->dumpCatalogue($locale, $configCache);
+    }
+
+    public function testDumpCatalogueNotInstalled()
+    {
+        $locale = 'en';
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+
+        /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject $container */
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->any())
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['loader', $exceptionFlag, $this->getLoader()],
+                    ['oro_translation.strategy.provider', $exceptionFlag, $this->getStrategyProvider($locale)],
+                ]
+            );
+        $container->expects($this->any())
+            ->method('hasParameter')
+            ->with('installed')
+            ->willReturn(true);
+        $container->expects($this->any())
+            ->method('getParameter')
+            ->willReturnMap([['installed', false]]);
+
+        $translator = new Translator(
+            $container,
+            new MessageSelector(),
+            ['loader' => ['loader']],
+            ['resource_files' => []]
+        );
+        $translator->addResource('loader', 'foo', 'en');
+
+        /** @var ConfigCacheInterface $configCache */
+        $configCache = $this->createMock(ConfigCacheInterface::class);
+
+        $translator->dumpCatalogue($locale, $configCache);
     }
 
     /**

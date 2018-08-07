@@ -7,6 +7,7 @@ use Behat\Gherkin\Node\TableNode;
 
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools;
@@ -328,7 +329,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)"( grid)? should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -1555,14 +1556,23 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
@@ -1577,14 +1587,23 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
