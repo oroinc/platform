@@ -60,7 +60,7 @@ class BlankTest extends \PHPUnit_Framework_TestCase
             'empty_array'         => [
                 'options'        => [new PropertyPath('foo')],
                 'context'        => ['foo' => []],
-                'expectedResult' => true
+                'expectedResult' => false
             ]
         ];
     }
