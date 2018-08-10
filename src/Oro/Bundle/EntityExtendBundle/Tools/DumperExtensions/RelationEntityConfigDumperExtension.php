@@ -285,6 +285,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         if ($fieldConfig->has('cascade')) {
             $relation['cascade'] = $fieldConfig->get('cascade');
         }
+        if ($fieldConfig->has('fetch')) {
+            $relation['fetch'] = $fieldConfig->get('fetch');
+        }
         if ($fieldConfig->has('on_delete')) {
             $relation['on_delete'] = $fieldConfig->get('on_delete');
         }

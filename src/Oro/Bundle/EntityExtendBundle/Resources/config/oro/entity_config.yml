@@ -400,6 +400,12 @@ entity_config:
                     options:
                         auditable:          false
 
+                # the type of fetch mode for the relation.
+                # the set of possible values are: 'lazy', 'extra_lazy' and 'eager'
+                fetch: # string
+                    options:
+                        auditable:          false
+
     enum:
         entity:
             items:
