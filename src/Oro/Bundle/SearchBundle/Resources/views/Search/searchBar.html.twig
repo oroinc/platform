@@ -1,6 +1,8 @@
 {% if is_granted('oro_search') %}
     <div class="dropdown header-dropdown-search">
-        <button class="dropdown-toggle" data-toggle="dropdown" title="{{'Search'|trans}}"><i class="fa-search"></i></button>
+        <button class="dropdown-toggle" data-toggle="dropdown" title="{{'Search'|trans}}">
+            <span class="fa-search" aria-hidden="true"></span>
+        </button>
         <ul class="dropdown-menu dropdown-menu-arrow" data-page-component-view="orosearch/js/app/views/search-suggestion-view">
             {% if isMobileVersion() %}<li class="nav-header nav-header-title">{{'Search'|trans}}</li>{% endif %}
             <li class="nav-content">
