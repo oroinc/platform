@@ -22,7 +22,7 @@ oro_behat_extension:
     Search Submit:
       selector:
          type: xpath
-         locator: '//button[@type="submit"][./span[text()="Search"]]'
+         locator: '//button[@type="submit"][text()="Search"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Theme Form:
