@@ -5,7 +5,9 @@
     {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
             <div class="dropdown header-dropdown-shortcut" data-layout="separate"
                 {{ UI.renderPageComponentAttributes({view: 'oronavigation/js/app/views/shortcuts-view'}) }}>
-                <button class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="fa-share-square"></i></button>
+                <button class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}">
+                    <i class="fa-share-square" aria-hidden="true"></i>
+                </button>
                 <ul class="dropdown-menu dropdown-menu-arrow">
                     <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
                     <li class="nav-content">

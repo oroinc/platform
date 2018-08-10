@@ -28,9 +28,9 @@
                             <div class="no-result-message" data-role="fallback">{{ 'oro.search.quick_search.noresults'|trans }}</div>
                         </div>
                         {% if isMobileVersion() %}
-                        <button type="submit" class="btn btn-icon btn-primary btn-search fa-search" aria-hiddden="true"></button>
+                        <button type="submit" class="btn btn-primary btn-icon fa-search btn-search" aria-label="{{'Search'|trans}}"></button>
                         {% else %}
-                        <button type="submit" class="btn btn-search btn-primary"><span>{{'Search'|trans}}</span></button>
+                        <button type="submit" class="btn btn-primary btn-search">{{'Search'|trans}}</button>
                         {%  endif %}
                     </div>
                 </form>
