@@ -92,7 +92,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         });
 
         mediator.on('page:beforeChange', function() {
-            $('.dot-menu.dropdown.open, .nav .dropdown.open').trigger('tohide.bs.dropdown');
+            $('.dot-menu.dropdown.open, .user-menu .dropdown.open, .app-header__search-and-shortcuts .dropdown.open')
+                .trigger('tohide.bs.dropdown');
             $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
         });
         mediator.on('page:afterChange', function() {

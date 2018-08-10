@@ -32,7 +32,7 @@ define(function(require) {
             'change [name=search]': 'updateCollectionSearchParams',
             'change [name=from]': 'updateCollectionSearchParams',
             'mousedown [data-role=search-suggestion-list] a': 'onSuggestionMouseDown',
-            'click li': 'stopPropagation',
+            'click .nav-content': 'stopPropagation',
             'select2-open.dropdown.data-api': 'stopPropagation'
         },
 

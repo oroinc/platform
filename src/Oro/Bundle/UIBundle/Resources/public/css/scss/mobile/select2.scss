@@ -25,6 +25,10 @@
         }
 
         &.select2-allowclear {
+            .select2-choice .select2-chosen {
+                padding-#{$end}: $mobile-select2-chosen-end-offset + $mobile-select2-search-choice-close-width;
+            }
+
             .select2-arrow {
                 right: $mobile-select2-allowclear-right;
             }
@@ -35,7 +39,12 @@
             width: $mobile-select2-search-choice-close-width;
             top: $mobile-select2-search-choice-close-top;
             right: $mobile-select2-search-choice-close-right;
+
             color: $primary-200;
+            text-align: center;
+            border-#{$start}: $select2-container-border;
+
+            line-height: $mobile-select2-search-choice-close-height;
 
             @include fa-icon($icon: $mobile-select2-search-choice-close-icon-content) {
                 top: $mobile-select2-search-choice-close-icon-top;
@@ -44,6 +53,10 @@
                 transform: $mobile-select2-search-choice-close-icon-transform;
                 font-size: $mobile-select2-search-choice-close-icon-size;
             }
+        }
+
+        &.select2-container-active .select2-search-choice-close {
+            border-#{$start}-color: $select2-container-active-border-color
         }
     }
 

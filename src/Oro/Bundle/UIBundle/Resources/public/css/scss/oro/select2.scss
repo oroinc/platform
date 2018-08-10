@@ -22,11 +22,20 @@
         }
 
         &.select2-container-active {
-            border-color: $secondary;
+            border-color: $select2-container-active-border-color;
 
             .error &,
             .validation-error & {
                 border-color: $input-error-border-color;
+            }
+        }
+
+        &.select2-allowclear {
+            .select2-search-choice-close {
+                display: $select2-search-choice-close-allow-display;
+            }
+            .select2-chosen {
+                padding-#{$end}: $select2-chosen-end-offset + $select2-search-choice-close-right;
             }
         }
 
@@ -222,12 +231,6 @@
             &:before {
                 font-size: $select2-search-multi-choice-close-icon-font-size;
             }
-        }
-    }
-
-    &.select2-allowclear {
-        .select2-search-choice-close {
-            display: $select2-search-choice-close-allow-display;
         }
     }
 

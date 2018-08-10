@@ -3,7 +3,7 @@
 .input {
     border-radius: $input-field-border-radius;
     background-color: $input-background-color;
-    border: $input-border;
+    border: $input-border-width solid $input-border-color;
     font-family: $input-font-family;
     padding: $input-inner-offset;
     box-shadow: $input-box-shadow;
@@ -54,7 +54,7 @@
 .uploader {
     border-radius: $uploader-border-radius;
     background-color: $uploader-background-color;
-    border: $uploader-border;
+    border: $input-border-width solid $input-border-color;
     height: $uploader-height;
     line-height: $uploader-line-height;
     float: $uploader-float;
@@ -77,7 +77,7 @@
     }
 
     .action {
-        border-left: $uploader-action-border-left;
+        border-left: $input-border-width solid $input-border-color;
     }
 
     &.focus,

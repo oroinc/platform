@@ -19,6 +19,8 @@ $select2-container-horizontal-max-width: 294px !default;
 $select2-container-input-append-width: 264px !default;
 $select2-container-input-append-max-width: 264px !default;
 
+$select2-container-active-border-color: $secondary !default;
+
 $select2-choice-display: block !default;
 $select2-choice-height: 28px !default;
 $select2-choice-padding: 0 !default;
@@ -33,7 +35,8 @@ $select2-choice-touch-callout: none !default;
 $select2-choice-user-select: none !default;
 $select2-choice-cursor: default !default;
 
-$select2-chosen-inner-offset: 8px 45px 7px 8px !default;
+$select2-chosen-end-offset: 26px !default;
+$select2-chosen-inner-offset: 8px $select2-chosen-end-offset 7px 8px !default;
 $select2-chosen-height: 28px !default;
 
 $select2-chosen-icon-height: 16px !default;
@@ -110,7 +113,7 @@ $select2-search-choice-close-display: none !default;
 $select2-search-choice-close-position: absolute !default;
 $select2-search-choice-close-right: 24px !default;
 $select2-search-choice-close-top: 6px !default;
-$select2-search-choice-close-font-size: 1px !default;
+$select2-search-choice-close-font-size: $base-font-size--m !default;
 $select2-search-choice-close-text-decoration: none !default;
 $select2-search-choice-close-border: 0 !default;
 $select2-search-choice-close-cursor: pointer !default;
