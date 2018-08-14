@@ -95,6 +95,8 @@ class EmailTemplateController extends RestController
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
+        $emailTemplateRepository->setAclHelper($this->get('oro_security.acl_helper'));
+
         $templates = $emailTemplateRepository
             ->getTemplateByEntityName(
                 $entityName,

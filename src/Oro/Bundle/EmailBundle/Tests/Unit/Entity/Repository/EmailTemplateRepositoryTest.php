@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EmailTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -55,13 +58,13 @@ class EmailTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
         $qb->expects($this->once())
             ->method('orWhere')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(1))
+        $qb->expects($this->exactly(2))
             ->method('andWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('orderBy')
             ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))
+        $qb->expects($this->exactly(3))
             ->method('setParameter')
             ->will($this->returnSelf());
 
@@ -69,12 +72,30 @@ class EmailTemplateRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $this->repository->getEntityTemplatesQueryBuilder(
+        $query = $this
+            ->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $query
+            ->expects($this->once())
+            ->method('getResult');
+        $aclHelper = $this
+            ->getMockBuilder(AclHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclHelper
+            ->expects($this->once())
+            ->method('apply')
+            ->with($qb)
+            ->willReturn($query);
+
+        $this->repository->setAclHelper($aclHelper);
+
+        $this->repository->getTemplateByEntityName(
             'Oro\Bundle\UserBundle\Entity\User',
             new Organization(),
             true,
-            true,
-            false
+            true
         );
     }
 

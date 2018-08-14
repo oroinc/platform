@@ -52,7 +52,11 @@
                         {{ form_row(form.cc) }}
                         {{ form_row(form.bcc) }}
                         {{ form_row(form.subject) }}
-                        {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
+
+                        {% if form.template is defined %}
+                            {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': true}) }}
+                        {% endif %}
+
                         {{ form_row(form.type) }}
                         {{ form_row(form.body) }}
 

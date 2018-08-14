@@ -6,9 +6,26 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Repository for EmailTemplate
+ */
 class EmailTemplateRepository extends EntityRepository
 {
+    /**
+     * @var AclHelper;
+     */
+    private $aclHelper;
+
+    /**
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
+
     /**
      * Gets a template by its name
      * This method can return null if the requested template does not exist
@@ -37,13 +54,18 @@ class EmailTemplateRepository extends EntityRepository
         $includeNonEntity = false,
         $includeSystemTemplates = true
     ) {
-        return $this->getEntityTemplatesQueryBuilder(
+        $qb = $this->getEntityTemplatesQueryBuilder(
             $entityName,
             $organization,
             $includeNonEntity,
             $includeSystemTemplates
-        )
-            ->getQuery()->getResult();
+        );
+
+        if ($this->aclHelper === null) {
+            return $qb->getQuery()->getResult();
+        }
+
+        return $this->aclHelper->apply($qb)->getResult();
     }
 
     /**
