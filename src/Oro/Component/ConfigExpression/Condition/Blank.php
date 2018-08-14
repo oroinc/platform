@@ -73,6 +73,6 @@ class Blank extends AbstractCondition implements ContextAccessorAwareInterface
     {
         $value = $this->resolveValue($context, $this->value, false);
 
-        return '' === $value || null === $value || [] === $value;
+        return '' === $value || null === $value;
     }
 }
