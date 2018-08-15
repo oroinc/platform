@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Form\Extension;
 
 use Oro\Bundle\EmailBundle\Form\Extension\EmailTypeTemplateAccessibilityCheckerExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\FormTypeExtensionInterface;
 
 class EmailTypeTemplateAccessibilityCheckerExtensionTest extends WebTestCase

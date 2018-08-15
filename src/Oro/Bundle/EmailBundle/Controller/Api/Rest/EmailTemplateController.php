@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @RouteResource("emailtemplate")
  * @NamePrefix("oro_api_")
+ *
+ * Controller to work with email templates
  */
 class EmailTemplateController extends RestController
 {

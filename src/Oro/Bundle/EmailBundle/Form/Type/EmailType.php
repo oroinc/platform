@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Form type to represent email
+ */
 class EmailType extends AbstractType
 {
     /** @var AuthorizationCheckerInterface */
