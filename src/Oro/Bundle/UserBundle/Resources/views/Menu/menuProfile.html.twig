@@ -1,7 +1,7 @@
 {% if app.user %}
     <li class="dropdown user-menu-dropdown" id="user-menu">
         {% set togglerId = 'dropdown-'|uniqid %}
-        <a href="#" role="button" id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
+        <button id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
             aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false">
             {% if isMobileVersion() %}
                 <span class="fa-user-circle" aria-hidden="true"></span>
@@ -12,7 +12,7 @@
                 {%  endif %}
                 <span class="fa-caret-down" aria-hidden="true"></span>
             {% endif %}
-        </a>
+        </button>
         {{ oro_menu_render('usermenu', {togglerId: togglerId}) }}
     </li>
 {% else %}

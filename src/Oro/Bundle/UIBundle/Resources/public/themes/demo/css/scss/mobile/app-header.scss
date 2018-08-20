@@ -20,7 +20,7 @@
 
     .nav.top-search.shortcuts {
         .dropdown{
-            > a {
+            > .dropdown-toggle {
                 color: $app-header-text-color;
             }
         }
@@ -28,7 +28,7 @@
 
     .nav.user-menu {
         .dropdown {
-            > a {
+            > .dropdown-toggle {
                 color: $app-header-text-color;
             }
         }

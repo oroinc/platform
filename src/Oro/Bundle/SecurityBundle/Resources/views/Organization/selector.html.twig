@@ -11,7 +11,7 @@
 
 {% if isDesktopVersion() %}
     {% if organizations|length > 1 %}
-        <div class="nav logo-wrapper dropdown header-utility-dropdown">
+        <div class="nav logo-wrapper dropdown">
             {{ UI.app_logo(organization_name) }}
             {{ _self.organization_name_and_logo(organization_name) }}
             {% set togglerId = 'dropdown-'|uniqid %}

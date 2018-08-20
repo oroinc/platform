@@ -38,7 +38,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             }
         });
         $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function(e) {
-            var $focusTarget = $(e.target).parent().find('input[type=text]').first();
+            var $focusTarget = $(e.target).parent().find('input[type=text]')
+                .not('.select2-focusser, .select2-input').first();
             if (!$focusTarget.is(e.target)) {
                 $focusTarget.focus();
             }
@@ -91,7 +92,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         });
 
         mediator.on('page:beforeChange', function() {
-            $('.dot-menu.dropdown.open, .nav .dropdown.open').trigger('tohide.bs.dropdown');
+            $('.dot-menu.dropdown.open, .user-menu .dropdown.open, .app-header__search-and-shortcuts .dropdown.open')
+                .trigger('tohide.bs.dropdown');
             $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
         });
         mediator.on('page:afterChange', function() {

@@ -161,15 +161,11 @@ JS;
                 return false;
             }
             
-            if (typeof(jQuery) == "undefined" || jQuery == null) {		
-                return false;		
-            }
-            
-            if (jQuery(document.body).hasClass('loading')) {
+            if (document.body.classList.contains('loading')) {
                 return false;
             }
 
-            if (0 !== jQuery("div.loader-mask.shown").length) {
+            if (document.querySelector('.loader-mask.shown') !== null) {
                 return false;
             }
             
@@ -195,31 +191,23 @@ JS;
     {
         $jsAppActiveCheck = <<<JS
         (function () {
-            if (document["readyState"] !== "complete") {
+            if (document['readyState'] !== 'complete') {
                 return false;
             }
             
-            if (document.title === "Loading...") {
+            if (document.title === 'Loading...') {
                 return false;
             }
         
-            if (typeof(jQuery) == "undefined" || jQuery == null) {
+            if (jQuery == null || jQuery.active) {
                 return false;
             }
             
-            if (jQuery.active) {
-                return false;
-            }
-            
-            if (jQuery(document.body).hasClass('loading')) {
+            if (document.body.classList.contains('loading')) {
                 return false;
             }
 
-            if (0 !== jQuery("div.loader-mask.shown").length) {
-                return false;
-            }
-            
-            if (0 !== jQuery("div.lazy-loading").length) {
+            if (document.querySelector('.loader-mask.shown, .lazy-loading') !== null) {
                 return false;
             }
             
@@ -229,7 +217,7 @@ JS;
                 }
                 
                 var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
-                if (typeof(isInAction) !== "boolean") {
+                if (typeof(isInAction) !== 'boolean') {
                     return false;
                 }
                 

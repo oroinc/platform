@@ -1,23 +1,18 @@
 {% if is_granted('oro_search') %}
-{% set searchTogglerId = 'dropdown-'|uniqid %}
-<div class="dropdown header-dropdown-search header-utility-dropdown">
-    <a id="{{ searchTogglerId }}" href="#" role="button" class="dropdown-toggle oro-dropdown-toggle"
-       title="{{ 'Search'|trans }}" aria-haspopup="true" aria-expanded="false"><span class="fa-search" aria-hidden="true"></span></a>
-    <ul class="dropdown-menu" aria-labelledby="{{ searchTogglerId }}">
-        <li class="nav-header nav-header-title">{% trans %}Search{% endtrans %}</li>
-        <li class="dark">
-            <form method="get" action="{{ path('oro_search_results') }}" style="margin: 0" id="top-search-form" class="search-form">
-                <div id="search-div" class="input-append input-prepend pull-left header-search">
-                    <div class="btn-group btn-block">
-                        <button data-toggle="dropdown" class="btn dropdown-toggle" id="search-bar-button"
-                                aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.search.result.entity_filter'|trans }}">
-                            <span class="search-bar-type">{{ 'All'|trans }}</span>
-                            <span class="fa-caret-down" aria-hidden="true"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="search-bar-dropdown" role="menu" aria-labelledby="search-bar-button">
-                            <li data-alias="">
-                                <a href="javascript: void(0);">{% trans %}All{% endtrans %}</a>
-                            </li>
+    {% set searchTogglerId = 'dropdown-'|uniqid %}
+    <div class="dropdown header-dropdown-search">
+        <button id="{{ searchTogglerId }}" class="dropdown-toggle" data-toggle="dropdown" title="{{'Search'|trans}}"
+                aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Search'|trans }}">
+            <span class="fa-search" aria-hidden="true"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-arrow" aria-labelledby="{{ searchTogglerId }}"
+            data-page-component-view="orosearch/js/app/views/search-suggestion-view">
+            {% if isMobileVersion() %}<li class="nav-header nav-header-title">{{'Search'|trans}}</li>{% endif %}
+            <li class="nav-content">
+                <form method="get" action="{{ path('oro_search_results') }}" class="search-form">
+                    <div class="header-search">
+                        <select data-page-component-module="oro/select2-component" name="from">
+                            <option value="">{{ 'All'|trans }}</option>
                             {% set searchEntities = [] %}
                             {% for className, alias in entities %}
                                 {% set entityType = oro_entity_config_value(className, 'label')|trans %}
@@ -25,25 +20,26 @@
                             {% endfor %}
 
                             {% for alias,name in searchEntities|sort %}
-                                <li data-alias="{{ alias }}">
-                                    <a href="javascript: void(0);">{{ name }}</a>
-                                </li>
+                                <option value="{{ alias }}" data-alias="{{ alias }}">{{ name }}</option>
                             {% endfor %}
-                        </ul>
+                        </select>
+                        <div class="search-field-container">
+                            <input type="text" class="span2 search" placeholder="" name="search" value="" autocomplete="off"/>
+                            <ul class="search-suggestion-list" data-role="search-suggestion-list">
+                                <li class="loading" data-role="loading">
+                                    <div class="loader-mask"><div class="loader-frame"></div></div>
+                                </li>
+                            </ul>
+                            <div class="no-result-message" data-role="fallback">{{ 'oro.search.quick_search.noresults'|trans }}</div>
+                        </div>
+                        {% if isMobileVersion() %}
+                        <button type="submit" class="btn btn-primary btn-icon fa-search btn-search" aria-label="{{'Search'|trans}}"></button>
+                        {% else %}
+                        <button type="submit" class="btn btn-primary btn-search">{{'Search'|trans}}</button>
+                        {%  endif %}
                     </div>
-                    <div class="header-search-frame">
-                        <input type="hidden" name="from" id="search-bar-from" value=""/>
-                        <input type="text" id="search-bar-search" class="span2 search" placeholder="" name="search" value="" autocomplete="off"/>
-                        <button type="submit" class="btn btn-search">{% trans %}Go{% endtrans %}</button>
-                        <div class="custom-dropdown" id="search-dropdown"></div>
-                        <div class="search-more hide"><a href="javascript:void(0);" class="search-view-more-link">{% trans %}View more...{% endtrans %}</a></div>
-                    </div>
-                </div>
-            </form>
-        </li>
-    </ul>
-</div>
-<script type="text/javascript">
-    require(['orosearch/js/init-search-bar'])
-</script>
+                </form>
+            </li>
+        </ul>
+    </div>
 {% endif %}

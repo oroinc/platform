@@ -13,7 +13,8 @@ define(function(require) {
         autoRender: true,
 
         events: {
-            change: 'onChange'
+            'change': 'onChange',
+            'click .nav-content': 'stopPropagation'
         },
 
         data: {},
@@ -58,7 +59,7 @@ define(function(require) {
         },
 
         getTypeaheadInput: function() {
-            return this.$('.input');
+            return this.$('[data-role="shortcut-search"]');
         },
 
         initTypeahead: function() {
@@ -188,6 +189,10 @@ define(function(require) {
                     $input.parent().find('li.active > a').click();
                 }
             }
+        },
+
+        stopPropagation: function(e) {
+            e.stopPropagation();
         }
     });
 

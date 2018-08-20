@@ -4,7 +4,8 @@ $field-size: 32px !default;
 $field-width: 294px !default;
 
 $input-field-border-radius: 2px !default;
-$input-border: 2px solid $primary-750 !default;
+$input-border-width: 2px !default;
+$input-border-color: $primary-750 !default;
 $input-background-color: $primary-inverse !default;
 $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
@@ -32,7 +33,6 @@ $input-error-color: $danger-dark !default;
 
 $uploader-border-radius: $input-field-border-radius !default;
 $uploader-background-color: $input-background-color !default;
-$uploader-border: $input-border !default;
 $uploader-height: $field-size !default;
 $uploader-line-height: $field-size !default;
 $uploader-float: left !default;
@@ -46,7 +46,6 @@ $uploader-action-display: inline-block !default;
 $uploader-action-vertical-align: top !default;
 $uploader-action-inner-offset: 0 6px !default;
 $uploader-action-box-sizing: $input-box-sizing !default;
-$uploader-action-border-left: $input-border !default;
 
 $uploader-filename-width: 202px !default;
 

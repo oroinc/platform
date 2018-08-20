@@ -43,8 +43,38 @@
     }
 
     .divider {
-        border-bottom-color: #eee;
+        border-bottom-color: $dropdown-menu-divider-color;
         margin: 4px 0;
+    }
+
+    &.dropdown-menu-arrow {
+        &:before {
+            border: 0 none;
+
+            content: '';
+            background: inherit;
+            width: 11px;
+            height: 10px;
+            position: absolute;
+            top: -5px;
+            #{$start}: 9px;
+            transform: rotate(53deg) skewX(15deg);
+            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
+            z-index: -1;
+        }
+
+        &:after {
+            border: 0 none;
+            background: inherit;
+            content: '';
+            position: absolute;
+            top: 0;
+            #{$start}: 0;
+            #{$end}: 0;
+            bottom: 0;
+            border-radius: inherit;
+            z-index: -1;
+        }
     }
 }
 

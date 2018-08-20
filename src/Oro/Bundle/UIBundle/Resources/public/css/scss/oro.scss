@@ -86,6 +86,7 @@ footer {
 .nav-header {
     color: $body-color;
     font-size: 12px;
+    text-transform: none;
 }
 
 .nav-header-title {
@@ -212,8 +213,6 @@ footer {
 .list-group > .list-group-item:first-child {
     border: 0;
 }
-
-
 
 .badge-enabled,
 .badge-tentatively,
