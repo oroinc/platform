@@ -1,15 +1,35 @@
 {% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
+    {% set system = 'oro-email-template-variables-system' %}
+    {% set systemTab = system ~ '-tab' %}
+    {% set entity = 'oro-email-template-variables-entity'%}
+    {% set entityTab = entity ~ '-tab' %}
     <script type="text/template" id="oro-email-template-variables-template">
         <div class="emailtemplate-variables oro-tabs tabbable">
             <div class="oro-tabs__head">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item active" id="oro-email-template-variables-system-tab">
-                        <a href="javascript:void(0);" class="nav-link" data-target="#oro-email-template-variables-system" data-toggle="tab">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" >
+                        <a id="{{ systemTab }}"
+                           href="#{{system }}"
+                           class="nav-link active"
+                           data-target="#{{system }}"
+                           data-toggle="tab"
+                           role="tab"
+                           aria-controls="{{system }}"
+                           aria-selected="true"
+                        >
                             {{ 'oro.email.emailtemplate.variables.system' | trans }}
                         </a>
                     </li>
-                    <li id="oro-email-template-variables-entity-tab" class="nav-item">
-                        <a href="javascript:void(0);" class="nav-link" data-target="#oro-email-template-variables-entity" data-toggle="tab">
+                    <li class="nav-item">
+                        <a id="{{ entityTab }}"
+                           href="#{{ entity }}"
+                           class="nav-link"
+                           data-target="#{{ entity }}"
+                           data-toggle="tab"
+                           role="tab"
+                           aria-controls="{{ entity }}"
+                           aria-selected="false"
+                        >
                             {{ 'oro.email.emailtemplate.variables.entity' | trans }}
                         </a>
                     </li>
@@ -17,10 +37,18 @@
             </div>
             <div class="oro-tabs__content">
                 <div class="tab-content">
-                    <div class="variables tab-pane active" id="oro-email-template-variables-system">
+                    <div id="{{system }}"
+                         class="variables tab-pane active"
+                         role="tabpanel"
+                         aria-labelledby="{{ systemTab }}"
+                    >
                         <%= variables.system %>
                     </div>
-                    <div class="variables tab-pane" id="oro-email-template-variables-entity">
+                    <div id="{{ entity }}"
+                         class="variables tab-pane"
+                         role="tabpanel"
+                         aria-labelledby="{{ entityTab }}"
+                    >
                     </div>
                 </div>
             </div>

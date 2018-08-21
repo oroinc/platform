@@ -3,6 +3,7 @@ define(function(require) {
 
     var TabItemView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     var module = require('module');
     var config = module.config();
@@ -17,7 +18,17 @@ define(function(require) {
 
         className: config.className,
 
-        template: _.template('<a href="#" class="' + config.templateClassName + '" data-tab-link><%- label %></a>'),
+        template: _.template('<a  href="#"\n' +
+            'id="<%- uniqueId %>" ' +
+            'class="'+ config.templateClassName +'<% if(obj.active) { %> active<% } %>"' +
+            'role="tab" ' +
+            'data-tab-link ' +
+            'data-toggle="tab" ' +
+            'aria-controls="<% if(obj.controlTabPanel) { %><%- controlTabPanel %><% } else { %><%- id %><% } %>" ' +
+            'aria-selected="<% if(obj.active) { %>true<% } else { %>false<% } %>"' +
+            '>' +
+            '    <%- label %>' +
+            '</a>'),
 
         listen: {
             'change:active model': 'updateStates',
@@ -42,8 +53,13 @@ define(function(require) {
         },
 
         updateStates: function() {
-            this.$el.toggleClass('active', !!this.model.get('active'));
             this.$el.toggleClass('changed', !!this.model.get('changed'));
+
+            if (this.model.get('active')) {
+                var tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
+
+                $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
+            }
         },
 
         onSelect: function() {

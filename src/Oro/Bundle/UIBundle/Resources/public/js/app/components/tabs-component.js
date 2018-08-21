@@ -111,7 +111,7 @@ define(function(require) {
 
                 $tab.on('shown.bs.tab', function(e) {
                     // fix bug, 'active' class doesn't removed from dropdown tabs
-                    $(e.relatedTarget).closest('li').removeClass('active');
+                    $(e.relatedTarget).removeClass('active');
                     self.dropdownUpdateLabel();
                 });
             });

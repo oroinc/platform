@@ -561,6 +561,15 @@
             {%- if parameters.dataRedirect is defined -%}
                 data-redirect="{{ parameters.dataRedirect }}"
             {%- endif -%}
+            {%- if parameters.role is defined -%}
+                role="{{ parameters.role }}"
+            {%- endif -%}
+            {%- if parameters.ariaSelected is defined -%}
+                aria-selected="{{ parameters.ariaSelected }}"
+            {%- endif -%}
+            {%- if parameters.ariaControls is defined -%}
+                aria-controls="{{ parameters.ariaControls }}"
+            {%- endif -%}
             {%- if (parameters.visible is defined and not parameters.visible) -%}
                 style="display: none"
             {%- endif -%}
@@ -581,7 +590,7 @@
             {%- endif -%}>
             {%- set labelInIcon = parameters.labelInIcon|default(true) -%}
             {%- if (parameters.iCss is defined) -%}
-                <i class="{{ parameters.iCss }}{% if labelInIcon %} hide-text{% endif %}">{{ (parameters.label is defined and labelInIcon) ? parameters.label : '' }}</i>
+                <span class="{{ parameters.iCss }}{% if labelInIcon %} hide-text{% endif %}" aria-hidden="true">{{ (parameters.label is defined and labelInIcon) ? parameters.label : '' }}</span>
             {%- endif %}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>

@@ -17,9 +17,9 @@
 %}
 
 <div class="widget-content import-widget-content" {{ UI.renderPageComponentAttributes(ImportValidateViewOptions) }}>
+    {% set tabId = 'import-tablist-'|uniqid %}
     {% if configsWithForm|length > 1 %}
-
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs" role="tablist">
             {% for configWithForm in configsWithForm %}
                 {% set config = configWithForm.configuration %}
                 {% set shortEntityName = config.entityClass|basename %}
@@ -32,12 +32,18 @@
 
                 {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
-                <li class="nav-item{% if isActiveEntity %} active{% endif %}">
-                    <a data-toggle="tab" href="#importExport{{ shortEntityName }}" class="nav-link">{{ entityLabel }}</a>
+                <li class="nav-item">
+                    <a id="importExport{{ shortEntityName ~ tabId }}-tab"
+                       href="#importExport{{ shortEntityName ~ tabId }}"
+                       class="nav-link{% if isActiveEntity %} active{% endif %}"
+                       data-toggle="tab"
+                       aria-selected="{% if isActiveEntity %}true{% else %}false{% endif %}"
+                       aria-controls="importExport{{ shortEntityName ~ tabId }}"
+                       role="tab"
+                    >{{ entityLabel }}</a>
                 </li>
             {% endfor %}
         </ul>
-
     {% endif %}
 
     {% if configsWithForm|length > 1 %}
@@ -51,9 +57,13 @@
             {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
             {% set strategyTooltip = config.importStrategyTooltip ? config.importStrategyTooltip : 'oro.importexport.import.strategy.tooltip' %}
 
-            <div id="importExport{{ shortEntityName }}" class="tab-pane fade in {% if isActiveEntity %} active {% endif %}">
+            <div id="importExport{{ shortEntityName ~ tabId }}"
+                 class="tab-pane{% if isActiveEntity %} active{% endif %}"
+                 role="tabpanel"
+                 aria-labelledby="importExport{{ shortEntityName ~ tabId }}-tab"
+            >
                 <div class="alert alert-info import-notice" role="alert">
-                    <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
+                    <b>{{ 'oro.importexport.import.importance'|trans }}</b>:
                     {{ 'oro.importexport.import.columns_notice'|trans }}
                     {% if config.importAdditionalNotices is defined %}
                         {% for importAdditionalNotice in config.importAdditionalNotices %}

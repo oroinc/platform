@@ -90,7 +90,7 @@ class ImportExportContext extends OroFeatureContext implements
             return;
         }
 
-        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active a');
+        $activeTab = $this->getPage()->find('css', '.import-widget-content .nav-tabs .active');
         $tabToBeActivated = $this->getPage()->findLink($tabLabel);
 
         self::assertNotNull($activeTab, 'There are currently no active tabs');
@@ -453,10 +453,10 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function iImportExportedFile()
     {
-        // todo: CRM-7599 Replace sleep to appropriate logic
+        // CRM-7599 Replace sleep to appropriate logic
         sleep(2);
 
-        // @todo replace with fetching file path from email: CRM-7599
+        // replace with fetching file path from email: CRM-7599
         // temporary solution: find the most recent file created in import_export dir
         $fileManager = $this->getContainer()->get('oro_importexport.file.file_manager');
         $files = $fileManager->getFilesByPeriod();

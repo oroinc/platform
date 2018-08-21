@@ -135,17 +135,22 @@
     <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-translation-view'
     }) }}>
+        {% set tabId = 'email-translation-'|uniqid %}
+        {% set tabContentId = tabId %}
         <div class="oro-tabs__head">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" role="tablist">
                 {% spaceless %}
                     {% if simple_way %}
                         {% for translationsField in form %}
-                            {{ _self.renderTabNavItem(translationsField, labels) }}
+                            {% set tabId = tabId ~ '-' ~ loop.index %}
+                            {{ _self.renderTabNavItem(translationsField, labels, null, tabId) }}
                         {% endfor %}
                     {% else %}
                         {% for translationsLocales in form %}
+                            {% set tabId = tabId ~ '-' ~ loop.index %}
                             {% for translationsField in translationsLocales %}
-                                {{ _self.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name)) }}
+                                {% set tabId = tabId ~ '-' ~ loop.index %}
+                                {{ _self.renderTabNavItem(translationsField, labels, ('defaultLocale' == translationsLocales.vars.name), tabId) }}
                             {% endfor %}
                         {% endfor %}
                     {% endif %}
@@ -157,12 +162,15 @@
                 {% spaceless %}
                     {% if simple_way %}
                         {% for translationsField in form %}
-                            {{ _self.renderTab(translationsField) }}
+                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
+                            {{ _self.renderTab(translationsField, tabContentId) }}
                         {% endfor %}
                     {% else %}
                         {% for translationsLocales in form %}
+                            {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
                             {% for translationsField in translationsLocales %}
-                                {{ _self.renderTab(translationsField) }}
+                                {% set tabContentId = tabContentId ~ '-' ~ loop.index %}
+                                {{ _self.renderTab(translationsField, tabContentId) }}
                             {% endfor %}
                         {% endfor %}
                     {% endif %}
@@ -300,12 +308,27 @@
         form         - instance of FormView, it's a view for localized field
         localeLabels - array with user friendly labels for locale codes
         isDefault    - is current locale's tab label should be marked as default
+        uniqid       - is unique identifier
 #}
-{% macro renderTabNavItem(form, localeLabels, isDefault = false) %}
+{% macro renderTabNavItem(form, localeLabels, isDefault = false, uniqid = null) %}
     {% set locale = form.vars.name %}
+    {% set selected = (app.request.locale == locale) ? 'true' : 'false' %}
 
-    <li class="nav-item{% if (app.request.locale == locale) %} active{% endif %}">
-        <a href="javascript:void(0);" class="nav-link" data-role="change-language" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
+    <li class="nav-item">
+        <a href="javascript:void(0);"
+           class="nav-link {% if (app.request.locale == locale) %}active{% endif %}"
+           data-role="change-language"
+           data-target=".emailtemplate-translatation-fields-{{ locale }}"
+           data-toggle="tab"
+           data-related="{{ locale }}"
+           role="tab"
+           aria-selected="{{ selected }}"
+                {{ oro_menu.attributes(linkAttributes) }}
+       {% if uniqid %}
+           id="{{ uniqid ~ '-tab'}}"
+           aria-controls="{{ uniqid }}"
+       {% endif %}
+        >
             {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>
@@ -314,12 +337,19 @@
 {#
     Renders content of bootstrap tab panel
     paramters:
-        form - instance of FormView, it's a view for localized field
+        form   - instance of FormView, it's a view for localized field
+        uniqid - is unique identifier
 #}
-{% macro renderTab(form) %}
+{% macro renderTab(form, uniqid = null) %}
     {% set locale = form.vars.name %}
 
-    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}">
+    <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}"
+         role="tabpanel"
+        {% if uniqid %}
+            id="{{ uniqid }}"
+            aria-labelledby="{{ uniqid ~ '-tab' }}"
+        {% endif %}
+    >
         {{ form_widget(form) }}
     </div>
 {% endmacro %}

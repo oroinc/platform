@@ -31,11 +31,11 @@
                 }
 
                 li {
-                    width: auto;
+                    width: 100%;
                     height: auto;
                     float: none;
 
-                    > a {
+                    a {
                         margin-right: 0;
                         margin-bottom: 0;
                         padding: side-values(12px 6px 12px 16px) !important;
@@ -57,27 +57,18 @@
 
                             color: $dot-menu-nav-tabs-icon-color;
                         }
+
+                        &.active,
+                        &:active,
+                        &:hover,
+                        &:focus {
+                            background-color: $dot-menu-item-active-background;
+
+                            text-shadow: none;
+                        }
                     }
 
-                    &:hover,
-                    &:active,
-                    &:focus {
-                        background-color: $dot-menu-item-active-background;
-                    }
-
-                    &.active {
-                        background-color: $dot-menu-item-active-background;
-                    }
-
-                    &.active a,
-                    a:hover,
-                    a:active,
-                    a:focus {
-                        background: none;
-                        text-shadow: none;
-                    }
-
-                    &:last-child > a {
+                    &:last-child a {
                         border-bottom: none;
                     }
                 }
