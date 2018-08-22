@@ -17,8 +17,6 @@ define(function(require) {
             this.makeUnique($container);
         }
 
-        $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
-
         $container.find('[data-spy="scroll"]').each(function() {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
@@ -50,14 +48,11 @@ define(function(require) {
             var suffix = _.uniqueId('-');
             var $spy = $(this);
             var href = $spy.attr('href');
-            if (href) {
-                href = href.replace(/.*(?=#[^\s]+$)/, ''); // strip for ie7
-            }
             var menuSelector = $spy.data('target') || href || '';
             // make target to be container related
             $spy.data('target', '#' + containerId + ' ' + menuSelector);
 
-            container.find(menuSelector + ' .nav li > a').each(function() {
+            container.find(menuSelector + ' .nav > a').each(function() {
                 var $target;
                 var $link = $(this);
                 var target = $link.data('target') || $link.attr('href');
@@ -91,6 +86,7 @@ define(function(require) {
                     .toggleClass('collapsed', collapsed)
                     .attr({
                         'id': headerId,
+                        'role': 'button',
                         'data-toggle': 'collapse',
                         'data-target': '#' + targetId,
                         'aria-controls': targetId,
@@ -138,30 +134,9 @@ define(function(require) {
                 }
             });
 
-            if ($spy.data('scrollspy')) {
-                $spy.scrollspy('refresh').scrollspy('process');
+            if ($spy.data('bs.scrollspy')) {
+                $spy.scrollspy('refresh').scrollspy('_process');
             }
-        });
-    };
-
-    scrollspy.top = function() {
-        if (tools.isMobile()) {
-            return;
-        }
-
-        $('[data-spy="scroll"]').each(function() {
-            var $spy = $(this);
-            var targetSelector = $spy.data('target');
-            var target = $(targetSelector);
-
-            target.each(function() {
-                var $target = $(this);
-                var firstItemHref = $target.find('li.active:first a').attr('href');
-                var $firstItem = $(firstItemHref);
-                var top = $firstItem.position().top;
-
-                $spy.scrollTop(top);
-            });
         });
     };
 

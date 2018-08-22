@@ -66,7 +66,6 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'nav-item active',
         'subblocks': [
             {
                 'title': '',
@@ -103,7 +102,6 @@
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Additional'|trans,
-            'class': 'nav-item',
             'subblocks': [{
                 'title': '',
                 'useSpan': false,
@@ -115,7 +113,6 @@
     {% if form.change_password is defined %}
         {% set dataBlocks = dataBlocks|merge( [{
             'title': 'oro.user.password.label'|trans,
-            'class': 'nav-item',
             'subblocks': [
                 {
                     'title': '',

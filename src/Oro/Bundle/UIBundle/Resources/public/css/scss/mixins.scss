@@ -3,17 +3,13 @@
 
 $enable-safe-area: true;
 
-@mixin clearfix {
-    *zoom: 1;
+// Helper to clear inner floats
+@mixin clearfix() {
+    &::after {
+        content: '';
 
-    &:before,
-    &:after {
-        display: table;
-        content: "";
-        line-height: 0;
-    }
+        display: block;
 
-    &:after {
         clear: both;
     }
 }

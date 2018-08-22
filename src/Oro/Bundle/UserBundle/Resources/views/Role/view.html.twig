@@ -38,7 +38,6 @@
     {% set dataBlocks = [
         {
             'title': 'General'|trans,
-            'class': 'nav-item active',
             'subblocks': [
                 {'data' : [
                     UI.renderProperty('oro.user.role.role.label'|trans, entity.label)
@@ -75,7 +74,6 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': 'Additional'|trans,
-        'class': 'nav-item',
         'subblocks': [{
             'data': [
                 additionalBlock
@@ -85,7 +83,6 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': 'Entity'|trans,
-        'class': 'nav-item',
         'subblocks': [{
             'data': [
                 rolePermissionsGrid
@@ -95,7 +92,6 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
-        'class': 'nav-item',
         'subblocks': [{
             'title' : null,
             'useSpan': false,

@@ -150,7 +150,6 @@
                 {% if activitiesData is not empty %}
                     {% set dataBlocks = dataBlocks|merge([{
                         'title': 'oro.activity.sections.activities'|trans,
-                        'class': 'nav-item',
                         'priority' : 1000,
                         'subblocks': [
                             {
@@ -168,7 +167,6 @@
                 {% if marketingActivitiesData is not empty %}
                     {% set dataBlocks = dataBlocks|merge([{
                         'title': 'oro.marketingactivity.sections.marketingactivities'|trans,
-                        'class': 'nav-item',
                         'priority' : 1050,
                         'subblocks': [
                             {
@@ -186,7 +184,6 @@
                 {% if communicationsData is not empty %}
                     {% set dataBlocks = dataBlocks|merge([{
                         'title': 'Communications'|trans,
-                        'class': 'nav-item',
                         'priority' : 1100,
                         'subblocks': [
                             {
@@ -204,7 +201,6 @@
                 {% if additionalInformationData is not empty %}
                     {% set dataBlocks = dataBlocks|merge([{
                         'title': 'Additional Information'|trans,
-                        'class': 'nav-item',
                         'priority' : 1200,
                         'subblocks': [
                             {
@@ -222,7 +218,6 @@
                 {% if commentsData is not empty %}
                     {% set dataBlocks = dataBlocks|merge([{
                         'title': 'oro.comment.entity_plural_label'|trans,
-                        'class': 'nav-item',
                         'priority' : 1300,
                         'subblocks': [
                             {

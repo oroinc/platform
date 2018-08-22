@@ -59,6 +59,7 @@ config:
         'bootstrap-scrollspy':
             deps:
                 - 'jquery'
+                - 'bootstrap-util'
         'bootstrap-tab':
             deps:
                 - 'jquery'
@@ -143,7 +144,7 @@ config:
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
         'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
         'bootstrap-popover': 'bowerassets/bootstrap/js/bootstrap-popover.js'
-        'bootstrap-scrollspy': 'bowerassets/bootstrap/js/bootstrap-scrollspy.js'
+        'bootstrap-scrollspy': 'components/bootstrap/js/dist/scrollspy.js'
         'bootstrap-tab': 'components/bootstrap/js/dist/tab.js'
         'bootstrap-tooltip': 'bowerassets/bootstrap/js/bootstrap-tooltip.js'
         'bootstrap-transition': 'bowerassets/bootstrap/js/bootstrap-transition.js'

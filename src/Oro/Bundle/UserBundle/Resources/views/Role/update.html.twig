@@ -82,7 +82,6 @@
 
     {% set dataBlocks = [{
         'title': 'General'|trans,
-        'class': 'nav-item active',
         'subblocks': [
             {
                 'title': '',
@@ -102,7 +101,6 @@
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
                 'title': 'Additional'|trans,
-                'class': 'nav-item',
                 'subblocks': [{
                     'title': '',
                     'useSpan': false,
@@ -133,7 +131,6 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title': privilegesConfig['entity'].label|trans,
-        'class': 'nav-item',
         'subblocks': [
             {
                 'title': '',
@@ -147,7 +144,6 @@
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
-        'class': 'nav-item',
         'subblocks': [
             {
                 'title' : null,
