@@ -134,11 +134,9 @@
         $apiDocLink.after('<div id="api_type">type:' +
             {%- for name, view in views %}
             {%- if view.sandbox %}
-                {%- set viewLink = view.default ? '' : '/' ~ name %}
-                {%- set viewType = view.default ? '' : name %}
                 {%- if loop.first %}'&nbsp;' + {% else %}'&nbsp;|&nbsp;' + {% endif -%}
-                '<a href="' + '{{ rootPath ~ viewLink }}"' +
-                (apiType === '{{ viewType }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
+                '<a href="' + '{{ rootPath ~ (view.default ? '' : '/' ~ name) }}"' +
+                (apiType === '{{ name }}' ? ' class="active"' : '') + '>{{ view.label }}</a>' +
             {%- endif %}
             {%- endfor -%}
             '</div>');
