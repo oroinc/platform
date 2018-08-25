@@ -53,7 +53,7 @@ class SegmentSnapshotRepository extends EntityRepository
             ->setParameter('segment', $segment);
 
         if ($entityIds) {
-            $entityIdentifierField = $this->getEntityReferenceField($segment);
+            $entityIdentifierField = $this->getEntityReferenceField($segment->getEntity());
 
             $qb->andWhere($qb->expr()->in('snp.' . $entityIdentifierField, ':entityIds'))
                 ->setParameter('entityIds', $entityIds);
@@ -141,15 +141,16 @@ class SegmentSnapshotRepository extends EntityRepository
         $deleteQB->delete($this->getEntityName(), 'snp');
         $returnQueryBuilder = false;
 
-        foreach ($deleteParams as $params) {
+        foreach ($deleteParams as $entityName => $params) {
             if (empty($params['segmentIds']) || empty($params['entityIds'])) {
                 continue;
             }
 
+            $entityField = $this->getEntityReferenceField($entityName);
             $deleteQB
                 ->orWhere($deleteQB->expr()->andX(
                     $deleteQB->expr()->in('snp.segment', ':segmentsIds'),
-                    $deleteQB->expr()->in('snp.entityId', ':entityIds')
+                    $deleteQB->expr()->in('snp.' . $entityField, ':entityIds')
                 ))
                 ->setParameter('segmentsIds', $params['segmentIds'])
                 ->setParameter('entityIds', $params['entityIds']);
@@ -167,7 +168,7 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
-        $fieldToSelect = $this->getEntityReferenceField($segment);
+        $fieldToSelect = $this->getEntityReferenceField($segment->getEntity());
         $tableName = QueryBuilderUtil::generateParameterName('snp');
         $paramName = QueryBuilderUtil::generateParameterName('segment');
         $fieldToSelect = sprintf('%s.%s', $tableName, $fieldToSelect);
@@ -181,12 +182,12 @@ class SegmentSnapshotRepository extends EntityRepository
     }
 
     /**
-     * @param Segment $segment
+     * @param string $entityName
      * @return string
      */
-    private function getEntityReferenceField(Segment $segment)
+    private function getEntityReferenceField(string $entityName)
     {
-        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
+        $entityMetadata = $this->getEntityManager()->getClassMetadata($entityName);
         $idField        = $entityMetadata->getSingleIdentifierFieldName();
         $idFieldType    = $entityMetadata->getTypeOfField($idField);
 
