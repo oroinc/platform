@@ -86,7 +86,11 @@ of the cache providers which are being used for caching. With these priorities s
 Default cache implementation
 ============================
 
-As you may read in [Readme](../../readme.md#abstract-cache-services) there are two abstract services you can use as a 
-parent for your cache services. Default implementations are following:
+As you may read in [Readme](../../readme.md#abstract-cache-services) there are three abstract services you can use as a
+parent for your cache services. The default implementation for services based on
+`oro.file_cache.abstract` and `oro.cache.abstract` is following:
+
  - for CLI requests: `MemoryCacheChain` with only `Oro\Bundle\CacheBundle\Provider\FilesystemCache` as a cache provider
  - for other requests: `MemoryCacheChain` with `ArrayCache` on the top of `FilesystemCache`
+
+For services based on `oro.cache.abstract.without_memory_cache` the `MemoryCacheChain` is not used.

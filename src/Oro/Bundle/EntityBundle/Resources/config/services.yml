@@ -279,7 +279,7 @@ services:
         lazy: true
 
     oro_entity.entity_alias_cache:
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases' ] ]
@@ -494,6 +494,7 @@ services:
 
     oro_entity.provider.structure_data:
         class: 'Oro\Bundle\EntityBundle\Provider\EntityStructureDataProvider'
+        public: false
         arguments:
             - '@event_dispatcher'
             - '@oro_entity.entity_field_list_provider'
