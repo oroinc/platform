@@ -5,16 +5,19 @@ namespace Oro\Bundle\SegmentBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
+/**
+ * Remove records from segment snapshot when referenced entity removed.
+ */
 class DoctrinePreRemoveListener
 {
     /** @var ConfigManager */
     protected $cm;
 
     /** @var array */
-    protected $deleteEntities;
+    protected $deleteEntities = [];
 
     /**
      * @param ConfigManager $cm
@@ -51,8 +54,11 @@ class DoctrinePreRemoveListener
     {
         if ($this->deleteEntities) {
             $em = $args->getEntityManager();
-            $em->getRepository('OroSegmentBundle:SegmentSnapshot')->massRemoveByEntities($this->deleteEntities);
-            $this->deleteEntities = [];
+            $knownNamespaces = $em->getConfiguration()->getEntityNamespaces();
+            if (!empty($knownNamespaces['OroSegmentBundle'])) {
+                $em->getRepository(SegmentSnapshot::class)->massRemoveByEntities($this->deleteEntities);
+                $this->deleteEntities = [];
+            }
         }
     }
 }
