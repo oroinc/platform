@@ -10,6 +10,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 
+/**
+ * Provides a tree of locale fallbacks configured by a user.
+ */
 class LocalizationFallbackStrategy implements TranslationStrategyInterface
 {
     const NAME = 'oro_localization_fallback_strategy';
@@ -69,17 +72,22 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
      */
     public function getLocaleFallbacks()
     {
-        $key = static::CACHE_KEY;
-        if ($this->cacheProvider->contains($key)) {
-            return $this->cacheProvider->fetch($key);
-        }
-        $fallbacks = array_reduce($this->getRootLocalizations(), function ($result, Localization $localization) {
-            return array_merge($result, $this->localizationToArray($localization));
-        }, []);
-        /** All localizations always should have only one parent that equals to default language */
-        $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
+        $fallbacks = $this->cacheProvider->fetch(static::CACHE_KEY);
+        if (false === $fallbacks) {
+            /** All localizations always should have only one parent that equals to default language */
+            $fallbacks = [
+                Configuration::DEFAULT_LOCALE => array_reduce(
+                    $this->getRootLocalizations(),
+                    function ($result, Localization $localization) {
+                        return array_merge($result, $this->localizationToArray($localization));
+                    },
+                    []
+                )
+            ];
 
-        $this->cacheProvider->save($key, $fallbacks);
+            $this->cacheProvider->save(static::CACHE_KEY, $fallbacks);
+        }
+
         return $fallbacks;
     }
 

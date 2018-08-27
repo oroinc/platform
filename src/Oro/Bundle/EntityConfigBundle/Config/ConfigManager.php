@@ -433,7 +433,12 @@ class ConfigManager
     public function getId($scope, $className, $fieldName = null)
     {
         if ($fieldName) {
-            return $this->getFieldConfig($scope, $className, $fieldName)->getId();
+            $field = $this->findField($className, $fieldName);
+            if (null === $field) {
+                throw new RuntimeException(sprintf('Field "%s::%s" is not configurable', $className, $fieldName));
+            }
+
+            return new FieldConfigId($scope, $className, $fieldName, $field['t']);
         } else {
             return new EntityConfigId($scope, $className);
         }

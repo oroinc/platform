@@ -36,12 +36,13 @@ class SerializationHelper
         array $context,
         FieldConfig $fieldConfig = null
     ) {
-        $config = [];
-        if (null !== $fieldConfig) {
-            $config = $fieldConfig->toArray(true);
-        }
-
-        return $this->dataTransformer->transform($entityClass, $fieldName, $fieldValue, $config, $context);
+        return $this->dataTransformer->transform(
+            $entityClass,
+            $fieldName,
+            $fieldValue,
+            null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
+            $context
+        );
     }
 
     /**

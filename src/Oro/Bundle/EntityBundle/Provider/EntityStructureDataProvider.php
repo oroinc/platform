@@ -8,6 +8,10 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides detailed information about entities
+ * including options collected via "oro_entity.structure.options" event listeners.
+ */
 class EntityStructureDataProvider
 {
     /** @var EventDispatcherInterface */
@@ -40,7 +44,7 @@ class EntityStructureDataProvider
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param EntityWithFieldsProvider $entityWithFieldsProvider
-     * @param EntityClassNameHelper $classNameHelper
+     * @param EntityClassNameHelper    $classNameHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -53,7 +57,7 @@ class EntityStructureDataProvider
     }
 
     /**
-     * @return array|EntityStructure[]
+     * @return EntityStructure[]
      */
     public function getData()
     {
@@ -66,26 +70,34 @@ class EntityStructureDataProvider
     }
 
     /**
-     * @return array|EntityStructure[]
+     * @param string $entityName The class name or url-safe class name of the entity
+     *
+     * @return EntityStructure
+     */
+    public function getEntity($entityName)
+    {
+        $entityClass = $this->classNameHelper->resolveEntityClass($entityName);
+        $entity = $this->entityWithFieldsProvider
+            ->getFieldsForEntity($entityClass, true, true, true, false, true, true);
+        $model = $this->processEntity($entity);
+
+        $event = new EntityStructureOptionsEvent();
+        $event->setData([$model]);
+        $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+
+        return $model;
+    }
+
+    /**
+     * @return EntityStructure[]
      */
     protected function processEntities()
     {
-        $data = $this->entityWithFieldsProvider->getFields(true, true, true, false, true, true);
         $result = [];
 
+        $data = $this->entityWithFieldsProvider->getFields(true, true, true, false, true, true);
         foreach ($data as $item) {
-            $model = new EntityStructure();
-            foreach ($this->entityPropertyMappings as $name => $method) {
-                if (isset($item[$name])) {
-                    $model->{$method}($item[$name]);
-                }
-            }
-
-            $model->setId($this->classNameHelper->getUrlSafeClassName($model->getClassName()));
-
-            if (!empty($item['fields'])) {
-                $this->processFields($model, $item['fields']);
-            }
+            $model = $this->processEntity($item);
             $result[$model->getClassName()] = $model;
         }
 
@@ -93,8 +105,31 @@ class EntityStructureDataProvider
     }
 
     /**
+     * @param array $entity
+     *
+     * @return EntityStructure
+     */
+    protected function processEntity(array $entity)
+    {
+        $model = new EntityStructure();
+        foreach ($this->entityPropertyMappings as $name => $method) {
+            if (isset($entity[$name])) {
+                $model->{$method}($entity[$name]);
+            }
+        }
+
+        $entityClass = $model->getClassName();
+        $model->setId($this->classNameHelper->getUrlSafeClassName($entityClass));
+        if (!empty($entity['fields'])) {
+            $this->processFields($model, $entity['fields']);
+        }
+
+        return $model;
+    }
+
+    /**
      * @param EntityStructure $structure
-     * @param array $fields
+     * @param array           $fields
      */
     protected function processFields(EntityStructure $structure, array $fields)
     {

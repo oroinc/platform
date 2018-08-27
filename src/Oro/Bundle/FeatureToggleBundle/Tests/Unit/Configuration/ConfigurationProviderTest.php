@@ -30,9 +30,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
-        $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
 
@@ -79,10 +76,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(true);
         $cache->expects($this->once())
             ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
@@ -147,12 +140,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = false;
         $cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
             ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
         $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);
@@ -185,10 +175,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $ignoreCache = false;
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with(FeatureToggleConfiguration::ROOT)
-            ->willReturn(true);
         $cache->expects($this->once())
             ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
@@ -223,12 +209,9 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 
         $ignoreCache = false;
         $cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(FeatureToggleConfiguration::ROOT)
             ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('delete')
-            ->with(FeatureToggleConfiguration::ROOT);
         $cache->expects($this->once())
             ->method('save')
             ->with(FeatureToggleConfiguration::ROOT, $mergedConfiguration);

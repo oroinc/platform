@@ -49,8 +49,10 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $classes = [];
-        $this->assertGetEntitiesFromCacheCall($classes);
+        $this->entitiesWithWorkflowCache->expects($this->once())
+            ->method('fetch')
+            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
+            ->willReturn([]);
 
         $this->assertFalse(
             $this->provider->isVirtualRelation('stdClass', WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME)
@@ -87,10 +89,6 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('contains')
-            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
-            ->willReturn(true);
-        $this->entitiesWithWorkflowCache->expects($this->once())
             ->method('fetch')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn([]);
@@ -102,8 +100,10 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
 
-        $classes = ['stdClass' => true];
-        $this->assertGetEntitiesFromCacheCall($classes);
+        $this->entitiesWithWorkflowCache->expects($this->once())
+            ->method('fetch')
+            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
+            ->willReturn(['stdClass' => true]);
 
         $this->assertEquals(
             [
@@ -175,7 +175,10 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
             ->with('stdClass')
             ->willReturn('id');
 
-        $this->assertGetEntitiesFromCacheCall(['stdClass' => true]);
+        $this->entitiesWithWorkflowCache->expects($this->once())
+            ->method('fetch')
+            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
+            ->willReturn(['stdClass' => true]);
 
         $this->assertEquals(
             [
@@ -204,7 +207,6 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    // testGetTargetJoinAlias
     public function testGetTargetJoinAlias()
     {
         $this->assertEquals('virtual_relation', $this->provider->getTargetJoinAlias('', 'virtual_relation'));
@@ -234,26 +236,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($repo);
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn(false);
         $this->entitiesWithWorkflowCache->expects($this->once())
             ->method('save')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW, $expectedClasses);
-    }
-
-    /**
-     * @param array $classes
-     */
-    private function assertGetEntitiesFromCacheCall(array $classes)
-    {
-        $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('contains')
-            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
-            ->willReturn(true);
-        $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
-            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
-            ->willReturn($classes);
     }
 }
