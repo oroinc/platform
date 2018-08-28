@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\ApiBundle\Request\RestFilterValueAccessorFactory
         arguments:
             # regex pattern to match operators
-            - '(!|<|>|%%21|%%3C|%%3E)?=|<>|%%3C%%3E|<|>|\*|%%3C|%%3E|%%2A|(!|%%21)?(~|\^|\$|%%7E|%%5E|%%24)'
+            - '(!|<|>|%%21|%%3C|%%3E)?(=|%%3D)|<>|%%3C%%3E|<|>|\*|%%3C|%%3E|%%2A|(!|%%21)?(~|\^|\$|%%7E|%%5E|%%24)'
             - # map for operator name and operator
                 'eq': '='
                 'neq': '!='
