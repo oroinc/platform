@@ -91,20 +91,13 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(ConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
         $this->cache
             ->expects($this->once())
             ->method('save')
             ->with(ConfigProvider::REQUIREJS_CONFIG_CACHE_KEY, [$config]);
-
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with(ConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue([$config]));
 
         $this->assertEquals($config, $this->provider->getConfig());
     }

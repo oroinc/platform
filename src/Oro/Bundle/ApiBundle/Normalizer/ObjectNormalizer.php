@@ -167,11 +167,9 @@ class ObjectNormalizer
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath($fieldName);
-            $path = ConfigUtil::explodePropertyPath($propertyPath);
-            $isReference = count($path) > 1;
 
-            if ($isReference) {
-                $referenceFields[$fieldName] = $path;
+            if (false !== strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                $referenceFields[$fieldName] = ConfigUtil::explodePropertyPath($propertyPath);
                 continue;
             }
 

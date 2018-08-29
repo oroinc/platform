@@ -4,12 +4,15 @@ namespace Oro\Bundle\SegmentBundle\Entity\Repository;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Repository for SegmentSnapshot entity
+ */
 class SegmentSnapshotRepository extends EntityRepository
 {
     const DELETE_BATCH_SIZE = 20;
@@ -98,15 +101,17 @@ class SegmentSnapshotRepository extends EntityRepository
         $segmentQB->select('s.id, s.entity')->from('OroSegmentBundle:Segment', 's');
 
         foreach ($entities as $key => $entity) {
-            if (is_array($entity) && array_key_exists('id', $entity)) {
+            if (\is_array($entity) && array_key_exists('id', $entity)) {
                 $entityId  = $entity['id'];
                 $className = ClassUtils::getClass($entity['entity']);
+                $entityIdentifierField = $this->getEntityReferenceFieldByEntityClass($className);
             } else {
                 /** @var object $entity */
                 $className = ClassUtils::getClass($entity);
                 $metadata  = $entityManager->getClassMetadata($className);
                 $entityIds = $metadata->getIdentifierValues($entity);
                 $entityId  = reset($entityIds);
+                $entityIdentifierField = $this->getEntityReferenceFieldNameByMetadata($metadata);
             }
 
             if (!$entityId) {
@@ -120,6 +125,7 @@ class SegmentSnapshotRepository extends EntityRepository
             }
 
             $deleteParams[$className]['entityIds'][] = (string)$entityId;
+            $deleteParams[$className]['entityIdentifierField'] = $entityIdentifierField;
         }
 
         $segments = $segmentQB->getQuery()->getResult();
@@ -147,10 +153,12 @@ class SegmentSnapshotRepository extends EntityRepository
             }
 
             $deleteQB
-                ->orWhere($deleteQB->expr()->andX(
-                    $deleteQB->expr()->in('snp.segment', ':segmentsIds'),
-                    $deleteQB->expr()->in('snp.entityId', ':entityIds')
-                ))
+                ->orWhere(
+                    $deleteQB->expr()->andX(
+                        $deleteQB->expr()->in('snp.segment', ':segmentsIds'),
+                        $deleteQB->expr()->in('snp.' . $params['entityIdentifierField'], ':entityIds')
+                    )
+                )
                 ->setParameter('segmentsIds', $params['segmentIds'])
                 ->setParameter('entityIds', $params['entityIds']);
             $returnQueryBuilder = true;
@@ -186,9 +194,28 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     private function getEntityReferenceField(Segment $segment)
     {
-        $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
-        $idField        = $entityMetadata->getSingleIdentifierFieldName();
-        $idFieldType    = $entityMetadata->getTypeOfField($idField);
+        return $this->getEntityReferenceFieldByEntityClass($segment->getEntity());
+    }
+
+    /**
+     * @param string $entityClass
+     * @return string
+     */
+    private function getEntityReferenceFieldByEntityClass($entityClass)
+    {
+        $entityMetadata = $this->getEntityManager()->getClassMetadata($entityClass);
+
+        return $this->getEntityReferenceFieldNameByMetadata($entityMetadata);
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     * @return string
+     */
+    private function getEntityReferenceFieldNameByMetadata(ClassMetadata $metadata)
+    {
+        $idField = $metadata->getSingleIdentifierFieldName();
+        $idFieldType = $metadata->getTypeOfField($idField);
 
         if ($idFieldType === 'integer') {
             return SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;

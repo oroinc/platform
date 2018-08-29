@@ -203,7 +203,7 @@ services:
 
     oro_api.resources_cache.impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
@@ -285,7 +285,7 @@ services:
         lazy: true
 
     oro_api.entity_alias_cache:
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         public: false
         calls:
             - [ setNamespace, [ 'oro_entity_aliases_api' ] ]
