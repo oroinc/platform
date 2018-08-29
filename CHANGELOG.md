@@ -6,6 +6,9 @@
 * Added data flow diagrams for public actions. See [Actions](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md).
 * Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
 
+#### CacheBundle
+* Added `oro.cache.abstract.without_memory_cache` that is the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service.
+
 #### UIBundle
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
 
@@ -149,6 +152,30 @@
 
 * Handling of `percent` data type in POST and PATCH requests was fixed. Before the fix, the percent value in GET and POST/PATCH requests was inconsistent; in POST/PATCH requests it was divided by 100, but GET request returned it as is. In this fix, the division by 100 was removed.
 * For string filters the default value of the `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
+#### DataGridBundle
+* Parameter `count_hints` will have value of `hints` unless otherwise specified.
+If other words from now
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+```
+equivalent
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+           count_hints:
+               - SOME_QUERY_HINT
+```
 #### SegmentBundle
 * Refactored the `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle

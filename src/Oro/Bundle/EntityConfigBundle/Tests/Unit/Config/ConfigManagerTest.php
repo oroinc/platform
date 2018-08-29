@@ -1457,8 +1457,6 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($extendPropertyConfigContainer);
-        $extendConfigProvider->expects($this->never())
-            ->method('persist');
         $expectedConfig = $this->getConfig(
             $configId,
             [
@@ -1678,8 +1676,6 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($extendPropertyConfigContainer);
-        $extendConfigProvider->expects($this->never())
-            ->method('persist');
 
         $expectedConfig = $this->getConfig(
             $configId,

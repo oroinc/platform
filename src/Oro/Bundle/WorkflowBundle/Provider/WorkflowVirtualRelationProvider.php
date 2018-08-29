@@ -12,6 +12,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 
+/**
+ * The provider to get virtual relations for workflow items ans steps.
+ */
 class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterface
 {
     use WorkflowQueryTrait;
@@ -87,7 +90,8 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
      */
     private function getEntitiesWithWorkflow()
     {
-        if (!$this->entitiesWithWorkflowCache->contains(self::ENTITIES_WITH_WORKFLOW)) {
+        $entitiesWithWorkflow = $this->entitiesWithWorkflowCache->fetch(self::ENTITIES_WITH_WORKFLOW);
+        if (false === $entitiesWithWorkflow) {
             /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
             $workflowDefinitionRepository = $this->doctrineHelper->getEntityRepository(WorkflowDefinition::class);
             $entityClasses = $workflowDefinitionRepository->getAllRelatedEntityClasses(true);
@@ -98,11 +102,9 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
             }
 
             $this->entitiesWithWorkflowCache->save(self::ENTITIES_WITH_WORKFLOW, $entitiesWithWorkflow);
-
-            return $entitiesWithWorkflow;
         }
 
-        return $this->entitiesWithWorkflowCache->fetch(self::ENTITIES_WITH_WORKFLOW);
+        return $entitiesWithWorkflow;
     }
 
     /**

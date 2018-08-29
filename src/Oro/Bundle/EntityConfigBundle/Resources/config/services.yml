@@ -96,13 +96,13 @@ services:
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config' ] ]
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config_model' ] ]
 

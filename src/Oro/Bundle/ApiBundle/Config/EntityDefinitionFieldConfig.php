@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraint;
  */
 class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInterface
 {
-    /** @var bool|null */
-    protected $exclude;
-
     /** @var string|null */
     protected $dataType;
 
@@ -31,9 +28,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function toArray($excludeTargetEntity = false)
     {
         $result = parent::toArray($excludeTargetEntity);
-        if (true === $this->exclude) {
-            $result[ConfigUtil::EXCLUDE] = $this->exclude;
-        }
         if (null !== $this->dataType) {
             $result[ConfigUtil::DATA_TYPE] = $this->dataType;
         }

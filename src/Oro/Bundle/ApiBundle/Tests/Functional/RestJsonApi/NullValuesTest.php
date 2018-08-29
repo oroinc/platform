@@ -52,7 +52,8 @@ class NullValuesTest extends DefaultAndNullTestCase
 
         $entity = $this->loadTestEntity((int)$result['data']['id']);
         self::assertNull($entity->withoutDefaultValueString);
-        // @todo: BAP-12444: skip this check for PostgreSQL because by some reasons NULL is saved in DB as FALSE
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if (!$this->isPostgreSql()) {
             self::assertNull($entity->withoutDefaultValueBoolean);
         }
@@ -86,7 +87,8 @@ class NullValuesTest extends DefaultAndNullTestCase
 
         $entity = $this->loadTestEntity((int)$result['data']['id']);
         self::assertNull($entity->withoutDefaultValueString);
-        // @todo: BAP-12444: skip this check for PostgreSQL because by some reasons NULL is saved in DB as FALSE
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if (!$this->isPostgreSql()) {
             self::assertNull($entity->withoutDefaultValueBoolean);
         }

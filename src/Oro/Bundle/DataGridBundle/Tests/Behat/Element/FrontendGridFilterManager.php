@@ -21,6 +21,7 @@ class FrontendGridFilterManager extends Element
         }
 
         $filterItem->getParent()->click();
+        $this->getSession()->getDriver()->waitForAjax();
 
         self::assertTrue(
             $filterItem->isChecked(),
