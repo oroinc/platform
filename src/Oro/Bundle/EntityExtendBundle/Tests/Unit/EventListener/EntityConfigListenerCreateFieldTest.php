@@ -25,8 +25,6 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
-        $this->configProvider->expects($this->never())
-            ->method('persist');
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 

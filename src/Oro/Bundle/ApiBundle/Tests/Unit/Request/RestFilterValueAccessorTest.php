@@ -18,7 +18,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     {
         return new RestFilterValueAccessor(
             $request,
-            '(!|<|>|%21|%3C|%3E)?=|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
+            '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [
                 ComparisonFilter::EQ              => '=',
                 ComparisonFilter::NEQ             => '!=',
@@ -77,6 +77,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
             'prm_13=%3Cval13%3E'                 => ['prm_13', 'eq', '<val13>', 'prm_13', 'prm_13'],
             'prm14!=val14'                       => ['prm14', 'neq', 'val14', 'prm14', 'prm14'],
             'prm15%21=val15'                     => ['prm15', 'neq', 'val15', 'prm15', 'prm15'],
+            'prm16%3Dval16'                      => ['prm16', 'eq', 'val16', 'prm16', 'prm16'],
             'page[number]=123'                   => ['page[number]', 'eq', '123', 'number', 'page[number]'],
             'page%5Bsize%5D=456'                 => ['page[size]', 'eq', '456', 'size', 'page[size]'],
             'filter[address.country]=US'         => [
@@ -113,6 +114,13 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 'Z123',
                 'address.code',
                 'filter[address][code]'
+            ],
+            'filter%5Baddress%5D%5Bname%5D%3Da1' => [
+                'filter[address.name]',
+                'eq',
+                'a1',
+                'address.name',
+                'filter[address][name]'
             ],
             'empty[prm20][]=123'                 => ['empty[prm20.]', 'eq', '123', 'prm20.', 'empty[prm20][]'],
             'empty%5Bprm21%5D%5B%5D=123'         => ['empty[prm21.]', 'eq', '123', 'prm21.', 'empty[prm21][]'],
@@ -183,6 +191,12 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                     'Z123',
                     'eq',
                     'filter[address][code]'
+                ),
+                'filter[address.name]'          => $this->getFilterValue(
+                    'address.name',
+                    'a1',
+                    'eq',
+                    'filter[address][name]'
                 )
             ],
             $accessor->getGroup('filter')
@@ -239,6 +253,26 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 'filter[field4]' => $this->getFilterValue('field4', 'val4', 'lte', 'filter[field4]'),
                 'filter[field5]' => $this->getFilterValue('field5', 'val5', 'gt', 'filter[field5]'),
                 'filter[field6]' => $this->getFilterValue('field6', 'val6', 'gte', 'filter[field6]')
+            ],
+            $accessor->getGroup('filter')
+        );
+    }
+
+    public function testParseUrlEncodedQueryStringWithAlternativeSyntaxOfFilters()
+    {
+        $queryStringValues = [
+            'filter%5Bfield1%5D%5Beq%5D%3Dval1'  => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]']
+        ];
+        $request = Request::create(
+            'http://test.com?' . implode('&', array_keys($queryStringValues))
+        );
+
+        $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
+        self::assertEquals(
+            [
+                'filter[field1]' => $this->getFilterValue('field1', 'val1', 'eq', 'filter[field1]')
             ],
             $accessor->getGroup('filter')
         );

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
+/**
+ * Interface for ownership metadata providers.
+ */
 interface OwnershipMetadataProviderInterface
 {
     /**
@@ -12,7 +15,7 @@ interface OwnershipMetadataProviderInterface
     /**
      * Get the ownership related metadata for the given entity
      *
-     * @param string $className
+     * @param string|null $className
      *
      * @return OwnershipMetadataInterface
      */

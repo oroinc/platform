@@ -10,6 +10,9 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The handler that allows to switch a logging level for some period of time.
+ */
 class DetailedLogsHandler extends AbstractProcessingHandler implements ContainerAwareInterface
 {
     /** @var HandlerInterface */
@@ -62,8 +65,9 @@ class DetailedLogsHandler extends AbstractProcessingHandler implements Container
     {
         /** @var CacheProvider $cache */
         $cache = $this->container->get('oro_logger.cache');
-        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
-            return $cache->fetch(Configuration::LOGS_LEVEL_KEY);
+        $logLevel = $cache->fetch(Configuration::LOGS_LEVEL_KEY);
+        if (false !== $logLevel) {
+            return $logLevel;
         }
 
         $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');

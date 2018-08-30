@@ -160,6 +160,8 @@ define(function(require) {
             if (this.useDropdown) {
                 this.dropdownInit();
             }
+
+            mediator.trigger('widget:doRefresh');
         }
     });
 

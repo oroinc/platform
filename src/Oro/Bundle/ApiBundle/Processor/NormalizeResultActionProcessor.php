@@ -17,11 +17,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * The base processor for actions with "normalize_result" group.
  * Processors from this group are intended to prepare a valid response
  * and they are executed regardless whether an error occurred or not.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAwareInterface
 {
@@ -157,7 +159,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
                     $this->getLogContext($context)
                 )
             );
-        } else {
+        } elseif (!$e instanceof AuthenticationException) {
             $this->logger->error(
                 \sprintf('The execution of "%s" processor is failed.', $processorId),
                 \array_merge(['exception' => $e], $this->getLogContext($context))
@@ -220,7 +222,7 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
             try {
                 $processor->process($context);
             } catch (\Exception $e) {
-                if (null !== $this->logger) {
+                if (null !== $this->logger && !$e instanceof AuthenticationException) {
                     $this->logger->error(
                         \sprintf('The execution of "%s" processor is failed.', $processors->getProcessorId()),
                         \array_merge(['exception' => $e], $this->getLogContext($context))

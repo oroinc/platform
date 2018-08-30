@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -21,21 +22,27 @@ class UserManager extends BaseUserManager
     /** @var EnumValueProvider */
     protected $enumValueProvider;
 
+    /** @var ConfigManager */
+    private $configManager;
+
     /**
      * @param string $class
      * @param ManagerRegistry $registry
      * @param EncoderFactoryInterface $encoderFactory
      * @param EnumValueProvider $enumValueProvider
+     * @param ConfigManager $configManager
      */
     public function __construct(
         $class,
         ManagerRegistry $registry,
         EncoderFactoryInterface $encoderFactory,
-        EnumValueProvider $enumValueProvider
+        EnumValueProvider $enumValueProvider,
+        ConfigManager $configManager
     ) {
         parent::__construct($class, $registry, $encoderFactory);
 
         $this->enumValueProvider = $enumValueProvider;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -131,5 +138,13 @@ class UserManager extends BaseUserManager
 
             $user->addRole($role);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isCaseInsensitiveEmailAddressesEnabled(): bool
+    {
+        return (bool) $this->configManager->get('oro_user.case_insensitive_email_addresses_enabled');
     }
 }

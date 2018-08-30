@@ -236,7 +236,7 @@ services:
 
     oro_api.resources_cache.impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
