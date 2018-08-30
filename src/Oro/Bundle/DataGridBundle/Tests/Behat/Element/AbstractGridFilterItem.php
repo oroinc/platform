@@ -26,4 +26,11 @@ abstract class AbstractGridFilterItem extends Element
         $this->find('css', 'span.reset-filter')->click();
         $this->getDriver()->waitForAjax();
     }
+
+    public function close()
+    {
+        if ($this->isOpen()) {
+            $this->find('css', '.filter-criteria-selector')->click();
+        }
+    }
 }

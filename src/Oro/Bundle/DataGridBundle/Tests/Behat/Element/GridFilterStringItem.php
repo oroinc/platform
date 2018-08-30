@@ -37,6 +37,22 @@ class GridFilterStringItem extends AbstractGridFilterItem
     }
 
     /**
+     * Get type of filter e.g. Contains, Ends With etc.
+     *
+     * @param string $filterType
+     */
+    public function getSelectedType($filterType)
+    {
+        $elem = $this->getElement('Chosen Select Option');
+
+        if (preg_match(sprintf('/%s/i', $filterType), $elem->getText())) {
+            return;
+        }
+
+        self::fail(sprintf('Chosen "%s" filter instead of "%s" type', $elem->getText(), $filterType));
+    }
+
+    /**
      * Set value to input field
      *
      * @param string $value
