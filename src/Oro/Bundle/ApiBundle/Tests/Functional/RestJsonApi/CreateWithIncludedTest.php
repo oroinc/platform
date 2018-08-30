@@ -178,7 +178,8 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
                     [
                         'status' => '400',
                         'title'  => 'request data constraint',
-                        'detail' => 'The entity should have a relationship with the primary entity',
+                        'detail' => 'The entity should have a relationship with the primary entity'
+                            . ' and this should be explicitly specified in the request',
                         'source' => [
                             'pointer' => '/included/0'
                         ]

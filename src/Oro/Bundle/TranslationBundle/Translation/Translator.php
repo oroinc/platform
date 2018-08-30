@@ -4,11 +4,13 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
+use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -70,6 +72,9 @@ class Translator extends BaseTranslator
     /** @var TranslationDomainProvider */
     private $translationDomainProvider;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
      * @param ContainerInterface $container
      * @param MessageFormatter $formatter
@@ -104,6 +109,14 @@ class Translator extends BaseTranslator
     public function setTranslationDomainProvider(TranslationDomainProvider $translationDomainProvider)
     {
         $this->translationDomainProvider = $translationDomainProvider;
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -304,6 +317,7 @@ class Translator extends BaseTranslator
 
             $translator->setStrategyProviderLink($this->strategyProviderLink);
             $translator->setTranslationDomainProvider($this->translationDomainProvider);
+            $translator->setEventDispatcher($this->eventDispatcher);
             $translator->setInstalled($this->installed);
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
 
@@ -379,7 +393,15 @@ class Translator extends BaseTranslator
     protected function loadCatalogue($locale)
     {
         $this->initializeDynamicResources($locale);
+        $isCacheReady = is_file($this->getCatalogueCachePath($locale));
         parent::loadCatalogue($locale);
+
+        if (!$isCacheReady && $this->isApplicationInstalled()) {
+            $this->eventDispatcher->dispatch(
+                AfterCatalogueDump::NAME,
+                new AfterCatalogueDump($this->catalogues[$locale])
+            );
+        }
     }
 
     /**

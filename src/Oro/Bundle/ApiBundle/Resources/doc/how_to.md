@@ -534,7 +534,7 @@ acme_api_get_my_resource:
 For information about the `ApiDoc` annotation, see [Symfony documentation](https://symfony.com/doc/2.x/bundles/NelmioApiDocBundle/the-apidoc-annotation.html). 
 To learn about all possible properties of the `fields` option, see [AbstractFormatter class in NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle/blob/2.x/Formatter/AbstractFormatter.php). Please note that the `fields` option can be used inside the `input` and `output` options.
 
-Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://www.oroinc.com/doc/orocrm/current/book/data-api#api-sandbox).
+Use the [oro:api:doc:cache:clear](./commands.md#oroapidoccacheclear) command to apply changes in the `ApiDoc` annotation to [API Sandbox](https://oroinc.com/orocrm/doc/current/dev-guide/web-api#api-sandbox).
 
 ## Add a Custom Route
 

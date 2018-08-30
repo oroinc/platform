@@ -6,9 +6,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\ORMInvalidArgumentException;
-use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\UserBundle\Entity\Repository\AbstractUserRepository;
 use Oro\Bundle\UserBundle\Entity\UserInterface as OroUserInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -18,6 +17,8 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * The base class for work with a user entity.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class BaseUserManager implements UserProviderInterface
 {
@@ -124,7 +125,22 @@ class BaseUserManager implements UserProviderInterface
      */
     public function findUserByEmail($email)
     {
+        $repository = $this->getRepository();
+
+        // Check if repository supports case insensitive search by email.
+        if ($repository instanceof AbstractUserRepository) {
+            return $repository->findUserByEmail((string)$email, $this->isCaseInsensitiveEmailAddressesEnabled());
+        }
+
         return $this->findUserBy(['email' => $email]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isCaseInsensitiveEmailAddressesEnabled(): bool
+    {
+        return false;
     }
 
     /**

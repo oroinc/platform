@@ -125,7 +125,7 @@ class RequireJSConfigProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
             ->will($this->returnValue(false));
 
@@ -133,12 +133,6 @@ class RequireJSConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('save')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY, ['default' => $config]);
-
-        $this->cache
-            ->expects($this->once())
-            ->method('fetch')
-            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(['default' => $config]));
 
         /** @var LayoutContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(LayoutContext::class);
@@ -161,9 +155,9 @@ class RequireJSConfigProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache
             ->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(true));
+            ->will($this->returnValue([]));
 
         $contextHolder = new LayoutContextHolder();
 
@@ -176,12 +170,6 @@ class RequireJSConfigProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetConfigOutOfBoundsException()
     {
-        $this->cache
-            ->expects($this->once())
-            ->method('contains')
-            ->with(RequireJSConfigProvider::REQUIREJS_CONFIG_CACHE_KEY)
-            ->will($this->returnValue(true));
-
         $this->cache
             ->expects($this->once())
             ->method('fetch')

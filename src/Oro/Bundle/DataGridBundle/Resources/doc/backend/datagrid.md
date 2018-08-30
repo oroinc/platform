@@ -5,18 +5,20 @@ Table of content
 -----------------
 - [Overview](#overview)
 - [Getting Started](#getting-started)
-- [Advanced grid configuration](./advanced_grid_configuration.md)
+- [Advanced grid configuration (How to's)](./advanced_grid_configuration.md)
+- [Configuration reference](./configuration_reference.md)
 - [Editable data grid cells](./editable_grid_cells.md)
-- [Implementation](#implementation)
+- [Implementation](./implementation.md)
 - [Extendability](#extendability)
 
+
 ## Overview
-Datagrid is table oriented representation of some data from some datasource.
- It's configuration is declarative YAML based file, that should be placed in `Resources/config/oro` folder of your bundle and named `datagrids.yml`.
-  This file should contain root node `datagrids` and each grid configuration should be placed under it.
+Datagrid is a table oriented representation of the data from some datasource.
+It is configured in a YAML file, that should be placed in the `Resources/config/oro` folder of your bundle and named `datagrids.yml`.
+This file should contain root node `datagrids` and each grid configuration should be placed under it.
 
 ## Getting Started
-#### Configuration file
+#### Configuration File
 First of all to define own datagrid you should create configuration file as described in "overview" section.
 After that, you have to choose identifier of yours future grid and declare it by adding associative array with identifier as key.
 e.g.
@@ -39,7 +41,7 @@ datagrids:
                 ....   # some query configuration
 ```
 
-##### Datasource as service
+##### Datasource as Service
 Other than the `query` yaml-oriented provider, ORM datasource supports an alternative `query_builder` service-oriented provider. 
 Basically it is possible to use any arbitrary method that returns a valid `Doctrine\ORM\QueryBuilder` instance.
 
@@ -76,7 +78,7 @@ datagrids:
             query_builder: "@acme_demo.user.repository->getUsersQb"
 ```
 
-##### Parameters binding
+##### Parameters Binding
 
 If datasource supports parameters binding, additional option "bind_parameters" can be specified. For example
 
@@ -102,13 +104,13 @@ Each binding will call `->setParameter('group_id', group_id)` automatically upon
 
 [More about parameters binding](./parameter_binding.md).
 
-#### Columns and properties
+#### Columns and Properties
 Next step is columns definition. It's array as well as other parts of grid configuration.
- Root node for columns is `columns`, definition key should be unique column identifier, value is array of column configuration.
+ Root node for columns is `columns`, the definition key should be a unique column identifier, the value is an array of the column configuration.
   The same for properties, but root node is `properties`.
 
-Property is similar something similar to column, but it has not frontend representation.
-Usually they are used when needs to pass some additional data that should be generated for each row(e.g urls for actions, row identifier for some needs etc).
+Property is something similar to column but it has no frontend representation.
+Properties can be used to pass additional data generated for each row, for example URLs of row actions.
 
 **Note:** _column identifier is used for some suggestion, so best practice is to use identifier similar with data identifier (e.g field name in DQL)_
 
@@ -122,9 +124,9 @@ Configuration format is different depending on column type, but there are list o
 - `editable` - is column editable on frontend (`false` - by default)
 - `data_name` - data identifier (column name suggested by default)
 - `renderable` - should column be rendered (`true` - by default)
-- `order` - number of column's position, allows to change columns order over [Column Manager](../frontend/column_manager.md) and save it in [Grid View](./extensions/grid_views.md) (by default is not defined and columns are rendered in order they are declared in configuration)
-- `required` - if it is `true` the column can not be hidden over [Column Manager](../frontend/column_manager.md) (by default is not defined)
-- `manageable` - if it is `true` the column does not appear in [Column Manager](../frontend/column_manager.md) (by default is not defined)
+- `order` - number of column's position, allows to change order of the columns over [Column Manager](../frontend/column_manager.md) and save it in [Grid View](./extensions/grid_views.md) (by default is not defined and the columns are rendered in the order in which they are declared in the configuration)
+- `required` - if it is `true` the column can not be hidden over [Column Manager](../frontend/column_manager.md) (by default is `false`)
+- `manageable` - if it is `false` the column does not appear in [Column Manager](../frontend/column_manager.md) (by default is `true`)
 - `shortenableLabel` - could column label be abbreviated or shortened with ellipsis (`true` - by default)
 
 For detailed explanation [see](./extensions/formatter.md).
@@ -138,7 +140,8 @@ datagrids:
             query:
                 select: [ o.firstName, o.lastName, o.age ]
                 from: 
-                    - { table: AcmeDemoBundle:Entity, alias: o }
+                    - { table: AcmeDemoBundle:Entity, alias: o } #defining table class using FQCN
+#                    - { table: '%acme_demo.entity.entity_name.class%', alias: o } #defining table class using parameter
         columns:
             firstName:                                   # data identifier will be taken from column name
                 label: acme.demo.grid.columns.firstName  # translation string
@@ -148,8 +151,6 @@ datagrids:
                 label: acme.demo.grid.columns.age        # translation string
                 frontend_type: number                    # needed for correct l10n (e.g. thousand, decimal separators etc)
 ``` 
-
-*Note: Since `%` is a reserved symbol for container parameters, you need to escape it by using `%%` instead.*
 
 #### Sorting
 After that you may want to make your columns sortable. Sorting configuration should be placed under `sorters` node.
@@ -176,11 +177,11 @@ datagrids:
 
 For detailed explanation [see](./extensions/sorter.md).
 
-#### Final step
+#### Final Step
 Final step for this tutorial is to add grid to template.
-There is predefined macros used for grid render. It defined in ` OroDataGridBundle::macros.html.twig` and could be imported
-by following call `{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}` .
-Macros name is `renderGrid`, it takes 2 arguments: grid name, route parameters(used for advanced query building).
+There is a predefined macro for grid rendering, that is defined in ` OroDataGridBundle::macros.html.twig` and can be imported
+by the following call `{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}` .
+Macro's name is `renderGrid`, it takes 2 arguments: grid name, route parameters(used for advanced query building).
 So for displaying our grid we have to add following code to template:
 
 ``` twig
@@ -189,27 +190,14 @@ So for displaying our grid we have to add following code to template:
      {{ dataGrid.renderGrid('acme-demo-datagrid') }}
 {% endblock %}
 ```
-**Note:** _if your template extends OroUIBundle:actions:index.html.twig template macros will be already imported and just set variable `gridName` make grid renered_
+**Note:** If your template extends the OroUIBundle:actions:index.html.twig template, macros will be already imported and you only have to set the gridName variable to get the grid rendered
 
-Actions, mass actions, toolbar, pagers, grid views and other functionality are explained on [advanced grid configuration](./advanced_grid_configuration.md) page.
+#### Advanced Configuration
 
-## Implementation
-[Base classes diagram](./diagrams/datagrid_base_uml.jpg) shows class relations and dependencies.
-
-#### Key classes
-
-- Datagrid\Manager - responsible of preparing of grid and it's configuration.
-- Datagrid\Builder - responsible of creating and configuring datagrid object and it's datasource.
-Contains registered datasource type and extensions, also it performs check for datasource availability according to ACL
-- Datagrid\Datagrid - main grid object, has knowledge ONLY about datasource object and interaction with it,  all further modifications of results and metadata comes from extensions
-- Extension\Acceptor - is visitable mediator, contains all applied extensions nad provokes visits in different points of interactions.
-- Extension\ExtensionVisitorInterface - visitor interface
-- Extension\AbstractExtension - basic empty implementation
-- Datasource\DatasourceInterface - link object between data and grid. Should provide results as array of ResultRecordInterface compatible objects
-- Provider\SystemAwareResolver - resolve specific grid YAML syntax expressions. For details [see](./references_in_configuration.md).
+Actions, mass actions, toolbar, pagers, grid views and other functionality are explained on [advanced grid configuration](./advanced_grid_configuration.md) page or you can check [configuration reference](./configuration_reference.md).
 
 ## Extendability
-#### Behavior customization
+#### Behavior Customization
 
 In order to customize the datagrid (e.g. dynamically added columns, custom actions, add additional data, etc.), you can listen to one of the events dispatched in the datagrid component. 
 More information on events, including their full list, is available in the [events documentation](./events.md).

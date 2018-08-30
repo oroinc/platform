@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
+/**
+ * Provides the list of all events related to entity configuration.
+ */
 final class Events
 {
     /**
@@ -47,19 +50,4 @@ final class Events
      * This event occurs after all changes of configuration data is flushed into a database.
      */
     const POST_FLUSH = 'oro.entity_config.post_flush';
-
-    /** @deprecated since 1.9. Use CREATE_ENTITY instead */
-    const NEW_ENTITY_CONFIG = 'entity_config.new.entity.config';
-    /** @deprecated since 1.9. Use UPDATE_ENTITY instead */
-    const UPDATE_ENTITY_CONFIG = 'entity_config.update.entity.config';
-    /** @deprecated since 1.9. Use CREATE_FIELD instead */
-    const NEW_FIELD_CONFIG = 'entity_config.new.field.config';
-    /** @deprecated since 1.9. Use UPDATE_FIELD instead */
-    const UPDATE_FIELD_CONFIG = 'entity_config.update.field.config';
-    /** @deprecated since 1.9. Use RENAME_FIELD instead */
-    const RENAME_FIELD_OLD = 'entity_config.rename.field';
-    /** @deprecated since 1.9. Use PRE_FLUSH instead */
-    const PRE_PERSIST_CONFIG = 'entity_config.persist.config';
-    /** @deprecated since 1.9. Use POST_FLUSH instead */
-    const POST_FLUSH_CONFIG = 'entity_config.flush.config';
 }

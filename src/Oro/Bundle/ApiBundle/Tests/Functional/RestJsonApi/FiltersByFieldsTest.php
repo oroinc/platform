@@ -155,7 +155,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $key = key($filter);
         $filter = [sprintf('filter[%s]!', $key) => $filter[$key]];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $key && $this->isPostgreSql()) {
             $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
         }
@@ -176,7 +177,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $key = key($filter);
         $filter[$key] = ['neq' => $filter[$key]];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $key && $this->isPostgreSql()) {
             $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
         }
@@ -553,7 +555,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = ['filters' => sprintf('filter[%s]*true', $filterFieldName)];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
             $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
         }
@@ -573,7 +576,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = [$filterFieldName => ['exists' => 'true']];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
             $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
         }
@@ -754,7 +758,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = ['filters' => sprintf('filter[%s]*false', $filterFieldName)];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
             $expectedRows = [];
         }
@@ -774,7 +779,8 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = [$filterFieldName => ['exists' => 'false']];
 
-        // @todo: BAP-12444: in PostgreSQL by some reasons NULL is saved in DB as FALSE for boolean column
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
             $expectedRows = [];
         }
@@ -1527,6 +1533,50 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $response = $this->cget(['entity' => $entityType], ['filter' => $filter]);
 
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function testFilterWithUrlEncodedQueryString()
+    {
+        /** @var TestAllDataTypes $entity */
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getReference('TestItem2')->id);
+        $entity->fieldString = 'Test String@2';
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+
+        $filter = 'filter%5BfieldString%5D%3DTest+String%402';
+        $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
+
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $this->prepareExpectedRows($expectedRows, $entityType);
+
+        $url = $this->getUrl($this->getListRouteName(), ['entity' => $entityType]);
+        $url .= '?' . $filter;
+        $response = $this->request('GET', $url);
+
+        self::assertResponseStatusCodeEquals($response, 200);
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function testFilterAlternativeSyntaxWithUrlEncodedQueryString()
+    {
+        /** @var TestAllDataTypes $entity */
+        $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $this->getReference('TestItem2')->id);
+        $entity->fieldString = 'Test String@2';
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+
+        $filter = 'filter%5BfieldString%5D%5Beq%5D%3DTest+String%402';
+        $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
+
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $this->prepareExpectedRows($expectedRows, $entityType);
+
+        $url = $this->getUrl($this->getListRouteName(), ['entity' => $entityType]);
+        $url .= '?' . $filter;
+        $response = $this->request('GET', $url);
+
+        self::assertResponseStatusCodeEquals($response, 200);
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 }

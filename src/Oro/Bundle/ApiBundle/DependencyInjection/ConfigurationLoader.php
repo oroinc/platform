@@ -462,7 +462,7 @@ class ConfigurationLoader
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $this->container
-            ->setDefinition($cacheServiceId, new ChildDefinition('oro.cache.abstract'))
+            ->setDefinition($cacheServiceId, new ChildDefinition('oro.cache.abstract.without_memory_cache'))
             ->setPublic(false)
             ->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);
 
