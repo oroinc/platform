@@ -12,10 +12,20 @@ abstract class AbstractGridFilterItem extends Element
     public function open()
     {
         if (!$this->isOpen()) {
-            $this->find('css', '.filter-criteria-selector')->click();
+            $this->toggleFilter();
         }
     }
 
+    public function close()
+    {
+        if ($this->isOpen()) {
+            $this->toggleFilter();
+        }
+    }
+
+    /**
+     * @return bool
+     */
     public function isOpen()
     {
         return $this->hasClass('open-filter');
@@ -27,10 +37,8 @@ abstract class AbstractGridFilterItem extends Element
         $this->getDriver()->waitForAjax();
     }
 
-    public function close()
+    private function toggleFilter()
     {
-        if ($this->isOpen()) {
-            $this->find('css', '.filter-criteria-selector')->click();
-        }
+        $this->find('css', '.filter-criteria-selector')->click();
     }
 }
