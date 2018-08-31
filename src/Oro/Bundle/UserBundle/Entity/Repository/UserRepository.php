@@ -3,14 +3,16 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class UserRepository extends EntityRepository implements EmailAwareRepository
+/**
+ * Doctrine repository for Oro\Bundle\UserBundle\Entity\User entity.
+ */
+class UserRepository extends AbstractUserRepository implements EmailAwareRepository
 {
     /**
      * @param bool|null $enabled

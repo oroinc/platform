@@ -10,14 +10,19 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLength;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Form type that used to receive options for extended field type.
+ */
 class FieldType extends AbstractType
 {
     const ORIGINAL_FIELD_NAMES_ATTRIBUTE = 'original_field_names';
@@ -67,9 +72,6 @@ class FieldType extends AbstractType
             [
                 'label'       => 'oro.entity_extend.form.field_name.label',
                 'block'       => 'general',
-                'constraints' => [
-                    new Assert\Length(['min' => 2, 'max' => $this->nameGenerator->getMaxCustomEntityFieldNameSize()])
-                ],
             ]
         );
 
@@ -120,6 +122,21 @@ class FieldType extends AbstractType
                     ]
                 ]
             );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $fieldName = $view->children['fieldName'];
+
+        //configuring js validator with correct parameters
+        $validation = \json_decode($fieldName->vars['attr']['data-validation'], true);
+        $validation[FieldNameLength::class]['min'] = FieldNameLength::MIN_LENGTH;
+        $validation[FieldNameLength::class]['max'] = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+
+        $fieldName->vars['attr']['data-validation'] = \json_encode($validation);
     }
 
     /**
