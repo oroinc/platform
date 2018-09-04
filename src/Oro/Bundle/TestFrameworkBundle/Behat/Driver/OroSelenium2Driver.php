@@ -165,11 +165,19 @@ JS;
                 return false;		
             }
             
+            if (jQuery.active) {
+                return false;
+            }
+            
             if (jQuery(document.body).hasClass('loading')) {
                 return false;
             }
 
             if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
+            if (0 !== jQuery("div.lazy-loading").length) {
                 return false;
             }
             
