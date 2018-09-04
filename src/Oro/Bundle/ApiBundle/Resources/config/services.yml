@@ -301,6 +301,23 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
 
+    oro_api.config_cache_factory:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/api'
+            - '%kernel.debug%'
+
+    oro_api.config_cache_warmer:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer
+        public: false
+        arguments:
+            - [] # config files. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.config_extension_registry'
+            - '@oro_api.config_cache_factory'
+            - '%kernel.debug%'
+            - '%kernel.environment%'
+
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
         public: false
