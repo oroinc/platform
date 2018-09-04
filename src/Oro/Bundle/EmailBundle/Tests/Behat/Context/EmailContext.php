@@ -126,12 +126,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     {
         self::assertNotEmpty($table, 'Assertions list must contain at least one row.');
 
-        $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
-        self::assertContains(
-            $searchField,
-            $allowedFields,
-            'Argument searchField must be one of '.implode(', ', $allowedFields)
-        );
+        self::assertEmailFieldValid($searchField);
 
         $mailer = $this->getMailer();
         if (!$mailer instanceof DirectMailerDecorator) {
@@ -160,6 +155,31 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         }
 
         self::assertNotFalse($found, 'Sent emails don\'t contain expected data.');
+    }
+
+    /**
+     * Example: Then email with Subject "Your RFQ has been received." was not sent:
+     *
+     * @Given /^email with (?P<searchField>[\w]+) "(?P<searchText>(?:[^"]|\\")*)" was not sent/
+     *
+     * @param string $searchField
+     * @param string $searchText
+     */
+    public function emailWithFieldIsNotSent(string $searchField, string $searchText)
+    {
+        self::assertEmailFieldValid($searchField);
+
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        /** @var \Swift_Mime_Message $message */
+        foreach ($mailer->getSentMessages() as $message) {
+            if ($searchText === $this->getMessageData($message, $searchField)) {
+                self::fail(sprintf('Email with %s \"%s\" was not expected to be sent', $searchField, $searchText));
+            }
+        }
     }
 
     /**
@@ -217,5 +237,18 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         }
 
         return $this->mailer;
+    }
+
+    /**
+     * @param string $fieldName
+     */
+    private static function assertEmailFieldValid(string $fieldName): void
+    {
+        $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
+        self::assertContains(
+            $fieldName,
+            $allowedFields,
+            'Email field must be one of '.implode(', ', $allowedFields)
+        );
     }
 }

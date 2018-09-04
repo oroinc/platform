@@ -1298,6 +1298,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )should see "(?P<message>(.+))" in confirmation dialogue$/
+     */
+    public function shouldSeeInConfirmationDialogue($message)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement('Modal');
+        self::assertContains(
+            $message,
+            $element->getText(),
+            sprintf('Confirmation dialogue does not contains text %s', $message)
+        );
+    }
+
+    /**
      * @When /^(?:|I )confirm deletion$/
      */
     public function confirmDeletion()

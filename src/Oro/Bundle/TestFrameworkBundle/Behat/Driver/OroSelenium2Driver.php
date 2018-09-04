@@ -161,11 +161,19 @@ JS;
                 return false;
             }
             
+            if (jQuery == null || jQuery.active) {
+                return false;
+            }
+            
             if (document.body.classList.contains('loading')) {
                 return false;
             }
 
             if (document.querySelector('.loader-mask.shown') !== null) {
+                return false;
+            }
+            
+            if (document.querySelector('div.lazy-loading') !== null) {
                 return false;
             }
             

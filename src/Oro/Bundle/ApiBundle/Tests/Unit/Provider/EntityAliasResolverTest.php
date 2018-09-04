@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
-use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Psr\Log\LoggerInterface;
@@ -15,7 +15,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
     private $loader;
 
-    /** @var EntityOverrideProvider */
+    /** @var MutableEntityOverrideProvider */
     private $entityOverrideProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
@@ -30,7 +30,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
-        $this->entityOverrideProvider = new EntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
+        $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
         $this->cache = $this->createMock(Cache::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
