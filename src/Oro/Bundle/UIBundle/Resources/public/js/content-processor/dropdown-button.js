@@ -42,6 +42,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
         _renderButtons: function() {
             var $elems = this._collectButtons();
             if ($elems.length <= 1) {
+                this._removeDropdownMenu();
                 return;
             }
 
@@ -127,6 +128,12 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 'class': 'dropdown-menu',
                 'data-options': '{"align": "right", "attachToParent": "true"}'
             }).append(this._prepareButtons($buttons));
+        },
+
+        _removeDropdownMenu: function() {
+            if (this.element.find('[data-toggle="dropdown"]').length) {
+                this.element.find('[data-toggle="dropdown"], .dropdown-menu').remove();
+            }
         },
 
         _prepareMainButton: function($main) {

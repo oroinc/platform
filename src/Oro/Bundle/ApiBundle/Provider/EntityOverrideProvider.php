@@ -8,24 +8,18 @@ namespace Oro\Bundle\ApiBundle\Provider;
  */
 class EntityOverrideProvider implements EntityOverrideProviderInterface
 {
+    /** @var ConfigCache */
+    private $configCache;
+
     /** @var string[] [class name => substitute class name, ...] */
     private $substitutions;
 
     /**
-     * @param string[] $substitutions [class name => substitute class name, ...]
+     * @param ConfigCache $configCache
      */
-    public function __construct(array $substitutions)
+    public function __construct(ConfigCache $configCache)
     {
-        $this->substitutions = $substitutions;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $substituteEntityClass
-     */
-    public function addSubstitution(string $entityClass, string $substituteEntityClass): void
-    {
-        $this->substitutions[$entityClass] = $substituteEntityClass;
+        $this->configCache = $configCache;
     }
 
     /**
@@ -33,6 +27,10 @@ class EntityOverrideProvider implements EntityOverrideProviderInterface
      */
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
+        if (null === $this->substitutions) {
+            $this->substitutions = $this->configCache->getSubstitutions();
+        }
+
         if (!isset($this->substitutions[$entityClass])) {
             return null;
         }

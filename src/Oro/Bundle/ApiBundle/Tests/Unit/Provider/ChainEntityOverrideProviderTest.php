@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
-use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
 
 class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,11 +13,11 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->chainEntityOverrideProvider = new ChainEntityOverrideProvider([
-            new EntityOverrideProvider([
+            new MutableEntityOverrideProvider([
                 'Test\Entity1' => 'Test\Model1_1',
                 'Test\Entity2' => 'Test\Model2_1'
             ]),
-            new EntityOverrideProvider([
+            new MutableEntityOverrideProvider([
                 'Test\Entity2' => 'Test\Model2_2',
                 'Test\Entity3' => 'Test\Model3_2'
             ])

@@ -510,6 +510,37 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert alert with text is present
+     * Example: Then I should see alert with message "You have unsaved changes"
+     *
+     * @Then /^(?:|I )should see alert with message "(?P<expectedMessage>[^"]+)"$/
+     */
+    public function iShouldSeeAlert(string $expectedMessage)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $alertMessage = $session->getAlert_text();
+
+            self::assertEquals(
+                $expectedMessage,
+                $alertMessage,
+                sprintf(
+                    'Expected to see alert with message "%s" but alert with "%s" found instead',
+                    $expectedMessage,
+                    $alertMessage
+                )
+            );
+        } catch (NoAlertOpenError $e) {
+            self::fail('Expected to see alert, but it was not found');
+
+            return;
+        }
+    }
+
+    /**
      * Assert that no malicious scripts present on page
      * Example: Then I should not see malicious scripts
      *
