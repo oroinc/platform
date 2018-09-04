@@ -30,6 +30,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
     private const FILTER_OPERATOR_REGISTRY_SERVICE_ID           = 'oro_api.filter_operator_registry';
     private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
+    private const CONFIG_CACHE_WARMER_SERVICE_ID                = 'oro_api.config_cache_warmer';
 
     /**
      * {@inheritdoc}
@@ -195,9 +196,18 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
+
         $apiDocViews = $config['api_doc_views'];
         $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, array_keys($apiDocViews));
         $container->setParameter(self::API_DOC_DEFAULT_VIEW_PARAMETER_NAME, $this->getDefaultView($apiDocViews));
+
+        $configFiles = [];
+        foreach ($config['config_files'] as $configKey => $fileConfig) {
+            $configFiles[$configKey] = $fileConfig['file_name'];
+        }
+        $container
+            ->getDefinition(self::CONFIG_CACHE_WARMER_SERVICE_ID)
+            ->replaceArgument(0, $configFiles);
     }
 
     /**
