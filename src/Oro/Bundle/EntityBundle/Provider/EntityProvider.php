@@ -215,7 +215,7 @@ class EntityProvider
      *
      * @return bool
      */
-    protected function isIgnoredEntity($className)
+    public function isIgnoredEntity($className)
     {
         return $this->exclusionProvider->isIgnoredEntity($className);
     }
