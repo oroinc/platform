@@ -79,7 +79,8 @@ var ORO = (function(ORO) {
                     realTag = document.createElement('script');
 
                     if (scripts[k].hasAttribute('src')) {
-                        realTag.setAttribute('src', scripts[k].getAttribute('src'));
+                        realTag.async = scripts[k].async;
+                        realTag.src = scripts[k].src;
                     } else {
                         realTag.innerHTML = scripts[k].innerHTML;
                     }
