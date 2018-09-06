@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager;
@@ -878,6 +879,44 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->setStartTime(new \DateTime($start));
         $filterItem->setEndTime(new \DateTime($end));
         $filterItem->submit();
+    }
+
+    /**
+     * Asserts header in datepicker.
+     *
+     * Example: Then I should see following header in "Datepicker" filter:
+     *             | S | M | T | W | T | F | S |
+     *
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter:$/
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter in "(?P<filterGridName>[\w\s]+)":$/
+     *
+     * @param string $filterName
+     * @param TableNode $table
+     * @param string $filterGridName
+     */
+    public function iShouldSeeFollowingHeaderInDateTimeFilter(
+        string $filterName,
+        TableNode $table,
+        $filterGridName = 'Grid'
+    ) {
+        $data = $table->getRows();
+        self::assertNotEmpty($data);
+
+        /** @var GridFilterDateTimeItem $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)
+            ->getFilterItem($filterGridName . 'FilterDateTimeItem', $filterName);
+
+        $filterItem->open();
+        $filterItem->selectType('equals');
+
+        /** @var DateTimePicker $input */
+        $input = $filterItem->findVisible('css', '.datepicker-input');
+        $input = $this->elementFactory->wrapElement('DateTimePicker', $input);
+
+        self::assertTrue($input->isVisible());
+        self::assertEquals(reset($data), $input->getHeader());
+
+        $filterItem->close();
     }
 
     /**
