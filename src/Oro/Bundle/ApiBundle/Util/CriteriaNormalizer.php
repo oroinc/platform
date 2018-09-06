@@ -5,12 +5,25 @@ namespace Oro\Bundle\ApiBundle\Util;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\Join;
 
+/**
+ * Performs the following normalizations of the Criteria object:
+ * * sets missing join aliases
+ * * adds required joins
+ * * replaces LEFT JOIN with INNER JOIN where it is possible
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class CriteriaNormalizer
 {
     const JOIN_ALIAS_TEMPLATE = 'alias%d';
 
     /** @var DoctrineHelper */
     private $doctrineHelper;
+
+    /** @var RequireJoinsFieldVisitorFactory */
+    private $requireJoinsFieldVisitorFactory;
+
+    /** @var OptimizeJoinsFieldVisitorFactory */
+    private $optimizeJoinsFieldVisitorFactory;
 
     /** @var DoctrineHelper */
     private $rootEntityClass;
@@ -22,6 +35,24 @@ class CriteriaNormalizer
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param RequireJoinsFieldVisitorFactory $factory
+     * @deprecated will be removed in 3.0
+     */
+    public function setRequireJoinsFieldVisitorFactory(RequireJoinsFieldVisitorFactory $factory)
+    {
+        $this->requireJoinsFieldVisitorFactory = $factory;
+    }
+
+    /**
+     * @param OptimizeJoinsFieldVisitorFactory $factory
+     * @deprecated will be removed in 3.0
+     */
+    public function setOptimizeJoinsFieldVisitorFactory(OptimizeJoinsFieldVisitorFactory $factory)
+    {
+        $this->optimizeJoinsFieldVisitorFactory = $factory;
     }
 
     /**
@@ -65,7 +96,7 @@ class CriteriaNormalizer
     }
 
     /**
-     * Makes sure that this criteria object contains all required joins and aliases are set for all joins.
+     * Makes sure that this criteria object contains all required joins.
      *
      * @param Criteria $criteria
      */
@@ -109,7 +140,7 @@ class CriteriaNormalizer
      */
     protected function optimizeJoins(Criteria $criteria)
     {
-        $fields = $this->getWhereFields($criteria);
+        $fields = $this->getFieldsToOptimizeJoins($criteria);
         foreach ($fields as $field) {
             $join = $criteria->getJoin($field);
             if (null !== $join && Join::LEFT_JOIN === $join->getJoinType()) {
@@ -247,7 +278,7 @@ class CriteriaNormalizer
             return [];
         }
 
-        $visitor = new FieldVisitor();
+        $visitor = $this->requireJoinsFieldVisitorFactory->createExpressionVisitor();
         $visitor->dispatch($whereExpr);
 
         return $visitor->getFields();
@@ -270,6 +301,24 @@ class CriteriaNormalizer
         }
 
         return $fields;
+    }
+
+    /**
+     * @param Criteria $criteria
+     *
+     * @return string[]
+     */
+    protected function getFieldsToOptimizeJoins(Criteria $criteria): array
+    {
+        $whereExpr = $criteria->getWhereExpression();
+        if (null === $whereExpr) {
+            return [];
+        }
+
+        $visitor = $this->optimizeJoinsFieldVisitorFactory->createExpressionVisitor();
+        $visitor->dispatch($whereExpr);
+
+        return $visitor->getFields();
     }
 
     /**

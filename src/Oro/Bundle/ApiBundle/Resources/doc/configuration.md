@@ -320,6 +320,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **data_type** (*string*) - The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false` for `string`, `boolean`, `datetime`, `date`, `time` fields. and `true` for other fields.
     * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false` for `string`, `boolean`, `guid`, `currency` fields. and `true` for other fields.
+    * **collection** (*boolean*) - Indicates whether the filter represents a collection valued association. By default, `false` for filters by fields and *to-one* associations, and `true` for filters by *to-many* associations.
     * **type** (*string*) - The filter type. By default, the filter type is equal to the **data_type** property value.
     * **options** (*array*) - The filter options.
     * **operators** (*array*) - A list of operators supported by the filter. By default, the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>**, and **>=** operators, etc. Use this parameter when you need to limit a list of supported operators.

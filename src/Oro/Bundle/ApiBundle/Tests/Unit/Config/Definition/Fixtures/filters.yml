@@ -70,8 +70,10 @@ full:
                     exclude: true
                     property_path: path1
                     data_type: string
+                    collection: true
                     allow_array: true
                     allow_range: true
+                    collection: true
                     description: description1
                 field4:
                     exclude: false
@@ -79,6 +81,8 @@ full:
                     allow_array: false
                 field6:
                     allow_range: false
+                field7:
+                    collection: false
     expected:
         filters:
             exclusion_policy: all
@@ -91,6 +95,7 @@ full:
                     data_type: string
                     allow_array: true
                     allow_range: true
+                    collection: true
                     description: description1
                 field4:
                     exclude: false
@@ -98,6 +103,8 @@ full:
                     allow_array: false
                 field6:
                     allow_range: false
+                field7:
+                    collection: false
 
 invalid_field_exclude:
     config:
@@ -143,6 +150,15 @@ invalid_field_allow_range:
                     allow_range: 123
     expected: []
     error: 'Invalid type for path "entity.filters.fields.field1.allow_range". Expected boolean, but got integer.'
+
+invalid_field_collection:
+    config:
+        filters:
+            fields:
+                field1:
+                    collection: 123
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.collection". Expected boolean, but got integer.'
 
 null_field_description:
     config:
