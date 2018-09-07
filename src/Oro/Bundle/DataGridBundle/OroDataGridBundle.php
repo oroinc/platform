@@ -23,5 +23,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new CompilerPass\InlineEditColumnOptionsGuesserPass());
         $container->addCompilerPass(new CompilerPass\SetDatagridEventListenersLazyPass());
         $container->addCompilerPass(new CompilerPass\BoardProcessorsPass());
+        $container->addCompilerPass(new CompilerPass\SelectedFieldsProvidersPass());
     }
 }

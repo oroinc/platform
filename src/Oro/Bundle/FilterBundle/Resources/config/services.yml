@@ -56,3 +56,19 @@ services:
         class: Oro\Bundle\FilterBundle\Utils\DateFilterModifier
         arguments:
             - '@oro_filter.expression.date.compiler'
+
+    oro_filter.provider.state.filters:
+        class: 'Oro\Bundle\FilterBundle\Provider\State\FiltersStateProvider'
+        parent: oro_datagrid.provider.state.abtract
+        lazy: true
+        arguments:
+            - '@oro_datagrid.tools.parameters_helper'
+
+    oro_datagrid.provider.selected_fields.filters:
+        class: 'Oro\Bundle\FilterBundle\Provider\SelectedFields\SelectedFieldsFromFiltersProvider'
+        public: false
+        lazy: true
+        arguments:
+            - '@oro_filter.provider.state.filters'
+        tags:
+            - { name: oro_datagrid.selected_fields_provider }

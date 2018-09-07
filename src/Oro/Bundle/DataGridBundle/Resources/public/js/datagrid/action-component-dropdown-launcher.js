@@ -28,7 +28,15 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
-            'shown.bs.dropdown': 'onOpen'
+            'shown.bs.dropdown': 'onOpen',
+            'hide.bs.dropdown': 'onHide'
+        },
+
+        /**
+         * @inheritDoc
+         */
+        constructor: function ActionComponentDropdownLauncher() {
+            ActionComponentDropdownLauncher.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -92,8 +100,10 @@ define(function(require) {
 
         /**
          * Handles dropdown menu open and sets max-width for the element
+         *
+         * @param {jQuery.Event} e
          */
-        onOpen: function() {
+        onOpen: function(e) {
             if (_.isFunction(this.component.updateViews)) {
                 this.component.updateViews();
             }
@@ -103,10 +113,22 @@ define(function(require) {
                 $dropdownMenu.css({
                     maxWidth: rect.right + 'px'
                 });
+
+                // focus input after Bootstrap opened dropdown menu
+                $dropdownMenu.focusFirstInput();
+
+                $dropdownMenu.trigger('dropdown-launcher:show', [e]);
             }
-            var $elem = this.$('.dropdown-menu');
-            // focus input after Bootstrap opened dropdown menu
-            $elem.focusFirstInput();
+        },
+
+        /**
+         * @param {jQuery.Event} e
+         */
+        onHide: function(e) {
+            var $dropdownMenu = this.$('>.dropdown-menu');
+            if ($dropdownMenu.length) {
+                $dropdownMenu.trigger('dropdown-launcher:hide', [e]);
+            }
         },
 
         /**

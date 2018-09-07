@@ -86,6 +86,9 @@ services:
             - "@oro_datagrid.datagrid.guesser"
             - "@oro_entity_extend.datagrid.extension.fields_helper"
             - "@oro_featuretoggle.checker.feature_checker"
+        calls:
+            - ['setDoctrineHelper', ['@oro_entity.doctrine_helper']]
+            - ['setSelectedFieldsProvider', ['@oro_datagrid.provider.selected_fields']]
         tags:
             - { name: oro_datagrid.extension }
 
