@@ -128,4 +128,9 @@ class EntityFieldFallbackValue
 
         return $this->arrayValue;
     }
+
+    public function __clone()
+    {
+        $this->id = null;
+    }
 }
