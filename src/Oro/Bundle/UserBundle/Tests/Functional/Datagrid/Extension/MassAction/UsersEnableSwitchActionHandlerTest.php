@@ -26,8 +26,8 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
         $userReference = 'user.1';
         $this->initToken($userReference, 'organization.1');
         $userRepository = $this->getUserRepo();
-        $qb             = $userRepository->createQueryBuilder('u');//select all
-        $resultIterator = new IterableResult($qb);
+        $query          = $userRepository->createQueryBuilder('u')->getQuery();//select all
+        $resultIterator = new IterableResult($query);
         $handler = self::getContainer()->get('oro_datagrid.mass_action.users_enable_switch.handler.disable');
         /** @var DatagridInterface $datagrid */
         $datagrid = $this->createMock(DatagridInterface::class);
@@ -40,13 +40,17 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
 
         /** @var User $user */
         foreach ($users as $user) {
-            if ($user->getId() !== $currentUser->getId()) {
+            // Admin user should not processed because he was created at another organization.
+            if ($user->getId() !== $currentUser->getId() && $user->getUsername() !== 'admin') {
                 self::assertFalse($user->isEnabled());
             }
         }
 
-        $all          = $qb->select('COUNT(u)')->getQuery()->getSingleScalarResult();
-        $expectedMessage = sprintf('%s user(s) were disabled', $all - 1/* except current*/);
+        $all          = $userRepository->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->getQuery()
+            ->getSingleScalarResult();
+        $expectedMessage = sprintf('%s user(s) were disabled', $all - 2/* except current and admin*/);
         self::assertEquals($expectedMessage, $response->getMessage());
     }
 

@@ -5,6 +5,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Data fixtures loader that allow to use nelmio/alice to load data fixtures in functional tests.
+ */
 class DataFixturesLoader extends Loader
 {
     /** @var ContainerInterface */
@@ -53,5 +56,22 @@ class DataFixturesLoader extends Loader
         $fixture = parent::addFixture($fixture);
 
         return $fixture;
+    }
+
+    /**
+     * Converts fixture dependencies to be allow to set short path to alice file fixture as dependency.
+     * {@inheritdoc}
+     */
+    protected function getUnsequencedFixtures(array $sequences, $dependencies = null)
+    {
+        $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($this->container->get('kernel'));
+
+        if (is_array($dependencies)) {
+            foreach ($dependencies as $id => $dependency) {
+                $dependencies[$id] = $fixtureIdentifierResolver->resolveId($dependency);
+            }
+        }
+
+        return parent::getUnsequencedFixtures($sequences, $dependencies);
     }
 }

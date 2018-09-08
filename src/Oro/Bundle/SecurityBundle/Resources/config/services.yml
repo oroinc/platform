@@ -478,9 +478,7 @@ services:
     oro_security.acl_helper:
         class: '%oro_security.acl_helper.class%'
         arguments:
-             - '@oro_security.orm.ownership_sql_walker_builder'
-             - '@event_dispatcher'
-             - '@oro_security.orm.acl_conditional_factor_builder'
+            - '@service_container'
 
     oro_security.search.acl_helper:
         class: '%oro_security.search.acl_helper.class%'
@@ -663,9 +661,6 @@ services:
                 tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
 
-    oro_security.orm.acl_conditional_factor_builder:
-        class: '%oro_security.orm.acl_conditional_factor_builder.class%'
-
     oro_security.configuration.permission_list_configuration:
         class: '%oro_security.configuration.permission_list_configuration.class%'
 
@@ -835,3 +830,22 @@ services:
             - '@service_container'
         tags:
             - { name: oro_platform.console.global_options_provider }
+
+    oro_security.access_rule.chain_access_rule:
+        class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
+
+    oro_security.access_rule.acl:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_security.owner.metadata_provider.chain'
+        tags:
+            - { name: oro_security.access_rule }
+
+    oro_security.access_rule.available_owner_check:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AvailableOwnerAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_security.owner.metadata_provider.chain'
+        tags:
+            - { name: oro_security.access_rule }
