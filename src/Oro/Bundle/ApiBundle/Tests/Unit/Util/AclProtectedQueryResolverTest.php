@@ -39,11 +39,9 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
         $config = new EntityConfig();
         $config->addHint('test');
 
-        $this->aclHelper->expects(self::never())
-            ->method('setCheckRootEntity');
         $this->aclHelper->expects(self::once())
             ->method('apply')
-            ->with(self::identicalTo($query));
+            ->with(self::identicalTo($query), 'VIEW', []);
         $this->queryHintResolver->expects(self::once())
             ->method('resolveHints')
             ->with(self::identicalTo($query), $config->getHints());
@@ -59,15 +57,9 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
         $config->addHint('test');
         $config->set(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY, true);
 
-        $this->aclHelper->expects(self::at(0))
-            ->method('setCheckRootEntity')
-            ->with(false);
-        $this->aclHelper->expects(self::at(1))
+        $this->aclHelper->expects(self::once())
             ->method('apply')
-            ->with(self::identicalTo($query));
-        $this->aclHelper->expects(self::at(2))
-            ->method('setCheckRootEntity')
-            ->with(true);
+            ->with(self::identicalTo($query), 'VIEW', ['checkRootEntity' => false]);
         $this->queryHintResolver->expects(self::once())
             ->method('resolveHints')
             ->with(self::identicalTo($query), $config->getHints());

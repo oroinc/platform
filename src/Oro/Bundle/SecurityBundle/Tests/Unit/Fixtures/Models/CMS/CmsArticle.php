@@ -2,48 +2,51 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity
- * @Table(name="cms_articles")
+ * @ORM\Entity()
+ * @ORM\Table(name="cms_articles")
  */
 class CmsArticle
 {
     /**
-     * @Id
-     * @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
 
     /**
-     * @Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255)
      */
     public $topic;
 
     /**
-     * @Column(type="text")
+     * @ORM\Column(type="text")
      */
     public $text;
 
     /**
-     * @ManyToOne(targetEntity="CmsUser", inversedBy="articles")
-     * @JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="CmsUser", inversedBy="articles")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     public $user;
 
     /**
-     * @OneToMany(targetEntity="CmsComment", mappedBy="article")
+     * @ORM\OneToMany(targetEntity="CmsComment", mappedBy="article")
      */
     public $comments;
 
     /**
-     * @Version @column(type="integer")
+     * Version
+     * @ORM\column(type="integer")
      */
     public $version;
 
     /**
-     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @JoinColumn(name="organization", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
      */
     public $organization;
 

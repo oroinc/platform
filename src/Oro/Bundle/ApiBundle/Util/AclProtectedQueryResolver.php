@@ -35,17 +35,12 @@ class AclProtectedQueryResolver extends QueryResolver
      */
     public function resolveQuery(Query $query, EntityConfig $config)
     {
+        $options = [];
         $skipRootEntity = (bool)$config->get(self::SKIP_ACL_FOR_ROOT_ENTITY);
         if ($skipRootEntity) {
-            $this->aclHelper->setCheckRootEntity(false);
-            try {
-                $this->aclHelper->apply($query);
-            } finally {
-                $this->aclHelper->setCheckRootEntity(true);
-            }
-        } else {
-            $this->aclHelper->apply($query);
+            $options[AclHelper::CHECK_ROOT_ENTITY] = false;
         }
+        $this->aclHelper->apply($query, 'VIEW', $options);
 
         parent::resolveQuery($query, $config);
     }

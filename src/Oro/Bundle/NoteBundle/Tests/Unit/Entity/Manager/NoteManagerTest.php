@@ -92,7 +92,7 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnSelf());
         $this->aclHelper->expects($this->once())
             ->method('apply')
-            ->with($this->identicalTo($qb))
+            ->with($this->identicalTo($qb), 'VIEW', ['checkRelations' => false])
             ->will($this->returnValue($query));
         $query->expects($this->once())
             ->method('getResult')

@@ -2,6 +2,9 @@
 
 namespace Oro\Component\TestUtils\ORM;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
@@ -10,20 +13,14 @@ use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Base testcase class for all ORM testcases.
+ * The base class for ORM related test cases.
  *
  * This class is a clone of Doctrine\Tests\OrmTestCase that is excluded from doctrine package since v2.4.
  */
 abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * The metadata cache that is shared between all ORM tests (except functional tests).
-     */
-    private static $metadataCacheImpl = null;
-    /**
-     * The query cache that is shared between all ORM tests (except functional tests).
-     */
-    private static $queryCacheImpl = null;
+    /** @var CacheProvider The metadata cache that is shared between all ORM tests */
+    private $metadataCacheImpl;
 
     protected function getProxyDir($shouldBeCreated = true)
     {
@@ -63,15 +60,11 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getTestEntityManager($conn = null, $eventManager = null, $withSharedMetadata = true)
     {
-        $metadataCache = $withSharedMetadata
-            ? self::getSharedMetadataCacheImpl()
-            : new \Doctrine\Common\Cache\ArrayCache;
-
         $config = new \Doctrine\ORM\Configuration();
 
-        $config->setMetadataCacheImpl($metadataCache);
+        $config->setMetadataCacheImpl($this->getMetadataCacheImpl($withSharedMetadata));
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
-        $config->setQueryCacheImpl(self::getSharedQueryCacheImpl());
+        $config->setQueryCacheImpl($this->getQueryCacheImpl());
         $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
@@ -242,21 +235,29 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    private static function getSharedMetadataCacheImpl()
+    /**
+     * @return CacheProvider
+     */
+    private function getMetadataCacheImpl($withSharedMetadata)
     {
-        if (self::$metadataCacheImpl === null) {
-            self::$metadataCacheImpl = new \Doctrine\Common\Cache\ArrayCache;
+        if (!$withSharedMetadata) {
+            // do not cache anything to avoid influence between tests
+            return new ChainCache();
         }
 
-        return self::$metadataCacheImpl;
+        if ($this->metadataCacheImpl === null) {
+            $this->metadataCacheImpl = new ArrayCache();
+        }
+
+        return $this->metadataCacheImpl;
     }
 
-    private static function getSharedQueryCacheImpl()
+    /**
+     * @return CacheProvider
+     */
+    private function getQueryCacheImpl()
     {
-        if (self::$queryCacheImpl === null) {
-            self::$queryCacheImpl = new \Doctrine\Common\Cache\ArrayCache;
-        }
-
-        return self::$queryCacheImpl;
+        // do not cache anything to avoid influence between tests
+        return new ChainCache();
     }
 }
