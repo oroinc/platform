@@ -17,4 +17,3 @@ User Interface, Dialogs
 
 - [JavaScript windows components](./Resources/doc/javascript_window_components.md)
 - [Windows as Widget](./Resources/doc/windows_as_widget.md)
-- [Windows REST API](./Resources/doc/windows_rest_api.md)

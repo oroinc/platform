@@ -1,7 +1,7 @@
 API simple search
 ====================
 
-REST and SOAP APIs allow to search by all text fields in all entities.
+REST API allow to search by all text fields in all entities.
 
 Parameters for APIs requests:
 
@@ -10,8 +10,6 @@ Parameters for APIs requests:
  - **max_results** - count of result records in response
 
 REST API url: `http://domail.com/api/rest/latest/search`
-
-SOAP function name: search
 
 REST API works with GET requests only. So, search request to the search must be like example:
 `http://domail.com/api/rest/latest/search?max_results=100&offset=0&search=search_string`
