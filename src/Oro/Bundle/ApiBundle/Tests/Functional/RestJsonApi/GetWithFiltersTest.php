@@ -302,19 +302,11 @@ class GetWithFiltersTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        $this->assertResponseContains(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'filter constraint',
-                        'detail' => 'The filter is not supported.',
-                        'source' => [
-                            'parameter' => 'filter[wrongFieldName]'
-                        ]
-                    ]
-                ]
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'filter[wrongFieldName]']
             ],
             $response
         );

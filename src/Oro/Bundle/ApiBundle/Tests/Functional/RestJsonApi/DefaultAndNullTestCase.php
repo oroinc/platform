@@ -15,7 +15,7 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
      *
      * @return Response
      */
-    protected function sendCreateRequest(array $data, $expectedStatusCode = 201)
+    protected function sendCreateRequest(array $data, $expectedStatusCode = Response::HTTP_CREATED)
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
@@ -40,7 +40,7 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
      *
      * @return Response
      */
-    protected function sendUpdateRequest($entityId, array $data, $expectedStatusCode = 200)
+    protected function sendUpdateRequest($entityId, array $data, $expectedStatusCode = Response::HTTP_OK)
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
