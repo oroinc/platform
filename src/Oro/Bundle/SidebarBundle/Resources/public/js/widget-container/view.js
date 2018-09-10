@@ -85,6 +85,8 @@ define(function(require) {
                     model: this.model,
                     el: this.$('.sidebar-widget-content')
                 });
+
+                this.adjustMaxHeight();
             }
         },
 
