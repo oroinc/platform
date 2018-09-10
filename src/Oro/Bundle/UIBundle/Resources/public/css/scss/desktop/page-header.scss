@@ -36,6 +36,30 @@
         position: relative;
         top: 8px;
     }
+
+    .navigation {
+        .row {
+            display: flex;
+
+            > .pull-left-extra {
+                width: 100%;
+            }
+
+            > .pull-right {
+                max-width: 100%;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .customer-content {
+        .top-row {
+            .pull-left {
+                float: none;
+                display: inline;
+            }
+        }
+    }
 }
 
 .customer-info {
@@ -51,5 +75,11 @@
         a {
             color: #006acc;
         }
+    }
+
+    .sub-title,
+    .separator,
+    .user-name {
+        display: inline;
     }
 }
