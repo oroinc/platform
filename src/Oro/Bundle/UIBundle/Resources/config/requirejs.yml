@@ -52,6 +52,7 @@ config:
         'bootstrap-modal':
             deps:
                 - 'jquery'
+                - 'bootstrap-util'
         'bootstrap-popover':
             deps:
                 - 'jquery'
@@ -146,7 +147,7 @@ config:
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
         'bootstrap-collapse': 'components/bootstrap/js/dist/collapse.js'
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
-        'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
+        'bootstrap-modal': 'components/bootstrap/js/dist/modal.js'
         'bootstrap-popover': 'components/bootstrap/js/dist/popover.js'
         'bootstrap-scrollspy': 'components/bootstrap/js/dist/scrollspy.js'
         'bootstrap-tab': 'components/bootstrap/js/dist/tab.js'
@@ -157,7 +158,6 @@ config:
         'underscore': 'bundles/bowerassets/underscore/underscore.js'
         'backbone': 'bundles/bowerassets/backbone/backbone.js'
         'chaplin': 'bundles/bowerassets/chaplin/chaplin.js'
-        'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'jquery.timepicker': 'bundles/bowerassets/timepicker/jquery.timepicker.js'
         'jquery.datepair': 'bundles/bowerassets/datepair/dist/jquery.datepair.js'
         'datepair': 'bundles/bowerassets/datepair/dist/datepair.js'

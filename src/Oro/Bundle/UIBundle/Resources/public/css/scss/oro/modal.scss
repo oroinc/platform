@@ -1,40 +1,42 @@
 /* @theme: admin.oro; */
 
 .modal {
+    outline: 0;
+
     &-header {
         padding: $modal-header-inner-offset;
 
         border-radius: $modal-border-radius $modal-border-radius 0 0;
         background-color: $primary-300;
         border: $modal-header-border;
+    }
 
-        .close {
-            height: $modal-close-size;
-            width: $modal-close-size;
-            margin: $modal-close-top-outer-offset;
-            float: #{$end};
+    &-title {
+        font-size: $modal-title-font-size;
+        font-weight: $modal-title-font-weight;
+        line-height: $modal-title-font-size;
+        text-align: #{$start};
+    }
 
-            font-size: $base-font-size--l;
-            text-align: $modal-close-align;
-            line-height: $modal-close-size;
+    .close {
+        height: $modal-close-size;
+        width: $modal-close-size;
+        margin: $modal-close-top-outer-offset;
+        float: #{$end};
 
+        font-size: $base-font-size--l;
+        text-align: $modal-close-align;
+        line-height: $modal-close-size;
+
+        color: $primary-inverse;
+
+        opacity: $modal-close-opacity;
+
+        &:hover,
+        &:focus {
             color: $primary-inverse;
 
-            opacity: $modal-close-opacity;
-
-            &:hover,
-            &:focus {
-                color: $primary-inverse;
-
-                opacity: $modal-close-hover-opacity;
-            }
-        }
-
-        h3 {
-            font-size: $modal-title-font-size;
-            font-weight: $modal-title-font-weight;
-            line-height: $modal-title-font-size;
-            text-align: #{$start};
+            opacity: $modal-close-hover-opacity;
         }
     }
 
