@@ -880,8 +880,10 @@ a.attachment .icon .fa-link {
 .attachment-list-popup .attachment-list-row {
     line-height: 26px;
     font-size: 13px;
+}
 
-    .popover-content {
+.attachment-preview-popover {
+    .popover-body {
         padding: 10px;
         min-width: 110px;
     }

@@ -206,10 +206,6 @@ JS;
             if (document.title === 'Loading...') {
                 return false;
             }
-        
-            if (jQuery == null || jQuery.active) {
-                return false;
-            }
             
             if (document.body.classList.contains('loading')) {
                 return false;
@@ -220,16 +216,17 @@ JS;
             }
             
             try {
+                if (jQuery == null || jQuery.active) {
+                    return false;
+                }
+                
                 if (!window.mediatorCachedForSelenium) {
                     window.mediatorCachedForSelenium = require('oroui/js/mediator');
                 }
                 
                 var isInAction = window.mediatorCachedForSelenium.execute('isInAction')
-                if (typeof(isInAction) !== 'boolean') {
-                    return false;
-                }
                 
-                if (isInAction) {
+                if (isInAction !== false || jQuery.active) {
                     return false;
                 }
             } catch (e) {

@@ -56,6 +56,7 @@ config:
             deps:
                 - 'jquery'
                 - 'bootstrap-tooltip'
+            exports: 'Popover'
         'bootstrap-scrollspy':
             deps:
                 - 'jquery'
@@ -67,6 +68,8 @@ config:
         'bootstrap-tooltip':
             deps:
                 - 'jquery'
+                - 'popper'
+                - 'bootstrap-util'
         'bootstrap-transition':
             deps:
                 - 'jquery'
@@ -138,15 +141,16 @@ config:
         'jquery.cookie': 'bundles/bowerassets/jquery-cookie/jquery.cookie.js'
         'jquery.mCustomScrollbar': 'bundles/bowerassets/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js'
         'jquery.jstree': 'bundles/components/jstree/dist/jstree.js'
+        'popper': 'oroui/js/extend/bootstrap/vendor/popper'
         'bootstrap-util': 'components/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
         'bootstrap-collapse': 'components/bootstrap/js/dist/collapse.js'
         'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
         'bootstrap-modal': 'bowerassets/bootstrap/js/bootstrap-modal.js'
-        'bootstrap-popover': 'bowerassets/bootstrap/js/bootstrap-popover.js'
+        'bootstrap-popover': 'components/bootstrap/js/dist/popover.js'
         'bootstrap-scrollspy': 'components/bootstrap/js/dist/scrollspy.js'
         'bootstrap-tab': 'components/bootstrap/js/dist/tab.js'
-        'bootstrap-tooltip': 'bowerassets/bootstrap/js/bootstrap-tooltip.js'
+        'bootstrap-tooltip': 'components/bootstrap/js/dist/tooltip.js'
         'bootstrap-transition': 'bowerassets/bootstrap/js/bootstrap-transition.js'
         'bootstrap-typeahead': 'bundles/oroui/lib/bootstrap/bootstrap-typeahead.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.js'
@@ -308,3 +312,7 @@ build:
 #       use AMD without dependency, therefore it's excluded
         'jquery.multiselect': 'empty:'
         'jquery.multiselect.filter': 'empty:'
+#        Transpiled bootstrap modules don't support AMD, but requires Popper from global scope
+#        and it is actually in AMD module
+        'bootstrap-tooltip': 'empty:'
+        'bootstrap-popover': 'empty:'

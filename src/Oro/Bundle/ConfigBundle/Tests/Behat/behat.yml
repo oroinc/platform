@@ -71,7 +71,7 @@ oro_behat_extension:
       selector: '.tooltip-icon.highlight-element'
 
     Tooltip Container:
-      selector: '.popover-content'
+      selector: '.popover-body'
 
     Shopping List Config:
       selector: 'form[name="shopping_list"]'

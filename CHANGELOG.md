@@ -5,6 +5,7 @@
 * Added [documentation about filters](./src/Oro/Bundle/ApiBundle/Resources/doc/filters.md).
 * Added data flow diagrams for public actions. See [Actions](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md).
 * Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
+* Added trigger `disposeLayout` on DOM element in `layout`
 
 #### CacheBundle
 * Added `oro.cache.abstract.without_memory_cache` that is the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service.
@@ -22,6 +23,7 @@
 
 #### UIBundle
 * All global JS Views and Components are defined in the HTML through data attributes.
+* Change target and name of a layout event. Now `layout` triggers `initLayout` event on DOM element instead `layoutInit` on `mediator`
 
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)
