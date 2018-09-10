@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * EntityFieldFallbackValue entity
+ *
  * @ORM\Table(name="oro_entity_fallback_value")
  * @ORM\Entity()
  * @Config()
@@ -20,6 +22,7 @@ class EntityFieldFallbackValue
 
     const PAGE_TEMPLATE = 'pageTemplate';
 
+    /** @var array */
     public static $specialRelations = [self::PAGE_TEMPLATE];
 
     /**
