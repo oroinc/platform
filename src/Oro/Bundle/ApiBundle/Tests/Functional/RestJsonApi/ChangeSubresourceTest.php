@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Extend\Entity\TestApiE1 as Entity;
 use Extend\Entity\TestApiE2 as TargetEntity;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -333,12 +334,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testDeleteToOneSubresource()
@@ -361,12 +364,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testUpdateToManySubresource()
@@ -391,12 +396,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testUpdateToManySubresourceWithInvalidData()
@@ -455,12 +462,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testDeleteToManySubresource()
@@ -485,12 +494,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testUpdateCustomSubresource()
@@ -513,12 +524,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testAddCustomSubresource()
@@ -541,12 +554,14 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     public function testDeleteCustomSubresource()
@@ -569,11 +584,13 @@ class ChangeSubresourceTest extends RestJsonApiTestCase
             false
         );
 
-        $expectedError = [
-            'title'  => 'runtime exception',
-            'detail' => 'The form builder was not created.'
-        ];
-        self::assertResponseStatusCodeEquals($response, 500);
-        $this->assertResponseContains(['errors' => [$expectedError]], $response);
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'runtime exception',
+                'detail' => 'The form builder was not created.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -19,23 +20,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not blank constraint',
-                        'detail' => 'This value should not be blank.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotBlank'
-                        ]
-                    ]
-                ]
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/withNotBlank']
             ],
-            $result
+            $response
         );
     }
 
@@ -66,23 +59,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not blank constraint',
-                        'detail' => 'This value should not be blank.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotBlank'
-                        ]
-                    ]
-                ]
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/withNotBlank']
             ],
-            $result
+            $response
         );
     }
 
@@ -100,23 +85,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, 400);
+        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not blank constraint',
-                        'detail' => 'This value should not be blank.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotBlank'
-                        ]
-                    ]
-                ]
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/withNotBlank']
             ],
-            $result
+            $response
         );
     }
 
@@ -132,23 +109,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not blank constraint',
-                        'detail' => 'This value should not be blank.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withDefaultValueAndNotBlank'
-                        ]
-                    ]
-                ]
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/withDefaultValueAndNotBlank']
             ],
-            $result
+            $response
         );
     }
 
@@ -165,23 +134,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, 400);
+        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not blank constraint',
-                        'detail' => 'This value should not be blank.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withDefaultValueAndNotBlank'
-                        ]
-                    ]
-                ]
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/withDefaultValueAndNotBlank']
             ],
-            $result
+            $response
         );
     }
 
@@ -195,23 +156,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not null constraint',
-                        'detail' => 'This value should not be null.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotNull'
-                        ]
-                    ]
-                ]
+                'title'  => 'not null constraint',
+                'detail' => 'This value should not be null.',
+                'source' => ['pointer' => '/data/attributes/withNotNull']
             ],
-            $result
+            $response
         );
     }
 
@@ -242,23 +195,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not null constraint',
-                        'detail' => 'This value should not be null.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotNull'
-                        ]
-                    ]
-                ]
+                'title'  => 'not null constraint',
+                'detail' => 'This value should not be null.',
+                'source' => ['pointer' => '/data/attributes/withNotNull']
             ],
-            $result
+            $response
         );
     }
 
@@ -276,23 +221,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, 400);
+        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not null constraint',
-                        'detail' => 'This value should not be null.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withNotNull'
-                        ]
-                    ]
-                ]
+                'title'  => 'not null constraint',
+                'detail' => 'This value should not be null.',
+                'source' => ['pointer' => '/data/attributes/withNotNull']
             ],
-            $result
+            $response
         );
     }
 
@@ -308,23 +245,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendCreateRequest($data, 400);
+        $response = $this->sendCreateRequest($data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not null constraint',
-                        'detail' => 'This value should not be null.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withDefaultValueAndNotNull'
-                        ]
-                    ]
-                ]
+                'title'  => 'not null constraint',
+                'detail' => 'This value should not be null.',
+                'source' => ['pointer' => '/data/attributes/withDefaultValueAndNotNull']
             ],
-            $result
+            $response
         );
     }
 
@@ -341,23 +270,15 @@ class NotNullAndNotBlankTest extends DefaultAndNullTestCase
             ]
         ];
 
-        $response = $this->sendUpdateRequest($entity->id, $data, 400);
+        $response = $this->sendUpdateRequest($entity->id, $data, Response::HTTP_BAD_REQUEST);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'not null constraint',
-                        'detail' => 'This value should not be null.',
-                        'source' => [
-                            'pointer' => '/data/attributes/withDefaultValueAndNotNull'
-                        ]
-                    ]
-                ]
+                'title'  => 'not null constraint',
+                'detail' => 'This value should not be null.',
+                'source' => ['pointer' => '/data/attributes/withDefaultValueAndNotNull']
             ],
-            $result
+            $response
         );
     }
 }

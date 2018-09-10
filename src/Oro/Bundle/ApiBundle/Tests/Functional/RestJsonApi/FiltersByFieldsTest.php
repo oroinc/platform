@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -1554,7 +1555,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $url .= '?' . $filter;
         $response = $this->request('GET', $url);
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
@@ -1576,7 +1577,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $url .= '?' . $filter;
         $response = $this->request('GET', $url);
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 }

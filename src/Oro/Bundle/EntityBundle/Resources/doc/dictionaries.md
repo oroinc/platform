@@ -1,71 +1,23 @@
-## Automatic creation of REST API for dictionaries
+# Dictionaries
 
 Dictionary entities are responsible for storing a predefined set of values of a certain type and their translations. They values within a dictionary can have a priority or some other data.
-Nevertheless, there is an automatic tool that creates a REST API resource for viewing dictionary values, which is accessible by the following URL:
 
-`/api/rest/{version}/{dictionary_plural_alias}.{_format}`. For example `/api/rest/latest/casestatuses.json`.
+## Automatic creation of REST API for dictionaries
 
-All generated REST API resources for dictionary values are processed by a single [DictionaryController](./../../Controller/Api/Rest/DictionaryController.php).
+REST API resources for viewing dictionary values are created automatically and they are accessible by the following URL:
 
-Please refer to the entity alias [document](entity_aliases.md) to get a better understanding how entity aliases are generated.
+`/api/{dictionary_plural_alias}`. For example `/api/casestatuses`.
+
+Please refer to [entity aliases](entity_aliases.md) to get a better understanding how the aliases are generated.
 
 **Dictionary types supported out-of-the-box**
 
 REST API resources are created automatically for the following types of dictionaries:
+
 - Non-translatable dictionary
 - Translatable dictionary (implements `Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation`)
 - Personal translatable dictionary (implements `Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation`)
 - Enum (Option set)
-
-
-**Customizing dictionary API**
-
-There are two approaches to customize the dictionary API basing on your needs
-
-***Creating a custom controller***
-
-In case if you need to customize API for just one dictionary entity, the easiest way will be to create a new controller that will override the automatically generated path. For example:
-
-```php
-/**
- * @RouteResource("casestatus")
- * @NamePrefix("oro_api_")
- */
-class CaseStatusesController extends RestGetController
-{
-    /**
-     * Get case statuses
-     *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10. Set -1 to get all items."
-     * )
-     * @QueryParam(
-     *      name="locale",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The preferred locale for dictionary values. Falls back to the default locale."
-     * )
-     * @ApiDoc(
-     *      description="Get case statuses",
-     *      resource=true
-     * )
-     * @return Response
-     */
-    public function cgetAction()
-    {
-        ...
-    }
-}
-```
 
 ***Creating a custom dictionary type***
 
