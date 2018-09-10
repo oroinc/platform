@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 /**
  * The configuration provider can be used to get configuration data inside particular configuration scope.
  */
-class ConfigProvider implements ConfigProviderInterface
+class ConfigProvider
 {
     /** @var ConfigManager */
     protected $configManager;
@@ -254,51 +254,6 @@ class ConfigProvider implements ConfigProviderInterface
                 gettype($object)
             )
         );
-    }
-
-    /**
-     * Removes configuration data for the given object (entity or field) from the cache.
-     *
-     * @param string      $className
-     * @param string|null $fieldName
-     *
-     * @deprecated since 1.9. Use ConfigManager::clearCache instead
-     */
-    public function clearCache($className, $fieldName = null)
-    {
-        $this->configManager->clearCache($this->getId($className, $fieldName));
-    }
-
-    /**
-     * Tells the ConfigManager to make the given configuration data managed and persistent.
-     *
-     * @param ConfigInterface $config
-     *
-     * @deprecated since 1.9. Use ConfigManager::persist instead
-     */
-    public function persist(ConfigInterface $config)
-    {
-        $this->configManager->persist($config);
-    }
-
-    /**
-     * @param ConfigInterface $config
-     *
-     * @deprecated since 1.9. Use ConfigManager::merge instead
-     */
-    public function merge(ConfigInterface $config)
-    {
-        $this->configManager->merge($config);
-    }
-
-    /**
-     * Flushes all changes to configuration data that have been queued up to now to the database.
-     *
-     * @deprecated since 1.9. Use ConfigManager::flush instead
-     */
-    public function flush()
-    {
-        $this->configManager->flush();
     }
 
     /**

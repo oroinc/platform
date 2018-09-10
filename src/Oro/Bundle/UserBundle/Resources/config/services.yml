@@ -59,6 +59,7 @@ services:
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
+            - '@oro_config.manager'
 
     oro_user.manager.api:
         class: '%oro_user.manager.api.class%'
@@ -451,6 +452,22 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
 
+    oro_user.validator.email_case_insensitive_option:
+        class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
+        arguments:
+            - '@oro_user.manager'
+            - '@translator'
+            - '@oro_datagrid.helper.route'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.email_case_insensitive_option }
+
+    oro_user.validator.unique_user_email_validator:
+        class: Oro\Bundle\UserBundle\Validator\UniqueUserEmailValidator
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.unique_user_email }
+
     oro_user.provider.password_complexity_config_provider:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
         arguments:
@@ -550,3 +567,11 @@ services:
             - '@security.token_storage'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    oro_user.event_listener.authentication_failure:
+        class: Oro\Bundle\UserBundle\EventListener\AuthenticationFailureListener
+        arguments:
+            - 'main'
+            - 'oro_user.login.errors.bad_credentials'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }

@@ -107,7 +107,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Checks whether the configuration of at least one field exists.
+     * Indicates whether the configuration of at least one field exists.
      *
      * @return bool
      */
@@ -381,7 +381,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Indicates whether the name of ACL resource is set explicitly.
      *
-     * @return string
+     * @return bool
      */
     public function hasAclResource()
     {

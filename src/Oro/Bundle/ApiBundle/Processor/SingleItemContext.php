@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 /**
- * A base implementation of the context for actions work with one entity.
+ * The base execution context for processors for actions work with one entity,
+ * such as "get", "update", "create" and "delete".
  */
 class SingleItemContext extends Context
 {

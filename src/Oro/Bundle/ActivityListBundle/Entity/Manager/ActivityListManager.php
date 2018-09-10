@@ -486,8 +486,8 @@ class ActivityListManager
 
             $updateQb = $dbConnection->createQueryBuilder();
             $updateQb->update($tableName)
-                ->set($targetField, 'masterEntityId')
-                ->where($updateQb->expr()->eq($targetField, ':sourceEntityI'))
+                ->set($targetField, ':masterEntityId')
+                ->where($updateQb->expr()->eq($targetField, ':sourceEntityId'))
                 ->andWhere($deleteQb->expr()->in($activityField, ':activityIds'))
                 ->setParameter('masterEntityId', $newTargetId)
                 ->setParameter('sourceEntityId', $oldTargetId)

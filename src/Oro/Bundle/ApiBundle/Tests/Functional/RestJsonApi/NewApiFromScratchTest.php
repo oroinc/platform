@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Symfony\Component\HttpFoundation\Response;
 
 class NewApiFromScratchTest extends RestJsonApiTestCase
 {
@@ -92,6 +93,6 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
     }
 }

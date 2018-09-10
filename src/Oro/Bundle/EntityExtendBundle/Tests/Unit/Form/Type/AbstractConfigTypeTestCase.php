@@ -160,10 +160,6 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         }
 
         // flush should be never called
-        foreach ($configProviders as $configProvider) {
-            $configProvider->expects($this->never())
-                ->method('flush');
-        }
         $this->configManager->expects($this->never())
             ->method('flush');
 

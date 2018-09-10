@@ -91,7 +91,9 @@ define(function(require) {
                 position: function() {
                     if (pinBar.el) {
                         return {
-                            left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                            left: _.isRTL()
+                                ? Math.ceil(pinBar.el.offsetLeft)
+                                : Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
                         };
                     } else {
                         return null;
@@ -110,6 +112,8 @@ define(function(require) {
             });
 
             this.pageState = new PageStateView(options);
+
+            mediator.setHandler('isPageStateChanged', this.pageState.isStateChanged.bind(this.pageState));
         },
 
         actualizeAttributes: function(model) {

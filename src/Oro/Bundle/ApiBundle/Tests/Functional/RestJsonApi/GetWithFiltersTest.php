@@ -250,7 +250,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestEmployee::class);
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter' => ['department.name' => 'TestDepartment2']]
+            ['filter' => ['department.title' => 'TestDepartment2']]
         );
 
         $this->assertResponseContains(
@@ -302,19 +302,11 @@ class GetWithFiltersTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        $this->assertResponseContains(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'filter constraint',
-                        'detail' => 'The filter is not supported.',
-                        'source' => [
-                            'parameter' => 'filter[wrongFieldName]'
-                        ]
-                    ]
-                ]
+                'title'  => 'filter constraint',
+                'detail' => 'The filter is not supported.',
+                'source' => ['parameter' => 'filter[wrongFieldName]']
             ],
             $response
         );

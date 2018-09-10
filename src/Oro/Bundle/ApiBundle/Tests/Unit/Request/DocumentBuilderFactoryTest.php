@@ -32,7 +32,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSouldReturnDocumentBuilderIfItExistsForSpecificRequestType()
+    public function testShouldReturnDocumentBuilderIfItExistsForSpecificRequestType()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -52,7 +52,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType()
+    public function testShouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -76,7 +76,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot find a document builder for the request "another".
      */
-    public function testSouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
+    public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api']

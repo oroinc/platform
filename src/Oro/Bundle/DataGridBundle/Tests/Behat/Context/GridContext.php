@@ -4,9 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\DateTimePicker;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridInterface;
@@ -326,7 +328,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^number of records in "(?P<gridName>[\w\s]+)" should be (?P<number>(?:|zero|one|two|\d+))$/
+     * @Given /^number of records in "(?P<gridName>[\w\s]+)"( grid)? should be (?P<number>(?:|zero|one|two|\d+))$/
      * @Given /^there (?:|are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number, $gridName = null)
@@ -878,6 +880,44 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Asserts header in datepicker.
+     *
+     * Example: Then I should see following header in "Datepicker" filter:
+     *             | S | M | T | W | T | F | S |
+     *
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter:$/
+     * @Then /^(?:|I )should see following header in "(?P<filterName>[^"]+)" filter in "(?P<filterGridName>[\w\s]+)":$/
+     *
+     * @param string $filterName
+     * @param TableNode $table
+     * @param string $filterGridName
+     */
+    public function iShouldSeeFollowingHeaderInDateTimeFilter(
+        string $filterName,
+        TableNode $table,
+        $filterGridName = 'Grid'
+    ) {
+        $data = $table->getRows();
+        self::assertNotEmpty($data);
+
+        /** @var GridFilterDateTimeItem $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)
+            ->getFilterItem($filterGridName . 'FilterDateTimeItem', $filterName);
+
+        $filterItem->open();
+        $filterItem->selectType('equals');
+
+        /** @var DateTimePicker $input */
+        $input = $filterItem->findVisible('css', '.datepicker-input');
+        $input = $this->elementFactory->wrapElement('DateTimePicker', $input);
+
+        self::assertTrue($input->isVisible());
+        self::assertEquals(reset($data), $input->getHeader());
+
+        $filterItem->close();
+    }
+
+    /**
      * Check checkboxes in multiple select filter
      * Example: When I check "Task, Email" in Activity Type filter
      *
@@ -1079,11 +1119,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            // Grid Row will assert us if action does not exists
-            $row->getActionLink(reset($item));
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertContains($item, $actions);
         }
     }
 
@@ -1101,6 +1150,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iShouldSeeOnlyFollowingActionsForRow($number, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByNumber($number);
 
         $actions = array_map(
@@ -1126,11 +1176,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function actionsForRowNotExist($content, TableNode $table, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
+        /** @var GridRow $row */
         $row = $grid->getRowByContent($content);
 
-        foreach ($table as $item) {
-            $action = $row->findActionLink(ucfirst(reset($item)));
-            self::assertNull($action, "$action still exists for $content row");
+        $actions = array_map(
+            function (Element $action) {
+                return $action->getText() ?: $action->getAttribute('title');
+            },
+            $row->getActionLinks()
+        );
+
+        $rows = array_column($table->getRows(), 0);
+
+        foreach ($rows as $item) {
+            self::assertNotContains($item, $actions);
         }
     }
 
@@ -1275,6 +1334,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $modal = $this->elementFactory->createElement('Modal');
         $modal->clickOrPress($button);
+    }
+
+    /**
+     * @When /^(?:|I )should see "(?P<message>(.+))" in confirmation dialogue$/
+     */
+    public function shouldSeeInConfirmationDialogue($message)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement('Modal');
+        self::assertContains(
+            $message,
+            $element->getText(),
+            sprintf('Confirmation dialogue does not contains text %s', $message)
+        );
     }
 
     /**
@@ -1534,14 +1607,23 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
@@ -1556,14 +1638,23 @@ TEXT;
     {
         $grid = $this->getGrid($gridName);
 
-        $grid->getElement($grid->getMappedChildElementName('GridFiltersButton'))->open();
+        $filtersButton = $grid->getMappedChildElementName('GridFiltersButton');
+        if ($grid->getElements($filtersButton)) {
+            $grid->getElement($filtersButton)->open();
+        }
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
         /** @var GridFilterManager $filterManager */
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
-        $filterManager->close();
+
+        try {
+            $filterManager->close();
+        } catch (\Exception $e) {
+            $filterButton->click();
+        }
     }
 
     /**
@@ -1757,7 +1848,7 @@ TEXT;
     }
 
     /**
-     * Example: I should see next rows in "Discounts" table:
+     * Example: I should see next rows in "Discounts" table
      *   | Description | Discount |
      *   | Amount      | -$2.00   |
      *

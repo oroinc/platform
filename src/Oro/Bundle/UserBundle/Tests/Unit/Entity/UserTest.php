@@ -78,13 +78,6 @@ class UserTest extends AbstractUserTest
         $this->assertFalse($user->hasRole($role));
     }
 
-    public function testCallbacks()
-    {
-        $user = $this->getUser();
-        $user->beforeSave();
-        $this->assertInstanceOf('\DateTime', $user->getCreatedAt());
-    }
-
     public function testStatuses()
     {
         $user = $this->getUser();
@@ -173,6 +166,15 @@ class UserTest extends AbstractUserTest
             ['updatedAt', new \DateTime()],
             ['salt', md5('user')],
         ];
+    }
+
+    public function testBeforeSave()
+    {
+        $user = $this->getUser();
+        $user->beforeSave();
+        $this->assertInstanceOf(\DateTime::class, $user->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $user->getUpdatedAt());
+        $this->assertEquals(0, $user->getLoginCount());
     }
 
     public function testPreUpdateUnChanged()
@@ -428,5 +430,13 @@ class UserTest extends AbstractUserTest
         $result = $user->getOrganizations(true);
         $this->assertCount(1, $result);
         $this->assertSame($result->first(), $organization);
+    }
+
+    public function testSetEmailGetEmailLowercase()
+    {
+        $user = $this->getUser();
+        $user->setEmail('John.Doe@example.org');
+
+        $this->assertEquals('john.doe@example.org', $user->getEmailLowercase());
     }
 }

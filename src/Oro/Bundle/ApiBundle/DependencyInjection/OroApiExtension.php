@@ -20,11 +20,17 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     public const API_DOC_VIEWS_PARAMETER_NAME        = 'oro_api.api_doc.views';
     public const API_DOC_DEFAULT_VIEW_PARAMETER_NAME = 'oro_api.api_doc.default_view';
+    public const REST_API_PREFIX_PARAMETER_NAME      = 'oro_api.rest.prefix';
+    public const REST_API_PATTERN_PARAMETER_NAME     = 'oro_api.rest.pattern';
+
+    private const REST_API_PREFIX_CONFIG  = 'rest_api_prefix';
+    private const REST_API_PATTERN_CONFIG = 'rest_api_pattern';
 
     private const ACTION_PROCESSOR_BAG_SERVICE_ID               = 'oro_api.action_processor_bag';
     private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
     private const FILTER_OPERATOR_REGISTRY_SERVICE_ID           = 'oro_api.filter_operator_registry';
     private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
+    private const CONFIG_CACHE_WARMER_SERVICE_ID                = 'oro_api.config_cache_warmer';
 
     /**
      * {@inheritdoc}
@@ -95,6 +101,26 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
+        // set "oro_api.rest.prefix" and "oro_api.rest.pattern" parameters
+        // they are required to correct processing a configuration of FOSRestBundle and SecurityBundle
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $filteredConfigs = [];
+        foreach ($configs as $item) {
+            $filteredItem = [];
+            if (\array_key_exists(self::REST_API_PREFIX_CONFIG, $item)) {
+                $filteredItem[self::REST_API_PREFIX_CONFIG] = $item[self::REST_API_PREFIX_CONFIG];
+            }
+            if (\array_key_exists(self::REST_API_PATTERN_CONFIG, $item)) {
+                $filteredItem[self::REST_API_PATTERN_CONFIG] = $item[self::REST_API_PATTERN_CONFIG];
+            }
+            if (!empty($filteredItem)) {
+                $filteredConfigs[] = $filteredItem;
+            }
+        }
+        $config = $this->processConfiguration($this->getConfiguration($filteredConfigs, $container), $filteredConfigs);
+        $container->setParameter(self::REST_API_PREFIX_PARAMETER_NAME, $config[self::REST_API_PREFIX_CONFIG]);
+        $container->setParameter(self::REST_API_PATTERN_PARAMETER_NAME, $config[self::REST_API_PATTERN_CONFIG]);
+
         if ($container instanceof ExtendedContainerBuilder) {
             $configs = $container->getExtensionConfig('fos_rest');
             foreach ($configs as $key => $config) {
@@ -103,7 +129,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                     array_unshift(
                         $configs[$key]['format_listener']['rules'],
                         [
-                            'path'             => '^/api/(?!(rest|doc)(/|$)+)',
+                            'path'             => '%' . self::REST_API_PATTERN_PARAMETER_NAME . '%',
                             'priorities'       => ['json'],
                             'fallback_format'  => 'json',
                             'prefer_extension' => false
@@ -170,9 +196,18 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $container
             ->getDefinition(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $config['config_max_nesting_level']);
+
         $apiDocViews = $config['api_doc_views'];
         $container->setParameter(self::API_DOC_VIEWS_PARAMETER_NAME, array_keys($apiDocViews));
         $container->setParameter(self::API_DOC_DEFAULT_VIEW_PARAMETER_NAME, $this->getDefaultView($apiDocViews));
+
+        $configFiles = [];
+        foreach ($config['config_files'] as $configKey => $fileConfig) {
+            $configFiles[$configKey] = $fileConfig['file_name'];
+        }
+        $container
+            ->getDefinition(self::CONFIG_CACHE_WARMER_SERVICE_ID)
+            ->replaceArgument(0, $configFiles);
     }
 
     /**

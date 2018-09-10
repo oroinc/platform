@@ -14,10 +14,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *   template that uses "nelmio_api_doc_index" directly
  * * to allow introduce new controllers for REST API sandbox with different views
  * Also makes sure that "view" request attribute contains the correct default API view
- * in case if a view was not requested explicitly.
+ * if a view was not requested explicitly.
  */
 class ValidateApiDocViewListener
 {
+    /** @var string */
+    private $basePath;
+
     /** @var string[] */
     private $views;
 
@@ -25,11 +28,13 @@ class ValidateApiDocViewListener
     private $defaultView;
 
     /**
+     * @param string      $basePath
      * @param string[]    $views
      * @param string|null $defaultView
      */
-    public function __construct(array $views, ?string $defaultView)
+    public function __construct(string $basePath, array $views, ?string $defaultView)
     {
+        $this->basePath = $basePath;
         $this->views = $views;
         $this->defaultView = $defaultView;
     }
@@ -99,7 +104,7 @@ class ValidateApiDocViewListener
     protected function isDefaultViewRequested(Request $request): bool
     {
         $pathInfo = $request->getPathInfo();
-        $pos = \strpos($pathInfo, '/api/doc');
+        $pos = \strpos($pathInfo, $this->basePath);
 
         return false === $pos || !\substr($pathInfo, $pos + 9);
     }

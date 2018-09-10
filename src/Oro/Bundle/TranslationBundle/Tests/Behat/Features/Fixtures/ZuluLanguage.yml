@@ -1,0 +1,6 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+    zulu_lang:
+        code: 'zu'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'

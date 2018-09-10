@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Provides access to Data API resourses and sub-resources related cache.
+ * Provides access to Data API resources and sub-resources related cache.
  */
 class ResourcesCache
 {

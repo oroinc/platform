@@ -25,6 +25,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
+ * The main entry point for entity configs.
  * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -57,13 +58,6 @@ class ConfigManager
 
     /** @var array */
     protected $configChangeSets = [];
-
-    /**
-     * @deprecated since 1.9. Should be removed together with deprecated events
-     * @see Oro\Bundle\EntityConfigBundle\Event\Events
-     * @var array
-     */
-    private $hasListenersCache = [];
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -429,7 +423,12 @@ class ConfigManager
     public function getId($scope, $className, $fieldName = null)
     {
         if ($fieldName) {
-            return $this->getFieldConfig($scope, $className, $fieldName)->getId();
+            $field = $this->findField($className, $fieldName);
+            if (null === $field) {
+                throw new RuntimeException(sprintf('Field "%s::%s" is not configurable', $className, $fieldName));
+            }
+
+            return new FieldConfigId($scope, $className, $fieldName, $field['t']);
         } else {
             return new EntityConfigId($scope, $className);
         }
@@ -489,9 +488,9 @@ class ConfigManager
      */
     public function flushAllCaches()
     {
-        //$this->cache->flushAllConfigurable();
-        //$this->cache->flushAllConfigs();
-        // @todo temporary solution. 'flush' methods should be used. should be fixed in BAP-9151
+        // 'flushAllConfigurable' and 'flushAllConfigs' methods cannot be used due to them are removed
+        // entries from all caches, not only from entity config related caches
+        // for details, see BAP-9151
         $this->cache->deleteAllConfigurable();
         $this->cache->deleteAllConfigs();
     }
@@ -549,13 +548,6 @@ class ConfigManager
             $this->auditManager->save($logEntry);
         }
 
-        // @todo: Should be removed together with deprecated events
-        if ($this->hasListeners(Events::POST_FLUSH_CONFIG)) {
-            $this->eventDispatcher->dispatch(
-                Events::POST_FLUSH_CONFIG,
-                new Event\FlushConfigEvent($models, $this)
-            );
-        }
         $this->eventDispatcher->dispatch(
             Events::POST_FLUSH,
             new Event\PostFlushConfigEvent($models, $this)
@@ -579,14 +571,6 @@ class ConfigManager
         $groupedConfigs = [];
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
-
-            // @todo: Should be removed together with deprecated events
-            if ($this->hasListeners(Events::PRE_PERSIST_CONFIG)) {
-                $this->eventDispatcher->dispatch(
-                    Events::PRE_PERSIST_CONFIG,
-                    new Event\PersistConfigEvent($config, $this)
-                );
-            }
 
             $configId = $config->getId();
             $modelKey = $configId instanceof FieldConfigId
@@ -778,13 +762,6 @@ class ConfigManager
                     $this->cache->saveEntities($entities, true);
                 }
 
-                // @todo: Should be removed together with deprecated events
-                if ($this->hasListeners(Events::NEW_ENTITY_CONFIG)) {
-                    $this->eventDispatcher->dispatch(
-                        Events::NEW_ENTITY_CONFIG,
-                        new Event\EntityConfigEvent($className, $this)
-                    );
-                }
                 $this->eventDispatcher->dispatch(
                     Events::CREATE_ENTITY,
                     new Event\EntityConfigEvent($className, $this)
@@ -843,13 +820,6 @@ class ConfigManager
                 $this->cache->saveFields($className, $fields, true);
             }
 
-            // @todo: Should be removed together with deprecated events
-            if ($this->hasListeners(Events::NEW_FIELD_CONFIG)) {
-                $this->eventDispatcher->dispatch(
-                    Events::NEW_FIELD_CONFIG,
-                    new Event\FieldConfigEvent($className, $fieldName, $this)
-                );
-            }
             $this->eventDispatcher->dispatch(
                 Events::CREATE_FIELD,
                 new Event\FieldConfigEvent($className, $fieldName, $this)
@@ -862,8 +832,6 @@ class ConfigManager
     /**
      * @param string $className
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigEntityModel($className, $force = false)
     {
@@ -887,13 +855,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
-        if ($this->hasListeners(Events::UPDATE_ENTITY_CONFIG)) {
-            $this->eventDispatcher->dispatch(
-                Events::UPDATE_ENTITY_CONFIG,
-                new Event\EntityConfigEvent($className, $this)
-            );
-        }
         $this->eventDispatcher->dispatch(
             Events::UPDATE_ENTITY,
             new Event\EntityConfigEvent($className, $this)
@@ -904,8 +865,6 @@ class ConfigManager
      * @param string $className
      * @param string $fieldName
      * @param bool   $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need handling for removed values
      */
     public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
@@ -935,13 +894,6 @@ class ConfigManager
             }
         }
 
-        // @todo: Should be removed together with deprecated events
-        if ($this->hasListeners(Events::UPDATE_FIELD_CONFIG)) {
-            $this->eventDispatcher->dispatch(
-                Events::UPDATE_FIELD_CONFIG,
-                new Event\FieldConfigEvent($className, $fieldName, $this)
-            );
-        }
         $this->eventDispatcher->dispatch(
             Events::UPDATE_FIELD,
             new Event\FieldConfigEvent($className, $fieldName, $this)
@@ -961,13 +913,6 @@ class ConfigManager
     {
         $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
         if ($result) {
-            // @todo: Should be removed together with deprecated events
-            if ($this->hasListeners(Events::RENAME_FIELD_OLD)) {
-                $this->eventDispatcher->dispatch(
-                    Events::RENAME_FIELD_OLD,
-                    new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
-                );
-            }
             $this->eventDispatcher->dispatch(
                 Events::RENAME_FIELD,
                 new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
@@ -1493,22 +1438,5 @@ class ConfigManager
             'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
             . ' check it by ConfigManager::modelManager::checkDatabase'
         );
-    }
-
-    /**
-     * @deprecated since 1.9. Should be removed together with deprecated events
-     * @see Oro\Bundle\EntityConfigBundle\Event\Events
-     *
-     * @param string $eventName
-     *
-     * @return bool
-     */
-    private function hasListeners($eventName)
-    {
-        if (!isset($this->hasListenersCache[$eventName])) {
-            $this->hasListenersCache[$eventName] = $this->eventDispatcher->hasListeners($eventName);
-        }
-
-        return $this->hasListenersCache[$eventName];
     }
 }

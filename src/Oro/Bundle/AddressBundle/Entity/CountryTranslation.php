@@ -6,10 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
 
 /**
+ * Represent Gedmo translation dictionary for Country entity.
+ *
  * @ORM\Table(name="oro_dictionary_country_trans", indexes={
  *      @ORM\Index(name="country_translation_idx", columns={"locale", "object_class", "field", "foreign_key"})
  * })
- * @ORM\Entity(repositoryClass="Gedmo\Translatable\Entity\Repository\TranslationRepository")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository")
  */
 class CountryTranslation extends AbstractTranslation
 {

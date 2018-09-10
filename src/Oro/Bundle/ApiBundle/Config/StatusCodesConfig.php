@@ -41,7 +41,7 @@ class StatusCodesConfig
     }
 
     /**
-     * Checks whether the configuration of at least one status code exists.
+     * Indicates whether the configuration of at least one status code exists.
      *
      * @return bool
      */
@@ -61,7 +61,7 @@ class StatusCodesConfig
     }
 
     /**
-     * Checks whether the configuration of the status code exists.
+     * Indicates whether the configuration of the given status code exists.
      *
      * @param string $code
      *

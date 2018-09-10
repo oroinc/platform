@@ -79,7 +79,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFieldsShouldRerurnEmptyArrayIfNoMandatoryFields()
+    public function testFieldsShouldReturnEmptyArrayIfNoMandatoryFields()
     {
         $entityClass = 'Test\Class';
 

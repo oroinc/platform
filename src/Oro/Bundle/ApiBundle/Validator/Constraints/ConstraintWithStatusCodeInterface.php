@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
 /**
- * This interface can be implemented by a validation constraint in case if a status code
+ * This interface can be implemented by a validation constraint if a status code
  * different than 400 (Bad Request) should be returned if the constraint is not satisfied.
  */
 interface ConstraintWithStatusCodeInterface

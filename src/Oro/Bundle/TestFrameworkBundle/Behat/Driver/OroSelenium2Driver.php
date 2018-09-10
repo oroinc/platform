@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Driver;
 
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
@@ -164,11 +165,19 @@ JS;
                 return false;		
             }
             
+            if (jQuery.active) {
+                return false;
+            }
+            
             if (jQuery(document.body).hasClass('loading')) {
                 return false;
             }
 
             if (0 !== jQuery("div.loader-mask.shown").length) {
+                return false;
+            }
+            
+            if (0 !== jQuery("div.lazy-loading").length) {
                 return false;
             }
             
@@ -392,5 +401,35 @@ var node = {{ELEMENT}};
 triggerEvent(node, '$eventName');
 JS;
         $this->executeJsOnXpath($xpath, $script);
+    }
+
+    /**
+     * @param NodeElement $element
+     */
+    public function switchToIFrameByElement(NodeElement $element)
+    {
+        $id = $element->getAttribute('id');
+
+        if ($id === null) {
+            $elementXpath = $element->getXpath();
+            $id = sprintf('iframe-%s', md5($elementXpath));
+
+            $function = <<<JS
+(function(){
+    var iframeElement = document.evaluate(
+        "{$elementXpath}",
+        document,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE,
+        null
+    ).singleNodeValue;
+    iframeElement.id = "{$id}";
+})()
+JS;
+
+            $this->executeScript($function);
+        }
+
+        parent::switchToIFrame($id);
     }
 }

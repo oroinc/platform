@@ -50,7 +50,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenHeaderAlreadExist()
+    public function testProcessWhenHeaderAlreadyExist()
     {
         $existingLocation = 'existing location';
 

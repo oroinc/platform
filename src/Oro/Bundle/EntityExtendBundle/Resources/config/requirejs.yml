@@ -7,3 +7,7 @@ config:
         'oro/datagrid/action/ajaxrestorefield-action': 'bundles/oroentityextend/js/datagrid/action/ajaxrestorefield-action.js'
         'oroentityextend/js/extend-field-form-component': 'bundles/oroentityextend/js/components/extend-field-form-component.js'
         'oroentityextend/js/bidirectional-only-for-extended-component': 'bundles/oroentityextend/js/components/bidirectional-only-for-extended-component.js'
+        'oroentityextend/js/app/modules/validator-constraints-module': 'bundles/oroentityextend/js/app/modules/validator-constraints-module.js'
+        'oroentityextend/js/validator/field-name-length': 'bundles/oroentityextend/js/validator/field-name-length.js'
+    appmodules:
+        - oroentityextend/js/app/modules/validator-constraints-module

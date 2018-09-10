@@ -3,7 +3,7 @@
 .main-menu-toggler {
     position: absolute;
     bottom: 0;
-    right: 0;
+    #{$end}: 0;
 
     width: 48px;
     padding-top: 14px;
@@ -14,6 +14,7 @@
     @extend %main-menu-trigger;
     @include fa-icon($menu-icon-toggler, before, true) {
         display: inline-block;
+        transform: rotate($menu-icon-toggler-transform);
     };
 
     &:hover,
@@ -27,7 +28,7 @@
         width: 100%;
 
         &:before {
-            transform: rotate(180deg);
+            transform: rotate($menu-icon-toggler-transform-active);
         }
     }
 }

@@ -40,7 +40,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('foo&lt;br/ &gt; foo&lt;br/ &gt;', $twig->render('html', array('foo' => 'foo<br/ >')));
         $this->assertEquals(
-            'foo\x3Cbr\x2F\x20\x3E foo\x3Cbr\x2F\x20\x3E',
+            'foo\u003Cbr\/\u0020\u003E foo\u003Cbr\/\u0020\u003E',
             $twig->render('js', array('bar' => 'foo<br/ >'))
         );
     }

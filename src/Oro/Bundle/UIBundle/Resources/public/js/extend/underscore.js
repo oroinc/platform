@@ -27,6 +27,10 @@ define(['underscore', 'asap'], function(_, asap) {
             return !this.isMobile();
         },
 
+        isRTL: function() {
+            return document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl';
+        },
+
         trim: function(text) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
         },

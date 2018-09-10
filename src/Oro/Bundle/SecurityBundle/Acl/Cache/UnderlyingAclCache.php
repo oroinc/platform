@@ -60,12 +60,11 @@ class UnderlyingAclCache
         if (!array_key_exists($type, $this->loadedBatches)
             || !array_key_exists($batchNumber, $this->loadedBatches[$type])
         ) {
-            //try to load batch
-            if ($this->cache->contains($batchKey)) {
-                $this->loadedBatches[$type][$batchNumber] = $this->cache->fetch($batchKey);
-            } else {
-                $this->loadedBatches[$type][$batchNumber] = [];
+            $batch = $this->cache->fetch($batchKey);
+            if (false === $batch) {
+                $batch = [];
             }
+            $this->loadedBatches[$type][$batchNumber] = $batch;
         }
 
         // set info that given id is underlined
@@ -99,11 +98,11 @@ class UnderlyingAclCache
         
         // check if batches info loaded and load it
         if (!array_key_exists($type, $this->entityBatches)) {
-            if ($this->cache->contains($type)) {
-                $this->entityBatches[$type] = $this->cache->fetch($type);
-            } else {
-                $this->entityBatches[$type] = [];
+            $batch = $this->cache->fetch($type);
+            if (false === $batch) {
+                $batch = [];
             }
+            $this->entityBatches[$type] = $batch;
         }
 
         // check if given batch is underlyied
@@ -115,13 +114,12 @@ class UnderlyingAclCache
         if (!array_key_exists($type, $this->loadedBatches)) {
             $this->loadedBatches[$type] = [];
         }
-        if (!array_key_exists($batchNumber, $this->loadedBatches[$type])
-        ) {
-            if ($this->cache->contains($batchKey)) {
-                $this->loadedBatches[$type][$batchNumber] = $this->cache->fetch($batchKey);
-            } else {
-                $this->loadedBatches[$type][$batchNumber] = [];
+        if (!array_key_exists($batchNumber, $this->loadedBatches[$type])) {
+            $batch = $this->cache->fetch($batchKey);
+            if (false === $batch) {
+                $batch = [];
             }
+            $this->loadedBatches[$type][$batchNumber] = $batch;
         }
 
         return array_key_exists($oid->getIdentifier(), $this->loadedBatches[$type][$batchNumber]);
