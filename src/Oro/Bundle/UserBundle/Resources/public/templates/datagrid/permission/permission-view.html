@@ -1,3 +1,4 @@
+<% var togglerId = _.uniqueId('dropdown-') %>
 <div
     data-toggle="dropdown" role="button" id="<%- togglerId %>"
     aria-label="<%- _.__('oro.role.permission.edit_label', {label: label}) %>"
@@ -11,3 +12,4 @@
        class="action-permissions__dropdown-toggle"
        title="<%- access_level_label %>"><%- access_level_label %></a>
 </div>
+<ul class="dropdown-menu dropdown-menu-collection dropdown-menu__permissions-item" aria-labelledby="<%- togglerId %>"></ul>

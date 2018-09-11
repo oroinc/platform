@@ -4,6 +4,7 @@
 
 .tooltip {
     &.show {
+        display: block;
         opacity: .9;
     }
 
@@ -61,5 +62,26 @@
             border-bottom-color: #000000;
             border-width: 0 5px 5px;
         }
+    }
+}
+
+.popover {
+    &.show {
+        display: block;
+    }
+}
+
+.dropdown-menu {
+    &.show {
+        display: block;
+    }
+
+    &[x-out-of-boundaries] {
+        display: none;
+    }
+
+    &.dropdown-menu-right {
+        right: 0;
+        left: auto;
     }
 }

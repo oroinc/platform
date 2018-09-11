@@ -35,11 +35,8 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = PermissionView.__super__.getTemplateData.call(this);
-            _.extend(data, {
-                dropdownTarget: '#' + _.result(this, 'id'),
-                isAccessLevelChanged: this.model.isAccessLevelChanged(),
-                togglerId: this.getTogglerId()
-            });
+            data.dropdownTarget = '#' + _.result(this, 'id');
+            data.isAccessLevelChanged = this.model.isAccessLevelChanged();
             return data;
         },
 
@@ -47,16 +44,13 @@ define(function(require) {
             var dropdown = this.subview('dropdown');
             this.$el.trigger('tohide.bs.dropdown');
             if (dropdown) {
+                this.$('[data-toggle="dropdown"]').dropdown('dispose');
                 dropdown.$el.detach();
             }
             PermissionView.__super__.render.call(this);
             if (dropdown) {
-                this.$el.append(dropdown.$el);
+                this.$('.dropdown-menu').replaceWith(dropdown.$el);
             }
-        },
-
-        getTogglerId: function() {
-            return 'dropdown-' + this.cid;
         },
 
         onDropdownOpen: function(e) {
@@ -64,26 +58,18 @@ define(function(require) {
             var accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    attributes: {
-                        'aria-labelledby': this.getTogglerId()
-                    },
-                    className: [
-                        'dropdown-menu',
-                        'dropdown-menu-collection',
-                        'dropdown-menu__permissions-item'
-                    ].join(' '),
+                    el: this.$('.dropdown-menu'),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
-                    },
-                    dropdownMenuOptions: {
-                        container: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);
+                this.listenTo(this.model.accessLevels, 'sync', function() {
+                    this.$('[data-toggle="dropdown"]').dropdown('update');
+                });
                 this.subview('dropdown', dropdown);
-                this.$el.append(dropdown.$el);
             }
             if (!accessLevels.length) {
                 accessLevels.fetch({

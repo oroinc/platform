@@ -34,7 +34,7 @@
 
         li {
             &.dropdown {
-                &.open,
+                &.show,
                 &.active {
                     > .dropdown-toggle {
                         background: none;
@@ -93,7 +93,7 @@
         }
     }
 
-    .dropdown.open .dropdown-toggle {
+    .dropdown.show .dropdown-toggle {
         color: $nav-link-color;
         background: $nav-link-background;
         border-color: $nav-tabs-border-color;

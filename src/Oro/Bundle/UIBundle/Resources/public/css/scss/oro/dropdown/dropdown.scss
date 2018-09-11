@@ -106,14 +106,6 @@
     box-shadow: $dropdown-toggle-box-shadow;
 }
 
-[data-drop-secondary-location="left"] {
-    & > .dropdown-menu,
-    & + .dropdown-menu {
-        left: auto;
-        right: 0;
-    }
-}
-
 .dropup-area {
     // Reverse the caret
     .caret {

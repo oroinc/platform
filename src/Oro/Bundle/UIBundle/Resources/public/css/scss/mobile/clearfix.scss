@@ -4,7 +4,8 @@ html& {
     overflow-x: hidden;
     overflow-y: auto;
 
-    &.lock-page-scroll {
+    &.lock-page-scroll,
+    &.modal-dropdown-shown {
         overflow: hidden;
     }
 }

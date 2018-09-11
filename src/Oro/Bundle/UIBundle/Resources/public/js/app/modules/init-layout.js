@@ -26,52 +26,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         }
         layout.hideProgressBar();
 
-        /* ============================================================
-         * Oro Dropdown close prevent
-         * ============================================================ */
-        var dropdownToggles = $('.oro-dropdown-toggle');
-        dropdownToggles.click(function(e) {
-            var $parent = $(this).parent().toggleClass('open');
-            if ($parent.hasClass('open')) {
-                $parent.find('.dropdown-menu').focus();
-                $parent.find('input[type=text]').first().focus().select();
-            }
-        });
-        $(document).on('focus.dropdown.data-api', '[data-toggle=dropdown]', _.debounce(function(e) {
-            var $focusTarget = $(e.target).parent().find('input[type=text]')
-                .not('.select2-focusser, .select2-input').first();
-            if (!$focusTarget.is(e.target)) {
-                $focusTarget.focus();
-            }
-        }, 10));
-
-        $(document).on('keyup.dropdown.data-api', '.dropdown-menu', function(e) {
-            if (e.keyCode === 27) {
-                $(e.currentTarget).parent().trigger('tohide.bs.dropdown');
-            }
-        });
-
         // fixes submit by enter key press on select element
         $(document).on('keydown', 'form select', function(e) {
             if (e.keyCode === 13) {
                 $(e.target.form).submit();
             }
         });
-
-        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .dropup.open, .dropup .open, ' +
-            '.oro-drop.open, .oro-drop .open';
-        $('html')[0].addEventListener('click', function(e) {
-            var $target = $(e.target);
-            var clickingTarget = null;
-            if ($target.is('.dropdown, .dropup, .oro-drop')) {
-                clickingTarget = $target;
-            } else {
-                clickingTarget = $target.parents('.dropdown, .dropup, .oro-drop');
-            }
-            $(openDropdownsSelector).filter(function() {
-                return !$(this).has(document.activeElement).length;
-            }).not(clickingTarget).trigger('tohide.bs.dropdown');
-        }, true);
 
         var mainMenu = $('#main-menu');
         var sideMainMenu = $('#side-menu');
@@ -88,17 +48,34 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         });
 
         mainMenu.mouseover(function() {
-            $(openDropdownsSelector).trigger('tohide.bs.dropdown');
+            $(document).trigger('clearMenus'); // hides all opened dropdown menus
         });
 
         mediator.on('page:beforeChange', function() {
-            $('.dot-menu.dropdown.open, .user-menu .dropdown.open, .app-header__search-and-shortcuts .dropdown.open')
-                .trigger('tohide.bs.dropdown');
-            $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
+            $(document).trigger('clearMenus'); // hides all opened dropdown menus
         });
-        mediator.on('page:afterChange', function() {
-            $('.dropdown .dropdown-menu.manually-hidden').css('display', '');
-        });
+
+        if (tools.isMobile()) {
+            /**
+             * When a dropdown occupies the whole screen width, like modal dialog, we need to lock page scroll
+             * to avoid moving elements behind the dropdown
+             */
+            $(document).on('shown.bs.dropdown', '.dropdown, .dropup, .dropleft, .dropright', function(e) {
+                if (e.namespace !== 'bs.dropdown') {
+                    // handle only events triggered with proper NS (omit just any shown events)
+                    return;
+                }
+                var $html = $('html');
+                var $dropdownMenu = $('>.dropdown-menu', this);
+
+                if ($dropdownMenu.css('position') === 'fixed' && $dropdownMenu.outerWidth() === $html.width()) {
+                    $html.addClass('modal-dropdown-shown');
+                    $(this).one('hide.bs.dropdown', function() {
+                        $html.removeClass('modal-dropdown-shown');
+                    });
+                }
+            });
+        }
 
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function(e) {

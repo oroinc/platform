@@ -1,6 +1,6 @@
 /* @theme: admin.demo; */
 
-.navbar.app-header {
+.app-header {
     color: $app-header-text-color;
     background-color: $app-header-bg-color;
 
@@ -8,7 +8,7 @@
         color: $app-header-logo-text-color;
     }
 
-    .nav.top-search {
+    &__search-and-shortcuts {
         .dropdown-toggle {
             &:hover,
             &:active {
@@ -17,10 +17,9 @@
         }
     }
 
-    .nav.user-menu {
+    .user-menu {
         > li {
             > .dropdown-toggle,
-            > .oro-dropdown-toggle,
             > .help {
                 &:hover {
                     color: $app-header-text-hover-color;
@@ -31,7 +30,7 @@
 
     .user-menu-dropdown {
         &:before {
-            border-left: 1px solid $app-header-divider-color;
+            border-#{$start}-color: $app-header-divider-color;
         }
     }
 }

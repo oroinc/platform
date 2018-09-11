@@ -35,7 +35,11 @@ define([
 
             this._appendFilter($filter);
 
-            $('body').on('click' + this._eventNamespace(), _.bind(function(e) {
+            var events = ['click', 'show.bs.dropdown'].map(function(eventName) {
+                return eventName + this._eventNamespace();
+            }.bind(this)).join(' ');
+
+            $(document).on(events, _.bind(function(e) {
                 if (this.popupCriteriaShowed) {
                     this._onClickOutsideCriteria(e);
                 }
@@ -59,7 +63,7 @@ define([
             if (this.disposed) {
                 return;
             }
-            $('body').off(this._eventNamespace());
+            $(document).off(this._eventNamespace());
             _.each(_.keys(dataFilterWrapper), function(prop) {
                 delete this[prop];
             }, this);

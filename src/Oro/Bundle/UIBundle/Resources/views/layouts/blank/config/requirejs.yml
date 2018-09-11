@@ -30,17 +30,17 @@ config:
         'bootstrap-util':
             deps:
                 - 'jquery'
+            exports: 'Util'
         'bootstrap-alert':
-            deps:
-                - 'jquery'
-                - 'bootstrap-util'
-        'bootstrap-collapse':
             deps:
                 - 'jquery'
                 - 'bootstrap-util'
         'bootstrap-dropdown':
             deps:
                 - 'jquery'
+                - 'popper'
+                - 'bootstrap-util'
+            exports: 'Dropdown'
         'bootstrap-modal':
             deps:
                 - 'jquery'
@@ -129,7 +129,7 @@ config:
         'popper': 'oroui/js/extend/bootstrap/vendor/popper'
         'bootstrap-util': 'components/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
-        'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
+        'bootstrap-dropdown': 'components/bootstrap/js/dist/dropdown.js'
         'bootstrap-modal': 'components/bootstrap/js/dist/modal.js'
         'bootstrap-popover': 'components/bootstrap/js/dist/popover.js'
         'bootstrap-scrollspy': 'components/bootstrap/js/dist/scrollspy.js'
@@ -229,9 +229,13 @@ config:
 
 build:
     paths:
+#       jQuery.UI after v.1.11.2 started to support AMD. And that broke a js-build with
+#       files which does not support AMD. jquery.multiselect and jquery.multiselect.filter
+#       use AMD without dependency, therefore it's excluded
         'jquery.multiselect': 'empty:'
         'jquery.multiselect.filter': 'empty:'
 #        Transpiled bootstrap modules don't support AMD, but requires Popper from global scope
 #        and it is actually in AMD module
+        'bootstrap-dropdown': 'empty:'
         'bootstrap-tooltip': 'empty:'
         'bootstrap-popover': 'empty:'

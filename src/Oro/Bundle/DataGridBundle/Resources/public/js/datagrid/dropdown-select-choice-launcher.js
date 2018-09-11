@@ -183,7 +183,7 @@ define(function(require) {
                 label: label,
                 icon: this.selectedItem.icon,
                 title: this.selectedItem.title,
-                className: this.selectedItem.className,
+                className: this.className,
                 iconClassName: this.selectedItem.iconClassName,
                 launcherMode: this.launcherMode,
                 link: this.link,
@@ -226,7 +226,6 @@ define(function(require) {
             actionOptions.key = $link.data('key');
             actionOptions.index = parseInt($link.data('index'));
             actionOptions.item = this.items[actionOptions.index];
-            $link.closest('.btn-group').toggleClass('open');
 
             this.action.run(actionOptions);
             e.preventDefault();
@@ -244,7 +243,7 @@ define(function(require) {
         disable: function() {
             this.enabled = false;
             this.$el.addClass('disabled');
-            this.$('.dropdown-toggle').addClass('disabled');
+            this.$('[data-toggle="dropdown"]').addClass('disabled');
             return this;
         },
 
@@ -256,7 +255,7 @@ define(function(require) {
         enable: function() {
             this.enabled = true;
             this.$el.removeClass('disabled');
-            this.$('.dropdown-toggle').removeClass('disabled');
+            this.$('[data-toggle="dropdown"]').removeClass('disabled');
             return this;
         }
     });

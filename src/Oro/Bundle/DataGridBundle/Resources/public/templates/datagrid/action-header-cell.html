@@ -1,11 +1,11 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
 <div class="dropdown btn-group">
-    <button type="button" class="btn btn-light btn-small dropdown-toggle" id="<%- togglerId %>" data-toggle="dropdown"
+    <button type="button" class="btn btn-light btn-small dropdown-toggle" id="<%- togglerId %>"
+            data-toggle="dropdown" data-placement="bottom-end"
             aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.datagrid.mass_action.title') %>"
             title="<%- _.__('oro.datagrid.mass_action.title') %>">
         <span class="fa-ellipsis-h" aria-hidden="true"></span>
         <span class="caret" aria-hidden="true"></span>
     </button>
-    <ul class="dropdown-menu dropdown-menu__action-column" aria-labelledby="<%- togglerId %>"
-        data-action-panel  data-options="{&quot;container&quot;: true}"></ul>
+    <ul class="dropdown-menu dropdown-menu__action-column" aria-labelledby="<%- togglerId %>" data-action-panel></ul>
 </div>

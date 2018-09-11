@@ -266,7 +266,7 @@
     {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
         <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false">
+           aria-haspopup="true" aria-expanded="false" data-placement="bottom-end">
             {% if parameters.iCss is defined %}
                 <span class="{{ parameters.iCss }}" aria-hidden="true"></span>
             {% endif %}

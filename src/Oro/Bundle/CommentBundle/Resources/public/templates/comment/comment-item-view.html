@@ -60,7 +60,7 @@
         <% var actionsTogglerId = _.uniqueId('dropdown-') %>
         <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#" role="button" id="<%- actionsTogglerId %>"
                                  aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">...</a>
-            <ul class="dropdown-menu pull-right launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
+            <ul class="dropdown-menu dropdown-menu-right launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
                     <ul class="nav nav-pills icons-holder launchers-list">
                         <% if (editable) { %>

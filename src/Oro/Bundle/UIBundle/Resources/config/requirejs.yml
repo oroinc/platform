@@ -38,6 +38,7 @@ config:
         'bootstrap-util':
             deps:
                 - 'jquery'
+            exports: 'Util'
         'bootstrap-alert':
             deps:
                 - 'jquery'
@@ -49,6 +50,9 @@ config:
         'bootstrap-dropdown':
             deps:
                 - 'jquery'
+                - 'popper'
+                - 'bootstrap-util'
+            exports: 'Dropdown'
         'bootstrap-modal':
             deps:
                 - 'jquery'
@@ -146,7 +150,7 @@ config:
         'bootstrap-util': 'components/bootstrap/js/dist/util.js'
         'bootstrap-alert': 'components/bootstrap/js/dist/alert.js'
         'bootstrap-collapse': 'components/bootstrap/js/dist/collapse.js'
-        'bootstrap-dropdown': 'bowerassets/bootstrap/js/bootstrap-dropdown.js'
+        'bootstrap-dropdown': 'components/bootstrap/js/dist/dropdown.js'
         'bootstrap-modal': 'components/bootstrap/js/dist/modal.js'
         'bootstrap-popover': 'components/bootstrap/js/dist/popover.js'
         'bootstrap-scrollspy': 'components/bootstrap/js/dist/scrollspy.js'
@@ -314,5 +318,6 @@ build:
         'jquery.multiselect.filter': 'empty:'
 #        Transpiled bootstrap modules don't support AMD, but requires Popper from global scope
 #        and it is actually in AMD module
+        'bootstrap-dropdown': 'empty:'
         'bootstrap-tooltip': 'empty:'
         'bootstrap-popover': 'empty:'

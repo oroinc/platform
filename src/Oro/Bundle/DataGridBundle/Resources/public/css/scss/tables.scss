@@ -172,7 +172,6 @@
         width: $table-action-cell-width;
 
         .dropdown-menu {
-            margin-right: $table-action-cell-dropdown-menu-offset-right;
             min-width: $table-action-cell-dropdown-menu-min-width;
         }
 
@@ -188,11 +187,6 @@
         [class*=" fa-"] {
             font-size: $base-font-size;
             margin: 0 2px 0 0;
-        }
-
-        .dropdown-menu {
-            right: $table-action-column-dropdown-menu-right;
-            left: $table-action-column-dropdown-menu-left;
         }
     }
 

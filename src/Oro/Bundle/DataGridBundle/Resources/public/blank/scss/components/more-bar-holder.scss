@@ -31,12 +31,6 @@
         display: inline-block;
     }
 
-    .launchers-dropdown-menu {
-        top: -10px;
-        right: calc(100% - 5px);
-        left: auto;
-    }
-
     .dropdown-menu__placeholder + .dropdown-toggle,
     .dropdown-toggle:hover {
         text-decoration: none;

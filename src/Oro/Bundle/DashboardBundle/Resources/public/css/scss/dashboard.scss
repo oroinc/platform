@@ -89,11 +89,6 @@
             .dropdown-menu {
                 margin-top: -3px;
                 min-width: 100px;
-
-                @include if-ltr() {
-                    #{$start}: auto;
-                    #{$end}: 0;
-                }
             }
         }
 

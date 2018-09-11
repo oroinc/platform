@@ -71,7 +71,7 @@
         </script>
     {% else %}{# if organizations|length == 1 #}
         <h1 class="logo">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name|striptags|trim }}" class="organization-name">
                 {{- organization_name -}}
             </a>
         </h1>
@@ -81,7 +81,7 @@
 {% macro organization_name_and_logo(organization_name) %}
     {% if organization_name|length %}
         <h1 class="logo logo-text">
-            <a href="{{ path('oro_default') }}" title="{{ organization_name }}">
+            <a href="{{ path('oro_default') }}" title="{{ organization_name }}" class="organization-name">
                 {{- organization_name -}}
             </a>
         </h1>

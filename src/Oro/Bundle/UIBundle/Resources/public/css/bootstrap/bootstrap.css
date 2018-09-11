@@ -6152,9 +6152,9 @@ a.badge:focus {
   display: none;
 }
 
-.show {
+/*.show { @todo has to be fix after styles update to Bootstrap 4.1
   display: block;
-}
+}*/
 
 .invisible {
   visibility: hidden;

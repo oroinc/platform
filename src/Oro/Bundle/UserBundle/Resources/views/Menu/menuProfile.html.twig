@@ -13,7 +13,7 @@
                 <span class="fa-caret-down" aria-hidden="true"></span>
             {% endif %}
         </button>
-        {{ oro_menu_render('usermenu', {togglerId: togglerId}) }}
+        {{ oro_menu_render('usermenu', {togglerId: togglerId, class:'dropdown-menu-right dropdown-menu-arrow'}) }}
     </li>
 {% else %}
     <li><a href="{{ path('oro_user_security_login') }}">{{ 'Login'|trans }}</a></li>

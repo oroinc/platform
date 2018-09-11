@@ -145,7 +145,7 @@
             }
         }
 
-        li.dropdown.open > .logo {
+        li.dropdown.show > .logo {
             color: $app-header-logo-text-color;
         }
     }

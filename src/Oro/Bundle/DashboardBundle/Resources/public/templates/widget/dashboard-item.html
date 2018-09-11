@@ -24,13 +24,11 @@
                             aria-label="<%- _.__('oro.dashboard.show_more_actions') %>"
                             aria-haspopup="true"
                             aria-expanded="false"
+                            data-placement="bottom-end"
                     >
                         <span class="fa-ellipsis-h" aria-hidden="true"></span>
                     </button>
-                    <ul class="dropdown-menu"
-                        data-options="<%- JSON.stringify({flipMode: true}) %>"
-                        aria-labelledby="<%- dashboardActionId %>"
-                    >
+                    <ul class="dropdown-menu" aria-labelledby="<%- dashboardActionId %>">
                         <li>
                             <a class="configure-action" href="#" role="button"
                                title="<%- _.__('oro.dashboard.widget.configure') %>">

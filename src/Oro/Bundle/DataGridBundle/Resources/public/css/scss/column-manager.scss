@@ -8,7 +8,7 @@
         display: inline-block;
     }
 
-    &.disabled.open > .dropdown-menu {
+    &.disabled > .dropdown-menu.show {
         display: none;
     }
 
@@ -16,9 +16,6 @@
         cursor: default;
         text-align: left;
         font-weight: normal;
-        top: 0;
-        right: calc(100% + 7px);
-        left: auto;
         padding: 20px;
         border-color: #ccc;
         min-width: 268px;

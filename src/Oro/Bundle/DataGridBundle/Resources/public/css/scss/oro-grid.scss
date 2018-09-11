@@ -89,7 +89,7 @@
 
 .more-bar-holder {
     .dropdown {
-        &:not(.open) {
+        &:not(.shown) {
             .dropdown-close {
                 display: none !important;
             }

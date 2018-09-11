@@ -475,7 +475,7 @@ footer {
         font-weight: normal;
     }
 
-    .dropdown.open .caret,
+    .dropdown.show .caret,
     .user-name .caret,
     .user-name:hover .caret {
         border-top-color: #444 !important;
@@ -779,7 +779,7 @@ h5.user-fieldset {
 }
 
 .page-size .dropdown-menu {
-    min-width: 20px;
+    min-width: 100%;
 }
 
 .separator-btn {

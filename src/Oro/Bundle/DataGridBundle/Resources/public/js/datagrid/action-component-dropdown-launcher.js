@@ -28,6 +28,7 @@ define(function(require) {
 
         events: {
             'click .dropdown-menu': 'onDropdownMenuClick',
+            'show.bs.dropdown': 'onBeforeOpen',
             'shown.bs.dropdown': 'onOpen'
         },
 
@@ -98,6 +99,17 @@ define(function(require) {
         },
 
         /**
+         * Handles bootstrap dropdown show event
+         *
+         * @param {jQuery.Event} showEvent
+         */
+        onBeforeOpen: function(showEvent) {
+            if (_.isFunction(this.component.beforeOpen)) {
+                this.component.beforeOpen(showEvent);
+            }
+        },
+
+        /**
          * Handles dropdown menu open and sets max-width for the element
          */
         onOpen: function() {
@@ -120,7 +132,7 @@ define(function(require) {
          * @inheritDoc
          */
         disable: function() {
-            this.$('.dropdown-toggle').addClass('disabled');
+            this.$('[data-toggle="dropdown"]').addClass('disabled');
             return ActionComponentDropdownLauncher.__super__.disable.call(this);
         },
 
@@ -128,7 +140,7 @@ define(function(require) {
          * @inheritDoc
          */
         enable: function() {
-            this.$('.dropdown-toggle').removeClass('disabled');
+            this.$('[data-toggle="dropdown"]').removeClass('disabled');
             return ActionComponentDropdownLauncher.__super__.enable.call(this);
         }
     });

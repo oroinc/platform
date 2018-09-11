@@ -116,10 +116,6 @@ class MenuExtension extends \Twig_Extension
             }
         }
 
-        if (!empty($options['togglerId'])) {
-            $menu->setChildrenAttribute('aria-labelledby', $options['togglerId']);
-        }
-
         return $this->getMenuHelper()->render($menu, $options, $renderer);
     }
 

@@ -128,8 +128,16 @@ oro_behat_extension:
       selector: 'div.toolbar .grid-toolbar-tools'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools
 
-    GridFloatingMenu:
-      selector: '.dropdown-menu__floating'
+    GridRowActionMenu:
+      selector: '.dropdown-menu__action-cell.show'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridMassActionMenu:
+      selector: '.dropdown-menu.show'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridMassCheckMenu:
+      selector: '.dropdown-menu.show'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionHeadCheckbox:

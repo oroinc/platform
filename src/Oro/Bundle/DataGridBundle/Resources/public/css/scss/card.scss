@@ -35,9 +35,7 @@
         }
 
         .dropdown-menu {
-            right: 100%;
-            left: auto;
-            top: -10px;
+            min-width: inherit;
         }
 
         .launchers-list {

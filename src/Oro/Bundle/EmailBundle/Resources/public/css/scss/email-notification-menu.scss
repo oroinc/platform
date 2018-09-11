@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .email-notification-menu {
-    .oro-dropdown-toggle {
+    .dropdown-toggle {
         .mail-icon {
             @include fa-icon($email-inactive-mail-icon);
 
