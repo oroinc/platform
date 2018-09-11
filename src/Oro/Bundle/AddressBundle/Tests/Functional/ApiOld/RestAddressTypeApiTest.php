@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
+namespace Oro\Bundle\AddressBundle\Tests\Functional\ApiOld;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 

@@ -1,0 +1,55 @@
+data:
+    -
+        type: countries
+        id: IL
+        attributes:
+            iso3Code: ISR
+            name: Israel
+        relationships:
+            regions:
+                data:
+                    -
+                        type: regions
+                        id: IL-Z
+                    -
+                        type: regions
+                        id: IL-TA
+                    -
+                        type: regions
+                        id: IL-M
+                    -
+                        type: regions
+                        id: IL-JM
+                    -
+                        type: regions
+                        id: IL-HA
+                    -
+                        type: regions
+                        id: IL-D
+    -
+        type: countries
+        id: MG
+        attributes:
+            iso3Code: MDG
+            name: Madagascar
+        relationships:
+            regions:
+                data:
+                    -
+                        type: regions
+                        id: MG-U
+                    -
+                        type: regions
+                        id: MG-T
+                    -
+                        type: regions
+                        id: MG-M
+                    -
+                        type: regions
+                        id: MG-F
+                    -
+                        type: regions
+                        id: MG-D
+                    -
+                        type: regions
+                        id: MG-A
