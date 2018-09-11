@@ -157,6 +157,10 @@ define(function(require) {
          *  @param {jQuery.Event} event
          */
         handlerClick: function(triggerKey, event) {
+            if (!this.$el) {
+                return;
+            }
+
             var eventName = EVENTS[triggerKey.toUpperCase()] || null;
 
             event.preventDefault();
@@ -177,7 +181,7 @@ define(function(require) {
          * @params {String} eventName
          */
         triggerEventOnContent: function(eventName) {
-            if (this.options.content && this.options.content.trigger) {
+            if (_.isObject(this.options.content) && this.options.content.trigger) {
                 this.options.content.trigger(eventName, this);
             }
         },

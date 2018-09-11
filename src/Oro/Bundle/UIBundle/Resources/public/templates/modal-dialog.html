@@ -15,7 +15,7 @@
         <% } %>
     </div>
     <div class="modal-body"><%= content %></div>
-    <% if (allowCancel && allowOk ) { %>
+    <% if (allowCancel || allowOk ) { %>
         <div class="modal-footer">
             <% if (allowCancel) { %>
                 <a href="#" role="button" class="cancel <%= cancelButtonClass %>" data-dismiss="modal"><%- cancelText %></a>

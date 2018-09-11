@@ -331,7 +331,7 @@ define(function(require) {
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });
-            confirm.on('hidden.bs.modal', function() {
+            confirm.on('hidden', function() {
                 delete this.model;
             });
 
@@ -454,7 +454,7 @@ define(function(require) {
             confirm.on('ok', function() {
                 collection.remove(this.model);
             });
-            confirm.on('hidden.bs.modal', function() {
+            confirm.on('hidden', function() {
                 delete this.model;
             });
 
