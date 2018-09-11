@@ -14,7 +14,6 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     private const WS_PORT = '8080';
     private const WS_PATH = '/';
     private const WS_SECURED = true;
-    private const WS_ORIGIN = 'testOrigin';
     private const TICKET = 'sampleTicket';
 
     /** @var GosClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -40,8 +39,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
             self::WS_HOST,
             self::WS_PORT,
             self::WS_PATH,
-            self::WS_SECURED,
-            self::WS_ORIGIN
+            self::WS_SECURED
         );
 
         $this->gosClient = $this->createMock(GosClient::class);
@@ -63,8 +61,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
             self::WS_HOST,
             self::WS_PORT,
             $target,
-            self::WS_SECURED,
-            self::WS_ORIGIN
+            self::WS_SECURED
         );
 
         $this->mockGosClientFactory();
@@ -256,7 +253,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $this->gosClientFactory
             ->expects(self::once())
             ->method('createGosClient')
-            ->with(self::WS_HOST, self::WS_PORT, self::WS_SECURED, self::WS_ORIGIN)
+            ->with(self::WS_HOST, self::WS_PORT, self::WS_SECURED)
             ->willReturn($this->gosClient);
     }
 }
