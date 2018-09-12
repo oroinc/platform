@@ -146,9 +146,9 @@
                     <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.id }}"/>
                 </div>
                 {% if content.formErrors is defined and content.formErrors | length %}
-                    <div class="customer-info-actions container-fluid well-small alert-wrap">
-                        <div class="alert alert-error">
-                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                    <div class="customer-info-actions container-fluid well-small alert-wrap" role="alert">
+                        <div class="alert alert-error alert-dismissible">
+                            <button class="close" type="button" data-dismiss="alert" aria-label="{{ 'Close'|trans }}" data-target=".alert-wrap"><span aria-hidden="true">&times;</span></button>
                             {{ content.formErrors|raw }}
                         </div>
                     </div>

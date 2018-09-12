@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .container-fluid.page-title {
     padding-right: 0;
 
@@ -36,6 +38,30 @@
         position: relative;
         top: 8px;
     }
+
+    .navigation {
+        .row {
+            display: flex;
+
+            > .pull-left-extra {
+                width: 100%;
+            }
+
+            > .pull-right {
+                max-width: 100%;
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .customer-content {
+        .top-row {
+            .pull-left {
+                float: none;
+                display: inline;
+            }
+        }
+    }
 }
 
 .customer-info {
@@ -49,7 +75,17 @@
 
     .sub-title {
         a {
-            color: #006acc;
+            color: $link-color;
+
+            &:hover {
+                color: $link-color-hover;
+            }
         }
+    }
+
+    .sub-title,
+    .separator,
+    .user-name {
+        display: inline;
     }
 }

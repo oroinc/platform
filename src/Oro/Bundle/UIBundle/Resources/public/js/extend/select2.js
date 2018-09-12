@@ -37,9 +37,12 @@ define(function(require) {
             var label;
             var innerContainer;
             var formatted;
+            var labelId;
             var subId;
             var parent;
             var resultId;
+            var expanded;
+
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
@@ -73,34 +76,41 @@ define(function(require) {
 
                 if (compound) {
                     container.addClass('accordion');
+                    labelId = _.uniqueId('label-');
                     subId = parent.attr('id') + '_' + depth + '_' + i;
 
-                    innerContainer = $('<ul></ul>')
-                        .addClass('select2-result-sub')
-                        .wrap('<div class="accordion-body collapse" id="' + subId + '" />');
-                    populate(result.children, innerContainer, depth + 1, parentStack.concat(innerContainer.parent()));
-                    innerContainer = innerContainer.parent();
+                    expanded = Boolean(query.term);
+
+                    innerContainer = $('<div class="accordion-body collapse"/>')
+                        .toggleClass('show', expanded)
+                        .attr({
+                            'id': subId,
+                            'role': 'subtree',
+                            'aria-labelledby': labelId
+                        })
+                        .append('<ul class="select2-result-sub"/>');
+
+                    populate(result.children, innerContainer.children(), depth + 1, parentStack.concat(innerContainer));
 
                     node.addClass('accordion-group')
                         .append(innerContainer);
 
-                    if (query.term) {
-                        innerContainer.addClass('in');
-                    } else {
-                        label.addClass('collapsed');
-                    }
-
-                    label = label.addClass('accordion-toggle')
-                        .attr('data-toggle', 'collapse')
-                        .attr('data-target', '#' + subId)
-                        .attr('data-parent', '#' + parent.attr('id'))
-                        .wrap('<div class="accordion-heading"/>')
-                        .parent();
+                    label.addClass('accordion-toggle')
+                        .toggleClass('collapsed', !expanded)
+                        .attr({
+                            'id': labelId,
+                            'data-toggle': 'collapse',
+                            'data-target': '#' + subId,
+                            'data-parent': '#' + parent.attr('id'),
+                            'aria-controls': subId,
+                            'aria-expanded': expanded
+                        });
+                    label = $('<div class="accordion-heading"/>').append(label);
                 }
 
                 if (selection.indexOf(resultId) >= 0) {
                     $.each(parentStack, function() {
-                        this.addClass('in');
+                        this.addClass('show');
                     });
                 }
 
@@ -110,13 +120,17 @@ define(function(require) {
             }
         };
 
-        parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
+        if (!parent.attr('id')) {
+            parent.attr('id', _.uniqueId('select2container_'));
+        }
+
         container.on('click.collapse.data-api', '[data-toggle=collapse]', function(e) {
-            var $this = $(this);
-            var target = $this.attr('data-target');
-            var option = $(target).data('collapse') ? 'toggle' : $this.data();
-            $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed');
-            $(target).collapse(option);
+            var $el = $(e.currentTarget);
+            var $target = $($el.attr('data-target'));
+            var options = $target.data('bs.collapse') ? 'toggle' : $el.data();
+
+            $el.toggleClass('collapsed', $target.hasClass('show'));
+            $target.collapse(options);
         });
         populate(results, container, 0, []);
     }

@@ -1,11 +1,13 @@
 <div class="btn-toolbar">
     <% if (choices.length) { %>
+    <% var gridViewTogglerId = _.uniqueId('dropdown-') %>
     <div class="btn-group views-group">
-        <div data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
+        <button class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>" type="button"
+                id="<%- gridViewTogglerId %>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <% // this is already escaped in the title template %>
             <%= title %>
-        </div>
-        <ul class="dropdown-menu">
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="<%- gridViewTogglerId %>">
             <% _.each(choices, function (choice) { %>
             <li><a href="#" data-value="<%- choice.value %>">
                 <% if (choice.icon) { %><i class="<%- choice.icon %>"></i><% } %><%- choice.label %></a>
@@ -15,11 +17,13 @@
     </div>
     <% } %>
     <% if (showActions) { %>
+    <% var gridViewActionsTogglerId = _.uniqueId('dropdown-') %>
     <div class="btn-group actions-group">
-        <div class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
+        <button class="btn btn-link dropdown-toggle" type="button"
+             id="<%- gridViewActionsTogglerId %>"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <%- actionsLabel %>
-        </div>
-        <ul class="dropdown-menu">
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="<%- gridViewActionsTogglerId %>">
             <% _.each(actions, function(action) { %>
                 <% if (action.enabled) { %>
                     <li><a href="#" class="<%- action.name %>"><%- action.label %></a></li>

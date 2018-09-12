@@ -263,15 +263,17 @@
         ]
 #}
 {% macro dropdownButton(parameters) %}
+    {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false" data-placement="bottom-end">
             {% if parameters.iCss is defined %}
-                <i class="{{ parameters.iCss }}"></i>
+                <span class="{{ parameters.iCss }}" aria-hidden="true"></span>
             {% endif %}
             {{ parameters.label }}
-            <span class="caret"></span>
+            <span class="caret" aria-hidden="true"></span>
         </a>
-        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
+        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}" role="menu" aria-labelledby="{{ togglerId }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
                     {{ _self.dropdownItem(item) }}
@@ -436,7 +438,7 @@
         class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
         title="{{ title }}"
     >
-        {{ label }}
+        {{- label -}}
     </a>
 {% endmacro %}
 
@@ -559,6 +561,15 @@
             {%- if parameters.dataRedirect is defined -%}
                 data-redirect="{{ parameters.dataRedirect }}"
             {%- endif -%}
+            {%- if parameters.role is defined -%}
+                role="{{ parameters.role }}"
+            {%- endif -%}
+            {%- if parameters.ariaSelected is defined -%}
+                aria-selected="{{ parameters.ariaSelected }}"
+            {%- endif -%}
+            {%- if parameters.ariaControls is defined -%}
+                aria-controls="{{ parameters.ariaControls }}"
+            {%- endif -%}
             {%- if (parameters.visible is defined and not parameters.visible) -%}
                 style="display: none"
             {%- endif -%}
@@ -583,11 +594,11 @@
                 {%- set labelInIcon = true -%}
             {%- endif %}
             {%- if (parameters.iCss is defined) -%}
-                <i class="{{ parameters.iCss }}">
+                <span class="{{ parameters.iCss }}" aria-hidden="true">
                     {%- if (parameters.label is defined and labelInIcon) -%}
                         <span class="sr-only">{{- parameters.label -}}</span>
                     {%- endif -%}
-                </i>
+                </span>
             {%- endif %}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>

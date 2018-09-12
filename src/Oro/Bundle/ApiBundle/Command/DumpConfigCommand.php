@@ -49,13 +49,6 @@ class DumpConfigCommand extends AbstractDebugCommand
                 InputArgument::OPTIONAL,
                 'The entity class name or alias'
             )
-            // @todo: API version is not supported for now
-            //->addArgument(
-            //    'version',
-            //    InputArgument::OPTIONAL,
-            //    'API version',
-            //    Version::LATEST
-            //)
             ->addOption(
                 'section',
                 null,
@@ -98,8 +91,7 @@ class DumpConfigCommand extends AbstractDebugCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $requestType = $this->getRequestType($input);
-        // @todo: API version is not supported for now
-        //$version = $input->getArgument('version');
+        // API version is not supported for now
         $version = Version::normalizeVersion(null);
         $extras = $this->getConfigExtras($input);
 

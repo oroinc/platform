@@ -3,11 +3,12 @@
 // add all lib
 @import "variables";
 @import "mixins";
+@import "font-awesome";
+@import "reset";
 @import "layout";
 @import "uniform";
 @import "oro";
-@import "font-awesome";
-@import "drag-and-drop-support";
+
 @import "oro/main";
 
 // desktop resolution
@@ -18,3 +19,6 @@
 
 // printing rules
 @import "print/main";
+
+
+@import "bootstrap-to-delete"; // @todo delete after styles for Bootstrap 4.1 are added

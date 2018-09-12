@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -56,7 +57,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         return new Criteria($this->createMock(EntityClassResolver::class));
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsNotDoctrineQuery()
     {
         $className = Product::class;
         $this->context->setClassName($className);
@@ -64,20 +65,15 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->context->setQuery($query);
 
         $this->aclHelper->expects(self::never())
-            ->method('applyAclToCriteria');
+            ->method('apply');
 
         $this->processor->process($this->context);
-    }
-
-    public function testProcessWhenCriteriaObjectDoesNotExist()
-    {
-        $this->processor->process($this->context);
-
-        self::assertNull($this->context->getCriteria());
     }
 
     public function testProcessWithoutConfig()
     {
+        $query = $this->createMock(QueryBuilder::class);
+        $this->context->setQuery($query);
         $className = Product::class;
         $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
@@ -86,14 +82,16 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->context->setCriteria($criteria);
 
         $this->aclHelper->expects(self::once())
-            ->method('applyAclToCriteria')
-            ->with($className, $criteria, 'VIEW');
+            ->method('apply')
+            ->with($query, 'VIEW');
 
         $this->processor->process($this->context);
     }
 
     public function testProcessWithConfig()
     {
+        $query = $this->createMock(QueryBuilder::class);
+        $this->context->setQuery($query);
         $className = Product::class;
         $this->context->setClassName($className);
         $config = new EntityDefinitionConfig();
@@ -118,8 +116,8 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
             ->willReturn($aclAnnotation);
 
         $this->aclHelper->expects(self::once())
-            ->method('applyAclToCriteria')
-            ->with($className, $criteria, 'DELETE');
+            ->method('apply')
+            ->with($query, 'DELETE');
 
         $this->processor->process($this->context);
     }

@@ -1,4 +1,4 @@
 assets:
     css:
         ororeminder:
-            - 'bundles/ororeminder/scss/style.scss'
+            - 'bundles/ororeminder/css/scss/main.scss'

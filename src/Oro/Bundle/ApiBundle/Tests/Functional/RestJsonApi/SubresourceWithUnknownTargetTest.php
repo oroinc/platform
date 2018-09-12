@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 {
@@ -30,19 +31,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -57,19 +52,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -84,19 +73,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -111,19 +94,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -138,19 +115,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -165,19 +136,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -192,19 +157,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 
@@ -219,19 +178,13 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 404);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '404',
-                        'title'  => 'not found http exception',
-                        'detail' => 'Unsupported subresource.'
-                    ]
-                ]
+                'title'  => 'not found http exception',
+                'detail' => 'Unsupported subresource.'
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 }

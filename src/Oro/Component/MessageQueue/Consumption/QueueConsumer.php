@@ -4,15 +4,21 @@ namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Exception\ConsumptionInterruptedException;
 use Oro\Component\MessageQueue\Consumption\Exception\RejectMessageExceptionInterface;
+use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
+use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Psr\Log\NullLogger;
 
 /**
+ * Consuming messages from a queue
+ *
  * @SuppressWarnings(PHPMD.NPathComplexity)
  */
 class QueueConsumer
 {
+    const MESSAGE_PROCESSED_KEY = 'message_processed';
+
     /** @var ConnectionInterface */
     private $connection;
 
@@ -25,18 +31,24 @@ class QueueConsumer
     /** @var int */
     private $idleMicroseconds;
 
+    /** @var ConsumerState */
+    private $consumerState;
+
     /**
      * @param ConnectionInterface $connection
      * @param ExtensionInterface  $extension
+     * @param ConsumerState       $consumerState
      * @param int                 $idleMicroseconds 100ms by default
      */
     public function __construct(
         ConnectionInterface $connection,
         ExtensionInterface $extension,
+        ConsumerState $consumerState,
         $idleMicroseconds = 100000
     ) {
         $this->connection = $connection;
         $this->extension = $extension;
+        $this->consumerState = $consumerState;
         $this->idleMicroseconds = $idleMicroseconds;
 
         $this->boundMessageProcessors = [];
@@ -198,10 +210,12 @@ class QueueConsumer
                     throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
             }
 
-            $logger->notice('Message processed: {status}. Execution time: {time} ms', [
+            $loggerContext = [
                 'status' => $statusForLog,
-                'time'   => $executionTime
-            ]);
+                'time_taken' => $executionTime
+            ];
+            $this->addMemoryUsageInfo($loggerContext);
+            $logger->notice('Message processed: {status}. Execution time: {time_taken} ms', $loggerContext);
 
             $extension->onPostReceived($context);
         } else {
@@ -259,5 +273,17 @@ class QueueConsumer
         }
 
         throw $exception;
+    }
+
+    /**
+     * Add information about memory usage difference and peak memory usage
+     *
+     * @param array $loggerContext
+     */
+    protected function addMemoryUsageInfo(array &$loggerContext)
+    {
+        $memoryTaken = memory_get_usage() - $this->consumerState->getStartMemoryUsage();
+        $loggerContext['peak_memory'] = BytesFormatter::format($this->consumerState->getPeakMemory());
+        $loggerContext['memory_taken'] = BytesFormatter::format($memoryTaken);
     }
 }

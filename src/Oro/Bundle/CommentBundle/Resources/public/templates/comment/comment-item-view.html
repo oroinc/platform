@@ -33,16 +33,20 @@
             <% } %>
             </div>
             <div class="dropdown link-to-record">
-                <a class="no-hash dropdown-toggle file-menu" href="javascript: void(0);" data-toggle="dropdown">
-                    <i class="fa <%- attachmentIcon %>"></i> <%- attachmentFileName %>
+                <% var attachmentTogglerId = _.uniqueId('dropdown-') %>
+                <a class="no-hash dropdown-toggle file-menu" id="<%- attachmentTogglerId %>" href="#" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="fa <%- attachmentIcon %>" aria-hidden="true"></span> <%- attachmentFileName %>
                 </a>
-                <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="dropdownMenu">
+                <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
+                    <li>
                     <a class="no-hash" tabindex="-1" href="<%- attachmentURL %>">
                         <%= _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
                     <% if (attachmentThumbnail) { %>
                         <a class="view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
                     <% } %>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -53,8 +57,10 @@
 <div class="comment-actions">
     <% if (hasActions) { %>
     <div class="more-bar-holder">
-        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#">...</a>
-            <ul class="dropdown-menu pull-right launchers-dropdown-menu">
+        <% var actionsTogglerId = _.uniqueId('dropdown-') %>
+        <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle" href="#" role="button" id="<%- actionsTogglerId %>"
+                                 aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">...</a>
+            <ul class="dropdown-menu dropdown-menu-right launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
                     <ul class="nav nav-pills icons-holder launchers-list">
                         <% if (editable) { %>

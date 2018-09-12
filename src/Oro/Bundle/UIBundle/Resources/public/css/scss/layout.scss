@@ -12,12 +12,12 @@
 
 .responsive-section {
     .inner-grid {/* todo: when it needs to upgrade to bootstrap4, check negative margins */
-        margin: -#{$contentPadding} -#{$contentPadding} #{$contentPadding} 0;
+        margin: -#{$content-padding} -#{$content-padding} #{$content-padding} 0;
     }
 
     .responsive-cell {
         .inner-grid {
-            margin: -#{$contentPadding} -#{$contentPadding} #{$contentPadding} -#{$contentPadding};
+            margin: -#{$content-padding} -#{$content-padding} #{$content-padding} -#{$content-padding};
         }
     }
 }
@@ -115,19 +115,15 @@
 }
 
 .container-fluid > .responsive-section {
-    margin: 0 -#{$horizontalPadding};
-    padding-right: $horizontalPadding;
-
-    .scrollspy-title {
-        margin-left: 0;
-    }
+    margin: 0 -#{$horizontal-padding};
+    padding-right: $horizontal-padding;
 
     .responsive-cell {
-        padding-left: $horizontalPadding;
+        padding-left: $horizontal-padding;
     }
 
     .responsive-cell:first-child {
-        padding-right: $horizontalPadding;
+        padding-right: $horizontal-padding;
     }
 
     &.responsive-medium:not(.responsive-section-no-blocks) .responsive-cell,
@@ -204,23 +200,23 @@ body.backdrop {
 }
 
 .oro-page {
-    border-top: 1px solid $pageBorderColor;
-    background: $pageSidebarBackgroundColor;
-    border-bottom: 1px solid $pageBorderColor;
+    border-top: 1px solid $page-border-color;
+    background: $page-sidebar-background-color;
+    border-bottom: 1px solid $page-border-color;
 
     .oro-page-sidebar {
         width: 236px;
         margin-right: -1px;
         float: left;
-        border-right: 1px solid $pageBorderColor;
-        border-bottom: 1px solid $pageBorderColor;
-        background: $pageSidebarBackgroundColor;
+        border-right: 1px solid $page-border-color;
+        border-bottom: 1px solid $page-border-color;
+        background: $page-sidebar-background-color;
     }
 
     .oro-page-body {
         float: right;
         width: calc(100% - 235px);
-        border-left: 1px solid $pageBorderColor;
+        border-left: 1px solid $page-border-color;
         padding: 10px;
         background-color: #fff;
         overflow: hidden;

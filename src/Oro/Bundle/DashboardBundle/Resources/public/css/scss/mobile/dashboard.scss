@@ -1,11 +1,42 @@
+/* @theme: admin.oro; */
+
+.dashboard-container-wrapper {
+    min-height: 100%;
+
+    .responsive-section {
+        padding: 0;
+
+        .responsive-cell > div {
+            padding: 0;
+        }
+    }
+
+    .dashboard-widget {
+        .action-wrapper.sortable {
+            display: none;
+        }
+    }
+}
+
+.chart-container {
+    & > .clearfix {
+        max-width: 100%;
+
+        .chart-legend {
+            padding-bottom: 8px;
+        }
+    }
+}
+
 .widget-configuration {
     .date-range-filter {
         max-width: 300px;
 
         .control-group .filter-select-oro {
             height: 32px;
-            line-height: 32px;
             max-width: initial;
+
+            line-height: 32px;
         }
 
         .filter-start-date,

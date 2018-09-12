@@ -168,7 +168,11 @@ class EnumNormalizerTest extends \PHPUnit\Framework\TestCase
             [
                 ['id' => $id, 'name' => 'name', 'priority' => 100, 'default' => true],
                 new TestEnumValue($id, 'name', 100, true)
-            ]
+            ],
+            'Check that id with "0" value is handled correctly' => [
+                ['id' => "0", 'name' => 'name', 'priority' => 100, 'default' => true],
+                new TestEnumValue("0", 'name', 100, true)
+            ],
         ];
     }
 }

@@ -38,7 +38,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage The "data" section must exist in the request data.
      */
-    public function testProcessIncludedDataWithoutPrimatyData()
+    public function testProcessIncludedDataWithoutPrimaryData()
     {
         $requestData = [
             'included' => [
@@ -396,6 +396,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,
             'The entity should have a relationship with the primary entity'
+            . ' and this should be explicitly specified in the request'
         );
         $error->setSource(
             ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))

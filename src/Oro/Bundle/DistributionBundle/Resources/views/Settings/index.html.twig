@@ -11,9 +11,9 @@
 
 {% block body %}
     {% if saved %}
-        <div class="alert fade in alert-success">
-            <i class="fa-success"></i>
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <div class="alert fade in alert-success alert-dismissible" role="alert">
+            <span class="fa-success" aria-hidden="true"></span>
+            <button type="button" class="close" data-dismiss="alert" aria-label="{{ 'Close'|trans }}"><span aria-hidden="true">&times;</span></button>
             {{ 'oro.distribution.messages.settings_saved'|trans }}
         </div>
     {% endif %}

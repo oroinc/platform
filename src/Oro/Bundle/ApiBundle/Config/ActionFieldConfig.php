@@ -167,7 +167,7 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * Indicates whetner the request data can contain this field.
+     * Indicates whether the request data can contain this field.
      *
      * @return bool
      */
@@ -185,7 +185,7 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * Indicates whetner the response data can contain this field.
+     * Indicates whether the response data can contain this field.
      *
      * @return bool
      */
@@ -205,7 +205,7 @@ class ActionFieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the path of the field value exists.
      *
-     * @return string
+     * @return bool
      */
     public function hasPropertyPath()
     {

@@ -1,11 +1,14 @@
 <% if (!_.isMobile()) { %>
     <label class="control-label"><%- _.__("View per page") %>: &nbsp;</label>
 <% } %>
+<% var togglerId = _.uniqueId('dropdown-') %>
 <div class="btn-group">
-    <button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">
-        <%- currentSizeLabel %><span class="caret"></span>
+    <button class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>" type="button"
+            id="<%- togglerId %>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            aria-label="<%- _.__('View per page') %>" data-placement="bottom-end">
+        <%- currentSizeLabel %><span class="caret" aria-hidden="true"></span>
     </button>
-    <ul class="dropdown-menu pull-right">
+    <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">
         <% _.each(items, function (item) { %>
         <li><a class="dropdown-item" href="#" data-size="<% if (_.isUndefined(item.size)) { %><%- item %><% } else { %><%- item.size %><% } %>"
                data-grid-pagesize-trigger>

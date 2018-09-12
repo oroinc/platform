@@ -12,7 +12,7 @@ define(function(require) {
     var config = require('module').config();
     config = _.extend({
         icon: 'cog',
-        wrapperClassName: 'column-manager',
+        wrapperClassName: 'column-manager dropleft',
         label: __('oro.datagrid.column_manager.title')
     }, config);
 

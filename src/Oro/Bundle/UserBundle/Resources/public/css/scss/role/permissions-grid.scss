@@ -1,4 +1,4 @@
-@import "oroui/css/scss/variables";
+/* @theme: admin.oro; */
 
 .inner-permissions-grid {
     margin: 0 -20px 20px -20px;
@@ -72,8 +72,6 @@
     }
 
     .fields-list {
-        display: none;
-
         & > :first-child {
             margin-top: 8px;
         }
@@ -87,10 +85,6 @@
 .collapse-expand-action-container .collapse-action {
     .field-less & {
         visibility: hidden;
-    }
-
-    .collapsed &:before {
-        content: '+';
     }
 }
 
@@ -168,7 +162,7 @@
 .field-permission-container {
     margin-left: 40px;
     padding: 4px 0;
-    border-top: 1px solid $generalBorderColor;
+    border-top: 1px solid $general-border-color;
 
     &:first-child {
         border-top: 0 none;
@@ -195,9 +189,6 @@
 .dropdown-menu__role-permissions-action {
     .grid .entity-row-action & {
         padding: 5px 0;
-        right: 100%;
-        left: auto;
-        top: -7px;
     }
 
     .dropdown-menu-collection__list > li {

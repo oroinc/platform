@@ -1,26 +1,29 @@
 <% obj.attributesTemplate = function(attributes) {
-_.each(attributes, function(attribute, name) { %>
-<%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %>
-<% });
+    _.each(attributes, function(attribute, name) { %>
+        <%- name %><% if (!_.isNull(attribute)) { %>="<%- attribute %>"<% } %>
+    <% });
 } %>
-<div class="<%= wrapperClassName %> dropdown">
+<% var togglerId = _.uniqueId('dropdown-') %>
+<div class="<%- wrapperClassName %> dropdown">
     <a href="#" class="action btn
-            <%= className ? " " + className : "" %>
-            <%= !enabled ? " disabled" : "" %>
-            <%= launcherMode != '' ? 'mode-' +  launcherMode : "" %>
+            <%- launcherMode == 'icon-only' ? 'btn-icon' : '' %>
+            <%- className ? className : '' %>
+            <%- !enabled ? 'disabled' : '' %>
+            <%- launcherMode != '' ? 'mode-' +  launcherMode : '' %>
             dropdown-toggle"
-        <%= attributesTemplate(attributes) %>
-        title="<%= title %>"
-        data-toggle="dropdown">
+       title="<%= title %>"
+       role="button" id="<%- togglerId %>" data-toggle="dropdown"
+       aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"
+       <% attributesTemplate(attributes) %>>
         <% if (launcherMode == 'icon-text') { %>
-            <i class="fa-<%= icon %> hide-text"></i>
+            <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
             <%= label %>
         <% } else if (launcherMode == 'icon-only') { %>
-            <i class="fa-<%= icon %> hide-text"></i>
+            <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
         <% } else if (launcherMode == 'text-only') { %>
-            <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
-            <%= label %>
+            <% if (iconClassName) { %><span class="<%= iconClassName %>" aria-hidden="true"></span><% } %>
+            <%- label %>
         <% } %>
     </a>
-    <div class="dropdown-menu"></div>
+    <div class="dropdown-menu" aria-labelledby="<%- togglerId %>"></div>
 </div>

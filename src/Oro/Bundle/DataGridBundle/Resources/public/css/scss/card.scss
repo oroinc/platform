@@ -1,0 +1,81 @@
+/* @theme: admin.oro; */
+
+.card-view {
+    position: relative;
+    background: #fff;
+    border: $card-view-border;
+    border-radius: 3px;
+    z-index: 0;
+
+    &:hover {
+        background: linear-gradient(#fff, #f0f0f0);
+        border-color: $card-view-hover-border-color;
+        z-index: 1;
+
+        & + .card-view {
+            border-top-color: $card-view-hover-card-view-border-top-color;
+        }
+    }
+
+    .card-title {
+        @include text-line-truncate(calc(100% - 15px));
+
+        font-weight: bold;
+    }
+
+    .card-actions {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+
+        .dropdown-toggle {
+            padding: 0 5px;
+            width: auto;
+            margin-top: 1px;
+        }
+
+        .dropdown-menu {
+            min-width: inherit;
+        }
+
+        .launchers-list {
+            padding: 0%;
+        }
+    }
+
+    .card-amount {
+        @include text-line-truncate();
+
+        color: #777;
+        font-weight: bold;
+    }
+
+    .card-additional {
+        color: #777;
+        margin-top: 5px;
+        line-height: 17px;
+
+        .card-additional-line {
+            @include text-line-truncate();
+        }
+    }
+
+    .card-date {
+        @include text-line-truncate();
+
+        color: #ccc;
+        font-size: 11px;
+    }
+
+    &[data-transition-status="error"] {
+        background: $cell-error-background;
+    }
+
+    &[data-transition-status="success"].transition-status-just-changed {
+        background: $cell-success-background;
+    }
+
+    &[data-transition-status="in_progress"] {
+        background: $cell-loading-background;
+    }
+}

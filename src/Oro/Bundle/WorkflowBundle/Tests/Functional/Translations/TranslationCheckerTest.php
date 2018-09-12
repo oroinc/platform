@@ -49,6 +49,7 @@ class TranslationCheckerTest extends WebTestCase
                 }
             }
         }
+
         $this->assertEquals([], $notTranslatedKeys, 'Some workflow keys are not translated');
     }
 

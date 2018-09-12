@@ -31,17 +31,19 @@ define(function(require) {
         showCloseButton: false,
 
         /** @property */
-        baseMarkup:
+        baseMarkup: _.template(
             '<div class="more-bar-holder">' +
-                '<div class="dropdown">' +
-                    '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
+                '<div class="dropleft">' +
+                    '<a class="dropdown-toggle" href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" ' +
+                        'aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>">...</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
-                    'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
+                        'aria-labelledby="<%- togglerId %>"></ul>' +
                 '</div>' +
-            '</div>',
+            '</div>'
+        ),
 
         /** @property */
-        simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
+        simpleBaseMarkup: _.template('<div class="more-bar-holder action-row"></div>'),
 
         /** @property */
         closeButtonTemplate: _.template(
@@ -78,7 +80,7 @@ define(function(require) {
         events: {
             'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown',
+            'mouseleave .dropleft.show': '_hideDropdown',
             'click .dropdown-close .fa-close': '_hideDropdown'
         },
 
@@ -120,7 +122,6 @@ define(function(require) {
             }
             delete this.actions;
             delete this.column;
-            this.$('.dropdown-toggle').dropdown('destroy');
             ActionsView.__super__.dispose.apply(this, arguments);
         },
 
@@ -130,7 +131,7 @@ define(function(require) {
          * @param {oro.datagrid.action.AbstractAction} action
          */
         onActionRun: function(action) {
-            this.$('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
+            this.$('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
         },
 
         /**
@@ -200,7 +201,7 @@ define(function(require) {
                 this.launchersContainerSelector = '.more-bar-holder';
             }
 
-            this.$el.html(this.baseMarkup);
+            this.$el.html(this.baseMarkup(this.getTemplateData()));
             this.isLauncherListFilled = false;
 
             if (isSimplifiedMarkupApplied) {
@@ -208,6 +209,13 @@ define(function(require) {
             }
 
             return this;
+        },
+
+        getTemplateData: function() {
+            return {
+                togglerId: 'actions-view-dropdown-' + this.cid,
+                label: __('oro.datagrid.card_actions.label')
+            };
         },
 
         fillLauncherList: function() {
@@ -303,8 +311,8 @@ define(function(require) {
          */
         _showDropdown: function(e) {
             this.fillLauncherList();
-            if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
-                this.$('.dropdown-toggle').dropdown('toggle');
+            if (!this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             e.stopPropagation();
         },
@@ -316,8 +324,8 @@ define(function(require) {
          * @protected
          */
         _hideDropdown: function(e) {
-            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
-                this.$('.dropdown-toggle').dropdown('toggle');
+            if (this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
+                this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             e.stopPropagation();
         }

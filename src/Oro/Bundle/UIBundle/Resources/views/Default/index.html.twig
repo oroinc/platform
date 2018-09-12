@@ -76,16 +76,16 @@
         {% endblock content_side %}
         <div class="app-page__content">
             {% block header %}
-                <header class="navbar app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
+                <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header">
                     {% placeholder before_navigation %}
-                    <div class="navbar-inner">
-                        <div class="container">
+                    <div class="app-header__inner">
+                        <div class="app-header__container">
                             {% placeholder header_logo %}
-                            <ul class="nav pull-right user-menu"
+                            <ul class="user-menu"
                                 {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
                                 {{ block('user_menu') }}
                             </ul>
-                            <div class="nav top-search shortcuts">
+                            <div class="app-header__search-and-shortcuts">
                                 {{ block('navbar') }}
                             </div>
                             {% placeholder pin_tabs_list %}

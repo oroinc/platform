@@ -26,7 +26,7 @@ class DeleteAclMigrationQuery implements MigrationQuery
     public function __construct(ContainerInterface $container, ObjectIdentityInterface $oid)
     {
         $this->aclProvider = $container->get(
-            'security.acl.dbal.provider',
+            'oro_security.alias.acl.dbal.provider',
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
         $this->oid         = $oid;

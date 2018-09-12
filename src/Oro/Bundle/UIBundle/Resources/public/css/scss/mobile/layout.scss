@@ -3,10 +3,11 @@
 & {
   min-height: 100%;
 }
+
 .app-page {
-  &__central-panel {
-    padding-top: $app-header-height;
-  }
+    &__central-panel {
+        padding-top: $app-header-height;
+    }
 }
 
 .mobile-hide {
@@ -28,17 +29,17 @@
 }
 
 .row {
-    margin-left: $contentPadding;
-    margin-right: $contentPadding;
+    margin-left: $content-padding;
+    margin-right: $content-padding;
 }
 
 .container-fluid {
-    padding-right: $contentPadding;
-    padding-left: $contentPadding;
+    padding-right: $content-padding;
+    padding-left: $content-padding;
 
     & > .responsive-section {
-        margin: 0 -#{$contentPadding};
-        padding-right: $contentPadding;
+        margin: 0 -#{$content-padding};
+        padding-right: $content-padding;
     }
 }
 
@@ -66,14 +67,14 @@
     padding: 0;
 
     .form-horizontal {
-        padding: $contentPadding 0;
+        padding: $content-padding 0;
     }
 }
 
 .container-fluid > .responsive-section {
     .responsive-cell,
     .responsive-cell:only-child {
-        padding: 0 $contentPadding;
+        padding: 0 $content-padding;
     }
 }
 
@@ -87,7 +88,7 @@
 
 .responsive-section {
     .inner-grid {
-        margin: -#{$contentPadding} 0 $contentPadding;
+        margin: -#{$content-padding} 0 $content-padding;
     }
 }
 
@@ -119,6 +120,19 @@
     }
 }
 
+.box-type1 {
+    margin: 0 $content-padding $content-padding;
+    border-radius: 3px;
+
+    .title {
+        padding: $content-padding $content-padding $content-padding 0;
+    }
+
+    .calendar-container {
+        padding: 0;
+    }
+}
+
 .dashboard-container {
     .responsive-cell {
         .box-type1 {
@@ -127,6 +141,7 @@
         }
     }
 }
+
 .responsive-cell {
     margin-bottom: 15px;
 

@@ -26,7 +26,7 @@ api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
-If an auto-generated alias for your entity does not look good enaough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
+If an auto-generated alias for your entity does not look good enough for you, change it in `Resources/config/oro/entity.yml`. For more details, see the [entity aliases documentation](../../../EntityBundle/Resources/doc/entity_aliases.md).
 
 **Important:**
 Run the `oro:api:cache:clear` CLI command to immediately make an entity accessible via the data API. If you use the API sandbox, run the `oro:api:doc:cache:clear` CLI command to apply the changes for it. 
@@ -368,6 +368,7 @@ This section describes fields by which the result data can be filtered. It conta
     * **data_type** (*string*) - The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
     * **allow_array** (*boolean*) - Indicates whether the filter can contains several values. By default, `false` for `string`, `boolean`, `datetime`, `date`, `time` fields. and `true` for other fields.
     * **allow_range** (*boolean*) - Indicates whether the filter can contains a pair of "from" and "to" values. By default, `false` for `string`, `boolean`, `guid`, `currency` fields. and `true` for other fields.
+    * **collection** (*boolean*) - Indicates whether the filter represents a collection valued association. By default, `false` for filters by fields and *to-one* associations, and `true` for filters by *to-many* associations.
     * **type** (*string*) - The filter type. By default, the filter type is equal to the **data_type** property value.
     * **options** (*array*) - The filter options.
     * **operators** (*array*) - A list of operators supported by the filter. By default, the list of operators depends on the filter type. For example a string filter supports **=** and **!=** operators, a number filter supports **=**, **!=**, **<**, **<=**, **>**, and **>=** operators, etc. Use this parameter when you need to limit a list of supported operators.
@@ -401,6 +402,12 @@ api:
                         operators: ['=']
 ```
 
+Please note that filters for fields that have a database index are enabled automatically. Filters by all other fields
+should be enabled explicitly, if necessary.
+
+See [Filters](./filters.md) for more information on the existing filter types and instructions on how to create
+custom filters.
+
 ## sorters Configuration Section
 
 This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.
@@ -423,6 +430,9 @@ api:
                     field2:
                         exclude: true
 ```
+
+Please note that sorters for fields that have a database index are enabled automatically. Sorters by all other fields
+should be enabled explicitly, if necessary.
 
 ## actions Configuration Section
 

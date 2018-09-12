@@ -79,9 +79,31 @@ services:
         public: false
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.query.require_joins_field_visitor_factory'
+            - '@oro_api.query.optimize_joins_field_visitor_factory'
 
     oro_api.criteria_placeholders_resolver:
         class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver
+        public: false
+
+    oro_api.query.require_joins_field_visitor_factory:
+        class: Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory
+        public: false
+        arguments:
+            - '@oro_api.query.require_joins_decision_maker'
+
+    oro_api.query.require_joins_decision_maker:
+        class: Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker
+        public: false
+
+    oro_api.query.optimize_joins_field_visitor_factory:
+        class: Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory
+        public: false
+        arguments:
+            - '@oro_api.query.optimize_joins_decision_maker'
+
+    oro_api.query.optimize_joins_decision_maker:
+        class: Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker
         public: false
 
     oro_api.doctrine_helper:
@@ -214,7 +236,7 @@ services:
 
     oro_api.resources_cache.impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
@@ -278,6 +300,23 @@ services:
         public: false
         arguments:
             - '@oro_api.config_extension_registry'
+
+    oro_api.config_cache_factory:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/api'
+            - '%kernel.debug%'
+
+    oro_api.config_cache_warmer:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer
+        public: false
+        arguments:
+            - [] # config files. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.config_extension_registry'
+            - '@oro_api.config_cache_factory'
+            - '%kernel.debug%'
+            - '%kernel.environment%'
 
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
@@ -549,6 +588,14 @@ services:
         arguments:
             - '@oro_api.rest.doc_view_detector'
 
+    oro_api.rest.routing_options_resolver.prefix:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestPrefixRouteOptionsResolver
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: routing.options_resolver, priority: -255 }
+
     oro_api.rest.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver
         public: false
@@ -631,14 +678,13 @@ services:
             - [setEnableSandbox, ['%nelmio_api_doc.sandbox.enabled%']]
             - [setEndpoint, ['%nelmio_api_doc.sandbox.endpoint%']]
             - [setAcceptType, ['%nelmio_api_doc.sandbox.accept_type%']]
-            - [setRequestFormatMethod, ['%nelmio_api_doc.sandbox.request_format.method%']]
+            - [setRequestFormatMethod, ['']]
             - [setRequestFormats, [[]]]
             - [setDefaultRequestFormat, ['']]
             - [setBodyFormats, [['json']]]
             - [setDefaultBodyFormat, ['json']]
             - [setAuthentication, ['%nelmio_api_doc.sandbox.authentication%']]
             - [setDefaultSectionsOpened, ['%nelmio_api_doc.default_sections_opened%']]
-            - [setEnableFormatParameter, [false]]
             - [setSecurityContext, ['@oro_api.api_doc.security_context']]
             - [setFileLocator, ['@file_locator']]
             - [setDocumentationProvider, ['@oro_api.api_doc.documentation_provider']]
@@ -691,6 +737,7 @@ services:
     oro_api.api_doc.validate_view_listener:
         class: Oro\Bundle\ApiBundle\EventListener\ValidateApiDocViewListener
         arguments:
+            - '%oro_api.rest.prefix%doc'
             - '%oro_api.api_doc.views%'
             - '%oro_api.api_doc.default_view%'
         tags:

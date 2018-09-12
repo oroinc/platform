@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+.entity-fallback-container {
+    .selector {
+        width: $entity-fallback-container-selector-width !important;
+
+        span {
+            width: $entity-fallback-container-selector-width !important;
+            padding-right: $entity-fallback-container-selector-inner-offset-right;
+        }
+    }
+
+    .use-fallback-checkbox {
+        margin-top: $entity-fallback-container-use-fallback-checkbox-offset-top;
+    }
+
+    .fallback-item-use-fallback {
+        padding: $entity-fallback-container-fallback-item-use-fallback-inner-offset;
+    }
+}
+

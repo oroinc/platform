@@ -1,17 +1,19 @@
+/* @theme: admin.oro; */
+
 .activity-list-widget {
     .activity-list {
         .info {
-            margin-bottom: $contentPadding;
+            margin-bottom: $content-padding;
         }
     }
 
     .grid-toolbar {
         padding: 0;
-        margin-bottom: $contentPadding;
+        margin-bottom: $content-padding;
 
         .filter-container {
             padding: 0;
-            margin-bottom: $contentPadding;
+            margin-bottom: $content-padding;
         }
 
         .actions-panel {
@@ -109,9 +111,6 @@
                 }
 
                 .filter-criteria-selector {
-                    height: 32px;
-                    line-height: 29px;
-
                     .caret {
                         margin-top: 13px;
                     }

@@ -1,0 +1,127 @@
+/* @theme: admin.oro; */
+// Bootstrap - Popover
+
+#container .popover {
+    // prevent menu and loading wrapper overlapping
+    z-index: $popover-z-index;
+}
+
+.popover {
+    position: $popover-position;
+    max-width: $popover-max-width;
+    border-radius: $popover-border-radius;
+    box-shadow: $popover-box-shadow;
+    border: $popover-border;
+
+    .arrow {
+        border: $popover-arrow-border;
+        width: $popover-arrow-container-size;
+
+        &:after {
+            border: $popover-arrow-border;
+            background-color: $popover-arrow-color;
+            width: $popover-arrow-size;
+            height: $popover-arrow-size;
+            display: block;
+            transform: rotate(45deg);
+        }
+    }
+
+    &.bs-popover-top {
+        margin-bottom: $popover-arrow-container-size;
+
+        .arrow {
+            bottom: -$popover-arrow-container-size;
+
+            &:after {
+                bottom: $popover-arrow-position-x;
+                box-shadow: $popover-arrow-top-shadow;
+            }
+        }
+    }
+
+    &.bs-popover-bottom {
+        margin-top: $popover-arrow-container-size;
+
+        .arrow {
+            top: -$popover-arrow-container-size;
+
+            &:after {
+                top: $popover-arrow-position-x;
+                box-shadow: $popover-arrow-bottom-shadow;
+            }
+        }
+    }
+
+    &.bs-popover-left {
+        margin-right: $popover-arrow-container-size;
+
+        .arrow {
+            right: -$popover-arrow-container-size;
+
+            &:after {
+                box-shadow: $popover-arrow-left-shadow;
+                bottom: $popover-arrow-position-y;
+                right: $popover-arrow-position-x;
+                margin-bottom: $popover-arrow-container-size;
+            }
+        }
+    }
+
+    &.bs-popover-right {
+        margin-left: $popover-arrow-container-size;
+
+        .arrow {
+            left: -$popover-arrow-container-size;
+
+            &:after {
+                box-shadow: $popover-arrow-right-shadow;
+                bottom: $popover-arrow-position-y;
+                left: $popover-arrow-position-x;
+                margin-bottom: $popover-arrow-container-size;
+            }
+        }
+    }
+
+    .oro-popover-content {
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    &-header {
+        padding: 8px 14px;
+        margin: 0;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 18px;
+        background-color: #f7f7f7;
+        border-bottom: 1px solid #ebebeb;
+        -webkit-border-radius: 5px 5px 0 0;
+        -moz-border-radius: 5px 5px 0 0;
+        border-radius: 5px 5px 0 0;
+    }
+
+    &-header:empty {
+        display: none;
+    }
+
+    &-body {
+        padding-top: $popover-content-offset-top;
+        padding-right: $popover-content-offset-right;
+        padding-bottom: $popover-content-offset-bottom;
+        padding-left: $popover-content-offset-left;
+        height: $popover-content-height;
+
+        &.popover-no-close-button {
+            padding-right: $popover-content-offset-right-no-close;
+        }
+    }
+
+    &-close {
+        position: $popover-close-position;
+        top: $popover-close-position-y;
+        right: $popover-close-position-x;
+        cursor: $popover-close-cursor;
+        color: $popover-close-color;
+    }
+}

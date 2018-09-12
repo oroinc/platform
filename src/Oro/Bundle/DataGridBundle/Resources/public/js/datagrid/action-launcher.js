@@ -249,7 +249,6 @@ define(function(require) {
                     key = $link.data('key');
                     if (!_.isUndefined(key)) {
                         this.action.actionKey = key;
-                        $link.closest('.btn-group').toggleClass('open');
                     }
                 }
                 if (tools.isTargetBlankEvent(e)) {

@@ -1,4 +1,7 @@
-div.uploader, div.selector {
+/* @theme: admin.oro; */
+
+div.uploader,
+div.selector {
     position: relative;
     overflow: hidden;
     cursor: default;
@@ -6,14 +9,16 @@ div.uploader, div.selector {
     display: inline-block;
     padding: 0;
     margin: 0;
+
+    input,
+    select {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        #{$end}: 0;
+        bottom: 0;
+        border: none;
+        cursor: default;
+    }
 }
 
-div.uploader input, div.selector select {
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    border: none;
-    cursor: default;
-}

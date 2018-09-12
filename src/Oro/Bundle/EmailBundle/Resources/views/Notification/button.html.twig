@@ -17,14 +17,14 @@
         <% } %>
     </div>
     <div class="footer row-fluid">
-        <span class="pull-left from-name">
+        <span class="from-name">
             <% if (linkFromName) { %>
                 <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
         </span>
-        <span class="pull-right">
+        <span class="forward-action-wrapper">
             <span class="forward-action">
                 {{- UI.clientLink({
                     'dataUrlRaw': "<%= forwardRoute %>",
@@ -96,7 +96,7 @@
 </script>
 
 {% if oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
-<li id="email-notification-menu-button" class="email-notification-menu dropdown" title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
+<li class="email-notification-menu dropdown" title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
     {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/user-menu-email-notification-component',
         options: {
@@ -109,17 +109,21 @@
         }
     }) }}>
     {% if isDesktopVersion() %}
-    <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>
-    {% endif %}
-    <div class="dropdown-menu pull-right" tabindex="0"></div>
+    {% set togglerId = 'dropdown-'|uniqid %}
+    <a href="#" role="button" id="{{ togglerId }}" data-toggle="dropdown"
+       class="dropdown-toggle email-notification-icon"
+       title="{{ 'oro.email.menu.user_emails'|trans }}"
+       aria-label="{{ 'oro.email.menu.user_emails'|trans }}" aria-haspopup="true" aria-expanded="false"></a>
+    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" aria-labelledby="{{ togglerId }}" tabindex="0"></div>
     <div class="new-email-notification" {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/new-email-message-component'
     }) }}> {{ 'oro.email.notification.new_email'|trans }}</div>
+    {% endif %}
 </li>
 {% else %}
-    <div {{ UI.renderPageComponentAttributes({
+    <li {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/new-email-flash-message-component'
-    }) }}></div>
+    }) }}></li>
 {% endif %}
 
 {% endif %}

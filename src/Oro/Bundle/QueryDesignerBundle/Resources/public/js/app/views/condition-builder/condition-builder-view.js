@@ -410,6 +410,7 @@ define(function(require) {
             var operatorView = new DropdownSelectView({
                 autoRender: true,
                 tagName: 'li',
+                label: __('oro.querydesigner.condition_operation'),
                 attributes: function() {
                     var attrs = {};
                     attrs['data-condition-cid'] = this.cid;

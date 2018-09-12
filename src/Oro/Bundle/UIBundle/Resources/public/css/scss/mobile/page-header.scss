@@ -1,3 +1,5 @@
+/* @theme: admin.oro; */
+
 .navbar-extra-right {
     padding-right: 0;
 }
@@ -85,15 +87,15 @@
 
 .page-title {
     h1 {
-        font-size: $baseFontSize * 1.75;
+        font-size: $base-font-size * 1.75;
         margin: 0;
-        line-height: $baseFontSize * 2.5;
+        line-height: $base-font-size * 2.5;
         display: block;
     }
 
     .sub-title {
         float: none;
-        font-size: $fontSizeSmall;
+        font-size: $base-font-size--xl;
 
         & + .separator {
             display: none;
@@ -107,7 +109,7 @@
     ul.inline li {
         line-height: 18px;
         display: block;
-        font-size: $fontSizeSmall;
+        font-size: $base-font-size--s;
         padding: 0;
         border: 0;
     }
@@ -126,7 +128,7 @@
         text-align: center;
 
         &:before {
-            font-size: $fontSizeLarge;
+            font-size: $base-font-size--l;
         }
     }
 
@@ -137,8 +139,8 @@
     }
 
     .btn {
-        font-size: $fontSizeLarge;
-        line-height: $fontSizeLarge * 2;
+        font-size: $base-font-size--l;
+        line-height: $base-font-size--l * 2;
         height: 34px;
         padding-left: 10px;
         padding-right: 10px;
@@ -164,8 +166,8 @@
     .btn-group > .dropdown-menu {
         li a,
         li button {
-            font-size: $fontSizeLarge;
-            line-height: $fontSizeLarge * 1.8;
+            font-size: $base-font-size--l;
+            line-height: $base-font-size--l * 1.8;
             padding: 1px 26px 1px 30px;
             color: #666;
 

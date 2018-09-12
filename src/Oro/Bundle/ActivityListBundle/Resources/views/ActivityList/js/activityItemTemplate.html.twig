@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block activityActions %}
-    <div class="dropdown vertical-actions activity-actions">
-        <a href="#" data-toggle="dropdown" class="dropdown-toggle activity-item">...</a>
-        <ul class="dropdown-menu activity-item pull-right">
+    <% var togglerId = _.uniqueId('dropdown-') %>
+    <div class="dropleft vertical-actions activity-actions">
+        <a href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" class="dropdown-toggle activity-item"
+           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.activitylist.actions.label'|trans }}">...</a>
+        <ul class="dropdown-menu activity-item" role="menu" aria-labelledby="<%- togglerId %>">
             {% for action in actions|default([]) %}
                 <li class="activity-action">{{ action|raw }}</li>
             {% endfor %}

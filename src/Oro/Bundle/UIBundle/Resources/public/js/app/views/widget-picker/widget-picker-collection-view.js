@@ -74,6 +74,9 @@ define(function(require) {
          */
         _startLoading: function() {
             return _.bind(function() {
+                if (this.disposed) {
+                    return;
+                }
                 this.isWidgetLoadingInProgress = false;
                 _.each(this.getItemViews(), function(itemView) {
                     itemView.trigger('unblock_add_btn');

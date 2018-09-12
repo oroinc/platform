@@ -5,20 +5,13 @@ namespace Oro\Component\Config\Loader;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 
+/**
+ * The base class for classes responsible to load resources from different kind of files, e.g. from YAML files.
+ */
 abstract class CumulativeFileLoader implements CumulativeResourceLoader
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $relativeFilePath;
-
-    /**
-     * @var string
-     */
-    protected $oroRelativeFilePath = null;
-
-    /** @var array  */
-    protected $relativePaths = [];
 
     /**
      * @var string
@@ -53,47 +46,28 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     }
 
     /**
-     * Gets relative path to a resource file in oro subfolder
-     *
-     * @return string
-     */
-    public function getOroRelativeFilePath()
-    {
-        return $this->oroRelativeFilePath;
-    }
-
-    /**
      * Sets relative path to a resource file
      *
      * @param string $relativeFilePath The relative path to a resource file starts from bundle folder
      */
     public function setRelativeFilePath($relativeFilePath)
     {
-        $relativeFilePath   = str_replace('\\', '/', $relativeFilePath);
-        $delim              = strrpos($relativeFilePath, '/');
+        $relativeFilePath = str_replace('\\', '/', $relativeFilePath);
+        $delim = strrpos($relativeFilePath, '/');
         $this->resourceName = pathinfo(
             false === $delim ? $relativeFilePath : substr($relativeFilePath, $delim + 1),
             PATHINFO_FILENAME
         );
-        $oroRelativeFilePath = sprintf(
-            '%s/oro%s',
-            substr($relativeFilePath, 0, $delim),
-            substr($relativeFilePath, $delim)
-        );
-        $path               = DIRECTORY_SEPARATOR === '/'
+        $path = DIRECTORY_SEPARATOR === '/'
             ? $relativeFilePath
             : str_replace('/', DIRECTORY_SEPARATOR, $relativeFilePath);
         if (strpos($relativeFilePath, '/') === 0) {
-            $this->resource            = substr($relativeFilePath, 1);
-            $this->relativeFilePath    = $path;
-            $this->oroRelativeFilePath = $oroRelativeFilePath;
+            $this->resource = substr($relativeFilePath, 1);
+            $this->relativeFilePath = $path;
         } else {
-            $this->resource            = $relativeFilePath;
-            $this->relativeFilePath    = DIRECTORY_SEPARATOR . $path;
-            $this->oroRelativeFilePath = DIRECTORY_SEPARATOR . $oroRelativeFilePath;
+            $this->resource = $relativeFilePath;
+            $this->relativeFilePath = DIRECTORY_SEPARATOR . $path;
         }
-
-        $this->relativePaths = [$this->oroRelativeFilePath, $this->relativeFilePath];
     }
 
     /**
@@ -111,7 +85,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     {
         $realPath = $this->getResourcePath($bundleAppDir, $bundleDir);
 
-        if ($realPath === null) {
+        if (!$realPath) {
             return null;
         }
 
@@ -125,16 +99,17 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @param string $realPath
+     *
      * @return array
      */
     protected function doLoad($realPath)
     {
         $data = $this->loadFile($realPath);
-        
+
         if (!is_array($data)) {
             return [];
         }
-        
+
         return (array)$data;
     }
 
@@ -150,7 +125,7 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     public function getResourcePath($bundleAppDir, $bundleDir)
     {
         $path = $this->getBundleAppResourcePath($bundleAppDir);
-        if ($path === null) {
+        if (!$path) {
             $path = $this->getBundleResourcePath($bundleDir);
         }
 
@@ -187,15 +162,11 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     protected function getBundleResourcePath($bundleDir)
     {
-        $path = null;
-        foreach ($this->relativePaths as $relativePath) {
-            $path = $bundleDir . $relativePath;
-            if (is_file($path)) {
-                return realpath($path);
-            }
-        }
+        $path = $bundleDir . $this->relativeFilePath;
 
-        return null;
+        return is_file($path)
+            ? realpath($path)
+            : null;
     }
 
     /**
@@ -204,11 +175,11 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         $path = $this->getBundleAppResourcePath($bundleAppDir);
-        if (is_file($path)) {
+        if ($path) {
             $resource->addFound($bundleClass, $path);
         } else {
             $path = $this->getBundleResourcePath($bundleDir);
-            if (is_file($path)) {
+            if ($path) {
                 $resource->addFound($bundleClass, $path);
             }
         }
@@ -219,7 +190,6 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
-        $path = null;
         if (is_dir($bundleAppDir)) {
             $path = $this->normalizeBundleAppDir($bundleAppDir);
             if ($resource->isFound($bundleClass, $path)) {
@@ -232,12 +202,10 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
             }
         }
 
-        foreach ($this->relativePaths as $relativePath) {
-            $path = $bundleDir . $relativePath;
-            if ($resource->isFound($bundleClass, $path)) {
-                // check exists and removed resource
-                return is_file($path) && filemtime($path) < $timestamp;
-            }
+        $path = $bundleDir . $this->relativeFilePath;
+        if ($resource->isFound($bundleClass, $path)) {
+            // check exists and removed resource
+            return is_file($path) && filemtime($path) < $timestamp;
         }
 
         // check new resource
@@ -276,13 +244,6 @@ abstract class CumulativeFileLoader implements CumulativeResourceLoader
      */
     protected function normalizeBundleAppDir($bundleAppDir)
     {
-        $path = null;
-        foreach ($this->relativePaths as $relativePath) {
-            if (!is_file($path)) {
-                $path = $bundleAppDir . str_replace('/Resources', '', $relativePath);
-            }
-        }
-
-        return $path;
+        return $bundleAppDir . str_replace('/Resources', '', $this->relativeFilePath);
     }
 }

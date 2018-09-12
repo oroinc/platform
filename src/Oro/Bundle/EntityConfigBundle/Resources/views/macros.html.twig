@@ -39,15 +39,14 @@
     {% set fieldValue = item.value %}
     {% if fieldValue is iterable %}
         {% if fieldValue.values is defined %}
-
-            {% for value in fieldValue.values %}
-                {{ _self.renderField(value) }}
-                {% if not loop.last %}
+            {%- for value in fieldValue.values -%}
+                {{- _self.renderField(value) -}}
+                {%- if not loop.last -%}
                     ,&nbsp;
-                {% endif %}
-            {% else %}
-                {{ 'N/A'|trans }}
-            {% endfor %}
+                {%- endif -%}
+            {%- else -%}
+                {{- 'N/A'|trans -}}
+            {%- endfor -%}
         {% else %}
             {{ _self.renderField(fieldValue) }}
         {% endif %}
@@ -106,7 +105,7 @@
     {% elseif value.raw is defined %}
         {{ value.title|raw }}
     {% else %}
-        {{ value.title|escape }}
+        {{- value.title|escape -}}
     {% endif %}
 {% endmacro %}
 

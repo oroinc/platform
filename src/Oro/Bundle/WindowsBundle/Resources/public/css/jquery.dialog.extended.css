@@ -43,10 +43,6 @@
     white-space: nowrap;
 }
 
-.ui-dialog .ui-dialog-titlebar-buttonpane>a {
-    float: right;
-}
-
 .ui-dialog .ui-dialog-titlebar-maximize,
 .ui-dialog .ui-dialog-titlebar-minimize,
 .ui-dialog .ui-dialog-titlebar-restore {

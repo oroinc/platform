@@ -1,6 +1,10 @@
-<button type="button" class="jstree-actions__handle btn btn-default btn-small dropdown-toggle"
-        data-toggle="dropdown" title="Mass Actions">
-    <i class="fa-ellipsis-h"></i>
-    <i class="caret"></i>
+<% var togglerId = _.uniqueId('dropdown-') %>
+<button type="button" class="jstree-actions__handle btn btn-icon btn-default btn-small dropdown-toggle"
+        data-toggle="dropdown" data-placement="bottom-end" id="<%- togglerId %>"
+        title="<%- _.__('oro.ui.jstree.actions.label') %>" aria-label="<%- _.__('oro.ui.jstree.actions.label') %>"
+        aria-haspopup="true" aria-expanded="false">
+    <span class="fa-ellipsis-h" aria-hidden="true"></span>
+    <span class="caret" aria-hidden="true"></span>
 </button>
-<ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions"></ul>
+<ul class="jstree-actions__menu dropdown-menu dropdown-menu__action-column" data-role="jstree-actions"
+    aria-labelledby="<%- togglerId %>" role="menu"></ul>

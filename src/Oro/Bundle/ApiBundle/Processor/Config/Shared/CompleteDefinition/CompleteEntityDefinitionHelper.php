@@ -21,7 +21,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 /**
- * The helper class to complete the configuraton of Data API resource based on ORM entity.
+ * The helper class to complete the configuration of Data API resource based on ORM entity.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */

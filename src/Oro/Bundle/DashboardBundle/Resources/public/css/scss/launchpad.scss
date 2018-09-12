@@ -1,0 +1,67 @@
+/* @theme: admin.oro; */
+
+.quick-launchpad-toolbar {
+  margin: 0;
+  padding: 16px;
+
+  text-align: center;
+
+  list-style: none;
+
+  &__item {
+    width: 110px;
+    min-width: 110px;
+    padding: 4px;
+
+    text-align: center;
+
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    padding-top: 16px;
+
+    color: $dashboard-launchpad-icon-color;
+    font-size: 32px;
+    text-align: center;
+
+    background: $dashboard-launchpad-icon-bg;
+
+    border-radius: 32px;
+  }
+
+  &__label {
+    padding: side-values(14px 8px 10px);
+
+    color: $dashboard-launchpad-label-color;
+    text-align: center;
+
+    display: inline-block;
+  }
+
+  &__link:hover &__icon {
+    width: 72px;
+    height: 72px;
+    margin: -4px;
+    padding-top: 20px;
+
+    color: $dashboard-launchpad-icon-active-color;
+
+    border-radius: 36px;
+  }
+
+  &__link:hover &__label {
+    margin-bottom: -2px;
+
+    border-bottom: 2px solid $dashboard-launchpad-active-underline-color;
+  }
+
+  @for $i from 1 through 7 {
+    &--with-#{$i}-items &__item {
+      width: floor(100% / $i);
+    }
+  }
+}

@@ -1,0 +1,54 @@
+/* @theme: admin.oro; */
+
+$mobile-filter-box-background-color: inherit !default;
+$mobile-filter-box-border-bottom-width: 0 !default;
+$mobile-filter-box-inner-offset: 10px !default;
+
+$mobile-filter-box-dropdown-offset-left: auto !default;
+$mobile-filter-box-dropdown-offset-right: auto !default;
+$mobile-filter-box-dropdown-width: 100% !default;
+
+$mobile-filter-box-dropdown-toggle-text-align: center !default;
+$mobile-filter-box-dropdown-toggle-width: 100% !default;
+
+$mobile-filter-box-dropdown-toggle-before-content: $fa-var-filter !default;
+$mobile-filter-box-dropdown-toggle-before-font-family: FontAwesome, sans-serif !default;
+$mobile-filter-box-dropdown-toggle-before-offset: 0 7px 0 -7px !default;
+$mobile-filter-box-dropdown-toggle-before-width: 10px !default;
+$mobile-filter-box-dropdown-toggle-before-display: inline-block !default;
+
+$mobile-filter-box-dropdown-menu-inner-offset: 10px !default;
+$mobile-filter-box-dropdown-menu-offset: 10px auto 0 !default;
+$mobile-filter-box-dropdown-menu-max-width: 506px !default;
+$mobile-filter-box-dropdown-menu-width: 100% !default;
+
+$mobile-filter-box-dropdown-menu-before-border-bottom: 8px solid rgba(0, 0, 0, .2) !default;
+$mobile-filter-box-dropdown-menu-before-border-left: 8px solid transparent !default;
+$mobile-filter-box-dropdown-menu-before-border-right: 8px solid transparent !default;
+$mobile-filter-box-dropdown-menu-before-content: '' !default;
+$mobile-filter-box-dropdown-menu-before-display: inline-block !default;
+$mobile-filter-box-dropdown-menu-before-left: 50% !default;
+$mobile-filter-box-dropdown-menu-before-offset-left: -8px !default;
+$mobile-filter-box-dropdown-menu-before-position: absolute !default;
+$mobile-filter-box-dropdown-menu-before-top: -8px !default;
+
+$mobile-filter-box-dropdown-menu-after-border-bottom: 7px solid #fff !default;
+$mobile-filter-box-dropdown-menu-after-border-left: 7px solid transparent !default;
+$mobile-filter-box-dropdown-menu-after-border-right: 7px solid transparent !default;
+$mobile-filter-box-dropdown-menu-after-content: '' !default;
+$mobile-filter-box-dropdown-menu-after-display: inline-block !default;
+$mobile-filter-box-dropdown-menu-after-left: 50% !default;
+$mobile-filter-box-dropdown-menu-after-offset-left: -7px !default;
+$mobile-filter-box-dropdown-menu-after-position: absolute !default;
+$mobile-filter-box-dropdown-menu-after-top: -7px !default;
+
+$mobile-filter-box-dropdown-menu-breakpoint-left: 50% !default;
+$mobile-filter-box-dropdown-menu-breakpoint-offset-left: -253px !default;
+
+$mobile-filter-box-height: 40px !default;
+$mobile-filter-box-line-height: 36px !default;
+
+$mobile-filter-box-caret-margin-top: 10px !default;
+
+$mobile-filter-box-product-price-filter-display: block !default;
+$mobile-filter-box-choice-filter-float: none !default;

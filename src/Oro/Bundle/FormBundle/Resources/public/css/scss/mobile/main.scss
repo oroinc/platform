@@ -7,7 +7,7 @@
     }
 
     .mce-tinymce.mce-fullscreen {
-        z-index: $oroMobileHeaderZindex + 20;
+        z-index: 10000;
         border-radius: 0;
 
         .mce-toolbar-grp {
@@ -40,11 +40,6 @@
         input[type="email"],
         input[type="password"] {
             width: 100%;
-        }
-
-        input[type="password"] {
-            height: 30px;
-            box-sizing: border-box;
         }
 
         .control-group-checkbox {

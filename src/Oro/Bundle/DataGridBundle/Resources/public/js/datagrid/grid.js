@@ -125,14 +125,16 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn refresh-action',
-                        iconClassName: 'fa-repeat'
+                        iconClassName: 'fa-repeat',
+                        launcherMode: 'icon-only'
                     }
                 },
                 resetAction: {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn reset-action',
-                        iconClassName: 'fa-refresh'
+                        iconClassName: 'fa-refresh',
+                        launcherMode: 'icon-only'
                     }
                 }
             },
@@ -707,10 +709,12 @@ define(function(require) {
                 var action = new SelectDataAppearanceAction({
                     datagrid: this,
                     launcherOptions: {
-                        items: this.toolbarOptions.availableApperances,
+                        label: __('oro_datagrid.action.appearance'),
+                        items: this.toolbarOptions.availableAppearances,
                         attributes: {
-                            'data-drop-secondary-location': 'left'
-                        }
+                            'data-placement': 'bottom-end'
+                        },
+                        className: 'btn btn-icon data-appearance-selector'
                     },
                     order: 700
                 });

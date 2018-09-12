@@ -2,7 +2,6 @@ parameters:
     twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
-    oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
     oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
@@ -79,15 +78,6 @@ parameters:
     oro_security.serializer.acl_filter:                        Oro\Bundle\SecurityBundle\Filter\SerializerFieldFilter
 
 services:
-    oro_security.security_facade:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        class: '%oro_security.security_facade.class%'
-        arguments:
-            - '@security.authorization_checker'
-            - '@oro_security.request_authorization_checker'
-            - '@oro_security.class_authorization_checker'
-            - '@security.token_storage'
-
     oro_security.request_authorization_checker:
         class: Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker
         arguments:
@@ -121,11 +111,6 @@ services:
     oro_security.entity_class_resolver.link:
         tags:
             - { name: oro_service_link, service: oro_entity.orm.entity_class_resolver }
-
-    oro_security.security_facade.link:
-        deprecated: The "%service_id%" service is deprecated since 2.3.
-        tags:
-            - { name: oro_service_link,  service: oro_security.security_facade }
 
     oro_security.acl.base_manager:
         class: '%oro_security.acl.base_manager.class%'
@@ -478,9 +463,7 @@ services:
     oro_security.acl_helper:
         class: '%oro_security.acl_helper.class%'
         arguments:
-             - '@oro_security.orm.ownership_sql_walker_builder'
-             - '@event_dispatcher'
-             - '@oro_security.orm.acl_conditional_factor_builder'
+            - '@service_container'
 
     oro_security.search.acl_helper:
         class: '%oro_security.search.acl_helper.class%'
@@ -663,9 +646,6 @@ services:
                 tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
 
-    oro_security.orm.acl_conditional_factor_builder:
-        class: '%oro_security.orm.acl_conditional_factor_builder.class%'
-
     oro_security.configuration.permission_list_configuration:
         class: '%oro_security.configuration.permission_list_configuration.class%'
 
@@ -795,6 +775,10 @@ services:
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
 
+    oro_security.alias.acl.dbal.provider:
+        alias: 'security.acl.dbal.provider'
+        public: true
+
     oro_security.token_serializer:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
         arguments:
@@ -831,3 +815,22 @@ services:
             - '@service_container'
         tags:
             - { name: oro_platform.console.global_options_provider }
+
+    oro_security.access_rule.chain_access_rule:
+        class: Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule
+
+    oro_security.access_rule.acl:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_security.owner.metadata_provider.chain'
+        tags:
+            - { name: oro_security.access_rule }
+
+    oro_security.access_rule.available_owner_check:
+        class: Oro\Bundle\SecurityBundle\AccessRule\AvailableOwnerAccessRule
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+            - '@oro_security.owner.metadata_provider.chain'
+        tags:
+            - { name: oro_security.access_rule }

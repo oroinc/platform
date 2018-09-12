@@ -174,7 +174,7 @@ class GridRow extends TableRow
             $showMoreLink->mouseOver();
             $link = $this->waitFor(5, function () use ($action) {
                 return $this->elementFactory
-                    ->createElement('GridFloatingMenu')
+                    ->createElement('GridRowActionMenu')
                     ->find('named', ['link', ucfirst($action)]);
             });
         } else {
@@ -203,7 +203,7 @@ class GridRow extends TableRow
     {
         if (null !== ($showMoreLink = $this->find('named', ['link', '...']))) {
             $showMoreLink->mouseOver();
-            $links = $this->elementFactory->createElement('GridFloatingMenu')->getElements('GridRowAction');
+            $links = $this->elementFactory->createElement('GridRowActionMenu')->getElements('GridRowAction');
         } else {
             $links = $this->getElements('GridRowAction');
         }

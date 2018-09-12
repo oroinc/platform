@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+.loading-dots {
+    display: inline-block;
+    width: 1.25em;
+    text-align: left;
+
+    &:after {
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: bottom;
+        -webkit-animation: dots steps(4, end) 900ms infinite;
+        animation: dots steps(4, end) 900ms infinite;
+        content: "\2026";
+        width: 0;
+    }
+}
+
+@-webkit-keyframes dots {
+    to {
+        width: 1.25em;
+    }
+}
+
+@keyframes dots {
+    to {
+        width: 1.25em;
+    }
+}

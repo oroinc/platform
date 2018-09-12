@@ -143,13 +143,22 @@ define(function(require) {
                 addSorting: this.addSorting,
                 orderShift: orderShift
             });
+
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
         },
 
-        updateViews: function() {
+        /**
+         * Handles bootstrap dropdown show event
+         *
+         * @param {jQuery.Event} showEvent
+         */
+        beforeOpen: function(showEvent) {
             if (!this.columnManagerCollectionView) {
                 this.createViews();
             }
+        },
+
+        updateViews: function() {
             this.columnManagerCollectionView.updateHeaderWidths();
             this.columnManagerView.updateStateView();
         },
