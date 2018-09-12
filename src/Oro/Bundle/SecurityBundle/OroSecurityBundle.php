@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AccessRulesPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
@@ -23,6 +25,9 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * Security bundle that responsible for security access checks to data.
+ */
 class OroSecurityBundle extends Bundle
 {
     /**
@@ -39,6 +44,7 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
         $container->addCompilerPass(new AclPrivilegeFilterPass());
+        $container->addCompilerPass(new AccessRulesPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new RemoveAclSchemaListenerPass());
             $container->moveCompilerPassBefore(
@@ -60,6 +66,15 @@ class OroSecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
         $extension->addSecurityListenerFactory(new OrganizationHttpBasicFactory());
         $extension->addSecurityListenerFactory(new OrganizationRememberMeFactory());
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(
+                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                    ['Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity'],
+                    [$this->getPath() . '/Tests/Functional/Environment/Entity']
+                )
+            );
+        }
     }
 
     /**

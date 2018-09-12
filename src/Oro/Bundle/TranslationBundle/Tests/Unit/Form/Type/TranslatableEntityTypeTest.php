@@ -10,9 +10,11 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -71,6 +73,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
      */
     protected $testChoices = array('one', 'two', 'three');
 
+    /** @var MockObject */
+    private $aclHelper;
+
     protected function setUp()
     {
         $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
@@ -118,7 +123,9 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->with(self::TEST_CLASS)
             ->will($this->returnValue($this->getEntityRepository()));
 
-        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory());
+        $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $this->type = new TranslatableEntityType($this->registry, new DefaultChoiceListFactory(), $this->aclHelper);
 
         parent::setUp();
     }

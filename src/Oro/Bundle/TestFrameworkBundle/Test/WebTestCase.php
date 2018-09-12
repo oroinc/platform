@@ -133,7 +133,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function afterTest()
     {
-        if (self::getDbIsolationPerTestSetting()) {
+        if (self::isDbIsolationPerTest()) {
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
@@ -400,11 +400,12 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get value of dbIsolationPerTest option from annotation of called class
+     * Indicates whether each test is executed in own database transaction.
+     * It is enabled by setting @dbIsolationPerTest annotation for the test class.
      *
      * @return bool
      */
-    private static function getDbIsolationPerTestSetting()
+    protected static function isDbIsolationPerTest()
     {
         $calledClass = get_called_class();
         if (!isset(self::$dbIsolationPerTest[$calledClass])) {

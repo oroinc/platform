@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -430,7 +429,9 @@ abstract class ApiTestCase extends WebTestCase
                 \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
                 $e = new \PHPUnit\Framework\ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()

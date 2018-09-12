@@ -1,0 +1,11 @@
+data:
+    -
+        type: addresstypes
+        id: billing
+        attributes:
+            label: Billing
+    -
+        type: addresstypes
+        id: shipping
+        attributes:
+            label: Shipping

@@ -32,9 +32,6 @@ class WebsocketClient implements WebsocketClientInterface
     /** @var bool */
     private $secured;
 
-    /** @var string|null */
-    private $origin;
-
     /** @var GosClient */
     private $gosClient;
 
@@ -45,7 +42,6 @@ class WebsocketClient implements WebsocketClientInterface
      * @param string|int $port
      * @param string $path
      * @param bool $secured
-     * @param null|string $origin
      */
     public function __construct(
         GosClientFactoryInterface $gosClientFactory,
@@ -53,8 +49,7 @@ class WebsocketClient implements WebsocketClientInterface
         string $host,
         $port,
         string $path = '',
-        bool $secured = false,
-        ?string $origin = null
+        bool $secured = false
     ) {
         $this->gosClientFactory = $gosClientFactory;
         $this->ticketProvider = $ticketProvider;
@@ -67,7 +62,6 @@ class WebsocketClient implements WebsocketClientInterface
         $this->port = (int)$port;
         $this->path = '/' . ltrim($path, '/');
         $this->secured = $secured;
-        $this->origin = $origin;
     }
 
     /**
@@ -174,7 +168,8 @@ class WebsocketClient implements WebsocketClientInterface
                 $this->host,
                 $this->port,
                 $this->secured,
-                $this->origin
+                // We don't have to check origin when connecting from backend.
+                '127.0.0.1'
             );
         }
 

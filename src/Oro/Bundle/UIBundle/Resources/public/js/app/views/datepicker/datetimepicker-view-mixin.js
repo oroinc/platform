@@ -47,6 +47,11 @@ define(function(require) {
         defaultTime: null,
 
         /**
+         * ClassName for empty field
+         */
+        emptyClassName: 'input--empty',
+
+        /**
          * Returns supper prototype
          *
          * @returns {Object}
@@ -106,6 +111,8 @@ define(function(require) {
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.attr('data-fake-front-field', '');
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontTimeField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.checkEmpty();
             this.$frontDateField.on('blur', function(e) {
                 $(this).parent().removeClass(DATEPICKER_DROPDOWN_CLASS_NAME + ' ' + DATEPICKER_DROPUP_CLASS_NAME);
             }).on('datepicker:dialogReposition', function(e, position) {
@@ -174,6 +181,17 @@ define(function(require) {
             // that is not done by default implementation
             this.$frontTimeField.timepicker('hide');
             this.$frontTimeField.timepicker('remove');
+        },
+
+        /**
+         * Update empty state
+         */
+        checkEmpty: function() {
+            this._super().checkEmpty.apply(this, arguments);
+
+            if (this.nativeMode && this.$frontTimeField) {
+                this.$frontTimeField.toggleClass(this.emptyClassName, !this.$frontTimeField.val().length);
+            }
         },
 
         /**
