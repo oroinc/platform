@@ -55,6 +55,10 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             - Length:
                   max: 255
 
+        organization:
+            - Length:
+                  max: 255
+
 # Prevent required values for all child of AbstractAddress
 Oro\Bundle\AddressBundle\Entity\Address:
     constraints:
