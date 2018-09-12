@@ -5,6 +5,10 @@ oro_behat_extension:
         type: xpath
         locator: '//html'
 
+    Link:
+      selector: 'a'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     Entity Status:
       selector: '.badge'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus
