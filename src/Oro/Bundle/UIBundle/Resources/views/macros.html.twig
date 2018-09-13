@@ -144,13 +144,13 @@
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
     {% if is_granted('VIEW', entity, fieldName) %}
         {% set collapseView = {
-                storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
-                uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
-                animationSpeed: 0,
-                closeClass: 'overflows',
-                checkOverflow: true,
-                open: false
-            } %}
+            storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
+            uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
+            animationSpeed: 0,
+            closeClass: 'overflows',
+            checkOverflow: true,
+            open: false
+        } %}
         <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
             {{ _self.renderAttribute(title,
                 '<div class="control-label" data-collapse-container>' ~
@@ -999,22 +999,22 @@
 
     {% set dataBlocks = data.dataBlocks|oro_sort_by %}
 
-    <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
-        <div class="navbar-inner">
-            <div class="container-fluid" style="width: auto;">
-                <ul class="nav">
-                    {% for navElement in dataBlocks %}
-                        <li {% if navElement.class is defined %}class="{{ navElement.class }}"{% endif %}><a href="#scroll-{{ loop.index }}">{{ navElement.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
+    {% if not isMobileVersion() %}
+        <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
+            <nav class="nav">
+                {% for navElement in dataBlocks %}
+                    <a class="nav-link{% if loop.first %} active {% endif %}{{ navElement.class|default('') }}"
+                       href="#scroll-{{ loop.index }}"
+                    >{{ navElement.title }}</a>
+                {% endfor %}
+            </nav>
         </div>
-    </div>
+    {% endif %}
     <div class="clearfix">
         {% if data.formErrors is defined and data.formErrors | length%}
-            <div class="customer-info-actions container-fluid well-small alert-wrap">
-                <div class="alert alert-error">
-                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+            <div class="customer-info-actions container-fluid well-small alert-wrap" role="alert">
+                <div class="alert alert-error alert-dismissible">
+                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}"><span aria-hidden="true">&times;</span></button>
                     {{ data.formErrors|raw }}
                 </div>
             </div>
