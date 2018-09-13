@@ -52,13 +52,17 @@
             font: 16px/1em FontAwesome;
         }
 
+        .mode-icon-only {
+            height: $btn-height;
+        }
+
         a {
             border-radius: 3px;
             border: 1px solid #fff;
 
             &:hover {
-                background: #fafafa !important;
-                border-color: #ddd;
+                background: none !important;
+                border-color: transparent;
 
                 [class^="fa-"]:before {
                     color: #666;
