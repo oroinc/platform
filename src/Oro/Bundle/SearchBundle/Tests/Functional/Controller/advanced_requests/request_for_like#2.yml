@@ -1,6 +1,6 @@
-# search by all strings LIKE "%em5%" so it should find only "item5@mail.com"
+# search by all strings LIKE "%item5@%" so it should find only "item5@mail.com"
 request:
-    query: "from oro_test_item where stringValue like em5@ order_by stringValue desc"
+    query: "from oro_test_item where stringValue like item5@ order_by stringValue desc"
 response:
     records_count: 1
     count: 1
