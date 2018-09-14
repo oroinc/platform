@@ -938,6 +938,27 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetFirstWorkflowItemByEntity()
+    {
+        $entity = new EntityStub(123);
+        $workflowItem = $this->createWorkflowItem();
+        $this->prepareGetWorkflowItemsByEntity($entity, [$workflowItem]);
+
+        $this->assertEquals(
+            $workflowItem,
+            $this->workflowManager->getFirstWorkflowItemByEntity($entity)
+        );
+    }
+
+    public function testGetFirstWorkflowItemByEntityNoItem()
+    {
+        $entity = new EntityStub(123);
+
+        $this->prepareGetWorkflowItemsByEntity($entity, []);
+
+        $this->assertFalse($this->workflowManager->getFirstWorkflowItemByEntity($entity));
+    }
+
     public function testActivateWorkflow()
     {
         $workflowName = 'test_workflow';
