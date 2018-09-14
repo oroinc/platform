@@ -27,8 +27,6 @@ Instead of specifying all 3 sets of host:port parameters, it is possible to use 
 
 ## Configuration of secure (SSL/WSS) connection ##
 
-Currently direct backend WebSocket SSL/WSS connections are not supported.
-
 To achieve WSS connection for your websocket communication on frontend you should configure additional reverse proxy before Clank server.
 Example configuration provided below.
 
@@ -42,7 +40,25 @@ Set websocket settings in parameters.yml
     websocket_backend_host:  "*"
     websocket_backend_port:  8080
     websocket_backend_path:  ""
+    websocket_backend_transport: "tcp"
+    websocket_backend_ssl_context_options: {}
 ```
+
+If you want to make backend work under secure connection as well, change corresponding parameters too:
+``` yaml
+    websocket_backend_port: 443
+    websocket_backend_path: "ws"
+    websocket_backend_transport: "ssl"
+```
+
+If you use untrusted SSL certificate, configure `websocket_backend_ssl_context_options` parameter with:
+``` yaml
+    websocket_backend_ssl_context_options:
+        verify_peer: false
+        verify_peer_name: false
+```
+
+Remember that having peer verification disabled is not recommended in production!
 
 NGINX server configuration: 
 ```

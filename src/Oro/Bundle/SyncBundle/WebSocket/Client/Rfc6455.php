@@ -22,6 +22,42 @@ class Rfc6455
     protected $blocking = false;
 
     /**
+     * Any registered socket transport returned by http://php.net/manual/en/function.stream-get-transports.php
+     *
+     * @var string
+     */
+    private $transport = 'tcp';
+
+    /**
+     * Will be passed to a context create function http://php.net/manual/en/function.stream-context-create.php
+     *
+     * @var array
+     */
+    private $contextOptions = [];
+
+    /**
+     * @param string $transport
+     * @return Rfc6455
+     */
+    public function setTransport(string $transport): Rfc6455
+    {
+        $this->transport = $transport;
+
+        return $this;
+    }
+
+    /**
+     * @param array $contextOptions
+     * @return Rfc6455
+     */
+    public function setContextOptions(array $contextOptions): Rfc6455
+    {
+        $this->contextOptions = $contextOptions;
+
+        return $this;
+    }
+
+    /**
      * @param string $host
      * @param string|integer $port
      * @param string $path
@@ -32,7 +68,7 @@ class Rfc6455
     {
         $path = trim($path, '/');
 
-        $remoteSocket = "tcp://{$host}:{$port}/{$path}";
+        $remoteSocket = $this->createRemoteSocketAddress($host, $port, $path);
 
         if ($this->remoteSocketAddress === $remoteSocket && $this->socket) {
             return $this->socket;
@@ -221,7 +257,14 @@ class Rfc6455
      */
     protected function create()
     {
-        $socket = @stream_socket_client($this->remoteSocketAddress, $errCode, $errStr, self::SOCKET_TIMEOUT);
+        $socket = @stream_socket_client(
+            $this->remoteSocketAddress,
+            $errCode,
+            $errStr,
+            self::SOCKET_TIMEOUT,
+            STREAM_CLIENT_CONNECT,
+            stream_context_create($this->contextOptions)
+        );
 
         if (!$socket) {
             throw new WebSocket\ConnectionError(
@@ -264,5 +307,16 @@ class Rfc6455
                 $this->remoteSocketAddress
             ));
         }
+    }
+
+    /**
+     * @param string $host
+     * @param string|integer $port
+     * @param string $path
+     * @return string
+     */
+    private function createRemoteSocketAddress($host, $port, $path): string
+    {
+        return "{$this->transport}://{$host}:{$port}/{$path}";
     }
 }

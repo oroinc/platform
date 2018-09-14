@@ -39,7 +39,19 @@ class TopicPublisher implements LoggerAwareInterface
      */
     protected $ws = null;
 
-    /** @var TicketProvider */
+    /**
+     * @var WebSocketClientFactoryInterface
+     */
+    private $clientFactory;
+
+    /**
+     * @var WebSocketClientAttributes
+     */
+    private $clientAttributes;
+
+    /**
+     * @var TicketProvider
+     */
     private $ticketProvider;
 
     /**
@@ -112,6 +124,22 @@ class TopicPublisher implements LoggerAwareInterface
     }
 
     /**
+     * @param WebSocketClientFactoryInterface $clientFactory
+     */
+    public function setClientFactory(WebSocketClientFactoryInterface $clientFactory)
+    {
+        $this->clientFactory = $clientFactory;
+    }
+
+    /**
+     * @param WebSocketClientAttributes $clientAttributes
+     */
+    public function setClientAttributes(WebSocketClientAttributes $clientAttributes)
+    {
+        $this->clientAttributes = $clientAttributes;
+    }
+
+    /**
      * @return null|WebSocket
      * @throws \Exception
      */
@@ -119,13 +147,12 @@ class TopicPublisher implements LoggerAwareInterface
     {
         if (null === $this->ws) {
             try {
-                // add the ticket parameter to the URL
                 $this->path = sprintf(
                     '%s?ticket=%s',
                     $this->path,
                     urlencode($this->ticketProvider->generateTicket(true))
                 );
-                $this->ws = new WebSocket($this->host, $this->port, $this->path);
+                $this->ws = $this->getClientFactory()->create($this->getClientAttributes());
             } catch (Rfc6455Exception $e) {
                 $this->logger->warning(
                     'Websocket backend exception: {message}',
@@ -138,5 +165,35 @@ class TopicPublisher implements LoggerAwareInterface
         }
 
         return $this->ws;
+    }
+
+    /**
+     * @return WebSocketClientFactoryInterface
+     */
+    private function getClientFactory(): WebSocketClientFactoryInterface
+    {
+        if ($this->clientFactory === null) {
+            $this->clientFactory = new WebSocketClientFactory($this->ticketProvider);
+        }
+
+        return $this->clientFactory;
+    }
+
+    /**
+     * @return WebSocketClientAttributes
+     */
+    private function getClientAttributes(): WebSocketClientAttributes
+    {
+        if ($this->clientAttributes === null) {
+            $this->clientAttributes = new WebSocketClientAttributes(
+                $this->host,
+                $this->port,
+                $this->path,
+                'tcp',
+                []
+            );
+        }
+
+        return $this->clientAttributes;
     }
 }
