@@ -1269,6 +1269,6 @@
     {% set classNames = classNames|default('') %}
 
     {% if classNames %}
-        <i class="{{- classNames -}}" aria-hidden="true"></i>
+        <span class="{{ classNames }}" aria-hidden="true"></span>
     {% endif %}
 {% endmacro %}
