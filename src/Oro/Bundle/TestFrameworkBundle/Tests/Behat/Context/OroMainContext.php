@@ -254,6 +254,36 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: I follow "My Configuration" link within flash message
+     *
+     * @Then /^(?:|I )follow "(?P<title>[^"]+)" link within flash message "(?P<message>[^"]+)"$/
+     *
+     * @param string $title
+     * @param string $message
+     */
+    public function iFollowLinkWithinFlashMessage($title, $message)
+    {
+        $flashMessage = $this->getFlashMessage($message);
+
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message didn\'t appear',
+            $title
+        ));
+
+        if ($flashMessage) {
+            $link = $flashMessage->findElementContains('Link', $title);
+
+            self::assertNotNull(
+                $link,
+                sprintf('Could not find link "%s" within flash message "%s"', $title, $message)
+            );
+
+            $link->focus();
+            $link->click();
+        }
+    }
+
+    /**
      * Example: Then I should see "Attachment created successfully" flash message
      * Example: Then I should see "The email was sent" flash message
      *
@@ -314,7 +344,7 @@ class OroMainContext extends MinkContext implements
      * @param string $timeLimit
      * @return Element|null
      */
-    protected function getFlashMessage($title, $flashMessageElement, $timeLimit)
+    protected function getFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
         return $this->spin(
             function (OroMainContext $context) use ($title, $flashMessageElement) {
