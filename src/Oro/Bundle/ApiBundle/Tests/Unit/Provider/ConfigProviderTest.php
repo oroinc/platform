@@ -122,7 +122,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \LogicException
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
      * @expectedExceptionMessage Cannot build the configuration of "Test\Class" because this causes the circular dependency.
      */
     // @codingStandardsIgnoreEnd

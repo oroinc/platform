@@ -29,9 +29,9 @@
 {% macro renderFieldName(objectClass, fieldKey, fieldValue) %}
     {% set fieldLabel = oro_field_config_value(objectClass, fieldKey, 'label')|default(fieldKey) %}
     {% if fieldValue.translationDomain is defined %}
-        {% set fieldLabel = fieldKey|trans({}, fieldValue.translationDomain) %}
+        {% set fieldLabel = fieldLabel|trans({}, fieldValue.translationDomain) %}
     {% else %}
-        {% set fieldLabel = fieldKey|trans %}
+        {% set fieldLabel = fieldLabel|trans %}
     {% endif %}
     {{- fieldLabel -}}:
 {% endmacro %}
