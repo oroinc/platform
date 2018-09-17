@@ -1,0 +1,49 @@
+services:
+    oro_datagrid.tools.parameters_helper:
+        class: 'Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper'
+        public: false
+
+    oro_datagrid.provider.state.abtract:
+        class: 'Oro\Bundle\DataGridBundle\Provider\State\AbstractStateProvider'
+        abstract: true
+        public: false
+        arguments:
+            - '@oro_datagrid.grid_view.manager'
+            - '@oro_security.token_accessor'
+
+    oro_datagrid.provider.state.columns:
+        class: 'Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider'
+        parent: oro_datagrid.provider.state.abtract
+        lazy: true
+        arguments:
+            - '@oro_datagrid.tools.parameters_helper'
+
+    oro_datagrid.provider.state.sorters:
+        class: 'Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider'
+        parent: oro_datagrid.provider.state.abtract
+        lazy: true
+        arguments:
+            - '@oro_datagrid.tools.parameters_helper'
+
+    oro_datagrid.provider.selected_fields:
+        class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProvider'
+        public: false
+        lazy: true
+
+    oro_datagrid.provider.selected_fields.columns:
+        class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromColumnsProvider'
+        public: false
+        lazy: true
+        arguments:
+            - '@oro_datagrid.provider.state.columns'
+        tags:
+            - { name: oro_datagrid.selected_fields_provider }
+
+    oro_datagrid.provider.selected_fields.sorters:
+        class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromSortersProvider'
+        public: false
+        lazy: true
+        arguments:
+            - '@oro_datagrid.provider.state.sorters'
+        tags:
+            - { name: oro_datagrid.selected_fields_provider }

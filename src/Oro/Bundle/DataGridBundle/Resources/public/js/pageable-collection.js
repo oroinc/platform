@@ -754,6 +754,7 @@ define([
             }
             data = this.processQueryParams(data, state);
             this.processFiltersParams(data, state);
+            this.processColumnsParams(data, state);
 
             var self = this;
             var success = options.success;
