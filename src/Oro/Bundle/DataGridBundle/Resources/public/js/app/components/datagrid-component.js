@@ -235,8 +235,8 @@ define(function(require) {
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
 
-            var Grid =  modules.GridView || GridView;
-            PageableCollection = modules.PageableCollection || PageableCollection;
+            var Grid = modules.GridView || GridView;
+            var Collection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
             if (this.data && this.data.data) {
@@ -250,7 +250,7 @@ define(function(require) {
 
             if (!collection) {
                 // otherwise, create collection from metadata
-                collection = new PageableCollection(collectionModels, collectionOptions);
+                collection = new Collection(collectionModels, collectionOptions);
             }
 
             // create grid

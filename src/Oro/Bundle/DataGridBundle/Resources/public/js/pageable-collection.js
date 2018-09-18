@@ -986,7 +986,7 @@ define([
          * @return {PageableCollection}
          */
         clone: function() {
-            var newCollection = new PageableCollection(this.toJSON(), tools.deepClone(this.options));
+            var newCollection = new (this.constructor)(this.toJSON(), tools.deepClone(this.options));
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
