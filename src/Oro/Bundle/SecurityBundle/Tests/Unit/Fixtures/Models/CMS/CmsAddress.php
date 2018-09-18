@@ -2,30 +2,32 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity
- * @Table(name="cms_addresses")
+ * @ORM\Entity()
+ * @ORM\Table(name="cms_addresses")
  */
 class CmsAddress
 {
     /**
-     * @Column(type="integer")
-     * @Id @GeneratedValue
+     * @ORM\Column(type="integer")
+     * @ORM\Id @ORM\GeneratedValue
      */
     public $id;
 
     /**
-     * @Column(length=50)
+     * @ORM\Column(length=50)
      */
     public $country;
 
     /**
-     * @Column(length=50)
+     * @ORM\Column(length=50)
      */
     public $zip;
 
     /**
-     * @Column(length=50)
+     * @ORM\Column(length=50)
      */
     public $city;
 
@@ -35,14 +37,14 @@ class CmsAddress
     public $street;
 
     /**
-     * @OneToOne(targetEntity="CmsUser", inversedBy="address")
-     * @JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="CmsUser", inversedBy="address")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     public $user;
 
     /**
-     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
-     * @JoinColumn(name="organization", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @ORM\JoinColumn(name="organization", referencedColumnName="id")
      */
     public $organization;
 

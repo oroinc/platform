@@ -2,479 +2,85 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\AST\ConditionalPrimary;
-use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\Query\AST\Join;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\SelectStatement;
-use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * This class analyse input query for acl and mark it with ORO_ACL_WALKER if it need to be ACL protected.
+ * This class adds the AccessRuleWalker tree walker with context to query to add ACL restrictions.
  *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @see \Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker
  */
 class AclHelper
 {
-    const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
-    const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    public const CHECK_ROOT_ENTITY = 'checkRootEntity';
+    public const CHECK_RELATIONS   = 'checkRelations';
 
-    /** @var AclConditionDataBuilderInterface */
-    protected $builder;
-
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var array */
-    protected $entityAliases;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var AclConditionalFactorBuilder */
-    protected $aclConditionFactorBuilder;
-
-    /** @var bool */
-    private $checkRootEntity = true;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param AclConditionDataBuilderInterface $builder
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param AclConditionalFactorBuilder   $aclConditionFactorBuilder
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        AclConditionDataBuilderInterface $builder,
-        EventDispatcherInterface $eventDispatcher,
-        AclConditionalFactorBuilder $aclConditionFactorBuilder
-    ) {
-        $this->builder = $builder;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->aclConditionFactorBuilder = $aclConditionFactorBuilder;
-    }
-
-    /**
-     * Add ACL checks to Criteria
-     *
-     * @param string   $className
-     * @param Criteria $criteria
-     * @param string   $permission
-     *
-     * @return Criteria
-     */
-    public function applyAclToCriteria($className, Criteria $criteria, $permission, $mapField = [])
+    public function __construct(ContainerInterface $container)
     {
-        $conditionData = $this->builder->getAclConditionData($className, $permission);
-        if (!empty($conditionData)) {
-            list($entityField, $value, , $organizationField, $organizationValue, $ignoreOwner) = $conditionData;
-
-            if (isset($mapField[$organizationField])) {
-                $organizationField = $mapField[$organizationField];
-            }
-
-            if (isset($mapField[$entityField])) {
-                $entityField = $mapField[$entityField];
-            }
-
-            if (!is_null($organizationField) && !is_null($organizationValue)) {
-                $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
-            }
-            if (!$ignoreOwner) {
-                if (!empty($value)) {
-                    if (!is_array($value)) {
-                        $value = [$value];
-                    }
-                    $criteria->andWhere(Criteria::expr()->in($entityField, $value));
-                } else {
-                    $expression = new Value('1=0');
-                    $criteria->andWhere($expression);
-                }
-            }
-        }
-
-        return $criteria;
+        $this->container = $container;
     }
 
     /**
-     * Mark query as acl protected
+     * Protects a query by ACL.
      *
-     * @param Query|QueryBuilder $query
-     * @param string             $permission
-     * @param bool               $checkRelations
+     * @param Query|QueryBuilder $query      The query to be protected
+     * @param string             $permission The permission to apply
+     * @param array              $options    Additional options for access rules.
+     *                                       The following options are implemented out-of-the-box:
+     *                                       * "checkRootEntity" determined whether the root entity should be
+     *                                         protected; default value is TRUE
+     *                                       * "checkRelations" determined whether entities associated with
+     *                                         the root entity should be protected; default value is TRUE
+     *                                       To find all possible options see classes that implement
+     *                                       Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface
      *
      * @return Query
      */
-    public function apply($query, $permission = 'VIEW', $checkRelations = true)
+    public function apply($query, string $permission = 'VIEW', array $options = [])
     {
-        $this->entityAliases = [];
+        $token = $this->container->get('security.token_storage')->getToken();
+        $userId = null;
+        $userClass = null;
+        $organizationId = null;
+        if ($token) {
+            $user = $token->getUser();
+            if ($user instanceof UserInterface) {
+                $userId = $user->getId();
+                $userClass = ClassUtils::getClass($user);
+                if ($token instanceof OrganizationContextTokenInterface) {
+                    $organizationId = $token->getOrganizationContext()->getId();
+                }
+            }
+        }
+        $context = new AccessRuleWalkerContext(
+            $this->container,
+            $permission,
+            $userClass,
+            $userId,
+            $organizationId
+        );
+        foreach ($options as $optionName => $value) {
+            $context->setOption($optionName, $value);
+        }
 
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery();
         }
-        /** @var Query $query */
-        $this->em = $query->getEntityManager();
 
-        $ast = $query->getAST();
-        if ($ast instanceof SelectStatement) {
-            if ($this->checkRootEntity) {
-                list($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
-                if (!$checkRelations) {
-                    $joinConditions = [];
-                }
-            } elseif ($checkRelations) {
-                $whereConditions = [];
-                $joinConditions = $this->processJoins($ast, $permission);
-            } else {
-                $whereConditions = [];
-                $joinConditions = [];
-            }
-            $conditionStorage = new AclConditionStorage($whereConditions, $joinConditions);
-            if ($ast->whereClause) {
-                $this->processSubselects($ast, $conditionStorage, $permission);
-            }
-
-            // We have access level check conditions. So mark query for acl walker.
-            if (!$conditionStorage->isEmpty()) {
-                QueryUtil::addTreeWalker($query, self::ORO_ACL_WALKER);
-                $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
-                $query->setHint(AclWalker::ORO_ACL_FACTOR_BUILDER, $this->aclConditionFactorBuilder);
-            }
-        }
+        QueryUtil::addTreeWalker($query, AccessRuleWalker::class);
+        $query->setHint(AccessRuleWalker::CONTEXT, $context);
 
         return $query;
-    }
-
-    /**
-     * Sets a flag indicates whether the root entity should be protected by ACL or not.
-     * The separate method is used instead of a parameter in "apply" method to avoid BC break.
-     *
-     * @param bool $checkRootEntity
-     */
-    public function setCheckRootEntity($checkRootEntity)
-    {
-        $this->checkRootEntity = $checkRootEntity;
-    }
-
-    /**
-     * Check subrequests for acl access level
-     *
-     * @param SelectStatement     $ast
-     * @param AclConditionStorage $storage
-     * @param                     $permission
-     */
-    protected function processSubselects(SelectStatement $ast, AclConditionStorage $storage, $permission)
-    {
-        $conditionalExpression = $ast->whereClause->conditionalExpression;
-        if (isset($conditionalExpression->conditionalPrimary)) {
-            $conditionalExpression = $conditionalExpression->conditionalPrimary;
-        }
-
-        if ($conditionalExpression instanceof ConditionalPrimary) {
-            // we have request with only one where condition
-            $expression = $conditionalExpression->simpleConditionalExpression;
-            if (isset($expression->subselect)
-                && $expression->subselect instanceof Subselect
-            ) {
-                $subRequestAclStorage = $this->processSubselect($expression->subselect, $permission);
-                if (!$subRequestAclStorage->isEmpty()) {
-                    $subRequestAclStorage->setFactorId(0);
-                    $storage->addSubRequests($subRequestAclStorage);
-                }
-            }
-        } else {
-            // we have request with only many where conditions
-            $subQueryAcl = [];
-            if (isset($conditionalExpression->conditionalFactors)) {
-                $factors = $conditionalExpression->conditionalFactors;
-            } else {
-                $factors = $conditionalExpression->conditionalTerms;
-            }
-            foreach ($factors as $factorId => $expression) {
-                if (isset($expression->simpleConditionalExpression->subselect)
-                    && $expression->simpleConditionalExpression->subselect instanceof Subselect
-                ) {
-                    $subRequestAclStorage = $this->processSubselect(
-                        $expression->simpleConditionalExpression->subselect,
-                        $permission
-                    );
-                    if (!$subRequestAclStorage->isEmpty()) {
-                        $subRequestAclStorage->setFactorId($factorId);
-                        $subQueryAcl[] = $subRequestAclStorage;
-                    }
-                }
-            }
-            if (!empty($subQueryAcl)) {
-                $storage->setSubRequests($subQueryAcl);
-            }
-        }
-    }
-
-    /**
-     * Check Access levels for subrequest
-     *
-     * @param Subselect $subSelect
-     * @param           $permission
-     *
-     * @return SubRequestAclConditionStorage
-     */
-    protected function processSubselect(Subselect $subSelect, $permission)
-    {
-        list($whereConditions, $joinConditions) = $this->processSelect($subSelect, $permission);
-
-        return new SubRequestAclConditionStorage($whereConditions, $joinConditions);
-    }
-
-    /**
-     * Check request
-     *
-     * @param Subselect|SelectStatement $select
-     * @param string                    $permission
-     *
-     * @return array [whereConditions, joinConditions]
-     */
-    protected function processSelect($select, $permission)
-    {
-        $whereConditions = [];
-        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
-        foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
-            $condition = $this->processRangeVariableDeclaration(
-                $identificationVariableDeclaration->rangeVariableDeclaration,
-                $permission,
-                false
-            );
-            if ($condition) {
-                $whereConditions[] = $condition;
-            }
-        }
-
-        $joinConditions = $this->processJoins($select, $permission);
-
-        $event = new ProcessSelectAfter($select, $whereConditions, $joinConditions);
-        $this->eventDispatcher->dispatch(ProcessSelectAfter::NAME, $event);
-
-        $whereConditions = $event->getWhereConditions();
-        $joinConditions  = $event->getJoinConditions();
-
-        return [$whereConditions, $joinConditions];
-    }
-
-    /**
-     * @param Subselect|SelectStatement $select
-     * @param string                    $permission
-     *
-     * @return array
-     */
-    protected function processJoins($select, $permission)
-    {
-        $joinConditions  = [];
-
-        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
-        foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
-            if (!empty($identificationVariableDeclaration->joins)) {
-                $this->addEntityAlias($identificationVariableDeclaration->rangeVariableDeclaration);
-                /** @var $join Join */
-                foreach ($identificationVariableDeclaration->joins as $joinKey => $join) {
-                    //check if join is simple join (join some_table on (some_table.id = parent_table.id))
-                    if ($join->joinAssociationDeclaration instanceof RangeVariableDeclaration) {
-                        $condition = $this->processRangeVariableDeclaration(
-                            $join->joinAssociationDeclaration,
-                            $permission,
-                            true
-                        );
-                    } else {
-                        $condition = $this->processJoinAssociationPathExpression(
-                            $identificationVariableDeclaration,
-                            $joinKey,
-                            $permission
-                        );
-                    }
-                    if ($condition) {
-                        $condition->setFromKey($fromKey);
-                        $condition->setJoinKey($joinKey);
-                        $joinConditions[] = $condition;
-                    }
-                }
-            }
-        }
-
-        return $joinConditions;
-    }
-
-    /**
-     * Process Joins without "on" statement
-     *
-     * @param IdentificationVariableDeclaration $declaration
-     * @param                                   $key
-     * @param                                   $permission
-     *
-     * @return JoinAssociationCondition|null
-     */
-    protected function processJoinAssociationPathExpression(
-        IdentificationVariableDeclaration $declaration,
-        $key,
-        $permission
-    ) {
-        /** @var Join $join */
-        $join = $declaration->joins[$key];
-
-        $joinParentEntityAlias = $join->joinAssociationDeclaration
-            ->joinAssociationPathExpression->identificationVariable;
-        $joinParentClass = $this->entityAliases[$joinParentEntityAlias];
-        $metadata = $this->em->getClassMetadata($joinParentClass);
-
-        $fieldName = $join->joinAssociationDeclaration->joinAssociationPathExpression->associationField;
-
-        $associationMapping = $metadata->getAssociationMapping($fieldName);
-        $targetEntity = $associationMapping['targetEntity'];
-
-        if (!isset($this->entityAliases[$join->joinAssociationDeclaration->aliasIdentificationVariable])) {
-            $this->entityAliases[$join->joinAssociationDeclaration->aliasIdentificationVariable] = $targetEntity;
-        }
-
-        $resultData = null;
-        if (!in_array($targetEntity, [self::ORO_USER_CLASS])) {
-            $resultData = $this->builder->getAclConditionData($targetEntity, $permission);
-        }
-
-        if ($resultData && is_array($resultData)) {
-            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
-            if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
-                    = $resultData;
-            }
-
-            return new JoinAssociationCondition(
-                $join->joinAssociationDeclaration->aliasIdentificationVariable,
-                $entityField,
-                $value,
-                $pathExpressionType,
-                $organizationField,
-                $organizationValue,
-                $ignoreOwner,
-                $targetEntity,
-                $this->getJoinConditions($associationMapping)
-            );
-        }
-
-        return null;
-    }
-
-    /**
-     * Process where statement
-     *
-     * @param RangeVariableDeclaration $rangeVariableDeclaration
-     * @param string                   $permission
-     * @param bool                     $isJoin
-     *
-     * @return null|AclCondition|JoinAclCondition
-     */
-    protected function processRangeVariableDeclaration(
-        RangeVariableDeclaration $rangeVariableDeclaration,
-        $permission,
-        $isJoin = false
-    ) {
-        $resultData = false;
-
-        $this->addEntityAlias($rangeVariableDeclaration);
-
-        $entityName = $rangeVariableDeclaration->abstractSchemaName;
-        if ($entityName !== self::ORO_USER_CLASS || $rangeVariableDeclaration->isRoot) {
-            $resultData = $this->builder->getAclConditionData($entityName, $permission);
-        }
-
-        if ($resultData !== false && ($resultData === null || !empty($resultData))) {
-            $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
-            $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
-            if (!empty($resultData)) {
-                list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
-                    = $resultData;
-            }
-            if ($isJoin) {
-                return new JoinAclCondition(
-                    $entityAlias,
-                    $entityField,
-                    $value,
-                    $pathExpressionType,
-                    $organizationField,
-                    $organizationValue,
-                    $ignoreOwner
-                );
-            } else {
-                return new AclCondition(
-                    $entityAlias,
-                    $entityField,
-                    $value,
-                    $pathExpressionType,
-                    $organizationField,
-                    $organizationValue,
-                    $ignoreOwner
-                );
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param RangeVariableDeclaration $rangeDeclaration
-     */
-    protected function addEntityAlias(RangeVariableDeclaration $rangeDeclaration)
-    {
-        $alias = $rangeDeclaration->aliasIdentificationVariable;
-        if (!isset($this->entityAliases[$alias])) {
-            $this->entityAliases[$alias] = $rangeDeclaration->abstractSchemaName;
-        }
-    }
-
-    /**
-     * @param array $associationMapping
-     *
-     * @return array
-     */
-    protected function getJoinConditions(array $associationMapping)
-    {
-        $targetEntity = $associationMapping['targetEntity'];
-        $type = $associationMapping['type'];
-        $targetEntityMetadata = $this->em->getClassMetadata($targetEntity);
-        $joinConditionsColumns = [];
-        $joinConditions = [];
-
-        switch ($type) {
-            case ClassMetadataInfo::ONE_TO_ONE:
-            case ClassMetadataInfo::MANY_TO_ONE:
-                $joinConditionsColumns = $associationMapping['joinColumns'];
-                break;
-            case ClassMetadataInfo::ONE_TO_MANY:
-                $joinConditionsColumns = [$associationMapping['mappedBy']];
-                break;
-            case ClassMetadataInfo::MANY_TO_MANY:
-                break;
-            default:
-                return $joinConditions;
-        }
-
-        foreach ($joinConditionsColumns as $joinConditionsColumn) {
-            if (is_string($joinConditionsColumn)) {
-                $joinConditions[] = $joinConditionsColumn;
-            } else {
-                $joinConditions[] = $targetEntityMetadata
-                    ->getFieldForColumn($joinConditionsColumn['referencedColumnName']);
-            }
-        }
-
-        return $joinConditions;
     }
 }

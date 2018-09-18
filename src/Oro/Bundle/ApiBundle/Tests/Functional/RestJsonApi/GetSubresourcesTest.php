@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group regression
@@ -39,7 +40,7 @@ class GetSubresourcesTest extends RestJsonApiTestCase
         $response = $this->getSubresource($parameters, [], [], false);
         self::assertApiResponseStatusCodeEquals(
             $response,
-            [200, 404],
+            [Response::HTTP_OK, Response::HTTP_NOT_FOUND],
             sprintf('%s(%s)->%s', $entityType, $entityId, $associationName),
             'get subresource'
         );

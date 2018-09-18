@@ -158,7 +158,7 @@
   &__popup,
   &__content {
     display: none;
-    overflow: initial;
+    overflow: auto;
   }
   &.poppedup &__popup,
   &.poppedup &__content,

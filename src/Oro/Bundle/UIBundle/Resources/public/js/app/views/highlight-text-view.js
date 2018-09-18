@@ -89,6 +89,11 @@ define(function(require) {
         /**
          * @property {String}
          */
+        groupedElementSelector: 'div[data-name="field__value"]',
+
+        /**
+         * @property {String}
+         */
         replaceBy: '',
 
         /**
@@ -179,6 +184,20 @@ define(function(require) {
             _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
             if (this.isElementHighlighted(this.$el)) {
                 _.each(this.findElements(_.keys(this.toggleSelectors)), this.toggleElement, this);
+            }
+
+            _.each(this.$(this.groupedElementSelector), this.showGroupContainingHighlighted, this);
+        },
+
+        /**
+         * Show whole subform if it contains at least one highlighted element.
+         *
+         * @param {Element} groupEl
+         */
+        showGroupContainingHighlighted: function(groupEl) {
+            var $groupEl = $(groupEl);
+            if (this.isElementHighlighted($groupEl)) {
+                $groupEl.find(this.findNotFoundClass).removeClass(this.notFoundClass);
             }
         },
 

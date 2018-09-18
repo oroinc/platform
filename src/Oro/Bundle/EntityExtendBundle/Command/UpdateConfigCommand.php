@@ -9,6 +9,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * The CLI command to update extend entity config
+ */
 class UpdateConfigCommand extends ContainerAwareCommand
 {
     /**
@@ -36,12 +39,6 @@ class UpdateConfigCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'A path to a file contains initial states of entity configs'
-            )
-            ->addOption(
-                'attributes-only',
-                null,
-                InputOption::VALUE_NONE,
-                'Executes update config only for entities which has attributes.'
             );
     }
 
@@ -53,12 +50,6 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        //Force provider to return configs for attribute extend entities if argument is passed
-        if ($input->getOption('attributes-only')) {
-            $this->getContainer()
-                ->get('oro_entity_config.provider.extend_entity_config_provider')
-                ->enableAttributesOnly();
-        }
         $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 

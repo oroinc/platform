@@ -6,6 +6,7 @@ gos_web_socket:
         host: "%websocket_bind_address%"   # (optional) The host ip to bind to
         router:
             resources: ~
+        origin_check: true
 
     # We don`t need assets of GosWebSocketBundle
     assetic: false

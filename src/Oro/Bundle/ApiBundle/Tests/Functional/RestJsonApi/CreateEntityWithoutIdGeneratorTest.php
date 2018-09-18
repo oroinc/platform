@@ -52,22 +52,14 @@ class CreateEntityWithoutIdGeneratorTest extends RestJsonApiTestCase
         ];
 
         $response = $this->post(['entity' => $entityType], $data, [], false);
-        self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier is mandatory',
-                        'source' => ['pointer' => '/data/id']
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier is mandatory',
+                'source' => ['pointer' => '/data/id']
             ],
-            $result
+            $response
         );
     }
 
@@ -94,21 +86,14 @@ class CreateEntityWithoutIdGeneratorTest extends RestJsonApiTestCase
         ];
 
         $response = $this->post(['entity' => $entityType], $data, [], false);
-        self::assertResponseStatusCodeEquals($response, Response::HTTP_CONFLICT);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '409',
-                        'title'  => 'conflict constraint',
-                        'detail' => 'The entity already exists'
-                    ]
-                ]
+                'title'  => 'conflict constraint',
+                'detail' => 'The entity already exists'
             ],
-            $result
+            $response,
+            Response::HTTP_CONFLICT
         );
     }
 }

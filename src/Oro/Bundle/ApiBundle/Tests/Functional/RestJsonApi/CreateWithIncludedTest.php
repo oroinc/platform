@@ -169,24 +169,14 @@ class CreateWithIncludedTest extends RestJsonApiTestCase
             false
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'request data constraint',
-                        'detail' => 'The entity should have a relationship with the primary entity'
-                            . ' and this should be explicitly specified in the request',
-                        'source' => [
-                            'pointer' => '/included/0'
-                        ]
-                    ]
-                ]
+                'title'  => 'request data constraint',
+                'detail' => 'The entity should have a relationship with the primary entity'
+                    . ' and this should be explicitly specified in the request',
+                'source' => ['pointer' => '/included/0']
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 

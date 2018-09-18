@@ -1,0 +1,19 @@
+data:
+    -
+        type: regions
+        id: IL-D
+    -
+        type: regions
+        id: IL-HA
+    -
+        type: regions
+        id: IL-JM
+    -
+        type: regions
+        id: IL-M
+    -
+        type: regions
+        id: IL-TA
+    -
+        type: regions
+        id: IL-Z

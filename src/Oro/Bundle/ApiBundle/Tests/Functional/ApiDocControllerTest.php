@@ -37,24 +37,24 @@ class ApiDocControllerTest extends WebTestCase
     public function testUnknownView()
     {
         $response = $this->sendApiDocRequest('unknown');
-        self::assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
     }
 
     public function testDefaultView()
     {
         $response = $this->sendApiDocRequest();
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
     }
 
     public function testRestJsonApiView()
     {
         $response = $this->sendApiDocRequest('rest_json_api');
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
     }
 
     public function testRestPlainView()
     {
         $response = $this->sendApiDocRequest('rest_plain');
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
     }
 }

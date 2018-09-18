@@ -1,0 +1,294 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+initial: true
+
+Oro\Bundle\UserBundle\Entity\Role:
+    admin_role:
+        label: 'Test admin role'
+        __construct: ['ROLE_ADMIN_TEST']
+    second_role:
+        label: 'Second role'
+        __construct: ['ROLE_SECOND']
+    third_role:
+        label: 'Third role'
+        __construct: ['ROLE_THIRD']
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    bu_first:
+        name: 'First BU Without Parent'
+        organization: '@organization'
+    bu_second:
+        name: 'Second BU Without Parent'
+        organization: '@organization'
+    bu_third:
+        name: 'Third BU Without Parent'
+        organization: '@organization'
+    bu_first_child1:
+        name: 'First BU Child 1'
+        organization: '@organization'
+        owner: '@bu_first'
+    bu_first_child2:
+        name: 'First BU Child 2'
+        organization: '@organization'
+        owner: '@bu_first'
+    bu_first_child1_child:
+        name: 'First BU Child 1 Child'
+        organization: '@organization'
+        owner: '@bu_first_child1'
+
+Oro\Bundle\UserBundle\Entity\User:
+    user_with_admin_role:
+        username: 'user_with_admin_role'
+        email: 'user_with_admin_role@test.org'
+        firstName: 'John'
+        lastName: 'Doe'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first', '@bu_second', '@bu_third']
+        roles: ['@admin_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_with_admin_role'
+        salt: salt
+    user_has_all_bu:
+        username: 'user_has_all_bu'
+        email: 'user_has_all_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first', '@bu_second', '@bu_third']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_all_bu'
+        salt: salt
+    user_has_first_bu:
+        username: 'user_has_first_bu'
+        email: 'user_has_first_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_first_bu'
+        salt: salt
+    user_has_second_bu:
+        username: 'user_has_second_bu'
+        email: 'user_has_second_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_second']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_second_bu'
+        salt: salt
+    user_has_third_bu:
+        username: 'user_has_third_bu'
+        email: 'user_has_third_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_third']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_third_bu'
+        salt: salt
+    user_has_first_child1_bu:
+        username: 'user_has_first_child1_bu'
+        email: 'user_has_first_child1_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first_child1']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_first_child1_bu'
+        salt: salt
+    user_has_first_child2_bu:
+        username: 'user_has_first_child2_bu'
+        email: 'user_has_first_child2_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first_child2']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_first_child2_bu'
+        salt: salt
+    user_has_first_child1_child_bu:
+        username: 'user_has_first_child1_child_bu'
+        email: 'user_has_first_child1_child_bu@test.org'
+        firstName: 'Charlie'
+        lastName: 'Sheen'
+        enabled: true
+        owner: '@bu_first'
+        businessUnits: ['@bu_first_child1_child']
+        roles: ['@second_role', '@third_role']
+        organization: '@organization'
+        organizations: ['@organization']
+        password: 'user_has_first_child1_child_bu'
+        salt: salt
+
+Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityCompany:
+    company_first:
+        name: 'company_first'
+        owner: '@organization'
+
+Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityDepartment:
+    department_bu_first:
+        name: 'department_bu_first'
+        company: '@company_first'
+        owner: '@bu_first'
+        organization: '@organization'
+    department_bu_second:
+        name: 'department_bu_second'
+        company: '@company_first'
+        owner: '@bu_second'
+        organization: '@organization'
+    department_bu_third:
+        name: 'department_bu_third'
+        company: '@company_first'
+        owner: '@bu_third'
+        organization: '@organization'
+    department_bu_first_child1:
+        name: 'department_bu_first_child1'
+        company: '@company_first'
+        owner: '@bu_first_child1'
+        organization: '@organization'
+    department_bu_first_child2:
+        name: 'department_bu_first_child2'
+        company: '@company_first'
+        owner: '@bu_first_child2'
+        organization: '@organization'
+    department_bu_first_child1_child:
+        name: 'department_bu_first_child1_child'
+        company: '@company_first'
+        owner: '@bu_first_child1_child'
+        organization: '@organization'
+
+Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityProduct:
+    product_{1..10}:
+        name: 'product_<current()>'
+        owner: '@organization'
+
+Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPerson:
+    person_user_with_admin_role:
+        name: 'person_user_with_admin_role'
+        department: '@department_bu_first'
+        owner: '@user_with_admin_role'
+        organization: '@organization'
+    person_user_has_all_bu:
+        name: 'person_user_has_all_bu'
+        department: '@department_bu_first_child1_child'
+        owner: '@user_has_all_bu'
+        organization: '@organization'
+    person_user_has_first_bu:
+        name: 'person_user_has_first_bu'
+        department: '@department_bu_first_child2'
+        owner: '@user_has_first_bu'
+        organization: '@organization'
+    person_user_has_second_bu:
+        name: 'person_user_has_second_bu'
+        department: '@department_bu_first_child1'
+        owner: '@user_has_second_bu'
+        organization: '@organization'
+    person_user_has_third_bu:
+        name: 'person_user_has_third_bu'
+        department: '@department_bu_third'
+        owner: '@user_has_third_bu'
+        organization: '@organization'
+    person_user_has_first_child1_bu:
+        name: 'person_user_has_first_child1_bu'
+        department: '@department_bu_second'
+        owner: '@user_has_first_child1_bu'
+        organization: '@organization'
+    person_user_has_first_child2_bu:
+        name: 'person_user_has_first_child2_bu'
+        department: '@department_bu_first'
+        owner: '@user_has_first_child2_bu'
+        organization: '@organization'
+    person_user_has_first_child1_child_bu:
+        name: 'person_user_has_first_child1_child_bu'
+        department: '@department_bu_first'
+        owner: '@user_has_first_child1_child_bu'
+        organization: '@organization'
+
+Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityOrder:
+    order_person_user_with_admin_role_1:
+        poNumber: 'order_person_user_with_admin_role_1'
+        person: '@person_user_with_admin_role'
+        products: ['@product_1', '@product_3']
+    order_person_user_with_admin_role_2:
+        poNumber: 'order_person_user_with_admin_role_2'
+        person: '@person_user_with_admin_role'
+        products: ['@product_2', '@product_4']
+    order_person_user_has_all_bu_1:
+        poNumber: 'order_person_user_has_all_bu_1'
+        person: '@person_user_has_all_bu'
+        products: ['@product_3', '@product_5']
+    order_person_user_has_all_bu_2:
+        poNumber: 'order_person_user_has_all_bu_2'
+        person: '@person_user_has_all_bu'
+        products: ['@product_4', '@product_6']
+    order_person_user_has_first_bu_1:
+        poNumber: 'order_person_user_has_first_bu_1'
+        person: '@person_user_has_first_bu'
+        products: ['@product_5', '@product_7']
+    order_person_user_has_first_bu_2:
+        poNumber: 'order_user_has_first_bu_2'
+        person: '@person_user_has_first_bu'
+        products: ['@product_6', '@product_8']
+    order_person_user_has_second_bu_1:
+        poNumber: 'order_person_user_has_second_bu_1'
+        person: '@person_user_has_second_bu'
+        products: ['@product_7', '@product_9']
+    order_person_user_has_second_bu_2:
+        poNumber: 'order_person_user_has_second_bu_2'
+        person: '@person_user_has_second_bu'
+        products: ['@product_8', '@product_10']
+    order_person_user_has_third_bu_1:
+        poNumber: 'order_person_user_has_third_bu_1'
+        person: '@person_user_has_third_bu'
+        products: ['@product_9', '@product_1']
+    order_person_user_has_third_bu_2:
+        poNumber: 'order_person_user_has_third_bu_2'
+        person: '@person_user_has_third_bu'
+        products: ['@product_10', '@product_2']
+    order_person_user_has_first_child1_bu_1:
+        poNumber: 'order_person_user_has_first_child1_bu_1'
+        person: '@person_user_has_first_child1_bu'
+        products: ['@product_5', '@product_8']
+    order_person_user_has_first_child1_bu_2:
+        poNumber: 'order_person_user_has_first_child1_bu_2'
+        person: '@person_user_has_first_child1_bu'
+        products: ['@product_1', '@product_10']
+    order_person_user_has_first_child2_bu_1:
+        poNumber: 'order_person_user_has_first_child2_bu_1'
+        person: '@person_user_has_first_child2_bu'
+        products: ['@product_2', '@product_9']
+    order_person_user_has_first_child2_bu_2:
+        poNumber: 'order_person_user_has_first_child2_bu_2'
+        person: '@person_user_has_first_child2_bu'
+        products: ['@product_3', '@product_8']
+    order_person_user_has_first_child1_child_bu_1:
+        poNumber: 'order_person_user_has_first_child1_child_bu_1'
+        person: '@person_user_has_first_child1_child_bu'
+        products: ['@product_4', '@product_7']
+    order_person_user_has_first_child1_child_bu_2:
+        poNumber: 'order_person_user_has_first_child1_child_bu_2'
+        person: '@person_user_has_first_child1_child_bu'
+        products: ['@product_5', '@product_6']
