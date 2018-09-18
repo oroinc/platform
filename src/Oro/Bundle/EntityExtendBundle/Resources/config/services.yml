@@ -86,6 +86,9 @@ services:
             - "@oro_datagrid.datagrid.guesser"
             - "@oro_entity_extend.datagrid.extension.fields_helper"
             - "@oro_featuretoggle.checker.feature_checker"
+        calls:
+            - ['setDoctrineHelper', ['@oro_entity.doctrine_helper']]
+            - ['setSelectedFieldsProvider', ['@oro_datagrid.provider.selected_fields']]
         tags:
             - { name: oro_datagrid.extension }
 
@@ -640,3 +643,10 @@ services:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postUpdate }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postRemove }
+
+    oro_entity_extend.validator.field_name_length:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLengthValidator
+        arguments:
+            - '@oro_entity_extend.db_id_name_generator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.field_name_length }

@@ -166,6 +166,17 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(['name' => $templateName])
             ->willReturn($this->emailTemplate);
 
+        $this->assertSendCalledWithoutRepositoryChecking($templateParams, $expectedMessage);
+    }
+
+    /**
+     * @param array          $templateParams
+     * @param \Swift_Message $expectedMessage
+     */
+    protected function assertSendCalledWithoutRepositoryChecking(
+        array $templateParams,
+        \Swift_Message $expectedMessage
+    ) {
         $this->renderer->expects($this->once())
             ->method('compileMessage')
             ->with($this->emailTemplate, $templateParams)

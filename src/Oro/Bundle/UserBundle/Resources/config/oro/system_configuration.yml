@@ -6,7 +6,8 @@ system_configuration:
         password_complexity_rules:
             icon:  fa-usd
             title: oro.user.system_configuration.groups.password_complexity_rules.title
-
+        email_settings:
+            title: oro.user.system_configuration.groups.email_settings.title
     fields:
         oro_user.password_min_length:
             data_type: integer
@@ -61,6 +62,17 @@ system_configuration:
                 tooltip: oro.user.system_configuration.fields.send_password_in_invitation_email.tooltip
                 required: false
 
+        oro_user.case_insensitive_email_addresses_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.user.system_configuration.fields.case_insensitive_email_addresses_enabled.label
+                tooltip: oro.user.system_configuration.fields.case_insensitive_email_addresses_enabled.tooltip
+                required: false
+                resettable: false
+                constraints:
+                    - Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint: ~
+
     tree:
         system_configuration:
             platform:
@@ -79,3 +91,6 @@ system_configuration:
                                             - oro_user.password_special_chars
                                             # The backend user should not be able to enable this option in the UI
                                             #- oro_user.send_password_in_invitation_email
+                                    email_settings:
+                                        children:
+                                            - oro_user.case_insensitive_email_addresses_enabled

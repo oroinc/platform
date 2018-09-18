@@ -1,0 +1,13 @@
+include:
+    - '@OroTranslationBundle:GermanLanguage.yml'
+
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+    title_localization_german:
+        string: 'German Localization'
+
+Oro\Bundle\LocaleBundle\Entity\Localization:
+    localization_german:
+        name: 'German_Loc'
+        language: '@german_lang'
+        formattingCode: 'de_DE'
+        titles: ['@title_localization_german']

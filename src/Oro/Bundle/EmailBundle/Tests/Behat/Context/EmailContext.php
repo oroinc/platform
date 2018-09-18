@@ -73,6 +73,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
      *            | Bcc     | user3@example.com |
      *            | Subject | Test Subject      |
      *            | Body    | Test Body         |
+     *            | Body    | Some other part   |
      *
      * @Given /^Email should contains the following:/
      * @Given /^An email containing the following was sent:/
@@ -88,24 +89,33 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
             return;
         }
 
-        $expectedContent = [];
+        $expectedRows = [];
         foreach ($table->getRows() as list($field, $text)) {
-            $expectedContent[$field] = $this->getPattern($text);
+            //Keys makes possible to use multiple Body field in expected table
+            $expectedRows[] = ['field' => $field, 'pattern' => $this->getPattern($text)];
         }
 
-        $found = false;
+        $sentMessages = $mailer->getSentMessages();
+
+        self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
         /** @var \Swift_Mime_Message $message */
-        foreach ($mailer->getSentMessages() as $message) {
-            foreach ($expectedContent as $field => $pattern) {
-                $found = (bool) preg_match($pattern, $this->getMessageData($message, $field));
+        foreach ($sentMessages as $message) {
+            foreach ($expectedRows as $expectedContent) {
+                $found = (bool) preg_match(
+                    $expectedContent['pattern'],
+                    $this->getMessageData($message, $expectedContent['field'])
+                );
                 if ($found === false) {
-                    break;
+                    self::assertNotFalse(
+                        $found,
+                        "Sent emails don't contain expected data for field: {$expectedContent['field']}
+                         and pattern: {$expectedContent['pattern']}"
+                    );
+                    break 2;
                 }
             }
         }
-
-        self::assertNotFalse($found, 'Sent emails don\'t contain expected data.');
     }
 
     /**
@@ -126,12 +136,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     {
         self::assertNotEmpty($table, 'Assertions list must contain at least one row.');
 
-        $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
-        self::assertContains(
-            $searchField,
-            $allowedFields,
-            'Argument searchField must be one of '.implode(', ', $allowedFields)
-        );
+        self::assertEmailFieldValid($searchField);
 
         $mailer = $this->getMailer();
         if (!$mailer instanceof DirectMailerDecorator) {
@@ -163,6 +168,31 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
+     * Example: Then email with Subject "Your RFQ has been received." was not sent:
+     *
+     * @Given /^email with (?P<searchField>[\w]+) "(?P<searchText>(?:[^"]|\\")*)" was not sent/
+     *
+     * @param string $searchField
+     * @param string $searchText
+     */
+    public function emailWithFieldIsNotSent(string $searchField, string $searchText)
+    {
+        self::assertEmailFieldValid($searchField);
+
+        $mailer = $this->getMailer();
+        if (!$mailer instanceof DirectMailerDecorator) {
+            return;
+        }
+
+        /** @var \Swift_Mime_Message $message */
+        foreach ($mailer->getSentMessages() as $message) {
+            if ($searchText === $this->getMessageData($message, $searchField)) {
+                self::fail(sprintf('Email with %s \"%s\" was not expected to be sent', $searchField, $searchText));
+            }
+        }
+    }
+
+    /**
      * @param string $text
      * @return string
      */
@@ -180,22 +210,22 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
     {
         switch (strtolower(trim($field))) {
             case 'from':
-                $data = $message->getFrom();
+                $data = array_keys($message->getFrom());
                 break;
             case 'to':
-                $data = $message->getTo();
+                $data = array_keys($message->getTo());
                 break;
             case 'cc':
-                $data = $message->getCc();
+                $data = is_array($message->getCc()) ? array_keys($message->getCc()) : $message->getCc();
                 break;
             case 'bcc':
-                $data = $message->getBcc();
+                $data = is_array($message->getBcc()) ? array_keys($message->getBcc()) : $message->getBcc();
                 break;
             case 'subject':
                 $data = $message->getSubject();
                 break;
             case 'body':
-                $data = $message->getBody();
+                $data = strip_tags($message->getBody());
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unsupported email field "%s".', $field));
@@ -217,5 +247,18 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         }
 
         return $this->mailer;
+    }
+
+    /**
+     * @param string $fieldName
+     */
+    private static function assertEmailFieldValid(string $fieldName): void
+    {
+        $allowedFields = ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body'];
+        self::assertContains(
+            $fieldName,
+            $allowedFields,
+            'Email field must be one of '.implode(', ', $allowedFields)
+        );
     }
 }

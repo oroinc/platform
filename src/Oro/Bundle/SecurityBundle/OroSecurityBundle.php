@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -61,6 +63,15 @@ class OroSecurityBundle extends Bundle
         $extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
         $extension->addSecurityListenerFactory(new OrganizationHttpBasicFactory());
         $extension->addSecurityListenerFactory(new OrganizationRememberMeFactory());
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(
+                DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                    ['Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity'],
+                    [$this->getPath() . '/Tests/Functional/Environment/Entity']
+                )
+            );
+        }
     }
 
     /**

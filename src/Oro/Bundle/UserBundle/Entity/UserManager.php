@@ -4,13 +4,15 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
+/**
+ * User manager - entry point for operations with User entity.
+ */
 class UserManager extends BaseUserManager
 {
     const AUTH_STATUS_ENUM_CODE = 'auth_status';
@@ -19,6 +21,9 @@ class UserManager extends BaseUserManager
 
     /** @var EnumValueProvider */
     protected $enumValueProvider;
+
+    /** @var ConfigManager|null */
+    private $configManager;
 
     /**
      * @param string $class
@@ -35,6 +40,14 @@ class UserManager extends BaseUserManager
         parent::__construct($class, $registry, $encoderFactory);
 
         $this->enumValueProvider = $enumValueProvider;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -106,6 +119,14 @@ class UserManager extends BaseUserManager
     /**
      * {@inheritdoc}
      */
+    public function findUserByEmail($email)
+    {
+        return parent::findUserByEmail($email);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function assertRoles(UserInterface $user)
     {
         if (count($user->getRoles()) === 0) {
@@ -129,5 +150,17 @@ class UserManager extends BaseUserManager
 
             $user->addRole($role);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isCaseInsensitiveEmailAddressesEnabled(): bool
+    {
+        if (!$this->configManager) {
+            return false;
+        }
+
+        return (bool) $this->configManager->get('oro_user.case_insensitive_email_addresses_enabled');
     }
 }

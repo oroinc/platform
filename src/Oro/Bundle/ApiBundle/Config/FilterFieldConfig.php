@@ -35,6 +35,9 @@ class FilterFieldConfig implements FieldConfigInterface
     /** the data type of the filter value */
     const DATA_TYPE = EntityDefinitionFieldConfig::DATA_TYPE;
 
+    /** a flag indicates whether the filter represents a collection valued association */
+    const COLLECTION = 'collection';
+
     /** a flag indicates whether the filter value can be an array */
     const ALLOW_ARRAY = 'allow_array';
 
@@ -53,6 +56,7 @@ class FilterFieldConfig implements FieldConfigInterface
     {
         $result = $this->convertItemsToArray();
         $this->removeItemWithDefaultValue($result, self::EXCLUDE);
+        $this->removeItemWithDefaultValue($result, self::COLLECTION);
         $this->removeItemWithDefaultValue($result, self::ALLOW_ARRAY);
         $this->removeItemWithDefaultValue($result, self::ALLOW_RANGE);
 
@@ -65,6 +69,36 @@ class FilterFieldConfig implements FieldConfigInterface
     public function __clone()
     {
         $this->items = ConfigUtil::cloneItems($this->items);
+    }
+
+    /**
+     * Indicates whether the "collection" option is set explicitly.
+     *
+     * @return bool
+     */
+    public function hasCollection()
+    {
+        return $this->has(self::COLLECTION);
+    }
+
+    /**
+     * Indicates whether the filter represents a collection valued association.
+     *
+     * @return bool
+     */
+    public function isCollection()
+    {
+        return (bool)$this->get(self::COLLECTION);
+    }
+
+    /**
+     * Sets a flag indicates whether the filter represents a collection valued association.
+     *
+     * @param bool $value
+     */
+    public function setIsCollection($value)
+    {
+        $this->set(self::COLLECTION, $value);
     }
 
     /**

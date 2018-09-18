@@ -113,6 +113,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $hints = ['test_hint'];
         $config = new EntityDefinitionConfig();
         $config->setHints($hints);
+        $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
@@ -128,6 +129,11 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->queryHintResolver->expects($this->once())
             ->method('resolveHints')
             ->with(self::isInstanceOf(Query::class), $hints);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(DISTINCT g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
 
         $this->context->getRequestHeaders()->set(
             self::REQUEST_INCLUDE_HEADER_NAME,
@@ -137,9 +143,8 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        // mocked fetchColumn method in StatementMock returns null value (0 records in db)
         $this->assertEquals(
-            0,
+            $totalCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
         );
     }
@@ -150,12 +155,18 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $hints = ['test_hint'];
         $config = new EntityDefinitionConfig();
         $config->setHints($hints);
+        $totalCount = 123;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
         $this->queryHintResolver->expects($this->once())
             ->method('resolveHints')
             ->with(self::isInstanceOf(Query::class), $hints);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT count(DISTINCT g0_.id) AS sclr_0 FROM group_table g0_',
+            [['sclr_0' => $totalCount]]
+        );
 
         $this->context->getRequestHeaders()->set(
             self::REQUEST_INCLUDE_HEADER_NAME,
@@ -165,9 +176,8 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        // mocked fetchColumn method in StatementMock returns null value (0 records in db)
         $this->assertEquals(
-            0,
+            $totalCount,
             $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
         );
     }

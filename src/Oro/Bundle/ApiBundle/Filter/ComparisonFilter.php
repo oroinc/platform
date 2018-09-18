@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
@@ -27,8 +28,9 @@ use Oro\Bundle\ApiBundle\Model\Range;
  * Also the field value can be:
  * * an array, in this case IN expression will be used
  * * an instance of Range class, in this case BETWEEN expression will be used
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInterface
+class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInterface, CollectionAwareFilterInterface
 {
     const NEQ             = '!=';
     const LT              = '<';
@@ -44,6 +46,9 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
 
     /** @var string */
     protected $field;
+
+    /** @var bool */
+    protected $collection = false;
 
     /** @var bool */
     private $caseInsensitive = false;
@@ -67,6 +72,24 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     public function setField($field)
     {
         $this->field = $field;
+    }
+
+    /**
+     * Indicates whether the filter represents a collection valued association.
+     *
+     * @return bool
+     */
+    public function isCollection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCollection($collection)
+    {
+        $this->collection = $collection;
     }
 
     /**
@@ -162,7 +185,9 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
             $operator = self::EQ;
         }
         if (in_array($operator, $this->operators, true)) {
-            $expr = $this->doBuildExpression($field, $path, $operator, $value);
+            $expr = $this->collection
+                ? $this->doBuildCollectionExpression($field, $path, $operator, $value)
+                : $this->doBuildExpression($field, $path, $operator, $value);
             if (null !== $expr) {
                 return $expr;
             }
@@ -208,9 +233,31 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
                 return $this->buildComparisonExpression($field, Comparison::ENDS_WITH, $value);
             case self::NOT_ENDS_WITH:
                 return $this->buildComparisonExpression($field, 'NOT_ENDS_WITH', $value);
-            default:
-                return null;
         }
+
+        return null;
+    }
+
+    /**
+     * @param string $field
+     * @param string $path
+     * @param string $operator
+     * @param mixed  $value
+     *
+     * @return Expression|null
+     */
+    protected function doBuildCollectionExpression($field, $path, $operator, $value)
+    {
+        switch ($operator) {
+            case self::EQ:
+                return $this->buildComparisonExpression($field, 'MEMBER OF', $value);
+            case self::NEQ:
+                return $this->buildNotExpression(
+                    $this->buildComparisonExpression($field, 'MEMBER OF', $value)
+                );
+        }
+
+        return null;
     }
 
     /**
@@ -278,6 +325,16 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
         }
 
         return new Comparison($field, $operator, new Value($value));
+    }
+
+    /**
+     * @param Expression $expr
+     *
+     * @return Expression
+     */
+    protected function buildNotExpression(Expression $expr)
+    {
+        return new CompositeExpression('NOT', [$expr]);
     }
 
     /**

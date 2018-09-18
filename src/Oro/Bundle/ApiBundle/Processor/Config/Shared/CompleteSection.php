@@ -7,6 +7,10 @@ use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * The base class for processors that make sure that all supported filters and sorters
+ * are added to Data API configuration and all of them are fully configured.
+ */
 abstract class CompleteSection implements ProcessorInterface
 {
     /** @var DoctrineHelper */

@@ -26,6 +26,7 @@ oro_behat_extension:
           Name: 'oro_workflow_definition_form[label]'
           Related Entity: 'oro_workflow_definition_form[related_entity]'
           Display Steps Ordered: 'oro_workflow_definition_form[steps_display_ordered]'
+          Default Step: 'oro_workflow_definition_form[start_step]'
 
     Workflow Step Edit Form:
       selector: 'div[id="step-form"] form'
@@ -72,3 +73,7 @@ oro_behat_extension:
         type: 'xpath'
         locator: '//div[contains(@data-page-component-name,"workflow-permission-grid")]/..'
       class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm
+
+    Default Step Dropdown:
+      selector: 'label:contains("Default step") + .controls > .select2-container > a'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

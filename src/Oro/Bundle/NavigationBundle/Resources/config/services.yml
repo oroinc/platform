@@ -244,6 +244,8 @@ services:
             - [ setHistoryItemEntityFQCN, [ %oro_navigation.entity.navigation_history_item.class% ]]
             - [ setUserEntityFQCN, [ %oro_user.entity.class% ]]
             - [ setNavigationHistoryItemType, ['history']]
+            - [ addExcludedRoute, ['oro_default']]
+            - [ addExcludedRoute, ['nelmio_api_doc_index']]
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener

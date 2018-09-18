@@ -953,4 +953,85 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevel()
+    {
+        $object = new TestEntity(123);
+        $this->setObjectToContext($object);
+
+        $acl = $this->getAcl();
+
+        $sidRole1 = new RoleSecurityIdentity('ROLE_USER1');
+        $sidRole2 = new RoleSecurityIdentity('ROLE_USER2');
+
+        $acl->insertObjectAce($sidRole1, 0, 0);
+        $acl->insertObjectAce($sidRole2, self::MASK_CREATE_BASIC, 1);
+
+        $this->extension->expects(self::once())
+            ->method('decideIsGranting')
+            ->with(self::MASK_CREATE_BASIC)
+            ->willReturn(true);
+
+        $this->extension->expects($this->any())
+            ->method('getAccessLevel')
+            ->willReturnMap([
+                [self::MASK_CREATE_BASIC, null, $object, AccessLevel::BASIC_LEVEL],
+                [self::MASK_CREATE_SYSTEM, null, $object, AccessLevel::SYSTEM_LEVEL],
+            ]);
+
+        // The Basic access level should be set to context.
+        $this->context->expects($this->once())
+            ->method('setTriggeredMask')
+            ->with(self::MASK_CREATE_BASIC, AccessLevel::BASIC_LEVEL);
+
+        $isGranted = $this->strategy->isGranted(
+            $acl,
+            [self::MASK_CREATE_BASIC, self::MASK_CREATE_SYSTEM],
+            [$sidRole1, $sidRole2]
+        );
+
+        $this->assertTrue($isGranted);
+    }
+
+    public function testIsGrantedInCaseOfTwoRolesShouldReturnCorrectAccessLevelForField()
+    {
+        $field = 'testField';
+        $object = new TestEntity(123);
+        $this->setObjectToContext($object);
+        $this->setFieldSecurityMetadata($object, new FieldSecurityMetadata($field));
+
+        $acl = $this->getAcl();
+
+        $sidRole1 = new RoleSecurityIdentity('ROLE_USER1');
+        $sidRole2 = new RoleSecurityIdentity('ROLE_USER2');
+
+        $acl->insertObjectFieldAce($field, $sidRole1, 0, 0);
+        $acl->insertObjectFieldAce($field, $sidRole2, self::MASK_CREATE_BASIC, 1);
+
+        $this->extension->expects(self::once())
+            ->method('decideIsGranting')
+            ->with(self::MASK_CREATE_BASIC)
+            ->willReturn(true);
+
+        $this->extension->expects($this->any())
+            ->method('getAccessLevel')
+            ->willReturnMap([
+                [self::MASK_CREATE_BASIC, null, $object, AccessLevel::BASIC_LEVEL],
+                [self::MASK_CREATE_SYSTEM, null, $object, AccessLevel::SYSTEM_LEVEL],
+            ]);
+
+        // The Basic access level should be set to context.
+        $this->context->expects($this->once())
+            ->method('setTriggeredMask')
+            ->with(self::MASK_CREATE_BASIC, AccessLevel::BASIC_LEVEL);
+
+        $isGranted = $this->strategy->isFieldGranted(
+            $acl,
+            $field,
+            [self::MASK_CREATE_BASIC, self::MASK_CREATE_SYSTEM],
+            [$sidRole1, $sidRole2]
+        );
+
+        $this->assertTrue($isGranted);
+    }
 }

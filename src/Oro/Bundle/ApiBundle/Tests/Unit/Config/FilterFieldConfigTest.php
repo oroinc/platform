@@ -93,6 +93,23 @@ class FilterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testIsCollection()
+    {
+        $config = new FilterFieldConfig();
+        self::assertFalse($config->hasCollection());
+        self::assertFalse($config->isCollection());
+
+        $config->setIsCollection(true);
+        self::assertTrue($config->hasCollection());
+        self::assertTrue($config->isCollection());
+        self::assertEquals(['collection' => true], $config->toArray());
+
+        $config->setIsCollection(false);
+        self::assertTrue($config->hasCollection());
+        self::assertFalse($config->isCollection());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testDescription()
     {
         $config = new FilterFieldConfig();

@@ -54,9 +54,20 @@ class EditEmailTemplateQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $query = "UPDATE oro_email_template SET content=REPLACE(content, :from, :to) WHERE name=:name";
+        $query = 'UPDATE oro_email_template SET content=REPLACE(content, :from, :to) WHERE name=:name';
         $params = ['from' => $this->from, 'to' => $this->to, 'name' => $this->templateName];
         $types = ['from' => 'text', 'to' => 'text', 'name' => 'string'];
+
+        $this->logQuery($logger, $query, $params, $types);
+        if (!$dryRun) {
+            $this->connection->executeUpdate($query, $params, $types);
+        }
+
+        $query = 'UPDATE oro_email_template_translation 
+          SET content=REPLACE(content, :from, :to)
+          WHERE field=:field AND object_id = (SELECT id FROM oro_email_template WHERE name=:name LIMIT 1)';
+        $params['field'] = 'content';
+        $types['field'] = 'string';
 
         $this->logQuery($logger, $query, $params, $types);
         if (!$dryRun) {

@@ -95,4 +95,81 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
             ],
         ];
     }
+
+    public function testBuildView()
+    {
+        $form = $this->factory->create($this->type);
+        $view = $form->createView();
+
+        $this->assertEquals(
+            [
+                'showDatevariables' => true,
+                'showTime' => true,
+                'showTimepicker' => true
+            ],
+            $view->vars['widget_options']
+        );
+        $this->assertEquals(
+            [
+                DateModifierProvider::PART_VALUE => 'oro.filter.form.label_date_part.value',
+                DateModifierProvider::PART_DOW => 'oro.filter.form.label_date_part.dayofweek',
+                DateModifierProvider::PART_WEEK => 'oro.filter.form.label_date_part.week',
+                DateModifierProvider::PART_DAY => 'oro.filter.form.label_date_part.day',
+                DateModifierProvider::PART_MONTH => 'oro.filter.form.label_date_part.month',
+                DateModifierProvider::PART_QUARTER => 'oro.filter.form.label_date_part.quarter',
+                DateModifierProvider::PART_DOY => 'oro.filter.form.label_date_part.dayofyear',
+                DateModifierProvider::PART_YEAR => 'oro.filter.form.label_date_part.year'
+            ],
+            $view->vars['date_parts']
+        );
+        $this->assertEquals(
+            [
+                'value' => [
+                    DateModifierProvider::VAR_NOW => 'oro.filter.form.label_date_var.now',
+                    DateModifierProvider::VAR_TODAY => 'oro.filter.form.label_date_var.today',
+                    DateModifierProvider::VAR_SOW => 'oro.filter.form.label_date_var.sow',
+                    DateModifierProvider::VAR_SOM => 'oro.filter.form.label_date_var.som',
+                    DateModifierProvider::VAR_SOQ => 'oro.filter.form.label_date_var.soq',
+                    DateModifierProvider::VAR_SOY => 'oro.filter.form.label_date_var.soy',
+                    DateModifierProvider::VAR_THIS_MONTH_W_Y => 'oro.filter.form.label_date_var.this_month_w_y',
+                    DateModifierProvider::VAR_THIS_DAY_W_Y => 'oro.filter.form.label_date_var.this_day_w_y'
+                ],
+                'dayofweek' => [
+                    DateModifierProvider::VAR_THIS_DAY => 'oro.filter.form.label_date_var.this_day'
+                ],
+                'week' => [
+                    DateModifierProvider::VAR_THIS_WEEK => 'oro.filter.form.label_date_var.this_week'
+                ],
+                'day' => [
+                    DateModifierProvider::VAR_THIS_DAY => 'oro.filter.form.label_date_var.this_day'
+                ],
+                'month' => [
+                    DateModifierProvider::VAR_THIS_MONTH => 'oro.filter.form.label_date_var.this_month',
+                    DateModifierProvider::VAR_FMQ => 'oro.filter.form.label_date_var.this_fmq'
+                ],
+                'quarter' => [
+                    DateModifierProvider::VAR_THIS_QUARTER => 'oro.filter.form.label_date_var.this_quarter'
+                ],
+                'dayofyear' => [
+                    DateModifierProvider::VAR_THIS_DAY => 'oro.filter.form.label_date_var.this_day',
+                    DateModifierProvider::VAR_FDQ => 'oro.filter.form.label_date_var.this_fdq'
+                ],
+                'year' => [
+                    DateModifierProvider::VAR_THIS_YEAR => 'oro.filter.form.label_date_var.this_year'
+                ]
+            ],
+            $view->vars['date_vars']
+        );
+        $this->assertEquals(
+            [
+                'between' => DateRangeFilterType::TYPE_BETWEEN,
+                'notBetween' => DateRangeFilterType::TYPE_NOT_BETWEEN,
+                'moreThan' => DateRangeFilterType::TYPE_MORE_THAN,
+                'lessThan' => DateRangeFilterType::TYPE_LESS_THAN,
+                'equal' => DateRangeFilterType::TYPE_EQUAL,
+                'notEqual' => DateRangeFilterType::TYPE_NOT_EQUAL
+            ],
+            $view->vars['type_values']
+        );
+    }
 }
