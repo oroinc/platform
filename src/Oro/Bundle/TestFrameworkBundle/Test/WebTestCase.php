@@ -98,6 +98,11 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     private static $referenceRepository;
 
+    /**
+     * @var array
+     */
+    private static $afterInitClientMethods = [];
+
     protected function setUp()
     {
     }
@@ -131,7 +136,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function afterTest()
     {
-        if (self::getDbIsolationPerTestSetting()) {
+        if (self::isDbIsolationPerTest()) {
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
@@ -222,7 +227,35 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance->setServerParameters($server);
         }
 
+        $hookMethods = self::getAfterInitClientMethods(\get_class($this));
+        foreach ($hookMethods as $method) {
+            $this->$method();
+        }
+
         return $this->client = self::$clientInstance;
+    }
+
+    private static function getAfterInitClientMethods($className)
+    {
+        if (!isset(self::$afterInitClientMethods[$className])) {
+            self::$afterInitClientMethods[$className] = [];
+
+            try {
+                $class = new \ReflectionClass($className);
+
+                foreach ($class->getMethods() as $method) {
+                    if (\preg_match('/@afterInitClient\b/', $method->getDocComment()) > 0) {
+                        \array_unshift(
+                            self::$afterInitClientMethods[$className],
+                            $method->getName()
+                        );
+                    }
+                }
+            } catch (\ReflectionException $e) {
+            }
+        }
+
+        return self::$afterInitClientMethods[$className];
     }
 
     /** {@inheritdoc} */
@@ -370,11 +403,12 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get value of dbIsolationPerTest option from annotation of called class
+     * Indicates whether each test is executed in own database transaction.
+     * It is enabled by setting @dbIsolationPerTest annotation for the test class.
      *
      * @return bool
      */
-    private static function getDbIsolationPerTestSetting()
+    protected static function isDbIsolationPerTest()
     {
         $calledClass = get_called_class();
         if (!isset(self::$dbIsolationPerTest[$calledClass])) {
