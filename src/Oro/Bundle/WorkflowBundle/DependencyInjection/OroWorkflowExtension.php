@@ -33,5 +33,9 @@ class OroWorkflowExtension extends Extension
         $loader->load('cache.yml');
         $loader->load('client.yml');
         $loader->load('commands.yml');
+
+        if ($container->getParameter('kernel.environment') === 'test') {
+            $loader->load('services_test.yml');
+        }
     }
 }

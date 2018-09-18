@@ -1,0 +1,5 @@
+services:
+    oro_workflow.entity_manager_clearer_stub:
+        class: Oro\Bundle\WorkflowBundle\Tests\Functional\Stub\EntityManagerClearerStub
+        arguments:
+            - '@doctrine'
