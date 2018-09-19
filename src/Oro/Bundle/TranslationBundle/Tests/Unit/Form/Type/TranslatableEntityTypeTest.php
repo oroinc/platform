@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -12,6 +13,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
 
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+use Gedmo\Translatable\TranslatableListener;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -55,7 +57,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /**
-     * @var Query
+     * @var Query|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $query;
 
@@ -94,7 +96,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getConfiguration'))
+            ->setMethods(array('getClassMetadata', 'getConfiguration', 'getEventManager'))
             ->getMock();
         $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
@@ -279,6 +281,10 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDefaultOptions(array $choiceListOptions, array $expectedChoices, $expectTranslation = false)
     {
+        $locale = 'de_DE';
+
+        $translatableListener = $this->createMock(TranslatableListener::class);
+
         // prepare query builder option
         if (isset($choiceListOptions['query_builder'])) {
             $choiceListOptions['query_builder'] = $this->getQueryBuilderOption($choiceListOptions);
@@ -290,24 +296,38 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
                     'Gedmo\\Translatable\\Hydrator\\ORM\\ObjectHydrator'
                 );
 
-            /** @var $query \PHPUnit_Framework_MockObject_MockObject */
             $this->query->expects($this->at(0))
                 ->method('setHint')
                 ->with(
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
                     'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
                 );
-
-            /** @var $query \PHPUnit_Framework_MockObject_MockObject */
             $this->query->expects($this->at(1))
+                ->method('setHint')
+                ->with(
+                    TranslatableListener::HINT_TRANSLATABLE_LOCALE,
+                    $locale
+                );
+            $this->query->expects($this->at(2))
                 ->method('setHint')
                 ->with(
                     Query::HINT_INCLUDE_META_COLUMNS,
                     true
                 );
+
+            $translatableListener->expects($this->once())
+                ->method('getListenerLocale')
+                ->willReturn($locale);
         }
 
+        $eventManager = $this->createMock(EventManager::class);
+        $eventManager->expects($this->any())
+            ->method('getListeners')
+            ->willReturn([[$translatableListener]]);
 
+        $this->entityManager->expects($this->any())
+            ->method('getEventManager')
+            ->willReturn($eventManager);
 
         $resolver = new OptionsResolver();
         $this->type->setDefaultOptions($resolver);
