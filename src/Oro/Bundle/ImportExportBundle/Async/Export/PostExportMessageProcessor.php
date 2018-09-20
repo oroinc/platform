@@ -12,11 +12,15 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Merge job result data and send notification
+ */
 class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -115,10 +119,9 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         if ($fileName !== null) {
-            $summary = $this->importExportResultSummarizer
-                ->processSummaryExportResultForNotification($job, $fileName);
+            $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->sendNotification($body['email'], $summary);
+            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate']);
 
             $this->logger->info('Sent notification email.');
         }
@@ -137,8 +140,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     /**
      * @param string $toEmail
      * @param array $summary
+     * @param string $notificationTemplate
+     *
+     * @throws Exception
      */
-    protected function sendNotification($toEmail, array $summary)
+    protected function sendEmailNotification($toEmail, array $summary, $notificationTemplate = null)
     {
         $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
         $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
@@ -148,7 +154,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             'toEmail' => $toEmail,
             'body' => $summary,
             'contentType' => 'text/html',
-            'template' => ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ];
 
         $this->producer->send(

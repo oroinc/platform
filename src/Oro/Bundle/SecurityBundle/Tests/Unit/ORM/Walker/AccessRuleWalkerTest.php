@@ -549,6 +549,7 @@ class AccessRuleWalkerTest extends OrmTestCase
                     )
                 )
             );
+            $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
         $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 10);
@@ -566,8 +567,9 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertEquals(
             'SELECT c0_.id AS id_0'
             . ' FROM cms_articles c0_'
-            . ' WHERE (c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization = 1)'
-            . ' OR EXISTS (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\')',
+            . ' WHERE ((c0_.user_id IN (1, 2, 3, 4, 5) AND c0_.organization = 1)'
+            . ' OR EXISTS (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\'))'
+            . ' AND c0_.user_id < 5',
             $query->getSQL()
         );
     }
@@ -594,6 +596,7 @@ class AccessRuleWalkerTest extends OrmTestCase
                     true
                 )
             );
+            $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
         $context = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 11);
@@ -611,9 +614,10 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertEquals(
             'SELECT c0_.id AS id_0'
             . ' FROM cms_articles c0_'
-            . ' WHERE c0_.user_id IN (1, 2, 3, 4, 5)'
+            . ' WHERE (c0_.user_id IN (1, 2, 3, 4, 5)'
             . ' OR NOT EXISTS'
-            . ' (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\')',
+            . ' (SELECT 1 AS sclr_1 FROM cms_users c1_ WHERE c0_.user_id = c1_.id AND c1_.name = \'test\'))'
+            . ' OR c0_.user_id < 5',
             $query->getSQL()
         );
     }
@@ -622,6 +626,7 @@ class AccessRuleWalkerTest extends OrmTestCase
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new NullComparison(new Path('user')));
+            $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
         $infoContainer = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 12);
@@ -637,7 +642,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->setHint(AccessRuleWalker::CONTEXT, $infoContainer);
 
         $this->assertEquals(
-            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NULL',
+            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NULL OR c0_.user_id < 5',
             $query->getSQL()
         );
     }
@@ -646,6 +651,7 @@ class AccessRuleWalkerTest extends OrmTestCase
     {
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new NullComparison(new Path('user'), true));
+            $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
         $infoContainer = new AccessRuleWalkerContext($this->container, 'VIEW', CmsUser::class, 13);
@@ -661,7 +667,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $query->setHint(AccessRuleWalker::CONTEXT, $infoContainer);
 
         $this->assertEquals(
-            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NOT NULL',
+            'SELECT c0_.id AS id_0 FROM cms_addresses c0_ WHERE c0_.user_id IS NOT NULL AND c0_.user_id < 5',
             $query->getSQL()
         );
     }

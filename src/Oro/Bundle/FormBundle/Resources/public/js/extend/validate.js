@@ -17,20 +17,20 @@ define(function(require) {
      * @returns {Array.<Element>} sorted in order from form element to input element
      */
     function validationHolders(element) {
+        var elems = [];
         var $el = $(element);
         var form = $el.parents('form').first();
         // instance of validator
         var validator = $(form).data('validator');
         if (validator instanceof $.validator) {
-            return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
+            elems = _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
                 var $el = $(el);
-
                 // is it current element or the first in a group of elements or the first visible one
                 return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
             });
-        } else {
-            return [];
         }
+
+        return elems;
     }
 
     /**
@@ -359,11 +359,32 @@ define(function(require) {
          * @returns {jQuery}
          */
         elementsOf: function(element) {
-            var $element = $(element);
-            return $element.find('input, select, textarea')
-                .not(':submit, :reset, :image, [disabled]')
-                .not(this.settings.ignore)
-                .add($element.find(':input[data-validate-element]'));
+            return $(element)
+                .find('input, select, textarea')
+                .not(':submit, :reset, :image, [disabled]:not([data-validate-element])')
+                .not(this.settings.ignore);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        destroy: function() {
+            // this.resetForm(); -- original reset form is to heavy,
+            // it collects all the rules during collecting elements, we don't need it all
+            if ($.fn.resetForm) {
+                $(this.currentForm).resetForm();
+            }
+            this.invalid = {};
+            this.submitted = {};
+            this.prepareForm();
+            this.hideErrors();
+
+            $(this.currentForm)
+                .off('.validate')
+                .removeData('validator')
+                .find('.validate-equalTo-blur')
+                .off('.validate-equalTo')
+                .removeClass('validate-equalTo-blur');
         }
     });
 
@@ -411,8 +432,8 @@ define(function(require) {
                 .removeClass('validation-error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
-        // ignore all invisible elements except input type=hidden
-        ignore: ':hidden:not([type=hidden])',
+        // ignore all invisible elements except input type=hidden, which are ':input[data-validate-element]'
+        ignore: ':hidden:not([type=hidden]), [data-validation-ignore] :input',
         onfocusout: function(element) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
@@ -469,16 +490,12 @@ define(function(require) {
      */
     $.validator.dataRules = _.wrap($.validator.dataRules, function(dataRules, element) {
         var optionalGroup;
-        var ignoreGroup;
         var validator;
         var rules = dataRules(element);
         if (!$.isEmptyObject(rules)) {
             optionalGroup = $(element).parents('[data-validation-optional-group]').get(0);
-            ignoreGroup = $(element).parents('[data-validation-ignore]').get(0);
         }
-        if (ignoreGroup) {
-            rules = {};
-        } else if (optionalGroup) {
+        if (optionalGroup) {
             validator = $(element.form).data('validator');
             validator.settings.unhighlight(element);
             _.each(rules, function(param) {

@@ -13,7 +13,7 @@ Feature: Send email form
     When I follow "Compose"
     And fill "Email Form" with:
       | Body | This is very simple test mail |
-    And press "Send"
+    And click "Send"
     Then I should see "Email Form" validation errors:
       | ToField | This value contains not valid email address. |
       | Subject | This value should not be blank.              |
@@ -44,7 +44,7 @@ Feature: Send email form
     And "Email Form" must contains values:
       | Subject | Test Template Subject |
       | Body    | Test Template Body    |
-    And press "Send"
+    And click "Send"
     Then I should see "The email was sent" flash message
     Then I should see following grid:
       | CONTACT       | SUBJECT                                  |

@@ -18,7 +18,7 @@ Feature: User statuses
   Scenario: Disable users mass action doesn't affect current logged in user
     And check all records in grid
     And I click "Disable" link from mass action dropdown
-    And I press "Apply"
+    And I click "Apply"
     Then I should see "admin@example.com" in grid with following data:
       |Username   |admin  |
       |Enabled    |Enabled|
