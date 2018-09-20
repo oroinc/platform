@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -14,6 +15,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Responsible for distribution job and creating dependent job
+ */
 abstract class PreExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -171,6 +175,8 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],
             'outputFormat' => $body['outputFormat'],
+            'notificationTemplate' =>
+                $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ]);
 
         $this->dependentJob->saveDependentJob($context);
