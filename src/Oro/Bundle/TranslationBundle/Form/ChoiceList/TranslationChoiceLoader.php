@@ -8,6 +8,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
  */
 class TranslationChoiceLoader implements ChoiceLoaderInterface
 {
+    use TranslatableQueryTrait;
+
     /** @var ChoiceListInterface */
     private $choiceList;
 
@@ -87,6 +90,7 @@ class TranslationChoiceLoader implements ChoiceLoaderInterface
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
         );
+        $this->addTranslatableLocaleHint($query, $entityManager);
 
         // In case we use not standard Hydrator (not Query::HYDRATE_OBJECT)
         // we should add this hint to load nested entities
