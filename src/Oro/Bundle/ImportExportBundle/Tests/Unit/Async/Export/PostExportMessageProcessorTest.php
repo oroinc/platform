@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -48,6 +48,16 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
+     * @var SessionInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $session;
+
+    /**
+     * @var MessageInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $message;
+
+    /**
      * @var ExportHandler|\PHPUnit_Framework_MockObject_MockObject
      */
     private $exportHandler;
@@ -62,6 +72,41 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->importExportResultSummarizer = $this->createMock(ImportExportResultSummarizer::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
+        $this->session = $this->createMock(SessionInterface::class);
+        $this->message = $this->createMock(MessageInterface::class);
+        $messageBody = [
+            'jobId' => '1',
+            'jobName' => 'job-name',
+            'exportType' => 'type',
+            'outputFormat' => 'csv',
+            'email' => 'test@example.com',
+            'notificationTemplate' => 'resultTemplate'
+        ];
+        $this->message
+            ->expects(self::once())
+            ->method('getBody')
+            ->willReturn(json_encode($messageBody));
+
+        $job = new Job();
+        $childJob = new Job();
+        $childJob->setRootJob($job);
+        $job->setChildJobs([$childJob]);
+
+        $this->jobStorage
+            ->expects(self::once())
+            ->method('findJobById')
+            ->willReturn($childJob);
+
+        $this->importExportResultSummarizer
+            ->expects(self::any())
+            ->method('processSummaryExportResultForNotification')
+            ->willReturn([]);
+
+        $this->exportHandler
+            ->expects(self::once())
+            ->method('exportResultFileMerge')
+            ->willReturn('acme_filename');
+
         $this->postExportMessageProcessor = new PostExportMessageProcessor(
             $this->exportHandler,
             $this->messageProducer,
@@ -74,34 +119,6 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessExceptionsAreHandledDuringMerge()
     {
-        $session = $this->createMock(SessionInterface::class);
-        $message = $this->createMock(MessageInterface::class);
-        $messageBody = [
-            'jobId' => '1',
-            'jobName' => 'job-name',
-            'exportType' => 'type',
-            'outputFormat' => 'csv',
-            'email' => 'test@example.com',
-        ];
-        $message
-            ->expects(self::once())
-            ->method('getBody')
-            ->willReturn(json_encode($messageBody));
-
-        $job = $this->createMock(Job::class);
-        $this->jobStorage
-            ->expects(self::once())
-            ->method('findJobById')
-            ->willReturn($job);
-
-        $job->expects(self::once())
-            ->method('isRoot')
-            ->willReturn(true);
-
-        $job->expects(self::once())
-            ->method('getChildJobs')
-            ->willReturn([]);
-
         $exceptionMessage = 'Exception message';
         $exception = new RuntimeException($exceptionMessage);
         $this->exportHandler
@@ -117,11 +134,27 @@ class PostExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 ['exception' => $exception]
             );
 
-        $this->importExportResultSummarizer
-            ->expects(self::never())
-            ->method('processSummaryExportResultForNotification');
+        $this->messageProducer->expects($this->never())->method('send');
+        $this->configManager->expects($this->never())->method('get');
 
-        $result = $this->postExportMessageProcessor->process($message, $session);
+        $result = $this->postExportMessageProcessor->process($this->message, $this->session);
+
+        self::assertSame(MessageProcessorInterface::ACK, $result);
+    }
+
+    public function testProcess()
+    {
+        $this->messageProducer->expects($this->once())->method('send');
+
+        $this->configManager
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls(
+                'oro_notification.email_notification_sender_email',
+                'oro_notification.email_notification_sender_name'
+            );
+
+        $result = $this->postExportMessageProcessor->process($this->message, $this->session);
 
         self::assertSame(MessageProcessorInterface::ACK, $result);
     }

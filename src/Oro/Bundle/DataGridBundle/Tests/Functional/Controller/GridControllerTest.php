@@ -42,6 +42,7 @@ class GridControllerTest extends WebTestCase
 
         $this->assertMessageSent(Topics::PRE_EXPORT, [
             'format' => 'csv',
+            'notificationTemplate' => 'datagrid_export_result',
             'parameters' => [
                 'gridName' => 'audit-grid',
                 'gridParameters' => [
