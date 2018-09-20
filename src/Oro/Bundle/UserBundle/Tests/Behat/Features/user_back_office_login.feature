@@ -15,7 +15,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
-    When I press "Log in"
+    When I click "Log in"
     Then I should be on Admin Dashboard page
 
   Scenario: failing back office login using username with a wrong password
@@ -33,7 +33,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username | charlie@example.com |
       | Password | charlie |
-    When I press "Log in"
+    When I click "Log in"
     Then I should be on Admin Dashboard page
 
   Scenario: failing back office login using email with a wrong password
@@ -42,7 +42,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username | charlie@example.com |
       | Password | charlie@example.com |
-    When I press "Log in"
+    When I click "Log in"
     Then I should see "Your login was unsuccessful. Please check your e-mail address and password before trying again. If you have forgotten your password, follow \"Forgot your password?\" link."
 
   Scenario: failing back office login of nonexistent user
@@ -57,7 +57,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username |  |
       | Password | admin |
-    When I press "Log in"
+    When I click "Log in"
     Then  I am on Login page
 
   Scenario: Check that password field has been filled up
@@ -66,7 +66,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username | admin |
       | Password |  |
-    When I press "Log in"
+    When I click "Log in"
     Then  I am on Login page
 
   Scenario: Check that username and password fields have been filled up
@@ -75,7 +75,7 @@ Feature: User back office login
     And I fill "Login Form" with:
       | Username |  |
       | Password |  |
-    When I press "Log in"
+    When I click "Log in"
     Then  I am on Login page
 
   Scenario: Redirect already logged user

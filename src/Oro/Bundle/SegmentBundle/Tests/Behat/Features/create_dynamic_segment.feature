@@ -7,7 +7,7 @@ Feature: Create dynamic segment
   Scenario Outline: Create segments with Dynamic type
     Given I login as administrator
     And I go to Reports & Segments/ Manage Segments
-    And I press "Create Segment"
+    And I click "Create Segment"
     And I fill "Segment Form" with:
       | Name         | <segment_name> |
       | Entity       | User           |
@@ -26,7 +26,7 @@ Feature: Create dynamic segment
 
   Scenario: Create Dynamic type segment with two segments in filter
     Given I go to Reports & Segments/ Manage Segments
-    And I press "Create Segment"
+    And I click "Create Segment"
     And I fill "Segment Form" with:
       | Name         | Segment with two segments in filter |
       | Entity       | User                                |
