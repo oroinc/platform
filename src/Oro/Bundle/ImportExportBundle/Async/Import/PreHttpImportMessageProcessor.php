@@ -10,8 +10,11 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Responsible for splitting import process triggered from UI into a set of independent jobs each processing its own
+ * chunk of data to be run in parallel. Notifies user by email if import error occurs.
+ */
 class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
 {
     /**
@@ -142,11 +145,12 @@ class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
             return;
         }
 
+        $sender = $this->notificationSettings->getSender();
         $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
-            'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
-            'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
+            'sender' => $sender->toArray(),
             'toEmail' => $user->getEmail(),
             'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
+            'recipientUserId' => $user->getId(),
             'body' => [
                 'originFileName' => $body['originFileName'],
                 'error' =>  'The import file could not be imported due to a fatal error. ' .
