@@ -83,6 +83,8 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_locale.settings'
+        calls:
+            - [setLocalizationManager, ['@oro_locale.manager.localization']]
         tags:
             - { name: form.type, alias: oro_email_emailtemplate }
 

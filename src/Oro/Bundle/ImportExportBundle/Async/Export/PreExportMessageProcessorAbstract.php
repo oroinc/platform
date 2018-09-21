@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Responsible for distribution job and creating dependent job
+ * A base class for entities related and grid related PreExportMessageProcessors.
  */
 abstract class PreExportMessageProcessorAbstract implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -172,6 +172,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         $context->addDependentJob(Topics::POST_EXPORT, [
             'jobId' => $rootJob->getId(),
             'email' => $this->getUser()->getEmail(),
+            'recipientUserId' => $this->getUser()->getId(),
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],
             'outputFormat' => $body['outputFormat'],

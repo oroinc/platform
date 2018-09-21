@@ -165,7 +165,7 @@ class PriceTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var $optionsResolverMock OptionsResolver|\PHPUnit_Framework_MockObject_MockObject */
+        /** @var $optionsResolverMock OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
         $optionsResolverMock = $this->getMockBuilder(OptionsResolver::class)
             ->disableOriginalConstructor()
             ->getMock();

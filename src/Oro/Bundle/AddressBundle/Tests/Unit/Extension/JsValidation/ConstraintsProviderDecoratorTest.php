@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConstraintsProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConstraintsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $provider;
 
@@ -36,7 +36,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form
             ->expects($this->any())
@@ -55,7 +55,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form
             ->expects($this->any())
@@ -74,7 +74,7 @@ class ConstraintsProviderDecoratorTest extends \PHPUnit\Framework\TestCase
             ->method('getFormConstraints')
             ->willReturn($constraints);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form
             ->expects($this->any())

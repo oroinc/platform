@@ -5,9 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Entity\Repository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithSameEmailInLowercase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class UserRepositoryTest extends WebTestCase
 {
     /** @var UserRepository */
@@ -17,8 +21,8 @@ class UserRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->repository = $this->getContainer()
-            ->get('doctrine')
+        $this->repository = self::getContainer()->get('doctrine')
+            ->getManagerForClass(User::class)
             ->getRepository(User::class);
     }
 
@@ -54,5 +58,30 @@ class UserRepositoryTest extends WebTestCase
             [LoadUsersWithSameEmailInLowercase::EMAIL],
             $this->repository->findLowercaseDuplicatedEmails(10)
         );
+    }
+
+    public function testFindEnabledUserEmails()
+    {
+        $this->loadFixtures([LoadUserData::class]);
+
+        $result = $this->repository->findEnabledUserEmails();
+        self::assertCount(4, $result);
+
+        /**
+         * @var User $adminUser
+         * @var User $simpleUser
+         * @var User $simpleUser2
+         * @var User $userWithConfirmationToken
+         */
+        $adminUser = $this->repository->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
+        $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
+        $simpleUser2 = $this->getReference(LoadUserData::SIMPLE_USER_2);
+        $userWithConfirmationToken = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
+        self::assertEquals([
+            ['id' => $adminUser->getId(), 'email' => $adminUser->getEmail()],
+            ['id' => $simpleUser->getId(), 'email' => $simpleUser->getEmail()],
+            ['id' => $simpleUser2->getId(), 'email' => $simpleUser2->getEmail()],
+            ['id' => $userWithConfirmationToken->getId(), 'email' => $userWithConfirmationToken->getEmail()],
+        ], $result);
     }
 }

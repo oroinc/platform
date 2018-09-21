@@ -354,11 +354,13 @@ services:
     oro_user.mailer.processor:
         class: '%oro_user.mailer.processor.class%'
         arguments:
-            - '@doctrine'
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@oro_email.email_holder_helper'
-            - '@oro_email.direct_mailer'
+            - '@oro_user.mailer.user_template_email_sender'
+
+    oro_user.mailer.user_template_email_sender:
+        class: 'Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender'
+        arguments:
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
 
     oro_user.placeholder.filter:
         class: '%oro_user.placeholder.filter.class%'
@@ -575,3 +577,12 @@ services:
             - 'oro_user.login.errors.bad_credentials'
         tags:
             - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
+
+    oro_user.provider.user_preferred_language_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_config.user'
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider }

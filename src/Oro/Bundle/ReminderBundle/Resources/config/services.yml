@@ -3,7 +3,6 @@ parameters:
     oro_reminder.entity.manager.class:            Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager
     oro_reminder.sender.class:                    Oro\Bundle\ReminderBundle\Model\ReminderSender
     oro_reminder.send_processor_registry.class:   Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
-    oro_reminder.model.email_notification.class:  Oro\Bundle\ReminderBundle\Model\Email\EmailNotification
     oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
     oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
     oro_reminder.web_socket.message_params_provider.class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
@@ -35,18 +34,11 @@ services:
         arguments:
             - []
 
-    oro_reminder.model.email_notification:
-        class: '%oro_reminder.model.email_notification.class%'
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_entity_config.provider.reminder'
-            - '@oro_entity.entity_name_resolver'
-
     oro_reminder.send_processor.email:
         class: '%oro_reminder.send_processor.email.class%'
         arguments:
             - '@oro_notification.manager.email_notification'
-            - '@oro_reminder.model.email_notification'
+            - '@oro_reminder.model.template_email_notification'
             - '@event_dispatcher'
         tags:
             - { name: oro_reminder.send_processor }
@@ -90,3 +82,10 @@ services:
             - '@gos_web_socket.websocket.client_manipulator'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_reminder.model.template_email_notification:
+         class: Oro\Bundle\ReminderBundle\Model\Email\TemplateEmailNotification
+         arguments:
+             - '@doctrine.orm.entity_manager'
+             - '@oro_entity_config.provider.reminder'
+             - '@oro_entity.entity_name_resolver'
