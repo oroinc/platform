@@ -4,10 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,6 +35,9 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var EmailNotificationManager|\PHPUnit_Framework_MockObject_MockObject */
     private $manager;
 
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    private $eventDispatcher;
+
     /** @var WorkflowNotificationHandler */
     private $handler;
 
@@ -42,7 +46,9 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->entity = new \stdClass();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
+        $this->event->expects($this->any())->method('getDispatcher')->willReturn($this->eventDispatcher);
         $this->event->expects($this->any())->method('getEntity')->willReturn($this->entity);
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
@@ -64,11 +70,12 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $expected = array_map(
             function (EmailNotification $notification) {
-                return new EmailNotificationAdapter(
+                return new TemplateEmailNotificationAdapter(
                     $this->entity,
                     $notification,
                     $this->em,
-                    new PropertyAccessor()
+                    new PropertyAccessor(),
+                    $this->eventDispatcher
                 );
             },
             $expected

@@ -5,7 +5,10 @@ namespace Oro\Bundle\UserBundle\Mailer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
@@ -26,6 +29,9 @@ class BaseProcessor
 
     /** @var \Swift_Mailer */
     protected $mailer;
+
+    /** @var TemplateEmailManager */
+    protected $templateEmailManager;
 
     /**
      * @param ManagerRegistry   $managerRegistry
@@ -60,6 +66,15 @@ class BaseProcessor
         $emailTemplateName,
         array $emailTemplateParams = []
     ) {
+        if ($this->templateEmailManager) {
+            return $this->templateEmailManager->sendTemplateEmail(
+                From::emailAddress($this->getSenderEmail($user), $this->getSenderName($user)),
+                [$user],
+                new EmailTemplateCriteria($emailTemplateName),
+                $emailTemplateParams
+            );
+        }
+
         $emailTemplate = $this->findEmailTemplateByName($emailTemplateName);
 
         return $this->sendEmail(
@@ -67,6 +82,14 @@ class BaseProcessor
             $this->renderer->compileMessage($emailTemplate, $emailTemplateParams),
             $this->getEmailTemplateType($emailTemplate)
         );
+    }
+
+    /**
+     * @param TemplateEmailManager $templateEmailManager
+     */
+    public function setTemplateEmailManager(TemplateEmailManager $templateEmailManager): void
+    {
+        $this->templateEmailManager = $templateEmailManager;
     }
 
     /**

@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSenderInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
@@ -20,6 +23,9 @@ class EmailNotificationSender implements NotificationSenderInterface
 
     /** @var \Swift_Mailer */
     private $mailer;
+
+    /** @var TemplateEmailManager */
+    private $templateEmailManager;
 
     /** @var EmailRenderer */
     protected $renderer;
@@ -46,6 +52,14 @@ class EmailNotificationSender implements NotificationSenderInterface
     }
 
     /**
+     * @param TemplateEmailManager $templateEmailManager
+     */
+    public function setTemplateEmailManager(TemplateEmailManager $templateEmailManager): void
+    {
+        $this->templateEmailManager = $templateEmailManager;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function sendNotification(UserEmailOrigin $emailOrigin)
@@ -56,23 +70,55 @@ class EmailNotificationSender implements NotificationSenderInterface
         $originOwner = $emailOrigin->getOwner();
         if ($originOwner) {
             $templateName = 'sync_wrong_credentials_user_box';
-            $sendTo = $emailOrigin->getOwner()->getEmail();
+            $sendTo = $emailOrigin->getOwner();
         } else {
             $templateName = 'sync_wrong_credentials_system_box';
-            $sendTo = $emailOrigin->getMailbox()->getEmail();
+            $sendTo = $emailOrigin->getMailbox();
         }
 
-        $template = $this->doctrine
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class)
-            ->findOneBy(['name' => $templateName]);
+        $templateCondition = [
+            'name' => $templateName
+        ];
 
-        $templateData = [
+        $templateParameters = [
             'username' => $emailOrigin->getUser(),
             'host' => $emailOrigin->getImapHost()
         ];
 
-        list($subjectRendered, $templateRendered) = $this->renderer->compileMessage($template, $templateData);
+        if ($this->templateEmailManager) {
+            $this->templateEmailManager->sendTemplateEmail(
+                From::emailAddress($senderEmail, $senderName),
+                [$sendTo],
+                new EmailTemplateCriteria($templateName),
+                $templateParameters
+            );
+        } else {
+            $this->sendEmail($templateCondition, $templateParameters, $senderEmail, $senderName, $sendTo->getEmail());
+        }
+    }
+
+    /**
+     * @deprecated since 2.6. Will be removed in 3.0
+     *
+     * @param array $templateCondition
+     * @param array $templateParameters
+     * @param string $senderEmail
+     * @param string $senderName
+     * @param string $sendTo
+     */
+    private function sendEmail(
+        array $templateCondition,
+        array $templateParameters,
+        $senderEmail,
+        $senderName,
+        $sendTo
+    ) {
+        $template = $this->doctrine
+            ->getManagerForClass(EmailTemplate::class)
+            ->getRepository(EmailTemplate::class)
+            ->findOneBy($templateCondition);
+
+        list($subjectRendered, $templateRendered) = $this->renderer->compileMessage($template, $templateParameters);
         $message = \Swift_Message::newInstance()
             ->setSubject($subjectRendered)
             ->setFrom($senderEmail, $senderName)

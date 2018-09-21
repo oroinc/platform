@@ -45,4 +45,18 @@ class BaseProcessorTest extends AbstractProcessorTest
             ]
         ];
     }
+
+    public function testSendEmailWhenTemplateEmailManagerSet(): void
+    {
+        $user = new User();
+        $returnValue = 1;
+        $templateEmailManager = $this->confgureTemplateEmailManagerExpectations($user, 1);
+
+        $this->mailProcessor->setTemplateEmailManager($templateEmailManager);
+
+        self::assertEquals(
+            $returnValue,
+            $this->mailProcessor->getEmailTemplateAndSendEmail($user, self::TEMPLATE_NAME, ['entity' => $user])
+        );
+    }
 }

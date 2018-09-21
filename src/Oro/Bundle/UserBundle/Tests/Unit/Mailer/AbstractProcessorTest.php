@@ -7,15 +7,20 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Manager\TemplateEmailManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Mailer\BaseProcessor;
 
 abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
 {
     const FROM_EMAIL = 'email_from@example.com';
     const FROM_NAME = 'From Name';
+    const TEMPLATE_NAME = 'email_template_name';
 
     /** @var EmailTemplateRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectRepository;
@@ -204,5 +209,30 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param int $returnValue
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function confgureTemplateEmailManagerExpectations(
+        UserInterface $user,
+        int $returnValue
+    ): \PHPUnit_Framework_MockObject_MockObject {
+        $templateEmailManager = $this->createMock(TemplateEmailManager::class);
+
+        $templateEmailManager
+            ->expects($this->once())
+            ->method('sendTemplateEmail')
+            ->with(
+                From::emailAddress(self::FROM_EMAIL, self::FROM_NAME),
+                [$user],
+                new EmailTemplateCriteria(self::TEMPLATE_NAME),
+                ['entity' => $user]
+            )
+            ->willReturn($returnValue);
+
+        return $templateEmailManager;
     }
 }

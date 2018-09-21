@@ -52,6 +52,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     private $configManager;
 
     /**
+     * @var int
+     */
+    private $recipientUserId;
+
+    /**
      * @param ExportHandler $exportHandler
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
@@ -119,7 +124,8 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         if ($fileName !== null) {
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate']);
+            $this->recipientUserId = $body['recipientUserId'] ?? null;
+            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
 
             $this->logger->info('Sent notification email.');
         }
@@ -165,6 +171,10 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
             'contentType' => 'text/html',
             'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ];
+
+        if ($this->recipientUserId) {
+            $message['recipientUserId'] = $this->recipientUserId;
+        }
 
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,

@@ -262,12 +262,15 @@ class LocaleSettings
     public function getLanguage()
     {
         if (null === $this->language) {
-            $this->language = $this->configManager->get('oro_locale.language');
-            if (!$this->language) {
-                $this->language = LocaleConfiguration::DEFAULT_LANGUAGE;
-            }
+            $this->language = $this->getLanguageConfigurationValue();
         }
+
         return $this->language;
+    }
+
+    public function getActualLanguage()
+    {
+        return $this->getLanguageConfigurationValue();
     }
 
     /**
@@ -508,5 +511,15 @@ class LocaleSettings
     public function getFirstQuarterDay()
     {
         return $this->get('oro_locale.quarter_start')['day'];
+    }
+
+    /**
+     * @return string
+     */
+    private function getLanguageConfigurationValue(): string
+    {
+        $language = $this->configManager->get('oro_locale.language');
+
+        return $language ?? LocaleConfiguration::DEFAULT_LANGUAGE;
     }
 }

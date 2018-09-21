@@ -15,6 +15,8 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
  */
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_MASS_NOTIFICATION_TEMPLATE = 'system_maintenance';
+
     /**
      * {@inheritDoc}
      */
@@ -28,7 +30,7 @@ class Configuration implements ConfigurationInterface
             [
                 'email_notification_sender_email' => ['value' => sprintf('no-reply@%s.example', gethostname())],
                 'email_notification_sender_name'  => ['value' => 'Oro'],
-                'mass_notification_template'      => ['value' => 'system_maintenance'],
+                'mass_notification_template'      => ['value' => self::DEFAULT_MASS_NOTIFICATION_TEMPLATE],
                 'mass_notification_recipients'    => ['value' => '']
             ]
         );
