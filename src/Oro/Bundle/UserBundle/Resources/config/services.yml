@@ -96,11 +96,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
-    oro_user.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_user' ] ]
-
     oro_user.user_menu:
         class:                        '%oro_user.user_menu.builder.class%'
         tags:

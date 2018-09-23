@@ -11,6 +11,9 @@ use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * The provider for configuration of datagrids used to show reports.
+ */
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
     /**
@@ -74,9 +77,8 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     {
         $cacheKey = $this->getCacheKey($gridName);
 
-        if ($this->reportCacheManager->contains($cacheKey)) {
-            $config = $this->reportCacheManager->fetch($cacheKey);
-        } else {
+        $config = $this->reportCacheManager->fetch($cacheKey);
+        if (false === $config) {
             $config = $this->prepareConfiguration($gridName);
             $this->reportCacheManager->save($cacheKey, $config);
         }
