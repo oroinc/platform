@@ -98,6 +98,7 @@ services:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
     oro_user.cache:
+        deprecated: The "%service_id%" service is never used and will be removed in 3.1
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_user' ] ]

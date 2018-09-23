@@ -103,7 +103,7 @@ class EventTriggerCache
      */
     protected function isBuilt()
     {
-        return $this->provider->contains(self::BUILT) && $this->provider->fetch(self::BUILT);
+        return true === $this->provider->fetch(self::BUILT);
     }
 
     /**
