@@ -7,6 +7,9 @@ use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * The search mapping provider.
+ */
 class SearchMappingProvider extends AbstractSearchMappingProvider
 {
     const CACHE_KEY = 'oro_search.mapping_config';
@@ -50,8 +53,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider
             return $this->processedConfig;
         }
 
-        if ($this->cache->contains(static::CACHE_KEY)) {
-            $this->processedConfig = $this->cache->fetch(static::CACHE_KEY);
+        $cachedConfig = $this->cache->fetch(static::CACHE_KEY);
+        if (false !== $cachedConfig) {
+            $this->processedConfig = $cachedConfig;
 
             return $this->processedConfig;
         }

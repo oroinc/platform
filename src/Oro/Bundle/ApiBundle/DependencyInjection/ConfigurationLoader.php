@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -266,7 +267,7 @@ class ConfigurationLoader
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $this->container
-            ->setDefinition($cacheServiceId, new ChildDefinition('oro.cache.abstract.without_memory_cache'))
+            ->setDefinition($cacheServiceId, new ChildDefinition(CacheConfiguration::DATA_CACHE_NO_MEMORY_SERVICE))
             ->setPublic(false)
             ->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);
 

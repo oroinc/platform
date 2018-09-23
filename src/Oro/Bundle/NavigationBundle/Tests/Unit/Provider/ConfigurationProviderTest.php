@@ -45,8 +45,9 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache
             ->expects($this->once())
-            ->method('contains')
-            ->with(ConfigurationProvider::CACHE_KEY);
+            ->method('fetch')
+            ->with(ConfigurationProvider::CACHE_KEY)
+            ->willReturn(false);
 
         $this->assertEquals(
             $expectedResult,
