@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -17,6 +17,10 @@ use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Responsible for sending different types of notifications related to import process such as import result and
+ * validation result notifications.
+ */
 class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -40,9 +44,9 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $importJobSummaryResultService;
 
     /**
-     * @var ConfigManager
+     * @var NotificationSettings
      */
-    private $configManager;
+    private $notificationSettings;
 
     /**
      * @var RegistryInterface
@@ -50,11 +54,16 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $doctrine;
 
     /**
+     * @var int
+     */
+    private $recipientUserId;
+
+    /**
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      * @param JobStorage $jobStorage
      * @param ImportExportResultSummarizer $importJobSummaryResultService
-     * @param ConfigManager $configManager
+     * @param NotificationSettings $notificationSettings
      * @param RegistryInterface $doctrine
      */
     public function __construct(
@@ -62,14 +71,14 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         LoggerInterface $logger,
         JobStorage $jobStorage,
         ImportExportResultSummarizer $importJobSummaryResultService,
-        ConfigManager $configManager,
+        NotificationSettings $notificationSettings,
         RegistryInterface $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;
         $this->jobStorage = $jobStorage;
         $this->importJobSummaryResultService = $importJobSummaryResultService;
-        $this->configManager = $configManager;
+        $this->notificationSettings = $notificationSettings;
         $this->doctrine = $doctrine;
     }
 
@@ -94,6 +103,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
+        $this->recipientUserId = null;
         if (! isset($body['notifyEmail']) || ! $body['notifyEmail']) {
             $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
             if (! $user instanceof User) {
@@ -103,6 +113,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
 
                 return self::REJECT;
             }
+            $this->recipientUserId = $user->getId();
             $notifyEmail = $user->getEmail();
         } else {
             $notifyEmail = $body['notifyEmail'];
@@ -137,14 +148,18 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     protected function sendNotification($toEmail, $template, array $body)
     {
+        $sender = $this->notificationSettings->getSender();
         $message = [
-            'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
-            'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
+            'sender' => $sender->toArray(),
             'toEmail' => $toEmail,
             'body' => $body,
             'contentType' => 'text/html',
             'template' => $template,
         ];
+
+        if ($this->recipientUserId) {
+            $message['recipientUserId'] = $this->recipientUserId;
+        }
 
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,

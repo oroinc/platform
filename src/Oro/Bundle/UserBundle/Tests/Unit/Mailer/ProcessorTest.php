@@ -4,81 +4,98 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Mailer\Processor;
+use Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class ProcessorTest extends AbstractProcessorTest
+class ProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Processor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mailProcessor;
+    /**
+     * @var User
+     */
+    private $user;
 
-    /** @var User */
-    protected $user;
+    /**
+     * @var UserTemplateEmailSender|MockObject
+     */
+    private $userTemplateEmailSender;
+
+    /**
+     * @var Processor
+     */
+    private $mailProcessor;
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->user = new User();
         $this->user
             ->setEmail('email_to@example.com')
             ->setPlainPassword('TestPassword');
 
-        $this->mailProcessor = new Processor(
-            $this->managerRegistry,
-            $this->configManager,
-            $this->renderer,
-            $this->emailHolderHelper,
-            $this->mailer
-        );
+        $this->userTemplateEmailSender = $this->createMock(UserTemplateEmailSender::class);
+        $this->mailProcessor = new Processor($this->userTemplateEmailSender);
     }
 
-    protected function tearDown()
+    public function testSendChangePasswordEmail(): void
     {
-        parent::tearDown();
+        $returnValue = 1;
+        $this->userTemplateEmailSender
+            ->expects($this->once())
+            ->method('sendUserTemplateEmail')
+            ->with(
+                $this->user,
+                Processor::TEMPLATE_USER_CHANGE_PASSWORD,
+                ['entity' => $this->user, 'plainPassword' => $this->user->getPlainPassword()]
+            )
+            ->willReturn($returnValue);
 
-        unset($this->user);
+        self::assertEquals($returnValue, $this->mailProcessor->sendChangePasswordEmail($this->user));
     }
 
-    public function testSendChangePasswordEmail()
+    public function testSendResetPasswordEmail(): void
     {
-        $this->assertSendCalled(
-            Processor::TEMPLATE_USER_CHANGE_PASSWORD,
-            ['entity' => $this->user, 'plainPassword' => $this->user->getPlainPassword()],
-            $this->buildMessage($this->user->getEmail())
-        );
+        $returnValue = 1;
+        $this->userTemplateEmailSender
+            ->expects($this->once())
+            ->method('sendUserTemplateEmail')
+            ->with(
+                $this->user,
+                Processor::TEMPLATE_USER_RESET_PASSWORD,
+                ['entity' => $this->user]
+            )
+            ->willReturn($returnValue);
 
-        $this->mailProcessor->sendChangePasswordEmail($this->user);
+        self::assertEquals($returnValue, $this->mailProcessor->sendResetPasswordEmail($this->user));
     }
 
-    public function testSendResetPasswordEmail()
+    public function testSendResetPasswordAsAdminEmail(): void
     {
-        $this->assertSendCalled(
-            Processor::TEMPLATE_USER_RESET_PASSWORD,
-            ['entity' => $this->user],
-            $this->buildMessage($this->user->getEmail())
-        );
+        $returnValue = 1;
+        $this->userTemplateEmailSender
+            ->expects($this->once())
+            ->method('sendUserTemplateEmail')
+            ->with(
+                $this->user,
+                Processor::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
+                ['entity' => $this->user]
+            )
+            ->willReturn($returnValue);
 
-        $this->mailProcessor->sendResetPasswordEmail($this->user);
+        self::assertEquals($returnValue, $this->mailProcessor->sendResetPasswordAsAdminEmail($this->user));
     }
 
-    public function testSendResetPasswordAsAdminEmail()
+    public function testSendForcedResetPasswordAsAdminEmail(): void
     {
-        $this->assertSendCalled(
-            Processor::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
-            ['entity' => $this->user],
-            $this->buildMessage($this->user->getEmail())
-        );
+        $returnValue = 1;
+        $this->userTemplateEmailSender
+            ->expects($this->once())
+            ->method('sendUserTemplateEmail')
+            ->with(
+                $this->user,
+                Processor::TEMPLATE_FORCE_RESET_PASSWORD,
+                ['entity' => $this->user]
+            )
+            ->willReturn($returnValue);
 
-        $this->mailProcessor->sendResetPasswordAsAdminEmail($this->user);
-    }
-
-    public function testSendForcedResetPasswordAsAdminEmail()
-    {
-        $this->assertSendCalled(
-            Processor::TEMPLATE_FORCE_RESET_PASSWORD,
-            ['entity' => $this->user],
-            $this->buildMessage($this->user->getEmail())
-        );
-
-        $this->mailProcessor->sendForcedResetPasswordAsAdminEmail($this->user);
+        self::assertEquals($returnValue, $this->mailProcessor->sendForcedResetPasswordAsAdminEmail($this->user));
     }
 }

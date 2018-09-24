@@ -98,6 +98,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
 
         self::assertNotEmpty($sentMessages, 'There are no sent messages');
 
+        $found = false;
         /** @var \Swift_Mime_Message $message */
         foreach ($sentMessages as $message) {
             foreach ($expectedRows as $expectedContent) {
@@ -106,14 +107,31 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                     $this->getMessageData($message, $expectedContent['field'])
                 );
                 if ($found === false) {
-                    self::assertNotFalse(
-                        $found,
-                        "Sent emails don't contain expected data for field: {$expectedContent['field']}
-                         and pattern: {$expectedContent['pattern']}"
-                    );
-                    break 2;
+                    break;
                 }
             }
+
+            if ($found) {
+                break;
+            }
+        }
+
+        if (!$found) {
+            $messagesData = [];
+            foreach ($mailer->getSentMessages() as $message) {
+                $item = [];
+                foreach ($expectedRows as $expectedContent) {
+                    $item[$expectedContent['field']] = $this->getMessageData($message, $expectedContent['field']);
+                }
+                $messagesData[] = $item;
+            }
+
+            self::fail(
+                sprintf(
+                    'Sent emails don\'t contain expected data. The following messages has been sent: %s',
+                    print_r($messagesData, true)
+                )
+            );
         }
     }
 

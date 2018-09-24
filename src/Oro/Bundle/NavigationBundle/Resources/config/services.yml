@@ -42,11 +42,6 @@ parameters:
     oro_navigation.menu_update.scope_type:                     menu_default_visibility
 
 services:
-    oro_menu.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_menu' ] ]
-
     oro_menu_acl_extension:
         class: '%oro_menu.factory.acl_extension.class%'
         arguments:

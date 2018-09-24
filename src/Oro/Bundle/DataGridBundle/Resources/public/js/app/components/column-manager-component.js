@@ -54,6 +54,14 @@ define(function(require) {
         columnManagerView: ColumnManagerView,
 
         /**
+         * Contains a snapshot of columns state which is created when grid.collection is loaded.
+         * Used in _onColumnManagerHide() to detect whether it is needed to refresh grid to fetch new columns.
+         *
+         * @type {Object|null}
+         */
+        _defaultState: null,
+
+        /**
          * @inheritDoc
          */
         constructor: function ColumnManagerComponent() {
@@ -84,6 +92,8 @@ define(function(require) {
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
+            this.defaultState = tools.deepClone(this.grid.collection.state);
+
             ColumnManagerComponent.__super__.initialize.apply(this, arguments);
         },
 
@@ -106,6 +116,7 @@ define(function(require) {
          */
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
+            this.listenTo(this.grid.collection, 'sync', this._onSync);
             this.listenTo(this.managedColumns, 'change:renderable', this._pushState);
             this.listenTo(this.managedColumns, 'sort', function() {
                 this.columns.sort();
@@ -128,6 +139,7 @@ define(function(require) {
                 collection: this.managedColumns,
                 columnFilterModel: this.columnFilterModel
             });
+            this.listenTo(this.columnManagerView, 'column-manager:hide', this._onColumnManagerHide);
 
             if (this.enableFilters) {
                 this.columnFilterView = new ColumnFilterView({
@@ -235,6 +247,51 @@ define(function(require) {
             }, this);
 
             return state;
+        },
+
+        /**
+         * Creates a snapshot of grid.collection state.
+         *
+         * @protected
+         */
+        _onSync: function() {
+            this.defaultState = tools.deepClone(this.grid.collection.state);
+        },
+
+        /**
+         * Makes the datagrid collection to refresh if new columns were added.
+         *
+         * @protected
+         */
+        _onColumnManagerHide: function() {
+            if (!this._isRefreshNeeded(this.defaultState)) {
+                // do not refresh collection if no new columns were added.
+                return;
+            }
+
+            this._refreshCollection();
+        },
+
+        /**
+         * Compares previous and new state and returns true if new columns are found in new state.
+         *
+         * @param {Object} previousState State object to compare current state with.
+         * @returns {boolean}
+         * @protected
+         */
+        _isRefreshNeeded: function(previousState) {
+            return _.filter(this._createState(), function(columnState, columnName) {
+                return columnState.renderable && !previousState.columns[columnName].renderable;
+            }).length > 0;
+        },
+
+        /**
+         * @protected
+         */
+        _refreshCollection: function() {
+            this.grid.setAdditionalParameter('refresh', true);
+            this.grid.collection.fetch({reset: true});
+            this.grid.removeAdditionalParameter('refresh');
         }
     });
 

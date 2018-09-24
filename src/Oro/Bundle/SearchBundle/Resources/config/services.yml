@@ -196,9 +196,16 @@ services:
             - [setMappingConfig, ['%oro_search.entities_config%']]
 
     oro_search.cache.doctrine_metadata:
-        parent: oro.cache.abstract
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'doctrine_metadata_search' ] ]
+
+    oro_search.cache.doctrine_query:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'doctrine_query_search' ] ]
 
     oro_search.entity.repository.search_index:
         class: '%oro_search.entity.repository.search_index.class%'

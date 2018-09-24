@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
 
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -94,8 +95,8 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 ],
             ],
             [
-                'fromEmail' => $this->emailNotificationSenderEmail,
-                'fromName' => $this->emailNotificationSenderName,
+                'sender' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
+                    ->toArray(),
                 'toEmail' => 'admin@example.com',
                 'body' => [
                     'data' => [
@@ -114,6 +115,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                         'downloadLogUrl' => '',
                     ],
                 ],
+                'recipientUserId' => 1,
                 'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
@@ -158,8 +160,8 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 ],
             ],
             [
-                'fromEmail' => $this->emailNotificationSenderEmail,
-                'fromName' => $this->emailNotificationSenderName,
+                'sender' => From::emailAddress($this->emailNotificationSenderEmail, $this->emailNotificationSenderName)
+                    ->toArray(),
                 'toEmail' => 'admin@example.com',
                 'body' => [
                     'data' => [
@@ -178,6 +180,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                         'downloadLogUrl' => '',
                     ],
                 ],
+                'recipientUserId' => 1,
                 'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]

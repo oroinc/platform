@@ -29,6 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class ConfigManager
 {
@@ -656,9 +657,34 @@ class ConfigManager
     {
         $configKey = $this->buildConfigKey($config->getId());
 
-        return isset($this->configChangeSets[$configKey])
-            ? $this->configChangeSets[$configKey]
-            : [];
+        return $this->configChangeSets[$configKey] ?? [];
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     *
+     * @return array [old_value, new_value] or empty array
+     */
+    public function getEntityConfigChangeSet($scope, $className)
+    {
+        $configKey = $this->buildEntityConfigKey($scope, $className);
+
+        return $this->configChangeSets[$configKey] ?? [];
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return array [old_value, new_value] or empty array
+     */
+    public function getFieldConfigChangeSet($scope, $className, $fieldName)
+    {
+        $configKey = $this->buildFieldConfigKey($scope, $className, $fieldName);
+
+        return $this->configChangeSets[$configKey] ?? [];
     }
 
     /**
@@ -1207,8 +1233,35 @@ class ConfigManager
     protected function buildConfigKey(ConfigIdInterface $configId)
     {
         return $configId instanceof FieldConfigId
-            ? $configId->getScope() . '.' . $configId->getClassName() . '.' . $configId->getFieldName()
-            : $configId->getScope() . '.' . $configId->getClassName();
+            ? $this->buildFieldConfigKey($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
+            : $this->buildEntityConfigKey($configId->getScope(), $configId->getClassName());
+    }
+
+    /**
+     * Returns a string unique identifies each entity config item
+     *
+     * @param string $scope
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function buildEntityConfigKey($scope, $className)
+    {
+        return $scope . '.' . $className;
+    }
+
+    /**
+     * Returns a string unique identifies each field config item
+     *
+     * @param string $scope
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    protected function buildFieldConfigKey($scope, $className, $fieldName)
+    {
+        return $scope . '.' . $className . '.' . $fieldName;
     }
 
     /**

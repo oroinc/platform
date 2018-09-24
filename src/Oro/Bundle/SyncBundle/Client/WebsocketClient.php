@@ -4,9 +4,10 @@ namespace Oro\Bundle\SyncBundle\Client;
 
 use Gos\Component\WebSocketClient\Exception\BadResponseException;
 use Gos\Component\WebSocketClient\Exception\WebsocketException;
-use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
+use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 /**
@@ -14,54 +15,31 @@ use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
  */
 class WebsocketClient implements WebsocketClientInterface
 {
-    /** @var GosClientFactoryInterface */
-    private $gosClientFactory;
+    /** @var WampClientFactoryInterface */
+    private $wampClientFactory;
+
+    /** @var ClientAttributes */
+    private $clientAttributes;
 
     /** @var TicketProviderInterface */
     private $ticketProvider;
 
-    /** @var string */
-    private $host;
-
-    /** @var int */
-    private $port;
-
-    /** @var string */
-    private $path;
-
-    /** @var bool */
-    private $secured;
-
-    /** @var GosClient */
-    private $gosClient;
+    /** @var WampClient */
+    private $wampClient;
 
     /**
-     * @param GosClientFactoryInterface $gosClientFactory
+     * @param WampClientFactoryInterface $wampClientFactory
+     * @param ClientAttributes $clientAttributes
      * @param TicketProviderInterface $ticketProvider
-     * @param string $host
-     * @param string|int $port
-     * @param string $path
-     * @param bool $secured
      */
     public function __construct(
-        GosClientFactoryInterface $gosClientFactory,
-        TicketProviderInterface $ticketProvider,
-        string $host,
-        $port,
-        string $path = '',
-        bool $secured = false
+        WampClientFactoryInterface $wampClientFactory,
+        ClientAttributes $clientAttributes,
+        TicketProviderInterface $ticketProvider
     ) {
-        $this->gosClientFactory = $gosClientFactory;
+        $this->wampClientFactory = $wampClientFactory;
+        $this->clientAttributes = $clientAttributes;
         $this->ticketProvider = $ticketProvider;
-
-        if ('*' === $host) {
-            $host = '127.0.0.1';
-        }
-
-        $this->host = $host;
-        $this->port = (int)$port;
-        $this->path = '/' . ltrim($path, '/');
-        $this->secured = $secured;
     }
 
     /**
@@ -72,12 +50,12 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function connect(): ?string
     {
-        $urlInfo = parse_url($this->path) + ['path' => '', 'query' => ''];
+        $urlInfo = parse_url($this->clientAttributes->getPath()) + ['path' => '', 'query' => ''];
         parse_str($urlInfo['query'], $query);
         $query['ticket'] = $this->ticketProvider->generateTicket();
         $pathWithTicket = sprintf('%s?%s', $urlInfo['path'], http_build_query($query));
 
-        return $this->getGosClient()->connect($pathWithTicket);
+        return $this->getWampClient()->connect($pathWithTicket);
     }
 
     /**
@@ -85,7 +63,7 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function disconnect(): bool
     {
-        return $this->getGosClient()->disconnect();
+        return $this->getWampClient()->disconnect();
     }
 
     /**
@@ -93,7 +71,7 @@ class WebsocketClient implements WebsocketClientInterface
      */
     public function isConnected(): bool
     {
-        return $this->getGosClient()->isConnected();
+        return $this->getWampClient()->isConnected();
     }
 
     /**
@@ -108,7 +86,7 @@ class WebsocketClient implements WebsocketClientInterface
         $this->validatePayload($payload);
         $this->ensureClientConnected();
 
-        $this->getGosClient()->publish($topicUri, $payload, $exclude, $eligible);
+        $this->getWampClient()->publish($topicUri, $payload, $exclude, $eligible);
 
         return true;
     }
@@ -122,7 +100,7 @@ class WebsocketClient implements WebsocketClientInterface
     public function prefix(string $prefix, string $uri): bool
     {
         $this->ensureClientConnected();
-        $this->getGosClient()->prefix($prefix, $uri);
+        $this->getWampClient()->prefix($prefix, $uri);
 
         return true;
     }
@@ -136,7 +114,7 @@ class WebsocketClient implements WebsocketClientInterface
     public function call(string $procUri, array $arguments = []): bool
     {
         $this->ensureClientConnected();
-        $this->getGosClient()->call($procUri, $arguments);
+        $this->getWampClient()->call($procUri, $arguments);
 
         return true;
     }
@@ -153,27 +131,21 @@ class WebsocketClient implements WebsocketClientInterface
         $this->validatePayload($payload);
         $this->ensureClientConnected();
 
-        $this->getGosClient()->event($topicUri, $payload);
+        $this->getWampClient()->event($topicUri, $payload);
 
         return true;
     }
 
     /**
-     * @return GosClient
+     * @return WampClient
      */
-    private function getGosClient(): GosClient
+    private function getWampClient(): WampClient
     {
-        if (!$this->gosClient) {
-            $this->gosClient = $this->gosClientFactory->createGosClient(
-                $this->host,
-                $this->port,
-                $this->secured,
-                // We don't have to check origin when connecting from backend.
-                '127.0.0.1'
-            );
+        if (!$this->wampClient) {
+            $this->wampClient = $this->wampClientFactory->createClient($this->clientAttributes);
         }
 
-        return $this->gosClient;
+        return $this->wampClient;
     }
 
     /**

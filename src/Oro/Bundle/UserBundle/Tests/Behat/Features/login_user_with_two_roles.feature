@@ -7,7 +7,7 @@ Feature: Login user with two roles
   Scenario: Creation of the First Role
     Given I login as administrator
     And go to System/ User Management/ Roles
-    And I press "Create Role"
+    And I click "Create Role"
     And I fill form with:
       | Role | First Role |
     When I save and create new form
@@ -21,7 +21,7 @@ Feature: Login user with two roles
 
   Scenario: Create new User and assign only just created Roles
     Given go to System/ User Management/ Users
-    And press "Create User"
+    And click "Create User"
     And I fill "User Form" with:
       | Username            | userName       |
       | Password            | Pa$$w0rd       |
@@ -44,5 +44,5 @@ Feature: Login user with two roles
     And I fill "Login Form" with:
       | Username | userName |
       | Password | Pa$$w0rd |
-    When I press "Log in"
+    When I click "Log in"
     Then I should be on Admin Dashboard page

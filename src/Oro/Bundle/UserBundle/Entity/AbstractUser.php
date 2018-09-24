@@ -11,6 +11,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 
 /**
+ * A base class for an organization aware user.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  *
@@ -548,7 +550,7 @@ abstract class AbstractUser implements
     /**
      * Get organization
      *
-     * @return OrganizationInterface
+     * @return OrganizationInterface|Organization
      */
     public function getOrganization()
     {

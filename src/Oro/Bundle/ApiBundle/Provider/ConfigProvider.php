@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
@@ -56,7 +57,7 @@ class ConfigProvider extends AbstractConfigProvider
         }
 
         if (isset($this->processing[$cacheKey])) {
-            throw new \LogicException(sprintf(
+            throw new RuntimeException(sprintf(
                 'Cannot build the configuration of "%s" because this causes the circular dependency.',
                 $className
             ));

@@ -2,47 +2,45 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
-use Gos\Component\WebSocketClient\Wamp\Client as GosClient;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
-use Oro\Bundle\SyncBundle\Client\Factory\GosClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Client\Wamp\Factory\ClientAttributes;
+use Oro\Bundle\SyncBundle\Client\Wamp\Factory\WampClientFactoryInterface;
+use Oro\Bundle\SyncBundle\Client\Wamp\WampClient;
 use Oro\Bundle\SyncBundle\Client\WebsocketClient;
 use Oro\Bundle\SyncBundle\Exception\ValidationFailedException;
 
 class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 {
-    private const WS_HOST = 'testHost';
-    private const WS_PORT = '8080';
-    private const WS_PATH = '/';
-    private const WS_SECURED = true;
     private const TICKET = 'sampleTicket';
 
-    /** @var GosClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $gosClientFactory;
+    /** @var WampClientFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $wampClientFactory;
+
+    /** @var ClientAttributes|\PHPUnit_Framework_MockObject_MockObject */
+    private $clientAttributes;
 
     /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketProvider;
 
-    /** @var GosClient|\PHPUnit\Framework\MockObject\MockObject */
-    private $gosClient;
+    /** @var WampClient|\PHPUnit\Framework\MockObject\MockObject */
+    private $wampClient;
 
     /** @var WebsocketClient */
-    private $client;
+    private $websocketClient;
 
     protected function setUp()
     {
-        $this->gosClientFactory = $this->createMock(GosClientFactoryInterface::class);
+        $this->wampClientFactory = $this->createMock(WampClientFactoryInterface::class);
+        $this->clientAttributes = $this->createMock(ClientAttributes::class);
         $this->ticketProvider = $this->createMock(TicketProviderInterface::class);
 
-        $this->client = new WebsocketClient(
-            $this->gosClientFactory,
-            $this->ticketProvider,
-            self::WS_HOST,
-            self::WS_PORT,
-            self::WS_PATH,
-            self::WS_SECURED
+        $this->websocketClient = new WebsocketClient(
+            $this->wampClientFactory,
+            $this->clientAttributes,
+            $this->ticketProvider
         );
 
-        $this->gosClient = $this->createMock(GosClient::class);
+        $this->wampClient = $this->createMock(WampClient::class);
     }
 
     /**
@@ -55,17 +53,13 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     {
         $connectionSession = 'sampleSession';
 
-        $client = new WebsocketClient(
-            $this->gosClientFactory,
-            $this->ticketProvider,
-            self::WS_HOST,
-            self::WS_PORT,
-            $target,
-            self::WS_SECURED
-        );
+        $this->clientAttributes
+            ->expects(self::once())
+            ->method('getPath')
+            ->willReturn($target);
 
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('connect')
             ->with($expectedTarget)
@@ -76,7 +70,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
             ->method('generateTicket')
             ->willReturn(self::TICKET);
 
-        self::assertSame($connectionSession, $client->connect());
+        self::assertSame($connectionSession, $this->websocketClient->connect());
     }
 
     /**
@@ -87,7 +81,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         return [
             'empty path in target' => [
                 'target' => '',
-                'expectedTarget' => '/?ticket=' . self::TICKET,
+                'expectedTarget' => '?ticket=' . self::TICKET,
             ],
 
             'root target' => [
@@ -102,7 +96,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 
             'path without slash' => [
                 'target' => 'sample-path',
-                'expectedTarget' => '/sample-path?ticket=' . self::TICKET,
+                'expectedTarget' => 'sample-path?ticket=' . self::TICKET,
             ],
 
             'normal path with query' => [
@@ -114,24 +108,24 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
 
     public function testDisconnect()
     {
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('disconnect')
             ->willReturn(true);
 
-        self::assertTrue($this->client->disconnect());
+        self::assertTrue($this->websocketClient->disconnect());
     }
 
     public function testIsConnected()
     {
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('isConnected')
             ->willReturn(true);
 
-        self::assertTrue($this->client->isConnected());
+        self::assertTrue($this->websocketClient->isConnected());
     }
 
     public function testPublish()
@@ -141,33 +135,33 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $exclude = ['sampleExclude'];
         $eligible = ['sampleEligible'];
 
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('connect');
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('publish')
             ->with($topicUri, $payload, $exclude, $eligible)
             ->willReturn(true);
 
-        self::assertTrue($this->client->publish($topicUri, $payload, $exclude, $eligible));
+        self::assertTrue($this->websocketClient->publish($topicUri, $payload, $exclude, $eligible));
     }
 
     public function testPublishValidationFailure()
     {
-        $this->gosClientFactory
+        $this->wampClientFactory
             ->expects(self::never())
-            ->method('createGosClient');
+            ->method('createClient');
 
         $this->expectException(ValidationFailedException::class);
         $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
 
-        $this->client->publish('sampleUrl', "\xB1\x31");
+        $this->websocketClient->publish('sampleUrl', "\xB1\x31");
     }
 
     public function testPrefix()
@@ -175,21 +169,21 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $prefix = 'samplePrefix';
         $uri = 'sampleUri';
 
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('connect');
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('prefix')
             ->with($prefix, $uri)
             ->willReturn(true);
 
-        self::assertTrue($this->client->prefix($prefix, $uri));
+        self::assertTrue($this->websocketClient->prefix($prefix, $uri));
     }
 
     public function testCall()
@@ -197,21 +191,21 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $procUri = 'sampleUri';
         $arguments = ['sampleArgument'];
 
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('connect');
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('call')
             ->with($procUri, $arguments)
             ->willReturn(true);
 
-        self::assertTrue($this->client->call($procUri, $arguments));
+        self::assertTrue($this->websocketClient->call($procUri, $arguments));
     }
 
     public function testEvent()
@@ -219,41 +213,41 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
         $topicUri = 'sampleUri';
         $payload = 'samplePayload';
 
-        $this->mockGosClientFactory();
-        $this->gosClient
+        $this->mockClientFactory();
+        $this->wampClient
             ->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('connect');
-        $this->gosClient
+        $this->wampClient
             ->expects(self::once())
             ->method('event')
             ->with($topicUri, $payload)
             ->willReturn(true);
 
-        self::assertTrue($this->client->event($topicUri, $payload));
+        self::assertTrue($this->websocketClient->event($topicUri, $payload));
     }
 
     public function testEventValidationFailure()
     {
-        $this->gosClientFactory
+        $this->wampClientFactory
             ->expects(self::never())
-            ->method('createGosClient');
+            ->method('createClient');
 
         $this->expectException(ValidationFailedException::class);
         $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
 
-        $this->client->event('sampleUrl', "\xB1\x31");
+        $this->websocketClient->event('sampleUrl', "\xB1\x31");
     }
 
-    private function mockGosClientFactory(): void
+    private function mockClientFactory(): void
     {
-        $this->gosClientFactory
+        $this->wampClientFactory
             ->expects(self::once())
-            ->method('createGosClient')
-            ->with(self::WS_HOST, self::WS_PORT, self::WS_SECURED)
-            ->willReturn($this->gosClient);
+            ->method('createClient')
+            ->with($this->clientAttributes)
+            ->willReturn($this->wampClient);
     }
 }

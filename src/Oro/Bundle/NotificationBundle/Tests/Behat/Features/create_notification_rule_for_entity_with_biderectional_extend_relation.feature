@@ -20,14 +20,14 @@ Feature: Create notification rule for entity with biderectional extend relation
     And I fill form with:
       | Field name | Name   |
       | Type       | String |
-    And I press "Continue"
+    And I click "Continue"
     And I save and close form
     Then I should see "Field saved" flash message
     When I click "Create Field"
     And I fill form with:
       | Field name | assigned_to |
       | Type       | One to many |
-    And I press "Continue"
+    And I click "Continue"
     And I fill form with:
       | Target Entity              | User          |
       | Related Entity Data Fields | Id            |
@@ -41,7 +41,7 @@ Feature: Create notification rule for entity with biderectional extend relation
 
   Scenario: Create Email Notification Rule for Order entity
     Given go to System/ Emails/ Notification Rules
-    And press "Create Notification Rule"
+    And click "Create Notification Rule"
     And fill form with:
       | Entity Name | Order                    |
     # Wait for AJAX

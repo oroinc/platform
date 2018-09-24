@@ -10,11 +10,17 @@ use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Extended and changed some ApiEntityManager functionality
+ */
 class DictionaryApiEntityManager extends ApiEntityManager
 {
+    use TranslatableQueryTrait;
+
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
 
@@ -128,6 +134,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
         );
+        $this->addTranslatableLocaleHint($query, $this->getObjectManager());
         $results = $query->getResult();
 
         return $this->prepareData($results, $keyField, $searchFields, $representationField);

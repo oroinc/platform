@@ -8,7 +8,7 @@ Feature: Business Unit crud
   Scenario: Required fields Business Unit create form
     Given I login as administrator
     And I go to System/ User Management/ Business Units
-    And press "Create Business Unit"
+    And click "Create Business Unit"
     When I save and close form
     Then I should see validation errors:
       | Name | This value should not be blank. |
