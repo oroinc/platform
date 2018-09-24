@@ -11,6 +11,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Choose fallback type between default and parent values.
+ */
 class FallbackPropertyType extends AbstractType
 {
     const NAME = 'oro_locale_fallback_property';
@@ -99,20 +102,6 @@ class FallbackPropertyType extends AbstractType
                 return array_flip($choices);
             }
         );
-
-        $resolver->setNormalizer(
-            'choice_label',
-            function (Options $options) {
-                $choices = $options->offsetGet('choices');
-
-                if ($choices) {
-                    return function ($choice, $key) use ($choices) {
-                        return $key;
-                    };
-                }
-                return;
-            }
-        );
     }
 
     /**
@@ -122,11 +111,9 @@ class FallbackPropertyType extends AbstractType
     {
         if ($options['localization']) {
             $view->vars['attr']['data-localization'] = $options['localization'];
-            $view->vars['attr']['test-localization'] = $options['localization'];
         }
         if ($options['parent_localization']) {
             $view->vars['attr']['data-parent-localization'] = $options['parent_localization'];
-            $view->vars['attr']['test-parent-localization'] = $options['parent_localization'];
         }
     }
 }
