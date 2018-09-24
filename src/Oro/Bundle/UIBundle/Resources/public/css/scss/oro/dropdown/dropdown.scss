@@ -75,6 +75,13 @@
             border-radius: inherit;
             z-index: -1;
         }
+
+        &.right {
+            &:before {
+                #{$end}: 9px;
+                #{$start}: auto;
+            }
+        }
     }
 }
 

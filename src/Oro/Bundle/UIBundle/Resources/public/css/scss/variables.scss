@@ -38,10 +38,10 @@ $inline-action-background:              #edf5fb;
 $cell-selected-background:              $inline-action-background;
 $row-selected-background:               $extra-300;
 $row-highlight-background:              darken($row-selected-background, 2%);
-$cell-success-background:               #f1f8dc;
+$cell-success-background:               $success-ultra-light;
 $cell-success-color:                    #96b76d;
-$cell-error-background:                 #fcd4d3;
-$cell-loading-background:               #f5f5f5;
+$cell-error-background:                 $danger-lighten;
+$cell-loading-background:               $warning-light;
 $side-bar-closed-width:                 33px;
 $side-bar-opened-width:                 200px;
 
@@ -95,7 +95,7 @@ $tag-item-color:                        $secondary;
 $tag-item-background:                   $secondary-300;
 $tag-my-item-background:                $secondary;
 
-$error-message-balloon-background:      lighten($error-text, 20%);
+$error-message-balloon-background:      #fae1dc;
 
 // Links
 $link-color:                            $secondary;
@@ -116,3 +116,9 @@ $oro-zindex-dropdown:                   900;
 
 $dot-menu-dropdown-min-height:          168px;
 $dot-menu-dropdown-max-height:          330px;
+
+// Loading
+
+$loader-size: 32px !default;
+$loader-width: 6px !default;
+$loader-color: $primary-700 !default;

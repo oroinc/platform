@@ -159,3 +159,11 @@
         margin-left: $checkbox-sibling-outer-offset-left;
     }
 }
+
+.shift-checkbox {
+    margin-left: $checkbox-shift-offset;
+
+    .checkbox-view__icon {
+        margin-left: -$checkbox-shift-offset;
+    }
+}

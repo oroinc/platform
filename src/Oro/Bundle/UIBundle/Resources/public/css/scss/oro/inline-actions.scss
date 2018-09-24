@@ -14,8 +14,6 @@
     &:hover {
         background: $inline-action-background;
 
-        @include inline-actions-element-outline($inline-action-background);
-
         .inline-actions-element_actions {
             visibility: visible;
         }
@@ -23,8 +21,6 @@
 
     &.inline-actions-element_no-actions:hover {
         background: transparent;
-
-        @include inline-actions-element-outline(transparent);
     }
 
     .inline-actions-element_wrapper {

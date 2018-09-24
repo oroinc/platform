@@ -1,5 +1,5 @@
-<% if (!_.isMobile()) { %>
-    <label class="control-label"><%- _.__("View per page") %>: &nbsp;</label>
+<% if (showLabels) { %>
+    <span class="control-label"><%- _.__("View per page") %>: &nbsp;</span>
 <% } %>
 <% var togglerId = _.uniqueId('dropdown-') %>
 <div class="btn-group">
@@ -16,6 +16,6 @@
         <% }); %>
     </ul>
 </div>
-<% if (_.isMobile()) { %>
-    <label><%- _.__("Per page") %></label>
+<% if (showLabels) { %>
+    <span><%- _.__("Per page") %></span>
 <% } %>

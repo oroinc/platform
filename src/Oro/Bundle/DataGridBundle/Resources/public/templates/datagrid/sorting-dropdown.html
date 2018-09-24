@@ -1,5 +1,5 @@
 <% if (hasSortingOrderButton) { %>
-<div class="sorting-label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</div>
+    <span class="sorting-label"><%=_.__('oro.datagrid.toolbar_sorting.label') %>:</span>
 <% } %>
 <select class="oro-select2 oro-select2--size-s input-widget">
     <% if (disableNotSelectedOption === false || currentDirection === null) { %>
@@ -17,5 +17,11 @@
     <% } %>
 </select>
 <% if (hasSortingOrderButton) { %>
-<a data-name="order-toggle" class="fa-sort-amount-asc<% if (currentDirection === 'ascending') { %>-alt<% } %>"></a>
+    <span class="sorting-divider" aria-hidden="true">|</span>
+    <button data-name="order-toggle" class="order-toggle btn btn-icon btn-light">
+        <span aria-hidden="true"
+              data-name="order-toggle-icon"
+              class="<% if (currentDirection === 'ascending') { %>fa-sort-amount-asc-alt<% } else { %>fa-sort-amount-asc<% } %>"
+        ></span>
+    </button>
 <% } %>

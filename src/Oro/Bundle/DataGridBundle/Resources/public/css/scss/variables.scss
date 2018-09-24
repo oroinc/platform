@@ -1,5 +1,14 @@
 /* @theme: admin.oro; */
 
-@import './variables/board-variables';
-@import './variables/card-variables';
-@import './variables/tables-variables';
+@import "oroui/css/scss/variables";
+@import "oroui/css/scss/colors";
+
+@import "variables/grid-variables";
+@import "variables/grid-no-data-variables";
+@import "variables/grid-toolbar-variables";
+@import "variables/toolbar-mass-actions-variables";
+@import "variables/actions-panel-variables";
+@import "variables/more-bar-holder-variables";
+@import "variables/grid-views-variables";
+@import "variables/sorting-select-variables";
+@import "variables/visible-items-counter-variables";

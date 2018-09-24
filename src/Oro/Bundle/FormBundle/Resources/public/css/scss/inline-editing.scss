@@ -1,139 +1,13 @@
 /* @theme: admin.oro; */
 
-.oro-datagrid.grid-editable .grid {
-    .number-cell,
-    .integer-cell,
-    .align-right,
-    .editable {
-        padding-right: 28px;
-    }
-
-    .row-edit-mode {
-        background: $row-highlight-background;
-    }
-
-    .view-mode > .inline-editor__edit-action {
-        display: none !important;
-    }
-
-    .editable {
-        &.save-success {
-            background: $cell-success-background;
-            position: relative;
-
-            &:before {
-                position: absolute;
-                font-family: FontAwesome;
-                content: '\f00c';
-                font-size: 14px;
-                top: 4px;
-                right: 6px;
-                color: $cell-success-color;
-            }
-
-            &:hover:before {
-                display: none;
-            }
-        }
-
-        &.save-fail {
-            background: $cell-error-background;
-        }
-
-        &.edit-mode {
-            position: relative;
-
-            &:before {
-                content: '';
-                position: absolute;
-                background-color: inherit;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-            }
-
-            > .inline-editor__edit-action {
-                display: none !important;
-            }
-        }
-
-        &.view-mode.has-error {
-            position: relative;
-            background: $cell-error-background;
-
-            &:hover {
-                background: $cell-error-background;
-
-                > .inline-editor__edit-action {
-                    &:before {
-                        color: $error-message-balloon-background;
-                    }
-                }
-            }
-
-            &:before {
-                content: '';
-                display: inline-block;
-                border-right: 6px solid transparent;
-                border-top: 6px solid #eea19f;
-                position: absolute;
-                top: 0;
-                left: 0;
-            }
-        }
-
-        &.view-mode:hover {
-            background: $cell-selected-background;
-            position: relative;
-
-            > .inline-editor__edit-action {
-                display: block !important;
-                position: absolute;
-                top: 2px;
-                right: -1px;
-                width: 25px;
-                height: 25px;
-                line-height: 35px;
-                text-align: center;
-                padding-left: 2px;
-
-                &:before {
-                    color: $inline-action-color;
-                }
-            }
-        }
-
-        &.loading {
-            background: $cell-loading-background;
-
-            &.view-mode > .inline-editor__edit-action {
-                display: none !important;
-            }
-
-            &:before {
-                background: url(../../../oroui/img/loader-16.gif) no-repeat center center transparent;
-                display: block !important;
-                content: "";
-                position: absolute;
-                top: 0;
-                right: 1px;
-                width: 29px;
-                height: 29px;
-            }
-        }
-    }
-}
-
-.grid thead th.header-cell-highlight {
-    background: linear-gradient($row-highlight-background, $row-selected-background);
-}
-
 .inline-editor__actions {
     position: absolute;
     top: 0;
-    right: 0;
-    padding: 0 4px;
+    #{$end}: 0;
+    bottom: 0;
+    z-index: 1;
+
+    padding: $inline-editor-actions-offset;
 
     &--over-multiselect {
         z-index: 10004; // to show over .ui-multiselect-menu
@@ -141,98 +15,78 @@
 }
 
 .inline-editor__action-item {
-    display: block;
-    float: left;
-    width: 22px;
-    height: 30px;
-    box-sizing: border-box;
-    padding: 0;
+    padding: $inline-editor-action-item-offset;
     background: none;
     border: none;
-    font-size: 14px;
-    color: #636363;
+    color: $inline-editor-action-item-color;
+
+    &:hover {
+        color: $inline-editor-action-item-color-hover;
+    }
 
     &[disabled] {
         cursor: auto;
-        color: #b7b7b7;
+        color: $inline-editor-action-item-color-disabled;
     }
 
-    &:focus,
-    &:active,
-    &:hover {
-        outline: none;
-        box-shadow: none;
+    [class^="fa-"] {
+        margin: 0;
     }
 }
 
 .inline-editor__fields {
-    input[type='text'] {
+    input[type="text"] {
         width: 100%;
-        box-sizing: border-box;
-        height: 30px;
         margin: 0;
-        border-radius: 0;
-        font-size: 13px;
-        line-height: 19px;
-        box-shadow: none;
 
-        &:focus {
-            box-shadow: none;
-        }
+        line-height: 1;
 
         &:first-child {
-            padding-left: 9px;
+            padding-#{$start}: $inline-editor-action-item-input-offset;
         }
 
         &:last-child {
-            padding-right: 52px;
+            padding-#{$end}: $inline-editor-action-item-fields-last-offset;
         }
     }
 }
 
 .inline-editor-wrapper {
-    position: absolute;
-    min-width: 150px;
+        position: absolute;
 
-    .select2-chosen {
-        padding-left: 9px !important;
-    }
-
-    .fa-check-square-o:before {
-        content: "\f00c";
-    }
+    min-width: $inline-editor-wrapper-width;
 
     .validation-failed:last-child {
-        margin-bottom: 2px;
+        margin-bottom: $input-border-width;
     }
 
     &.number-editor {
         // about 10+2 digits
-        min-width: 189px;
+        min-width: $inline-editor-number-editor-width;
 
         input[name='value'] {
-            text-align: right;
+            text-align: #{$end};
         }
     }
 
     &.date-editor {
         .hasDatepicker {
-            padding-left: 9px;
+            padding-#{$start}: $inline-editor-action-item-input-offset;
         }
     }
 
     &.datetime-editor {
-        min-width: 225px;
+        min-width: $inline-editor-datetime-editor-width;
         width: auto !important;
 
         .hasDatepicker {
-            border-right: none;
-            padding-left: 9px;
-            width: 105px;
+            padding-#{$start}: $inline-editor-has-datepicker-offset;
+            width: $inline-editor-has-datepicker-width;
         }
 
         .timepicker-input {
-            width: 121px;
+            width: $inline-editor-has-timepicker-input-width;
+            margin-#{$start}: -$input-border-width;
         }
 
         .fields-row {
@@ -240,20 +94,33 @@
         }
     }
 
+    .hasDatepicker,
+    .timepicker-input {
+        &:focus {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
     &.select-editor {
-        min-width: 180px;
+        min-width: $inline-editor-select-editor-width;
+    }
 
-        .select2-choice {
-            width: calc(100% - 52px);
-            border-right: 1px solid #ddd;
-        }
+    .select2-choice {
+        width: $inline-editor-select2-choice-width;
 
-        .select2-dropdown-open .select2-choice {
-            border-right-color: #aaa;
-        }
+        &:after {
+            position: absolute;
+            #{$end}: 0;
+            top: 50%;
 
-        .select2-container {
-            border-radius: 0;
+            height: 12px;
+            width: 1px;
+            margin-top: -6px;
+
+            background-color: $inline-editor-select2-divider-color;
+
+            content: '';
         }
     }
 
@@ -270,22 +137,27 @@
         .select2-choices {
             max-height: 40vh;
             max-width: 50vw;
-            min-width: 130px;
+            min-width: $inline-editor-multi-select2-choices-width;
             overflow: auto;
         }
     }
 }
 
-.inline-editor__select2-drop.select2-drop {
-    border-radius: 0;
+.inline-editor__select2-drop {
+    .select2-input {
+        margin: 0;
+        height: $inline-editor-select2-drop-height;
+    }
 }
 
 .datepicker-focusser {
-    background: transparent;
-    border: 0;
+    position: absolute;
+
     width: 0;
     height: 0;
-    position: absolute;
+
+    background: transparent;
+    border: 0;
 
     &:focus {
         outline: none;

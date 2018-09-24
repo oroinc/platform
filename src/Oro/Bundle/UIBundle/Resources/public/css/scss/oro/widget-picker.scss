@@ -87,7 +87,7 @@
 
             .widget-picker__actions-column {
                 &:after {
-                    @extend %loader;
+                    @include loader();
 
                     content: '';
                     width: 10px;

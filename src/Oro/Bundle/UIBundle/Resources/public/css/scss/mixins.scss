@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 @import "mixins/direction";
+@import "mixins/loading";
 
 $enable-safe-area: true;
 
@@ -36,21 +37,21 @@ $enable-safe-area: true;
 
 @mixin accordion-toggle() {
     font-weight: bold;
-    padding-left: 15px;
+    padding-#{$start}: 15px;
     background: $accordion-heading-background-color;
 }
 
 @mixin accordion-toggle-before() {
     content: "\f107";
     font-family: FontAwesome;
-    margin: 0 7px 0 -7px;
+    margin: side-values(0 7px 0 -7px);
     width: 10px;
     display: inline-block;
 }
 
 @mixin accordion-toggle-collapsed-before() {
     content: "\f105";
-    margin: 0 5px 0 -5px;
+    margin: side-values(0 5px 0 -5px);
 }
 
 @mixin accordion-group() {
@@ -61,7 +62,7 @@ $enable-safe-area: true;
 
 @mixin header-cell-dropdown() {
     > .dropdown {
-        margin-left: -5px;
+        margin-#{$start}: -5px;
 
         > .dropdown-toggle {
             padding: 4px;
@@ -90,17 +91,13 @@ $enable-safe-area: true;
             padding: 0;
 
             > li:first-child > a {
-                margin-left: 2px;
+                margin-#{$start}: 2px;
             }
         }
     }
 }
 
 @mixin open() {
-    // IE7's z-index only goes to the nearest positioned ancestor, which would
-    // make the menu appear below buttons that appeared later on the page
-    *z-index: $zindexDropdown;
-
     & > .dropdown-menu {
         display: block;
     }
@@ -149,7 +146,7 @@ $enable-safe-area: true;
         width: 12px;
         height: 12px;
         background-size: 12px 12px;
-        right: -20px;
+        #{$end}: -20px;
         top: 50%;
         margin-top: -6px;
     }
@@ -177,9 +174,9 @@ $enable-safe-area: true;
         position: absolute;
         top: 100%;
         margin-top: -38px;
-        left: 10px;
+        #{$start}: 10px;
         border-style: solid;
-        border-color: lighten($error-text, 20%) transparent;
+        border-color: $error-message-balloon-background transparent;
         border-width: 8px 4px 0;
     }
 
@@ -191,25 +188,29 @@ $enable-safe-area: true;
         > span {
             position: absolute;
             bottom: 0;
-            padding: 5px 5px 5px 20px;
+            padding: side-values(5px 5px 5px 20px);
             border-radius: 4px;
             background-color: $error-message-balloon-background;
-            color: #fff;
+            color: $danger-ultra-dark;
 
             &:before {
                 content: "\f00d";
                 display: inline-block;
                 width: 14px;
-                margin-left: -14px;
-                color: #fff;
+                margin-#{$start}: -14px;
+                color: $danger-darken;
                 font: normal 1.15em/1em FontAwesome, sans-serif;
             }
         }
     }
 }
 
-@mixin text-line-truncate($width: 100%) {
-    width: $width;
+@mixin text-line-truncate($width: 100%, $max-width: false) {
+    @if $max-width {
+        max-width: $width;
+    } @else {
+        width: $width;
+    }
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -101,7 +101,7 @@ class GridRow extends TableRow
         $cell->mouseOver();
 
         /** @var NodeElement $pencilIcon */
-        $pencilIcon = $cell->find('css', 'i[data-role="edit"]');
+        $pencilIcon = $cell->find('css', '[data-role="edit"]');
         self::assertNotNull($pencilIcon, "Cell with '$header' is not inline editable");
         self::assertTrue(
             $pencilIcon->isValid() && $pencilIcon->isVisible(),

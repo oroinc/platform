@@ -19,10 +19,7 @@
     background-color: rgba($loading-mask-background-color, .5);
 
     .loader-frame {
-        @extend %loader;
-
-        width: $loading-mask-icon-size;
-        height: $loading-mask-icon-size;
+        @include loader();
     }
 
     .loader-content {

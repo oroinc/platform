@@ -141,7 +141,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionHeadCheckbox:
-      selector: 'th.grid-header-cell-massAction div.btn-group .btn .caret'
+      selector: 'th.grid-header-cell-massAction div.btn-group .icon'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionButton:
@@ -157,11 +157,11 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewList:
-      selector: '.grid-views .btn-toolbar .btn-group.views-group, .grid-views .grid-views__header'
+      selector: '.grid-views .views-group, .grid-views .grid-views__header'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewOptions:
-      selector: '.grid-views .btn-toolbar .btn-group.actions-group'
+      selector: '.grid-views .actions-group'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     GridViewOptionsLink:

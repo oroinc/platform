@@ -4,19 +4,6 @@
     &.save-success .inline-actions-element {
         background: $cell-success-background;
 
-        @include inline-actions-element-outline($cell-success-background);
-
-        &:after {
-            position: relative;
-            font-family: 'FontAwesome';
-            content: '\f00c';
-            font-size: 15px;
-            line-height: 22px;
-            height: 22px;
-            padding: 0 4px;
-            color: $cell-success-color;
-        }
-
         .inline-actions-element_actions {
             display: none;
         }
@@ -25,8 +12,6 @@
     &.save-fail .inline-actions-element {
         background: $cell-error-background;
 
-        @include inline-actions-element-outline($cell-error-background);
-
         .inline-actions-element_actions {
             display: none;
         }
@@ -34,24 +19,52 @@
 }
 
 .inline-editable-wrapper {
-    &.loading .inline-actions-element {
-        background: $cell-loading-background;
+    &.loading {
+        .inline-actions-element {
+            background: $cell-loading-background;
 
-        @include inline-actions-element-outline($cell-loading-background);
+            &:before {
+                position: absolute;
+                top: $inline-editable-wrapper-loading-top;
+                #{$end}: $inline-editable-wrapper-loading-end;
 
-        &:after {
-            background: url(../../../../bundles/oroui/img/loader-16.gif) no-repeat center center transparent;
-            display: block !important;
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 1px;
-            width: 24px;
-            height: 24px;
+                display: block;
+
+                content: '';
+
+                @include loader($inline-editable-wrapper-loading-size, $inline-editable-wrapper-loading-width);
+            }
+
+            &:hover .inline-actions-element_actions {
+                visibility: hidden;
+            }
         }
+    }
+}
 
-        &:hover .inline-actions-element_actions {
-            visibility: hidden !important;
+.inline-actions-btn {
+    padding: $inline-actions-btn-offset;
+
+    font-size: $base-font-size--m;
+    line-height: 1;
+
+    border-width: 0;
+    background-color: transparent;
+    color: $inline-actions-btn-color;
+
+    &:hover {
+        color: $inline-actions-btn-color-hover;
+    }
+
+    &--size-s {
+        padding: $inline-actions-btn-s-offset;
+    }
+
+    @at-root .has-error .inline-actions-btn  {
+        color: $inline-actions-btn-color-error;
+
+        &:hover {
+            color: $inline-actions-btn-color-error;
         }
     }
 }

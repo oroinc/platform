@@ -7,29 +7,6 @@
         }
     }
 
-    .grid-toolbar {
-        padding: 0;
-        margin-bottom: $content-padding;
-
-        .filter-container {
-            padding: 0;
-            margin-bottom: $content-padding;
-        }
-
-        .actions-panel {
-            margin-left: 0;
-
-            a.action.btn {
-                display: inline-block;
-            }
-        }
-
-        .pagination {
-            text-align: center;
-            margin: 0;
-        }
-    }
-
     .comments-view-footer {
         margin-bottom: 0;
     }
@@ -45,19 +22,6 @@
 
 @media screen and (max-width: 650px) {
     .activity-list-widget {
-        .grid-toolbar {
-            .btn-group {
-                margin: 0 10px 10px 0;
-            }
-
-            .pagination {
-                width: calc(100% - 40px);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                text-align: left;
-            }
-        }
-
         .accordion > .items {
             .extra-info {
                 width: 100%;

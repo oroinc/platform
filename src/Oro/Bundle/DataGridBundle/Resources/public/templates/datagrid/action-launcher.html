@@ -21,12 +21,12 @@
         aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"<% } %>>
 
     <% if (launcherMode == 'icon-text') { %>
-        <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+        <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
         <%- label %>
     <% } else if (launcherMode == 'icon-only') { %>
-        <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+        <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
     <% } else if (launcherMode == 'text-only') { %>
-        <% if (iconClassName) { %><span class="<%- iconClassName %>" aria-hidden="true"></span><% } %>
+        <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
         <%- label %>
     <% } %>
 
@@ -40,12 +40,12 @@
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%- item.key %>">
             <% if (launcherMode == 'icon-text') { %>
-                <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+                <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
                 <%- item.label %>
             <% } else if (launcherMode == 'icon-only') { %>
-                <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+                <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
             <% } else if (launcherMode == 'text-only') { %>
-                <% if (iconClassName) { %><span class="<%- iconClassName %>" aria-hidden="true"></span><% } %>
+                <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
                 <%- item.label %>
             <% } %>
         </a></li>

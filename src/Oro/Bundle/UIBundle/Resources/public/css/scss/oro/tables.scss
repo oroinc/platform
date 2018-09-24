@@ -372,77 +372,8 @@
     }
 }
 
-.floatThead {
-    .table {
-        .dropdown-menu {
-            z-index: 898;
-        }
-    }
-
-    .grid-container {
-        thead {
-            z-index: 3;
-
-            &:first-child {
-                position: absolute;
-                width: auto;
-                display: block;
-                box-sizing: content-box;
-
-                tr {
-                    display: block;
-
-                    th {
-                        border-bottom: 1px solid #ddd;
-                    }
-                }
-            }
-
-            &.thead-sizing {
-                th {
-                    border-top: none;
-                }
-            }
-        }
-    }
-
-    &.floatThead-relative {
-        .grid-container {
-            thead {
-                &.thead-sizing {
-                    display: table-header-group;
-                }
-            }
-        }
-    }
-
-    &.floatThead-fixed {
-        .grid-container {
-            thead {
-                &:first-child {
-                    position: fixed;
-                    display: block;
-                    overflow: hidden;
-                    border-bottom: 1px solid #ddd;
-                    box-sizing: content-box;
-
-                    tr {
-                        display: block;
-                    }
-                }
-
-                &.thead-sizing {
-                    display: table-header-group;
-
-                    visibility: hidden; // Should check why we have double headers for datagrid
-                }
-            }
-        }
-    }
-}
-
 .td-expander {
-    font-size: 30px;
+    font-size: $table-td-expander-font-size;
     line-height: 0;
     height: 0;
     overflow: hidden;

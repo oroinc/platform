@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 
+// Not used
 .inline-editing-help-wrapper {
     z-index: 10000;
     border-radius: 50px;
@@ -10,7 +11,6 @@
     top: 30px;
     right: 30px;
     padding: 4px;
-    box-shadow: 0 3px 16px rgba(0, 0, 0, .4), 0 0 6px rgba(0, 0, 0, .4);
 
     .inline-editing-help-content {
         width: 474px;
@@ -26,10 +26,6 @@
         > .arrow {
             left: 433px;
         }
-    }
-
-    &:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, .4), 0 0 8px rgba(0, 0, 0, .4);
     }
 }
 

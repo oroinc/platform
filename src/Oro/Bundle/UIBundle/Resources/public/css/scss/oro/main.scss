@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
 @import "variables";
-@import "extends";
 
 @import "app-page";
 @import "application-menu";
@@ -9,7 +8,6 @@
 @import "create-select-entity";
 @import "entity";
 @import "ui-sortable";
-@import "more-bar-holder";
 @import "form/form";
 @import "loading/loading-mask";
 @import "loading/loading-dots";
@@ -31,7 +29,6 @@
 @import "form/form-signin";
 @import "form/forms";
 
-@import "datagrid";
 @import "footer";
 @import "fs-toolbar";
 @import "flash-messages";
@@ -59,3 +56,6 @@
 @import "tooltip";
 @import "popover";
 @import "widget-picker";
+
+@import "tables";
+@import "other-scroll-container";

@@ -20,9 +20,9 @@ define([
         /** @property */
         template: _.template(
             '<% if (sortable) { %>' +
-                '<a class="grid-header-cell__link" href="#">' +
+                '<a class="grid-header-cell__link" href="#" role="button">' +
                     '<span class="grid-header-cell__label"><%- label %></span>' +
-                    '<span class="caret"></span>' +
+                    '<span class="caret" aria-hidden="true"></span>' +
                 '</a>' +
             '<% } else { %>' +
                 '<span class="grid-header-cell__label-container">' +

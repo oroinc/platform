@@ -25,7 +25,7 @@ define([
         template: template,
 
         /** @property */
-        className: 'visible-items-counter pagination-centered',
+        className: 'visible-items-counter',
 
         /** @property */
         themeOptions: {

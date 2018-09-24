@@ -168,13 +168,16 @@ $btn-mini-line-height: $btn-mini-height - 3 !default;
 
 $btn-link-background: none !default;
 $btn-link-font-weight: normal !default;
-$btn-link-text-decoration: underline !default;
+$btn-link-text-decoration: none !default;
+$btn-link-text-transform: none !default;
 $btn-link-border: none !default;
+$btn-link-color: $link-color !default;
 $btn-link-inner-offset: 0 !default;
 $btn-link-box-shadow: none !default;
 $btn-link-border-radius: 0 !default;
 
 $btn-link-hover-text-decoration: none !default;
+$btn-link-hover-color: $link-color-hover !default;
 
 $btn-group-btn-height: $btn-height !default;
 $btn-group-btn-font-size: $btn-font-size !default;

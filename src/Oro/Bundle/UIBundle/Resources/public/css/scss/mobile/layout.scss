@@ -17,7 +17,7 @@
     visibility: hidden;
     position: absolute;
     top: -9999px;
-    left: -9999px;
+    #{$start}: -9999px;
 }
 
 /**
@@ -29,17 +29,17 @@
 }
 
 .row {
-    margin-left: $content-padding;
-    margin-right: $content-padding;
+    margin-#{$start}: $content-padding;
+    margin-#{$end}: $content-padding;
 }
 
 .container-fluid {
-    padding-right: $content-padding;
-    padding-left: $content-padding;
+    padding-#{$end}: $content-padding;
+    padding-#{$start}: $content-padding;
 
     & > .responsive-section {
         margin: 0 -#{$content-padding};
-        padding-right: $content-padding;
+        padding-#{$end}: $content-padding;
     }
 }
 
@@ -94,9 +94,9 @@
 
 .customer-without-border-tabs {
     min-width: 280px;
-    padding-right: 0;
-    margin-left: -10px;
-    margin-right: -10px;
+    padding-#{$end}: 0;
+    margin-#{$start}: -10px;
+    margin-#{$end}: -10px;
     width: calc(100% + 20px);
 }
 
@@ -125,7 +125,7 @@
     border-radius: 3px;
 
     .title {
-        padding: $content-padding $content-padding $content-padding 0;
+        padding: side-values($content-padding $content-padding $content-padding 0);
     }
 
     .calendar-container {
@@ -136,8 +136,8 @@
 .dashboard-container {
     .responsive-cell {
         .box-type1 {
-            margin-right: 10px;
-            margin-left: 10px;
+            margin-#{$end}: 10px;
+            margin-#{$start}: 10px;
         }
     }
 }
@@ -150,28 +150,27 @@
             margin-bottom: 0;
 
             .container-fluid {
-                padding-left: 10px;
-                padding-right: 10px;
+                padding-#{$start}: 10px;
+                padding-#{$end}: 10px;
             }
         }
     }
 
     .box-type1 {
-        margin-right: 0;
-        margin-left: 0;
+        margin-#{$end}: 0;
+        margin-#{$start}: 0;
 
         .filter-box {
-            padding-left: 0;
-            padding-right: 0;
-            margin-left: 0;
-            margin-right: 0;
+            padding-#{$start}: 0;
+            padding-#{$end}: 0;
+            margin-#{$start}: 0;
+            margin-#{$end}: 0;
             max-width: 100%;
         }
 
-        .container-fluid,
-        .grid-toolbar {
-            padding-left: 0;
-            padding-right: 0;
+        .container-fluid {
+            padding-#{$start}: 0;
+            padding-#{$end}: 0;
         }
     }
 }
@@ -201,7 +200,7 @@
 
                 > .dropdown-toggle {
                     display: block;
-                    background: #fff;
+                    background: $primary-inverse;
                     line-height: 30px;
                     margin: 0 10px;
                 }
@@ -211,8 +210,7 @@
                     position: absolute;
                     padding: 5px 0;
                     margin: 2px 0 0;
-                    background-color: #fff;
-                    border: 1px solid #ccc;
+                    background-color: $primary-inverse;
                     border: 1px solid rgba(0, 0, 0, .2);
                     border-radius: 6px;
                     box-shadow: 0 5px 10px rgba(0, 0, 0, .2);

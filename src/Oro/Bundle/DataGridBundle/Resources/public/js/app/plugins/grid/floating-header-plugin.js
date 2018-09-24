@@ -207,7 +207,7 @@ define(function(require) {
         selectMode: function() {
             // get gridRect
             var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
-            var visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+            var visibleRect = scrollHelper.getVisibleRect(this.$grid[0], {
                 top: -this.headerHeight
             }, this.currentFloatTheadMode === 'default');
             var mode = 'default';
@@ -243,7 +243,7 @@ define(function(require) {
                     // works well with dropdowns, but causes jumps while scrolling
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
-                        this.$el.addClass('floatThead-relative');
+                        this.$el.addClass('floatThead-relative floatThead');
                         this._ensureTHeadSizing();
                     }
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
@@ -262,7 +262,7 @@ define(function(require) {
                     // provides good scroll experience
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
-                        this.$el.addClass('floatThead-fixed');
+                        this.$el.addClass('floatThead-fixed floatThead');
                         this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({

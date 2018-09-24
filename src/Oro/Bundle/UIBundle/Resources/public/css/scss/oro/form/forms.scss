@@ -47,7 +47,9 @@
         }
 
         .controls {
-            margin-left: 170px;
+            margin-#{$start}: 170px;
+
+            text-align: #{$start};
 
             &.autocomplete-box {
                 margin-bottom: 10px;

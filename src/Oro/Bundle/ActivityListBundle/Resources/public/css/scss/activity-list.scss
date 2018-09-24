@@ -260,37 +260,6 @@
             margin-bottom: 20px;
         }
     }
-
-    .grid-toolbar {
-        padding: 0 0 5px;
-        margin: 0;
-
-        .pagination {
-            white-space: nowrap;
-            padding-top: 1px;
-            width: 375px;
-            margin: 0 auto;
-            text-align: center;
-
-            > ul > li a {
-                width: 90px;
-                color: #666;
-                font-weight: bold;
-
-                i {
-                    margin: 0 3px;
-                }
-            }
-
-            > ul > li.disabled a {
-                font-weight: normal;
-            }
-        }
-
-        .filter-container {
-            padding-bottom: 5px;
-        }
-    }
 }
 
 li[data-criteria="condition-activity"] {

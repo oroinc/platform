@@ -56,7 +56,16 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        noDataTemplate: _.template('<span><%= hint %><span>'),
+        noDataTemplate: require('tpl!orodatagrid/templates/datagrid/no-data.html'),
+
+        /** @property {Object} */
+        noDataTranslations: {
+            entityHint: 'oro.datagrid.entityHint',
+            noColumns: 'oro.datagrid.no.columns',
+            noEntities: 'oro.datagrid.no.entities',
+            noResults: 'oro.datagrid.no.results',
+            noResultsTitle: 'oro.datagrid.no.resultsTitle'
+        },
 
         /** @property {Object} */
         selectors: {
@@ -1103,14 +1112,21 @@ define(function(require) {
          */
         _defineNoDataBlock: function() {
             var placeholders = {
-                entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
+                entityHint: (this.entityHint || __(this.noDataTranslations.entityHint)).toLowerCase()
             };
-            var message = _.isEmpty(this.collection.state.filters)
-                ? 'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
-            message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
+            var hints = [];
+
+            if (this.noColumnsFlag) {
+                hints.push(__(this.noDataTranslations.noColumns));
+            } else if (_.isEmpty(this.collection.state.filters)) {
+                hints.push(__(this.noDataTranslations.noEntities));
+            } else {
+                hints.push(__(this.noDataTranslations.noResultsTitle));
+                hints.push(__(this.noDataTranslations.noResults, placeholders));
+            }
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
-                hint: __(message, placeholders).replace('\n', '<br />')
+                hints: hints
             })));
         },
 

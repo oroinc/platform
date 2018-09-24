@@ -538,7 +538,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iPressNextPageButton($gridName = null)
     {
         $grid = $this->getGrid($gridName);
-        $this->getGridPaginator($grid)->clickLink('Next');
+        $this->getGridPaginator($grid)->pressButton('Next');
     }
 
     /**
@@ -1828,10 +1828,10 @@ TEXT;
     }
 
     /**
-     * @param string $lnk
+     * @param string $button
      * @param string|null $gridName
      */
-    private function pressPaginationControlButton($lnk, $gridName = null)
+    private function pressPaginationControlButton($button, $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 
@@ -1844,7 +1844,7 @@ TEXT;
         );
 
         $gridPaginator = $this->elementFactory->createElement('GridToolbarPaginator', $gridPaginatorContainer);
-        $gridPaginator->clickLink($lnk);
+        $gridPaginator->pressButton($button);
     }
 
     /**

@@ -24,6 +24,23 @@ define(function(require) {
          */
         constructor: function ColumnHeaderView() {
             ColumnHeaderView.__super__.constructor.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            this.boardCollection = options.boardCollection;
+            this.listenTo(this.boardCollection, 'add remove reset sort', this.markAsEmpty);
+            ColumnHeaderView.__super__.initialize.call(this, options);
+            this.markIfEmpty();
+        },
+
+        /**
+         * Add empty css class to root element if modal is empty
+         */
+        markIfEmpty: function() {
+            this.$el.toggleClass('empty', this.model.get('items').length === 0);
         }
     });
 

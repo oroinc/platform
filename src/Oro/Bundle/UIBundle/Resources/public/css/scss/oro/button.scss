@@ -332,13 +332,17 @@
         background: $btn-link-background;
         font-weight: $btn-link-font-weight;
         text-decoration: $btn-link-text-decoration;
+        text-transform: $btn-link-text-transform;
         border: $btn-link-border;
+        color: $btn-link-color;
         padding: $btn-link-inner-offset;
         box-shadow: $btn-link-box-shadow;
         border-radius: $btn-link-border-radius;
 
         &:hover {
             text-decoration: $btn-link-hover-text-decoration;
+
+            color: $btn-link-hover-color;
         }
     }
 

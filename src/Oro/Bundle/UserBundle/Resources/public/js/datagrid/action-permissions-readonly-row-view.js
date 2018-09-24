@@ -13,7 +13,7 @@ define(function(require) {
     ActionPermissionsReadonlyRowView = BaseView.extend({
         tagName: 'tr',
 
-        className: 'collapsed',
+        className: 'grid-row collapsed',
 
         autoRender: false,
 

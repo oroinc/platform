@@ -1,14 +1,19 @@
+<% var gridViewId = _.uniqueId('grid-view-') %>
+
 <div class="form-horizontal">
     <div class="control-group">
-        <label class="control-label" for="gridViewName"><%- label %>:</label>
+        <label class="control-label" for="<%- gridViewId %>"><%- label %>:</label>
         <div class="controls">
-            <input id="gridViewName" name="name" type="text" value="<%- value %>">
+            <input id="<%- gridViewId %>" data-role="grid-view-input" name="name" type="text" value="<%- value %>">
         </div>
     </div>
     <div class="control-group control-group-checkbox">
         <label class="control-label" for="gridViewDefault"><%- defaultLabel %>:</label>
         <div class="controls">
-            <input id="gridViewDefault" name="is_default" type="checkbox" <% if(defaultChecked) { %> checked <% } %> >
+            <span class="checkbox-view">
+                <input class="checkbox-view__input" id="gridViewDefault" name="is_default" type="checkbox" <% if(defaultChecked) { %> checked <% } %> >
+                <span class="checkbox-view__icon" aria-hidden="true"></span>
+            </span>
         </div>
     </div>
 </div>

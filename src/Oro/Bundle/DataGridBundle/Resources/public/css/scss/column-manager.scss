@@ -1,4 +1,10 @@
+/* @theme: admin.oro; */
+
 .column-manager {
+    &:not(:last-child) {
+        margin-right: 4px;
+    }
+
     a.action.btn.dropdown-toggle {
         margin-right: 0;
     }

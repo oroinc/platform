@@ -73,7 +73,7 @@ define(function(require) {
         /** @property */
         launchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
-                '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
+                '<li><ul class="launchers-list"></ul></li>' +
             '<% } else { %>' +
                 '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
             '<% } %>'
@@ -307,6 +307,8 @@ define(function(require) {
             var result = $(this.launcherItemTemplate(params));
             var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
+            var className = 'mode-' + launcher.launcherMode;
+            $launcherItem.addClass(className);
             return result;
         },
 
