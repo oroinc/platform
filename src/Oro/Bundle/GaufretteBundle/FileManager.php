@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\GaufretteBundle;
 
+use Gaufrette\Exception;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
@@ -12,6 +13,10 @@ use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
+/**
+ * This manager that can be used to simplify retrieve and store files
+ * via Gaufrette filesystem abstraction layer.
+ */
 class FileManager
 {
     /** The number of bytes to be read from a source stream at a time */
@@ -120,6 +125,26 @@ class FileManager
     }
 
     /**
+     * Returns a File stream for the file stored in the Gaufrette file system.
+     *
+     * @param string $fileName       The file name
+     * @param bool   $throwException Whether to throw an exception in case the file does not exists
+     *
+     * @return Stream|null
+     */
+    public function getStream($fileName, $throwException = true)
+    {
+        $hasFile = $this->filesystem->has($fileName);
+        if (!$hasFile && $throwException) {
+            throw new Exception\FileNotFound($fileName);
+        }
+
+        return $hasFile
+            ? $this->filesystem->createStream($fileName)
+            : null;
+    }
+
+    /**
      * Returns the content of a file stored in the Gaufrette file system.
      *
      * @param string $fileName
@@ -184,23 +209,47 @@ class FileManager
      *
      * @param Stream $srcStream
      * @param string $fileName
+     * @param bool   $avoidWriteEmptyStream
+     *
+     * @return bool returns false in case if $avoidWriteEmptyStream = true and input stream is empty.
      */
-    public function writeStreamToStorage(Stream $srcStream, $fileName)
+    public function writeStreamToStorage(Stream $srcStream, $fileName, $avoidWriteEmptyStream = false)
     {
         $srcStream->open(new StreamMode('rb'));
+
+        $nonEmptyStream = true;
+        $firstChunk = '';
+
         try {
-            $dstStream = $this->filesystem->createStream($fileName);
-            $dstStream->open(new StreamMode('wb+'));
-            try {
-                while (!$srcStream->eof()) {
-                    $dstStream->write($srcStream->read(static::READ_BATCH_SIZE));
+            if ($avoidWriteEmptyStream) {
+                // check if input stream is empty
+                $firstChunk = $srcStream->read(static::READ_BATCH_SIZE);
+                if ($firstChunk === '' && $srcStream->eof()) {
+                    $nonEmptyStream = false;
                 }
-            } finally {
-                $dstStream->close();
+            }
+
+            if ($nonEmptyStream) {
+                $dstStream = $this->filesystem->createStream($fileName);
+                $dstStream->open(new StreamMode('wb+'));
+                try {
+                    // save the chunk that was used to check if input stream is empty
+                    if ($firstChunk) {
+                        $dstStream->write($firstChunk);
+                    }
+
+                    while (!$srcStream->eof()) {
+                        $dstStream->write($srcStream->read(static::READ_BATCH_SIZE));
+                    }
+                } finally {
+                    $dstStream->close();
+                }
             }
         } finally {
             $srcStream->close();
         }
+
+        return $nonEmptyStream;
     }
 
     /**
