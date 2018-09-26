@@ -36,9 +36,12 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     /** @var string */
     protected $targetStepName;
 
+    /** @var WorkflowManager */
+    protected $workflowManager;
+
     /**
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
+     * @param TokenAccessorInterface $tokenAccessor
      */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -46,6 +49,14 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * @param WorkflowManager $workflowManager
+     */
+    public function setWorkflowManager(WorkflowManager $workflowManager)
+    {
+        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -83,17 +94,11 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
      */
     protected function isConditionAllowed($context)
     {
-        /** @var WorkflowItem $context */
-
         if (!$this->tokenAccessor->hasUser()) {
             return true;
         }
 
-        $objectWrapper = new DomainObjectWrapper(
-            $context->getEntity(),
-            new ObjectIdentity('workflow', $context->getWorkflowName())
-        );
-
+        $objectWrapper = $this->getDomainObjectWrapper($context);
         if (!$this->authorizationChecker->isGranted('PERFORM_TRANSITIONS', $objectWrapper)) {
             //performing of transitions is forbidden on workflow level
             return false;
@@ -147,5 +152,26 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
         }
 
         return null;
+    }
+
+    /**
+     * @param WorkflowItem $context
+     * @return DomainObjectWrapper
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     */
+    protected function getDomainObjectWrapper(WorkflowItem $context): DomainObjectWrapper
+    {
+        $entity = $context->getEntity();
+        if ($entity) {
+            $workflow = $this->workflowManager->getWorkflow($context);
+            $transition = $workflow->getTransitionManager()->getTransition($this->transitionName);
+            if ($transition && $transition->isStart() && !$context->getEntityId()) {
+                $entity = 'entity:' . ClassUtils::getClass($entity);
+            }
+        }
+        return new DomainObjectWrapper(
+            $entity,
+            new ObjectIdentity('workflow', $context->getWorkflowName())
+        );
     }
 }
