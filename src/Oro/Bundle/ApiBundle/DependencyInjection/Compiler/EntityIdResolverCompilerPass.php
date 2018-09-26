@@ -38,7 +38,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
                 );
                 $resolvers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null),
+                    DependencyInjectionUtil::getRequestType($tagAttributes),
                     $entityId,
                     $entityClass
                 ];

@@ -76,8 +76,10 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        if (!isset($server['HTTP_X-WSSE'])) {
+        if (!array_key_exists('HTTP_X-WSSE', $server)) {
             $server = array_replace($server, $this->getWsseAuthHeader());
+        } elseif (!$server['HTTP_X-WSSE']) {
+            unset($server['HTTP_X-WSSE']);
         }
 
         $this->client->request(
