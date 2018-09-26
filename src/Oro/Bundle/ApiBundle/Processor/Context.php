@@ -58,6 +58,9 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     const INCLUDE_HEADER = 'X-Include';
 
+    /** indicates whether the current request is CORS request */
+    const CORS = 'cors';
+
     /** @var FilterCollection */
     private $filters;
 
@@ -95,6 +98,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->configExtras = new ConfigExtraCollection();
         $this->configProvider = $configProvider;
         $this->metadataProvider = $metadataProvider;
+        $this->set(self::CORS, false);
     }
 
     /**
@@ -235,6 +239,29 @@ class Context extends NormalizeResultContext implements ContextInterface
     public function setFilterValues(FilterValueAccessorInterface $accessor)
     {
         $this->filterValues = $accessor;
+    }
+
+
+    /**
+     * Indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     *
+     * @return bool
+     */
+    public function isCorsRequest(): bool
+    {
+        return $this->get(self::CORS);
+    }
+
+    /**
+     * Sets a flag indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     *
+     * @param bool $cors
+     */
+    public function setCorsRequest(bool $cors): void
+    {
+        $this->set(self::CORS, $cors);
     }
 
     /**

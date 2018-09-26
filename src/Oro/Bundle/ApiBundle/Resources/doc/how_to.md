@@ -448,6 +448,7 @@ If this controller cannot handle the implementation of your REST API resources, 
  - saving data to the database
  - implementing relationships with other API resources
  - documenting such API resources
+ - implementing OPTIONS HTTP method for such API resources
 
 If you know about these disadvantages and still want to proceed, to register a custom controller, perform the following steps:
 

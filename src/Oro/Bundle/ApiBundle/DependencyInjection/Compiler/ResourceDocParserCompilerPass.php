@@ -31,7 +31,7 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
             foreach ($attributes as $tagAttributes) {
                 $resourceDocParsers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides information about mapping between API actions and HTTP methods and about general API route names.
@@ -50,18 +51,21 @@ class RestActionMapper
         switch ($templateRouteName) {
             case $this->itemRouteName:
                 return [
+                    ApiActions::OPTIONS,
                     ApiActions::GET,
                     ApiActions::DELETE,
                     ApiActions::UPDATE
                 ];
             case $this->listRouteName:
                 return [
+                    ApiActions::OPTIONS,
                     ApiActions::GET_LIST,
                     ApiActions::DELETE_LIST,
                     ApiActions::CREATE
                 ];
             case $this->subresourceRouteName:
                 return [
+                    ApiActions::OPTIONS,
                     ApiActions::GET_SUBRESOURCE,
                     ApiActions::UPDATE_SUBRESOURCE,
                     ApiActions::ADD_SUBRESOURCE,
@@ -69,6 +73,7 @@ class RestActionMapper
                 ];
             case $this->relationshipRouteName:
                 return [
+                    ApiActions::OPTIONS,
                     ApiActions::GET_RELATIONSHIP,
                     ApiActions::UPDATE_RELATIONSHIP,
                     ApiActions::ADD_RELATIONSHIP,
@@ -85,6 +90,7 @@ class RestActionMapper
     public function getActionsForResourcesWithoutIdentifier(): array
     {
         return [
+            ApiActions::OPTIONS,
             ApiActions::GET,
             ApiActions::DELETE,
             ApiActions::CREATE,
@@ -108,20 +114,22 @@ class RestActionMapper
             case ApiActions::GET_LIST:
             case ApiActions::GET_SUBRESOURCE:
             case ApiActions::GET_RELATIONSHIP:
-                return 'GET';
+                return Request::METHOD_GET;
             case ApiActions::DELETE:
             case ApiActions::DELETE_LIST:
             case ApiActions::DELETE_SUBRESOURCE:
             case ApiActions::DELETE_RELATIONSHIP:
-                return 'DELETE';
+                return Request::METHOD_DELETE;
             case ApiActions::UPDATE:
             case ApiActions::UPDATE_SUBRESOURCE:
             case ApiActions::UPDATE_RELATIONSHIP:
-                return 'PATCH';
+                return Request::METHOD_PATCH;
             case ApiActions::CREATE:
             case ApiActions::ADD_SUBRESOURCE:
             case ApiActions::ADD_RELATIONSHIP:
-                return 'POST';
+                return Request::METHOD_POST;
+            case ApiActions::OPTIONS:
+                return Request::METHOD_OPTIONS;
         }
 
         throw new \LogicException(\sprintf('Unsupported API action "%s".', $action));

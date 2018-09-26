@@ -23,3 +23,8 @@ oro_api:
                 Content-Type: application/vnd.api+json
                 X-Test-Request-Type: test_override
             request_type: ['rest', 'json_api', 'test_override']
+
+    cors:
+        allow_credentials: true
+        allow_origins:
+            - 'https://api.test.com'
