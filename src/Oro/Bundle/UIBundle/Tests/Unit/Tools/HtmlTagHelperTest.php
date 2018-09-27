@@ -4,6 +4,7 @@ namespace Oro\Bundle\UIBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\Filesystem\Filesystem;
 
 class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,10 +14,21 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagProvider;
 
+    /** @var string */
+    private $cachePath;
+
     protected function setUp()
     {
+        $this->cachePath = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'cache_test_data';
+        mkdir($this->cachePath);
         $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
-        $this->helper = new HtmlTagHelper($this->htmlTagProvider);
+        $this->helper = new HtmlTagHelper($this->htmlTagProvider, $this->cachePath);
+    }
+
+    protected function tearDown()
+    {
+        $fileSystem = new Filesystem();
+        $fileSystem->remove($this->cachePath);
     }
 
     public function testGetStripped()
