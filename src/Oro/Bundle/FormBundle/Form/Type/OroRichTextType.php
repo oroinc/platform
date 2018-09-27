@@ -134,7 +134,7 @@ class OroRichTextType extends AbstractType
             'convert_urls'       => true,
             'cache_suffix'       => $assetsVersionFormatted,
             'document_base_url'  => $assetsVersionBaseUrl,
-            'paste_data_images'  => true //to avoid of a paste plugin restriction
+            'paste_data_images'  => false
         ];
 
         $defaults = [
