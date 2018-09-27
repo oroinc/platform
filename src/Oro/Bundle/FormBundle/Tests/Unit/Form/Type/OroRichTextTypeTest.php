@@ -192,7 +192,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'convert_urls' => true,
                 'cache_suffix' => '',
                 'document_base_url' => '/prefix//',
-                'paste_data_images' => true,
+                'paste_data_images' => false,
             ]
         ];
 
