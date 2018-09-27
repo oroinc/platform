@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
-use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -164,11 +163,11 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
     protected function getDomainObjectWrapper(WorkflowItem $context): DomainObjectWrapper
     {
         $entity = $context->getEntity();
-        if ($entity) {
+        if ($entity && !$context->getEntityId()) {
             $workflow = $this->workflowManager->getWorkflow($context);
             $transition = $workflow->getTransitionManager()->getTransition($this->transitionName);
-            if ($transition && $transition->isStart() && !$context->getEntityId()) {
-                $entity = 'entity:' . ClassUtils::getClass($entity);
+            if ($transition && $transition->isStart()) {
+                $entity = 'workflow:' . $context->getWorkflowName();
             }
         }
         return new DomainObjectWrapper(
