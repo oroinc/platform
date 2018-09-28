@@ -58,14 +58,15 @@ abstract class RestApiTestCase extends ApiTestCase
     /**
      * Sends REST API request.
      *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
+     * @param string      $method
+     * @param string      $uri
+     * @param array       $parameters
+     * @param array       $server
+     * @param string|null $content
      *
      * @return Response
      */
-    abstract protected function request($method, $uri, array $parameters = [], array $server = []);
+    abstract protected function request($method, $uri, array $parameters = [], array $server = [], $content = null);
 
     /**
      * Sends OPTIONS request.

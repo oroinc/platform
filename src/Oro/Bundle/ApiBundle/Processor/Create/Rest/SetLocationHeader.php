@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -20,8 +21,8 @@ class SetLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Location';
 
-    /** @var string */
-    private $itemRouteName;
+    /** @var RestRoutes */
+    private $routes;
 
     /** @var RouterInterface */
     private $router;
@@ -33,18 +34,18 @@ class SetLocationHeader implements ProcessorInterface
     private $entityIdTransformerRegistry;
 
     /**
-     * @param string                      $itemRouteName
+     * @param RestRoutes                  $routes
      * @param RouterInterface             $router
      * @param ValueNormalizer             $valueNormalizer
      * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
      */
     public function __construct(
-        string $itemRouteName,
+        RestRoutes $routes,
         RouterInterface $router,
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
-        $this->itemRouteName = $itemRouteName;
+        $this->routes = $routes;
         $this->router = $router;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -83,7 +84,7 @@ class SetLocationHeader implements ProcessorInterface
         $entityId = $this->getEntityIdTransformer($requestType)->transform($entityId, $metadata);
 
         $location = $this->router->generate(
-            $this->itemRouteName,
+            $this->routes->getItemRouteName(),
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
