@@ -5,11 +5,18 @@ namespace Oro\Bundle\NotificationBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
+use Oro\Bundle\NotificationBundle\DependencyInjection\Configuration;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * This class prepares a mass notification message about maintenance mode, by provided data or data from system config
+ */
 class MassNotificationSender
 {
     const MAINTENANCE_VARIABLE  = 'maintenance_message';
@@ -69,11 +76,16 @@ class MassNotificationSender
             ? : $senderEmail
             ? : $this->cm->get('oro_notification.email_notification_sender_name');
         $senderEmail = $senderEmail ? : $this->cm->get('oro_notification.email_notification_sender_email');
+        $recipients = $this->getRecipients();
 
-        $recipients = $this->getRecipientEmails();
-        $template = $this->getTemplate($subject);
-
-        $massNotification = new MassNotification($senderName, $senderEmail, $recipients, $template);
+        $massNotification = new TemplateMassNotification(
+            $senderName,
+            $senderEmail,
+            $recipients,
+            $this->getTemplate($subject),
+            new EmailTemplateCriteria($this->getTemplateName()),
+            $subject
+        );
 
         $this->emailNotificationManager->process(
             null,
@@ -92,6 +104,7 @@ class MassNotificationSender
      *
      * @param string $subject
      *
+     * @deprecated since 2.6, will be removed in 3.1. Use ::getTemplateName instead.
      * @return EmailTemplate
      */
     protected function getTemplate($subject)
@@ -117,6 +130,7 @@ class MassNotificationSender
     }
 
     /**
+     * @deprecated since 2.6, will be removed in 3.1. Use ::getRecipients instead.
      * @return array
      */
     protected function getRecipientEmails()
@@ -134,6 +148,7 @@ class MassNotificationSender
     /**
      * Get all active users emails
      *
+     * @deprecated since 2.6, will be removed in 3.1. Use ::getRecipients instead.
      * @return array
      */
     protected function getRecipientsFromDB()
@@ -145,6 +160,46 @@ class MassNotificationSender
         $users = $qb->getQuery()->getResult();
 
         return array_column($users, 'email');
+    }
+
+    /**
+     * @return EmailHolderInterface[]
+     */
+    private function getRecipients()
+    {
+        $recipients = [];
+        $recipientEmails = $this->cm->get('oro_notification.mass_notification_recipients');
+        if ($recipientEmails) {
+            $recipientEmails = explode(';', $recipientEmails);
+            foreach ($recipientEmails as $recipientEmail) {
+                $recipients[] = new EmailAddressWithContext($recipientEmail);
+            }
+
+            return $recipients;
+        }
+
+        foreach ($this->getUserRepository()->findEnabledUserEmails() as $item) {
+            $recipients[] = new EmailAddressWithContext(
+                $item['email'],
+                $this->em->getReference(User::class, $item['id'])
+            );
+        }
+
+        return $recipients;
+    }
+
+    /**
+     * @return string
+     */
+    private function getTemplateName()
+    {
+        $templateName = $this->cm->get('oro_notification.mass_notification_template');
+        $isExist = $this->getEmailTemplateRepository()->isExist(new EmailTemplateCriteria($templateName));
+        if ($isExist) {
+            return $templateName;
+        }
+
+        return Configuration::DEFAULT_MASS_NOTIFICATION_TEMPLATE;
     }
 
     /**

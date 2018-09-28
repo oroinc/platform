@@ -36,6 +36,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
             'field' => 'string',
             'type' => 'text',
             'options' => [],
+            'exclude_parent_localization' => false
         ];
 
         $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
@@ -58,7 +59,11 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
             ->with(
                 LocalizedFallbackValueCollectionType::FIELD_VALUES,
                 LocalizedPropertyType::NAME,
-                ['type' => $type, 'options' => $options]
+                [
+                    'type' => $type,
+                    'options' => $options,
+                    'exclude_parent_localization' => false
+                ]
             )->willReturnSelf();
         $builder->expects($this->at(1))
             ->method('add')
@@ -74,7 +79,12 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
 
         $this->type->buildForm(
             $builder,
-            ['type' => $type, 'options' => $options, 'field' => $field]
+            [
+                'type' => $type,
+                'options' => $options,
+                'field' => $field,
+                'exclude_parent_localization' => false
+            ]
         );
     }
 }

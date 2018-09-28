@@ -56,6 +56,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailTemplate implements EmailTemplateInterface, Translatable
 {
+    public const TYPE_HTML = 'html';
+    public const TYPE_TEXT = 'text';
+
     /**
      * @var integer
      *

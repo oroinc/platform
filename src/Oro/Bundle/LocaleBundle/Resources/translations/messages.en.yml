@@ -73,6 +73,8 @@ oro.locale:
 
         use_fallback:
             label: 'Use'
+        use_fallback_to_default_value:
+            label: 'Use default value'
 
     controller:
         localization:

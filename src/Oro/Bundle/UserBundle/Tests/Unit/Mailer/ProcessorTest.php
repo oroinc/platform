@@ -81,4 +81,21 @@ class ProcessorTest extends AbstractProcessorTest
 
         $this->mailProcessor->sendForcedResetPasswordAsAdminEmail($this->user);
     }
+
+    public function testSendEmailWhenTemplateEmailManagerSet(): void
+    {
+        $returnValue = 1;
+        $templateEmailManager = $this->confgureTemplateEmailManagerExpectations($this->user, 1);
+
+        $this->mailProcessor->setTemplateEmailManager($templateEmailManager);
+
+        self::assertEquals(
+            $returnValue,
+            $this->mailProcessor->getEmailTemplateAndSendEmail(
+                $this->user,
+                self::TEMPLATE_NAME,
+                ['entity' => $this->user]
+            )
+        );
+    }
 }

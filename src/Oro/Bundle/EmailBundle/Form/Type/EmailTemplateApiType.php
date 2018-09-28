@@ -28,6 +28,7 @@ class EmailTemplateApiType extends EmailTemplateType
                 'data_class'      => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'intention'       => 'emailtemplate',
                 'csrf_protection' => false,
+                'additional_language_codes' => [],
             )
         );
     }

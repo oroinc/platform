@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -170,9 +171,12 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         $context->addDependentJob(Topics::POST_EXPORT, [
             'jobId' => $rootJob->getId(),
             'email' => $this->getUser()->getEmail(),
+            'recipientUserId' => $this->getUser()->getId(),
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],
             'outputFormat' => $body['outputFormat'],
+            'notificationTemplate' =>
+                $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ]);
 
         $this->dependentJob->saveDependentJob($context);

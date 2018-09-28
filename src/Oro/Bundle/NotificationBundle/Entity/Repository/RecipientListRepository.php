@@ -3,11 +3,17 @@
 namespace Oro\Bundle\NotificationBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
-
-use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Responsible for fetching recipients based on recipient list entity which includes direct users and users in groups.
+ */
 class RecipientListRepository extends EntityRepository
 {
     /**
@@ -35,27 +41,47 @@ class RecipientListRepository extends EntityRepository
     }
 
     /**
+     * @param RecipientList $recipientList
+     *
+     * @return array
+     */
+    public function getRecipients(RecipientList $recipientList): array
+    {
+        $users = $recipientList->getUsers();
+        $groupUsers = $this->getGroupRecipients($recipientList);
+
+        $recipients = array_merge($users->toArray(), $groupUsers);
+
+        // add custom email
+        if ($recipientList->getEmail()) {
+            $found = false;
+            /** @var EmailHolderInterface $recipient */
+            foreach ($recipients as $recipient) {
+                if ($recipient->getEmail() === $recipientList->getEmail()) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $recipients[] = new EmailAddressWithContext($recipientList->getEmail());
+            }
+        }
+
+        return $recipients;
+    }
+
+    /**
      * @param ArrayCollection $emails
      * @param RecipientList   $recipientList
      */
     protected function addGroupUsersEmails(ArrayCollection $emails, RecipientList $recipientList)
     {
-        $groupIds = $recipientList->getGroups()->map(
-            function ($group) {
-                return $group->getId();
-            }
-        )->toArray();
-
-        if (!$groupIds) {
+        if ($recipientList->getGroups()->isEmpty()) {
             return;
         }
 
-        $groupUsers = $this->_em->createQueryBuilder()
-            ->select('u.email')
-            ->from('OroUserBundle:User', 'u')
-            ->leftJoin('u.groups', 'groups')
-            ->where('groups.id IN (:groupIds)')
-            ->setParameter('groupIds', $groupIds)
+        $groupUsers = $this->getUserEmailsInGroupsQueryBuilder($recipientList->getGroups())
             ->getQuery()
             ->getResult();
 
@@ -65,5 +91,51 @@ class RecipientListRepository extends EntityRepository
             },
             $groupUsers
         );
+    }
+
+    /**
+     * @param Collection $groups
+     * @return QueryBuilder
+     */
+    private function getUserEmailsInGroupsQueryBuilder(Collection $groups): QueryBuilder
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('u.email')
+            ->from('OroUserBundle:User', 'u')
+            ->leftJoin('u.groups', 'groups')
+            ->where('groups.id IN (:groupIds)')
+            ->setParameter('groupIds', $groups);
+    }
+
+    /**
+     * @param RecipientList $recipientList
+     * @return array|EmailHolderInterface[]
+     */
+    private function getGroupRecipients(RecipientList $recipientList): array
+    {
+        if ($recipientList->getGroups()->isEmpty()) {
+            return [];
+        }
+
+        $queryBuilder = $this->getUserEmailsInGroupsQueryBuilder($recipientList->getGroups())->addSelect('u.id');
+
+        if (!$recipientList->getUsers()->isEmpty()) {
+            // Filter out user recipients which were selected directly
+            $queryBuilder
+                ->andWhere('u.id not IN (:users)')
+                ->setParameter('users', $recipientList->getUsers());
+        }
+
+        $groupUsers = $queryBuilder->getQuery()->getArrayResult();
+
+        $recipients = [];
+        foreach ($groupUsers as $groupUser) {
+            $recipients[] = new EmailAddressWithContext(
+                $groupUser['email'],
+                $this->_em->getReference(User::class, $groupUser['id'])
+            );
+        }
+
+        return $recipients;
     }
 }

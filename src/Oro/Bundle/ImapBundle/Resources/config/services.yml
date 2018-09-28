@@ -263,6 +263,8 @@ services:
             - '@oro_email.email_renderer'
             - '@doctrine'
             - '@oro_email.direct_mailer'
+        calls:
+             - [setTemplateEmailManager, ['@oro_email.manager.template_email']]
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 

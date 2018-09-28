@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
@@ -23,6 +24,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
  */
 class EnumSynchronizer
 {
+    use TranslatableQueryTrait;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -260,15 +263,18 @@ class EnumSynchronizer
         $em       = $this->doctrine->getManagerForClass($enumValueClassName);
         $enumRepo = $em->getRepository($enumValueClassName);
 
-        return $enumRepo->createQueryBuilder('e')
+        $query = $enumRepo->createQueryBuilder('e')
             ->select('e.id, e.priority, e.name as label, e.default as is_default')
             ->orderBy('e.priority')
             ->getQuery()
             ->setHint(
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
                 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
-            )
-            ->getArrayResult();
+            );
+
+        $this->addTranslatableLocaleHint($query, $em);
+
+        return $query->getArrayResult();
     }
 
     /**

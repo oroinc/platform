@@ -52,8 +52,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider
             return $this->processedConfig;
         }
 
-        if ($this->cache->contains(static::CACHE_KEY)) {
-            $this->processedConfig = $this->cache->fetch(static::CACHE_KEY);
+        $cachedConfig = $this->cache->fetch(static::CACHE_KEY);
+        if (false !== $cachedConfig) {
+            $this->processedConfig = $cachedConfig;
 
             return $this->processedConfig;
         }

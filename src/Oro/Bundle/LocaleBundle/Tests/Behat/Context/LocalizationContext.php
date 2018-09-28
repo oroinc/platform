@@ -43,4 +43,21 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
         $container->get('oro_translation.js_dumper')->dumpTranslations();
         $container->get('oro_ui.dynamic_asset_version_manager')->updateAssetVersion('translations');
     }
+
+    /**
+     * @Given /^I enable "(?P<languageCode>(?:[^"]|\\")*)" language$/
+     *
+     * @param string $languageCode
+     */
+    public function selectLanguage($languageCode)
+    {
+        /** @var ContainerInterface $container */
+        $container = $this->getContainer();
+
+        /** @var ConfigManager $configManager */
+        $configManager = $container->get('oro_config.global');
+        $configManager->set('oro_locale.languages', array_unique(['en', $languageCode]));
+        $configManager->set('oro_locale.language', $languageCode);
+        $configManager->flush();
+    }
 }

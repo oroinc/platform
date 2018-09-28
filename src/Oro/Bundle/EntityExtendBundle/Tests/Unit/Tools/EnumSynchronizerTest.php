@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
+use Doctrine\Common\EventManager;
 use Doctrine\ORM\Query;
 
 use Gedmo\Translatable\TranslatableListener;
@@ -15,6 +16,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -827,7 +832,8 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
     public function testGetEnumOptions()
     {
         $enumValueClassName = 'Test\EnumValue';
-        $values             = [['id' => 'opt1']];
+        $values = [['id' => 'opt1']];
+        $locale = 'de_DE';
 
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -865,16 +871,36 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
-        $query->expects($this->once())
+        $query->expects($this->exactly(2))
             ->method('setHint')
-            ->with(
-                Query::HINT_CUSTOM_OUTPUT_WALKER,
-                'Gedmo\Translatable\Query\TreeWalker\TranslationWalker'
+            ->withConsecutive(
+                [
+                    Query::HINT_CUSTOM_OUTPUT_WALKER,
+                    'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                ],
+                [
+                    TranslatableListener::HINT_TRANSLATABLE_LOCALE,
+                    $locale
+                ]
             )
             ->will($this->returnSelf());
         $query->expects($this->once())
             ->method('getArrayResult')
             ->will($this->returnValue($values));
+
+        $translatableListener = $this->createMock(TranslatableListener::class);
+        $translatableListener->expects($this->once())
+            ->method('getListenerLocale')
+            ->willReturn($locale);
+
+        $eventManager = $this->createMock(EventManager::class);
+        $eventManager->expects($this->any())
+            ->method('getListeners')
+            ->willReturn([[$translatableListener]]);
+
+        $em->expects($this->any())
+            ->method('getEventManager')
+            ->willReturn($eventManager);
 
         $result = $this->synchronizer->getEnumOptions($enumValueClassName);
 

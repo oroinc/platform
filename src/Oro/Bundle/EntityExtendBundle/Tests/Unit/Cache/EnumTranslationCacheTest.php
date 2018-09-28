@@ -68,23 +68,18 @@ class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isContains
-     * @param int $fetchCount
      * @param array $values
      *
      * @dataProvider getDataForFetch
      */
-    public function testFetch(bool $isContains, int $fetchCount, array $values)
+    public function testFetch(bool $isContains, array $values)
     {
         $key = $this->getKey();
 
         $this->cache->expects($this->once())
-            ->method('contains')
-            ->with($key)
-            ->willReturn($isContains);
-        $this->cache->expects($this->exactly($fetchCount))
             ->method('fetch')
             ->with($key)
-            ->willReturn($values);
+            ->willReturn($isContains ? $values : false);
 
         $this->assertEquals($values, $this->enumTranslationCache->fetch(self::CLASS_NAME));
     }
@@ -97,17 +92,14 @@ class EnumTranslationCacheTest extends \PHPUnit_Framework_TestCase
         return [
             'not contains' => [
                 'isContains' => false,
-                'fetchCount' => 0,
                 'values' => []
             ],
             'contains empty' => [
                 'isContains' => true,
-                'fetchCount' => 1,
                 'values' => []
             ],
             'contains values' => [
                 'isContains' => true,
-                'fetchCount' => 1,
                 'values' => [
                     ['value' => 1],
                     ['value' => 2]

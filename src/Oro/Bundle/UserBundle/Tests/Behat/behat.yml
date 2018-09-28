@@ -60,6 +60,9 @@ oro_behat_extension:
     Edit Button:
       selector: 'a[title="Edit profile"]'
 
+    Username or Email:
+      selector: '.oro-forgot-password input[name="username"]'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
@@ -107,7 +110,6 @@ oro_behat_extension:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
         - OroUserBundle::FeatureContext
-        - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
@@ -115,5 +117,6 @@ oro_behat_extension:
         - OroLocaleBundle::LocalizationContext
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

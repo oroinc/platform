@@ -43,6 +43,7 @@ parameters:
 
 services:
     oro_menu.cache:
+        deprecated: The "%service_id%" service is never used and will be removed in 3.1
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_menu' ] ]

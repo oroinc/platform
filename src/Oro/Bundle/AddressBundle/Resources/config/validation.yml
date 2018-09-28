@@ -47,6 +47,10 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             - Length:
                   max: 255
 
+        organization:
+            - Length:
+                  max: 255
+
         label:
             - Length:
                   max: 255

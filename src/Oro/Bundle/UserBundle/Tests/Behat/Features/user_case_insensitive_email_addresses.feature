@@ -53,7 +53,7 @@ Feature: User Case Insensitive Email Addresses
   Scenario: Check registration is not allowed when same email in lowercase exists when "Case Insensitive Email Addresses" is enabled
     Given I proceed as the Admin
     And go to System/User Management/Users
-    And press "Create User"
+    And click "Create User"
     When I fill "User Form" with:
       | Username          | John                |
       | Password          | Pa$$w0rd            |
@@ -76,7 +76,7 @@ Feature: User Case Insensitive Email Addresses
     Then I should see "Configuration saved" flash message
 
     When I go to System/User Management/Users
-    And I press "Create User"
+    And I click "Create User"
     When I fill "User Form" with:
       | Username          | John                |
       | Password          | Pa$$w0rd            |

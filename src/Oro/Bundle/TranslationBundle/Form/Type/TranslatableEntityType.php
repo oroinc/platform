@@ -16,9 +16,12 @@ use Doctrine\ORM\Query;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
 
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;
+use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 
 class TranslatableEntityType extends AbstractType
 {
+    use TranslatableQueryTrait;
+
     const NAME = 'translatable_entity';
 
     /**
@@ -89,7 +92,7 @@ class TranslatableEntityType extends AbstractType
             }
 
             if (null !== $options['choices']) {
-                return new ObjectChoiceList($options['choices'], $options['property'], array(), null, $idField);
+                return new ObjectChoiceList($options['choices'], $options['property'], [], null, $idField);
             }
 
             // get query builder
@@ -118,6 +121,8 @@ class TranslatableEntityType extends AbstractType
                 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
             );
 
+            $this->addTranslatableLocaleHint($query, $entityManager);
+
             // In case we use not standard Hydrator (not Query::HYDRATE_OBJECT)
             // we should add this hint to load nested entities
             // otherwise Doctrine will create partial object
@@ -125,18 +130,18 @@ class TranslatableEntityType extends AbstractType
 
             $entities = $query->execute(null, TranslationWalker::HYDRATE_OBJECT_TRANSLATION);
 
-            return new ObjectChoiceList($entities, $options['property'], array(), null, $idField);
+            return new ObjectChoiceList($entities, $options['property'], [], null, $idField);
         };
 
         $resolver->setDefaults(
-            array(
+            [
                 'property'      => null,
                 'query_builder' => null,
                 'choices'       => null,
                 'choice_list'   => $choiceList,
                 'translatable_options' => false
-            )
+            ]
         );
-        $resolver->setRequired(array('class'));
+        $resolver->setRequired(['class']);
     }
 }
