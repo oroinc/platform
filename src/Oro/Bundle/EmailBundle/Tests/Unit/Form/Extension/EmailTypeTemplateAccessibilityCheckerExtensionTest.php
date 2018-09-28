@@ -11,9 +11,7 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
 {
     public function testRemoveField()
     {
-        $authorizationChecker = $this
-            ->getMockBuilder(AuthorizationCheckerInterface::class)
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $authorizationChecker
             ->expects($this->once())
@@ -26,14 +24,12 @@ class EmailTypeTemplateAccessibilityCheckerExtensionTest extends TypeTestCase
         $this->builder->add('template');
         $extension->buildForm($this->builder, []);
 
-        $this->assertTrue(!$this->builder->has('template'));
+        $this->assertFalse($this->builder->has('template'));
     }
 
     public function testSafeField()
     {
-        $authorizationChecker = $this
-            ->getMockBuilder(AuthorizationCheckerInterface::class)
-            ->getMock();
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
         $authorizationChecker
             ->expects($this->once())
