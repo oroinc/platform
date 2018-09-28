@@ -91,10 +91,10 @@ define(function(require) {
          * @returns {SideMenuOverlayView}
          */
         updateContent: function($menu) {
-            this.searchContent = $menu.children();
+            this.searchContent = $menu.children().filter(':not(.divider)');
 
             var $menuItem = $('<li/>', {
-                'class': $menu.children().last().attr('class') + ' ui-helper'
+                'class': 'menu-item ui-helper'
             }).append(this.$('[data-role="overlay-design-helper"]'));
 
             $menu.append($menuItem);
