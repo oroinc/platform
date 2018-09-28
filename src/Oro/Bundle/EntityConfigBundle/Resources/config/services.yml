@@ -96,13 +96,13 @@ services:
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config' ] ]
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [setNamespace, [ 'oro_entity_config_model' ] ]
 
@@ -245,7 +245,6 @@ services:
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
             - '@session'
-            - '@event_dispatcher'
             - '@doctrine'
 
     oro_entity_config.config.config_helper:
@@ -419,12 +418,12 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
-    oro_entity_config.event_listener.attribute_after_remove_field:
-        class: Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener
+    oro_entity_config.event_listener.remove_attribute_group_relation:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: onPostFlushConfig }
 
     oro_entity_config.event_listener.cache_state:
         class:  Oro\Bundle\EntityConfigBundle\EventListener\CacheStateChangeListener

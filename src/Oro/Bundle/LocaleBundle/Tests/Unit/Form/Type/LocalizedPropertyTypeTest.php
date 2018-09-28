@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\PercentTypeStub;
-use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
@@ -126,6 +129,75 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                 ],
             ],
         ];
+    }
+
+    public function testConfigureOptions()
+    {
+        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())->method('setDefaults')->with(
+            $this->callback(
+                function (array $options) {
+                    self::assertEquals([], $options['entry_options']);
+                    self::assertFalse($options['exclude_parent_localization']);
+
+                    return true;
+                }
+            )
+        );
+
+        $resolver->expects($this->once())->method('setRequired')->with(['entry_type']);
+        $formType = new LocalizedPropertyType();
+        $formType->configureOptions($resolver);
+    }
+
+    public function testBuildForm()
+    {
+        $type = 'form_text';
+        $options = ['key' => 'value'];
+
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects($this->at(0))
+            ->method('add')
+            ->with(
+                LocalizedPropertyType::FIELD_DEFAULT,
+                $type,
+                [
+                    'key' => 'value',
+                    'label' => 'oro.locale.fallback.value.default'
+                ]
+            )->willReturnSelf();
+        $builder->expects($this->at(1))
+            ->method('add')
+            ->with(
+                LocalizedPropertyType::FIELD_LOCALIZATIONS,
+                LocalizationCollectionType::class,
+                [
+                    'entry_type' => $type,
+                    'entry_options' => $options,
+                    'exclude_parent_localization' => false
+                ]
+            )->willReturnSelf();
+        $builder->expects($this->once())
+            ->method('addViewTransformer')
+            ->with(
+                new MultipleValueTransformer(
+                    LocalizedPropertyType::FIELD_DEFAULT,
+                    LocalizedPropertyType::FIELD_LOCALIZATIONS
+                )
+            )
+            ->willReturnSelf();
+
+        $formType = new LocalizedPropertyType();
+        $formType->buildForm(
+            $builder,
+            [
+                'entry_type' => $type,
+                'entry_options' => $options,
+                'exclude_parent_localization' => false
+            ]
+        );
     }
 
     public function testGetName()

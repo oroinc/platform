@@ -24,11 +24,11 @@ Scenario: Add note
   And I go to System/User Management/Users
   And click view Charlie in grid
   And follow "More actions"
-  And press "Add note"
+  And click "Add note"
   And fill "Note Form" with:
     | Message    | Charlie works hard  |
     | Attachment | note-attachment.jpg |
-  When press "Add"
+  When click "Add"
   Then I should see "Note saved" flash message
   And should see "Charlie works hard" note in activity list
 
@@ -45,11 +45,11 @@ Scenario: Edit note in view page
   And fill "Note Form" with:
     | Message    | Very good actor      |
     | Attachment | note-attachment2.jpg |
-  When I press "Save"
+  When I click "Save"
   Then I should see "Very good actor" note in activity list
   And I should see note-attachment2.jpg text in activity
 
 Scenario: Delete note
   When I click "Delete note" on "Very good actor" in activity list
-  And press "Yes, Delete"
+  And click "Yes, Delete"
   Then I see no records in activity list

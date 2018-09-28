@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -30,7 +31,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $this->createLoggerInterfaceMock(),
             $this->createJobStorageMock(),
             $this->createImportJobSummaryResultServiceMock(),
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettings(),
             $this->createDoctrineMock()
         );
 
@@ -58,7 +59,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $logger,
             $this->createJobStorageMock(),
             $this->createImportJobSummaryResultServiceMock(),
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettings(),
             $this->createDoctrineMock()
         );
 
@@ -110,7 +111,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $logger,
             $jobStorage,
             $this->createImportJobSummaryResultServiceMock(),
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettings(),
             $doctrine
         );
 
@@ -174,17 +175,14 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('getSummaryResultForNotification')
             ->with($job, 'import.csv')
             ->willReturn(['data' => 'summary import information']);
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_email')
-            ->willReturn('test@mail.com');
-        $configManager
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_name')
-            ->willReturn('John');
+
+        $sender = From::emailAddress('test@mail.com', 'John');
+        $notificationsSettings = $this->createNotificationSettings();
+        $notificationsSettings
+            ->expects($this->once())
+            ->method('getSender')
+            ->willReturn($sender);
+
         $producer = $this->createMessageProducerInterfaceMock();
         $producer
             ->expects($this->once())
@@ -192,11 +190,11 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             ->with(
                 $this->equalTo(NotificationTopics::SEND_NOTIFICATION_EMAIL),
                 $this->equalTo([
-                    'fromEmail' => 'test@mail.com',
-                    'fromName' => 'John',
+                    'sender' => $sender->toArray(),
                     'toEmail' => $user->getEmail(),
                     'body' => ['data' => 'summary import information'],
                     'contentType' => 'text/html',
+                    'recipientUserId' => 1,
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
                 ])
             );
@@ -205,7 +203,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $logger,
             $jobStorage,
             $consolidateImportJobResultNotification,
-            $configManager,
+            $notificationsSettings,
             $doctrine
         );
         $message = new NullMessage();
@@ -255,11 +253,11 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
      */
-    private function createConfigManagerMock()
+    private function createNotificationSettings()
     {
-        return $this->createMock(ConfigManager::class);
+        return $this->createMock(NotificationSettings::class);
     }
 
     /**

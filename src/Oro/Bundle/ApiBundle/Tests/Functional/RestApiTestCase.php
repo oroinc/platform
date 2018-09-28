@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\Version;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * The base class for different kind of REST API functional tests.
@@ -52,6 +53,73 @@ abstract class RestApiTestCase extends ApiTestCase
     protected function getRelationshipRouteName()
     {
         return 'oro_rest_api_relationship';
+    }
+
+    /**
+     * Sends REST API request.
+     *
+     * @param string $method
+     * @param string $uri
+     * @param array  $parameters
+     * @param array  $server
+     *
+     * @return Response
+     */
+    abstract protected function request($method, $uri, array $parameters = [], array $server = []);
+
+    /**
+     * Sends OPTIONS request.
+     *
+     * @param string $routeName
+     * @param array  $routeParameters
+     * @param array  $parameters
+     * @param array  $server
+     * @param bool   $assertValid
+     *
+     * @return Response
+     */
+    protected function options(
+        string $routeName,
+        array $routeParameters = [],
+        array $server = [],
+        $assertValid = true
+    ) {
+        if (!array_key_exists('HTTP_X-WSSE', $server)) {
+            // disables authentication because OPTIONS requests must not require it
+            $server['HTTP_X-WSSE'] = null;
+        }
+
+        $response = $this->request(
+            'OPTIONS',
+            $this->getUrl($routeName, self::processTemplateData($routeParameters)),
+            [],
+            $server
+        );
+
+        if ($assertValid) {
+            self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+            self::assertSame('', $response->getContent());
+            self::assertSame(0, $response->headers->get('Content-Length'));
+            $this->assertOptionsResponseCacheHeader($response);
+        }
+
+        if (!$server['HTTP_X-WSSE']) {
+            self::assertTrue(
+                null === self::getContainer()->get('security.token_storage')->getToken(),
+                'The security token must not be initialized for OPTIONS request'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param Response $response
+     */
+    protected function assertOptionsResponseCacheHeader(Response $response)
+    {
+        self::assertResponseHeader($response, 'Cache-Control', 'max-age=600, public');
+        self::assertResponseHeader($response, 'Vary', 'Origin');
     }
 
     /**

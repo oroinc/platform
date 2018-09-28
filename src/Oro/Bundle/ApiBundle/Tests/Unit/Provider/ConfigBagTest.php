@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Request\Version;
 
 class ConfigBagTest extends \PHPUnit\Framework\TestCase
@@ -24,55 +25,43 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
             ];
         }
 
-        $this->configBag = new ConfigBag($config);
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn($config);
+        $this->configBag = new ConfigBag($configCache, $configFile);
     }
 
-    /**
-     * @dataProvider getClassNamesProvider
-     */
-    public function testGetClassNames($version, $expectedEntityClasses)
+    public function testGetClassNames()
     {
-        self::assertEquals(
-            $expectedEntityClasses,
-            $this->configBag->getClassNames($version)
-        );
+        $version = Version::LATEST;
+        $expectedEntityClasses = ['Test\Class1', 'Test\Class2'];
+
+        self::assertEquals($expectedEntityClasses, $this->configBag->getClassNames($version));
+        // test that data is cached in memory
+        self::assertEquals($expectedEntityClasses, $this->configBag->getClassNames($version));
     }
 
-    public function getClassNamesProvider()
+    public function testNoConfig()
     {
-        return [
-            [
-                Version::LATEST,
-                ['Test\Class1', 'Test\Class2']
-            ]
-        ];
+        $className = 'Test\UnknownClass';
+        $version = Version::LATEST;
+
+        self::assertNull($this->configBag->getConfig($className, $version));
+        // test that data is cached in memory
+        self::assertNull($this->configBag->getConfig($className, $version));
     }
 
-    /**
-     * @dataProvider noConfigProvider
-     */
-    public function testNoConfig($className, $version)
+    public function testNoRelationConfig()
     {
-        self::assertNull(
-            $this->configBag->getConfig($className, $version)
-        );
-    }
+        $className = 'Test\UnknownClass';
+        $version = Version::LATEST;
 
-    /**
-     * @dataProvider noConfigProvider
-     */
-    public function testNoRelationConfig($className, $version)
-    {
-        self::assertNull(
-            $this->configBag->getRelationConfig($className, $version)
-        );
-    }
-
-    public function noConfigProvider()
-    {
-        return [
-            ['Test\UnknownClass', Version::LATEST]
-        ];
+        self::assertNull($this->configBag->getRelationConfig($className, $version));
+        // test that data is cached in memory
+        self::assertNull($this->configBag->getRelationConfig($className, $version));
     }
 
     /**
@@ -84,6 +73,11 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
             $expectedConfig,
             $this->configBag->getConfig($className, $version)
         );
+        // test that data is cached in memory
+        self::assertEquals(
+            $expectedConfig,
+            $this->configBag->getConfig($className, $version)
+        );
     }
 
     /**
@@ -91,6 +85,11 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRelationConfig($className, $version, $expectedConfig)
     {
+        self::assertEquals(
+            $expectedConfig,
+            $this->configBag->getRelationConfig($className, $version)
+        );
+        // test that data is cached in memory
         self::assertEquals(
             $expectedConfig,
             $this->configBag->getRelationConfig($className, $version)

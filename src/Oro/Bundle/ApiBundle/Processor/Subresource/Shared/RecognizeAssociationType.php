@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -45,18 +46,13 @@ class RecognizeAssociationType implements ProcessorInterface
         }
 
         $associationName = $context->getAssociationName();
-        if (!$associationName) {
+        if ($associationName) {
+            $this->setAssociationType($context, $associationName);
+        } else {
             $context->addError(
                 Error::createValidationError(
                     Constraint::RELATIONSHIP,
                     'The association name must be set in the context.'
-                )
-            );
-        } elseif (!$this->setAssociationType($context, $associationName)) {
-            $context->addError(
-                Error::createValidationError(
-                    Constraint::RELATIONSHIP,
-                    'The target entity type cannot be recognized.'
                 )
             );
         }
@@ -65,28 +61,40 @@ class RecognizeAssociationType implements ProcessorInterface
     /**
      * @param SubresourceContext $context
      * @param string             $associationName
-     *
-     * @return bool
      */
-    private function setAssociationType(SubresourceContext $context, string $associationName): bool
+    private function setAssociationType(SubresourceContext $context, string $associationName): void
     {
         $subresource = $this->getSubresource($context, $associationName);
         if (null === $subresource) {
-            throw new NotFoundHttpException('Unsupported subresource.');
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::RELATIONSHIP,
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
+                )
+            );
+
+            return;
         }
+
         if ($subresource->isExcludedAction($context->getAction())) {
             throw new ActionNotAllowedException();
         }
 
         $targetClassName = $subresource->getTargetClassName();
         if (!$targetClassName) {
-            return false;
+            $context->addError(
+                Error::createValidationError(
+                    Constraint::RELATIONSHIP,
+                    'The target entity type cannot be recognized.'
+                )
+            );
+
+            return;
         }
 
         $context->setClassName($targetClassName);
         $context->setIsCollection($subresource->isCollection());
-
-        return true;
     }
 
     /**

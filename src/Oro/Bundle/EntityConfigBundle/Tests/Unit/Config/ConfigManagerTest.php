@@ -467,9 +467,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConfigChangeSet()
+    public function testEntityConfigChangeSet()
     {
-        $configId       = new EntityConfigId('entity', self::ENTITY_CLASS);
+        $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $originalConfig = $this->getConfig(
             $configId,
             [
@@ -508,16 +508,89 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->persist($changedConfig);
 
         $this->configManager->calculateConfigChangeSet($changedConfig);
+
+        $expectedChangeSet = [
+            'item12' => [true, false],
+            'item22' => [123, 456],
+            'item3'  => ['val2', 'val21'],
+            'item5'  => [null, 'val5'],
+            'item6'  => [null, 'val6'],
+            'item7'  => ['val7', null]
+        ];
         $this->assertEquals(
-            [
-                'item12' => [true, false],
-                'item22' => [123, 456],
-                'item3'  => ['val2', 'val21'],
-                'item5'  => [null, 'val5'],
-                'item6'  => [null, 'val6'],
-                'item7'  => ['val7', null]
-            ],
+            $expectedChangeSet,
             $this->configManager->getConfigChangeSet($changedConfig)
+        );
+        $this->assertEquals(
+            $expectedChangeSet,
+            $this->configManager->getEntityConfigChangeSet(
+                'entity',
+                $configId->getClassName()
+            )
+        );
+    }
+
+    public function testFieldConfigChangeSet()
+    {
+        $configId = new FieldConfigId('entity', self::ENTITY_CLASS, 'testField');
+        $originalConfig = $this->getConfig(
+            $configId,
+            [
+                'item1'  => true,
+                'item11' => true,
+                'item12' => true,
+                'item2'  => 123,
+                'item21' => 123,
+                'item22' => 123,
+                'item3'  => 'val2',
+                'item4'  => 'val4',
+                'item6'  => null,
+                'item7'  => 'val7'
+            ]
+        );
+        $this->configCache->expects($this->once())
+            ->method('getFieldConfig')
+            ->willReturn($originalConfig);
+        $this->configManager->getConfig($configId);
+
+        $changedConfig = $this->getConfig(
+            $configId,
+            [
+                'item1'  => true,
+                'item11' => 1,
+                'item12' => false,
+                'item2'  => 123,
+                'item21' => '123',
+                'item22' => 456,
+                'item3'  => 'val21',
+                'item5'  => 'val5',
+                'item6'  => 'val6',
+                'item7'  => null
+            ]
+        );
+        $this->configManager->persist($changedConfig);
+
+        $this->configManager->calculateConfigChangeSet($changedConfig);
+
+        $expectedChangeSet = [
+            'item12' => [true, false],
+            'item22' => [123, 456],
+            'item3'  => ['val2', 'val21'],
+            'item5'  => [null, 'val5'],
+            'item6'  => [null, 'val6'],
+            'item7'  => ['val7', null]
+        ];
+        $this->assertEquals(
+            $expectedChangeSet,
+            $this->configManager->getConfigChangeSet($changedConfig)
+        );
+        $this->assertEquals(
+            $expectedChangeSet,
+            $this->configManager->getFieldConfigChangeSet(
+                'entity',
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
         );
     }
 
@@ -1457,8 +1530,6 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($extendPropertyConfigContainer);
-        $extendConfigProvider->expects($this->never())
-            ->method('persist');
         $expectedConfig = $this->getConfig(
             $configId,
             [
@@ -1678,8 +1749,6 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($extendPropertyConfigContainer);
-        $extendConfigProvider->expects($this->never())
-            ->method('persist');
 
         $expectedConfig = $this->getConfig(
             $configId,

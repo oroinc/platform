@@ -1605,6 +1605,75 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNull()
+    {
+        $entityClass = 'Test\Entity';
+        $targetAction = 'get';
+        $config = [
+            'exclusion_policy' => 'all'
+        ];
+        $entityDescription = 'Entity';
+        $actionDescription = 'Get Entity';
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityDescription')
+            ->with($entityClass)
+            ->willReturn(null);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getResourceDescription')
+            ->with($targetAction, $entityDescription)
+            ->willReturn($actionDescription);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNullForCollectionResource()
+    {
+        $entityClass = 'Test\Entity';
+        $targetAction = 'get_list';
+        $config = [
+            'exclusion_policy' => 'all'
+        ];
+        $entityDescription = 'Entity';
+        $actionDescription = 'Get list of Entity';
+
+        $this->entityDocProvider->expects(self::once())
+            ->method('getEntityPluralDescription')
+            ->with($entityClass)
+            ->willReturn(null);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getResourceDescription')
+            ->with($targetAction, $entityDescription)
+            ->willReturn($actionDescription);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setIsCollection(true);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => CompleteDescriptions::ID_DESCRIPTION,
+                'description'            => $actionDescription
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testPrimaryResourceDescriptionLoadedByEntityDocProvider()
     {
         $entityClass = 'Test\Entity';

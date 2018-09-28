@@ -191,7 +191,7 @@ system_configuration:
 #### API Tree
 
 The `api_tree` section is used to define which configuration option should be available
-through API, e.g. REST API or SOAP API. Also it can be used to split the options
+through API, e.g. REST API. Also it can be used to split the options
 by some logical groups. Using the group name an API client can get only subset of the options.
 
 Please note that

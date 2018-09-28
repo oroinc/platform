@@ -344,3 +344,14 @@ services:
             - "@oro_locale.provider.current_localization"
         tags:
             - {name: oro_scope.provider, scopeType: web_content, priority: 1}
+
+    oro_locale.provider.chain_preferred_language_provider:
+        class: Oro\Bundle\LocaleBundle\Provider\ChainPreferredLanguageProvider
+
+    oro_locale.provider.default_preferred_language_provider:
+        class: Oro\Bundle\LocaleBundle\Provider\DefaultPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider, priority: 255 }

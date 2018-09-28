@@ -19,6 +19,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides related recipients for given entity.
+ */
 class RelatedEmailsProvider
 {
     /** @var Registry */
@@ -214,26 +217,26 @@ class RelatedEmailsProvider
      */
     protected function getFieldAttributes(ClassMetadata $metadata)
     {
-        $attributes           = [];
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $attributes = [];
         foreach ($metadata->fieldNames as $fieldName) {
+            if (!$this->configManager->hasConfig($metadata->name, $fieldName)) {
+                continue;
+            }
+
+            if ($this->configManager->isHiddenModel($metadata->name, $fieldName)) {
+                continue;
+            }
+
             if (false !== stripos($fieldName, 'email')) {
-                if ($extendConfigProvider->hasConfig($metadata->name, $fieldName)) {
-                    $config = $extendConfigProvider->getConfig($metadata->name, $fieldName);
-                    if (!$config->is('is_deleted')) {
-                        $attributes[] = new EmailAttribute($fieldName);
-                    }
+                $extendFieldConfig = $this->configManager->getFieldConfig('extend', $metadata->name, $fieldName);
+                if (!$extendFieldConfig->is('is_deleted')) {
+                    $attributes[] = new EmailAttribute($fieldName);
                 }
                 continue;
             }
 
-            if (!$entityConfigProvider->hasConfig($metadata->name, $fieldName)) {
-                continue;
-            }
-
-            $fieldConfig = $entityConfigProvider->getConfig($metadata->name, $fieldName);
-            if ($fieldConfig->get('contact_information') === 'email') {
+            $entityFieldConfig = $this->configManager->getFieldConfig('entity', $metadata->name, $fieldName);
+            if ($entityFieldConfig->get('contact_information') === 'email') {
                 $attributes[] = new EmailAttribute($fieldName);
             }
         }

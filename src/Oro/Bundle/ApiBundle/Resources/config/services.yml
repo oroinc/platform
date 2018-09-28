@@ -236,7 +236,7 @@ services:
 
     oro_api.resources_cache.impl:
         public: false
-        parent: oro.cache.abstract
+        parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'oro_api_resources' ] ]
 
@@ -300,6 +300,23 @@ services:
         public: false
         arguments:
             - '@oro_api.config_extension_registry'
+
+    oro_api.config_cache_factory:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory
+        public: false
+        arguments:
+            - '%kernel.cache_dir%/oro/api'
+            - '%kernel.debug%'
+
+    oro_api.config_cache_warmer:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer
+        public: false
+        arguments:
+            - [] # config files. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.config_extension_registry'
+            - '@oro_api.config_cache_factory'
+            - '%kernel.debug%'
+            - '%kernel.environment%'
 
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
@@ -599,12 +616,20 @@ services:
         arguments:
             - 'rest_api'
             - '@oro_api.rest.doc_view_detector'
-            - '@oro_api.action_processor_bag'
+            - '@oro_api.rest.doc_handler.context_provider'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.doc_handler.identifier'
             - '@oro_api.rest.doc_handler.filters'
+            - '@oro_api.rest.doc_handler.status_codes'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro_api.rest.doc_handler.context_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocContextProvider
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.action_processor_bag'
 
     oro_api.rest.doc_handler.identifier:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocIdentifierHandler
@@ -621,6 +646,10 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.value_normalizer'
             - '@oro_api.rest.doc_data_type_converter'
+
+    oro_api.rest.doc_handler.status_codes:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocStatusCodesHandler
+        public: false
 
     oro_api.rest.doc_data_type_converter:
         class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter

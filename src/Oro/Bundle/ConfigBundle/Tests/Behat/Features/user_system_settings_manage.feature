@@ -13,10 +13,10 @@ Feature: User system settings manage
       | Require a lower case letter  | true |
       | Require an upper case letter | true |
       | Require a special character  | true |
-    And I press "Save settings"
+    And I click "Save settings"
     Then I should see "Configuration saved" flash message
     When I go to System/User Management/Users
-    And press "Create User"
+    And click "Create User"
     And fill form with:
       | Password | 1 |
     And I save and close form

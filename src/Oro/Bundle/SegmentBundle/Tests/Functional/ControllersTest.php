@@ -183,6 +183,7 @@ class ControllersTest extends WebTestCase
                     ],
                     'format_type' => 'excel'
                 ],
+                'notificationTemplate' => 'datagrid_export_result',
             ]
         );
     }

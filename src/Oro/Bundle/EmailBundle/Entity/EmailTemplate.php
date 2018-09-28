@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * EmailTemplate
+ * Represents localizable email template which is used for template email notifications sending.
  *
  * @ORM\Table(name="oro_email_template",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="UQ_NAME", columns={"name", "entityName"})},
@@ -52,6 +52,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class EmailTemplate implements EmailTemplateInterface, Translatable
 {
+    public const TYPE_HTML = 'html';
+    public const TYPE_TEXT = 'text';
+
     /**
      * @var integer
      *

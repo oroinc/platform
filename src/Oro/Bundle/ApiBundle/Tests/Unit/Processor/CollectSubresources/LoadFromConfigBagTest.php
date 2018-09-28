@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContex
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
+use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
@@ -134,9 +135,15 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources = new ApiResourceSubresourcesCollection();
         $subresources->add($entitySubresources);
 
-        $configBag = new ConfigBag([
-            'entities' => []
-        ]);
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => []
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -168,19 +175,25 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources = new ApiResourceSubresourcesCollection();
         $subresources->add($entitySubresources);
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -238,18 +251,24 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $association->setTargetClassName($targetEntityClass);
         $association->setAcceptableTargetClassNames([$targetEntityClass]);
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'association1' => [
-                            'exclude' => true,
-                            'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'association1' => [
+                                'exclude' => true,
+                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -285,17 +304,23 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $association->setTargetClassName($targetEntityClass);
         $association->setAcceptableTargetClassNames([$targetEntityClass]);
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'association1' => [
-                            'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'association1' => [
+                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -340,19 +365,25 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -399,19 +430,25 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -450,17 +487,23 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'subresource1' => [
-                            'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'actions' => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => false]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -487,19 +530,25 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -547,22 +596,28 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'actions'      => [
-                        ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]
-                    ],
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'actions'      => [
+                            ApiActions::UPDATE_SUBRESOURCE => ['exclude' => true]
+                        ],
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
@@ -610,22 +665,28 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $subresources->add($entitySubresources);
         $entityMetadata = new EntityMetadata();
 
-        $configBag = new ConfigBag([
-            'entities' => [
-                $entityClass => [
-                    'actions'      => [
-                        ApiActions::CREATE => ['exclude' => true]
-                    ],
-                    'subresources' => [
-                        'subresource1' => [
-                            'target_class' => $targetEntityClass,
-                            'target_type'  => 'to-one',
-                            'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+        $configFile = 'api.yml';
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
+            ->method('getConfig')
+            ->with($configFile)
+            ->willReturn([
+                'entities' => [
+                    $entityClass => [
+                        'actions'      => [
+                            ApiActions::CREATE => ['exclude' => true]
+                        ],
+                        'subresources' => [
+                            'subresource1' => [
+                                'target_class' => $targetEntityClass,
+                                'target_type'  => 'to-one',
+                                'actions'      => [ApiActions::UPDATE_SUBRESOURCE => ['description' => 'test']]
+                            ]
                         ]
                     ]
                 ]
-            ]
-        ]);
+            ]);
+        $configBag = new ConfigBag($configCache, $configFile);
 
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');

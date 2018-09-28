@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -36,7 +37,7 @@ class LocationHeaderTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeEquals($response, 400);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
         self::assertFalse($response->headers->has('Location'));
     }
 }

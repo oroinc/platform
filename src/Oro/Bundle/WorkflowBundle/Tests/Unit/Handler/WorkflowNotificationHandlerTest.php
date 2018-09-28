@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationAdapter;
+use Oro\Bundle\NotificationBundle\Event\Handler\TemplateEmailNotificationAdapter;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\EmailNotificationStub;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
@@ -32,6 +33,9 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailNotificationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
     /** @var WorkflowNotificationHandler */
     private $handler;
 
@@ -40,6 +44,7 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->entity = new \stdClass();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
         $this->event->expects($this->any())->method('getEntity')->willReturn($this->entity);
 
@@ -48,7 +53,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new WorkflowNotificationHandler(
             $this->manager,
             $this->em,
-            new PropertyAccessor()
+            new PropertyAccessor(),
+            $this->eventDispatcher
         );
     }
 
@@ -62,11 +68,12 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $expected = array_map(
             function (EmailNotification $notification) {
-                return new EmailNotificationAdapter(
+                return new TemplateEmailNotificationAdapter(
                     $this->entity,
                     $notification,
                     $this->em,
-                    new PropertyAccessor()
+                    new PropertyAccessor(),
+                    $this->eventDispatcher
                 );
             },
             $expected
@@ -78,7 +85,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->manager->expects($expected ? $this->once() : $this->never())
             ->method('process')
             ->with(
-                $this->entity,
                 $expected,
                 null,
                 [

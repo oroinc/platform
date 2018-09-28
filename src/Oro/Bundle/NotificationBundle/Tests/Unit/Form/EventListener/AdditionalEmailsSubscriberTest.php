@@ -92,8 +92,8 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
-     * @param \PHPUnit_Framework_MockObject_MockObject $notification
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
+     * @param \PHPUnit\Framework\MockObject\MockObject $notification
      */
     protected function assertInitAdditionalRecipientChoicesCalls(
         \PHPUnit\Framework\MockObject\MockObject $form,
