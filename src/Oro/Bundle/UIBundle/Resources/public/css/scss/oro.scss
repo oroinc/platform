@@ -997,11 +997,6 @@ span.validation-failed {
         }
     }
 
-    .filter-box {
-        padding: 5px 20px 5px 130px;
-        margin: 5px;
-    }
-
     .tab-container {
         .nav-tabs > .active > a,
         .nav-tabs > .active > a:hover,
@@ -1113,66 +1108,21 @@ label .popover-body {
 }
 
 .list-box {
-    &:after {
-        content: '';
-        clear: both;
-        display: block;
-    }
-
     .list-item {
-        border-bottom: 1px solid #eee;
         padding: 15px;
-        box-sizing: border-box;
         width: 100%;
 
-        &:hover {
-            background: #f8f8f8;
+        border-bottom: 1px solid $primary-860;
+
+        &:first-child {
+            border-top: 1px solid $primary-860;
         }
 
         .actions {
             position: relative;
-            float: right;
-            margin-right: -4px;
+            float: #{$end};
+            margin-#{$end}: -4px;
             z-index: 99;
-
-            .btn {
-                line-height: 1em;
-                height: auto;
-                border: 0;
-                background: 0;
-                box-shadow: none;
-                padding: 0;
-
-                [class^="fa-"] {
-                    &:before {
-                        opacity: .6;
-                        font-size: 15px;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: 1;
-                        }
-                    }
-                }
-            }
-
-            .btn.disabled,
-            .btn[disabled] {
-                cursor: not-allowed;
-
-                [class^="fa-"] {
-                    &:before {
-                        opacity: .3;
-                    }
-
-                    &:hover {
-                        &:before {
-                            opacity: .3;
-                        }
-                    }
-                }
-            }
         }
     }
 }

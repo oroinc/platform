@@ -7,9 +7,11 @@
 {% block activityActions %}
     <% var togglerId = _.uniqueId('dropdown-') %>
     <div class="dropleft vertical-actions activity-actions">
-        <a href="#" role="button" id="<%- togglerId %>" data-toggle="dropdown" class="dropdown-toggle activity-item"
-           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.activitylist.actions.label'|trans }}">...</a>
-        <ul class="dropdown-menu activity-item" role="menu" aria-labelledby="<%- togglerId %>">
+        <button id="<%- togglerId %>" data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret activity-item"
+           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.activitylist.actions.label'|trans }}">
+            <span class="fa fa-ellipsis-h" aria-hidden="true"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-toggle--no-caret activity-item" role="menu" aria-labelledby="<%- togglerId %>">
             {% for action in actions|default([]) %}
                 <li class="activity-action">{{ action|raw }}</li>
             {% endfor %}

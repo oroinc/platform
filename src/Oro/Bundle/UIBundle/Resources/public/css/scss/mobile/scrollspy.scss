@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+.scrollspy {
+    .accordion-toggle {
+        padding: $scrollspy-mobile-toggle-offset;
+
+        border-radius: $scrollspy-mobile-border-radius;
+
+        &:before {
+            margin: $scrollspy-mobile-toggle-icon-offset;
+
+            font-size: $scrollspy-mobile-toggle-icon-font-size;
+            font-weight: normal;
+
+            color: $scrollspy-mobile-toggle-icon-color;
+
+            vertical-align: middle;
+        }
+    }
+}

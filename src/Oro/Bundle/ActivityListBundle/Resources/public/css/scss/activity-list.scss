@@ -3,12 +3,30 @@
 .activity-list-widget {
     position: relative;
 
-    .actions-bottom {
-        border-top: 1px solid #ddd;
-    }
-
     .title {
         display: none;
+    }
+
+    .grid-toolbar {
+        margin-bottom: 12px;
+    }
+
+    .filter-box {
+        padding: 0;
+        width: 33%;
+        flex-grow: 1;
+    }
+
+    .pagination {
+        margin: 0;
+    }
+
+    .actions-panel {
+        width: 33%;
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0;
     }
 
     .activity-list {
@@ -29,29 +47,17 @@
             }
         }
 
-        .filter-box {
-            float: left;
-            margin: 0;
-            padding: 0;
-            background: none;
-            border: none;
-            box-shadow: none;
-        }
-
         .filter-item {
-            margin-bottom: 0;
-            margin-right: 7px;
+            margin-#{$end}: 8px;
+
+            &:last-child {
+                margin-#{$end}: 0;
+            }
         }
 
         .info {
-            margin-top: 7px;
+            margin-top: 8px;
             margin-bottom: 20px;
-        }
-
-        .info.responsive-cell.thread {
-            .items.list-box.list-shaped {
-                border: none;
-            }
         }
 
         .info.responsive-cell {
@@ -62,15 +68,6 @@
     }
 
     .list-box {
-        &.list-shaped {
-            border: solid 1px #ddd;
-            border-radius: 4px;
-
-            .list-item {
-                border-bottom-color: #ddd;
-            }
-        }
-
         &:empty {
             display: none;
         }
@@ -84,22 +81,6 @@
 
             .actions {
                 position: static;
-
-                .vertical-actions .dropdown-toggle {
-                    padding: 0;
-                    color: #999;
-                    font-size: 16px;
-                    line-height: .7em;
-                    width: 23px;
-                    height: 19px;
-                    float: left;
-
-                    &:hover,
-                    &:focus {
-                        border: 0;
-                        text-decoration: none;
-                    }
-                }
             }
 
             .user {
@@ -117,8 +98,9 @@
         }
 
         .comment-count {
-            color: #999;
-            margin-left: 5px;
+            margin-#{$start}: 5px;
+
+            color:$primary-700;
 
             .icon {
                 width: auto;
@@ -138,105 +120,96 @@
     }
 
     .accordion-heading {
-        min-height: 46px;
+        display: flex;
+        justify-content: space-between;
         width: 100%;
-        padding: 5px 10px;
+        min-height: 46px;
+        padding: 14px 0;
+
         cursor: pointer;
 
         &:hover {
-            background-color: #f8f8f8;
+            background-color: $primary-900;
         }
 
-        > .icon,
-        > .accordion-icon,
-        > .details,
-        > .comment-count,
-        > .message,
-        > .created-at,
-        > .actions {
+        .icon,
+        .accordion-icon,
+        .details,
+        .comment-count,
+        .message,
+        .created-at,
+        .actions {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        > .accordion-icon {
-            padding: 0;
-            margin: 8px 0 0 5px;
+        .accordion-icon {
             float: left;
-            line-height: 20px;
-            height: 20px;
+            font-size: 16px;
+            font-weight: normal;
 
-            &:before {
-                content: '\f147';
-                font-family: FontAwesome;
-                font-size: 18px;
-                color: #999;
+            &:hover {
+                color: $primary-400;
             }
 
-            &:hover:before {
-                color: #444;
-            }
+            @include fa-icon($fa-var-plus-square-o);
 
-            &.collapsed:before {
-                content: '\f196';
+            &.collapsed {
+                @include fa-icon($fa-var-minus-square-o);
             }
         }
 
-        > .icon {
-            float: left;
+        .icon {
+            float: #{$start};
             width: 27px;
             font-size: 18px;
-            color: #999;
-            margin: 8px 6px 0 8px;
+            color: #878789;
+            margin: 8px 0;
         }
 
-        > .actions {
-            float: right;
-            margin: 8px 0 0 8px;
+        .actions {
+            float: #{$end};
             overflow: visible;
         }
 
-        > .details {
-            margin: 9px 7px 0 0;
+        .details {
             max-width: 247px;
             min-width: 247px;
-            padding-bottom: 1px;
-            float: left;
+            float: #{$start};
 
             &:hover {
-                background: #fafafa;
+                background: $primary-900;
                 width: auto;
                 z-index: 1;
             }
         }
 
-        > .extra-info {
-            padding-top: 9px;
-            padding-bottom: 4px;
+        .extra-info {
             width: calc(100% - 351px);
             display: flex;
             flex-flow: row nowrap;
             white-space: nowrap;
 
-            > .created-at {
-                margin-left: 8px;
-                color: #888;
+            .created-at {
+                margin-#{$start}: 8px;
+                color: $primary-600;
                 align-self: flex-end;
             }
 
-            > .comment-count {
+            .comment-count {
                 align-self: flex-end;
             }
 
-            > .message-item {
+            .message-item {
                 align-self: stretch;
                 width: 100%;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                color: #888;
+                color: $primary-600;
 
                 strong {
-                    color: #555;
+                    color: $primary-500;
                 }
             }
         }
@@ -245,14 +218,14 @@
     .accordion-body {
         padding: 0;
 
-        > .message {
+        .message {
             .user-fieldset {
                 margin-top: 5px;
-                margin-right: 20px;
+                margin-#{$end}: 20px;
             }
 
             .comment {
-                padding: 0 20px 0 0;
+                padding: side-values(0 20px 0 0);
             }
         }
 
@@ -267,16 +240,16 @@ li[data-criteria="condition-activity"] {
         border: none;
         background: none;
         font-weight: normal;
-        padding-left: 0;
-        padding-right: 0;
-        color: #444;
+        padding-#{$start}: 0;
+        padding-#{$end}: 0;
+        color: $primary-400;
     }
 
     .filter-item {
-        margin-right: 0;
+        margin-#{$end}: 0;
 
         .fa-close {
-            margin-right: 0;
+            margin-#{$end}: 0;
         }
     }
 }

@@ -79,6 +79,12 @@
     }
 }
 
+.dropleft > .dropdown-toggle--no-caret {
+    &:before {
+        content: none;
+    }
+}
+
 .dropdown-item {
     [class^="fa-"],
     [class*=" fa-"] {

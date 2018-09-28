@@ -43,7 +43,6 @@
     }
 }
 
-.scrollspy.container-fluid,
 .page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
 .page-title + .product-container {
     margin-top: -10px;
@@ -161,11 +160,8 @@
         margin-#{$start}: 0;
 
         .filter-box {
-            padding-#{$start}: 0;
-            padding-#{$end}: 0;
-            margin-#{$start}: 0;
-            margin-#{$end}: 0;
             max-width: 100%;
+            width: 100%;
         }
 
         .container-fluid {

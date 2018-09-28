@@ -5,10 +5,11 @@
         <div class="accordion-heading clearfix">
             <a href="#<%- regionId %>" data-toggle="collapse" aria-expanded="<%- collapsed ? 'false' : 'true' %>"
                aria-controls="<%- regionId %>"
-               class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"
+               class="btn btn-light accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"
                title="<%- _.__(collapsed ? 'Expand' : 'Collapse')%>"
                data-collapsed-title="{{ 'Expand'|trans }}"
                data-expanded-title="{{ 'Collapse'|trans }}"
+               role="button"
             ></a>
             <div class="icon">
                 {% block activityIcon %}
@@ -18,14 +19,10 @@
                 {% block activityDetails %}
                 {% endblock %}
             </div>
-            <div class="actions">
-                {% block activityActions %}
-                {% endblock %}
-            </div>
             <div class="extra-info">
                 <div class="message-item message">
                     {% block activityShortMessage %}
-                        <strong><%- _.unescape(subject) %></strong>
+                        <b><%- _.unescape(subject) %></b>
                         <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
                         - <%= description %>
                         <% } %>
@@ -33,13 +30,17 @@
                 </div>
                 <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
                     title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                    <i class="fa-comment"></i><span class="count"><%= commentCount %></span>
+                    <span class="fa-comment" aria-hidden="true"></span><span class="count"><%= commentCount %></span>
                 </div>
+            {% block activityDate %}
                 <div class="created-at">
-                    {% block activityDate %}
-                        <i class="date"><%= updatedAt %></i>
-                    {% endblock %}
+                    <i class="date"><%= updatedAt %></i>
                 </div>
+            {% endblock %}
+            <div class="actions">
+                {% block activityActions %}
+                {% endblock %}
+            </div>
             </div>
         </div>
         <div id="<%- regionId %>" role="region" aria-labelledby="<%- labelId %>" class="accordion-body collapse<% if (!collapsed) { %> show<% } %>">

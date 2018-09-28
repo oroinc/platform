@@ -1,85 +1,31 @@
 /* @theme: admin.oro; */
 
 .activity-list-widget {
-    .activity-list {
-        .info {
-            margin-bottom: $content-padding;
-        }
+    .grid-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
     }
 
-    .comments-view-footer {
-        margin-bottom: 0;
+    .filter-box {
+        padding: 0;
+        width: 100%;
+        flex-grow: 1;
     }
 
-    .accordion-heading > .created-at {
-        margin: 7px 0 0 0;
+    .filter-item {
+        margin-bottom: 8px;
     }
 
-    .accordion-body .message .comment {
-        padding-right: 0;
+    .pagination {
+        margin: 0;
     }
-}
 
-@media screen and (max-width: 650px) {
-    .activity-list-widget {
-        .accordion > .items {
-            .extra-info {
-                width: 100%;
-            }
-
-            .message-item {
-                margin-right: 4px;
-            }
-
-            .details {
-                min-width: 0;
-                max-width: calc(100% - 80px);
-                margin-right: 0;
-            }
-
-            .actions {
-                margin-left: 0;
-                margin-right: -10px;
-            }
-        }
-
-        .accordion-body {
-            .widget-content > .responsive-block {
-                min-width: 100%;
-            }
-
-            .message .comment {
-                padding: 0;
-            }
-        }
+    .actions-panel {
+        width: auto;
     }
 }
 
-@media screen and (min-width: 400px) {
-    .activity-list-widget .filter-box {
-        width: calc(100% - 34px);
 
-        + .pull-right {
-            margin-left: -2px;
-        }
-
-        > .filter-container {
-            margin-bottom: 6px;
-
-            > .filter-item {
-                width: calc(50% - 16px);
-                margin: 0 12px 10px 0;
-
-                &:last-child {
-                    margin-bottom: 10px;
-                }
-
-                .filter-criteria-selector {
-                    .caret {
-                        margin-top: 13px;
-                    }
-                }
-            }
-        }
-    }
+@media only screen and (max-width: $small-devices-media-breakpoint) {
 }

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "./activity-list";
+    @import "oroui/css/scss/mobile/variables/layout";
+
+    @import "activity-list";
 }
