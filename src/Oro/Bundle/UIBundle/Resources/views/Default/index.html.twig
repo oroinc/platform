@@ -1,12 +1,12 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
-    <html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
+    <html lang="{{ oro_language()|slice(0,2) }}" class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
     <head>
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no{% if isMobileVersion() %}, viewport-fit=cover{% endif %}"/>
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0{% if isMobileVersion() %}, user-scalable=no, viewport-fit=cover{% endif %}"/>
             <meta http-equiv="cache-control" content="max-age=0" />
             <meta http-equiv="cache-control" content="no-cache" />
             <meta http-equiv="expires" content="0" />
@@ -95,7 +95,7 @@
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
-            <div class="app-page__main">
+            <main class="app-page__main">
                 {% if isDesktopVersion() %}
                     {% block left_panel %}
                         <div id="left-panel" class="app-page__left-panel">
@@ -206,7 +206,7 @@
                         </div>
                     {% endblock right_panel %}
                 {% endif %}
-            </div>
+            </main>
         {% block footer %}
             <div id="dialog-extend-fixed-container" class="ui-dialog-minimize-container"></div>
             <footer id="footer" class="footer">

@@ -17,6 +17,7 @@
                 data-operation-url="{{ buttonOptions.url }}"
                 data-options="{{ buttonOptions|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
+                role="button"
                 {% if not button.buttonContext.enabled %}
                     disabled="disabled"
                 {% endif %}

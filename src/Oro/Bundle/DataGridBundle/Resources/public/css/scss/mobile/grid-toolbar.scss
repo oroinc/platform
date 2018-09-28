@@ -7,7 +7,7 @@
 
     .grid-toolbar-input {
         width: $oro-datagrid-toolbar-input-width;
-        margin: 0 $oro-datagrid-toolbar-mobile-offset;
+        margin: $oro-datagrid-toolbar-mobile-input-offset;
     }
 
     &__part {

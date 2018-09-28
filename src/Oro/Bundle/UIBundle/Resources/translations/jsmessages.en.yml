@@ -138,6 +138,10 @@ oro:
             auto: Zoom auto
             steps: Zoom steps
 
+        search: "Search"
+        reset: "Reset"
+        close_menu: "Close menu"
+
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

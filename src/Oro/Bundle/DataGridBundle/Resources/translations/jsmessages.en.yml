@@ -39,6 +39,7 @@
 "oro.datagrid.no.resultsTitle": "No Results Found"
 "oro.datagrid.no.results": "No {{ entityHint }} were found to match your search.<br/>Try modifying your search criteria"
 "oro.datagrid.no.columns": "No columns configured for this grid"
+"oro.datagrid.pagination.input-aria": "data grid pagination input"
 "oro.datagrid.pagination.label": "Page"
 "oro.datagrid.pagination.prev": "Prev"
 "oro.datagrid.pagination.next": "Next"

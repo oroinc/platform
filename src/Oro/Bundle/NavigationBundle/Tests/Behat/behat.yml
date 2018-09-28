@@ -1,7 +1,7 @@
 oro_behat_extension:
   elements:
     MainMenu:
-      selector: 'div#main-menu'
+      selector: 'nav#main-menu'
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
 
     SideMenuOverlay:

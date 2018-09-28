@@ -8,7 +8,7 @@
                class="grid-toolbar-input"
                value="<%- state.firstPage == 0 ? state.currentPage + 1 : state.currentPage  %>"
             <% if (disabled) { %>disabled<% } %>
-            data-grid-pagination-trigger-input
+            data-grid-pagination-trigger-input aria-label="<%- _.__('oro.datagrid.pagination.input-aria') %>"
         >
     <% } else { %>
         <%
