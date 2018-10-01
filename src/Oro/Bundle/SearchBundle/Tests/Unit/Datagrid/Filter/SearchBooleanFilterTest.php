@@ -67,22 +67,25 @@ class SearchBooleanFilterTest extends \PHPUnit_Framework_TestCase
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->once())
             ->method('addRestriction')
-            ->with(Criteria::expr()->eq(self::FIELD_NAME, BooleanAttributeType::TRUE_VALUE));
+            ->with(Criteria::expr()->in(self::FIELD_NAME, [BooleanFilterType::TYPE_YES]));
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => self::FIELD_NAME]);
-        $this->filter->apply($dataSource, ['value' => BooleanFilterType::TYPE_YES]);
+        $this->filter->apply($dataSource, ['value' => [BooleanFilterType::TYPE_YES]]);
     }
 
-    public function testApplyWhenNo()
+    public function testApplyWhenYesAndNo()
     {
         /** @var FilterDatasourceAdapterInterface|\PHPUnit_Framework_MockObject_MockObject $dataSource */
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->once())
             ->method('addRestriction')
-            ->with(Criteria::expr()->eq(self::FIELD_NAME, BooleanAttributeType::FALSE_VALUE));
+            ->with(Criteria::expr()->in(
+                self::FIELD_NAME,
+                [BooleanAttributeType::TRUE_VALUE, BooleanAttributeType::FALSE_VALUE]
+            ));
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => self::FIELD_NAME]);
-        $this->filter->apply($dataSource, ['value' => BooleanFilterType::TYPE_NO]);
+        $this->filter->apply($dataSource, ['value' => [BooleanFilterType::TYPE_YES, BooleanFilterType::TYPE_NO]]);
     }
 
     public function testApplyWhenSomeOther()
