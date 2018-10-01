@@ -1,8 +1,9 @@
 define([
     'underscore',
     'oroui/js/tools',
-    './filters-manager'
-], function(_, tools, FiltersManager) {
+    './filters-manager',
+    'oroui/js/mediator'
+], function(_, tools, FiltersManager, mediator) {
     'use strict';
 
     var CollectionFiltersManager;
@@ -207,6 +208,9 @@ define([
             _.each(valuesToApply, function(filterState, name) {
                 this.filters[name].setValue(filterState);
             }, this);
+
+            mediator.trigger('filters-manager:after-applying-state');
+            this.checkFiltersVisibility();
 
             return this;
         }

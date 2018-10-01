@@ -313,6 +313,13 @@ services:
         tags:
             - { name: form.type, alias: oro_search_type_entity_filter }
 
+    oro_search.form.type.filter.search_boolean:
+        class: Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_search_type_boolean_filter }
+
     oro_search.provider.console.optional_listeners_global_options_provider:
         class: Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProvider
         tags:
