@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Doctrine\Common\Cache\ApcCache;
+use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Listener that clears the owner tree and doctrine query caches.
+ */
 class OwnerTreeListener
 {
     /** @var array [class name => [[field name, ...], [association name, ...]], ...] */
@@ -56,6 +61,13 @@ class OwnerTreeListener
 
         if ($this->isCacheOutdated) {
             $this->treeProvider->clear();
+
+            // Clear doctrine query cache to be sure that queries will process hints
+            // again with updated security information.
+            $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCacheImpl();
+            if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
+                $cacheDriver->deleteAll();
+            }
         }
     }
 

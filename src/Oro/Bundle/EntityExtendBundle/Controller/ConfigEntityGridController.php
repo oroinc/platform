@@ -22,10 +22,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Class ConfigEntityGridController
+ * ConfigEntityGrid controller
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/entity")
- * TODO: Discuss ACL impl., currently acl is disabled
+ * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
 class ConfigEntityGridController extends Controller

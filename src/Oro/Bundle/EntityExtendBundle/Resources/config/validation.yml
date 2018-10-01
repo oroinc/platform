@@ -13,6 +13,7 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     properties:
         fieldName:
             - NotBlank: ~
+            - oro_entity_extend:FieldNameLength: ~
             - Regex:
                 pattern: "/^[a-z]+[a-z0-9_]*$/i"
                 message: "This value should start with a symbol and contain only alphabetic symbols, underscore and numbers."

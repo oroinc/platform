@@ -254,6 +254,31 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: I follow "My Configuration" link within flash message
+     *
+     * @Then /^(?:|I )follow "(?P<title>[^"]+)" link within flash message "(?P<message>[^"]+)"$/
+     *
+     * @param string $title
+     * @param string $message
+     */
+    public function iFollow($title, $message)
+    {
+        $flashMessage = $this->assertHasFlashMessageByTitle($message, 'Flash Message', 15);
+
+        if ($flashMessage) {
+            $link = $flashMessage->findElementContains('Link', $title);
+
+            self::assertNotNull(
+                $link,
+                sprintf('Could not find link "%s" within flash message "%s"', $title, $message)
+            );
+
+            $link->focus();
+            $link->click();
+        }
+    }
+
+    /**
      * Example: Then I should see "Attachment created successfully" flash message
      * Example: Then I should see "The email was sent" flash message
      *
@@ -263,6 +288,18 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
         $this->assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit);
+    }
+
+    /**
+     * Example: Then I should see "Attachment created successfully" flash message and keep it
+     * Example: Then I should see "The email was sent" flash message and keep it
+     *
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message and keep it$/
+     * @Then /^(?:|I )should see '(?P<title>[^']+)' flash message and keep it$/
+     */
+    public function iShouldSeeFlashMessageAndKeepIt($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
+    {
+        $this->assertHasFlashMessageByTitle($title, $flashMessageElement, $timeLimit);
     }
 
     /**
@@ -449,6 +486,37 @@ class OroMainContext extends MinkContext implements
         }
 
         self::fail('Expect to see no alert but alert with "'.$alertMessage.'" message is present');
+    }
+
+    /**
+     * Assert alert with text is present
+     * Example: Then I should see alert with message "You have unsaved changes"
+     *
+     * @Then /^(?:|I )should see alert with message "(?P<expectedMessage>[^"]+)"$/
+     */
+    public function iShouldSeeAlert(string $expectedMessage)
+    {
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $session = $driver->getWebDriverSession();
+
+        try {
+            $alertMessage = $session->getAlert_text();
+
+            self::assertEquals(
+                $expectedMessage,
+                $alertMessage,
+                sprintf(
+                    'Expected to see alert with message "%s" but alert with "%s" found instead',
+                    $expectedMessage,
+                    $alertMessage
+                )
+            );
+        } catch (NoAlertOpenError $e) {
+            self::fail('Expected to see alert, but it was not found');
+
+            return;
+        }
     }
 
     /**
@@ -2051,6 +2119,22 @@ JS;
      */
     protected function assertFlashMessageByTitle($title, $flashMessageElement, $timeLimit, $assertExist = true)
     {
+        $flashMessage = $this->assertHasFlashMessageByTitle($title, $flashMessageElement, $timeLimit, $assertExist);
+
+        if ($flashMessage) {
+            $this->closeFlashMessage($flashMessage);
+        }
+    }
+
+    /**
+     * @param $title
+     * @param $flashMessageElement
+     * @param $timeLimit
+     * @param $assertExist
+     * @return null|Element
+     */
+    protected function assertHasFlashMessageByTitle($title, $flashMessageElement, $timeLimit, $assertExist = true)
+    {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
         $flashMessage = $this->spin(
@@ -2087,16 +2171,22 @@ JS;
             ));
         }
 
-        if ($flashMessage) {
-            try {
-                /** @var NodeElement $closeButton */
-                $closeButton = $flashMessage->find('css', 'button.close');
-                $closeButton->press();
-            } catch (\Throwable $e) {
-                //No worries, flash message can disappeared till time next call
-            } catch (\Exception $e) {
-                //No worries, flash message can disappeared till time next call
-            }
+        return $flashMessage;
+    }
+
+    /**
+     * @param NodeElement $flashMessage
+     */
+    protected function closeFlashMessage(NodeElement $flashMessage)
+    {
+        try {
+            /** @var NodeElement $closeButton */
+            $closeButton = $flashMessage->find('css', 'button.close');
+            $closeButton->press();
+        } catch (\Throwable $e) {
+            //No worries, flash message can disappeared till time next call
+        } catch (\Exception $e) {
+            //No worries, flash message can disappeared till time next call
         }
     }
 }

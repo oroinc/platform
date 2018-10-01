@@ -10,17 +10,17 @@ Feature: Adding attributes for workflow transition
   Scenario: Create a workflow
     Given I login as administrator
     When I go to System/Workflows
-    And I press "Create Workflow"
+    And I click "Create Workflow"
     And I fill "Workflow Edit Form" with:
       | Name           | User Workflow Test |
       | Related Entity | User               |
 # Add step
-    And I press "Add step"
+    And I click "Add step"
     And I fill "Workflow Step Edit Form" with:
       | Name | Step One |
-    And I press "Apply"
+    And I click "Apply"
 # Add transition
-    And I press "Add transition"
+    And I click "Add transition"
     And I fill "Workflow Transition Edit Info Form" with:
       | Name      | Transition One |
       | From step | (Start)        |
@@ -30,17 +30,17 @@ Feature: Adding attributes for workflow transition
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | First name        |
       | Label        | User`s first name |
-    And I press "Add"
+    And I click "Add"
 # Add attribute for object property
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | Owner        |
       | Label        | User`s owner |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
     And I save and close form
 # Update cache
     When I go to System/Localization/Translations
-    And I press "Update Cache"
+    And I click "Update Cache"
     Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Edit a workflow
@@ -52,8 +52,8 @@ Feature: Adding attributes for workflow transition
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | Avatar        |
       | Label        | User`s avatar |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
     And I save and close form
 
   Scenario: Clone a workflow
@@ -68,15 +68,15 @@ Feature: Adding attributes for workflow transition
     And I fill "Workflow Transition Edit Attributes Form" with:
       | Entity field | Organization        |
       | Label        | User`s organization |
-    And I press "Add"
-    And I press "Apply"
+    And I click "Add"
+    And I click "Apply"
     And I save and close form
-    And I press "Activate"
+    And I click "Activate"
 # press Activate button in popup
-    And I press "Activate"
+    And I click "Activate"
 # Update cache
     When I go to System/Localization/Translations
-    And I press "Update Cache"
+    And I click "Update Cache"
     Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Verify Transition

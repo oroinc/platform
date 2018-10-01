@@ -117,11 +117,10 @@ abstract class AbstractScopeManager
         $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
-        if (!$this->cache->contains($cacheKey)) {
+        $settings = $this->cache->fetch($cacheKey);
+        if (false === $settings) {
             $settings = $this->loadStoredSettings($entityId);
             $this->cache->save($cacheKey, $settings);
-        } else {
-            $settings = $this->cache->fetch($cacheKey);
         }
 
         $keySetting = null;

@@ -7,25 +7,25 @@ Feature: Navigating on workflow states
   Scenario: Workflow creation for Organization entity
     Given I login as administrator
     And I go to System / Workflows
-    And I press "Create Workflow"
+    And I click "Create Workflow"
     And I fill form with:
       | Name            | Test Workflow |
       | Related Entity  | Organization  |
-    And I press "Add step"
+    And I click "Add step"
     And I fill form with:
       | label           | First step |
-    And I press "Apply"
-    And I press "Add transition"
+    And I click "Apply"
+    And I click "Add transition"
     And I fill form with:
       | label           | First Transit |
       | step_from       | (Start)       |
       | step_to         | First step    |
-    And I press "Apply"
+    And I click "Apply"
     And I save and close form
     When I click "Edit"
-    And I press "Add step"
+    And I click "Add step"
     And I fill form with:
       | label           | Second step |
-    And I press "Apply"
-    And I press "Undo"
+    And I click "Apply"
+    And I click "Undo"
     Then I should not see "Second step"

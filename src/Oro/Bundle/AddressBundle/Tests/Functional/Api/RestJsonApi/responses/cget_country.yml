@@ -1,0 +1,28 @@
+data:
+    -
+        type: countries
+        id: IL
+        attributes:
+            iso3Code: ISR
+            name: Israel
+        relationships:
+            regions:
+                data:
+                    -
+                        type: regions
+                        id: IL-Z
+                    -
+                        type: regions
+                        id: IL-TA
+                    -
+                        type: regions
+                        id: IL-M
+                    -
+                        type: regions
+                        id: IL-JM
+                    -
+                        type: regions
+                        id: IL-HA
+                    -
+                        type: regions
+                        id: IL-D

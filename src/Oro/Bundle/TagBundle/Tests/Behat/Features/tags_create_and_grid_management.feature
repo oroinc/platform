@@ -7,13 +7,13 @@ Feature: Tags create and grid management
   Scenario: Create taxonomies
     Given I login as administrator
     And I go to System / Tags Management / Taxonomies
-    And I press "Create Taxonomy"
+    And I click "Create Taxonomy"
     And I fill form with:
       | Name        | A Taxonomy |
     When I save form
     Then I should see "Taxonomy has been saved" flash message
     And I go to System / Tags Management / Taxonomies
-    And I press "Create Taxonomy"
+    And I click "Create Taxonomy"
     And I fill form with:
       | Name        | B Taxonomy |
     When I save and close form
@@ -22,7 +22,7 @@ Feature: Tags create and grid management
   Scenario: Create tags
     Given I login as administrator
     And I go to System / Tags Management / Tags
-    And I press "Create Tag"
+    And I click "Create Tag"
     And I fill form with:
       | Name        | Tag A      |
       | Taxonomy    | A Taxonomy |

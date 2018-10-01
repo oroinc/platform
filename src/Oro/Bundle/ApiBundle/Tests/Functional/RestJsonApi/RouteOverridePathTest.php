@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartmen
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -30,19 +31,12 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_tests_override_path')
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of an entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of an entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -57,7 +51,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_tests_override_path')
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -85,7 +79,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ['meta' => 'title']
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -122,19 +116,12 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of an entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of an entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -166,7 +153,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -219,48 +206,31 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 409);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '409',
-                        'title'  => 'conflict constraint',
-                        'detail' => 'The \'id\' property of the primary data object'
-                            . ' should match \'id\' parameter of the query sting',
-                        'source' => [
-                            'pointer' => '/data/id'
-                        ]
-                    ]
-                ]
+                'title'  => 'conflict constraint',
+                'detail' => 'The \'id\' property of the primary data object'
+                    . ' should match \'id\' parameter of the query sting',
+                'source' => ['pointer' => '/data/id']
             ],
-            self::jsonToArray($response->getContent())
+            $response,
+            Response::HTTP_CONFLICT
         );
     }
 
     public function testGetSubresourceWhenCurrentDepartmentDoesNotExist()
     {
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
-
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_tests_override_path_subresource', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of the parent entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of the parent entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -268,7 +238,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -276,7 +245,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_tests_override_path_subresource', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -305,7 +274,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -314,7 +282,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ['meta' => 'title']
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -347,26 +315,17 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
     public function testGetRelationshipWhenCurrentDepartmentDoesNotExist()
     {
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
-
         $response = $this->request(
             'GET',
             $this->getUrl('oro_rest_tests_override_path_relationship', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of the parent entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of the parent entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -374,7 +333,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -382,7 +340,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_tests_override_path_relationship', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $this->assertResponseContains(
             [
@@ -397,26 +355,17 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
     public function testUpdateRelationshipWhenCurrentDepartmentDoesNotExist()
     {
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
-
         $response = $this->request(
             'PATCH',
             $this->getUrl('oro_rest_tests_override_path_relationship', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of the parent entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of the parent entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -424,7 +373,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -437,7 +385,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 204);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
 
         $this->getEntityManager()->clear();
         $updatedDepartment = $this->getEntityManager()
@@ -451,26 +399,17 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
     public function testAddRelationshipWhenCurrentDepartmentDoesNotExist()
     {
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
-
         $response = $this->request(
             'POST',
             $this->getUrl('oro_rest_tests_override_path_relationship', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of the parent entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of the parent entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -478,7 +417,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -491,7 +429,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 204);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
 
         $this->getEntityManager()->clear();
         $updatedDepartment = $this->getEntityManager()
@@ -513,26 +451,17 @@ class RouteOverridePathTest extends RestJsonApiTestCase
 
     public function testDeleteRelationshipWhenCurrentDepartmentDoesNotExist()
     {
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
-
         $response = $this->request(
             'DELETE',
             $this->getUrl('oro_rest_tests_override_path_relationship', ['association' => 'staff'])
         );
 
-        self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        self::assertEquals(
+        $this->assertResponseValidationError(
             [
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title'  => 'entity identifier constraint',
-                        'detail' => 'The identifier of the parent entity must be set in the context.'
-                    ]
-                ]
+                'title'  => 'entity identifier constraint',
+                'detail' => 'The identifier of the parent entity must be set in the context.'
             ],
-            self::jsonToArray($response->getContent())
+            $response
         );
     }
 
@@ -540,7 +469,6 @@ class RouteOverridePathTest extends RestJsonApiTestCase
     {
         $this->loadCurrentDepartment();
 
-        $entityType = $this->getEntityType(TestCurrentDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $response = $this->request(
@@ -553,7 +481,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             ])
         );
 
-        self::assertResponseStatusCodeEquals($response, 204);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
 
         $this->getEntityManager()->clear();
         $updatedDepartment = $this->getEntityManager()

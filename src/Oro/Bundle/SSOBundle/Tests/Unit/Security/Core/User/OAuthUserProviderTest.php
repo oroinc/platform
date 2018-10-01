@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Entity;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
 use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
@@ -102,7 +103,13 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
                 return new StubEnumValue($id, $id, 0, false);
             }
         );
-        $this->userManager = new UserManager(static::USER_CLASS, $this->registry, $ef, $enumValueProvider);
+        $this->userManager = new UserManager(
+            static::USER_CLASS,
+            $this->registry,
+            $ef,
+            $enumValueProvider,
+            $this->createMock(ConfigManager::class)
+        );
 
         $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
     }

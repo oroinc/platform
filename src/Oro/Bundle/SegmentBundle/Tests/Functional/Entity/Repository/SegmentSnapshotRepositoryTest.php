@@ -80,9 +80,9 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         $expectedCondition = $this->getExpectedResult($registry, [$entity]);
 
+        self::assertNotEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
         $segmentSnapshotRepository->removeByEntity($entity);
-
-        $this->assertSegmentSnapshotHasBeenDeletedCorrectly($segmentSnapshotRepository, $expectedCondition);
+        self::assertEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
     }
 
     /**
@@ -101,9 +101,9 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         $expectedCondition = $this->getExpectedResult($registry, $entities);
 
+        self::assertNotEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
         $segmentSnapshotRepository->massRemoveByEntities($entities);
-
-        $this->assertSegmentSnapshotHasBeenDeletedCorrectly($segmentSnapshotRepository, $expectedCondition);
+        self::assertEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
     }
 
     /**
@@ -171,8 +171,9 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
     /**
      * @param SegmentSnapshotRepository $segmentSnapshotRepository
      * @param array $expectedCondition
+     * @return array
      */
-    protected function assertSegmentSnapshotHasBeenDeletedCorrectly($segmentSnapshotRepository, $expectedCondition)
+    protected function findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition)
     {
         $selectQB = $segmentSnapshotRepository->createQueryBuilder('snp');
 
@@ -181,15 +182,19 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
             $selectQB->select('snp.id')
                 ->orWhere($selectQB->expr()->andX(
                     $selectQB->expr()->in('snp.segment', ':segmentIds' . $suffix),
-                    $selectQB->expr()->in('snp.entityId', ':entityIds' . $suffix)
+                    $selectQB->expr()->orX(
+                        $selectQB->expr()->in('snp.entityId', ':entityIds' . $suffix),
+                        $selectQB->expr()->in('snp.integerEntityId', ':integerEntityIds' . $suffix)
+                    )
                 ))
                 ->setParameter('segmentIds' . $suffix, $params['segmentIds'])
-                ->setParameter('entityIds' . $suffix, $params['entityIds']);
+                ->setParameter('entityIds' . $suffix, $params['entityIds'])
+                ->setParameter('integerEntityIds' . $suffix, $params['entityIds']);
         }
 
         $entities = $selectQB->getQuery()->getResult();
 
-        $this->assertEmpty($entities);
+        return $entities;
     }
 
     /**
@@ -211,7 +216,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     'OroSegmentBundle:SegmentSnapshot',
                     'snp',
                     Join::WITH,
-                    'snp.integerEntityId = entity.id'
+                    'snp.entityId = CONCAT(entity.id, \'\') or snp.integerEntityId = entity.id'
                 );
         } else {
             $queryBuilder
@@ -219,7 +224,10 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     'OroSegmentBundle:SegmentSnapshot',
                     'snp',
                     Join::WITH,
-                    $queryBuilder->expr()->isNull('snp.integerEntityId')
+                    $queryBuilder->expr()->andX(
+                        $queryBuilder->expr()->isNull('snp.entityId'),
+                        $queryBuilder->expr()->isNull('snp.integerEntityId')
+                    )
                 );
         }
 

@@ -6,12 +6,24 @@
 * Added data flow diagrams for public actions. See [Actions](./src/Oro/Bundle/ApiBundle/Resources/doc/actions.md).
 * Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
 
+#### CacheBundle
+* Added `oro.cache.abstract.without_memory_cache` that is the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service.
+
+#### SecurityBundle
+* Added `Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension` trait that can be used in functional tests where you need to change permissions for security roles.
+
 #### UIBundle
 * Added the `addBeforeActionPromise` static method of `BaseController` in JS which enables to postpone route action if the required async process is in progress.
 
 ### Removed
+#### EntityConfigBundle
+* Removed `oro.entity_config.field.after_remove` event. Use `oro.entity_config.post_flush` event and `ConfigManager::getFieldConfigChangeSet('extend', $className, $fieldName)` method to check if a field was removed. If the change set has `is_deleted` attribute and its value is changed from `false` to `true` than a field was removed.
 #### UIBundle
 * Removed the `loadBeforeAction` and `addToReuse` static methods of `BaseController` in JS. Global Views and Components can now be defined in the HTML over data attributes, the same way as an ordinary [Page Component](./src/Oro/Bundle/UIBundle/Resources/doc/reference/page-component.md).
+#### SecurityBundle
+* Removed `oro_security.acl_helper.process_select.after` event, create [Access Rule](./src/Oro/Bundle/SecurityBundle/Resources/doc/access-rules.md) instead.
+* Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage` and `Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder` classes because now ACL restrictions applies with Access Rules by `Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker`.
+* Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
 
 ### Changed
 #### ApiBundle
@@ -19,6 +31,8 @@
 
 #### UIBundle
 * All global JS Views and Components are defined in the HTML through data attributes.
+#### SecurityBundle
+* `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::apply` method logic was changed to support Access rules.
 
 ## 3.0.0 (2018-07-27)
 [Show detailed list of changes](incompatibilities-3-0.md)
@@ -149,6 +163,30 @@
 
 * Handling of `percent` data type in POST and PATCH requests was fixed. Before the fix, the percent value in GET and POST/PATCH requests was inconsistent; in POST/PATCH requests it was divided by 100, but GET request returned it as is. In this fix, the division by 100 was removed.
 * For string filters the default value of the `allow_array` option was changed from `true` to `false`. This was done to allow filter data if a string field contains a comma.
+#### DataGridBundle
+* Parameter `count_hints` will have value of `hints` unless otherwise specified.
+If other words from now
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+```
+equivalent
+```yaml
+datagrids:
+    grid-name:
+       ...
+       source:
+           ...
+           hints:
+               - SOME_QUERY_HINT
+           count_hints:
+               - SOME_QUERY_HINT
+```
 #### SegmentBundle
 * Refactored the `SegmentComponent` js-component to use `EntityStructureDataProvider`.
 #### SidebarBundle

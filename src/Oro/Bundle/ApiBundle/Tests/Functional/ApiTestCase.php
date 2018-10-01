@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -430,7 +429,9 @@ abstract class ApiTestCase extends WebTestCase
                 \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
                 $e = new \PHPUnit\Framework\ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
@@ -438,6 +439,51 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     * @param mixed    $expectedValue
+     */
+    public static function assertResponseHeader(Response $response, string $headerName, string $expectedValue)
+    {
+        self::assertEquals(
+            $expectedValue,
+            $response->headers->get($headerName),
+            sprintf('"%s" response header', $headerName)
+        );
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     */
+    public static function assertResponseHeaderNotExists(Response $response, string $headerName)
+    {
+        self::assertFalse(
+            $response->headers->has($headerName),
+            sprintf('"%s" header should not exist in the response', $headerName)
+        );
+    }
+
+    /**
+     * Asserts "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    public static function assertAllowResponseHeader(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ) {
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
     }
 
     /**
@@ -454,7 +500,7 @@ abstract class ApiTestCase extends WebTestCase
         string $message = ''
     ) {
         self::assertResponseStatusCodeEquals($response, Response::HTTP_METHOD_NOT_ALLOWED, $message);
-        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
+        self::assertAllowResponseHeader($response, $expectedAllowedMethods, $message);
     }
 
     /**

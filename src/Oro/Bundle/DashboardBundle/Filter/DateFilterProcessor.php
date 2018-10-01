@@ -3,13 +3,16 @@
 namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\CurrencyBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Modifies datagrid`s query builder according to the values of date range filter.
+ */
 class DateFilterProcessor
 {
     /** @var DateRangeFilter */
@@ -17,6 +20,9 @@ class DateFilterProcessor
 
     /** @var DateFilterModifier */
     protected $modifier;
+
+    /** @var LocaleSettings */
+    private $localeSettings;
 
     /**
      * @param DateRangeFilter $filter

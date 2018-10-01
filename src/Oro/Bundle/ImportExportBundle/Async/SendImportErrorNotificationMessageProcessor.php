@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
+ * Sends import error notification to specified email or user.
  * @deprecated since 2.1, will be removed in 2.3
  */
 class SendImportErrorNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
@@ -30,9 +31,9 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
     private $logger;
 
     /**
-     * @var ConfigManager
+     * @var NotificationSettings
      */
-    private $configManager;
+    private $notificationSettings;
 
     /**
      * @var RegistryInterface
@@ -42,18 +43,18 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
     /**
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
-     * @param ConfigManager $configManager
+     * @param NotificationSettings $notificationSettings
      * @param RegistryInterface $doctrine
      */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,
-        ConfigManager $configManager,
+        NotificationSettings $notificationSettings,
         RegistryInterface $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;
-        $this->configManager = $configManager;
+        $this->notificationSettings = $notificationSettings;
         $this->doctrine = $doctrine;
     }
 
@@ -93,11 +94,9 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
 
     protected function sendNotification($toEmail, $summary, $subject)
     {
-        $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+        $sender = $this->notificationSettings->getSender();
         $message = [
-            'fromEmail' => $fromEmail,
-            'fromName' => $fromName,
+            'sender' => $sender->toArray(),
             'toEmail' => $toEmail,
             'subject' => $subject,
             'body' => $summary,

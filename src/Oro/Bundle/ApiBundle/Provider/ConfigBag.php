@@ -10,15 +10,23 @@ class ConfigBag implements ConfigBagInterface
     private const ENTITIES  = 'entities';
     private const RELATIONS = 'relations';
 
+    /** @var ConfigCache */
+    private $configCache;
+
+    /** @var string */
+    private $configFile;
+
     /** @var array */
     private $config;
 
     /**
-     * @param array $config
+     * @param ConfigCache $configCache
+     * @param string      $configFile
      */
-    public function __construct(array $config)
+    public function __construct(ConfigCache $configCache, string $configFile)
     {
-        $this->config = $config;
+        $this->configCache = $configCache;
+        $this->configFile = $configFile;
     }
 
     /**
@@ -53,6 +61,8 @@ class ConfigBag implements ConfigBagInterface
      */
     private function findConfigs($section, $version)
     {
+        $this->ensureInitialized();
+
         if (!isset($this->config[$section])) {
             return [];
         }
@@ -66,16 +76,23 @@ class ConfigBag implements ConfigBagInterface
      * @param string $version
      *
      * @return array|null
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function findConfig($section, $className, $version)
     {
+        $this->ensureInitialized();
+
         if (!isset($this->config[$section][$className])) {
             // no config for the requested class
             return null;
         }
 
         return $this->config[$section][$className];
+    }
+
+    private function ensureInitialized()
+    {
+        if (null === $this->config) {
+            $this->config = $this->configCache->getConfig($this->configFile);
+        }
     }
 }

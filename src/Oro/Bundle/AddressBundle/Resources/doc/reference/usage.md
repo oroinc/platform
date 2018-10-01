@@ -1,7 +1,5 @@
 ## Usage
 
-OroAddressBundle provides PHP/REST/SOAP API for address CRUD operations.
-
 ### PHP API
 
 ``` php
@@ -20,13 +18,6 @@ OroAddressBundle provides PHP/REST/SOAP API for address CRUD operations.
     $this->get('oro_address.form.address')
 ```
 
-### REST API
-
-<pre>
-    oro_api_get_addresstype   GET           /api/rest/{version}/addresstypes/{name}.{_format}
-    oro_api_get_addresstypes  GET           /api/rest/{version}/addresstypes.{_format}
-</pre>
-
 ### Address collection
 
 Address collection may be added to a form following the next three steps:
@@ -43,6 +34,7 @@ $builder->add(
     )
 );
 ```
+
 2) Add AddressCollectionTypeSubscriber. AddressCollectionTypeSubscriber must be initialized with an address collection field name and an address class name.
 
 ```php

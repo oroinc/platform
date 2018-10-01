@@ -59,6 +59,7 @@ services:
             - '@doctrine'
             - '@security.encoder_factory'
             - '@oro_entity_extend.enum_value_provider'
+            - '@oro_config.manager'
 
     oro_user.manager.api:
         class: '%oro_user.manager.api.class%'
@@ -94,11 +95,6 @@ services:
         arguments:                    ["@oro_user.manager"]
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
-
-    oro_user.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_user' ] ]
 
     oro_user.user_menu:
         class:                        '%oro_user.user_menu.builder.class%'
@@ -353,11 +349,13 @@ services:
     oro_user.mailer.processor:
         class: '%oro_user.mailer.processor.class%'
         arguments:
-            - '@doctrine'
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@oro_email.email_holder_helper'
-            - '@oro_email.direct_mailer'
+            - '@oro_user.mailer.user_template_email_sender'
+
+    oro_user.mailer.user_template_email_sender:
+        class: 'Oro\Bundle\UserBundle\Mailer\UserTemplateEmailSender'
+        arguments:
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
 
     oro_user.placeholder.filter:
         class: '%oro_user.placeholder.filter.class%'
@@ -450,6 +448,22 @@ services:
             - '@oro_user.provider.password_complexity_config_provider'
         tags:
             - { name: validator.constraint_validator, alias: oro_user.validator.password_complexity }
+
+    oro_user.validator.email_case_insensitive_option:
+        class: Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator
+        arguments:
+            - '@oro_user.manager'
+            - '@translator'
+            - '@oro_datagrid.helper.route'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.email_case_insensitive_option }
+
+    oro_user.validator.unique_user_email_validator:
+        class: Oro\Bundle\UserBundle\Validator\UniqueUserEmailValidator
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_user.validator.unique_user_email }
 
     oro_user.provider.password_complexity_config_provider:
         class: Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider
@@ -558,3 +572,12 @@ services:
             - 'oro_user.login.errors.bad_credentials'
         tags:
             - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -255 }
+
+    oro_user.provider.user_preferred_language_provider:
+        class: Oro\Bundle\UserBundle\Provider\UserPreferredLanguageProvider
+        public: false
+        arguments:
+            - '@oro_config.user'
+            - '@oro_locale.settings'
+        tags:
+            - { name: oro_locale.preferred_language_provider }

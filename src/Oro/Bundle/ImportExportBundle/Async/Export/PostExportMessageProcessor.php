@@ -2,21 +2,25 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Transport\Exception\Exception;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * This processor serves to finalize batched export process and send email notification upon its completion.
+ */
 class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -45,9 +49,14 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     private $importExportResultSummarizer;
 
     /**
-     * @var ConfigManager
+     * @var NotificationSettings
      */
-    private $configManager;
+    private $notificationSettings;
+
+    /**
+     * @var int
+     */
+    private $recipientUserId;
 
     /**
      * @param ExportHandler $exportHandler
@@ -55,7 +64,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      * @param LoggerInterface $logger
      * @param JobStorage $jobStorage
      * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param ConfigManager $configManager
+     * @param NotificationSettings $notificationSettings
      */
     public function __construct(
         ExportHandler $exportHandler,
@@ -63,14 +72,14 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         LoggerInterface $logger,
         JobStorage $jobStorage,
         ImportExportResultSummarizer $importExportResultSummarizer,
-        ConfigManager $configManager
+        NotificationSettings $notificationSettings
     ) {
         $this->exportHandler = $exportHandler;
         $this->producer = $producer;
         $this->logger = $logger;
         $this->jobStorage = $jobStorage;
         $this->importExportResultSummarizer = $importExportResultSummarizer;
-        $this->configManager = $configManager;
+        $this->notificationSettings = $notificationSettings;
     }
 
     /**
@@ -115,10 +124,10 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         if ($fileName !== null) {
-            $summary = $this->importExportResultSummarizer
-                ->processSummaryExportResultForNotification($job, $fileName);
+            $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->sendNotification($body['email'], $summary);
+            $this->recipientUserId = $body['recipientUserId'] ?? null;
+            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
 
             $this->logger->info('Sent notification email.');
         }
@@ -137,19 +146,24 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
     /**
      * @param string $toEmail
      * @param array $summary
+     * @param string $notificationTemplate
+     *
+     * @throws Exception
      */
-    protected function sendNotification($toEmail, array $summary)
+    protected function sendEmailNotification($toEmail, array $summary, $notificationTemplate = null)
     {
-        $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+        $sender = $this->notificationSettings->getSender();
         $message = [
-            'fromEmail' => $fromEmail,
-            'fromName' => $fromName,
+            'sender' => $sender->toArray(),
             'toEmail' => $toEmail,
             'body' => $summary,
             'contentType' => 'text/html',
-            'template' => ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ];
+
+        if ($this->recipientUserId) {
+            $message['recipientUserId'] = $this->recipientUserId;
+        }
 
         $this->producer->send(
             NotificationTopics::SEND_NOTIFICATION_EMAIL,

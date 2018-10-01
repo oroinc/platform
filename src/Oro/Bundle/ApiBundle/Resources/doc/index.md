@@ -46,6 +46,7 @@
      - [**update_relationship** Action](./actions.md#update_relationship-action)
      - [**add_relationship** Action](./actions.md#add_relationship-action)
      - [**delete_relationship** Action](./actions.md#delete_relationship-action)
+     - [**options** Action](./actions.md#options-action)
    - Auxiliary actions
      - [**customize_loaded_data** Action](./actions.md#customize_loaded_data-action)
      - [**customize_form_data** Action](./actions.md#customize_form_data-action)
@@ -110,6 +111,7 @@
    - [Enable Custom API](./how_to.md#enable-custom-api)
    - [Add a Predefined Identifier for API Resource](./how_to.md#add-a-predefined-identifier-for-api-resource)
    - [Add a Computed Field](./how_to.md#add-a-computed-field)
+ - [CORS Configuration](./cors.md)
  - [Testing](./testing.md)
    - [Overview](./testing.md#overview)
    - [Load Fixtures](./testing.md#load-fixtures)

@@ -12,7 +12,6 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * Adds filters to ApiDoc annotation.
@@ -81,10 +80,7 @@ class RestDocFiltersHandler
         $filters = $annotation->getFilters();
         if (!empty($filters)) {
             ksort($filters);
-            // unfortunately there is no other way to update filters except to use the reflection
-            $filtersProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'filters');
-            $filtersProperty->setAccessible(true);
-            $filtersProperty->setValue($annotation, $filters);
+            ApiDocAnnotationUtil::setFilters($annotation, $filters);
         }
     }
 
