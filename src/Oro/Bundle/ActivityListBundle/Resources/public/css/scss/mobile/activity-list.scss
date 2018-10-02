@@ -28,10 +28,6 @@
     .accordion-heading {
         flex-wrap: wrap;
 
-        .actions {
-            margin-#{$start}: auto;
-        }
-
         .details {
             margin: 0 0 0 8px;
         }
@@ -49,8 +45,11 @@
     .accordion-icon {
         padding-#{$start}: 0;
     }
-    .user {
-        display: block;
+
+    .comment {
+        .user {
+            display: block;
+        }
     }
 }
 

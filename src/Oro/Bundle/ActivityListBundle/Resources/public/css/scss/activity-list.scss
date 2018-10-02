@@ -76,12 +76,10 @@
 
     .icon {
         width: auto;
-        color: $primary-550;
-    }
 
-    .icon,
-    .dropdown-toggle {
         font-size: 16px;
+
+        color: $primary-550;
     }
 
     .activity-actions {
@@ -144,14 +142,16 @@
         }
 
         .actions {
-            float: #{$end};
+            margin-#{$start}: auto;
+
             overflow: visible;
         }
 
         .details {
-            max-width: 250px;
+            max-width: 210px;
+            min-width: 210px;
 
-            margin: 0 26px;
+            padding: side-values(0 30px 0 22px);
 
             &:hover {
                 width: auto;
@@ -190,7 +190,7 @@
         }
 
         .comment {
-            padding: side-values(0 20px 0 0);
+            padding: side-values(0 6px 0 0);
         }
 
         .responsive-cell {

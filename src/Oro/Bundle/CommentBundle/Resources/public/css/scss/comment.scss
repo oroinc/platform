@@ -153,6 +153,10 @@
         color: $primary-200;
 
         word-break: break-all;
+
+        .scrollspy-title {
+            display: none;
+        }
     }
 
     .comment-attachments {
@@ -161,11 +165,11 @@
             display: block;
             width: 110px;
             height: 80px;
-            padding: 0;
+
             text-align: center;
-            background: #eee;
-            border-radius: 6px;
-            border: none;
+
+            background: $primary-830;
+            border-radius: 4px;
 
             @media only screen and (max-width: 500px) {
                 display: none; // hide thumbnails on mobile

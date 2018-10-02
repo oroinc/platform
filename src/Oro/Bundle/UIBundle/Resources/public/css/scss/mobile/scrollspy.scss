@@ -1,12 +1,20 @@
 /* @theme: admin.oro; */
 
 .scrollspy {
+    .accordion-group {
+        margin-bottom: $scrollspy-mobile-accordion-group-offset;;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
     .accordion-toggle {
         padding: $scrollspy-mobile-toggle-offset;
 
         border-radius: $scrollspy-mobile-border-radius;
 
-        &:before {
+        @include fa-icon($fa-var-angle-down, before, true) {
             margin: $scrollspy-mobile-toggle-icon-offset;
 
             font-size: $scrollspy-mobile-toggle-icon-font-size;
@@ -15,6 +23,10 @@
             color: $scrollspy-mobile-toggle-icon-color;
 
             vertical-align: middle;
+        };
+
+        &.collapsed {
+            @include fa-icon($fa-var-angle-right);
         }
     }
 }

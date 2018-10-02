@@ -2,7 +2,7 @@
 
 .label-info,
 .badge-info {
-    background: #92b2d6;
+    background: $info-light;
 }
 
 .job-progress {
@@ -55,7 +55,7 @@ footer {
         }
 
         .nav {
-            margin-right: 0;
+            margin-#{$end}: 0;
         }
     }
 }
@@ -96,14 +96,14 @@ footer {
 
 .label-important,
 .badge-important {
-    background: #ea0000;
-    background: linear-gradient(#ea0000, #ba0000);
+    background: $danger;
+    background: linear-gradient($danger-light, $danger);
 }
 
 /* general style classes */
 .extra-small {
     font-size: 10px;
-    color: #555;
+    color: $primary-700;
 }
 
 .input-large {
@@ -132,20 +132,20 @@ footer {
             height: 29px !important;
 
             > a {
-                border: 1px solid #ddd;
+                border: 1px solid $primary-860;
                 padding-top: 4px;
                 padding-bottom: 4px;
-                background: #f5f5f5;
-                color: #777;
+                background: $primary-900;
+                color: $primary-700;
 
                 &:hover {
-                    background: #eee;
+                    background: $primary-830;
                 }
             }
 
             &.active {
                 a {
-                    border-bottom-color: #fff;
+                    border-bottom-color: $primary-inverse;
                     color: $body-color;
                 }
             }
@@ -178,18 +178,18 @@ footer {
 
 .list-inline {
     list-style: none;
-    padding-left: 0;
+    padding-#{$start}: 0;
 }
 
 .list-inline > li {
     display: inline-block;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-#{$start}: 5px;
+    padding-#{$end}: 4px;
 }
 
 .list-group > .list-group-item {
     padding: 10px;
-    border-top: 1px solid #efefef;
+    border-top: 1px solid $primary-860;
     width: 100%;
     box-sizing: border-box;
 }
@@ -204,20 +204,81 @@ footer {
     border: 0;
 }
 
+.badge-enabled,
+.badge-tentatively,
+.badge-disabled {
+    padding: side-values(3px 10px 3px 5px);
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.badge-enabled {
+    background-color: #dff2d4;
+    color: #4c7940;
+}
+
+.badge-tentatively {
+    background-color: #faf2cc;
+    color: #a7a50a;
+}
+
+.badge-disabled {
+    color: #aaa;
+    background-color: #f2f2f2;
+}
+
+.status-disabled,
+.status-unknown {
+    color: #aaa;
+}
+
+.status-enabled {
+    color: #2f8206;
+}
+
+.status-tentatively {
+    color: #a7a50a;
+}
+
+.status-disabled,
+.status-tentatively,
+.status-enabled,
+.status-unknown {
+    margin-#{$start}: 5px;
+    text-shadow: none;
+    padding: side-values(3px 10px 3px 5px);
+
+    [class^="fa-"]:before {
+        font-size: 12px;
+    }
+}
+
+.status-enabled [class^="fa-"]:before {
+    color: #4a9938;
+}
+
+.status-disabled [class^="fa-"]:before {
+    color: #e37878;
+}
+
+.status-unknown [class^="fa-"]:before {
+    color: #aaa;
+}
+
 .holder-height {
     max-height: 200px;
     overflow: auto;
 }
 
 .icons-holder .icons-holder-text [class^="fa-"] {
-    margin-right: 5px;
+    margin-#{$end}: 5px;
 }
 
 .brand-extra {
     font-size: 18px;
     font-weight: bold;
     margin-top: 12px;
-    margin-right: 15px;
+    margin-#{$start}: 15px;
     line-height: 24px;
     color: $body-color;
 }
@@ -227,8 +288,8 @@ footer {
 
     .top-action-box {
         padding: 3px 12px;
-        background-color: #fff;
-        float: right;
+        background-color: $primary-inverse;
+        float: #{$end};
     }
 }
 
@@ -237,7 +298,7 @@ footer {
 }
 
 .user-info-state {
-    clear: right;
+    clear: #{$end};
 
     .inline-decorate-container {
         margin-top: 10px;
@@ -252,7 +313,7 @@ footer {
 .user-profile-cols .label {
     display: block;
     background: none;
-    padding: 0 0 7px 0;
+    padding: side-values(0 0 7px 0);
     text-shadow: none;
     color: $body-color;
     font-weight: normal;
@@ -263,7 +324,7 @@ footer {
 .tag-sort-actions {
     margin-top: 5px;
     margin-bottom: 0;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $primary-860;
     white-space: nowrap;
 
     &:after {
@@ -282,20 +343,20 @@ footer {
         a {
             display: inline-block;
             border-radius: 0;
-            background: #fafafa;
+            background: $primary-860;
             outline: none;
             padding: 8px 12px;
-            color: #555;
+            color: $primary-700;
             margin-bottom: 0;
-            border: solid #ddd;
+            border: solid $primary-860;
             border-width: 1px 1px 1px 0;
             line-height: 20px;
 
             &.active {
-                border-bottom-color: #fff;
+                border-bottom-color: $primary-inverse;
                 box-shadow: none;
                 color: $body-color;
-                background: #fff;
+                background: $primary-inverse;
                 text-decoration: none;
             }
 
@@ -307,7 +368,7 @@ footer {
     }
 
     &.inline li {
-        float: left;
+        float: #{$start};
         margin-bottom: -1px;
         padding: 0;
         line-height: 20px;
@@ -317,9 +378,9 @@ footer {
 .tag-view .tags-holder {
     box-shadow: none;
     border-radius: 0;
-    border: solid #ddd;
+    border: solid $primary-860;
     border-width: 0 1px 1px;
-    padding: 5px 10px 10px;
+    padding: 4px 10px 10px;
     overflow: hidden;
 }
 
@@ -333,15 +394,15 @@ footer {
     margin-bottom: 0;
 
     li {
-        padding: 5px 5px 0 0;
+        padding: side-values(4px 4px 0 0);
     }
 
     a:hover span.label {
-        background: #e4e4e4;
+        background: $primary-800;
     }
 
     span.label {
-        background: #eee;
+        background: $primary-830;
         font-size: 12px;
         font-weight: normal;
         text-shadow: none;
@@ -352,17 +413,17 @@ footer {
 }
 
 .sub-title a {
-    color: #888;
+    color: $primary-600;
 }
 
 .customer-info {
     padding-top: 4px;
-    padding-left: 60px;
+    padding-#{$start}: 60px;
     padding-bottom: 0;
     line-height: 18px;
 
     &.customer-simple {
-        padding: 0 4px 0 0;
+        padding: side-values(0 4px 0 0);
     }
 
     .top-row {
@@ -375,19 +436,19 @@ footer {
 
     .sub-title {
         font-size: $base-font-size--xl;
-        color: #999;
+        color: $primary-200;
         display: inline-block;
         margin-bottom: 3px;
     }
 
     .separator {
         padding: 0 3px;
-        color: #999;
+        color: $primary-200;
         font-size: 18px;
     }
 
     .user-name {
-        margin: 0 10px 3px 0;
+        margin: side-values(0 10px 3px 0);
         min-height: 15px;
         display: inline-block;
         float: none !important;
@@ -399,16 +460,16 @@ footer {
     .dropdown.show .caret,
     .user-name .caret,
     .user-name:hover .caret {
-        border-top-color: #444 !important;
-        border-bottom-color: #444 !important;
+        border-top-color: $primary-100 !important;
+        border-bottom-color: $primary-100 !important;
     }
 
     .visual {
         border-radius: 3px;
-        float: left;
+        float: #{$start};
         position: relative;
         width: 60px;
-        margin: 0 0 0 -60px;
+        margin: side-values(0 0 0 -60px);
 
         img {
             margin-top: -4px;
@@ -424,19 +485,19 @@ footer {
     ul.inline {
         margin: 0;
         padding: 0;
-        color: #777;
+        color: $primary-700;
         list-style: none;
 
         li {
             padding: 0 10px;
             margin-bottom: 4px;
-            border-left: 1px solid #e6e6e6;
+            border-#{$start}: 1px solid $primary-860;
             font-size: 11px;
             line-height: 14px;
             display: inline-block;
 
             &:first-child {
-                padding: 0 10px 0 0;
+                padding: side-values(0 10px 0 0);
                 border: 0;
             }
         }
@@ -450,10 +511,10 @@ ul.inline-decorate {
 }
 
 ul.inline-decorate > li {
-    padding-left: 10px;
-    margin-left: 8px;
+    padding-#{$start}: 10px;
+    margin-#{$start}: 8px;
     display: inline;
-    border-left: 1px solid #e6e6e6;
+    border-#{$start}: 1px solid $primary-860;
 }
 
 ul.inline-decorate > li:first-child {
@@ -486,18 +547,18 @@ ul.inline-extra {
     }
 
     & > li {
-        float: left;
+        float: #{$start};
         padding: 0 10px;
 
         &:first-child {
-            padding: 0 10px 0 0;
+            padding: side-values(0 10px 0 0);
         }
     }
 }
 
 .customer-info-actions {
-    background-color: #f6f6f6;
-    border-bottom: 1px solid #ebebeb;
+    background-color: $primary-860;
+    border-bottom: 1px solid $additional-ultra-light;
 
     .alert {
         margin-bottom: 0;
@@ -520,7 +581,7 @@ ul.inline-extra {
 }
 
 .btn-action {
-    color: #777 !important;
+    color: $primary-700 !important;
     font-size: 20px;
     padding: 0 5px !important;
 
@@ -553,13 +614,13 @@ label.required em,
     color: $danger-dark;
     font-size: 21px;
     font-style: normal;
-    margin-left: 3px;
+    margin-#{$start}: 3px;
     line-height: 1px;
 }
 
 .controls .removeRow {
     position: relative;
-    margin: 0 0 0 -24px;
+    margin: side-values(0 0 0 -24px);
 }
 
 body .mce-tinymce {
@@ -569,7 +630,7 @@ body .mce-tinymce {
 textarea {
     height: 150px;
     resize: vertical;
-    text-align: left;
+    text-align: #{$start};
     vertical-align: top;
 }
 
@@ -589,13 +650,13 @@ textarea {
 }
 
 .horizontal .oro-clearfix .label {
-    float: left;
+    float: #{$start};
 }
 
 
 
 .oro-action .btn-group {
-    margin-right: 0;
+    margin-#{$end}: 0;
 }
 
 .top-messages {
@@ -613,7 +674,7 @@ textarea {
 
 .ui-slider {
     position: relative;
-    text-align: left;
+    text-align: #{$start};
 }
 
 .ui-slider .ui-slider-handle {
@@ -639,7 +700,7 @@ textarea {
 
 .ui-slider-horizontal .ui-slider-handle {
     top: -.3em;
-    margin-left: -.6em;
+    margin-#{$start}: -.6em;
 }
 
 .ui-slider-horizontal .ui-slider-range {
@@ -647,11 +708,11 @@ textarea {
 }
 
 .ui-slider-horizontal .ui-slider-range-min {
-    left: 0;
+    #{$start}: 0;
 }
 
 .ui-slider-horizontal .ui-slider-range-max {
-    right: 0;
+    #{$end}: 0;
 }
 
 .ui-slider-vertical {
@@ -660,13 +721,13 @@ textarea {
 }
 
 .ui-slider-vertical .ui-slider-handle {
-    left: -.3em;
-    margin-left: 0;
+    #{$start}: -.3em;
+    margin-#{$start}: 0;
     margin-bottom: -.6em;
 }
 
 .ui-slider-vertical .ui-slider-range {
-    left: 0;
+    #{$start}: 0;
     width: 100%;
 }
 
@@ -697,7 +758,7 @@ h5.user-fieldset {
     font-weight: bold;
     font-size: 20px;
     line-height: 20px;
-    margin: 20px 10px 16px 0;
+    margin: side-values(20px 10px 16px 0);
 }
 
 .page-size .dropdown-menu {
@@ -705,20 +766,20 @@ h5.user-fieldset {
 }
 
 .separator-btn {
-    border-left: 1px solid #e9e9e9;
+    border-#{$start}: 1px solid $additional-extra-lighten;
     margin: 4px 8px 0;
     height: 24px;
 }
 
 .title-buttons-container {
     .pull-left > .separator-btn {
-        margin-right: 1px;
+        margin-#{$end}: 1px;
     }
 }
 
 .pagination-centered > label {
-    margin-right: -4px;
-    padding-left: 5px;
+    margin-#{$end}: -4px;
+    padding-#{$start}: 5px;
 }
 
 .alert-error > ul {
@@ -744,13 +805,13 @@ h5.user-fieldset {
 
     &:before {
         display: inline-block;
-        margin-left: 8px;
+        margin-#{$start}: 8px;
         font: normal 18px/1em FontAwesome;
         font-style: normal;
         text-decoration: inherit;
         -webkit-font-smoothing: antialiased;
         content: "\f06a";
-        color: #c81717;
+        color: $danger;
         text-indent: 0;
         speak: none;
     }
@@ -774,7 +835,7 @@ h5.user-fieldset {
 
 label.checkbox.error,
 label.radio.error {
-    padding-right: 12px;
+    padding-#{$end}: 12px;
 }
 
 .scrollable-container {
@@ -811,13 +872,13 @@ label.radio.error {
     }
 
     .add-list-item {
-        margin-left: 183px;
+        margin-#{$start}: 183px;
     }
 
     .removeRow {
         font-size: 0;
         line-height: 0;
-        margin: 0;
+        margin: side-values(0 0 0 5px);
 
         &:after {
             display: inline-block;
@@ -836,13 +897,13 @@ label.radio.error {
         &:after {
             display: inline-block;
             font: 14px/1em FontAwesome;
-            color: #ddd;
+            color: $primary-860;
             content: '\f067';
             text-indent: 0;
         }
 
         &:hover:after {
-            color: #888;
+            color: $primary-600;
         }
     }
 
@@ -875,34 +936,36 @@ label.radio.error {
         position: relative;
         padding: 16px;
         margin: 0 0 20px;
-        border: 1px solid #e6e6e6;
-        background: #f8f8f8;
+        border: 1px solid $primary-860;
+        background: $primary-900;
         border-radius: 4px;
     }
 
     .add-list-item {
-        margin-left: 183px;
+        margin-#{$start}: 183px;
     }
 
     .removeRow {
         position: absolute;
         width: 28px;
         top: 4px;
-        right: 4px;
+        #{$end}: 4px;
         text-decoration: none;
 
         &:after {
-            color: #bbb;
+            color: $primary-700;
         }
     }
 }
 
 .box-type1 {
-    background-color: #fff;
+    background-color: $primary-inverse;
 
     .title {
-        font: bold 14px/18px Helvetica, Arial, sans-serif;
-        padding: 10px 15px;
+        margin-bottom: 10px;
+
+        font-size: 20px;
+        font-weight: bold;
     }
 
     .box-content {
@@ -919,7 +982,7 @@ label.radio.error {
     }
 
     .list-inline {
-        margin-left: 0;
+        margin-#{$start}: 0;
     }
 }
 
@@ -928,7 +991,7 @@ label.radio.error {
 }
 
 .float-holder {
-    float: left;
+    float: #{$start};
 
     .removeRow {
         margin: 0;
@@ -951,7 +1014,7 @@ iframe.email-body {
     display: block;
     font-size: $base-font-size - 1; // 14px to 13px
     line-height: $line-height-base;
-    background-color: #f5f5f5;
+    background-color: $primary-900;
     border: 1px solid #ccc; // fallback for IE7-8
     border: 1px solid rgba(0, 0, 0, .15);
     border-radius: $border-radius;
@@ -964,7 +1027,7 @@ iframe.email-body {
 
     & > div {
         display: inline-block;
-        margin-right: 20px;
+        margin-#{$end}: 20px;
     }
 
     input[type="checkbox"] {
@@ -985,7 +1048,7 @@ span.validation-failed {
 }
 
 .default-field {
-    background: #f5f5f5;
+    background: $primary-900;
 }
 
 .responsive-cell .box-type1 {
@@ -1001,7 +1064,7 @@ span.validation-failed {
         .nav-tabs > .active > a,
         .nav-tabs > .active > a:hover,
         .nav-tabs > .active > a:focus {
-            background: #fff;
+            background: $primary-inverse;
         }
     }
 }
@@ -1011,16 +1074,16 @@ span.validation-failed {
 }
 
 .create-select-entity-container {
-    padding: 5px 30px 30px 30px;
-    border: 1px solid #e6e6e6;
+    padding: side-values(5px 30px 30px 30px);
+    border: 1px solid $primary-860;
     border-radius: 3px;
 
     .buttons-container {
-        margin-left: -20px;
+        margin-#{$start}: -20px;
         margin-bottom: 30px;
 
         a {
-            margin-right: 20px;
+            margin-#{$end}: 20px;
         }
     }
 
@@ -1029,7 +1092,7 @@ span.validation-failed {
     }
 
     .box-type1 .title {
-        padding-left: 0;
+        padding-#{$start}: 0;
         padding-top: 0;
     }
 }
@@ -1053,7 +1116,7 @@ span.validation-failed {
 }
 
 .pull-left-extra {
-    margin-left: 20px;
+    margin-#{$start}: 20px;
 }
 
 .tooltip-icon {
@@ -1073,7 +1136,7 @@ label .popover-body {
         border: 0;
         background: 0;
         box-shadow: none;
-        padding: 0 0 0 10px;
+        padding: side-values(0 0 0 10px);
 
         [class^="fa-"] {
             &:before {
