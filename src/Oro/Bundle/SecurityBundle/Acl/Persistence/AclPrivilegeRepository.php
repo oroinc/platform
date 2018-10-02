@@ -21,6 +21,9 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
 /**
+ * The repository class that allows to manage Privilege models.
+ * @see \Oro\Bundle\SecurityBundle\Model\AclPrivilege
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclPrivilegeRepository
