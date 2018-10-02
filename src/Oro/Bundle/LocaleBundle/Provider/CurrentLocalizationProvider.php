@@ -5,6 +5,9 @@ namespace Oro\Bundle\LocaleBundle\Provider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Extension\CurrentLocalizationExtensionInterface;
 
+/**
+ * Provides localization depending on extension set and executed
+ */
 class CurrentLocalizationProvider
 {
     /** @var CurrentLocalizationExtensionInterface[] */

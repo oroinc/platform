@@ -40,6 +40,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldAllowToAddFormType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $type = uniqid();
         $manager->addFormType($type);
     }
@@ -50,6 +51,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldAllowToAddFormTypeWithLabel()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $type = uniqid();
         $label = uniqid('label');
         $manager->addFormType($type, $label);
@@ -61,6 +63,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnEmptyLabelForNotAddedType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $type = uniqid();
         $this->assertNull($manager->getLabelByType($type));
     }
@@ -71,6 +74,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnLabelForAddedType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $type = uniqid();
         $label = uniqid('label');
         $manager->addFormType($type, $label);
@@ -84,6 +88,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnTypeAsLabelForAddedTypeWithoutLabel()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $type = uniqid();
         $manager->addFormType($type);
         $this->assertEquals($type, $manager->getLabelByType($type));
@@ -99,6 +104,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
             $type2 = uniqid('type') => uniqid('label'),
         ];
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $manager->addFormType($type1, $types[$type1]);
         $manager->addFormType($type2, $types[$type2]);
 
@@ -111,6 +117,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnEmptyDefaultCss()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $this->assertEquals('', $manager->getDefaultCssByType(uniqid('type')));
     }
 
@@ -130,6 +137,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($defaultCss));
 
         $manager = new EmbeddedFormManager($container, $formFactory);
+
         $this->assertEquals($defaultCss, $manager->getDefaultCssByType($type));
     }
 
@@ -149,6 +157,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($defaultMessage));
 
         $manager = new EmbeddedFormManager($container, $formFactory);
+
         $this->assertEquals($defaultMessage, $manager->getDefaultSuccessMessageByType($type));
     }
 
@@ -158,6 +167,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnEmptyDefaultSuccessMessage()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $this->assertEquals('', $manager->getDefaultSuccessMessageByType(uniqid('type')));
     }
 
@@ -167,6 +177,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnEmptyCustomFormLayoutByFormType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
+
         $this->assertEquals('', $manager->getCustomFormLayoutByFormType(uniqid('type')));
     }
 
@@ -181,6 +192,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
 
         $type = 'type';
         $manager = new EmbeddedFormManager($container, $formFactory);
+
         $this->assertEquals($expectedLayout, $manager->getCustomFormLayoutByFormType($type));
     }
 
