@@ -1,0 +1,4 @@
+services:
+    oro_datagrid.tools.parameters_helper:
+        class: 'Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper'
+        public: false
