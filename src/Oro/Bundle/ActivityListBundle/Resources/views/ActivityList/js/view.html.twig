@@ -21,11 +21,11 @@
             </div>
             <div class="extra-info">
                 <div class="message-item message">
+                    <b class="message-subject"><%- _.unescape(subject) %></b>
+                    <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
+                    - <%= description %>
+                    <% } %>
                     {% block activityShortMessage %}
-                        <b class="message-subject"><%- _.unescape(subject) %></b>
-                        <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
-                        - <%= description %>
-                        <% } %>
                     {% endblock %}
                 </div>
                 <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
