@@ -22,7 +22,7 @@ assets:
             # customized libraries' styles
             - 'bundles/oroui/css/jquery-ui.grid.css'
             - 'bundles/oroui/css/jquery-ui.custom.css'
-            - 'bundles/oroui/css/lightgallery/lightgallery.css'
+            - 'bundles/oroui/css/lightgallery/lightgallery.scss'
             - 'bundles/oroui/css/mcustomscrollbar/jquery.mCustomScrollbar-custome.css'
 
             # custom styles

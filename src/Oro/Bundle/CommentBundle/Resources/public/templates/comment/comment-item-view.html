@@ -40,11 +40,11 @@
                 </a>
                 <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
                     <li>
-                    <a class="no-hash" tabindex="-1" href="<%- attachmentURL %>">
+                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL %>">
                         <%= _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
                     <% if (attachmentThumbnail) { %>
-                        <a class="view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
+                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
                     <% } %>
                     </li>
                 </ul>

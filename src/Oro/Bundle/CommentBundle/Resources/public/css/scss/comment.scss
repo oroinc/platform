@@ -3,7 +3,7 @@
 .comments-view-header,
 .comments-view-body,
 .comments-view-footer {
-    margin: 16px 0 12px;
+    margin: $comment-view-offset;
 
     @include clearfix();
 }
@@ -11,8 +11,8 @@
 .comments-header-view-title {
     margin: 0;
 
-    font-size: 14px;
-    font-weight: bold;
+    font-size: $comment-view-title-font-size;
+    font-weight: $comment-view-title-font-weight;
 }
 
 .comments-view-header {
@@ -25,16 +25,16 @@
             .load-more-label {
                 display: inline-block;
                 width: 100%;
-                padding: 0 8px;
+                padding: $comment-view-load-mode-offset;
 
-                text-align: center;
+                text-align: $comment-view-load-mode-align;
 
                 &:before {
                     display: inline-block;
 
                     content: '';
 
-                    @include loader(14px, 2px);
+                    @include loader($comment-view-loader-size, $comment-view-loader-width);
                 }
             }
         }
@@ -42,20 +42,19 @@
 }
 
 .comments-view-footer {
-    margin-top: 10px;
+    margin-top: $comment-view-base-offset;
 }
 
 .comment-form-container {
     .comment-form {
-        padding-bottom: 10px;
+        padding-bottom: $comment-view-content-offset;
 
         .comment-text-field {
             width: 100%;
-            box-sizing: border-box;
         }
 
         .attachment-item {
-            margin-top: 5px;
+            margin-top: $comment-view-attachment-item-offset;
         }
     }
 
@@ -66,16 +65,6 @@
             background: transparent;
             font-family: FontAwesome !important;
         }
-    }
-}
-
-.add-comment-dialog {
-    .comment-text-field {
-        height: 165px;
-    }
-
-    label {
-        margin-bottom: 8px;
     }
 }
 
@@ -98,7 +87,7 @@
 }
 
 .comments-block {
-    color: #888;
+    color: $comments-block-color;
     margin: 0;
     min-width: inherit;
 
@@ -108,17 +97,17 @@
     }
 
     .comment-title {
-        width: 32px;
+        width: $comments-block-title-size;
         position: relative;
     }
 
     .comment-author-info {
-        margin-bottom: 8px;
+        margin-bottom: $comments-block-author-info-offset;
     }
 
     .comment-content {
         flex-grow: 1;
-        padding: 16px;
+        padding: $comments-block-content-offset;
     }
 
     .comment-item:first-child {
@@ -135,22 +124,20 @@
 
     .comment-title {
         .comment-title-avatar {
-            width: 32px;
-            height: 32px;
+            width: $comments-block-title-size;
+            height: $comments-block-title-size;
 
-            border-radius: 50%;
+            border-radius: $comments-block-avatar-radius;
         }
 
         .no-avatar {
             background: url(../../../oroui/img/info-user.png);
-            background-size: 32px 32px;
+            background-size: $comments-block-title-size $comments-block-title-size;
         }
     }
 
     .comment-body {
-        line-height: 1.57;
-
-        color: $primary-200;
+        color: $comments-block-body-color;
 
         word-break: break-all;
 
@@ -160,65 +147,39 @@
     }
 
     .comment-attachments {
-
         .thumbnail {
             display: block;
-            width: 110px;
-            height: 80px;
+            width: $comments-thumbnail-width;
+            height: $comments-thumbnail-height;
 
             text-align: center;
 
             background: $primary-830;
-            border-radius: 4px;
+            border-radius: $border-radius;
 
             @media only screen and (max-width: 500px) {
                 display: none; // hide thumbnails on mobile
             }
 
             .fa {
-                padding-top: 20px;
-                color: #fff;
+                padding-top: $comments-thumbnail-icon-offset;
+                color: $comments-thumbnail-icon-color;
             }
         }
 
         .link-to-record {
-            padding-top: 10px;
+            padding-top: $comment-view-base-offset;
 
             .dropdown-toggle {
                 display: inline-block;
-
-                &:focus {
-                    font-weight: normal;
-                }
             }
 
             .dropdown-menu {
-                white-space: nowrap;
-                padding: 5px 15px;
-
-                a {
-                    span {
-                        margin-left: 7px;
-                        color: #777;
-                    }
-
-                    &:hover {
-                        span {
-                            color: #777;
-                        }
-                    }
-                }
-
                 .view-image {
                     display: none;
                 }
 
                 @media only screen and (max-width: 500px) {
-                    a {
-                        display: block;
-                        text-align: left;
-                    }
-
                     .view-image {
                         display: block;
                     }
@@ -226,10 +187,10 @@
             }
 
             .fa {
-                color: $primary-200;
-                font-size: 15px;
-                margin-right: 1px;
-                margin-left: 0;
+                color: $comments-thumbnail-icon-record-color;
+                font-size: $comments-thumbnail-icon-record-font-size;
+                margin-#{$end}: 1px;
+                margin-#{$start}: 0;
             }
         }
     }

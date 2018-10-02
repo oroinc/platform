@@ -4,7 +4,7 @@
     .grid-toolbar {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 16px;
+        margin-bottom: $activity-mobile-toolbar-offset;
     }
 
     .filter-box {
@@ -14,7 +14,7 @@
     }
 
     .filter-item {
-        margin-bottom: 8px;
+        margin-bottom: $activity-mobile-toolbar-item-offset;
     }
 
     .pagination {
@@ -29,7 +29,7 @@
         flex-wrap: wrap;
 
         .details {
-            margin: 0 0 0 8px;
+            margin: $activity-mobile-details-offset;
         }
 
         .extra-info {
@@ -53,12 +53,11 @@
     }
 }
 
-
 @media only screen and (max-width: $small-devices-media-breakpoint) {
     .activity-list-widget {
         .accordion-heading {
             .details {
-                max-width: 200px;
+                max-width: $activity-mobile-details-small-width;
             }
         }
     }
