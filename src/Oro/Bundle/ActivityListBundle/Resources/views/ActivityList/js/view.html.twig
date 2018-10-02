@@ -2,7 +2,7 @@
     <% var labelId = _.uniqueId('label-') %>
     <% var regionId = _.uniqueId('region-') %>
     <div class="accordion-group">
-        <div class="accordion-heading clearfix">
+        <div class="accordion-heading">
             <a href="#<%- regionId %>" data-toggle="collapse" aria-expanded="<%- collapsed ? 'false' : 'true' %>"
                aria-controls="<%- regionId %>"
                class="btn btn-light accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"
@@ -22,7 +22,7 @@
             <div class="extra-info">
                 <div class="message-item message">
                     {% block activityShortMessage %}
-                        <b><%- _.unescape(subject) %></b>
+                        <b class="message-subject"><%- _.unescape(subject) %></b>
                         <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
                         - <%= description %>
                         <% } %>
@@ -34,13 +34,13 @@
                 </div>
             {% block activityDate %}
                 <div class="created-at">
-                    <i class="date"><%= updatedAt %></i>
+                    <span class="date"><%= updatedAt %></span>
                 </div>
             {% endblock %}
+            </div>
             <div class="actions">
                 {% block activityActions %}
                 {% endblock %}
-            </div>
             </div>
         </div>
         <div id="<%- regionId %>" role="region" aria-labelledby="<%- labelId %>" class="accordion-body collapse<% if (!collapsed) { %> show<% } %>">

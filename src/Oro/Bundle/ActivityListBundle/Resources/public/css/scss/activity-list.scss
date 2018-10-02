@@ -32,21 +32,6 @@
     .activity-list {
         position: relative;
 
-        .no-data {
-            margin: 20px;
-        }
-
-        .comments-view-header {
-            &,
-            & > h5 {
-                margin-top: 0;
-            }
-
-            & > .no-data {
-                margin: 0;
-            }
-        }
-
         .filter-item {
             margin-#{$end}: 8px;
 
@@ -71,101 +56,91 @@
         &:empty {
             display: none;
         }
+    }
 
-        .list-item {
-            padding: 0;
+    .actions {
+        position: static;
+    }
 
-            &:hover {
-                background-color: transparent;
-            }
+    .user {
+        font-style: normal;
+    }
 
-            .actions {
-                position: static;
-            }
+    .date {
+        font-size: 12px;
+    }
 
-            .user {
-                font-style: normal;
-            }
+    .list-item:last-child {
+        border-bottom: 0;
+    }
 
-            .date {
-                font-style: normal;
-                font-size: smaller;
-            }
+    .icon {
+        width: auto;
+        color: $primary-550;
+    }
+
+    .icon,
+    .dropdown-toggle {
+        font-size: 16px;
+    }
+
+    .activity-actions {
+        margin-#{$start}: 12px;
+
+        .dropdown-toggle {
+            font-size: 16px;
         }
+    }
+    .comment-count {
+        margin: 0 20px;
 
-        .list-item:last-child {
-            border-bottom: 0;
-        }
+        color:$primary-700;
 
-        .comment-count {
-            margin-#{$start}: 5px;
-
-            color:$primary-700;
-
-            .icon {
-                width: auto;
-                font-size: 14px;
-            }
+        .count {
+            margin-#{$start}: 8px;
         }
     }
 
     .accordion {
         padding: 0;
         margin: 0;
-
-        .accordion-group {
-            border: 0;
-            margin: 0;
-        }
     }
 
     .accordion-heading {
         display: flex;
-        justify-content: space-between;
+        align-items: center;
         width: 100%;
         min-height: 46px;
-        padding: 14px 0;
+        padding: 6px 0;
 
         cursor: pointer;
 
-        &:hover {
-            background-color: $primary-900;
-        }
+        @include clearfix();
 
-        .icon,
-        .accordion-icon,
         .details,
-        .comment-count,
         .message,
-        .created-at,
+        .message-subject,
         .actions {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            @include text-line-truncate(null);
         }
 
         .accordion-icon {
-            float: left;
+            width: auto;
             font-size: 16px;
             font-weight: normal;
+
+            padding: side-values(0 8px 0 16px);
+            margin: 0;
 
             &:hover {
                 color: $primary-400;
             }
 
-            @include fa-icon($fa-var-plus-square-o);
+            @include fa-icon($fa-var-minus-square-o);
 
             &.collapsed {
-                @include fa-icon($fa-var-minus-square-o);
+                @include fa-icon($fa-var-plus-square-o);
             }
-        }
-
-        .icon {
-            float: #{$start};
-            width: 27px;
-            font-size: 18px;
-            color: #878789;
-            margin: 8px 0;
         }
 
         .actions {
@@ -174,64 +149,63 @@
         }
 
         .details {
-            max-width: 247px;
-            min-width: 247px;
-            float: #{$start};
+            max-width: 250px;
+
+            margin: 0 26px;
 
             &:hover {
-                background: $primary-900;
                 width: auto;
                 z-index: 1;
             }
         }
 
         .extra-info {
-            width: calc(100% - 351px);
+            width: calc(100% - 324px);
             display: flex;
-            flex-flow: row nowrap;
+            align-items: center;
             white-space: nowrap;
+        }
 
-            .created-at {
-                margin-#{$start}: 8px;
-                color: $primary-600;
-                align-self: flex-end;
-            }
+        .created-at {
+            color: $primary-550;
+        }
 
-            .comment-count {
-                align-self: flex-end;
-            }
+        .message-item {
+            color: $primary-550;
 
-            .message-item {
-                align-self: stretch;
-                width: 100%;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                color: $primary-600;
+            @include text-line-truncate();
+        }
 
-                strong {
-                    color: $primary-500;
-                }
-            }
+        .message-subject {
+            color: $primary-200;
         }
     }
 
     .accordion-body {
         padding: 0;
 
-        .message {
-            .user-fieldset {
-                margin-top: 5px;
-                margin-#{$end}: 20px;
-            }
+        .user-fieldset {
+            margin-top: 5px;
+            margin-#{$end}: 20px;
+        }
 
-            .comment {
-                padding: side-values(0 20px 0 0);
-            }
+        .comment {
+            padding: side-values(0 20px 0 0);
         }
 
         .responsive-cell {
             margin-bottom: 20px;
         }
+    }
+
+    .no-data {
+        padding: 4px;
+
+        font-size: 13px;
+
+        color: $primary-550;
+
+        text-align: center;
     }
 }
 

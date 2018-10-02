@@ -9,6 +9,12 @@
         align-items: center;
     }
 
+    .grid-view-title {
+        margin: $oro-datagrid-grid-views-title-offset;
+
+        font-size: $oro-datagrid-grid-views-title-font-size;
+    }
+
     .edited-label {
         font-size: $font-size-base - 1px;
 

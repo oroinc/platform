@@ -28,7 +28,7 @@
                 </div>
                 <div class="dropdown link-to-record">
                     {% set togglerId = 'dropdown-'|uniqid %}
-                    <a id="{{ togglerId }}" class="no-hash dropdown-toggle file-menu" href="#" role="button" data-toggle="dropdown"
+                    <a id="{{ togglerId }}" class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
                         <span class="fa {{ attachment.attachmentIcon }}" aria-hidden="true"></span> {{ attachment.attachmentFileName }}
                     </a>

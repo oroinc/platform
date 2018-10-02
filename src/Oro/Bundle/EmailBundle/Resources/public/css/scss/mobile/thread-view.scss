@@ -72,20 +72,3 @@
         }
     }
 }
-
-.activity-list-widget {
-    .thread-view {
-        .email-info {
-            &:last-child,
-            &:only-child {
-                .email-view-toggle {
-                    padding: $content-padding;
-                }
-
-                .email-content {
-                    padding: 0 $content-padding;
-                }
-            }
-        }
-    }
-}

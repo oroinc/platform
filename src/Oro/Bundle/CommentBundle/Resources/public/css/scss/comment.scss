@@ -3,32 +3,38 @@
 .comments-view-header,
 .comments-view-body,
 .comments-view-footer {
-    clear: both;
-    margin: 13px 0;
+    margin: 16px 0 12px;
+
+    @include clearfix();
+}
+
+.comments-header-view-title {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .comments-view-header {
-    > .no-data {
-        margin: 0;
-    }
-
     .load-more {
         display: inline-block;
+
         width: 100%;
-
-        @include load-more-items(#e5e5e5, #fff, #888);
-
-        border-top: solid 1px #e5e5e5;
-        border-bottom: solid 1px #e5e5e5;
 
         &.process {
             .load-more-label {
-                padding: 0 10px;
+                display: inline-block;
+                width: 100%;
+                padding: 0 8px;
 
-                @include process('../../../oroui/img/loader-16.gif');
+                text-align: center;
 
-                &:after {
-                    right: 4px;
+                &:before {
+                    display: inline-block;
+
+                    content: '';
+
+                    @include loader(14px, 2px);
                 }
             }
         }
@@ -75,18 +81,18 @@
 
 .responsive-section {
     .email-content .responsive-cell .comment-list {
-        padding-left: $horizontal-padding;
+        padding-#{$start}: $horizontal-padding;
     }
 
     &.responsive-small .email-content .responsive-cell .comment-list {
-        padding-left: 0;
+        padding-#{$start}: 0;
     }
 }
 
 .email-content {
     .responsive-cell {
         .comment-list {
-            padding-left: $horizontal-padding;
+            padding-#{$start}: $horizontal-padding;
         }
     }
 }
@@ -94,91 +100,62 @@
 .comments-block {
     color: #888;
     margin: 0;
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-    min-width: initial;
+    min-width: inherit;
 
     .comment-item {
-        display: table-row !important;
-    }
-
-    .comment-title,
-    .comment-content,
-    .comment-actions {
-        display: table-cell;
-        line-height: 1.3em;
-        padding: 13px 0 14px 0;
-        border-bottom: 1px solid #e5e5e5;
-        vertical-align: top;
+        display: flex;
+        align-items: flex-start;
     }
 
     .comment-title {
-        width: 30px;
+        width: 32px;
         position: relative;
     }
 
-    .comment-actions {
-        width: 23px;
-
-        /** .horizontal-icon-menu; */
-        .dropdown-menu {
-            padding: 0;
-            top: -8px;
-            right: 23px;
-        }
-
-        .nav-pills {
-            padding: 0 0 0 2px;
-        }
+    .comment-author-info {
+        margin-bottom: 8px;
     }
 
     .comment-content {
-        vertical-align: middle;
-        padding: 14px;
-
-        .comment-author-info .date {
-            font-size: smaller;
-        }
+        flex-grow: 1;
+        padding: 16px;
     }
 
     .comment-item:first-child {
-        .comment-title,
-        .comment-content,
-        .comment-actions {
+        .comment-content {
             padding-top: 0;
         }
     }
 
     .comment-item:last-child {
-        .comment-title,
-        .comment-content,
-        .comment-actions {
-            border-bottom: none;
+        .comment-content {
             padding-bottom: 0;
         }
     }
 
     .comment-title {
         .comment-title-avatar {
-            width: 29px;
-            height: 29px;
+            width: 32px;
+            height: 32px;
+
+            border-radius: 50%;
         }
 
         .no-avatar {
             background: url(../../../oroui/img/info-user.png);
-            background-size: 29px 29px;
+            background-size: 32px 32px;
         }
     }
 
     .comment-body {
-        display: block;
-        color: #444;
-        word-wrap: break-word;
+        line-height: 1.57;
+
+        color: $primary-200;
+
+        word-break: break-all;
     }
 
     .comment-attachments {
-        margin: .5em 0 0 0;
 
         .thumbnail {
             display: block;
@@ -245,7 +222,7 @@
             }
 
             .fa {
-                color: #444;
+                color: $primary-200;
                 font-size: 15px;
                 margin-right: 1px;
                 margin-left: 0;
