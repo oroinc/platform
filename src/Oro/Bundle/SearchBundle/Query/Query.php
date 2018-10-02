@@ -779,4 +779,9 @@ class Query
 
         return $field;
     }
+
+    public function __clone()
+    {
+        $this->criteria = clone $this->criteria;
+    }
 }
