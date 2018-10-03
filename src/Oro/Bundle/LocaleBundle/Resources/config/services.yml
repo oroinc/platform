@@ -45,6 +45,12 @@ services:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
 
+    oro_locale.helper.default_locale_localization:
+        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationHelper'
+        arguments:
+           - '@oro_locale.manager.localization'
+           - '@oro_locale.provider.config_default_localization'
+
     oro_locale.helper.localization.link:
         tags:
             - { name: oro_service_link, service: oro_locale.helper.localization }
@@ -316,6 +322,11 @@ services:
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'
+
+    oro_locale.provider.config_default_localization:
+        class: 'Oro\Bundle\LocaleBundle\Provider\ConfigDefaultLocalizationProvider'
+        arguments:
+            - '@oro_locale.manager.localization'
 
     oro_locale.entity_generator.extension:
         class: '%oro_locale.entity_generator.extension.class%'
