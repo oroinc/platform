@@ -1,8 +1,11 @@
 {% if app.user %}
     <li class="dropdown user-menu-dropdown" id="user-menu">
         {% set togglerId = 'dropdown-'|uniqid %}
-        <button id="{{ togglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
-            aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false">
+        <button id="{{ togglerId }}"
+                class="dropdown-toggle{% if isMobileVersion() %} dropdown-toggle--no-caret{% endif %}"
+                data-toggle="dropdown"
+                aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false"
+        >
             {% if isMobileVersion() %}
                 <span class="fa-user-circle" aria-hidden="true"></span>
             {% else %}
