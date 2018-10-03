@@ -18,27 +18,27 @@
                 <div class="filter-container"></div>
             </div>
             <div class="pagination" role="navigation">
+                {% set prevButtonText = oro_config_value('oro_activity_list.sorting_direction') == 'DESC'
+                        ? 'oro.activitylist.pagination.newer'|trans : 'oro.activitylist.pagination.older'|trans
+                %}
+                {% set nextButtonText = oro_config_value('oro_activity_list.sorting_direction') == 'DESC'
+                    ? 'oro.activitylist.pagination.older'|trans : 'oro.activitylist.pagination.newer'|trans
+                %}
                 <button data-section="top"
                         data-action-name="goto_previous"
                         class="btn pagination-previous"
+                        title="{{ prevButtonText }}"
                         {% if pager.current == 1 %}disabled={% endif %}
                 >
                     <span class="fa-chevron-left" aria-hidden="true"></span>
-                    {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
-                        {{ 'oro.activitylist.pagination.newer'|trans }}
-                    {% else %}
-                        {{ 'oro.activitylist.pagination.older'|trans }}
-                    {% endif %}
+                    {{ prevButtonText }}
                 </button>
                 <button data-section="top"
                         data-action-name="goto_next"
                         class="btn icon-end pagination-next"
+                        title="{{ nextButtonText }}"
                 >
-                    {% if oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
-                        {{ 'oro.activitylist.pagination.older'|trans }}
-                    {% else %}
-                        {{ 'oro.activitylist.pagination.newer'|trans }}
-                    {% endif %}
+                    {{ nextButtonText }}
                     <span class="fa-chevron-right" aria-hidden="true"></span>
                 </button>
             </div>
