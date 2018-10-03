@@ -14,6 +14,11 @@ define(function(require) {
          */
         multiple: false,
 
+        /**
+         * @type {number}
+         */
+        sortableInitDelay: 500,
+
         events: {
             'click a.add-list-item': 'reindexValues',
             'click [name$="[is_default]"]': 'onIsDefaultClick',
@@ -32,8 +37,9 @@ define(function(require) {
         render: function() {
             this.appendClearDefault();
             this.updateClearDefault();
-            this.initSortable();
-            this.reindexValues();
+            // Delays sortable initialization which prevents spinner loading a lot of time in case if have hundreds of options
+            _.delay(this.initSortable.bind(this), this.sortableInitDelay);
+            this.reindexValues.bind(this);
             return this;
         },
 
