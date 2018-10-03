@@ -11,7 +11,6 @@ define(function(require) {
     require('bootstrap-scrollspy');
     require('bootstrap-tab');
     require('bootstrap-tooltip');
-    require('bootstrap-transition');
     require('bootstrap-typeahead');
 
     return $;

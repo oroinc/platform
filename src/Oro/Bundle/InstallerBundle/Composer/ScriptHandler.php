@@ -33,10 +33,6 @@ class ScriptHandler extends SensioScriptHandler
                 'from' => $vendorDir.'/npm-asset',
                 'to' => $webDir.'/bundles/npmassets',
             ],
-            [ // @todo remove it before merge in master
-                'from' => $vendorDir.'/twbs/bootstrap',
-                'to' => $webDir.'/bundles/components/bootstrap',
-            ],
         ];
 
         $filesystem = new Filesystem();
