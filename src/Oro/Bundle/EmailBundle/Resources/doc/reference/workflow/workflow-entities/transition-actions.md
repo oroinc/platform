@@ -48,7 +48,8 @@ Send Email Template Action
   - class - class name of created object;
   - attribute - attribute that will contain entity instance;
   - from - email address in From field (required);
-  - to - email address in To field (required);
+  - to - email address in To field (required if no 'recipients' option);
+  - recipients - receiver objects (required if no 'to' option)
   - template - email template name (required);
   - entity - entity parameter (required);
 
@@ -60,5 +61,6 @@ Send Email Template Action
     to: 'email@address.com'
     template: 'template_name'
     entity: $entity
+    recipients: [$customerUser]
 
 ```

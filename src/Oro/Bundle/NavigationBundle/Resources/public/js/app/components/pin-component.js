@@ -112,6 +112,8 @@ define(function(require) {
             });
 
             this.pageState = new PageStateView(options);
+
+            mediator.setHandler('isPageStateChanged', this.pageState.isStateChanged.bind(this.pageState));
         },
 
         actualizeAttributes: function(model) {

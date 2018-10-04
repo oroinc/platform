@@ -7,6 +7,7 @@ use FOS\RestBundle\View\ViewHandlerInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Shared\Rest\CorsHeaders;
 use Oro\Bundle\ApiBundle\Request\RequestActionHandler as BaseRequestActionHandler;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessorFactory;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
@@ -62,6 +63,19 @@ class RequestActionHandler extends BaseRequestActionHandler
     /**
      * {@inheritdoc}
      */
+    protected function prepareContext(Context $context, Request $request): void
+    {
+        parent::prepareContext($context, $request);
+        if ($request->headers->has(CorsHeaders::ORIGIN)
+            && $request->headers->get(CorsHeaders::ORIGIN) !== $request->getSchemeAndHttpHost()
+        ) {
+            $context->setCorsRequest(true);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function buildResponse(Context $context): Response
     {
         $view = View::create($context->getResult());
@@ -77,8 +91,13 @@ class RequestActionHandler extends BaseRequestActionHandler
             'json',
             function (ViewHandlerInterface $viewHandler, View $view, Request $request, $format) {
                 $response = $view->getResponse();
-                $encoder = new JsonEncode();
-                $response->setContent($encoder->encode($view->getData(), $format));
+                $data = $view->getData();
+                if (null !== $data) {
+                    $encoder = new JsonEncode();
+                    $response->setContent($encoder->encode($data, $format));
+                } elseif (Response::HTTP_OK === $view->getStatusCode()) {
+                    $response->headers->set('Content-Length', 0);
+                }
                 if (!$response->headers->has('Content-Type')) {
                     $response->headers->set('Content-Type', $request->getMimeType($format));
                 }

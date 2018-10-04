@@ -305,6 +305,9 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobProcessor->startChildJob($job);
     }
 
+    /**
+     * @return array
+     */
     public function getStatusThatCanRun()
     {
         return [
@@ -314,6 +317,7 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param string $jobStatus
      * @dataProvider getStatusThatCanRun
      */
     public function testStartJobShouldUpdateJobWithRunningStatusAndStartAtTime($jobStatus)
@@ -710,5 +714,71 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('findRootJobByOwnerIdAndJobName');
 
         return $jobConfigurationProvider;
+    }
+
+    /**
+     * @param Job|null $job
+     * @param bool $expectedResult
+     * @dataProvider getIsRootJobExistsAndNotStaleProvider
+     */
+    public function testIsRootJobExistsAndNotStale($job, $expectedResult)
+    {
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->with('job-name', [])
+            ->willReturn($job);
+
+        static::assertEquals(
+            $expectedResult,
+            $this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', [])
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getIsRootJobExistsAndNotStaleProvider()
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setChildJobs([]);
+
+        return [
+            'job not found' => [
+                'job' => null,
+                'expectedResult' => null
+            ],
+            'job not stale' => [
+                'job' => $rootJob,
+                'expectedResult' => $rootJob
+            ]
+        ];
+    }
+
+    public function testIsRootJobExistsAndNotStaleIfJobStale()
+    {
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setChildJobs([]);
+
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('findRootJobByJobNameAndStatuses')
+            ->willReturn($rootJob);
+        $this->jobStorage
+            ->expects($this->once())
+            ->method('saveJob');
+
+        /** @var JobConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject $jobConfigurationProvider */
+        $jobConfigurationProvider = $this->createMock(JobConfigurationProviderInterface::class);
+        $jobConfigurationProvider
+            ->expects($this->any())
+            ->method('getTimeBeforeStaleForJobName')
+            ->will($this->returnValue(0));
+
+        $this->jobProcessor->setJobConfigurationProvider($jobConfigurationProvider);
+
+        static::assertNull($this->jobProcessor->findNotStaleRootJobyJobNameAndStatuses('job-name', []));
     }
 }

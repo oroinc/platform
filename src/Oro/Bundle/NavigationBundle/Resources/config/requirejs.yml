@@ -14,3 +14,8 @@ config:
         'oronavigation/js/app/views/page-state-view': 'bundles/oronavigation/js/app/views/page-state-view.js'
         'oronavigation/js/app/views/history-view': 'bundles/oronavigation/js/app/views/history-view.js'
         'oronavigation/js/app/views/most-viewed-view': 'bundles/oronavigation/js/app/views/most-viewed-view.js'
+
+        'oronavigation/js/app/modules/navigation-module': 'bundles/oronavigation/js/app/modules/navigation-module.js'
+
+    appmodules:
+        - oronavigation/js/app/modules/navigation-module

@@ -58,9 +58,8 @@ define(function(require) {
                 self._showLoading();
 
                 e.preventDefault();
-                var pageStateView = mediator.execute('composer:retrieve', 'pageState', true);
 
-                if (pageStateView && pageStateView.isStateChanged()) {
+                if (mediator.execute('isPageStateChanged')) {
                     var confirmModal = self.createModal();
                     confirmModal.once('ok', function() {
                         self.saveAndRedirect();

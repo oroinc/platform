@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class DocumentationTest extends RestJsonApiTestCase
 {
@@ -26,7 +27,7 @@ class DocumentationTest extends RestJsonApiTestCase
     private function isSkippedField($entityClass, $fieldName)
     {
         return
-            // @todo: remove this after CRM-8214 fix
+            // remove this after CRM-8214 fix
             'data_channel' === $fieldName;
     }
 
@@ -169,5 +170,13 @@ class DocumentationTest extends RestJsonApiTestCase
             ],
             $resourceData
         );
+    }
+
+    /**
+     * @depends testWarmUpCache
+     */
+    public function testOptionsDocumentation()
+    {
+        $this->checkOptionsDocumentationForEntity($this->getEntityType(User::class));
     }
 }

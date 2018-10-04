@@ -7,6 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provides a functional for building all localized fields.
+ */
 class LocalizedPropertyType extends AbstractType
 {
     const NAME = 'oro_locale_localized_property';
@@ -37,6 +40,7 @@ class LocalizedPropertyType extends AbstractType
     {
         $formType    = $options['entry_type'];
         $formOptions = $options['entry_options'];
+        $excludeParentLocalization = $options['exclude_parent_localization'];
 
         $builder
             ->add(
@@ -45,7 +49,9 @@ class LocalizedPropertyType extends AbstractType
                 array_merge($formOptions, ['label' => 'oro.locale.fallback.value.default'])
             )
             ->add(self::FIELD_LOCALIZATIONS, LocalizationCollectionType::class, [
-                'entry_type' => $formType, 'entry_options' => $formOptions
+                'entry_type' => $formType,
+                'entry_options' => $formOptions,
+                'exclude_parent_localization' => $excludeParentLocalization
             ]);
 
         $builder->addViewTransformer(new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_LOCALIZATIONS));
@@ -62,6 +68,7 @@ class LocalizedPropertyType extends AbstractType
 
         $resolver->setDefaults([
             'entry_options' => [],
+            'exclude_parent_localization' => false
         ]);
     }
 }

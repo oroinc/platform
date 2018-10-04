@@ -10,6 +10,10 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 class ResourceDocProvider
 {
     private const TEMPLATES = [
+        ApiActions::OPTIONS             => [
+            'description'   => 'Get options',
+            'documentation' => 'Get communication options for a resource'
+        ],
         ApiActions::GET                 => [
             'description'   => 'Get {name}',
             'documentation' => 'Get an entity'

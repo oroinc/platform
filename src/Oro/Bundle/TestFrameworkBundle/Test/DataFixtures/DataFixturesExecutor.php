@@ -10,7 +10,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 /**
  * This ORM executor does not clear the entity manager if a data fixture
- * implements \Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface.
+ * implements \Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface
+ * or Alice fixture have 'initial' parameter with 'true' value.
  */
 class DataFixturesExecutor extends ORMExecutor
 {
@@ -32,6 +33,9 @@ class DataFixturesExecutor extends ORMExecutor
         }
         $fixture->load($manager);
         if (!$fixture instanceof InitialFixtureInterface) {
+            if ($fixture instanceof AliceFileFixture && $fixture->isInitialFixture()) {
+                return;
+            }
             $manager->clear();
         }
     }

@@ -111,7 +111,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
     public function testIsReportValid()
     {
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
         $exception = new InvalidConfigurationException();
         $this->doctrine->expects($this->once())->method('getRepository')
             ->will($this->throwException($exception));
@@ -125,7 +125,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $this->prepareMetadata();
         $report = $this->getReportEntity($entity, ['columns' => ['column' => ['name' => 'street']]]);
         $this->prepareRepository($report);
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $this->resolver->expects($this->once())
             ->method('resolve')
@@ -148,7 +148,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ]
         ];
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -195,7 +195,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ]
         ];
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -235,7 +235,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $expectedViewRoute = 'oro_sample_view';
         $entityMetadata    = $this->getEntityMetadata($expectedViewRoute);
 
-        $this->reportCacheManager->expects(self::once())->method('contains')->willReturn(false);
+        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
 
         $metadata = $this->prepareMetadata();
         $metadata->expects($this->once())
@@ -357,8 +357,6 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturnArgument(1);
 
         $expectedConfiguration = $this->buildConfiguration($gridName, $report);
-        $this->reportCacheManager->expects(self::once())
-            ->method('contains')->willReturn(true);
         $this->reportCacheManager->expects(self::once())
             ->method('fetch')->willReturn($expectedConfiguration);
 

@@ -206,5 +206,4 @@ acme_bundle.event_listener.datagrid.complex_data:
 **Use cases**
 
 * Translate workflow fields in the email notification grid: `Oro\Bundle\WorkflowBundle\Datagrid\EmailNotificationDatagridListener`
-* (OroCommerce) Add pricing data to the product grid: `Oro\Bundle\PricingBundle\EventListener\ProductPriceDatagridListener`
 * (OroCommerce) Add payment methods to the order grid: `Oro\Bundle\OrderBundle\EventListener\OrderDatagridListener`

@@ -7,12 +7,12 @@ Feature: Workflow transition notifications
   Scenario: Update translations cache
     Given I login as administrator
     When I go to System/Localization/Translations
-    And I press "Update Cache"
+    And I click "Update Cache"
     Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Create an Email notification rule for workflow transition
     Given I go to System/Emails/Notification Rules
-    And I press "Create Notification Rule"
+    And I click "Create Notification Rule"
     And I fill form with:
       | Entity Name | User |
     And I save and close form

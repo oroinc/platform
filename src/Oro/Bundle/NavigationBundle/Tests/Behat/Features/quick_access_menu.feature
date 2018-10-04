@@ -35,7 +35,7 @@ Feature: Quick access menu
     Given I click icon bars
     And I go to System/ User Management/ Users
     And I add page to favorites
-    And I press "Create User"
+    And I click "Create User"
     And I fill "User Form" with:
       | Username          | userName       |
       | Password          | Pa$$w0rd       |
@@ -44,7 +44,7 @@ Feature: Quick access menu
       | Last Name         | Last Name      |
       | Primary Email     | email@test.com |
     And add page to favorites
-    And press "Cancel"
+    And click "Cancel"
     And go to System/ Configuration
     And I reload the page
     When I click icon bars

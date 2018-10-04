@@ -252,10 +252,8 @@ services:
     oro_imap.origin_credentials.notification_sender.email:
         class: Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\EmailNotificationSender
         arguments:
-            - '@oro_config.global'
-            - '@oro_email.email_renderer'
-            - '@doctrine'
-            - '@oro_email.direct_mailer'
+            - '@oro_notification.model.notification_settings'
+            - '@oro_email.manager.template_email'
         tags:
             - {name: oro_imap.origin_credentials.notification_sender}
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
@@ -12,6 +13,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Handler that enables user list.
+ */
 class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
@@ -73,6 +77,7 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
         if ($token && $this->currentUser = $token->getUser()) {
             set_time_limit(0);
             $results = $args->getResults();
+            /** @var Query $query */
             $query   = $results->getSource();
             $this->aclHelper->apply($query, 'EDIT');
             $em = $results->getSource()->getEntityManager();
@@ -81,8 +86,8 @@ class UsersEnableSwitchActionHandler implements MassActionHandlerInterface
             foreach ($results as $result) {
                 if ($this->processUser($result)) {
                     $count++;
+                    $processedEntities[] = $result->getRootEntity();
                 }
-                $processedEntities[] = $result->getRootEntity();
                 if ($count % self::FLUSH_BATCH_SIZE === 0) {
                     $this->finishBatch($em, $processedEntities);
                     $processedEntities = [];

@@ -26,7 +26,7 @@ class QueryModifierCompilerPass implements CompilerPassInterface
             foreach ($attributes as $tagAttributes) {
                 $queryModifiers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null)
+                    DependencyInjectionUtil::getRequestType($tagAttributes)
                 ];
             }
         }

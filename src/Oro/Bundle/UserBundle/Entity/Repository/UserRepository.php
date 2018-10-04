@@ -193,4 +193,16 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
             ->andWhere('u.enabled = :enabled')
             ->setParameter('enabled', true);
     }
+
+    /**
+     * @return array
+     */
+    public function findEnabledUserEmails()
+    {
+        return $this->findEnabledUsersQB()
+                ->select('u.id, u.email')
+                ->orderBy('u.id')
+                ->getQuery()
+                ->getArrayResult();
+    }
 }

@@ -146,6 +146,16 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         $resource3 = new ApiResource('Test\Entity3');
         $resource3->setExcludedActions(['create']);
 
+        $accessibleResources = [
+            'Test\Entity1' => true,
+            'Test\Entity2' => false,
+            'Test\Entity3' => true
+        ];
+        $excludedActions = [
+            'Test\Entity2' => ['get', 'get_list'],
+            'Test\Entity3' => ['create']
+        ];
+
         $this->cache->expects(self::at(0))
             ->method('save')
             ->with(
@@ -160,27 +170,21 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with(
                 'accessible_1.2rest',
-                [
-                    'Test\Entity1' => true,
-                    'Test\Entity2' => false,
-                    'Test\Entity3' => true
-                ]
+                $accessibleResources
             );
         $this->cache->expects(self::at(2))
             ->method('save')
             ->with(
                 'excluded_actions_1.2rest',
-                [
-                    'Test\Entity2' => ['get', 'get_list'],
-                    'Test\Entity3' => ['create']
-                ]
+                $excludedActions
             );
 
         $this->resourcesCache->saveResources(
             '1.2',
             new RequestType(['rest']),
             [$resource1, $resource2, $resource3],
-            ['Test\Entity1', 'Test\Entity3']
+            $accessibleResources,
+            $excludedActions
         );
     }
 

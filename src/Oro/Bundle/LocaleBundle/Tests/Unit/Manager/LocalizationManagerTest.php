@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
@@ -13,6 +13,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
@@ -261,14 +264,12 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
      */
     protected function assertRepositoryCalls(Localization $entity = null, array $entities = [])
     {
-        $this->repository->expects($this->never())->method('find');
-
         if (count($entities) > 0) {
             $this->repository->expects($this->once())->method('findBy')->willReturn($entities);
         }
 
         if ($entity) {
-            $this->repository->expects($this->once())->method('findOneBy')->willReturn($entity);
+            $this->repository->expects($this->once())->method('find')->willReturn($entity);
         }
     }
 

@@ -11,7 +11,7 @@ Feature: Application search
     And I follow "Search"
     And type "Common" in "search"
     And I should see 3 search suggestions
-    When I press "Go"
+    When I click "Go"
     Then I should be on Search Result page
     And I should see following search entity types:
       | Type            | N | isSelected |
@@ -29,7 +29,7 @@ Feature: Application search
   Scenario: Search in search page
     Given I follow "Search"
     And type "Alice" in "search"
-    When I press "Go"
+    When I click "Go"
     Then I should see following search entity types:
       | Type            | N | isSelected |
       | All             |15 | yes        |
@@ -47,7 +47,7 @@ Feature: Application search
     And I select "Business Unit" from search types
     And I type "Common" in "search"
     And I should see 1 search suggestion
-    When I press "Go"
+    When I click "Go"
     Then I should see following search entity types:
       | Type            | N | isSelected |
       | All             | 3 |            |
@@ -74,6 +74,6 @@ Feature: Application search
   Scenario: No results search
     Given I follow "Search"
     And I type "Unsearchable" in "search"
-    When I press "Go"
+    When I click "Go"
     Then I should see "No results were found to match your search."
     And I should see "Try modifying your search criteria or creating a new"

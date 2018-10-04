@@ -476,4 +476,26 @@ class JobProcessor
     {
         return [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED];
     }
+
+    /**
+     * Finds root non interrupted and non stale job by name and given statuses.
+     *
+     * @param string $jobName
+     * @param array $statuses
+     *
+     * @return Job|null
+     */
+    public function findNotStaleRootJobyJobNameAndStatuses($jobName, array $statuses)
+    {
+        $currentRootJob = $this->findRootJobByJobNameAndStatuses($jobName, $statuses);
+        if ($currentRootJob) {
+            if ($this->isJobStale($currentRootJob)) {
+                $this->staleRootJobAndChildren($currentRootJob);
+            } else {
+                return $currentRootJob;
+            }
+        }
+
+        return null;
+    }
 }

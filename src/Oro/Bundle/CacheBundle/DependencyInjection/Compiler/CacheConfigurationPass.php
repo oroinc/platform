@@ -17,13 +17,13 @@ use Symfony\Component\DependencyInjection\Reference;
 class CacheConfigurationPass implements CompilerPassInterface
 {
     /** this cache should be used to caching data private for each node in a web farm */
-    const FILE_CACHE_SERVICE = 'oro.file_cache.abstract';
+    public const FILE_CACHE_SERVICE = 'oro.file_cache.abstract';
     /** this cache should be used to caching data which need to be shared between nodes in a web farm */
-    const DATA_CACHE_SERVICE = 'oro.cache.abstract';
+    public const DATA_CACHE_SERVICE = 'oro.cache.abstract';
     /** the same as "oro.cache.abstract" but without additional in-memory caching */
-    const DATA_CACHE_NO_MEMORY_SERVICE = 'oro.cache.abstract.without_memory_cache';
+    public const DATA_CACHE_NO_MEMORY_SERVICE = 'oro.cache.abstract.without_memory_cache';
     /** data cache manager service */
-    const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
+    public const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
 
     /**
      * {@inheritdoc}
@@ -140,12 +140,9 @@ class CacheConfigurationPass implements CompilerPassInterface
      *
      * @return Definition
      */
-    private function getMemoryCacheChain(Definition $cacheProvider)
+    public static function getMemoryCacheChain(Definition $cacheProvider)
     {
-        $definition = new Definition(
-            MemoryCacheChain::class,
-            [[$cacheProvider]]
-        );
+        $definition = new Definition(MemoryCacheChain::class, [$cacheProvider]);
         $definition->setAbstract(true);
 
         return $definition;

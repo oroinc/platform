@@ -76,12 +76,11 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
     {
         $expectedProviderCalls = [
             // first call
-            ['contains', [EventTriggerCache::BUILT], false],
+            ['fetch', [EventTriggerCache::BUILT], false],
             ['deleteAll'],
             ['save', [EventTriggerCache::DATA, $this->testTriggerData]],
             ['save', [EventTriggerCache::BUILT, true]],
             // second call
-            ['contains', [EventTriggerCache::BUILT], true],
             ['fetch', [EventTriggerCache::BUILT], true],
             ['fetch', [EventTriggerCache::DATA], $this->testTriggerData],
         ];
