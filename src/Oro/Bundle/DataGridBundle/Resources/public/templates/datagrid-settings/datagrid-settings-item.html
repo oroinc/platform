@@ -1,6 +1,7 @@
 <td class="title-cell">
     <label for="column-<%= cid  %>"><%= label %></label>
 </td>
+<% if (addSorting) { %>
 <td class="sort-cell">
     <% if (!_.isMobile()) { %>
     <span title="Move column"><i class="fa-arrows-v handle"></i></span>
@@ -9,7 +10,8 @@
     <span class="btn move-down" data-role="moveDown" title="Move column down"><i class="fa-chevron-down"></i></span>
     <% } %>
 </td>
-<td class="visibility-cell">
+<% } %>
+<td class="visibility-cell" title="<%- label %>">
     <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
     <% if (disabledVisibilityChange) {%>disabled<% } %>
     <% if (renderable) {%>checked<% } %>/>

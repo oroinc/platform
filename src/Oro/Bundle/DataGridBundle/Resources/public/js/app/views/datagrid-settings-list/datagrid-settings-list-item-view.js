@@ -1,13 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var ColumnManagerItemView;
-    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-item.html');
+    var DatagridSettingsListItemView;
+    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-item.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    ColumnManagerItemView = BaseView.extend({
+    /**
+     * @class DatagridSettingsListItemView
+     * @extends BaseView
+     */
+    DatagridSettingsListItemView = BaseView.extend({
         template: template,
 
         tagName: 'tr',
@@ -24,19 +28,22 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        addSorting: false,
+
         /**
          * @inheritDoc
          */
-        constructor: function ColumnManagerItemView() {
-            ColumnManagerItemView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListItemView() {
+            DatagridSettingsListItemView.__super__.constructor.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            ColumnManagerItemView.__super__.render.apply(this, arguments);
+            DatagridSettingsListItemView.__super__.render.apply(this, arguments);
             this.$el.toggleClass('renderable', this.model.get('renderable'));
+            this.$el.inputWidget('seekAndCreate');
             return this;
         },
 
@@ -45,17 +52,22 @@ define(function(require) {
             this.listenTo(this.filterModel, 'change:search', this.render);
         },
 
+        setSorting: function(addSorting) {
+            this.addSorting = addSorting;
+        },
+
         /**
          * @inheritDoc
          */
         getTemplateData: function() {
             var searchString = this.filterModel.get('search');
-            var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
+            var data = DatagridSettingsListItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
             data.label = _.escape(data.label);
             if (searchString.length > 0) {
                 data.label = this.highlightLabel(data.label, searchString);
             }
+            data.addSorting = this.addSorting;
             return data;
         },
 
@@ -93,5 +105,5 @@ define(function(require) {
         }
     });
 
-    return ColumnManagerItemView;
+    return DatagridSettingsListItemView;
 });

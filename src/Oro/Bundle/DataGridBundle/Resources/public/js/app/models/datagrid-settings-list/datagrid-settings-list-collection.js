@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ColumnsCollection;
+    var DatagridSettingsListCollection;
     var _ = require('underscore');
     var BaseCollection = require('oroui/js/app/models/base/collection');
 
-    ColumnsCollection = BaseCollection.extend({
+    DatagridSettingsListCollection = BaseCollection.extend({
         comparator: 'order',
 
         /**
@@ -18,8 +18,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnsCollection() {
-            ColumnsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListCollection() {
+            DatagridSettingsListCollection.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -28,7 +28,7 @@ define(function(require) {
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['minVisibleColumnsQuantity']));
 
-            ColumnsCollection.__super__.initialize.apply(this, arguments);
+            DatagridSettingsListCollection.__super__.initialize.apply(this, arguments);
 
             this.on({
                 'change:renderable': this.updateVisibilityChange
@@ -39,7 +39,7 @@ define(function(require) {
          * @inheritDoc
          */
         reset: function() {
-            ColumnsCollection.__super__.reset.apply(this, arguments);
+            DatagridSettingsListCollection.__super__.reset.apply(this, arguments);
 
             this.updateVisibilityChange();
 
@@ -66,5 +66,5 @@ define(function(require) {
         }
     });
 
-    return ColumnsCollection;
+    return DatagridSettingsListCollection;
 });

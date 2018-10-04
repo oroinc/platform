@@ -92,6 +92,7 @@ oro:
                 all: 'All'
                 selected: 'Selected'
                 select_all: 'Select All'
+                unselect_all: 'Select Default'
                 search_placeholder: "Quick Search"
                 clear_search_tooltip: "Clear Quick Search"
             column:

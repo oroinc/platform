@@ -11,6 +11,7 @@ define(function(require) {
     var layout = require('oroui/js/layout');
     var AbstractWidget = require('oroui/js/widget/abstract-widget');
     var StateModel = require('orowindows/js/dialog/state/model');
+    var LoadingBarView = require('oroui/js/app/views/loading-bar-view');
     var DialogManager = require('orowindows/js/widget/dialog-manager');
     var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
@@ -63,6 +64,8 @@ define(function(require) {
 
         $messengerContainer: null,
 
+        loadingBar: null,
+
         /**
          * @inheritDoc
          */
@@ -112,6 +115,7 @@ define(function(require) {
             this._initAdjustHeight(content);
             this._setMaxSize();
             this._addMessengerContainer();
+            this._initLoadingBar();
         },
 
         /**
@@ -149,6 +153,17 @@ define(function(require) {
             } else {
                 this.model = new StateModel();
             }
+        },
+
+        /**
+         * Create loading bar under titlebar
+         * @private
+         */
+        _initLoadingBar: function() {
+            this.subview('LoadingBarView', new LoadingBarView({
+                container: this.widget.dialog('instance').uiDialogTitlebar,
+                ajaxLoading: true
+            }));
         },
 
         /**

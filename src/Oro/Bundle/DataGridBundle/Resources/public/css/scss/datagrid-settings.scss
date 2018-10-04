@@ -1,0 +1,298 @@
+/* @theme: admin.oro; */
+
+.datagrid-settings {
+    &:not(:last-child) {
+        margin-right: 4px;
+    }
+
+    a.action.btn.dropdown-toggle {
+        margin-right: 0;
+    }
+
+    &.dropdown,
+    &.dropup {
+        display: inline-block;
+    }
+
+    .dropdown-menu {
+        cursor: default;
+        text-align: left;
+        font-weight: normal;
+        padding: 20px;
+        border-color: #ccc;
+        min-width: 268px;
+
+        &:before,
+        &:after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+        }
+
+        &:before {
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-left: 7px solid rgba(0, 0, 0, .2);
+            top: 6px;
+            right: -7px;
+        }
+
+        &:after {
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 6px solid #fff;
+            top: 7px;
+            right: -6px;
+        }
+
+        .close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+        }
+    }
+
+    &__title {
+        font-size: $datagrid-settings-title-font-size;
+        line-height: $datagrid-settings-title-line-height;
+        margin: $datagrid-settings-title-offset;
+    }
+
+    &__tabs {
+        border-bottom: none;
+    }
+
+    &__wrapper {
+        .datagrid-settings-title {
+            font-size: $base-font-size--l;
+            line-height: $base-font-size--l;
+            font-weight: bold;
+            margin-bottom: -3px;
+        }
+
+        .datagrid-settings-hint {
+            font-size: $base-font-size--s;
+            color: $btn-text-color;
+        }
+
+        .ui-sortable-placeholder {
+            border-top: 3px solid transparent;
+        }
+
+        .datagrid-settings-filter {
+            margin-top: 4px;
+
+            .datagrid-settings-renderable-tab {
+                &:not(:last-of-type):after {
+                    content: "|";
+                }
+                &.active {
+                    pointer-events: none;
+                    color: #444;
+                }
+            }
+
+            .datagrid-settings-search {
+                margin: 15px 0 10px 0;
+                position: relative;
+
+                input {
+                    margin: 0;
+                    width: 100%;
+                }
+
+                &.empty:after {
+                    content: "\f002";
+                    font-family: FontAwesome;
+                    font-size: $base-font-size * 1.15;
+                    color: lighten($btn-text-color, 15%);
+                    position: absolute;
+                    top: 5px;
+                    right: 8px;
+                    z-index: 0;
+                }
+
+                > .clear {
+                    position: absolute;
+                    top: 5px;
+                    right: 8px;
+                    z-index: 1;
+                    font-size: 20px;
+                    font-weight: bold;
+                    line-height: 20px;
+                    color: lighten($btn-text-color, 15%);
+
+                    &:hover {
+                        color: $btn-text-color;
+                    }
+                }
+
+                &.empty > .clear {
+                    display: none;
+                }
+            }
+        }
+
+        .datagrid-settings-actions {
+            position: relative;
+            top: -10px;
+            line-height: 0;
+
+            .disabled {
+                color: lighten($btn-text-color, 35%);
+                pointer-events: none;
+            }
+
+            .hide-action {
+                display: none;
+            }
+        }
+
+        .column-filter-match {
+            text-decoration: underline;
+        }
+
+        .datagrid-settings-no-columns {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .datagrid-settings-right-flap {
+            position: absolute;
+            left: 100%;
+            width: 22px;
+            top: 27px;
+            bottom: 0;
+        }
+
+        .dropup &,
+        .dropup-area & {
+            .dropdown-menu {
+                top: auto;
+                bottom: 0;
+
+                &:before {
+                    top: auto;
+                    bottom: 6px;
+                }
+
+                &:after {
+                    top: auto;
+                    bottom: 7px;
+                }
+            }
+
+            .datagrid-settings-right-flap {
+                top: 0;
+                bottom: 27px;
+            }
+        }
+
+        td {
+            &.title-cell {
+                white-space: nowrap;
+            }
+
+            &.visibility-cell {
+                text-align: center;
+            }
+
+            &.sort-cell {
+                white-space: nowrap;
+                text-align: center;
+
+                .btn.move-up,
+                .btn.move-down {
+                    padding: 0;
+
+                    [class^="fa-"] {
+                        margin: 0;
+                    }
+                }
+            }
+        }
+
+        tr {
+            &.sortable-placeholder {
+                td {
+                    height: 0;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    border-top: 0 none;
+                }
+            }
+
+            &.renderable {
+                td {
+                    background: $row-highlight-background;
+                }
+
+                &:hover {
+                    td {
+                        background: $row-selected-background;
+                    }
+                }
+            }
+
+            &:first-child .btn.move-up,
+            &:last-child .btn.move-down {
+                cursor: default;
+                background-image: none;
+                opacity: .65;
+                box-shadow: none;
+            }
+        }
+
+        .table {
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0;
+
+            label {
+                margin-bottom: 0;
+            }
+
+            input[type='checkbox'] {
+                margin-bottom: 3px;
+            }
+        }
+
+        .table-header-wrapper {
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border: 1px solid #ddd;
+            margin: 10px 0 0;
+        }
+
+        .table-wrapper {
+            border-bottom-left-radius: 3px;
+            border-bottom-right-radius: 3px;
+            border: 1px solid #ddd;
+            border-top: none;
+            max-height: 2000px;
+            overflow: auto;
+            overflow-x: hidden;
+            margin: 0;
+
+            .table {
+                margin-top: -1px;
+
+                th {
+                    padding-top: 0;
+                    padding-bottom: 0;
+                    overflow: hidden;
+
+                    span {
+                        padding: 0;
+                        line-height: 0;
+                    }
+                }
+            }
+        }
+    }
+}

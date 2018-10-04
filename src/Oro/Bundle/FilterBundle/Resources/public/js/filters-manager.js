@@ -127,6 +127,13 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        listen: {
+            'filters:update mediator': '_onChangeFilterSelect'
+        },
+
+        /**
+         * @inheritDoc
+         */
         constructor: function FiltersManager() {
             FiltersManager.__super__.constructor.apply(this, arguments);
         },
@@ -211,6 +218,9 @@ define(function(require) {
 
         checkFiltersVisibility: function() {
             var filterSelector = this.$(this.filterSelector);
+            if (!filterSelector.length) {
+                return;
+            }
             _.each(this.filters, function(filter) {
                 var option = filterSelector.find('option[value="' + filter.name + '"]');
                 if (filter.visible && option.hasClass('hidden')) {
@@ -337,9 +347,9 @@ define(function(require) {
          *
          * @protected
          */
-        _onChangeFilterSelect: function() {
+        _onChangeFilterSelect: function(filters) {
             this.trigger('updateList', this);
-            this._processFilterStatus();
+            this._processFilterStatus(filters);
             this.trigger('afterUpdateList', this);
         },
 
@@ -374,7 +384,6 @@ define(function(require) {
                 return this;
             }
             var optionsSelectors = [];
-
             _.each(filters, function(filter) {
                 this._renderFilter(filter);
                 if (filter.visible) {
@@ -383,6 +392,9 @@ define(function(require) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
+            if (!this.$(this.filterSelector).length) {
+                return;
+            }
             var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', true);
@@ -412,6 +424,9 @@ define(function(require) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
 
+            if (!this.$(this.filterSelector).length) {
+                return;
+            }
             var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', false);
@@ -619,6 +634,10 @@ define(function(require) {
                 this.multiselectParameters
             );
 
+            if (!this.$(this.filterSelector).length) {
+                return;
+            }
+
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: options
@@ -636,6 +655,9 @@ define(function(require) {
          * @protected
          */
         _refreshSelectWidget: function() {
+            if (!this.selectWidget) {
+                return;
+            }
             this.selectWidget.multiselect('refresh');
         },
 
@@ -694,8 +716,10 @@ define(function(require) {
          *
          * @protected
          */
-        _processFilterStatus: function() {
-            var activeFilters = this.$(this.filterSelector).val();
+        _processFilterStatus: function(activeFilters) {
+            if (!_.isArray(activeFilters)) {
+                activeFilters = this.$(this.filterSelector).val();
+            }
 
             _.each(this.filters, function(filter, name) {
                 if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {

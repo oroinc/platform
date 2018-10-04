@@ -84,7 +84,7 @@ define(function(require) {
             this.view.render();
             this.view.$el.insertAfter(this.main.$el.find('.other-scroll-container'));
             this.main.$el.find('.other-scroll-container, .pagination, .page-size, ' +
-                '.column-manager, .extra-actions-panel').hide();
+                '.datagrid-settings, .extra-actions-panel').hide();
             this.main.$el.find('.visible-items-counter').show();
             this.main.$el.find('.board').show();
 
@@ -133,7 +133,7 @@ define(function(require) {
         disable: function() {
             this.main.$el.find('.board').hide();
             this.main.$el.find('.other-scroll-container, .pagination, .page-size, ' +
-                '.column-manager, .extra-actions-panel').show();
+                '.datagrid-settings, .extra-actions-panel').show();
             this.main.$el.find('.visible-items-counter').hide();
 
             // restore sorting settings

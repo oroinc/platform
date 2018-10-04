@@ -1613,6 +1613,9 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1620,11 +1623,8 @@ TEXT;
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->checkColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
@@ -1644,6 +1644,9 @@ TEXT;
             $grid->getElement($filtersButton)->open();
         }
 
+        $gridSettingsButton = $grid->getElement($grid->getMappedChildElementName('GridColumnManagerButton'));
+        $gridSettingsButton->click();
+
         $filterButton = $grid->getElement($grid->getMappedChildElementName('GridFilterManagerButton'));
         $filterButton->click();
 
@@ -1651,11 +1654,8 @@ TEXT;
         $filterManager = $grid->getElement($grid->getMappedChildElementName('GridFilterManager'));
         $filterManager->uncheckColumnFilter($filter);
 
-        try {
-            $filterManager->close();
-        } catch (\Exception $e) {
-            $filterButton->click();
-        }
+        $gridSettingsClose = $grid->getElement($grid->getMappedChildElementName('GridSettingsManagerClose'));
+        $gridSettingsClose->click();
     }
 
     /**
