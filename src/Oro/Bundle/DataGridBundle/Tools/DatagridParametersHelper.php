@@ -5,6 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Tools;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 
+/**
+ * Contains useful methods common for services that work with datagrid parameters.
+ */
 class DatagridParametersHelper
 {
     /**
