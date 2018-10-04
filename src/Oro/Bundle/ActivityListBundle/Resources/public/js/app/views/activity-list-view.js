@@ -170,9 +170,9 @@ define(function(require) {
                 this.collection.getPage() === 1 &&
                 !this.collection.models.length
             ) {
-                //this.gridToolbar.hide();
+                this.gridToolbar.hide();
             } else {
-                //this.gridToolbar.show();
+                this.gridToolbar.show();
             }
         },
 
