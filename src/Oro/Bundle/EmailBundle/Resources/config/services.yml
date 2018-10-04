@@ -998,6 +998,12 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    oro_email.internal_email.flag_manager_loader:
+        public: false
+        class: Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader
+        tags:
+            - { name: oro_email.email_flag_manager_loader }
+
     oro_email.manager.notification:
         class: %oro_email.manager.notification.class%
         arguments:
