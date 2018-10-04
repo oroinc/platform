@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 {
@@ -52,10 +53,6 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Unsupported subresource.
-     */
     public function testProcessForUnknownParentEntity()
     {
         $parentEntityClass = 'Test\ParentClass';
@@ -69,12 +66,19 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
         $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'relationship constraint',
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
+                )
+            ],
+            $this->context->getErrors()
+        );
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage Unsupported subresource.
-     */
     public function testProcessForUnknownAssociation()
     {
         $parentEntityClass = 'Test\ParentClass';
@@ -90,6 +94,17 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
         $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                Error::createValidationError(
+                    'relationship constraint',
+                    'Unsupported subresource.',
+                    Response::HTTP_NOT_FOUND
+                )
+            ],
+            $this->context->getErrors()
+        );
     }
 
     /**

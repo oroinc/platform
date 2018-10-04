@@ -61,7 +61,7 @@ define(['jquery', 'backbone', './mediator', 'jquery-ui'], function($, Backbone, 
                 var $group = $(this);
                 var isActive = $group.hasClass('active');
                 var autoCollapse = self.options.autoCollapse;
-                var $header = $group.find('a[href="#"]>span').first();
+                var $header = $group.find('a>span').first();
                 var $target = $group.find('.accordion-body').first();
                 var headerId = self._getGroupId(i + 1) + '-header';
                 var targetId = self._getGroupId(i + 1);

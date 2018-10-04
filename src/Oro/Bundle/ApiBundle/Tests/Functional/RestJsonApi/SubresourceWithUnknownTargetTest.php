@@ -33,7 +33,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -54,7 +54,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -75,7 +75,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -96,7 +96,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -117,7 +117,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -138,7 +138,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -159,7 +159,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,
@@ -180,7 +180,7 @@ class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'not found http exception',
+                'title'  => 'relationship constraint',
                 'detail' => 'Unsupported subresource.'
             ],
             $response,

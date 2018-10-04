@@ -15,6 +15,9 @@ class DependencyInjectionUtil
     /** the name of DIC tag for Data API processors */
     public const PROCESSOR_TAG = 'oro.api.processor';
 
+    /** the attribute to specify the request type for "oro.api.processor" DIC tag */
+    public const REQUEST_TYPE = 'requestType';
+
     /**
      * @internal never use this constant outside of ApiBundle,
      *           to receive and update the configuration use getConfig and setConfig methods.
@@ -119,6 +122,18 @@ class DependencyInjectionUtil
     }
 
     /**
+     * Gets a value of the "requestType" attribute.
+     *
+     * @param array $attributes
+     *
+     * @return string|null
+     */
+    public static function getRequestType(array $attributes)
+    {
+        return self::getAttribute($attributes, self::REQUEST_TYPE, null);
+    }
+
+    /**
      * Sorts the tagged services by the priority;
      * the higher the priority, the earlier element is added to the result list,
      * and return flatten array of sorted services.
@@ -189,10 +204,10 @@ class DependencyInjectionUtil
         $processorDef->clearTag(self::PROCESSOR_TAG);
 
         foreach ($tags as $tag) {
-            if (empty($tag['requestType'])) {
-                $tag['requestType'] = '!' . $requestType;
+            if (empty($tag[self::REQUEST_TYPE])) {
+                $tag[self::REQUEST_TYPE] = '!' . $requestType;
             } else {
-                $tag['requestType'] .= '&!' . $requestType;
+                $tag[self::REQUEST_TYPE] = sprintf('!%s&%s', $requestType, $tag[self::REQUEST_TYPE]);
             }
             $processorDef->addTag(self::PROCESSOR_TAG, $tag);
         }

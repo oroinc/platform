@@ -53,9 +53,7 @@ class RegionTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToUpdate()
@@ -66,9 +64,7 @@ class RegionTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToDelete()
@@ -79,9 +75,7 @@ class RegionTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testTryToDeleteList()
@@ -92,9 +86,7 @@ class RegionTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
     public function testGetSubresourceCountry()
@@ -123,8 +115,6 @@ class RegionTest extends RestJsonApiTestCase
             [],
             false
         );
-
-        self::assertResponseStatusCodeEquals($response, 405);
-        self::assertEquals('GET', $response->headers->get('Allow'));
+        self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 }

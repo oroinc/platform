@@ -1,0 +1,55 @@
+services:
+    oro_api.options.processor:
+        class: Oro\Bundle\ApiBundle\Processor\OptionsProcessor
+        public: false
+        arguments:
+            - '@oro_api.processor_bag'
+            - options
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    #
+    # initialize
+    #
+
+    oro_api.options.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Options\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: options, group: initialize, actionType: list|item, priority: 10 }
+
+    oro_api.options.initialize_subresource_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Options\InitializeSubresourceConfigExtras
+        tags:
+            - { name: oro.api.processor, action: options, group: initialize, actionType: relationship|subresource, priority: 10 }
+
+    #
+    # resource_check
+    #
+
+    #
+    # normalize_result
+    #
+
+    oro_api.options.rest.set_success_response_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Options\SetSuccessResponseStatusCode
+        tags:
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -29 }
+
+    oro_api.options.rest.cors.set_max_age:
+        class: Oro\Bundle\ApiBundle\Processor\Options\Rest\SetCorsMaxAge
+        arguments:
+            - 0 # preflightMaxAge. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+        tags:
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -242 }
+
+    oro_api.options.rest.set_cache_control:
+        class: Oro\Bundle\ApiBundle\Processor\Options\Rest\SetCacheControl
+        arguments:
+            - 0 # preflightMaxAge. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+        tags:
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -245 }
+
+    oro_api.options.rest.cors.set_allow_methods:
+        class: Oro\Bundle\ApiBundle\Processor\Options\Rest\SetCorsAllowMethods
+        tags:
+            - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -252 }

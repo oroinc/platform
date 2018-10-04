@@ -152,6 +152,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccurs($withLogger)
@@ -208,6 +209,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -265,6 +267,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccurs($withLogger)
@@ -323,6 +326,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessor($withLogger)
@@ -379,6 +383,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndSoftErrorsHandlingEnabled($withLogger)
@@ -438,6 +443,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled($withLogger)
@@ -495,6 +501,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -552,6 +559,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -610,6 +618,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled($withLogger)
@@ -684,6 +693,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled($withLogger)
@@ -744,6 +754,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroup($withLogger)
@@ -797,6 +808,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -851,6 +863,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup($withLogger)
@@ -1095,6 +1108,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled($withLogger)
@@ -1138,6 +1152,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $withLogger
+     *
      * @dataProvider loggerProvider
      */
     public function testWhenInternalPhpErrorOccurs($withLogger)
@@ -1197,6 +1212,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param \Exception $exception
+     *
      * @dataProvider safeExceptionProvider
      */
     public function testWhenSafeExceptionOccurs(\Exception $exception)
@@ -1260,6 +1276,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param HttpException $exception
+     *
      * @dataProvider httpInternalServerErrorExceptionProvider
      */
     public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
@@ -1321,6 +1338,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param Error $error
      * @param array $loggedError
+     *
      * @dataProvider errorForLogConversionProvider
      */
     public function testErrorForLogConversion(Error $error, array $loggedError)

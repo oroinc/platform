@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Validator;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\ORM\ORMException;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -20,49 +18,48 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Validates that a query built via the query designer is correct and can be executed.
+ */
 class QueryValidator extends ConstraintValidator
 {
-    /**
-     * @var ChainConfigurationProvider
-     */
-    protected $configurationProvider;
+    /** @var ChainConfigurationProvider */
+    private $configurationProvider;
 
-    /**
-     * @var Builder
-     */
-    protected $gridBuilder;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var bool
-     */
-    protected $isDebug;
+    /** @var Builder */
+    private $gridBuilder;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var bool */
+    private $isDebug;
+
+    /** @var array [grid name => true, ...] */
+    private $processing = [];
 
     /**
-     * Constructor
-     *
      * @param ChainConfigurationProvider $configurationProvider
      * @param Builder                    $gridBuilder
+     * @param DoctrineHelper             $doctrineHelper
      * @param TranslatorInterface        $translator
      * @param bool                       $isDebug
      */
     public function __construct(
         ChainConfigurationProvider $configurationProvider,
         Builder $gridBuilder,
+        DoctrineHelper $doctrineHelper,
         TranslatorInterface $translator,
         $isDebug
     ) {
         $this->configurationProvider = $configurationProvider;
-        $this->gridBuilder           = $gridBuilder;
-        $this->translator            = $translator;
-        $this->isDebug               = $isDebug;
+        $this->gridBuilder = $gridBuilder;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->translator = $translator;
+        $this->isDebug = $isDebug;
     }
 
     /**
@@ -75,35 +72,43 @@ class QueryValidator extends ConstraintValidator
             return;
         }
 
-        $uniqueId = uniqid('grid', true);
-        if ($this->doctrineHelper && $entityId = $this->doctrineHelper->getSingleEntityIdentifier($value, false)) {
-            $uniqueId = $entityId;
+        $uniqueId = $this->doctrineHelper->getSingleEntityIdentifier($value, false) ?: uniqid('grid', true);
+        $gridName = $value->getGridPrefix() . $uniqueId;
+        if (isset($this->processing[$gridName])) {
+            return;
         }
-        $gridName = $value->getGridPrefix().$uniqueId;
-        $builder = $this->getBuilder($gridName);
 
+        /**
+         * Remember the currently processing datagrid to avoid circular validation of the same grid.
+         * Remember the current validation context because it can be changed.
+         * It can happen during building the datagrid's accepted datasource
+         * if a datagrid has a filter related to Segment entity.
+         * In this case this validator is executed by submitting the filter form.
+         * An example of such case is pages for building a segment or a marketing list.
+         * @see \Oro\Bundle\DataGridBundle\Datagrid\Datagrid::getAcceptedDatasource
+         * @see \Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension::visitDatasource
+         * @see \Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder::doBuildRestrictions
+         * @see \Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy::getDefinition
+         */
+        $this->processing[$gridName] = true;
+        $context = $this->context;
+
+        $builder = $this->getBuilder($gridName);
         $builder->setGridName($gridName);
         $builder->setSource($value);
-
-        $message = $this->translator->trans($constraint->message);
         try {
-            $dataGrid = $this->gridBuilder->build(
-                $builder->getConfiguration(),
-                new ParameterBag()
-            );
-            $dataSource = $dataGrid->getDatasource();
+            $dataGrid = $this->gridBuilder->build($builder->getConfiguration(), new ParameterBag());
+            $dataSource = $dataGrid->getAcceptedDatasource();
             if ($dataSource instanceof OrmDatasource) {
-                $qb = $dataSource->getQueryBuilder();
-                $qb->setMaxResults(1);
+                $dataSource->getQueryBuilder()->setMaxResults(1);
             }
-
             $dataSource->getResults();
-        } catch (DBALException $e) {
-            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
-        } catch (ORMException $e) {
-            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
-        } catch (InvalidConfigurationException $e) {
-            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
+        } catch (\Throwable $e) {
+            $context->addViolation(
+                $this->isDebug ? $e->getMessage() : $this->translator->trans($constraint->message)
+            );
+        } finally {
+            unset($this->processing[$gridName]);
         }
     }
 
@@ -112,7 +117,7 @@ class QueryValidator extends ConstraintValidator
      *
      * @return DatagridConfigurationBuilder
      */
-    protected function getBuilder($gridName)
+    private function getBuilder($gridName)
     {
         foreach ($this->configurationProvider->getProviders() as $provider) {
             /** @var ConfigurationProviderInterface|BuilderAwareInterface $provider */
@@ -126,13 +131,5 @@ class QueryValidator extends ConstraintValidator
         }
 
         throw new InvalidConfigurationException('Builder is missing');
-    }
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
     }
 }

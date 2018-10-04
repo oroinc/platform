@@ -18,7 +18,7 @@
 
     opacity: 0;
 
-    transition: opacity 300ms linear;
+    transition: opacity 150ms linear;
 
     visibility: hidden;
 
@@ -274,5 +274,9 @@
     .highlight {
         text-decoration: underline;
         background-color: $menu-item-text-highlight-color;
+    }
+
+    .divider {
+        display: none;
     }
 }

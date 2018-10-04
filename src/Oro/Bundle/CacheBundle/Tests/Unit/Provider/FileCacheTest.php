@@ -18,7 +18,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetFilename($cacheClass, $id, $namespace, $expectedFileName)
     {
         $fs = new Filesystem();
-        $directory = 'dir' . uniqid();
+        $directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'dir' . uniqid();
 
         $cache = $this->getMockBuilder($cacheClass)
             ->setConstructorArgs([$directory, '.ext'])
