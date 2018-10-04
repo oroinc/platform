@@ -56,12 +56,12 @@ define(function(require) {
             }
             _.extend(this, _.pick(options, ['View', 'viewOptions']));
 
-            options.dialogOptions = {
+            options.dialogOptions = _.defaults({}, options.dialogOptions, {
                 autoResize: false,
                 modal: true,
                 resize: false,
                 dialogClass: 'datagrid-settings-dialog'
-            };
+            });
 
             DatagridSettingsDialogWidget.__super__.initialize.apply(this, arguments);
         },

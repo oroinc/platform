@@ -145,19 +145,15 @@ define(function(require) {
 
                 // focus input after Bootstrap opened dropdown menu
                 $dropdownMenu.focusFirstInput();
-
-                mediator.trigger('dropdown-launcher:show');
             }
+            mediator.trigger('dropdown-launcher:show', e);
         },
 
         /**
          * @param {jQuery.Event} e
          */
         onHide: function(e) {
-            var $dropdownMenu = this.$('>.dropdown-menu');
-            if ($dropdownMenu.length) {
-                mediator.trigger('dropdown-launcher:hide');
-            }
+            mediator.trigger('dropdown-launcher:hide', e);
         },
 
         /**
@@ -170,7 +166,10 @@ define(function(require) {
                 viewOptions: this.componentOptions,
                 stateEnabled: false,
                 incrementalPosition: true,
-                resize: false
+                resize: false,
+                dialogOptions: {
+                    close: _.bind(this.onHide)
+                }
             });
 
             this.dialogWidget.render();
