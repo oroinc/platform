@@ -64,11 +64,12 @@
         .datagrid-settings-filter {
             .datagrid-settings-search {
                 &.empty:after {
-                    top: 14px;
+                    top: 10px;
                     right: 13px;
-                    font-size: 16px;
-                    line-height: 16px;
-                    height: 16px;
+                }
+
+                .clear {
+                    top: 10px;
                 }
             }
         }
@@ -85,17 +86,14 @@
             .btn {
                 height: 28px;
                 width: 28px;
-                line-height: 28px;
-                border-radius: 28px;
-                border: none;
 
                 [class^="fa-"],
                 [class*=" fa-"] {
-                    line-height: 28px;
                     vertical-align: top;
 
                     &:before {
-                        line-height: 28px;
+                        line-height: 22px;
+                        font-size: 15px;
                     }
                 }
             }

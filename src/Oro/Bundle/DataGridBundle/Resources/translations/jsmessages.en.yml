@@ -78,6 +78,8 @@ oro_datagrid.action.appearance: "Data appearance"
 "Export Confirmation": "Export Confirmation"
 oro:
     datagrid:
+        settings.title: "Settings"
+        settings.close.label: "Close"
         loading_failed_message: "Data loading failed, try reloading the page. If the issue appears again please contact your administrator."
         toolbar_sorting:
             label: "Sorted By"

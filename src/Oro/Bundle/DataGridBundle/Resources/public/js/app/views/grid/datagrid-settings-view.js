@@ -32,7 +32,7 @@ define(function(require) {
         /**
          * @property {String}
          */
-        title: _.__('Settings'),
+        title: _.__('oro.datagrid.settings.title'),
 
         /**
          * @property {String}

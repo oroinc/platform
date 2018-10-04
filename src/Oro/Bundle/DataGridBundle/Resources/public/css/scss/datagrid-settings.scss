@@ -108,7 +108,7 @@
                     color: lighten($btn-text-color, 15%);
                     position: absolute;
                     top: 5px;
-                    right: 8px;
+                    right: 10px;
                     z-index: 0;
                 }
 
@@ -249,7 +249,7 @@
         }
 
         .table {
-            border-radius: 3px;
+            border-radius: 3px 3px 0 0;
             overflow: hidden;
             margin-bottom: 0;
 

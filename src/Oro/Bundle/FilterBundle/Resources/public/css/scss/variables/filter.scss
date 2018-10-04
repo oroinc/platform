@@ -229,6 +229,7 @@ $filter-item-btn-font-size: 14px !default;
 $filter-item-btn-line-height: 24px !default;
 $filter-item-btn-text-transform: none !default;
 $filter-item-btn-border: none !default;
+$filter-item-btn-background-color: $primary-900 !default;
 $filter-item-btn-vertical-align: top !default;
 
 $filter-item-btn-caret-offset-top: 10px !default;
@@ -296,6 +297,8 @@ $filter-select-oro-line-height: 20px !default;
 $filter-select-oro-width: 120px !default;
 
 $filter-criteria-selector-font-weight: normal !default;
+$filter-criteria-selector-caret-offset-top: 14px !default;
+
 $select-filter-widget-caret-offset-top: 8px !default;
 
 $open-filter-before-content: "" !default;
@@ -316,6 +319,9 @@ $open-filter-after-left: 10px !default;
 $open-filter-after-position: absolute !default;
 $open-filter-after-bottom: -11px !default;
 $open-filter-after-z-index: $oro-zindex-dropdown  !default;
+
+$open-filter-filter-criteria-selector-background-color: $additional-extra-light  !default;
+$open-filter-filter-criteria-selector-box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21)  !default;
 
 $filter-date-range-datetime-visual-element-width: 113px !default;
 $filter-date-range-datetime-visual-element-offset-bottom: 8px !default;

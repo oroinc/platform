@@ -30,14 +30,19 @@ define(function(require) {
         viewOptions: {},
 
         /**
-         * @property {underscore.template}
+         * @property {Function}
          */
         actionsTemplate: actionsTemplate,
 
         /**
-         * Loading bar view instance
+         * @property {Object}
          */
-        loadingBar: null,
+        dialogOptions: {
+            autoResize: false,
+            modal: true,
+            resize: false,
+            dialogClass: 'datagrid-settings-dialog'
+        },
 
         /**
          * @inheritDoc
@@ -56,12 +61,7 @@ define(function(require) {
             }
             _.extend(this, _.pick(options, ['View', 'viewOptions']));
 
-            options.dialogOptions = _.defaults({}, options.dialogOptions, {
-                autoResize: false,
-                modal: true,
-                resize: false,
-                dialogClass: 'datagrid-settings-dialog'
-            });
+            options.dialogOptions = _.extend({}, this.dialogOptions, options.dialogOptions);
 
             DatagridSettingsDialogWidget.__super__.initialize.apply(this, arguments);
         },
@@ -70,11 +70,11 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            this.$el.append(this.actionsTemplate());
             this.viewOptions._sourceElement = this.$el;
             this.viewOptions.title = '';
             this.view = new this.View(this.viewOptions);
             this.view.beforeOpen();
+            this.$el.append(this.actionsTemplate());
 
             DatagridSettingsDialogWidget.__super__.render.call(this);
         },
@@ -85,14 +85,6 @@ define(function(require) {
         onContentUpdated: function() {
             this.view.updateViews();
             this.$el.focusFirstInput();
-        },
-
-        /**
-         * @instance
-         */
-        hide: function() {
-            this.loadingBar.appendTo('#oroplatform-header');
-            DatagridSettingsDialogWidget.__super__.hide.apply(this, arguments);
         },
 
         /**

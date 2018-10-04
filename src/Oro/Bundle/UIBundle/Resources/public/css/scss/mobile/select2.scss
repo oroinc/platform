@@ -65,8 +65,61 @@
         height: $mobile-select2-container-multi-top-height;
 
         .select2-search-choice {
-            float: $mobile-select2-container-multi-choice-float;
-            margin-right: $mobile-select2-container-multi-choice-offset-right;
+            font-size: $base-font-size--m;
+            padding: 6px 40px 6px 8px;
+            height: 32px;
+            background: $additional-extra-light;
+            margin: 4px;
+            line-height: 20px;
+            max-width: 100%;
+
+            > div {
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            .select2-search-choice-close {
+                height: 32px;
+                top: 0;
+                border: none;
+
+                &:before {
+                    font-size: 16px;
+                    color: $primary-200;
+                    line-height: 32px;
+                    display: block;
+                }
+            }
+        }
+
+        .select2-search-field {
+            input {
+                height: $mobile-select2-container-multi-select2-search-field-height;
+                line-height: $mobile-select2-container-multi-select2-search-field-line-height;
+            }
+        }
+    }
+}
+
+.select2-container.select2-tree-autocomplete {
+    &.select2-container-multi {
+        .select2-choices {
+            .select2-search-choice {
+                background: $additional-extra-lighten;
+                border: none;
+                box-shadow: none;
+                color: $primary-200;
+                padding: 6px 20px 6px 8px;
+                margin: 4px;
+
+                .select2-search-choice-close {
+                    top: 0;
+
+                    &:before {
+                        color: $primary-200;
+                    }
+                }
+            }
         }
     }
 }
