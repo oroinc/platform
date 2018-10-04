@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
-
-use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 
 class FileNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,35 +30,27 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     public function setUp()
     {
         $this->normalizer = new FileNormalizer();
 
-        $router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $associationManager = $this
-            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attachmentManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $router = $this->createMock(Router::class);
+        $associationManager = $this->createMock(AssociationManager::class);
+        $this->attachmentManager = $this->getMockBuilder(AttachmentManager::class)
             ->setConstructorArgs([$router, [], $associationManager, true, true])
             ->setMethods(['getAttachment'])
             ->getMock();
-
-        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->validator = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fileManager = $this->createMock(FileManager::class);
+        $this->validator = $this->createMock(ConfigFileValidator::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->normalizer->setAttachmentManager($this->attachmentManager);
         $this->normalizer->setFileManager($this->fileManager);
         $this->normalizer->setValidator($this->validator);
+        $this->normalizer->setLogger($this->logger);
     }
 
     /**
@@ -65,7 +64,7 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     public function supportsDenormalizationData()
     {
         return [
-            'supports' => ['Oro\Bundle\AttachmentBundle\Entity\File', true],
+            'supports' => [File::class, true],
             'notSupports' => ['testClass', false],
         ];
     }
@@ -105,9 +104,30 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('validate')
             ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
             ->will($this->returnValue($violations));
+        $this->logger->expects($this->never())
+            ->method('error');
 
         $result = $this->normalizer->denormalize($data, '', '', $context);
         $this->assertSame($entity, $result);
+    }
+
+    public function testDenormalizeNotSupportedFileProtocol()
+    {
+        $data = 'http://example.com/test.txt';
+        $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
+
+        $this->fileManager->expects($this->once())
+            ->method('createFileEntity')
+            ->with($data)
+            ->willThrowException(new ProtocolNotSupportedException($data));
+        $this->validator->expects($this->never())
+            ->method('validate');
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('The protocol for the file "http://example.com/test.txt" is not supported.');
+
+        $result = $this->normalizer->denormalize($data, '', '', $context);
+        $this->assertNull($result);
     }
 
     public function testDenormalizeNotExistingFile()
@@ -115,12 +135,15 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
         $data = 'http://example.com/test.txt';
         $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
 
-        $this->fileManager->expects($this->any())
+        $this->fileManager->expects($this->once())
             ->method('createFileEntity')
             ->with($data)
-            ->willReturn(null);
+            ->willThrowException(new FileNotFoundException('File does not exist.', 0, null, $data));
         $this->validator->expects($this->never())
             ->method('validate');
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('File does not exist.');
 
         $result = $this->normalizer->denormalize($data, '', '', $context);
         $this->assertNull($result);
@@ -130,7 +153,9 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $data = 'http://example.com/test.txt';
         $context = ['entityName' => 'testEntity', 'fieldName' => 'testField'];
-        $violations = new ConstraintViolationList([new ConstraintViolation('', '', [], '', '', '')]);
+        $violations = new ConstraintViolationList([
+            new ConstraintViolation('Some constraint violation', '', [], '', '', '')
+        ]);
 
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
@@ -144,6 +169,9 @@ class FileNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('validate')
             ->with($this->identicalTo($file), $context['entityName'], $context['fieldName'])
             ->will($this->returnValue($violations));
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with($this->stringStartsWith('Some constraint violation.'));
 
         $result = $this->normalizer->denormalize($data, '', '', $context);
         $this->assertNull($result);
