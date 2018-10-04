@@ -133,7 +133,7 @@
                 color: $activity-accordion-icon-color-hover;
             }
 
-            @include fa-icon($activity-accordion-icon);
+            @include fa-icon($activity-accordion-icon-expanded);
 
             &.collapsed {
                 @include fa-icon($activity-accordion-icon-collapsed);
@@ -200,6 +200,10 @@
         color: $activity-icon-color;
 
         text-align: center;
+    }
+
+    .responsive-block {
+        margin-bottom: $activity-responsive-block-offset;
     }
 }
 

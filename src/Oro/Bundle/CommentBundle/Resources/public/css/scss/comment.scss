@@ -131,7 +131,7 @@
         }
 
         .no-avatar {
-            background: url(../../../oroui/img/info-user.png);
+            background: $comments-avatar-placeholder;
             background-size: $comments-block-title-size $comments-block-title-size;
         }
     }
@@ -154,8 +154,8 @@
 
             text-align: center;
 
-            background: $primary-830;
-            border-radius: $border-radius;
+            background:  $comments-thumbnail-background;
+            border-radius: $comments-thumbnail-border-radius;
 
             @media only screen and (max-width: 500px) {
                 display: none; // hide thumbnails on mobile

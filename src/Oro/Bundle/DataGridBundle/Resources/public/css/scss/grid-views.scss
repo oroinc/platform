@@ -39,7 +39,7 @@
 
         @include fa-icon($oro-datagrid-grid-views-icon-close);
 
-        @at-root .show .grid-view-icon {
+        @at-root .show > .grid-views-toogler .grid-view-icon {
             @include fa-icon($oro-datagrid-grid-views-icon-show);
         }
     }

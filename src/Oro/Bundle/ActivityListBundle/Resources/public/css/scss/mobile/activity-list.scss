@@ -58,6 +58,7 @@
         .accordion-heading {
             .details {
                 max-width: $activity-mobile-details-small-width;
+                min-width: $activity-mobile-details-small-width;
             }
         }
     }

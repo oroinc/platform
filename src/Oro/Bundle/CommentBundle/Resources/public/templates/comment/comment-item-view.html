@@ -58,24 +58,24 @@
     <% if (hasActions) { %>
     <div class="more-bar-holder">
         <% var actionsTogglerId = _.uniqueId('dropdown-') %>
-        <div class="dropleft"><a data-toggle="dropdown" class="dropdown-toggle" href="#" role="button" id="<%- actionsTogglerId %>"
-                                 aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
-            <span class="fa fa-ellipsis-h" aria-hidden="true"></span></a>
+        <div class="dropdown"><button data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" id="<%- actionsTogglerId %>"
+                                 data-placement="left-start" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
+            <span class="fa fa-ellipsis-h" aria-hidden="true"></span></button>
             <ul class="dropdown-menu launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
                     <ul class="launchers-list">
                         <% if (editable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <a href="#" class="action mode-icon-only item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
+                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
                                 <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.update') %></span>
-                            </a>
+                            </button>
                         </li>
                         <% } %>
                         <% if (removable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <a href="#" class="action mode-icon-only item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
+                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
                                 <span class="fa-trash-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.delete') %></span>
-                            </a>
+                            </button>
                         </li>
                         <% } %>
                     </ul>

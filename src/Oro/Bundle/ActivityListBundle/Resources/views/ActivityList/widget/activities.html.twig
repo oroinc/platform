@@ -18,12 +18,10 @@
                 <div class="filter-container"></div>
             </div>
             <div class="pagination" role="navigation">
-                {% set prevButtonText = oro_config_value('oro_activity_list.sorting_direction') == 'DESC'
-                        ? 'oro.activitylist.pagination.newer'|trans : 'oro.activitylist.pagination.older'|trans
-                %}
-                {% set nextButtonText = oro_config_value('oro_activity_list.sorting_direction') == 'DESC'
-                    ? 'oro.activitylist.pagination.older'|trans : 'oro.activitylist.pagination.newer'|trans
-                %}
+                {% set direction = oro_config_value('oro_activity_list.sorting_direction') == 'DESC' %}
+                {% set prevButtonText = direction ? 'oro.activitylist.pagination.newer'|trans : 'oro.activitylist.pagination.older'|trans %}
+                {% set nextButtonText = direction ? 'oro.activitylist.pagination.older'|trans : 'oro.activitylist.pagination.newer'|trans %}
+
                 <button data-section="top"
                         data-action-name="goto_previous"
                         class="btn pagination-previous"

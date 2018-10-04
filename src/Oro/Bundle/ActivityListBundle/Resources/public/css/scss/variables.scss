@@ -24,7 +24,7 @@ $activity-count-color: $primary-700 !default;
 
 $activity-accordion-icon-offset: side-values(0 8px 0 16px) !default;
 $activity-accordion-icon-color-hover: $primary-400 !default;
-$activity-accordion-icon: $fa-var-minus-square-o !default;
+$activity-accordion-icon-expanded: $fa-var-minus-square-o !default;
 $activity-accordion-icon-collapsed: $fa-var-plus-square-o !default;
 
 $activity-details-width: 240px !default;
@@ -41,3 +41,5 @@ $activity-comment-offset: side-values(0 6px 0 0) !default;
 $activity-filter-select-color: $primary-400 !default;
 
 $activity-short-message-offset: side-values(0 8px 0 0) !default;
+
+$activity-responsive-block-offset: 16px !default;

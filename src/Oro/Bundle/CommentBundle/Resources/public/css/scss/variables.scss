@@ -16,6 +16,7 @@ $comment-view-attachment-item-offset: 5px !default;
 
 $comments-block-color: $primary-200 !default;
 
+$comments-avatar-placeholder: url(../../../oroui/img/info-user.png) !default;
 $comments-block-title-size: 32 !default;
 
 $comments-block-avatar-radius: 50% !default;
@@ -28,6 +29,8 @@ $comments-block-body-color: $primary !default;
 
 $comments-thumbnail-width: 110px !default;
 $comments-thumbnail-height: 80px !default;
+$comments-thumbnail-background: $primary-830 !default;
+$comments-thumbnail-border-radius: $border-radius !default;
 $comments-thumbnail-icon-offset: 20px !default;
 $comments-thumbnail-icon-color: $primary-inverse !default;
 
