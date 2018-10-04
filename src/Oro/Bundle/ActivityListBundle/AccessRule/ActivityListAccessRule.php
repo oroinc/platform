@@ -51,7 +51,9 @@ class ActivityListAccessRule implements AccessRuleInterface
     {
         return
             $criteria->getType() === AccessRuleWalker::ORM_RULES_TYPE
-            && $criteria->getEntityClass() === ActivityList::class;
+            && $criteria->getEntityClass() === ActivityList::class
+            // This check should be deleted in BAP-17679
+            && $criteria->hasOption(self::ACTIVITY_OWNER_TABLE_ALIAS);
     }
 
     /**

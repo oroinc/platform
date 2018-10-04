@@ -23,6 +23,8 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
     /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $modifier;
 
+    private const TIMEZONE = 'Europe/Moscow';
+
     protected function setUp()
     {
         /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
@@ -32,7 +34,7 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('Europe/Moscow'));
+            ->will($this->returnValue(self::TIMEZONE));
 
         /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translatorMock */
         $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
@@ -87,7 +89,7 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
      */
     public function dataProvider()
     {
-        $weekDateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $weekDateTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $weekDateTime->modify('this week');
         // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
         $weekNumber = $weekDateTime->format('W');
@@ -104,19 +106,18 @@ class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            // TODO: Should be fixed in BAP-13057
-//            'should process weeks'                                                => [
-//                [
-//                    'part'  => DateModifierInterface::PART_WEEK,
-//                    'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
-//                ],
-//                [
-//                    'part'  => DateModifierInterface::PART_WEEK,
-//                    'value' => ['start' => 3, 'end' => $weekNumber]
-//                ],
-//                ['start' => 'start subform', 'end' => 'end subform'],
-//                ['start' => null, 'end' => null]
-//            ],
+            'should process weeks'                                                => [
+                [
+                    'part'  => DateModifierInterface::PART_WEEK,
+                    'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
+                ],
+                [
+                    'part'  => DateModifierInterface::PART_WEEK,
+                    'value' => ['start' => 3, 'end' => $weekNumber]
+                ],
+                ['start' => 'start subform', 'end' => 'end subform'],
+                ['start' => null, 'end' => null]
+            ],
             'should process months'                                               => [
                 [
                     'part'  => DateModifierInterface::PART_MONTH,
