@@ -189,4 +189,15 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
             ]
         ];
     }
+
+    public function testDatagridSkipExtensionParam()
+    {
+        $parameterBag = new ParameterBag();
+        $this->datagridParametersHelper->setDatagridExtensionSkipped($parameterBag);
+        self::assertTrue($parameterBag->get(DatagridParametersHelper::DATAGRID_SKIP_EXTENSION_PARAM));
+        self::assertTrue($this->datagridParametersHelper->isDatagridExtensionSkipped($parameterBag));
+
+        $this->datagridParametersHelper->setDatagridExtensionSkipped($parameterBag, false);
+        self::assertFalse($this->datagridParametersHelper->isDatagridExtensionSkipped($parameterBag));
+    }
 }

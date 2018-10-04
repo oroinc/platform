@@ -10,6 +10,8 @@ use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
  */
 class DatagridParametersHelper
 {
+    public const DATAGRID_SKIP_EXTENSION_PARAM = 'dataGridSkipExtensionParam';
+
     /**
      * @param ParameterBag $datagridParameters
      * @param string $parameterName
@@ -61,5 +63,23 @@ class DatagridParametersHelper
             unset($minifiedFilters[AbstractFilterExtension::MINIFIED_FILTER_PARAM][$filterName]);
             $dataGridParameters->set(ParameterBag::MINIFIED_PARAMETERS, $minifiedFilters);
         }
+    }
+
+    /**
+     * @param ParameterBag $parameterBag
+     * @param boolean $value
+     */
+    public function setDatagridExtensionSkipped(ParameterBag $parameterBag, bool $value = true): void
+    {
+        $parameterBag->set(self::DATAGRID_SKIP_EXTENSION_PARAM, $value);
+    }
+
+    /**
+     * @param ParameterBag $parameterBag
+     * @return bool
+     */
+    public function isDatagridExtensionSkipped(ParameterBag $parameterBag): bool
+    {
+        return $parameterBag->get(self::DATAGRID_SKIP_EXTENSION_PARAM, false);
     }
 }

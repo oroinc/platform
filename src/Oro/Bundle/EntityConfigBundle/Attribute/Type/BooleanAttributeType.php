@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Attribute type provides metadata about boolean attribute.
+ */
 class BooleanAttributeType implements AttributeTypeInterface
 {
     public const TRUE_VALUE = 1;

@@ -20,15 +20,16 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     protected function setUp()
     {
         $translator = $this->createMockTranslator();
+        $this->type = new SearchBooleanFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension(
             [
                 new BooleanFilterType($translator),
                 new ChoiceFilterType($translator),
                 new FilterType($translator),
+                $this->type
             ],
             []
         );
-        $this->type = new SearchBooleanFilterType($translator);
         parent::setUp();
     }
 
@@ -40,7 +41,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testConfigureOptions()
+    public function testFormConfigureOptions()
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('field_options');
@@ -54,7 +55,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
     /**
      * {@inheritDoc}
      */
-    public function setDefaultOptionsDataProvider()
+    public function configureOptionsDataProvider()
     {
         return [];
     }
@@ -101,6 +102,6 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(BooleanFilterType::NAME, $this->type->getParent());
+        $this->assertEquals(BooleanFilterType::class, $this->type->getParent());
     }
 }

@@ -21,7 +21,7 @@ class SearchBooleanFilter extends BooleanFilter
      */
     protected function getFormType()
     {
-        return SearchBooleanFilterType::NAME;
+        return SearchBooleanFilterType::class;
     }
 
     /**

@@ -34,7 +34,7 @@ class SearchBooleanFilterType extends AbstractChoiceType
      */
     public function getParent()
     {
-        return BooleanFilterType::NAME;
+        return BooleanFilterType::class;
     }
 
     /**
