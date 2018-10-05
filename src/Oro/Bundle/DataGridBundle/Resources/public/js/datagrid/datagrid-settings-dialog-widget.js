@@ -5,7 +5,7 @@ define(function(require) {
     var _ = require('underscore');
     var DialogWidget = require('oro/dialog-widget');
     var actionsTemplate = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
-
+    var mediator = require('oroui/js/mediator');
     /**
      * @class DatagridSettingsDialogWidget
      * @extends DialogWidget
@@ -60,8 +60,13 @@ define(function(require) {
                 autoResize: false,
                 modal: true,
                 resize: false,
-                dialogClass: 'datagrid-settings-dialog'
+                dialogClass: 'datagrid-settings-dialog',
+                close: function() {
+                    mediator.trigger('dropdown-launcher:hide');
+                }
             });
+
+            mediator.execute('hideLoading');
 
             DatagridSettingsDialogWidget.__super__.initialize.apply(this, arguments);
         },
@@ -92,18 +97,8 @@ define(function(require) {
          */
         hide: function() {
             this.loadingBar.appendTo('#oroplatform-header');
-            DatagridSettingsDialogWidget.__super__.hide.apply(this, arguments);
-        },
 
-        /**
-         * @inheritDoc
-         */
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-            this.view.dispose();
-            DatagridSettingsDialogWidget.__super__.dispose.call(this);
+            DatagridSettingsDialogWidget.__super__.hide.apply(this, arguments);
         }
     });
 
