@@ -79,6 +79,8 @@ define(function(require) {
             this.view.beforeOpen();
             this.$el.append(this.actionsTemplate());
 
+            mediator.execute('hideLoading');
+
             DatagridSettingsDialogWidget.__super__.render.call(this);
         },
 
