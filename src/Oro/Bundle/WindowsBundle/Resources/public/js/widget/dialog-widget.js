@@ -22,7 +22,9 @@ define(function(require) {
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,
-        messengerContainerClass: ''
+        messengerContainerClass: '',
+        mobileLoadingBar: true,
+        desktopLoadingBar: false
     }, require('module').config());
 
     /**
@@ -64,6 +66,9 @@ define(function(require) {
 
         $messengerContainer: null,
 
+        /**
+         * @property {Object}
+         */
         loadingBar: null,
 
         /**
@@ -160,10 +165,13 @@ define(function(require) {
          * @private
          */
         _initLoadingBar: function() {
-            this.subview('LoadingBarView', new LoadingBarView({
-                container: this.widget.dialog('instance').uiDialogTitlebar,
-                ajaxLoading: true
-            }));
+            if ((this.options.mobileLoadingBar && tools.isMobile()) ||
+                (this.options.desktopLoadingBar && !tools.isMobile())) {
+                this.subview('LoadingBarView', new LoadingBarView({
+                    container: this.widget.dialog('instance').uiDialogTitlebar,
+                    ajaxLoading: true
+                }));
+            }
         },
 
         /**

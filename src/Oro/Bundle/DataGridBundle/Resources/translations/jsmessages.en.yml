@@ -78,12 +78,11 @@ oro_datagrid.action.appearance: "Data appearance"
 "Export Confirmation": "Export Confirmation"
 oro:
     datagrid:
-        settings.title: "Settings"
-        settings.close.label: "Close"
         loading_failed_message: "Data loading failed, try reloading the page. If the issue appears again please contact your administrator."
         toolbar_sorting:
             label: "Sorted By"
-        column_manager:
+        settings:
+            header.title: "Settings"
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
@@ -103,6 +102,7 @@ oro:
                 sort: "Sort"
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
+            close.label: "Close"
         not_number: Not a number
         inline_editing:
             message:
