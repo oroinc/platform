@@ -144,10 +144,10 @@ define(function(require) {
         return this.$el;
     };
     Backbone.View.prototype.initControls = function() {
-        Backbone.mediator.execute('layout:init', this.getLayoutElement());
+        Backbone.mediator.execute({name: 'layout:init', silent: true}, this.getLayoutElement());
     };
     Backbone.View.prototype.disposeControls = function() {
-        Backbone.mediator.execute('layout:dispose', this.$el);
+        Backbone.mediator.execute({name: 'layout:dispose', silent: true}, this.$el);
     };
     Backbone.View.prototype.initLayout = function(options) {
         // initializes controls in layout
