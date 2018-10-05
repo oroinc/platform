@@ -685,6 +685,8 @@ services:
             - '@doctrine'
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email_grid_mailbox_name_helper'
+        calls:
+            - [setEmailAddressManager, ['@oro_email.email.address.manager']]
 
     oro_email.email_grid_mailbox_name_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper
