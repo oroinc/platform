@@ -2,20 +2,16 @@
     <% if (_.isMobile()) { %>
     <div class="filter-box oro-clearfix-width">
         <div class="dropdown">
-            <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-name="filters-dropdown"><%= _.__('Filter Results') %></a>
+            <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-name="filters-dropdown">
+                <%= _.__('oro.filter.filter_results_trigger') %>
+                <span data-role="reset-all-filters" class="reset-all-filter"></span>
+            </a>
             <ul class="dropdown-menu">
                 <li>
                     <div class="filter-container">
-                        <a class="reset-filter-button" href="javascript:void(0);"><%= _.__('Reset') %></a>
-                        <select data-action="add-filter-select" multiple>
-                            <% _.each(filters, function (filter, name) { %>
-                            <% if (filter.visible) { %>
-                            <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
-                            <%- filter.label %>
-                            </option>
-                            <% } %>
-                            <% }); %>
-                        </select>
+                        <a class="reset-filter-button" href="javascript:void(0);">
+                            <%= _.__('oro.filter.filter_reset') %>
+                        </a>
                         <span class="filter-items"></span>
                         <div class="filter-items-hint"></div>
                     </div>
@@ -26,18 +22,11 @@
     <% } else { %>
     <div class="filter-box oro-clearfix-width">
         <div class="filter-container">
-            <select data-action="add-filter-select" multiple>
-                <% _.each(filters, function (filter, name) { %>
-                <% if (filter.visible) { %>
-                <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
-                <%- filter.label %>
-                </option>
-                <% } %>
-                <% }); %>
-            </select>
             <span class="filter-items"></span>
             <div class="filter-items-hint">
-                <a class="reset-filter-button" href="javascript:void(0);"><%= _.__('oro.filter.reset.label') %></a>
+                <a class="reset-filter-button" href="javascript:void(0);">
+                    <%= _.__('oro.filter.reset.label') %>
+                </a>
             </div>
         </div>
     </div>

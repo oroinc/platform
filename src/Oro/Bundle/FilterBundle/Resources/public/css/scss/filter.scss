@@ -5,7 +5,7 @@
 }
 
 .filter-box {
-    padding: 8px 20px 0 124px;
+    padding: 8px 20px 0 12px;
 
     .filter-criteria {
         position: $filter-box-criteria-position;
@@ -95,7 +95,6 @@
 
                 input[type='text'] {
                     max-width: $choice-filter-input-max-width;
-                    width: $choice-filter-input-width;
                     margin-bottom: $choice-filter-input-offset-bottom;
                 }
 
@@ -302,6 +301,10 @@
         .filter-criteria-selector,
         .dropdown-toggle.btn {
             font-weight: $filter-criteria-selector-font-weight;
+
+            .caret {
+                margin-top: $filter-criteria-selector-caret-offset-top;
+            }
         }
 
         .select-filter-widget .caret {
@@ -331,6 +334,11 @@
                 bottom: $open-filter-after-bottom;
                 z-index: $open-filter-after-z-index+ 3;
             }
+
+            .filter-criteria-selector {
+                background-color: $open-filter-filter-criteria-selector-background-color;
+                box-shadow: $open-filter-filter-criteria-selector-box-shadow;
+            }
         }
 
         .divider {
@@ -357,6 +365,7 @@
             line-height: $filter-item-btn-line-height;
             text-transform: $filter-item-btn-text-transform;
             border: $filter-item-btn-border;
+            background-color: $filter-item-btn-background-color;
         }
     }
 
@@ -371,7 +380,8 @@
         font-size: $filter-item-fa-close-font-size;
     }
 
-    .filter-select {
+    .filter-select,
+    .filter-criteria-selector {
         height: $filter-select-height;
 
         .disable-filter {
@@ -509,6 +519,7 @@
 
                     span {
                         vertical-align: $select-filter-widget-label-state-span-vertical-align;
+                        display: block;
                     }
                 }
             }

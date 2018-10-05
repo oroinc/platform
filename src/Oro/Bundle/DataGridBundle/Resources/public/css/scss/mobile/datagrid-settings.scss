@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-.column-manager {
+.datagrid-settings {
     a.action.btn.dropdown-toggle {
         display: inline-block !important;
         line-height: 30px;
@@ -41,47 +41,78 @@
         }
     }
 
-    .column-manager-right-flap {
-        display: none;
-    }
+    &-dialog {
+        .close {
+            display: none;
+        }
 
-    .table-header-wrapper th:nth-child(2) {
-        text-align: center;
-    }
-
-    td.title-cell {
-        white-space: normal;
-    }
-
-    td.sort-cell {
-        width: 40px;
-        padding-left: 0;
-        padding-right: 0;
-
-        .btn {
-            height: 20px;
-            line-height: 16px;
-
-            [class^="fa-"],
-            [class*=" fa-"] {
-                line-height: 18px;
-
-                &:before {
-                    line-height: 18px;
-                }
-            }
+        .ui-dialog-content {
+            padding-bottom: 17px;
         }
     }
 
-    td.visibility-cell {
-        width: 40px;
+    &__wrapper {
+
+        .datagrid-settings-right-flap {
+            display: none;
+        }
+
+        .table-header-wrapper th:nth-child(2) {
+            text-align: center;
+        }
+
+        .datagrid-settings-filter {
+            .datagrid-settings-search {
+                &.empty:after {
+                    top: 10px;
+                    right: 13px;
+                }
+
+                .clear {
+                    top: 9px;
+                }
+            }
+        }
+
+        td.title-cell {
+            white-space: normal;
+
+            label {
+                padding: 5px 0;
+            }
+        }
+
+        td.sort-cell {
+            width: 40px;
+            padding-left: 0;
+            padding-right: 0;
+
+            .btn {
+                height: 28px;
+                width: 28px;
+
+                [class^="fa-"],
+                [class*=" fa-"] {
+                    vertical-align: top;
+
+                    &:before {
+                        line-height: 22px;
+                        font-size: 15px;
+                    }
+                }
+            }
+        }
+
+        td.visibility-cell {
+            width: 40px;
+        }
     }
 }
 
 /* changes position of bubble point of dropdown when it's shown above */
 .dropup,
 .dropup-area {
-    .column-manager .dropdown-menu {
+    .datagrid-settings .dropdown-menu {
         top: auto;
         margin-top: 0;
         margin-bottom: 40px;

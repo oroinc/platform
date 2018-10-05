@@ -119,9 +119,9 @@ define(function(require) {
             toolbarOptions: {
                 addResetAction: true,
                 addRefreshAction: true,
-                addColumnManager: true,
+                addDatagridSettingsManager: true,
                 addSorting: false,
-                columnManager: {
+                datagridSettings: {
                     addSorting: true
                 },
                 placement: {
@@ -667,7 +667,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
-            var ComponentConstructor = this.collection.options.modules.columnManagerComponentCustom || null;
+            var ComponentConstructor = this.collection.options.modules.datagridSettingsComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
