@@ -8,6 +8,10 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Provides a set of reusable utility methods for "big numbers" dashboard widgets
+ * to simplify a work with time periods by which the widget's data is filtered.
+ */
 class BigNumberDateHelper
 {
     /** @var RegistryInterface */
@@ -64,13 +68,12 @@ class BigNumberDateHelper
      */
     public function getLastWeekPeriod($weeksDiff = 0)
     {
-        // As for now week starts from Monday and ends by Sunday
-        // @todo: Should be refactored in BAP-9846
+        // Suppose that week starts from Monday and ends by Sunday.
+        // Changing of first day of week will be fixed in BAP-9846
         $end = new \DateTime('last Sunday', new \DateTimeZone($this->localeSettings->getTimeZone()));
-
+        $end->setTime(0, 0, 0)->modify('1 day');
         $start = clone $end;
-        $start->modify('-6 days');
-        $end->setTime(23, 59, 59);
+        $start->modify('-7 days');
 
         if ($weeksDiff) {
             $days = $weeksDiff * 7;

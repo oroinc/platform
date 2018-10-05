@@ -16,19 +16,23 @@ define(function(require) {
             'ajaxLoading', 'pageLoading'
         ]),
 
-        /** @property {string} */
+        /**
+         * @property {string}
+         */
         className: 'loading-bar',
 
-        /** @property {string} */
+        /**
+         * @property {string}
+         */
         container: 'body',
 
         /**
-         * @property {Object}
+         * @property {Boolean}
          */
         ajaxLoading: false,
 
         /**
-         * @property {Object}
+         * @property {Boolean}
          */
         pageLoading: false,
 

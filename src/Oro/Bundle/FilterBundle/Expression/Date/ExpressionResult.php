@@ -8,9 +8,9 @@ use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
 /**
- * Class ExpressionResult
+ * A wrapper for date, time or datetime value that can represent expressions
+ * like "today", "start of week", "current year", etc.
  *
- * @package Oro\Bundle\FilterBundle\Expression\Date
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -20,6 +20,7 @@ class ExpressionResult
     const TYPE_DATE     = 2;
     const TYPE_TIME     = 3;
     const TYPE_DAYMONTH = 4;
+    const TYPE_DATETIME = 5;
 
     /** @var int */
     private $variableType = null;
@@ -280,9 +281,11 @@ class ExpressionResult
             $dateValue->second($expression->getValue()->second);
             $dateValue->minute($expression->getValue()->minute);
             $dateValue->hour($expression->getValue()->hour);
+            $this->sourceType = self::TYPE_DATETIME;
         } elseif (self::TYPE_TIME === $this->getSourceType()) {
             $expression->merge($this);
             $this->value = $expression->getValue();
+            $this->sourceType = self::TYPE_DATETIME;
         } else {
             throw new ExpressionDenied($expression->getVariableLabel());
         }

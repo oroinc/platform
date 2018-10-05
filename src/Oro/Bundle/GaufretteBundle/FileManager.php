@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 /**
- * This manager can be used to simplify retrieve and store files
+ * This manager can be used to simplify retrieving and storing files
  * via Gaufrette filesystem abstraction layer.
  */
 class FileManager
