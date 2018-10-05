@@ -45,7 +45,7 @@ class FiltersStateProvider extends AbstractStateProvider
         $defaultState = $this->getDefaultFiltersState($datagridConfiguration);
 
         // Fetch state from datagrid parameters.
-        $stateFromParameters = $this->getStateFromParameters($datagridParameters);
+        $stateFromParameters = $this->getFromParameters($datagridParameters);
         if ($stateFromParameters) {
             $state = array_replace($defaultState, $stateFromParameters);
         }
@@ -63,23 +63,48 @@ class FiltersStateProvider extends AbstractStateProvider
             $state = $defaultState;
         }
 
-        return $this->sanitizeState($state, $datagridConfiguration);
+        return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStateFromParameters(
+        DatagridConfiguration $datagridConfiguration,
+        ParameterBag $datagridParameters
+    ): array {
+        $defaultState = $this->getDefaultFiltersState($datagridConfiguration);
+
+        // Fetch state from datagrid parameters.
+        $stateFromParameters = $this->getFromParameters($datagridParameters);
+        $state = array_replace($defaultState, $stateFromParameters);
+
+        return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultState(DatagridConfiguration $datagridConfiguration): array
+    {
+        $state = $this->getDefaultFiltersState($datagridConfiguration);
+
+        return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
     }
 
     /**
      * @param array $state
-     * @param DatagridConfiguration $datagridConfiguration
+     * @param array $filtersConfig
      *
      * @return array
      */
-    private function sanitizeState(array $state, DatagridConfiguration $datagridConfiguration): array
+    private function sanitizeState(array $state, array $filtersConfig): array
     {
         // Remove filters which are not in datagrid configuration.
-        $filters = $this->getFilters($datagridConfiguration);
         $state = array_filter(
             $state,
-            function (string $filterName) use ($filters) {
-                if (isset($filters[$filterName])) {
+            function (string $filterName) use ($filtersConfig) {
+                if (isset($filtersConfig[$filterName])) {
                     return true;
                 }
 
@@ -87,7 +112,7 @@ class FiltersStateProvider extends AbstractStateProvider
                 // Initially was added to AbstractFilterExtension::updateFilterStateEnabled() in scope of CRM-4760.
                 if (strpos($filterName, '__') === 0) {
                     $originalFilterName = substr($filterName, 2);
-                    return isset($filters[$originalFilterName]);
+                    return isset($filtersConfig[$originalFilterName]);
                 }
 
                 return false;
@@ -101,18 +126,14 @@ class FiltersStateProvider extends AbstractStateProvider
     /**
      * {@inheritdoc}
      */
-    private function getStateFromParameters(ParameterBag $datagridParameters): array
+    private function getFromParameters(ParameterBag $datagridParameters): array
     {
-        $filtersState = $this->datagridParametersHelper
+        $filtersState = (array) $this->datagridParametersHelper
             ->getFromParameters($datagridParameters, AbstractFilterExtension::FILTER_ROOT_PARAM);
+        $minifiedFiltersState = (array) $this->datagridParametersHelper
+            ->getFromMinifiedParameters($datagridParameters, AbstractFilterExtension::MINIFIED_FILTER_PARAM);
 
-        // Try to fetch from minified parameters if any.
-        if (!$filtersState) {
-            $filtersState = $this->datagridParametersHelper
-                ->getFromMinifiedParameters($datagridParameters, AbstractFilterExtension::MINIFIED_FILTER_PARAM);
-        }
-
-        return (array)$filtersState;
+        return array_replace_recursive($filtersState, $minifiedFiltersState);
     }
 
     /**
@@ -120,7 +141,7 @@ class FiltersStateProvider extends AbstractStateProvider
      *
      * @return array
      */
-    private function getFilters(DatagridConfiguration $datagridConfiguration)
+    private function getFiltersConfig(DatagridConfiguration $datagridConfiguration)
     {
         return (array)$datagridConfiguration->offsetGetByPath(FilterConfiguration::COLUMNS_PATH, []);
     }
