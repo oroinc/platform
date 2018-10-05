@@ -1056,8 +1056,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Asserts that no record with provided content in grid
      * Example: And there is no "Glorious workflow" in grid
      *
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in grid$/
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in "(?P<gridName>[\w\s]+)"/
+     * @Then /^there is no "(?P<record>[^"]*)" in grid$/
+     * @Then /^there is no "(?P<record>[^"]*)" in "(?P<gridName>[\w\s]+)"/
      * @param string $record
      */
     public function thereIsNoInGrid($record, $gridName = null)

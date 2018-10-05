@@ -913,6 +913,17 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Close all popup notifications which is present on the current page
+     * @When /^(?:|I )close all popup notifications$/
+     */
+    public function closePopupNotifications()
+    {
+        foreach ($this->getPage()->findAll('css', '.popover-close') as $closeBtn) {
+            $closeBtn->click();
+        }
+    }
+
+    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
