@@ -7,6 +7,10 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
+/**
+ * Applies filters to orm datasource.
+ * {@inheritDoc}
+ */
 class OrmFilterExtension extends AbstractFilterExtension
 {
     /**
@@ -26,37 +30,41 @@ class OrmFilterExtension extends AbstractFilterExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $filters = $this->getFiltersToApply($config);
-        $values  = $this->getValuesToApply($config);
+        $filtersState = $this->filtersStateProvider->getStateFromParameters($config, $this->getParameters());
+
         /** @var OrmDatasource $datasource */
-        $countQb        = $datasource->getCountQb();
-        $countQbAdapter = null;
-        if ($countQb) {
-            $countQbAdapter = new OrmFilterDatasourceAdapter($countQb);
-        }
+        $countQb = $datasource->getCountQb();
+        $countQbAdapter = $countQb ? new OrmFilterDatasourceAdapter($countQb) : null;
         $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
         foreach ($filters as $filter) {
-            $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
+            $value = $filtersState[$filter->getName()] ?? null;
+            if ($value === null) {
+                continue;
+            }
 
-            if ($value !== false) {
-                $form = $filter->getForm();
-                if (!$form->isSubmitted()) {
-                    $form->submit($value);
-                }
+            $filterForm = $this->submitFilter($filter, $value);
+            if (!$filterForm->isValid()) {
+                continue;
+            }
 
-                if ($form->isValid()) {
-                    $data = $form->getData();
-                    if (isset($value['value']['start'])) {
-                        $data['value']['start_original'] = $value['value']['start'];
-                    }
-                    if (isset($value['value']['end'])) {
-                        $data['value']['end_original'] = $value['value']['end'];
-                    }
-                    $filter->apply($datasourceAdapter, $data);
-                    if ($countQbAdapter) {
-                        $filter->apply($countQbAdapter, $data);
-                    }
-                }
+            $data = $filterForm->getData();
+
+            // Initially added in AEIV-405 to make work date interval filters.
+            if (isset($value['value']['start'])) {
+                $data['value']['start_original'] = $value['value']['start'];
+            }
+
+            if (isset($value['value']['end'])) {
+                $data['value']['end_original'] = $value['value']['end'];
+            }
+
+            // Applies filter to datasource.
+            $filter->apply($datasourceAdapter, $data);
+
+            // Applies filter to count query of datasource, if any.
+            if ($countQbAdapter) {
+                $filter->apply($countQbAdapter, $data);
             }
         }
     }

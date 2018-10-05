@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider\State;
 
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
@@ -29,7 +30,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
      * @param array $columns
      * @param array $expectedState
      */
-    public function testGetStateFromParameters(array $state, array $columns, array $expectedState): void
+    public function testGetStateWhenParameters(array $state, array $columns, array $expectedState): void
     {
         $this->mockParametersState($state, '');
 
@@ -67,7 +68,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         $this->datagridConfiguration
             ->expects(self::once())
             ->method('offsetGet')
-            ->with(ColumnsExtension::COLUMNS_PATH)
+            ->with(Configuration::COLUMNS_KEY)
             ->willReturn($columns);
     }
 
@@ -81,8 +82,8 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         return [
             'ensure state contains only defined columns' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => true],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 1],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 1],
                     'extraColumn' => [],
                 ],
                 'columns' => [
@@ -91,79 +92,79 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
             'ensure state overrides default columns renderable setting' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => true],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => false],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => false],
                 ],
                 'columns' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => false],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => true],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => false],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
             'ensure renderable is set to true when is not defined' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => 0],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 1],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => 0],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 1],
                 ],
                 'columns' => [
                     'sampleColumn1' => [],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
             'ensure renderable is inherited from default column setting when is not defined' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => 0],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => 0],
                 ],
                 'columns' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => false],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => false],
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                 ],
             ],
             'ensure renderable is sanitized' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => 0],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => 1],
-                    'sampleColumn3' => [ColumnsExtension::RENDER_FIELD_NAME => '1'],
-                    'sampleColumn4' => [ColumnsExtension::RENDER_FIELD_NAME => 234],
-                    'sampleColumn5' => [ColumnsExtension::RENDER_FIELD_NAME => '234'],
-                    'sampleColumn6' => [ColumnsExtension::RENDER_FIELD_NAME => 'true'],
-                    'sampleColumn7' => [ColumnsExtension::RENDER_FIELD_NAME => 'false'],
-                    'sampleColumn8' => [ColumnsExtension::RENDER_FIELD_NAME => 'invalid'],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => 0],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => 1],
+                    'sampleColumn3' => [ColumnsStateProvider::RENDER_FIELD_NAME => '1'],
+                    'sampleColumn4' => [ColumnsStateProvider::RENDER_FIELD_NAME => 234],
+                    'sampleColumn5' => [ColumnsStateProvider::RENDER_FIELD_NAME => '234'],
+                    'sampleColumn6' => [ColumnsStateProvider::RENDER_FIELD_NAME => 'true'],
+                    'sampleColumn7' => [ColumnsStateProvider::RENDER_FIELD_NAME => 'false'],
+                    'sampleColumn8' => [ColumnsStateProvider::RENDER_FIELD_NAME => 'invalid'],
                 ],
                 'columns' => [
                     'sampleColumn1' => [],
@@ -177,43 +178,43 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                     'sampleColumn3' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 2,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 2,
                     ],
                     'sampleColumn4' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 3,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 3,
                     ],
                     'sampleColumn5' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 4,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 4,
                     ],
                     'sampleColumn6' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 5,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 5,
                     ],
                     'sampleColumn7' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 6,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 6,
                     ],
                     'sampleColumn8' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 7,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 7,
                     ],
                 ],
             ],
             'ensure order is filled automatically when not defined' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => true],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => true],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
                 ],
                 'columns' => [
                     'sampleColumn1' => [],
@@ -221,61 +222,61 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
             'ensure state overrides default columns order setting' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => 1],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 0],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => 1],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 0],
                 ],
                 'columns' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => 0],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 1],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => 0],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 1],
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                 ],
             ],
             'ensure order is inherited from default column setting' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => true],
-                    'sampleColumn2' => [ColumnsExtension::RENDER_FIELD_NAME => true],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
                 ],
                 'columns' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => 1],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 2],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => 1],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 2],
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 2,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 2,
                     ],
                 ],
             ],
             'ensure order is filled when not defined and not conflicts with other columns' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::RENDER_FIELD_NAME => true],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 3],
-                    'sampleColumn3' => [ColumnsExtension::ORDER_FIELD_NAME => 2],
-                    'sampleColumn4' => [ColumnsExtension::RENDER_FIELD_NAME => true],
+                    'sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 3],
+                    'sampleColumn3' => [ColumnsStateProvider::ORDER_FIELD_NAME => 2],
+                    'sampleColumn4' => [ColumnsStateProvider::RENDER_FIELD_NAME => true],
                 ],
                 'columns' => [
                     'sampleColumn1' => [],
@@ -285,31 +286,31 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 3,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 3,
                     ],
                     'sampleColumn3' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 2,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 2,
                     ],
                     'sampleColumn4' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
             'ensure order is sanitized' => [
                 'state' => [
-                    'sampleColumn1' => [ColumnsExtension::ORDER_FIELD_NAME => '10'],
-                    'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 'invalid'],
-                    'sampleColumn3' => [ColumnsExtension::ORDER_FIELD_NAME => 'false'],
-                    'sampleColumn4' => [ColumnsExtension::ORDER_FIELD_NAME => 'true'],
-                    'sampleColumn5' => [ColumnsExtension::ORDER_FIELD_NAME => false],
-                    'sampleColumn6' => [ColumnsExtension::ORDER_FIELD_NAME => true],
+                    'sampleColumn1' => [ColumnsStateProvider::ORDER_FIELD_NAME => '10'],
+                    'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 'invalid'],
+                    'sampleColumn3' => [ColumnsStateProvider::ORDER_FIELD_NAME => 'false'],
+                    'sampleColumn4' => [ColumnsStateProvider::ORDER_FIELD_NAME => 'true'],
+                    'sampleColumn5' => [ColumnsStateProvider::ORDER_FIELD_NAME => false],
+                    'sampleColumn6' => [ColumnsStateProvider::ORDER_FIELD_NAME => true],
                 ],
                 'columns' => [
                     'sampleColumn1' => [],
@@ -321,28 +322,28 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 10,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 10,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn3' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                     'sampleColumn4' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 2,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 2,
                     ],
                     'sampleColumn5' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 3,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 3,
                     ],
                     'sampleColumn6' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                 ],
             ],
@@ -356,7 +357,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
      * @param array $columns
      * @param array $expectedState
      */
-    public function testGetStateFromMinifiedParameters(string $state, array $columns, array $expectedState): void
+    public function testGetStateWhenMinifiedParameters(string $state, array $columns, array $expectedState): void
     {
         $this->mockParametersState([], $state);
 
@@ -381,12 +382,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ]
                 ],
             ],
@@ -398,12 +399,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ]
                 ],
             ],
@@ -415,12 +416,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ]
                 ],
             ],
@@ -432,12 +433,12 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
                 ],
                 'expectedState' => [
                     'sampleColumn1' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => false,
-                        ColumnsExtension::ORDER_FIELD_NAME => 0,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                     ],
                     'sampleColumn2' => [
-                        ColumnsExtension::RENDER_FIELD_NAME => true,
-                        ColumnsExtension::ORDER_FIELD_NAME => 1,
+                        ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                        ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                     ]
                 ],
             ],
@@ -451,7 +452,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
      * @param array $columns
      * @param array $expectedState
      */
-    public function testGetStateFromCurrentGridView(array $state, array $columns, array $expectedState): void
+    public function testGetStateWhenCurrentGridView(array $state, array $columns, array $expectedState): void
     {
         $this->mockParametersState([], '');
 
@@ -478,7 +479,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
      * @param array $columns
      * @param array $expectedState
      */
-    public function testGetStateFromDefaultGridView(array $state, array $columns, array $expectedState): void
+    public function testGetStateWhenDefaultGridView(array $state, array $columns, array $expectedState): void
     {
         $this->mockParametersState([], '');
 
@@ -504,7 +505,22 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    public function testGetStateFromDefaultColumnsState(): void
+    public function testGetStateWhenGridViewsDisabled(): void
+    {
+        [$columns, $expectedState] = array_values($this->getDefaultColumnsStates());
+
+        $this->mockParametersState([], '');
+
+        $this->assertGridViewsDisabled();
+
+        $this->mockColumns($columns);
+
+        $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    public function testGetStateWhenDefaultColumnsState(): void
     {
         [$columns, $expectedState] = array_values($this->getDefaultColumnsStates());
 
@@ -527,33 +543,62 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         return [
             'columns' => [
                 'sampleColumn1' => [],
-                'sampleColumn2' => [ColumnsExtension::ORDER_FIELD_NAME => 2],
-                'sampleColumn3' => [ColumnsExtension::RENDER_FIELD_NAME => false],
+                'sampleColumn2' => [ColumnsStateProvider::ORDER_FIELD_NAME => 2],
+                'sampleColumn3' => [ColumnsStateProvider::RENDER_FIELD_NAME => false],
                 'sampleColumn4' => [],
                 'sampleColumn5' => [],
             ],
             'expectedState' => [
                 'sampleColumn1' => [
-                    ColumnsExtension::RENDER_FIELD_NAME => true,
-                    ColumnsExtension::ORDER_FIELD_NAME => 0,
+                    ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                    ColumnsStateProvider::ORDER_FIELD_NAME => 0,
                 ],
                 'sampleColumn2' => [
-                    ColumnsExtension::RENDER_FIELD_NAME => true,
-                    ColumnsExtension::ORDER_FIELD_NAME => 2,
+                    ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                    ColumnsStateProvider::ORDER_FIELD_NAME => 2,
                 ],
                 'sampleColumn3' => [
-                    ColumnsExtension::RENDER_FIELD_NAME => false,
-                    ColumnsExtension::ORDER_FIELD_NAME => 1,
+                    ColumnsStateProvider::RENDER_FIELD_NAME => false,
+                    ColumnsStateProvider::ORDER_FIELD_NAME => 1,
                 ],
                 'sampleColumn4' => [
-                    ColumnsExtension::RENDER_FIELD_NAME => true,
-                    ColumnsExtension::ORDER_FIELD_NAME => 3,
+                    ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                    ColumnsStateProvider::ORDER_FIELD_NAME => 3,
                 ],
                 'sampleColumn5' => [
-                    ColumnsExtension::RENDER_FIELD_NAME => true,
-                    ColumnsExtension::ORDER_FIELD_NAME => 4,
+                    ColumnsStateProvider::RENDER_FIELD_NAME => true,
+                    ColumnsStateProvider::ORDER_FIELD_NAME => 4,
                 ],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider stateDataProvider
+     *
+     * @param array $state
+     * @param array $columns
+     * @param array $expectedState
+     */
+    public function testGetStateFromParameters(array $state, array $columns, array $expectedState): void
+    {
+        $this->mockParametersState($state, '');
+
+        $this->mockColumns($columns);
+
+        $actualState = $this->provider->getStateFromParameters($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    public function testGetDefaultState(): void
+    {
+        [$columns, $expectedState] = array_values($this->getDefaultColumnsStates());
+
+        $this->mockColumns($columns);
+
+        $actualState = $this->provider->getDefaultState($this->datagridConfiguration);
+
+        self::assertEquals($expectedState, $actualState);
     }
 }

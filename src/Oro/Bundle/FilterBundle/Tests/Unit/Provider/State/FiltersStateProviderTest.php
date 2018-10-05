@@ -33,7 +33,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
      * @param array $filtersColumns
      * @param array $expectedState
      */
-    public function testGetStateFromParameters(array $state, array $filtersColumns, array $expectedState): void
+    public function testGetStateWhenParameters(array $state, array $filtersColumns, array $expectedState): void
     {
         $this->mockParametersState($state, []);
 
@@ -57,7 +57,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
             ->willReturn($state);
 
         $this->datagridParametersHelper
-            ->expects(self::exactly(1 - (int)$state))
+            ->expects(self::once())
             ->method('getFromMinifiedParameters')
             ->with($this->datagridParameters, AbstractFilterExtension::MINIFIED_FILTER_PARAM)
             ->willReturn($minifiedState);
@@ -65,16 +65,16 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @param array $filtersColumns
-     * @param array $defaultFiltersState
+     * @param array $defaultFilters
      */
-    private function mockFiltersColumns(array $filtersColumns, array $defaultFiltersState): void
+    private function mockFiltersColumns(array $filtersColumns, array $defaultFilters): void
     {
         $this->datagridConfiguration
             ->expects(self::exactly(2))
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [FilterConfiguration::COLUMNS_PATH, [], $filtersColumns],
-                [FilterConfiguration::DEFAULT_FILTERS_PATH, [], $defaultFiltersState],
+                [FilterConfiguration::DEFAULT_FILTERS_PATH, [], $defaultFilters],
             ]);
     }
 
@@ -85,8 +85,11 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
      * @param array $filtersColumns
      * @param array $expectedState
      */
-    public function testGetStateFromMinifiedParameters(array $state, array $filtersColumns, array $expectedState): void
-    {
+    public function testGetStateWhenMinifiedParameters(
+        array $state,
+        array $filtersColumns,
+        array $expectedState
+    ): void {
         $this->mockParametersState([], $state);
 
         $this->mockFiltersColumns($filtersColumns, self::DEFAULT_FILTERS_STATE);
@@ -107,7 +110,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
                     'sampleFilter1' => ['value' => 'sampleValue1'],
                     'undefinedFilter1' => ['value' => 'sampleValue1'],
                 ],
-                'sortersColumns' => [
+                'filtersColumns' => [
                     'sampleFilter1' => [],
                 ],
                 'expectedState' => [
@@ -119,7 +122,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
                     'sampleFilter1' => ['value' => 'sampleValue1'],
                     '__sampleFilter2' => ['value' => 'sampleValue2'],
                 ],
-                'sortersColumns' => [
+                'filtersColumns' => [
                     'sampleFilter1' => [],
                     'sampleFilter2' => [],
                 ],
@@ -138,7 +141,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
      * @param array $filtersColumns
      * @param array $expectedState
      */
-    public function testGetStateFromCurrentGridView(array $state, array $filtersColumns, array $expectedState): void
+    public function testGetStateWhenCurrentGridView(array $state, array $filtersColumns, array $expectedState): void
     {
         $this->mockParametersState([], []);
 
@@ -165,7 +168,7 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
      * @param array $filtersColumns
      * @param array $expectedState
      */
-    public function testGetStateFromDefaultGridView(array $state, array $filtersColumns, array $expectedState): void
+    public function testGetStateWhenDefaultGridView(array $state, array $filtersColumns, array $expectedState): void
     {
         $this->mockParametersState([], []);
 
@@ -198,7 +201,27 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
      * @param array $filtersColumns
      * @param array $expectedState
      */
-    public function testGetStateFromDefaultSortersState(array $state, array $filtersColumns, array $expectedState): void
+    public function testGetStateWhenGridViewsDisabled(array $state, array $filtersColumns, array $expectedState): void
+    {
+        $this->mockParametersState([], []);
+
+        $this->mockFiltersColumns($filtersColumns, $state);
+
+        $this->assertGridViewsDisabled();
+
+        $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    /**
+     * @dataProvider stateDataProvider
+     *
+     * @param array $state
+     * @param array $filtersColumns
+     * @param array $expectedState
+     */
+    public function testGetStateWhenDefaultFiltersState(array $state, array $filtersColumns, array $expectedState): void
     {
         $this->mockParametersState([], []);
 
@@ -207,6 +230,46 @@ class FiltersStateProviderTest extends AbstractStateProviderTest
         $this->assertNoCurrentNoDefaultGridView();
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    /**
+     * @dataProvider stateDataProvider
+     *
+     * @param array $state
+     * @param array $filtersColumns
+     * @param array $expectedState
+     */
+    public function testGetStateFromParameters(
+        array $state,
+        array $filtersColumns,
+        array $expectedState
+    ): void {
+        $this->mockParametersState($state, []);
+
+        $this->mockFiltersColumns($filtersColumns, self::DEFAULT_FILTERS_STATE);
+
+        $actualState = $this->provider->getStateFromParameters($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    /**
+     * @dataProvider stateDataProvider
+     *
+     * @param array $defaultFilters
+     * @param array $filtersColumns
+     * @param array $expectedState
+     */
+    public function testGetDefaultState(
+        array $defaultFilters,
+        array $filtersColumns,
+        array $expectedState
+    ): void {
+        $this->mockFiltersColumns($filtersColumns, $defaultFilters);
+
+        $actualState = $this->provider->getDefaultState($this->datagridConfiguration);
 
         self::assertEquals($expectedState, $actualState);
     }

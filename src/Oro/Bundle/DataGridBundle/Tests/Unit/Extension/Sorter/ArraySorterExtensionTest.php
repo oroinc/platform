@@ -9,10 +9,10 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 
-class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
+class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
 {
     /** @var ArraySorterExtension */
-    protected $arraySorterExtension;
+    protected $extension;
 
     /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config **/
     protected $config;
@@ -42,13 +42,15 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
+
         $this->config = $this->createMock(DatagridConfiguration::class);
         $this->arrayDatasource = new ArrayDatasource();
         $this->arrayDatasource->setArraySource($this->arraySource);
-        $this->arraySorterExtension = new ArraySorterExtension();
-        $this->arraySorterExtension->setParameters(new ParameterBag());
+        $this->extension = new ArraySorterExtension($this->sortersStateProvider);
+        $this->extension->setParameters(new ParameterBag());
     }
 
     public function testIsApplicableWithArrayDatasource()
@@ -59,7 +61,7 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
         $this->config->expects($this->once())->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn([]);
 
-        $this->assertTrue($this->arraySorterExtension->isApplicable($this->config));
+        $this->assertTrue($this->extension->isApplicable($this->config));
     }
 
     public function testIsApplicableWithWrongDatasource()
@@ -70,28 +72,26 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
         $this->config->expects($this->never())->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn([]);
 
-        $this->assertFalse($this->arraySorterExtension->isApplicable($this->config), new ArrayDatasource());
+        $this->assertFalse($this->extension->isApplicable($this->config), new ArrayDatasource());
     }
 
     /**
      * @dataProvider sortingDataProvider
-     * @param $sorter
-     * @param $defaultSorter
-     * @param $expectedData
+     *
+     * @param array $sorter
+     * @param array $state
+     * @param array $expectedData
      */
-    public function testVisitDatasource($sorter, $defaultSorter, $expectedData)
+    public function testVisitDatasource(array $sorter, array $state, array $expectedData)
     {
         $this->config->expects($this->at(0))->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn($sorter);
 
-        $this->config->expects($this->at(1))->method('offsetGetByPath')
-            ->with(Configuration::DEFAULT_SORTERS_PATH, [])->willReturn($defaultSorter);
+        $this->sortersStateProvider->expects($this->once())->method('getState')
+            ->willReturn($state);
 
-        $this->config->expects($this->at(2))->method('offsetGetByPath')
-            ->with(Configuration::DISABLE_DEFAULT_SORTING_PATH, false)->willReturn([]);
-
-        $this->arraySorterExtension->setParameters(new ParameterBag());
-        $this->arraySorterExtension->visitDatasource($this->config, $this->arrayDatasource);
+        $this->extension->setParameters(new ParameterBag());
+        $this->extension->visitDatasource($this->config, $this->arrayDatasource);
 
         $this->assertEquals($expectedData, $this->arrayDatasource->getArraySource());
     }
@@ -103,14 +103,11 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn(['priceListName' => ['data_name' => 'priceListName']]);
 
-        $this->config->expects($this->at(1))->method('offsetGetByPath')
-            ->with(Configuration::DEFAULT_SORTERS_PATH, [])->willReturn(['priceListName' => 'DESC']);
+        $this->sortersStateProvider->expects($this->once())->method('getState')
+            ->willReturn(['priceListName' => 'DESC']);
 
-        $this->config->expects($this->at(2))->method('offsetGetByPath')
-            ->with(Configuration::DISABLE_DEFAULT_SORTING_PATH, false)->willReturn([]);
-
-        $this->arraySorterExtension->setParameters(new ParameterBag());
-        $this->arraySorterExtension->visitDatasource(
+        $this->extension->setParameters(new ParameterBag());
+        $this->extension->visitDatasource(
             $this->config,
             $this->createMock(OrmDatasource::class)
         );
@@ -124,7 +121,7 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'sorter' => ['priceListName' => ['data_name' => 'priceListName']],
-                'defaultSorting' => ['priceListName' => 'ASC'],
+                'state' => ['priceListName' => 'ASC'],
                 'expectedData' => [
                     [
                         'priceListId' => 256,
@@ -146,7 +143,7 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'sorter' => ['priceListName' => ['data_name' => 'priceListName']],
-                'defaultSorting' => ['priceListName' => 'DESC'],
+                'state' => ['priceListName' => 'DESC'],
                 'expectedData' => [
                     [
                         'priceListId' => 41,
@@ -168,7 +165,7 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'sorter' => ['priceListId' => ['data_name' => 'priceListId']],
-                'defaultSorting' => ['priceListId' => 'ASC'],
+                'state' => ['priceListId' => 'ASC'],
                 'expectedData' => [
                     [
                         'priceListId' => 5,
@@ -190,7 +187,7 @@ class ArraySorterExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'sorter' => ['priceListId' => ['data_name' => 'priceListId']],
-                'defaultSorting' => ['priceListId' => 'DESC'],
+                'state' => ['priceListId' => 'DESC'],
                 'expectedData' => [
                     [
                         'priceListId' => 256,

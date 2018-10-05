@@ -51,9 +51,6 @@ parameters:
     oro_entity.form.entity_field.handler.base_handler.class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler
     oro_entity.form.entity_field.handler.processor.handler_processor.class:  Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor
 
-    # helpers
-    oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
-
 services:
     oro_entity.entity_manager_bag:
         public: false
@@ -334,6 +331,16 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 
+    oro_entity.entity_name_provider.dictionary:
+        class: Oro\Bundle\EntityBundle\Provider\DictionaryEntityNameProvider
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
+            - '@property_accessor'
+        tags:
+            - { name: oro_entity.name_provider, priority: -85 }
+
     oro_entity.entity_name_provider.fallback:
         class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
         public: false
@@ -400,12 +407,8 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_entity.dictionary_value_list_provider'
-            - '@oro_entity.helper.dictionary'
             - '@oro_entity_config.config_manager'
-            - '@property_accessor'
-
-    oro_entity.helper.dictionary:
-        class: '%oro_entity.helper.dictionary.class%'
+            - '@oro_entity.entity_name_resolver'
 
     oro_entity.manager.entity_field_manager:
         class: '%oro_entity.manager.entity_field_manager.class%'

@@ -16,12 +16,9 @@ Feature: User statuses
     Then Charlie Sheen user could login to the Dashboard
 
   Scenario: Disable users mass action doesn't affect current logged in user
+    Given I check "Enabled" in Enabled filter
     And check all records in grid
-    And I click "Disable" link from mass action dropdown
-    And I click "Apply"
-    Then I should see "admin@example.com" in grid with following data:
-      |Username   |admin  |
-      |Enabled    |Enabled|
-    And I should see "charlie@example.com" in grid with following data:
-      |Username   |charlie |
-      |Enabled    |Disabled|
+    When I click "Disable" link from mass action dropdown
+    And I press "Apply"
+    Then I should see "admin@example.com" in grid
+    And there is no "charlie@example.com" in grid

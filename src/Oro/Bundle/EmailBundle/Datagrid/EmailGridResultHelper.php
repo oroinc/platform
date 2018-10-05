@@ -10,11 +10,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Helper that modify email grid results
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailGridResultHelper
@@ -28,19 +31,25 @@ class EmailGridResultHelper
     /** @var MailboxNameHelper */
     private $mailboxNameHelper;
 
+    /** @var EmailAddressManager */
+    private $emailAddressManager;
+
     /**
      * @param ManagerRegistry           $doctrine
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param MailboxNameHelper         $mailboxNameHelper
+     * @param EmailAddressManager       $emailAddressManager
      */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        MailboxNameHelper $mailboxNameHelper
+        MailboxNameHelper $mailboxNameHelper,
+        EmailAddressManager $emailAddressManager
     ) {
         $this->doctrine = $doctrine;
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->mailboxNameHelper = $mailboxNameHelper;
+        $this->emailAddressManager = $emailAddressManager;
     }
 
     /**
@@ -301,7 +310,7 @@ class EmailGridResultHelper
             return [];
         }
 
-        $qb = $this->createQueryBuilder(EmailAddress::class, 'ea');
+        $qb = $this->createQueryBuilder($this->getEmailAddressClass(), 'ea');
         $qb
             ->select('ea')
             ->where($qb->expr()->in('ea.id', ':emailAddressIds'))
@@ -421,5 +430,13 @@ class EmailGridResultHelper
         return $this->getEntityManager($entityClass)
             ->getRepository($entityClass)
             ->createQueryBuilder($alias);
+    }
+
+    /**
+     * @return string
+     */
+    private function getEmailAddressClass()
+    {
+        return $this->emailAddressManager->getEmailAddressProxyClass();
     }
 }
