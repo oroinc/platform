@@ -6,6 +6,7 @@ define(function(require) {
     var DialogWidget = require('oro/dialog-widget');
     var actionsTemplate = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-dialog-widget-actions.html');
     var mediator = require('oroui/js/mediator');
+
     /**
      * @class DatagridSettingsDialogWidget
      * @extends DialogWidget
@@ -78,8 +79,6 @@ define(function(require) {
             this.view = new this.View(this.viewOptions);
             this.view.beforeOpen();
             this.$el.append(this.actionsTemplate());
-
-            mediator.execute('hideLoading');
 
             DatagridSettingsDialogWidget.__super__.render.call(this);
         },

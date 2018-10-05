@@ -8,6 +8,7 @@ define(function(require) {
     var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var template = require('tpl!orodatagrid/templates/datagrid/grid-settings.html');
+    var mediator = require('oroui/js/mediator');
 
     /**
      * @class DatagridSettingsView
@@ -137,6 +138,7 @@ define(function(require) {
 
             this.views.each(this.renderSubview, this);
             this.listenTo(this.views, 'change', this.onTabChange);
+            mediator.execute('hideLoading');
         },
 
         /**
