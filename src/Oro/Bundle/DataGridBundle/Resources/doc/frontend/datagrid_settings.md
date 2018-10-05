@@ -6,7 +6,7 @@ Datagrid Settings allows to:
 - change the order of columns
 - save columns state in [Grid View](./extensions/grid_views.md)
 
-Column Manager operates with columns' attributes:
+Datagrid Settings operates with columns' attributes:
 - `renderable` show/hide the column/filters (if is not defined the column is shown)
 - `order` is used to sort only columns in a row
 - `required` if `true` the column/filters can not be hidden (but can be ordered)
