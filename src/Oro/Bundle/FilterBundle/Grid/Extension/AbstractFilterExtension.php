@@ -4,23 +4,27 @@ namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Updates datagrid metadata object with:
+ * - initial filters state - as per datagrid sorters configuration;
+ * - filters state - as per current state based on columns configuration, grid view settings and datagrid parameters;
+ * - updates metadata with filters config.
+ */
 abstract class AbstractFilterExtension extends AbstractExtension
 {
-    /**
-     * Query param
-     */
-    const FILTER_ROOT_PARAM     = '_filter';
-    const MINIFIED_FILTER_PARAM = 'f';
+    public const FILTER_ROOT_PARAM = '_filter';
+    public const MINIFIED_FILTER_PARAM = 'f';
 
     /** @var FilterInterface[] */
     protected $filters = [];
@@ -31,130 +35,28 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /** @var ConfigurationProvider */
     protected $configurationProvider;
 
+    /** @var DatagridStateProviderInterface */
+    protected $filtersStateProvider;
+
     /**
      * @param ConfigurationProvider $configurationProvider
+     * @param DatagridStateProviderInterface $filtersStateProvider
      * @param TranslatorInterface $translator
      */
-    public function __construct(ConfigurationProvider $configurationProvider, TranslatorInterface $translator)
-    {
+    public function __construct(
+        ConfigurationProvider $configurationProvider,
+        DatagridStateProviderInterface $filtersStateProvider,
+        TranslatorInterface $translator
+    ) {
         $this->configurationProvider = $configurationProvider;
+        $this->filtersStateProvider = $filtersStateProvider;
         $this->translator = $translator;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function processConfigs(DatagridConfiguration $config)
-    {
-        $filters = $config->offsetGetByPath(Configuration::FILTERS_PATH);
-        // validate extension configuration and pass default values back to config
-        $filtersNormalized = $this->validateConfiguration(
-            new Configuration(array_keys($this->filters)),
-            ['filters' => $filters]
-        );
-        // replace config values by normalized, extra keys passed directly
-        $config->offsetSetByPath(
-            Configuration::FILTERS_PATH,
-            array_replace_recursive($filters, $filtersNormalized)
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
-    {
-        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
-        $initialFiltersState = $data->offsetGetByPath('[initialState][filters]', []);
-        $filtersMetaData     = [];
-
-        $filters       = $this->getFiltersToApply($config);
-        $values        = $this->getValuesToApply($config);
-        $initialValues = $this->getValuesToApply($config, false);
-        $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
-        $filtersParams = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
-        $rawConfig     = $this->configurationProvider->isApplicable($config->getName())
-            ? $this->configurationProvider->getRawConfiguration($config->getName())
-            : [];
-
-        foreach ($filters as $filter) {
-            if (!$lazy) {
-                $filter->resolveOptions();
-            }
-            $name             = $filter->getName();
-            $value            = $this->getFilterValue($values, $name);
-            $initialValue     = $this->getFilterValue($initialValues, $name);
-            $filtersState        = $this->updateFilterStateEnabled($name, $filtersParams, $filtersState);
-            $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
-            $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
-
-            $filter->setFilterState($value);
-            $metadata          = $filter->getMetadata();
-            $filtersMetaData[] = array_merge(
-                $metadata,
-                [
-                    'label' => $metadata[FilterUtility::TRANSLATABLE_KEY]
-                        ? $this->translator->trans($metadata['label'])
-                        : $metadata['label'],
-                    'cacheId' => $this->getFilterCacheId($rawConfig, $metadata),
-                ]
-            );
-        }
-
-        $data
-            ->offsetAddToArray('initialState', ['filters' => $initialFiltersState])
-            ->offsetAddToArray('state', ['filters' => $filtersState])
-            ->offsetAddToArray('filters', $filtersMetaData)
-            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
-    }
-
-    /**
-     * @param array $rawGridConfig
-     * @param array $filterMetadata
-     *
-     * @return string|null
-     */
-    protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata)
-    {
-        if (empty($filterMetadata['lazy'])) {
-            return null;
-        }
-
-        $rawOptions = ArrayUtil::getIn(
-            $rawGridConfig,
-            ['filters', 'columns', $filterMetadata['name'], 'options']
-        );
-
-        return $rawOptions ? md5(serialize($rawOptions)) : null;
-    }
-
-    /**
-     * @param FilterInterface $filter
-     * @param mixed           $value
-     * @param array           $state
-     *
-     * @return array
-     */
-    protected function updateFiltersState(FilterInterface $filter, $value, array $state)
-    {
-        if ($value !== false) {
-            $form = $filter->getForm();
-            if (!$form->isSubmitted()) {
-                $form->submit($value);
-            }
-
-            if ($form->isValid()) {
-                $state[$filter->getName()] = $value;
-            }
-        }
-
-        return $state;
     }
 
     /**
      * Add filter to array of available filters
      *
-     * @param string          $name
+     * @param string $name
      * @param FilterInterface $filter
      *
      * @return $this
@@ -167,22 +69,33 @@ abstract class AbstractFilterExtension extends AbstractExtension
     }
 
     /**
-     * @param ParameterBag $parameters
+     * {@inheritDoc}
      */
-    public function setParameters(ParameterBag $parameters)
+    public function processConfigs(DatagridConfiguration $config)
     {
-        if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
-            $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
-            $filters            = [];
+        $filters = $config->offsetGetByPath(Configuration::FILTERS_PATH);
 
-            if (array_key_exists(self::MINIFIED_FILTER_PARAM, $minifiedParameters)) {
-                $filters = $minifiedParameters[self::MINIFIED_FILTER_PARAM];
-            }
+        // Validates extension configuration and passes default values back to config.
+        $filtersNormalized = $this->validateConfiguration(
+            new Configuration(array_keys($this->filters)),
+            ['filters' => $filters]
+        );
 
-            $parameters->set(self::FILTER_ROOT_PARAM, $filters);
-        }
+        // Replaces config values by normalized, extra keys passed directly.
+        $config->offsetSetByPath(Configuration::FILTERS_PATH, array_replace_recursive($filters, $filtersNormalized));
+    }
 
-        parent::setParameters($parameters);
+    /**
+     * {@inheritDoc}
+     */
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $metadata)
+    {
+        $filters = $this->getFiltersToApply($config);
+
+        $this->updateState($filters, $config, $metadata);
+        $this->updateMetadata($filters, $config, $metadata);
+
+        $metadata->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }
 
     /**
@@ -192,97 +105,167 @@ abstract class AbstractFilterExtension extends AbstractExtension
      *
      * @return FilterInterface[]
      */
-    protected function getFiltersToApply(DatagridConfiguration $config)
+    protected function getFiltersToApply(DatagridConfiguration $config): array
     {
-        $filters       = [];
-        $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $filters = [];
+        $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH, []);
 
-        foreach ($filtersConfig as $name => $definition) {
-            if (isset($definition[PropertyInterface::DISABLED_KEY])
-                && $definition[PropertyInterface::DISABLED_KEY]
-            ) {
-                // skip disabled filter
+        foreach ($filtersConfig as $filterName => $filterConfig) {
+            if (!empty($filterConfig[PropertyInterface::DISABLED_KEY])) {
+                // Skips disabled filter.
                 continue;
             }
 
-            // if label not set, try to suggest it from column with the same name
-            if (!isset($definition['label'])) {
-                $definition['label'] = $config->offsetGetByPath(
-                    sprintf('[%s][%s][label]', FormatterConfiguration::COLUMNS_KEY, $name)
+            // If label is not set, tries to use corresponding column label.
+            if (!isset($filterConfig['label'])) {
+                $filterConfig['label'] = $config->offsetGetByPath(
+                    sprintf('[%s][%s][label]', FormatterConfiguration::COLUMNS_KEY, $filterName)
                 );
             }
-            $filters[] = $this->getFilterObject($name, $definition);
+            $filters[$filterName] = $this->getFilterObject($filterName, $filterConfig);
         }
 
         return $filters;
     }
 
     /**
-     * Takes param from request and merge with default filters
-     *
-     * @param DatagridConfiguration $config
-     * @param bool                  $readParameters
-     *
-     * @return array
-     */
-    protected function getValuesToApply(DatagridConfiguration $config, $readParameters = true)
-    {
-        $defaultFilters = $config->offsetGetByPath(Configuration::DEFAULT_FILTERS_PATH, []);
-
-        if (!$readParameters) {
-            return $defaultFilters;
-        } else {
-            $currentFilters = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
-            return array_replace($defaultFilters, $currentFilters);
-        }
-    }
-
-    /**
      * Returns prepared filter object
      *
-     * @param string $name
-     * @param array  $config
+     * @param string $filterName
+     * @param array $filterConfig
      *
      * @return FilterInterface
      */
-    protected function getFilterObject($name, array $config)
+    protected function getFilterObject($filterName, array $filterConfig): FilterInterface
     {
-        $type = $config[FilterUtility::TYPE_KEY];
+        $filterType = $filterConfig[FilterUtility::TYPE_KEY];
 
-        $filter = $this->filters[$type];
-        $filter->init($name, $config);
+        $filter = $this->filters[$filterType];
+        $filter->init($filterName, $filterConfig);
 
+        // Ensures filter is "somewhat-stateless" across datagrids.
+        // "Somewhat stateless" means that some filters cannot be fully stateless, because there are filters that
+        // are used directly as a service, e.g. oro_filter.date_grouping_filter. That is why we cannot clone filter
+        // before calling "init".
         return clone $filter;
     }
 
     /**
-     * @param array       $values
-     * @param string      $key
-     * @param mixed|false $default
-     *
-     * @return mixed
+     * @param FilterInterface[] $filters
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $metadata
      */
-    protected function getFilterValue(array $values, $key, $default = false)
+    protected function updateState(array $filters, DatagridConfiguration $config, MetadataObject $metadata): void
     {
-        return isset($values[$key]) ? $values[$key] : $default;
+        $filtersState = $this->filtersStateProvider->getState($config, $this->getParameters());
+        $initialFiltersState = $this->filtersStateProvider->getDefaultState($config);
+
+        foreach ($filters as $filterName => $filter) {
+            $value = $filtersState[$filterName] ?? null;
+            $initialValue = $initialFiltersState[$filterName] ?? null;
+            if ($value === null && $initialValue === null) {
+                continue;
+            }
+
+            if (!$this->isLazy($metadata)) {
+                // Resolves options to make it possible to submit & validate the filter form.
+                $filter->resolveOptions();
+            }
+
+            // Submits filter initial state value to check if it is valid.
+            if ($initialValue !== null && !$this->submitFilter($filter, $initialValue)->isValid()) {
+                // Excludes invalid filter value from initial state.
+                unset($initialFiltersState[$filterName]);
+            }
+
+            // Submits filter state value and checks if it is valid.
+            if ($value !== null && !$this->submitFilter($filter, $value)->isValid()) {
+                // Excludes invalid filter value from state.
+                unset($filtersState[$filterName]);
+            }
+
+            $filter->setFilterState($value);
+        }
+
+        $metadata
+            ->offsetAddToArray('initialState', ['filters' => $initialFiltersState])
+            ->offsetAddToArray('state', ['filters' => $filtersState]);
     }
 
     /**
-     * Set state of filters(enable or disable) from parameters by special key - "__{$filterName}"
+     * @param MetadataObject $metadata
      *
-     * @param string $name
-     * @param array  $filtersParams
-     * @param array  $state
-     *
-     * @return array
+     * @return bool
      */
-    protected function updateFilterStateEnabled($name, array $filtersParams, array $state)
+    protected function isLazy(MetadataObject $metadata): bool
     {
-        $filterEnabledKey = sprintf('__%s', $name);
-        if (isset($filtersParams[$filterEnabledKey])) {
-            $state[$filterEnabledKey] = $filtersParams[$filterEnabledKey];
+        return (bool)$metadata->offsetGetOr(MetadataObject::LAZY_KEY, true);
+    }
+
+    /**
+     * Submits filter form with filter state (i.e. value).
+     * Works with cloned form to ensure filter is stateless.
+     *
+     * @param FilterInterface $filter
+     * @param array $filterState
+     *
+     * @return FormInterface
+     */
+    protected function submitFilter(FilterInterface $filter, array $filterState): FormInterface
+    {
+        $filterForm = clone $filter->getForm();
+        $filterForm->submit($filterState);
+
+        return $filterForm;
+    }
+
+    /**
+     * @param FilterInterface[] $filters
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $metadata
+     */
+    protected function updateMetadata(
+        array $filters,
+        DatagridConfiguration $config,
+        MetadataObject $metadata
+    ): void {
+        $rawConfig = $this->configurationProvider->isApplicable($config->getName())
+            ? $this->configurationProvider->getRawConfiguration($config->getName())
+            : [];
+
+        $filtersMetadata = [];
+        foreach ($filters as $filter) {
+            $filterMetadata = $filter->getMetadata();
+            $label = $filterMetadata['label'] ?? '';
+
+            $filtersMetadata[] = array_merge(
+                $filterMetadata,
+                [
+                    'label' => !empty($filterMetadata[FilterUtility::TRANSLATABLE_KEY])
+                        ? $this->translator->trans($label)
+                        : $label,
+                    'cacheId' => $this->getFilterCacheId($rawConfig, $filterMetadata),
+                ]
+            );
         }
 
-        return $state;
+        $metadata->offsetAddToArray('filters', $filtersMetadata);
+    }
+
+    /**
+     * @param array $rawGridConfig
+     * @param array $filterMetadata
+     *
+     * @return string|null
+     */
+    protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata): ?string
+    {
+        if (empty($filterMetadata['lazy'])) {
+            return null;
+        }
+
+        $rawOptions = ArrayUtil::getIn($rawGridConfig, ['filters', 'columns', $filterMetadata['name'], 'options']);
+
+        return $rawOptions ? md5(serialize($rawOptions)) : null;
     }
 }
