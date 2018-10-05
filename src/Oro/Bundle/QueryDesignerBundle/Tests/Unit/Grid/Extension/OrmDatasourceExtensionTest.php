@@ -197,7 +197,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 AND ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
                     . 'AND (address.country LIKE :string4 '
                     . 'OR address.city LIKE :string5 OR '
                     . 'address.zip LIKE :string6))'
@@ -249,7 +249,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . 'user_status < :datetime2 OR user_status > :datetime3 '
+                    . 'user_status < :datetime2 OR user_status >= :datetime3 '
                     . 'OR address.country LIKE :string4)'
             ],
             'test with OR filters between simple and group conditions' => [
@@ -299,7 +299,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user '
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
-                    . '(user_status < :datetime2 OR user_status > :datetime3) '
+                    . '(user_status < :datetime2 OR user_status >= :datetime3) '
                     . 'AND address.country LIKE :string4)'
             ],
         ];

@@ -84,6 +84,6 @@ class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals('2013-01-01', $result['start']->format('Y-m-d'));
-        $this->assertEquals('2013-12-31', $result['end']->format('Y-m-d'));
+        $this->assertEquals('2014-01-01', $result['end']->format('Y-m-d'));
     }
 }
