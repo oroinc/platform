@@ -13,6 +13,7 @@ define(function(require) {
     var filterWrapper = require('./datafilter-wrapper');
     var FiltersStateView = require('./app/views/filters-state-view');
     var persistentStorage = require('oroui/js/persistent-storage');
+    var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
 
     /**
      * View that represents all grid filters
@@ -75,6 +76,13 @@ define(function(require) {
         multiselectResetButtonLabel: __('oro_datagrid.label_reset_button'),
 
         /**
+         * Set title for dialog widget with filters
+         *
+         * @property
+         */
+        filterDialogTitle: __('oro.filter.dialog.filter_results'),
+
+        /**
          * Select widget object
          *
          * @property {oro.MultiselectDecorator}
@@ -121,14 +129,15 @@ define(function(require) {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
             'click .reset-filter-button': '_onReset',
             'click a[data-name="filters-dropdown"]': '_onDropdownToggle',
-            'click [data-role="reset-filters"]': '_onReset'
+            'click [data-role="reset-filters"], [data-role="reset-all-filters"]': '_onReset'
         },
 
         /**
          * @inheritDoc
          */
         listen: {
-            'filters:update mediator': '_onChangeFilterSelect'
+            'filters:update mediator': '_onChangeFilterSelect',
+            'filters:reset mediator': '_onReset'
         },
 
         /**
@@ -275,7 +284,6 @@ define(function(require) {
         _onFilterUpdated: function(filter) {
             this._resetHintContainer();
             this.trigger('updateFilter', filter);
-
             this._publishCountSelectedFilters();
         },
 
@@ -384,6 +392,7 @@ define(function(require) {
                 return this;
             }
             var optionsSelectors = [];
+
             _.each(filters, function(filter) {
                 this._renderFilter(filter);
                 if (filter.visible) {
@@ -395,6 +404,7 @@ define(function(require) {
             if (!this.$(this.filterSelector).length) {
                 return;
             }
+
             var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', true);
@@ -528,6 +538,8 @@ define(function(require) {
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
                 countFilters
             );
+
+            this.$('a[data-name="filters-dropdown"]').toggleClass('filters-exist', countFilters > 0);
         },
 
         /**
@@ -733,10 +745,11 @@ define(function(require) {
         /**
          * Reset button click handler
          */
-        _onReset: function() {
+        _onReset: function(e) {
+            e.stopPropagation();
             this.collection.state.filters = {};
             this.collection.trigger('updateState', this.collection);
-            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName);
+            mediator.trigger('datagrid:doRefresh:' + this.collection.inputName, true);
         },
 
         /**
@@ -746,7 +759,12 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            this.$el.find('> .dropdown').toggleClass('open');
+            var dialogWidget = new FilterDialogWidget({
+                title: this.filterDialogTitle,
+                content: this.dropdownContainer
+            });
+
+            dialogWidget.render();
         },
 
         /**

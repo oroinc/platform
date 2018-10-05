@@ -28,6 +28,9 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        /**
+         * @property {Boolean}
+         */
         addSorting: false,
 
         /**
@@ -47,11 +50,19 @@ define(function(require) {
             return this;
         },
 
+        /**
+         * Set filter data to model
+         * @param {Object} filterModel
+         */
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
             this.listenTo(this.filterModel, 'change:search', this.render);
         },
 
+        /**
+         * Set sorting data
+         * @param {Boolean} addSorting
+         */
         setSorting: function(addSorting) {
             this.addSorting = addSorting;
         },
@@ -71,6 +82,11 @@ define(function(require) {
             return data;
         },
 
+        /**
+         * Set sorting data
+         * @param {String} label
+         * @param {Number} searchString
+         */
         highlightLabel: function(label, searchString) {
             var result = label;
             var length = searchString.length;

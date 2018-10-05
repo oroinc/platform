@@ -63,111 +63,12 @@
     }
 
     &__wrapper {
-        .datagrid-settings-title {
-            font-size: $base-font-size--l;
-            line-height: $base-font-size--l;
-            font-weight: bold;
-            margin-bottom: -3px;
-        }
-
-        .datagrid-settings-hint {
-            font-size: $base-font-size--s;
-            color: $btn-text-color;
-        }
-
         .ui-sortable-placeholder {
             border-top: 3px solid transparent;
         }
 
-        .datagrid-settings-filter {
-            margin-top: 4px;
-
-            .datagrid-settings-renderable-tab {
-                &:not(:last-of-type):after {
-                    content: "|";
-                }
-                &.active {
-                    pointer-events: none;
-                    color: #444;
-                }
-            }
-
-            .datagrid-settings-search {
-                margin: 15px 0 10px 0;
-                position: relative;
-
-                input {
-                    margin: 0;
-                    width: 100%;
-                }
-
-                &.empty:after {
-                    content: "\f002";
-                    font-family: FontAwesome;
-                    font-size: $base-font-size * 1.15;
-                    color: lighten($btn-text-color, 15%);
-                    position: absolute;
-                    top: 5px;
-                    right: 8px;
-                    z-index: 0;
-                }
-
-                > .clear {
-                    position: absolute;
-                    top: 5px;
-                    right: 8px;
-                    z-index: 1;
-                    font-size: 20px;
-                    font-weight: bold;
-                    line-height: 20px;
-                    color: lighten($btn-text-color, 15%);
-
-                    &:hover {
-                        color: $btn-text-color;
-                    }
-                }
-
-                &.empty > .clear {
-                    display: none;
-                }
-            }
-        }
-
-        .datagrid-settings-actions {
-            position: relative;
-            top: -10px;
-            line-height: 0;
-
-            .disabled {
-                color: lighten($btn-text-color, 35%);
-                pointer-events: none;
-            }
-
-            .hide-action {
-                display: none;
-            }
-        }
-
         .column-filter-match {
             text-decoration: underline;
-        }
-
-        .datagrid-settings-no-columns {
-            margin-top: 10px;
-            text-align: center;
-            font-size: 14px;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .datagrid-settings-right-flap {
-            position: absolute;
-            left: 100%;
-            width: 22px;
-            top: 27px;
-            bottom: 0;
         }
 
         .dropup &,
@@ -249,7 +150,7 @@
         }
 
         .table {
-            border-radius: 3px;
+            border-radius: 3px 3px 0 0;
             overflow: hidden;
             margin-bottom: 0;
 
@@ -294,5 +195,104 @@
                 }
             }
         }
+    }
+
+    &-title {
+        font-size: $base-font-size--l;
+        line-height: $base-font-size--l;
+        font-weight: bold;
+        margin-bottom: -3px;
+    }
+
+    &-hint {
+        font-size: $base-font-size--s;
+        color: $btn-text-color;
+    }
+
+    &-filter {
+        margin-top: 4px;
+
+        .datagrid-settings-renderable-tab {
+            &:not(:last-of-type):after {
+                content: "|";
+            }
+            &.active {
+                pointer-events: none;
+                color: #444;
+            }
+        }
+    }
+
+    &-search {
+        margin: 15px 0 10px 0;
+        position: relative;
+
+        input {
+            margin: 0;
+            width: 100%;
+        }
+
+        &.empty:after {
+            content: "\f002";
+            font-family: FontAwesome;
+            font-size: $base-font-size * 1.15;
+            color: lighten($btn-text-color, 15%);
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            z-index: 0;
+        }
+
+        > .clear {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            z-index: 1;
+            font-size: $base-font-size * 1.15;
+            font-weight: bold;
+            line-height: 20px;
+            color: lighten($btn-text-color, 15%);
+
+            &:hover {
+                color: $btn-text-color;
+            }
+        }
+
+        &.empty > .clear {
+            display: none;
+        }
+    }
+
+    &-actions {
+        position: relative;
+        top: -10px;
+        line-height: 0;
+
+        .disabled {
+            color: lighten($btn-text-color, 35%);
+            pointer-events: none;
+        }
+
+        .hide-action {
+            display: none;
+        }
+    }
+
+    &-no-columns {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    &-right-flap {
+        position: absolute;
+        left: 100%;
+        width: 22px;
+        top: 27px;
+        bottom: 0;
     }
 }
