@@ -6,6 +6,8 @@
     display: $checkbox-display;
     vertical-align: $checkbox-vertical-align;
     position: $checkbox-position;
+    margin: -$checkbox-icon-border-shadow-size;
+    overflow: $checkbox-overflow;
 
     &__icon {
         display: $checkbox-icon-display;
@@ -20,16 +22,16 @@
 
         cursor: $checkbox-icon-cursor;
 
-        vertical-align: $checkbox-icon-vertical-align;
-
         position: $checkbox-icon-position;
 
         color: $checkbox-icon-color;
+        margin: $checkbox-icon-border-shadow-size;
+        vertical-align: -$checkbox-icon-border-shadow-size;
 
         &:before {
             position: $checkbox-icon-marker-position;
             top: $checkbox-icon-marker-top;
-            left: $checkbox-icon-marker-left;
+            #{$start}: $checkbox-icon-marker-start;
             transform: $checkbox-icon-marker-transform;
 
             font-size: $checkbox-icon-marker-font-size;
@@ -63,18 +65,19 @@
     input[type="radio"],
     input[type="checkbox"] {
         position: $checkbox-input-position;
-        height: $checkbox-icon-height;
-        width: $checkbox-icon-height;
+        width: 100%;
+        height: 100%;
+        margin: 0 !important;
+        top: 0;
+        #{$start}: 0;
     }
 
     &__input {
         position: $checkbox-input-position;
         z-index: $checkbox-input-z-index;
-        top: $checkbox-input-top;
-        left: $checkbox-input-left;
-        width: $checkbox-icon-height;
-        height: $checkbox-icon-height;
-        opacity: $checkbox-input-opacity;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
 
         &:hover, &:focus {
             & ~ .checkbox-view__icon {
@@ -110,7 +113,7 @@
             &:hover, &:focus {
                 & ~ .checkbox-view__icon {
                     border-color: $checkbox-icon-border-color;
-                    box-shadow: 0 0 5px $checkbox-icon-border-color;
+                    box-shadow: 0 0 $checkbox-icon-border-shadow-size $checkbox-icon-border-color;
                 }
             }
         }
@@ -135,7 +138,7 @@
     }
 
     &__text {
-        margin-left: $checkbox-text-outer-offset-left;
+        margin-#{$start}: $checkbox-text-outer-offset-start;
         vertical-align: $checkbox-text-vertical-align;
         font-size: $base-font-size;
 
@@ -155,15 +158,21 @@
     }
 
     + span,
-    + div {
-        margin-left: $checkbox-sibling-outer-offset-left;
+    + div,
+    + label {
+        margin-#{$start}: $checkbox-sibling-outer-offset-start;
+    }
+
+    + label {
+        display: inline;
     }
 }
 
 .shift-checkbox {
-    margin-left: $checkbox-shift-offset;
+    padding-#{$start}: $checkbox-shift-offset;
 
-    .checkbox-view__icon {
-        margin-left: -$checkbox-shift-offset;
+    .checkbox-view {
+        margin-#{$start}: -($checkbox-icon-width + $checkbox-icon-border-shadow-size * 2);
+        margin-#{$end}: 0;
     }
 }

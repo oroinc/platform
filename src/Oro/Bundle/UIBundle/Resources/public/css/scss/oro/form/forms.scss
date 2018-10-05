@@ -21,6 +21,28 @@
 }
 
 .form-horizontal {
+
+    .controls {
+        padding-top: 7px;
+
+        input:not([type=checkbox]):not([type=radio]),
+        textarea,
+        .selector,
+        .select2-container,
+        .input-append {
+            margin-top: -6px;
+
+            + .fallback-status {
+                margin-top: -6px;
+            }
+        }
+
+        .input-append .select2-container,
+        .select2-container input:not([type=checkbox]):not([type=radio]) {
+            margin-top: 0;
+        }
+    }
+
     .control-group {
         label.control-label {
             float: left;
@@ -60,7 +82,7 @@
                 width: 100%;
                 word-wrap: break-word;
                 padding-left: 5px; // to get nice hover background
-                padding-top: 7px;
+                padding-top: 0;
 
                 &.html-property {
                     overflow: auto;
@@ -68,6 +90,10 @@
             }
 
             .control-subgroup {
+                display: inline-block;
+                vertical-align: top;
+                margin-right: 8px;
+
                 .controls {
                     margin-left: 0;
                     float: left;

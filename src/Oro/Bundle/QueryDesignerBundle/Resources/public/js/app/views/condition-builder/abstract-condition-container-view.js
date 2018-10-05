@@ -80,6 +80,10 @@ define(function(require) {
             return this;
         },
 
+        initControls: function() {
+            // all controls are defined by subviews
+        },
+
         onCloseClick: function(e) {
             this.closeCondition();
         },

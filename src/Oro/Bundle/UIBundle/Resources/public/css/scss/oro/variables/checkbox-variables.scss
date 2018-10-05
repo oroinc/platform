@@ -3,12 +3,13 @@
 $checkbox-outer-offset-bottom: 0 !default;
 $checkbox-line-height: inherit !default;
 $checkbox-display: inline-block !default;
-$checkbox-vertical-align: middle !default;
+$checkbox-vertical-align: -3px !default;
 $checkbox-position: relative !default;
+$checkbox-overflow: hidden !default;
 
 $checkbox-controls-offset-top: 12px !default;
 
-$checkbox-sibling-outer-offset-left: 5px !default;
+$checkbox-sibling-outer-offset-start: 5px !default;
 
 $checkbox-icon-display: inline-block !default;
 $checkbox-icon-height: 16px !default;
@@ -17,13 +18,12 @@ $checkbox-icon-border: 2px solid $primary-750 !default;
 $checkbox-icon-background-color: $primary-inverse !default;
 $checkbox-icon-border-radius: 3px !default;
 $checkbox-icon-cursor: pointer !default;
-$checkbox-icon-vertical-align: text-bottom !default;
 $checkbox-icon-position: relative !default;
 $checkbox-icon-color: $primary-inverse !default;
 
 $checkbox-icon-marker-position: absolute !default;
 $checkbox-icon-marker-top: 50% !default;
-$checkbox-icon-marker-left: 50% !default;
+$checkbox-icon-marker-start: 50% !default;
 $checkbox-icon-marker-transform: translate(-50%, -50%) !default;
 $checkbox-icon-marker-font-size: 10px !default;
 $checkbox-icon-marker-line-height: 1 !default;
@@ -41,11 +41,9 @@ $checkbox-icon-size-l-height: 24px !default;
 $checkbox-input-position: absolute !default;
 $checkbox-input-z-index: 100 !default;
 $checkbox-input-display: none !default;
-$checkbox-input-top: 0 !default;
-$checkbox-input-left: 0 !default;
-$checkbox-input-opacity: 0 !default;
 
 $checkbox-icon-border-color: $secondary !default;
+$checkbox-icon-border-shadow-size: 5px !default;
 $checkbox-icon-checked-background-color: $secondary !default;
 $checkbox-icon-checked-border-color: $secondary !default;
 
@@ -67,7 +65,7 @@ $checkbox-disabled-opacity: .5 !default;
 $checkbox-disabled-background-color: $primary-900 !default;
 $checkbox-disabled-pointer-events: none !default;
 
-$checkbox-text-outer-offset-left: 4px !default;
+$checkbox-text-outer-offset-start: 4px !default;
 $checkbox-text-vertical-align: middle !default;
 $checkbox-text-empty-display: none !default;
 $checkbox-label-empty-offset-top: 7px !default;

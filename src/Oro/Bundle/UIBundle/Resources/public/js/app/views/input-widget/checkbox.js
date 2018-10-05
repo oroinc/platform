@@ -3,7 +3,6 @@ define(function(require) {
 
     var CheckboxInputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
-    var _ = require('underscore');
     var $ = require('jquery');
     var defaultTemplate = require('tpl!oroui/templates/checkbox/default-template.html');
 
@@ -46,23 +45,20 @@ define(function(require) {
         },
 
         /**
-         * Prepear custom checkbox markup
+         * Prepare custom checkbox markup
          * @private
          */
         _buildCustomCheckbox: function() {
             this.type = this.$el.attr('type');
-            var label = this.$el.parent().find('> label');
-            var labelText = label.html();
-            var labelId = label.attr('for');
-            label.remove();
 
-            this.$checkboxContainer = $(this.template({
-                label: labelText,
-                labelId: labelId,
+            var container = document.createElement('span');
+            container.className = 'checkbox-view';
+            container.innerHTML = this.template({
                 type: this.type
-            }));
+            });
 
-            this.$checkboxContainer.toggleClass('empty-label', _.isEmpty(labelText));
+            this.$checkboxContainer = $(container);
+
             this.$el.after(this.$checkboxContainer);
             this.$el
                 .addClass('checkbox-view__input')
@@ -73,7 +69,8 @@ define(function(require) {
          * @inheritDoc
          */
         disposeWidget: function() {
-            this.$checkboxContainer.parent().append(this.$el);
+            this.$el.removeClass('checkbox-view__input');
+            this.$checkboxContainer.before(this.$el);
             this.$checkboxContainer.remove();
 
             CheckboxInputWidget.__super__.disposeWidget.apply(this, arguments);
