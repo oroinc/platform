@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ColumnFilterModel;
+    var DatagridSettingsListFilterModel;
     var BaseModel = require('oroui/js/app/models/base/model');
 
-    ColumnFilterModel = BaseModel.extend({
+    DatagridSettingsListFilterModel = BaseModel.extend({
         defaults: {
             search: '',
             renderable: false
@@ -13,8 +13,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnFilterModel() {
-            ColumnFilterModel.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListFilterModel() {
+            DatagridSettingsListFilterModel.__super__.constructor.apply(this, arguments);
         },
 
         filterer: function(item) {
@@ -29,5 +29,5 @@ define(function(require) {
         }
     });
 
-    return ColumnFilterModel;
+    return DatagridSettingsListFilterModel;
 });

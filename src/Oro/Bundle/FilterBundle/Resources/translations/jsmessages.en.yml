@@ -76,3 +76,9 @@ oro:
             filters: Filters
             filters_count: Filters ({{ count }})
             save_filters: Save Filters
+        dialog:
+            filter_results: Filter Results
+            reset_all: Reset All
+            close: Close
+        filter_results_trigger: Filter Results
+        filter_reset: Reset

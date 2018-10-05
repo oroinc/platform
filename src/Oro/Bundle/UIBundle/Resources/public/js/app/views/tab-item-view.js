@@ -57,7 +57,6 @@ define(function(require) {
 
             if (this.model.get('active')) {
                 var tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
-
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }
         },

@@ -1,35 +1,45 @@
 define(function(require) {
     'use strict';
 
-    var ColumnManagerCollectionView;
-    var template = require('tpl!orodatagrid/templates/column-manager/column-manager-collection.html');
+    var DatagridSettingsListCollectionView;
+    var template = require('tpl!orodatagrid/templates/datagrid-settings/datagrid-settings-collection.html');
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var ColumnFilterModel = require('orodatagrid/js/app/models/column-manager/column-filter-model');
-    var ColumnManagerItemView = require('./column-manager-item-view');
+    var DatagridSettingsListFilterModel = require('orodatagrid/js/app/models/datagrid-settings-list/datagrid-settings-list-filter-model');
+    var DatagridSettingsListItemView = require('orodatagrid/js/app/views/datagrid-settings-list/datagrid-settings-list-item-view');
     var module = require('module');
     var config = module.config();
     require('jquery-ui');
 
     config = _.extend({
-        fallbackSelector: '.column-manager-no-columns'
+        fallbackSelector: '.datagrid-settings-no-columns'
     }, config);
 
-    ColumnManagerCollectionView = BaseCollectionView.extend({
+    /**
+     * @class DatagridSettingsListCollectionView
+     * @extends BaseCollectionView
+     */
+    DatagridSettingsListCollectionView = BaseCollectionView.extend({
         animationDuration: 0,
         template: template,
-        itemView: ColumnManagerItemView,
+        itemView: DatagridSettingsListItemView,
 
         className: 'dropdown-menu',
         listSelector: 'tbody',
         fallbackSelector: config.fallbackSelector,
 
+        /**
+         * @inheritDoc
+         */
         events: {
             'click tbody tr [data-role=moveUp]': 'onMoveUp',
             'click tbody tr [data-role=moveDown]': 'onMoveDown'
         },
 
+        /**
+         * @inheritDoc
+         */
         listen: {
             'change collection': 'filter',
             'visibilityChange': 'updateHeaderWidths',
@@ -44,7 +54,7 @@ define(function(require) {
         orderShift: 0,
 
         /**
-         * @type {ColumnFilterModel}
+         * @type {DatagridSettingsListFilterModel}
          */
         filterModel: null,
 
@@ -58,8 +68,8 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        constructor: function ColumnManagerCollectionView() {
-            ColumnManagerCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsListCollectionView() {
+            DatagridSettingsListCollectionView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -67,12 +77,12 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['orderShift', 'filterModel', 'addSorting']));
-            if (!(this.filterModel instanceof ColumnFilterModel)) {
+            if (!(this.filterModel instanceof DatagridSettingsListFilterModel)) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
 
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
-            ColumnManagerCollectionView.__super__.initialize.apply(this, arguments);
+            DatagridSettingsListCollectionView.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -80,26 +90,37 @@ define(function(require) {
          */
         delegateListeners: function() {
             this.listenTo(this.filterModel, 'change', this.filter);
-            return ColumnManagerCollectionView.__super__.delegateListeners.apply(this, arguments);
+            return DatagridSettingsListCollectionView.__super__.delegateListeners.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         render: function() {
-            ColumnManagerCollectionView.__super__.render.apply(this, arguments);
+            DatagridSettingsListCollectionView.__super__.render.apply(this, arguments);
             if (this.addSorting) {
                 this.initSorting();
             }
             this.updateHeaderWidths();
-            this.$el.inputWidget('seekAndCreate');
             return this;
         },
 
+
         initItemView: function() {
-            var itemView = ColumnManagerCollectionView.__super__.initItemView.apply(this, arguments);
+            var itemView = DatagridSettingsListCollectionView.__super__.initItemView.apply(this, arguments);
             itemView.setFilterModel(this.filterModel);
+            itemView.setSorting(this.addSorting);
             return itemView;
+        },
+
+        /**
+         * @inheritDoc
+         * @returns {*}
+         */
+        getTemplateData: function() {
+            var data = DatagridSettingsListCollectionView.__super__.getTemplateData.call(this);
+            data.addSorting = this.addSorting;
+            return data;
         },
 
         /**
@@ -193,18 +214,19 @@ define(function(require) {
         toggleFallback: function() {
             var hasVisibleItems = Boolean(this.visibleItems.length);
             // to hide table's header once no visible data
-            this.$('[data-role="column-manager-table-header-wrapper"], [data-role="column-manager-table-wrapper"]')
+            this.$('[data-role="datagrid-settings-table-header-wrapper"], ' +
+                '[data-role="datagrid-settings-table-wrapper"]')
                 .toggle(hasVisibleItems);
-            ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
+            DatagridSettingsListCollectionView.__super__.toggleFallback.apply(this, arguments);
         },
 
         updateHeaderWidths: function() {
             var i;
             var clientWidth;
-            var $wrapper = this.$('[data-role="column-manager-table-wrapper"]');
+            var $wrapper = this.$('[data-role="datagrid-settings-table-wrapper"]');
             var $table = $wrapper.children('table');
             var tableThs = $table.find('thead th');
-            var headerThs = this.$('[data-role="column-manager-table-header-wrapper"] tr th');
+            var headerThs = this.$('[data-role="datagrid-settings-table-header-wrapper"] tr th');
             $wrapper.css('padding-right', 0);
             clientWidth = $wrapper[0].clientWidth;
             if (clientWidth > 0) {
@@ -216,5 +238,5 @@ define(function(require) {
         }
     });
 
-    return ColumnManagerCollectionView;
+    return DatagridSettingsListCollectionView;
 });
