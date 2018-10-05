@@ -40,8 +40,8 @@
             top: $mobile-select2-search-choice-close-top;
             right: $mobile-select2-search-choice-close-right;
 
-            color: $primary-200;
-            text-align: center;
+            color: $mobile-select2-search-choice-close-color;
+            text-align: $mobile-select2-search-choice-close-text-align;
             border-#{$start}: $select2-container-border;
 
             line-height: $mobile-select2-search-choice-close-height;

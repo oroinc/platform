@@ -8,6 +8,10 @@ define(function(require) {
     var DialogWidget = require('oro/dialog-widget');
     var actionsTemplate = require('tpl!orofilter/templates/filters-dialog-actions.html');
 
+    /**
+     * @class FilterDialogWidget
+     * @extends DialogWidget
+     */
     FilterDialogWidget = DialogWidget.extend({
         /**
          * @property {Function}

@@ -14,7 +14,7 @@ define(function(require) {
     config = _.extend({
         icon: 'cog',
         wrapperClassName: 'datagrid-settings dropleft',
-        label: __('oro.datagrid.column_manager.title')
+        label: __('oro.datagrid.settings.title')
     }, config);
 
     DatagridSettingPlugin = BasePlugin.extend({

@@ -69,13 +69,17 @@
                 }
 
                 .clear {
-                    top: 10px;
+                    top: 9px;
                 }
             }
         }
 
         td.title-cell {
             white-space: normal;
+
+            label {
+                padding: 5px 0;
+            }
         }
 
         td.sort-cell {

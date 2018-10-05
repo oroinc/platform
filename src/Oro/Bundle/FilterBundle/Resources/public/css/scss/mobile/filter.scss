@@ -37,7 +37,7 @@
                 top: $mobile-filter-box-reset-all-filter-top;
                 #{$end}: $mobile-filter-box-reset-all-filter-end;
 
-                @include fa-icon("\f00d", before, true) {
+                @include fa-icon($mobile-filter-box-reset-all-filter-icon, before, true) {
                     font-size: $mobile-filter-box-reset-all-icon-font-size;
                     color: $mobile-filter-box-reset-all-icon-color;
                 }
@@ -98,15 +98,14 @@
             float: none;
 
             > .btn {
-                display: flex;
-                justify-content: space-between;
+                display: $mobile-filter-box-display;
+                justify-content: $mobile-filter-box-justify-content;
+                width: $mobile-filter-box-width;
                 height: $mobile-filter-box-height;
+                font-size: $mobile-filter-box-font-size;
                 line-height: $mobile-filter-box-line-height;
-                width: 100%;
-                font-size: $base-font-size--m;
-                text-transform: none;
+                text-transform: $mobile-filter-box-text-transform;
             }
-
             & + .value-field-frame {
                 margin-left: 0;
                 margin-top: 8px;

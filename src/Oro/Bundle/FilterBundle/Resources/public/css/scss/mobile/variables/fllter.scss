@@ -17,12 +17,12 @@ $mobile-filter-box-dropdown-toggle-border-color: $primary-900 !default;
 $mobile-filter-box-dropdown-toggle-font-size: 14px !default;
 
 $mobile-filter-box-dropdown-toggle-before-content: $fa-var-filter !default;
-$mobile-filter-box-dropdown-toggle-before-font-family: FontAwesome, sans-serif !default;
 $mobile-filter-box-dropdown-toggle-before-offset: 0 7px 0 -7px !default;
 $mobile-filter-box-dropdown-toggle-before-width: 16px !default;
 $mobile-filter-box-dropdown-toggle-before-font-size: $base-font-size--l !default;
 $mobile-filter-box-dropdown-toggle-before-display: inline-block !default;
 
+$mobile-filter-box-reset-all-filter-icon: $fa-var-times !default;
 $mobile-filter-box-reset-all-filter-display: none !default;
 $mobile-filter-box-reset-all-filter-position: absolute !default;
 $mobile-filter-box-reset-all-filter-top: 0 !default;
@@ -65,7 +65,12 @@ $mobile-filter-item-offset: 0 0 16px !default;
 $mobile-filter-box-dropdown-menu-breakpoint-left: 50% !default;
 $mobile-filter-box-dropdown-menu-breakpoint-offset-left: -253px !default;
 
+$mobile-filter-box-display: flex !default;
+$mobile-filter-box-justify-content: space-between !default;
+$mobile-filter-box-width: 100% !default;
 $mobile-filter-box-height: 40px !default;
+$mobile-filter-box-text-transform: none !default;
+$mobile-filter-box-font-size: $base-font-size--m !default;
 $mobile-filter-box-line-height: 36px !default;
 
 $mobile-filter-box-caret-margin-top: 16px !default;
