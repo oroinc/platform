@@ -3,24 +3,26 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
-use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Converts exported records to plain format.
+ * - applies formatting;
+ * - sorts columns according to their "order";
+ * - excludes non-renderable columns.
+ */
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
     /**
-     * @var ServiceLink
+     * @var DatagridColumnsFromContextProviderInterface
      */
-    protected $gridManagerLink;
+    private $datagridColumnsFromContextProvider;
 
     /**
      * @var TranslatorInterface
@@ -33,11 +35,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $formatterProvider;
 
     /**
-     * @var ColumnsHelper
-     */
-    protected $columnsHelper;
-
-    /**
      * @var ContextInterface
      */
     protected $context;
@@ -48,20 +45,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $formatters = [];
 
     /**
-     * @param ServiceLink         $gridManagerLink
+     * Contains grid columns cache for current context
+     *
+     * @var array
+     */
+    private $gridColumns = [];
+
+    /**
+     * @param DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider
      * @param TranslatorInterface $translator
-     * @param ColumnsHelper       $columnsHelper
-     * @param FormatterProvider   $formatterProvider
+     * @param FormatterProvider $formatterProvider
      */
     public function __construct(
-        ServiceLink $gridManagerLink,
+        DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider,
         TranslatorInterface $translator,
-        ColumnsHelper $columnsHelper,
         FormatterProvider $formatterProvider
     ) {
-        $this->gridManagerLink   = $gridManagerLink;
-        $this->translator        = $translator;
-        $this->columnsHelper     = $columnsHelper;
+        $this->datagridColumnsFromContextProvider = $datagridColumnsFromContextProvider;
+        $this->translator = $translator;
         $this->formatterProvider = $formatterProvider;
     }
 
@@ -74,10 +75,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
 
         $result = [];
         foreach ($columns as $columnName => $column) {
-            if (isset($column['renderable']) && false === $column['renderable']) {
-                continue;
-            }
-
             $val = array_key_exists($columnName, $exportedRecord) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
             $columnLabel = $this->translator->trans($column['label']);
@@ -93,31 +90,20 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @return array|mixed
+     * Returns columns from either:
+     * 1) datagrid columns stored in context;
+     * 2) columns from datagrid configuration;
+     * Caches grid columns in gridColumns property until the new context is set.
+     *
+     * @return array
      */
     protected function getGridColumns()
     {
-        if ($this->context->getValue('columns')) {
-            $columns = $this->context->getValue('columns');
-        } elseif ($this->context->hasOption('gridName')) {
-            $gridName   = $this->context->getOption('gridName');
-            $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
-            $columns    = $gridConfig->offsetGet('columns');
-        } else {
-            throw new InvalidConfigurationException(
-                'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
-            );
+        if (!$this->gridColumns) {
+            $this->gridColumns = $this->datagridColumnsFromContextProvider->getColumnsFromContext($this->context);
         }
 
-        if ($this->context->hasOption('gridParameters')) {
-            $gridParams = $this->context->getOption('gridParameters');
-            if ($gridParams->has(ColumnsExtension::COLUMNS_PARAM)) {
-                $columnsParams = $gridParams->get(ColumnsExtension::COLUMNS_PARAM);
-                $columns       = $this->columnsHelper->reorderColumns($columns, $columnsParams);
-            }
-        }
-
-        return $columns;
+        return $this->gridColumns;
     }
 
     /**
@@ -201,6 +187,8 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;
+        // Clear grid columns cache because it is not actual for new context.
+        $this->gridColumns = [];
     }
 
     /**
@@ -214,7 +202,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         if (isset($this->formatters[$formatType][$type])) {
             return $this->formatters[$formatType][$type];
         }
-        $formatter                            = $this->formatterProvider->getFormatterFor($formatType, $type);
+        $formatter = $this->formatterProvider->getFormatterFor($formatType, $type);
         $this->formatters[$formatType][$type] = $formatter;
 
         return $formatter;

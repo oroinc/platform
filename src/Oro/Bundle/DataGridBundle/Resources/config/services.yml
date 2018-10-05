@@ -27,7 +27,6 @@ parameters:
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view_user.entity.class:                     Oro\Bundle\DataGridBundle\Entity\GridViewUser
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
-    oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
     oro_datagrid.choice.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
@@ -255,9 +254,6 @@ services:
         calls:
             - [setFileManager, ['@oro_importexport.file.file_manager']]
             - [setLogger, ['@logger']]
-
-    oro_datagrid.columns.helper:
-        class: '%oro_datagrid.columns.helper.class%'
 
     oro_datagrid.grid_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper

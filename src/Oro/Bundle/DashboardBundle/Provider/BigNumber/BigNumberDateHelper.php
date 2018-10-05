@@ -68,9 +68,10 @@ class BigNumberDateHelper
      */
     public function getLastWeekPeriod($weeksDiff = 0)
     {
-        // Suppose that week starts from Monday and ends by Sunday.
-        // Changing of first day of week will be fixed in BAP-9846
-        $end = new \DateTime('last Sunday', new \DateTimeZone($this->localeSettings->getTimeZone()));
+        $lastDayNumber  = $this->localeSettings->getCalendar()->getFirstDayOfWeek() + 5;
+        $lastDayString = date('l', strtotime("Sunday +{$lastDayNumber} days"));
+
+        $end = new \DateTime('last ' . $lastDayString, new \DateTimeZone($this->localeSettings->getTimeZone()));
         $end->setTime(0, 0, 0)->modify('1 day');
         $start = clone $end;
         $start->modify('-7 days');
