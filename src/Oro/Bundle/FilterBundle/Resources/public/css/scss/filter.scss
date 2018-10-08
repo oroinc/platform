@@ -477,12 +477,6 @@
                 padding: $select-filter-widget-checkboxes-label-inner-offset;
 
                 float: $select-filter-widget-checkboxes-label-float;
-
-                span {
-                    white-space: $select-filter-widget-checkboxes-label-span-white-space;
-                    vertical-align: $select-filter-widget-checkboxes-label-span-vertical-align;
-                    line-height: $select-filter-widget-checkboxes-label-span-line-height;
-                }
             }
 
             li {
@@ -515,11 +509,6 @@
                     &.ui-state-active {
                         background-image: $select-filter-widget-label-state-active-background-image;
                         background-color: $select-filter-widget-label-state-active-background-color;
-                    }
-
-                    span {
-                        vertical-align: $select-filter-widget-label-state-span-vertical-align;
-                        display: block;
                     }
                 }
             }
