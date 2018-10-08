@@ -87,7 +87,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->config->expects($this->at(0))->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn($sorter);
 
-        $this->sortersStateProvider->expects($this->once())->method('getState')
+        $this->sortersStateProvider->expects($this->once())->method('getStateFromParameters')
             ->willReturn($state);
 
         $this->extension->setParameters(new ParameterBag());
@@ -103,7 +103,7 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn(['priceListName' => ['data_name' => 'priceListName']]);
 
-        $this->sortersStateProvider->expects($this->once())->method('getState')
+        $this->sortersStateProvider->expects($this->once())->method('getStateFromParameters')
             ->willReturn(['priceListName' => 'DESC']);
 
         $this->extension->setParameters(new ParameterBag());

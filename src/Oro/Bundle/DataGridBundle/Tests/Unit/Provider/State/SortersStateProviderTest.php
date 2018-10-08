@@ -306,6 +306,34 @@ class SortersStateProviderTest extends AbstractStateProviderTest
     /**
      * @dataProvider stateDataProvider
      *
+     * @param array $state
+     * @param array $sortersColumns
+     * @param array $expectedState
+     */
+    public function testGetStateFromParametersWhenDefaultSortersState(
+        array $state,
+        array $sortersColumns,
+        array $expectedState
+    ): void {
+        $this->mockParametersState([], []);
+
+        $this->datagridConfiguration
+            ->expects(self::any())
+            ->method('offsetGetByPath')
+            ->willReturnMap([
+                [SorterConfiguration::COLUMNS_PATH, [], $sortersColumns],
+                [SorterConfiguration::DISABLE_DEFAULT_SORTING_PATH, false, false],
+                [SorterConfiguration::DEFAULT_SORTERS_PATH, [], $state],
+            ]);
+
+        $actualState = $this->provider->getStateFromParameters($this->datagridConfiguration, $this->datagridParameters);
+
+        self::assertEquals($expectedState, $actualState);
+    }
+
+    /**
+     * @dataProvider stateDataProvider
+     *
      * @param array $defaultSorters
      * @param array $sortersColumns
      * @param array $expectedState
