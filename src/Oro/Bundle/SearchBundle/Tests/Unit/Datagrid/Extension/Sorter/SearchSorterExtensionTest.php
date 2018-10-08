@@ -47,7 +47,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockQuery = $this->createMock(SearchQueryInterface::class);
@@ -101,7 +101,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
@@ -134,7 +134,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 
         $this->sortersStateProvider
             ->expects($this->once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
