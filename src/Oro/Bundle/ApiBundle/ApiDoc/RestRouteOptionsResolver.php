@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -344,12 +345,14 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         array $actions
     ) {
         $cache = new RouteCollection();
+        $isSubresource = $this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER);
         foreach ($resources as $entityType => $resource) {
             $entityClass = $resource->getEntityClass();
             foreach ($actions as $action) {
-                if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
+                if ($isSubresource) {
                     $cache = $this->addSubresources(
                         $action,
+                        $actions,
                         $entityType,
                         $entityClass,
                         $routeName,
@@ -357,7 +360,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                         $routes,
                         $cache
                     );
-                } elseif (!\in_array($action, $resource->getExcludedActions(), true)) {
+                } elseif (!$this->isExcludedAction($action, $actions, $resource->getExcludedActions())) {
                     $cache = $this->addResource(
                         $action,
                         $entityType,
@@ -373,6 +376,40 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         if ($cache->count()) {
             $routes->insertCollection($cache, $routeName, true);
         }
+    }
+
+    /**
+     * @param string   $action
+     * @param string[] $otherActions
+     * @param string[] $excludedActions
+     *
+     * @return bool
+     */
+    private function isExcludedAction($action, $otherActions, $excludedActions)
+    {
+        if (ApiActions::OPTIONS === $action) {
+            return !$this->hasOtherActions($action, $otherActions, $excludedActions);
+        }
+
+        return \in_array($action, $excludedActions, true);
+    }
+
+    /**
+     * @param string   $action
+     * @param string[] $otherActions
+     * @param string[] $excludedActions
+     *
+     * @return bool
+     */
+    private function hasOtherActions($action, $otherActions, $excludedActions)
+    {
+        foreach ($otherActions as $otherAction) {
+            if ($otherAction !== $action && !\in_array($otherAction, $excludedActions, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -445,6 +482,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /**
      * @param string                  $action
+     * @param string[]                $otherActions
      * @param string                  $entityType
      * @param string                  $entityClass
      * @param string                  $routeName
@@ -456,6 +494,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function addSubresources(
         $action,
+        $otherActions,
         $entityType,
         $entityClass,
         $routeName,
@@ -470,7 +509,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
         $entityRoutePath = \str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath());
         foreach ($subresources as $associationName => $subresource) {
-            if (\in_array($action, $subresource->getExcludedActions(), true)) {
+            if ($this->isExcludedAction($action, $otherActions, $subresource->getExcludedActions())) {
                 continue;
             }
 
