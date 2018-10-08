@@ -4,7 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Provider\SelectedFields;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 
 /**
  * Returns array of field names (used in renderable columns) which must be present in select statement of datasource
@@ -22,7 +23,7 @@ class SelectedFieldsFromColumnsProvider extends AbstractSelectedFieldsProvider
         return array_filter(
             $state,
             function (array $columnState) {
-                return $columnState[ColumnsExtension::RENDER_FIELD_NAME];
+                return $columnState[ColumnsStateProvider::RENDER_FIELD_NAME];
             }
         );
     }
@@ -32,6 +33,6 @@ class SelectedFieldsFromColumnsProvider extends AbstractSelectedFieldsProvider
      */
     protected function getConfiguration(DatagridConfiguration $datagridConfiguration): array
     {
-        return (array)$datagridConfiguration->offsetGet(ColumnsExtension::COLUMNS_PATH);
+        return (array)$datagridConfiguration->offsetGet(Configuration::COLUMNS_KEY);
     }
 }

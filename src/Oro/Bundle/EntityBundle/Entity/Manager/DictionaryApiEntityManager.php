@@ -2,56 +2,55 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Manager;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
-use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
+use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
- * Extended and changed some ApiEntityManager functionality
+ * The API manager for dictionaries and enums.
  */
 class DictionaryApiEntityManager extends ApiEntityManager
 {
     use TranslatableQueryTrait;
 
+    private const DEFAULT_SEARCH_FIELD = 'label';
+    private const SEARCH_FIELD_FOR_ENUM = 'name';
+
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
-
-    /** @var DictionaryHelper */
-    protected $dictionaryHelper;
 
     /** @var ConfigManager */
     protected $entityConfigManager;
 
-    /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /**
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param DictionaryHelper $dictionaryHelper
      * @param ConfigManager $entityConfigManager
-     * @param PropertyAccessor $propertyAccessor
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
-        DictionaryHelper $dictionaryHelper,
         ConfigManager $entityConfigManager,
-        PropertyAccessor $propertyAccessor
+        EntityNameResolver $entityNameResolver
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
-        $this->dictionaryHelper = $dictionaryHelper;
         $this->entityConfigManager = $entityConfigManager;
-        $this->propertyAccessor = $propertyAccessor;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -115,11 +114,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueBySearchQuery($searchQuery)
     {
-        $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
-
-        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
-        $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
+        $searchFields = $this->getSearchFields($this->getMetadata());
 
         $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
@@ -137,7 +132,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $this->addTranslatableLocaleHint($query, $this->getObjectManager());
         $results = $query->getResult();
 
-        return $this->prepareData($results, $keyField, $searchFields, $representationField);
+        return $this->prepareData($results, $this->getMetadata());
     }
 
     /**
@@ -152,11 +147,8 @@ class DictionaryApiEntityManager extends ApiEntityManager
         if (empty($keys)) {
             return [];
         }
-        $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
 
-        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
-        $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
+        $keyField = $this->getEntityIdentifierFieldName($this->getMetadata());
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         $qb->andWhere('e.' . $keyField . ' in (:keys)');
@@ -165,37 +157,90 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $query = $qb->getQuery();
         $results = $query->getResult();
 
-        return $this->prepareData($results, $keyField, $searchFields, $representationField);
+        return $this->prepareData($results, $this->getMetadata());
     }
 
     /**
-     * @param array $results
-     * @param string $keyField
-     * @param array $searchFields
-     * @param string $representationField
+     * @param object[] $entities
+     * @param ClassMetadata $metadata
      *
      * @return array
      */
-    protected function prepareData($results, $keyField, $searchFields, $representationField)
+    protected function prepareData($entities, ClassMetadata $metadata)
     {
         $prepared = [];
-        foreach ($results as $result) {
-            $id = $value = $this->propertyAccessor->getValue($result, $keyField);
-            if ($representationField !== null) {
-                $text = $this->propertyAccessor->getValue($result, $representationField);
-            } else {
-                $text = implode(' ', array_map(function ($field) use ($result) {
-                    return $this->propertyAccessor->getValue($result, $field);
-                }, $searchFields));
-            }
-
+        foreach ($entities as $entity) {
+            $id = $this->getEntityIdentifier($entity, $metadata);
+            $text = $this->entityNameResolver->getName($entity);
             $prepared[] = [
                 'id' => $id,
-                'value' => $value,
-                'text' => $text,
+                'value' => $id,
+                'text' => $text
             ];
         }
 
         return $prepared;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     *
+     * @return string
+     */
+    private function getEntityIdentifierFieldName(ClassMetadata $metadata)
+    {
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        if (count($idFieldNames) === 1) {
+            return reset($idFieldNames);
+        }
+
+        throw new RuntimeException(
+            sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
+        );
+    }
+
+    /**
+     * @param object $entity
+     * @param ClassMetadata $metadata
+     *
+     * @return mixed
+     */
+    private function getEntityIdentifier($entity, ClassMetadata $metadata)
+    {
+        $entityIdentifier = $metadata->getIdentifierValues($entity);
+        if (count($entityIdentifier) === 1) {
+            return reset($entityIdentifier);
+        }
+
+        throw new RuntimeException(
+            sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
+        );
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     *
+     * @return string[]
+     */
+    private function getSearchFields(ClassMetadata $metadata)
+    {
+        $className = $metadata->getName();
+        if (is_a($className, AbstractEnumValue::class, true)) {
+            return [self::SEARCH_FIELD_FOR_ENUM];
+        }
+        if ($this->entityConfigManager->hasConfig($className)) {
+            $entityConfig = $this->entityConfigManager->getEntityConfig('dictionary', $className);
+            $searchFieldNames = $entityConfig->get('search_fields');
+            if ($searchFieldNames) {
+                return $searchFieldNames;
+            }
+        }
+        if ($metadata->hasField(self::DEFAULT_SEARCH_FIELD)) {
+            return [self::DEFAULT_SEARCH_FIELD];
+        }
+
+        throw new \LogicException(
+            sprintf('Search fields are not configured for class %s', $metadata->getName())
+        );
     }
 }

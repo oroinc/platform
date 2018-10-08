@@ -149,33 +149,26 @@ class ResourcesCache
      * @param string        $version             The Data API version
      * @param RequestType   $requestType         The request type, for example "rest", "soap", etc.
      * @param ApiResource[] $resources           The list of Data API resources
-     * @param string[]      $accessibleResources The list of resources accessible through Data API
+     * @param array         $accessibleResources The resources accessible through Data API
+     * @param array         $excludedActions     The actions excluded from Data API
      */
     public function saveResources(
         string $version,
         RequestType $requestType,
         array $resources,
-        array $accessibleResources
+        array $accessibleResources,
+        array $excludedActions
     ): void {
         $allResources = [];
-        $excludedActionsData = [];
-        $accessibleResourcesData = array_fill_keys($accessibleResources, true);
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
             $allResources[$entityClass] = $this->serializeApiResource($resource);
-            if (!isset($accessibleResourcesData[$entityClass])) {
-                $accessibleResourcesData[$entityClass] = false;
-            }
-            $excludedActions = $resource->getExcludedActions();
-            if (!empty($excludedActions)) {
-                $excludedActionsData[$entityClass] = $excludedActions;
-            }
         }
 
         $keyIndex = $this->getCacheKeyIndex($version, $requestType);
         $this->cache->save(self::RESOURCES_KEY_PREFIX . $keyIndex, $allResources);
-        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResourcesData);
-        $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActionsData);
+        $this->cache->save(self::ACCESSIBLE_RESOURCES_KEY_PREFIX . $keyIndex, $accessibleResources);
+        $this->cache->save(self::EXCLUDED_ACTIONS_KEY_PREFIX . $keyIndex, $excludedActions);
     }
 
     /**

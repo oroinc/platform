@@ -569,14 +569,20 @@ services:
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
 
-    oro_api.rest.action_mapper:
-        class: Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper
+    oro_api.rest.routes:
+        class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutes
         public: false
         arguments:
             - 'oro_rest_api_item'
             - 'oro_rest_api_list'
             - 'oro_rest_api_subresource'
             - 'oro_rest_api_relationship'
+
+    oro_api.rest.action_mapper:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper
+        public: false
+        arguments:
+            - '@oro_api.rest.routes'
 
     oro_api.rest.api_doc_annotation_handler:
         class: Oro\Bundle\ApiBundle\ApiDoc\ChainApiDocAnnotationHandler
@@ -601,6 +607,7 @@ services:
         public: false
         arguments:
             - 'rest_api'
+            - '@oro_api.rest.routes'
             - '@oro_api.rest.action_mapper'
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.resources_provider'

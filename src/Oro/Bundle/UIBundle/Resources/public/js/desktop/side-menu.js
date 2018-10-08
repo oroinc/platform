@@ -183,6 +183,10 @@ define(function(require) {
             } else {
                 var $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
 
+                if (!$menu.length) {
+                    return;
+                }
+
                 this.overlay
                     .setTitle(
                         $(event.currentTarget)
@@ -289,19 +293,17 @@ define(function(require) {
                         $menuItem.children().last().remove();
                     }
 
-                    if (!$menuItem.hasClass('divider')) {
-                        if (parentIndex) {
-                            uniqueGroupIndex = (parentGroupIndex ? parentGroupIndex : parentIndex) + ';' + uniqueIndex;
-                            $menuItem.attr('data-related-groups', uniqueGroupIndex);
-                        }
-
-                        $menuItem
-                            .attr('data-index', uniqueIndex)
-                            .attr('data-original-text', $menuItem.text())
-                            .addClass(self.options.innerMenuItemClassName);
-
-                        collection.push($menuItem[0]);
+                    if (parentIndex) {
+                        uniqueGroupIndex = (parentGroupIndex ? parentGroupIndex : parentIndex) + ';' + uniqueIndex;
+                        $menuItem.attr('data-related-groups', uniqueGroupIndex);
                     }
+
+                    $menuItem
+                        .attr('data-index', uniqueIndex)
+                        .attr('data-original-text', $menuItem.text())
+                        .addClass(self.options.innerMenuItemClassName);
+
+                    collection.push($menuItem[0]);
 
                     if ($nestedMenuItem) {
                         createFlatStructure(
