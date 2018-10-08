@@ -12,23 +12,21 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $formExtensionSwitcher;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionSwitcherInterface */
+    private $formExtensionSwitcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataTypeGuesser;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataTypeGuesser */
+    private $metadataTypeGuesser;
 
     /** @var RestoreDefaultFormExtension */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         $this->formExtensionSwitcher = $this->createMock(FormExtensionSwitcherInterface::class);
-        $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataTypeGuesser = $this->createMock(MetadataTypeGuesser::class);
 
         $this->processor = new RestoreDefaultFormExtension(
             $this->formExtensionSwitcher,
@@ -38,15 +36,15 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 
     public function testProcessWhenApiFormExtensionIsNotActivated()
     {
-        $this->formExtensionSwitcher->expects($this->never())
+        $this->formExtensionSwitcher->expects(self::never())
             ->method('switchToDefaultFormExtension');
-        $this->metadataTypeGuesser->expects($this->never())
+        $this->metadataTypeGuesser->expects(self::never())
             ->method('setIncludedEntities')
             ->with(null);
-        $this->metadataTypeGuesser->expects($this->never())
+        $this->metadataTypeGuesser->expects(self::never())
             ->method('setMetadataAccessor')
             ->with(null);
-        $this->metadataTypeGuesser->expects($this->never())
+        $this->metadataTypeGuesser->expects(self::never())
             ->method('setConfigAccessor')
             ->with(null);
 
@@ -55,15 +53,15 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 
     public function testProcessWhenApiFormExtensionIsActivated()
     {
-        $this->formExtensionSwitcher->expects($this->once())
+        $this->formExtensionSwitcher->expects(self::once())
             ->method('switchToDefaultFormExtension');
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setIncludedEntities')
             ->with(null);
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setMetadataAccessor')
             ->with(null);
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setConfigAccessor')
             ->with(null);
 
@@ -77,15 +75,15 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         $configAccessor = $this->createMock(ConfigAccessorInterface::class);
 
-        $this->formExtensionSwitcher->expects($this->once())
+        $this->formExtensionSwitcher->expects(self::once())
             ->method('switchToDefaultFormExtension');
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setIncludedEntities')
             ->with($includedEntities);
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setMetadataAccessor')
             ->with(self::identicalTo($metadataAccessor));
-        $this->metadataTypeGuesser->expects($this->once())
+        $this->metadataTypeGuesser->expects(self::once())
             ->method('setConfigAccessor')
             ->with(self::identicalTo($configAccessor));
 

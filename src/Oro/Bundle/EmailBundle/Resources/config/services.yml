@@ -657,6 +657,7 @@ services:
             - '@validator'
         calls:
             - [setLogger, ['@logger']]
+            - [setPreferredLanguageProvider, ['@oro_locale.provider.chain_preferred_language_provider']]
         tags:
             - { name: oro_action.action, alias: send_email_template }
 
@@ -675,6 +676,7 @@ services:
             - '@doctrine'
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email_grid_mailbox_name_helper'
+            - '@oro_email.email.address.manager'
 
     oro_email.email_grid_mailbox_name_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper
@@ -988,6 +990,12 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
+    oro_email.internal_email.flag_manager_loader:
+        public: false
+        class: Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader
+        tags:
+            - { name: oro_email.email_flag_manager_loader }
+
     oro_email.manager.notification:
         class: '%oro_email.manager.notification.class%'
         arguments:
@@ -1277,3 +1285,35 @@ services:
             - '@gos_web_socket.websocket.client_manipulator'
         tags:
             - { name: gos_web_socket.topic }
+
+    oro_email.acl.voter.email_template_voter:
+        class: Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setClassName, ['%oro_email.emailtemplate.entity.class%']]
+        tags:
+            - { name: security.voter }
+
+    oro_email.manager.template_email:
+        class: Oro\Bundle\EmailBundle\Manager\TemplateEmailManager
+        arguments:
+            - '@oro_email.direct_mailer'
+            - '@oro_locale.provider.chain_preferred_language_provider'
+            - '@oro_email.mailer.processor'
+            - '@oro_email.provider.email_template_content_provider'
+
+    oro_email.async.template_email_message_sender:
+        class: 'Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender'
+        public: false
+        arguments:
+            - '@oro_email.manager.template_email'
+            - '@oro_entity.doctrine_helper'
+
+    oro_email.provider.email_template_content_provider:
+        class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.email_renderer'

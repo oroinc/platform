@@ -4,7 +4,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\DataStorage;
 
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 
-class InvalidateCacheDataStorageTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheDataStorageTest extends \PHPUnit\Framework\TestCase
 {
     public function testCompiles()
     {

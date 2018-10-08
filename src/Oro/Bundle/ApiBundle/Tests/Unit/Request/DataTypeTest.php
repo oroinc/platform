@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class DataTypeTest extends \PHPUnit_Framework_TestCase
+class DataTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider nestedObjectProvider
@@ -21,7 +21,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             ['object', false],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -39,7 +39,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             ['nestedAssociation', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -60,7 +60,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             ['nestedObject', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -79,7 +79,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             ['association:manyToOne:kind', true],
             ['string', false],
             [null, false],
-            ['', false],
+            ['', false]
         ];
     }
 
@@ -97,7 +97,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['association:manyToOne', 'manyToOne', null],
-            ['association:manyToOne:kind', 'manyToOne', 'kind'],
+            ['association:manyToOne:kind', 'manyToOne', 'kind']
         ];
     }
 
@@ -119,7 +119,7 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
             ['association::'],
             ['association:manyToOne:'],
             [null],
-            [''],
+            ['']
         ];
     }
 }

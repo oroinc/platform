@@ -8,12 +8,12 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
 
-class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
+class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /** @var CustomizeLoadedDataContext */

@@ -8,15 +8,15 @@ use Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class MailboxOriginValidatorTest extends \PHPUnit_Framework_TestCase
+class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MailboxOrigin */
     protected $constraint;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var MailboxOriginValidator */

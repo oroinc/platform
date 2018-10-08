@@ -6,7 +6,7 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 
-class EntityCreateOrSelectTransformerTest extends \PHPUnit_Framework_TestCase
+class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'TestClass';
     const DEFAULT_MODE = 'default';
@@ -17,7 +17,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit_Framework_TestCase
     protected $transformer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 

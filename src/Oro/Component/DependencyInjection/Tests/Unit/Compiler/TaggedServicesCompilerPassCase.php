@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCase
+abstract class TaggedServicesCompilerPassCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param CompilerPassInterface $compilerPass
@@ -32,7 +32,7 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
      */
     private function assetProcessSkipWithoutServiceDefinition(CompilerPassInterface $compilerPass, $serviceId)
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->assertHasDefinitionCall($containerBuilder, $serviceId, false);
 
@@ -46,7 +46,7 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
      */
     private function assertProcessSkipWithoutTaggedServices(CompilerPassInterface $compilerPass, $serviceId, $tagName)
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->assertHasDefinitionCall($containerBuilder, $serviceId, true);
         $this->assertFindTaggedServiceIds($containerBuilder, $tagName, null);
@@ -66,7 +66,7 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
      */
     private function assertProcess(CompilerPassInterface $compilerPass, $serviceId, $tagName, $addMethodName)
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->createMock(ContainerBuilder::class);
 
         $this->assertHasDefinitionCall($containerBuilder, $serviceId, true);
@@ -100,12 +100,12 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param \PHPUnit\Framework\MockObject\MockObject $containerBuilder
      * @param string|array $serviceId
      * @param bool $result
      */
     private function assertHasDefinitionCall(
-        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        \PHPUnit\Framework\MockObject\MockObject $containerBuilder,
         $serviceId,
         $result
     ) {
@@ -118,12 +118,12 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param \PHPUnit\Framework\MockObject\MockObject $containerBuilder
      * @param string|array $tagName
      * @param mixed $result
      */
     private function assertFindTaggedServiceIds(
-        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        \PHPUnit\Framework\MockObject\MockObject $containerBuilder,
         $tagName,
         $result
     ) {
@@ -136,13 +136,13 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $containerBuilder
+     * @param \PHPUnit\Framework\MockObject\MockObject $containerBuilder
      * @param string|array $serviceId
      * @param array $taggedServices
      * @param $addMethodName
      */
     private function assertServicesRegistrationByTag(
-        \PHPUnit_Framework_MockObject_MockObject $containerBuilder,
+        \PHPUnit\Framework\MockObject\MockObject $containerBuilder,
         $serviceId,
         array $taggedServices,
         $addMethodName

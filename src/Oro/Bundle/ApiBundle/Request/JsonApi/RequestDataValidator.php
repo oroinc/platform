@@ -16,7 +16,7 @@ class RequestDataValidator extends AbstractRequestDataValidator
      * Validates that the given request data contains a resource object in the "data" section.
      * Also validates that the request data contains an array of resource objects in the "included" section
      * if $allowIncludedResources is TRUE and this section exists.
-     * If $allowIncludedResources is FALSE validats that the request data and does not contain "included" section.
+     * If $allowIncludedResources is FALSE validates that the request data and does not contain "included" section.
      *
      * @param array $requestData
      * @param bool  $allowIncludedResources
@@ -52,7 +52,7 @@ class RequestDataValidator extends AbstractRequestDataValidator
      * Validates that the given request data contains an array of resource objects in the "data" section.
      * Also validates that the request data contains an array of resource objects in the "included" section
      * if $allowIncludedResources is TRUE and this section exists.
-     * If $allowIncludedResources is FALSE validats that the request data and does not contain "included" section.
+     * If $allowIncludedResources is FALSE validates that the request data and does not contain "included" section.
      *
      * @param array $requestData
      * @param bool  $allowIncludedResources

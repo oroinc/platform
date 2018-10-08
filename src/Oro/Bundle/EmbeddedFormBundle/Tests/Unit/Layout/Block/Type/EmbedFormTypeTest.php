@@ -14,7 +14,7 @@ class EmbedFormTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        /** @var BlockBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getId')

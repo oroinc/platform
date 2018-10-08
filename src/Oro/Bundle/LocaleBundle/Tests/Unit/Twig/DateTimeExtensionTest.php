@@ -6,14 +6,14 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
+class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var DateTimeExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
     protected function setUp()

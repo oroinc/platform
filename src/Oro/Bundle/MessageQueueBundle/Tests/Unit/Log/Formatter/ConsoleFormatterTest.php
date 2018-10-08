@@ -5,195 +5,104 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Log\Formatter;
 use Oro\Bundle\MessageQueueBundle\Log\Formatter\ConsoleFormatter;
 use Oro\Component\MessageQueue\Client\Config;
 
-class ConsoleFormatterTest extends \PHPUnit_Framework_TestCase
+class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDefaultDataMap()
+    /**
+     * @dataProvider recordsProvider
+     *
+     * @param array $record
+     * @param string $expectedResult
+     */
+    public function testFormat(array $record, $expectedResult)
     {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => [
-                'processor'          => 'TestProcessor',
-                'message_body'       => 'message body',
-                'message_properties' => [
-                    Config::PARAMETER_TOPIC_NAME => 'test topic'
-                ]
-            ]
-        ];
         $formatter = new ConsoleFormatter();
 
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message '
-            . '["processor" => "TestProcessor","topic" => "test topic","message" => "message body"] '
-            . "\n",
-            $formatter->format($record)
-        );
+        self::assertEquals($expectedResult, $formatter->format($record));
     }
 
-    public function testEmptyDataMap()
+    /**
+     * @return array
+     */
+    public function recordsProvider()
     {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => [
-                'processor'    => 'TestProcessor',
-                'message_body' => 'message body'
-            ]
-        ];
-        $formatter = new ConsoleFormatter([
-            'data_map' => [],
-        ]);
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message  ' . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testCustomDataMap()
-    {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => [
-                'processor' => 'TestProcessor',
-                'message'   => [
-                    'body' => 'message body'
-                ]
-            ]
-        ];
-        $formatter = new ConsoleFormatter([
-            'data_map' => ['message' => ['extra', 'message', 'body']],
-        ]);
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message ["message" => "message body"] ' . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testDataValuesNotExist()
-    {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => []
-        ];
-        $formatter = new ConsoleFormatter();
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message  ' . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testDataValueWhenContainerIsNotArray()
-    {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => [
-                'message' => 'test message'
-            ]
-        ];
-        $formatter = new ConsoleFormatter([
-            'data_map' => ['message' => ['extra', 'message', 'body']]
-        ]);
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message  ' . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testWithContext()
-    {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [
-                'key' => 'value'
+        return [
+            'with context and extra' => [
+                'record' => [
+                    'datetime'   => new \DateTime('2018-07-06 09:16:02'),
+                    'channel'    => 'app',
+                    'level_name' => 'NOTICE',
+                    'message'    => 'Message processed: {status}',
+                    'level'      => 100,
+                    'context'    => [
+                        'status' => 'ACK'
+                    ],
+                    'extra'      => [
+                        'processor'          => 'TestProcessor',
+                        'message_body'       => 'message body',
+                        'message_properties' => [
+                            Config::PARAMETER_TOPIC_NAME => 'test topic'
+                        ],
+                        'message_id' => 1,
+                        'elapsed_time' => '1 ms',
+                        'time_taken'   => 1,
+                        'memory_usage' => '1 MB',
+                        'memory_taken' => '1 MB',
+                        'peak_memory'  => '1 MB'
+                    ]
+                ],
+                'expectedResult' => '2018-07-06 09:16:02 <fg=white>app.NOTICE</>: Message processed: <comment>ACK</> '
+                    . '["status" => "ACK"] ["processor" => "TestProcessor","message_body" => "message body",'
+                    . '"message_properties" => ["oro.message_queue.client.topic_name" => "test topic"],'
+                    . '"message_id" => 1,"elapsed_time" => "1 ms","time_taken" => 1,'
+                    . '"memory_usage" => "1 MB","memory_taken" => "1 MB","peak_memory" => "1 MB"]'
+                    . "\n"
             ],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => [
-                'processor'    => 'TestProcessor',
-                'message_body' => 'message body'
-            ]
-        ];
-        $formatter = new ConsoleFormatter();
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message ["processor" => "TestProcessor","message" => "message body"] '
-            . '["key" => "value"]'
-            . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testPrettyFormatting()
-    {
-        $record = [
-            'message'    => 'test message',
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [
-                'key'         => 'value',
-                'jsonString1' => '{"class":"Test\Class","encodedjsonString":"{\"Test\\\\Class\"}"}',
-                'jsonString2' => '{"class":"Test\Another\Class"}'
+            'without context and with extra' => [
+                'record' => [
+                    'datetime'   => new \DateTime('2018-07-06 09:16:03'),
+                    'channel'    => 'app',
+                    'level_name' => 'INFO',
+                    'message'    => 'Start consuming',
+                    'level'      => 100,
+                    'context'    => [],
+                    'extra'      => [
+                        'memory_usage' => '1 MB',
+                    ]
+                ],
+                'expectedResult' => '2018-07-06 09:16:03 <fg=white>app.INFO</>: Start consuming '
+                    . '[] ["memory_usage" => "1 MB"]'
+                    . "\n"
             ],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => []
+            'with context and without extra' => [
+                'record' => [
+                    'datetime'   => new \DateTime('2018-07-06 09:16:04'),
+                    'channel'    => 'app',
+                    'level_name' => 'NOTICE',
+                    'message'    => 'Message processed: {status}',
+                    'level'      => 100,
+                    'context'    => [
+                        'status' => 'ACK'
+                    ],
+                    'extra'      => []
+                ],
+                'expectedResult' => '2018-07-06 09:16:04 <fg=white>app.NOTICE</>: Message processed: <comment>ACK</> '
+                    . '["status" => "ACK"] []'
+                    . "\n"
+            ],
+            'without context and without extra' => [
+                'record' => [
+                    'datetime'   => new \DateTime('2018-07-06 09:16:05'),
+                    'channel'    => 'app',
+                    'level_name' => 'INFO',
+                    'message'    => 'Idle',
+                    'level'      => 100,
+                    'context'    => [],
+                    'extra'      => []
+                ],
+                'expectedResult' => '2018-07-06 09:16:05 <fg=white>app.INFO</>: Idle '
+                    . '[] []'
+                    . "\n"
+            ],
         ];
-        $formatter = new ConsoleFormatter();
-
-        self::assertEquals(
-            '<fg=white>DEBUG    :</> test message  ['
-            . '"key" => "value","jsonString1" => "{"class":"Test\Class","encodedjsonString":"{\"Test\\\\Class\"}"}",'
-            . '"jsonString2" => "{"class":"Test\Another\Class"}"]'
-            . "\n",
-            $formatter->format($record)
-        );
-    }
-
-    public function testLineBreaks()
-    {
-        $record = [
-            'message'    => "test\nmessage",
-            'level'      => 100,
-            'level_name' => 'DEBUG',
-            'context'    => [],
-            'datetime'   => new \DateTime(),
-            'channel'    => 'app',
-            'extra'      => []
-        ];
-        $formatter = new ConsoleFormatter();
-
-        self::assertEquals(
-            "<fg=white>DEBUG    :</> test\nmessage  \n",
-            $formatter->format($record)
-        );
     }
 }

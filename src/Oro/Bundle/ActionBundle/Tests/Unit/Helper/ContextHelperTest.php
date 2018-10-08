@@ -9,15 +9,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ContextHelperTest extends \PHPUnit_Framework_TestCase
+class ContextHelperTest extends \PHPUnit\Framework\TestCase
 {
     const ROUTE = 'test_route';
     const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestStack */
     protected $requestStack;
 
     /** @var ContextHelper */
@@ -121,7 +121,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetActionParameters(array $context, array $expected)
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Request $request */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Request $request */
         $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();

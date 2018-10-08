@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\DateTimeToRfc3339Transformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToRfc3339Transformer as BaseTransformer;
 
-class DateTimeToRfc3339TransformerTest extends \PHPUnit_Framework_TestCase
+class DateTimeToRfc3339TransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|BaseTransformer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BaseTransformer */
     private $innerTransformer;
 
     /** @var DateTimeToRfc3339Transformer */

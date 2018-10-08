@@ -15,21 +15,21 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterf
 use Symfony\Component\Security\Acl\Permission\PermissionMapInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AclVoterTest extends \PHPUnit_Framework_TestCase
+class AclVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionMapInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionMapInterface */
     private $permissionMap;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclExtensionSelector */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionSelector */
     private $extensionSelector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
     private $groupProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TokenInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenInterface */
     private $securityToken;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PermissionMapInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|PermissionMapInterface */
     private $extension;
 
     /** @var AclVoter */

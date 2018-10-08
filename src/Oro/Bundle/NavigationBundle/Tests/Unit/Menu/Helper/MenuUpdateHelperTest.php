@@ -12,14 +12,14 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationHelper;
 
     /** @var MenuUpdateHelper */

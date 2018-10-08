@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\Job;
 
-class DependentJobContextTest extends \PHPUnit_Framework_TestCase
+class DependentJobContextTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {

@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\NullLogger;
 
-class ContextTest extends \PHPUnit_Framework_TestCase
+class ContextTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
@@ -220,7 +220,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     protected function createSession()
     {
@@ -228,7 +228,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageConsumerInterface
      */
     protected function createMessageConsumer()
     {
@@ -236,7 +236,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProcessorInterface
      */
     protected function createMessageProcessor()
     {

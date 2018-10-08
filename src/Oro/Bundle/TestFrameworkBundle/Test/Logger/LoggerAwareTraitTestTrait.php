@@ -13,12 +13,12 @@ use Psr\Log\LoggerInterface;
 trait LoggerAwareTraitTestTrait
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     protected $loggerMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LoggerAwareInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerAwareInterface
      */
     protected $loggerAwareObject;
 

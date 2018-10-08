@@ -15,15 +15,15 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
+class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailEntityBuilder */
     private $builder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $batch;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     protected function setUp()

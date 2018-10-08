@@ -17,7 +17,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class LoadNormalizedEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionProcessorBagInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
 
     /** @var LoadNormalizedEntity */
@@ -32,23 +32,23 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $this->processor = new LoadNormalizedEntity($this->processorBag);
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizadResult()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult()
     {
         $metadata = new EntityMetadata();
-        $normalizadResult = ['key' => 'value'];
+        $normalizedResult = ['key' => 'value'];
 
         $this->processorBag->expects(self::never())
             ->method('getProcessor');
 
         $this->context->setMetadata($metadata);
-        $this->context->setResult($normalizadResult);
+        $this->context->setResult($normalizedResult);
         $this->processor->process($this->context);
 
-        self::assertEquals($normalizadResult, $this->context->getResult());
+        self::assertEquals($normalizedResult, $this->context->getResult());
         self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
-    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizadResult()
+    public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult()
     {
         $metadata = new EntityMetadata();
 

@@ -8,13 +8,13 @@ use Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\LayoutContext;
 
-class LastModifiedDateContextConfiguratorTest extends \PHPUnit_Framework_TestCase
+class LastModifiedDateContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionContextConfigurator */
     protected $contextConfigurator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Cache
+     * @var \PHPUnit\Framework\MockObject\MockObject|Cache
      */
     protected $cache;
 

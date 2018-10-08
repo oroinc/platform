@@ -6,7 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class OrganizationTest extends \PHPUnit_Framework_TestCase
+class OrganizationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Organization */
     protected $organization;

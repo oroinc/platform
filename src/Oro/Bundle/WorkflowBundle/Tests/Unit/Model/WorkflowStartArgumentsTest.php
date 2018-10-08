@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
-class WorkflowStartArgumentsTest extends \PHPUnit_Framework_TestCase
+class WorkflowStartArgumentsTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorSetsProperValues()
     {

@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class StartWorkflowTest extends \PHPUnit_Framework_TestCase
+class StartWorkflowTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var StartWorkflow
@@ -16,7 +16,7 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|
+     * @var \PHPUnit\Framework\MockObject\MockObject|
      */
     protected $workflowManager;
 

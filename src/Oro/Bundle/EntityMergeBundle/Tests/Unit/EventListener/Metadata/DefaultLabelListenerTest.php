@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\DefaultLabelListener;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 
-class DefaultLabelListenerTest extends \PHPUnit_Framework_TestCase
+class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Namespace\\Entity';
 
@@ -15,7 +15,7 @@ class DefaultLabelListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityConfigHelper;
 

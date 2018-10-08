@@ -30,15 +30,15 @@ class RequestHandler
      */
     public function handleItem(Request $request): Response
     {
-        $method = $request->getMethod();
-        if ('GET' === $method) {
-            return $this->actionHandler->handleGet($request);
-        }
-        if ('PATCH' === $method) {
-            return $this->actionHandler->handleUpdate($request);
-        }
-        if ('DELETE' === $method) {
-            return $this->actionHandler->handleDelete($request);
+        switch ($request->getMethod()) {
+            case Request::METHOD_GET:
+                return $this->actionHandler->handleGet($request);
+            case Request::METHOD_PATCH:
+                return $this->actionHandler->handleUpdate($request);
+            case Request::METHOD_DELETE:
+                return $this->actionHandler->handleDelete($request);
+            case Request::METHOD_OPTIONS:
+                return $this->actionHandler->handleOptionsItem($request);
         }
 
         return $this->actionHandler->handleNotAllowedItem($request);
@@ -53,15 +53,15 @@ class RequestHandler
      */
     public function handleList(Request $request): Response
     {
-        $method = $request->getMethod();
-        if ('GET' === $method) {
-            return $this->actionHandler->handleGetList($request);
-        }
-        if ('POST' === $method) {
-            return $this->actionHandler->handleCreate($request);
-        }
-        if ('DELETE' === $method) {
-            return $this->actionHandler->handleDeleteList($request);
+        switch ($request->getMethod()) {
+            case Request::METHOD_GET:
+                return $this->actionHandler->handleGetList($request);
+            case Request::METHOD_POST:
+                return $this->actionHandler->handleCreate($request);
+            case Request::METHOD_DELETE:
+                return $this->actionHandler->handleDeleteList($request);
+            case Request::METHOD_OPTIONS:
+                return $this->actionHandler->handleOptionsList($request);
         }
 
         return $this->actionHandler->handleNotAllowedList($request);
@@ -76,18 +76,17 @@ class RequestHandler
      */
     public function handleSubresource(Request $request): Response
     {
-        $method = $request->getMethod();
-        if ('GET' === $method) {
-            return $this->actionHandler->handleGetSubresource($request);
-        }
-        if ('PATCH' === $method) {
-            return $this->actionHandler->handleUpdateSubresource($request);
-        }
-        if ('POST' === $method) {
-            return $this->actionHandler->handleAddSubresource($request);
-        }
-        if ('DELETE' === $method) {
-            return $this->actionHandler->handleDeleteSubresource($request);
+        switch ($request->getMethod()) {
+            case Request::METHOD_GET:
+                return $this->actionHandler->handleGetSubresource($request);
+            case Request::METHOD_PATCH:
+                return $this->actionHandler->handleUpdateSubresource($request);
+            case Request::METHOD_POST:
+                return $this->actionHandler->handleAddSubresource($request);
+            case Request::METHOD_DELETE:
+                return $this->actionHandler->handleDeleteSubresource($request);
+            case Request::METHOD_OPTIONS:
+                return $this->actionHandler->handleOptionsSubresource($request);
         }
 
         return $this->actionHandler->handleNotAllowedSubresource($request);
@@ -102,18 +101,17 @@ class RequestHandler
      */
     public function handleRelationship(Request $request): Response
     {
-        $method = $request->getMethod();
-        if ('GET' === $method) {
-            return $this->actionHandler->handleGetRelationship($request);
-        }
-        if ('PATCH' === $method) {
-            return $this->actionHandler->handleUpdateRelationship($request);
-        }
-        if ('POST' === $method) {
-            return $this->actionHandler->handleAddRelationship($request);
-        }
-        if ('DELETE' === $method) {
-            return $this->actionHandler->handleDeleteRelationship($request);
+        switch ($request->getMethod()) {
+            case Request::METHOD_GET:
+                return $this->actionHandler->handleGetRelationship($request);
+            case Request::METHOD_PATCH:
+                return $this->actionHandler->handleUpdateRelationship($request);
+            case Request::METHOD_POST:
+                return $this->actionHandler->handleAddRelationship($request);
+            case Request::METHOD_DELETE:
+                return $this->actionHandler->handleDeleteRelationship($request);
+            case Request::METHOD_OPTIONS:
+                return $this->actionHandler->handleOptionsRelationship($request);
         }
 
         return $this->actionHandler->handleNotAllowedRelationship($request);
@@ -128,18 +126,17 @@ class RequestHandler
      */
     public function handleItemWithoutId(Request $request): Response
     {
-        $method = $request->getMethod();
-        if ('GET' === $method) {
-            return $this->actionHandler->handleGet($request);
-        }
-        if ('POST' === $method) {
-            return $this->actionHandler->handleCreate($request);
-        }
-        if ('PATCH' === $method) {
-            return $this->actionHandler->handleUpdate($request);
-        }
-        if ('DELETE' === $method) {
-            return $this->actionHandler->handleDelete($request);
+        switch ($request->getMethod()) {
+            case Request::METHOD_GET:
+                return $this->actionHandler->handleGet($request);
+            case Request::METHOD_POST:
+                return $this->actionHandler->handleCreate($request);
+            case Request::METHOD_PATCH:
+                return $this->actionHandler->handleUpdate($request);
+            case Request::METHOD_DELETE:
+                return $this->actionHandler->handleDelete($request);
+            case Request::METHOD_OPTIONS:
+                return $this->actionHandler->handleOptionsItem($request);
         }
 
         return $this->actionHandler->handleNotAllowedItem($request);

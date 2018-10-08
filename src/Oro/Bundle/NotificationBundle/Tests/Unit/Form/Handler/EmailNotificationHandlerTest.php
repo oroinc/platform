@@ -9,14 +9,14 @@ use Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
+class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface |\PHPUnit_Framework_MockObject_MockObject*/
+    /** @var FormInterface |\PHPUnit\Framework\MockObject\MockObject*/
     protected $form;
 
-    /** @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     /** @var Request */
@@ -34,7 +34,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager = $this->createMock(ObjectManager::class);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())->method('getManagerForClass')->willReturn($this->manager);
 

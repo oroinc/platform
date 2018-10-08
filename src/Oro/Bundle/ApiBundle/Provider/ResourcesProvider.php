@@ -21,6 +21,9 @@ class ResourcesProvider
     /** @var ResourcesWithoutIdentifierLoader */
     private $resourcesWithoutIdentifierLoader;
 
+    /** @var array [request cache key => [ApiResource, ...], ...] */
+    private $resources = [];
+
     /** @var array [request cache key => [entity class => accessible flag, ...], ...] */
     private $accessibleResources = [];
 
@@ -55,25 +58,52 @@ class ResourcesProvider
      */
     public function getResources($version, RequestType $requestType): array
     {
-        $resources = $this->resourcesCache->getResources($version, $requestType);
-        if (null !== $resources) {
-            return $resources;
+        $cacheIndex = $this->getCacheKeyIndex($version, $requestType);
+        if (array_key_exists($cacheIndex, $this->resources)) {
+            $resources = $this->resources[$cacheIndex];
+        } else {
+            $resources = $this->resourcesCache->getResources($version, $requestType);
+            if (null === $resources) {
+                // load data
+                /** @var CollectResourcesContext $context */
+                $context = $this->processor->createContext();
+                $context->setVersion($version);
+                $context->getRequestType()->set($requestType);
+                $this->processor->process($context);
+
+                // prepare loaded data
+                /** @var ApiResource[] $resources */
+                $resources = array_values($context->getResult()->toArray());
+                $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
+                $excludedActions = [];
+                foreach ($resources as $resource) {
+                    $entityClass = $resource->getEntityClass();
+                    if (!isset($accessibleResources[$entityClass])) {
+                        $accessibleResources[$entityClass] = false;
+                    }
+                    $resourceExcludedActions = $resource->getExcludedActions();
+                    if (!empty($resourceExcludedActions)) {
+                        $excludedActions[$entityClass] = $resourceExcludedActions;
+                    }
+                }
+
+                // add data to memory cache
+                $this->resources[$cacheIndex] = $resources;
+                $this->accessibleResources[$cacheIndex] = $accessibleResources;
+                $this->excludedActions[$cacheIndex] = $excludedActions;
+
+                // save data to the cache
+                $this->resourcesCache->saveResources(
+                    $version,
+                    $requestType,
+                    $resources,
+                    $accessibleResources,
+                    $excludedActions
+                );
+            } else {
+                $this->resources[$cacheIndex] = $resources;
+            }
         }
-
-        /** @var CollectResourcesContext $context */
-        $context = $this->processor->createContext();
-        $context->setVersion($version);
-        $context->getRequestType()->set($requestType);
-
-        $this->processor->process($context);
-
-        $resources = array_values($context->getResult()->toArray());
-        $this->resourcesCache->saveResources(
-            $version,
-            $requestType,
-            $resources,
-            $context->getAccessibleResources()
-        );
 
         return $resources;
     }
@@ -191,6 +221,7 @@ class ResourcesProvider
      */
     public function clearCache(): void
     {
+        $this->resources = [];
         $this->accessibleResources = [];
         $this->excludedActions = [];
         $this->resourcesWithoutIdentifier = [];

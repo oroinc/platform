@@ -11,29 +11,29 @@ use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Twig\OperationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class OperationExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     const ROUTE = 'test_route';
     const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RouteProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RouteProviderInterface */
     protected $routeProvider;
 
     /** @var OperationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsHelper */
     protected $optionsHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonProvider */
     protected $buttonProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ButtonSearchContextProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ButtonSearchContextProvider */
     protected $buttonSearchContextProvider;
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -34,7 +35,6 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\ConstraintTextExtractorCompilerPass());
         $container->addCompilerPass(new Compiler\QueryExpressionCompilerPass());
         $container->addCompilerPass(new Compiler\ApiDocLogoutCompilerPass());
-        $container->addCompilerPass(new Compiler\RestDocUrlGeneratorCompilerPass());
         $container->addCompilerPass(new Compiler\SecurityFirewallCompilerPass());
         $container->addCompilerPass(new Compiler\DocumentBuilderCompilerPass());
         $container->addCompilerPass(new Compiler\ErrorCompleterCompilerPass());
@@ -47,7 +47,10 @@ class OroApiBundle extends Bundle
             new LoadApplicableCheckersCompilerPass('oro_api.processor_bag', 'oro.api.processor.applicable_checker')
         );
         $container->addCompilerPass(
-            new CleanUpProcessorsCompilerPass('oro_api.simple_processor_factory', 'oro.api.processor'),
+            new CleanUpProcessorsCompilerPass(
+                'oro_api.simple_processor_factory',
+                DependencyInjectionUtil::PROCESSOR_TAG
+            ),
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $container->addCompilerPass(

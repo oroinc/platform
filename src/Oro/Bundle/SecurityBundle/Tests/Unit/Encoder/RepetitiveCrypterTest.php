@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Encoder;
 
 use Oro\Bundle\SecurityBundle\Encoder\RepetitiveCrypter;
 
-class RepetitiveCrypterTest extends \PHPUnit_Framework_TestCase
+class RepetitiveCrypterTest extends \PHPUnit\Framework\TestCase
 {
     public function testCryptData()
     {

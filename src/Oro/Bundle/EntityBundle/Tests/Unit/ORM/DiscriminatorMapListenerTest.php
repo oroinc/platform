@@ -7,7 +7,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener;
 
-class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
+class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DiscriminatorMapListener */
     protected $listener;
@@ -19,7 +19,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyClasses()
     {
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $metadata = new ClassMetadata('\stdClass');
@@ -32,7 +32,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testNotSingleTable()
     {
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $metadata = new ClassMetadata('\stdClass');
@@ -46,7 +46,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleTableNotRoot()
     {
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $metadata = new ClassMetadata('\stdClass');
@@ -62,7 +62,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSingleTableRoot()
     {
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $metadata = new ClassMetadata('\stdClass');
@@ -77,7 +77,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testMapOverride()
     {
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $metadata = new ClassMetadata('\stdClass');

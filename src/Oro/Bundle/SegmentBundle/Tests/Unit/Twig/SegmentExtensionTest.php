@@ -6,7 +6,7 @@ use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Twig\SegmentExtension;
 
-class SegmentExtensionTest extends \PHPUnit_Framework_TestCase
+class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
 {
     protected $dispatcher;
 

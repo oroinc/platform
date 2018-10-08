@@ -11,19 +11,19 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
-    /** \PHPUnit_Framework_MockObject_MockObject */
+    /** \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject */
+    /* @var \PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
-    /* @var \PHPUnit_Framework_MockObject_MockObject */
+    /* @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityTitleResolver;
 
     protected function setUp()

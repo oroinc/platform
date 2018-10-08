@@ -11,12 +11,12 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
-class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConsoleCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConsoleCommandSubscriber */
     protected $subscriber;
 
-    /** @var Logger|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Logger|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
     /**
@@ -42,7 +42,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnConsoleCommandNotRun()
     {
-        /** @var ConsoleCommandEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConsoleCommandEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(ConsoleCommandEvent::class);
         $event->expects($this->once())
             ->method('commandShouldRun')
@@ -68,7 +68,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $input = new InputStub('test:command', $arguments, $options);
 
-        /** @var ConsoleCommandEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var ConsoleCommandEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(ConsoleCommandEvent::class);
         $event->expects($this->once())
             ->method('commandShouldRun')

@@ -5,38 +5,38 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
+class NormalizeValueContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NormalizeValueContext */
-    protected $context;
+    private $context;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->context = new NormalizeValueContext();
     }
 
     public function testRequestType()
     {
-        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
+        self::assertEquals(new RequestType([]), $this->context->getRequestType());
 
         $this->context->getRequestType()->add('test');
-        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
-        $this->assertEquals(
+        self::assertEquals(new RequestType(['test']), $this->context->getRequestType());
+        self::assertEquals(
             new RequestType(['test']),
             $this->context->get(NormalizeValueContext::REQUEST_TYPE)
         );
 
         $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        self::assertEquals(
             new RequestType(['test', 'another']),
             $this->context->get(NormalizeValueContext::REQUEST_TYPE)
         );
 
         // test that already existing type is not added twice
         $this->context->getRequestType()->add('another');
-        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
-        $this->assertEquals(
+        self::assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        self::assertEquals(
             new RequestType(['test', 'another']),
             $this->context->get(NormalizeValueContext::REQUEST_TYPE)
         );
@@ -44,65 +44,65 @@ class NormalizeValueContextTest extends \PHPUnit_Framework_TestCase
 
     public function testVersion()
     {
-        $this->assertNull($this->context->getVersion());
+        self::assertNull($this->context->getVersion());
 
         $this->context->setVersion('test');
-        $this->assertEquals('test', $this->context->getVersion());
-        $this->assertEquals('test', $this->context->get(NormalizeValueContext::VERSION));
+        self::assertEquals('test', $this->context->getVersion());
+        self::assertEquals('test', $this->context->get(NormalizeValueContext::VERSION));
     }
 
     public function testProcessed()
     {
-        $this->assertFalse($this->context->isProcessed());
+        self::assertFalse($this->context->isProcessed());
         $this->context->setProcessed(true);
-        $this->assertTrue($this->context->isProcessed());
+        self::assertTrue($this->context->isProcessed());
     }
 
     public function testArrayDelimiter()
     {
-        $this->assertEquals(',', $this->context->getArrayDelimiter());
+        self::assertEquals(',', $this->context->getArrayDelimiter());
         $this->context->setArrayDelimiter('-');
-        $this->assertEquals('-', $this->context->getArrayDelimiter());
+        self::assertEquals('-', $this->context->getArrayDelimiter());
     }
 
     public function testRangeDelimiter()
     {
-        $this->assertEquals('..', $this->context->getRangeDelimiter());
+        self::assertEquals('..', $this->context->getRangeDelimiter());
         $this->context->setRangeDelimiter('|');
-        $this->assertEquals('|', $this->context->getRangeDelimiter());
+        self::assertEquals('|', $this->context->getRangeDelimiter());
     }
 
     public function testDataType()
     {
-        $this->assertFalse($this->context->has('dataType'));
+        self::assertFalse($this->context->has('dataType'));
         $this->context->setDataType('string');
-        $this->assertEquals('string', $this->context->getDataType());
-        $this->assertEquals('string', $this->context->get('dataType'));
+        self::assertEquals('string', $this->context->getDataType());
+        self::assertEquals('string', $this->context->get('dataType'));
     }
 
     public function testRequirement()
     {
-        $this->assertFalse($this->context->has('requirement'));
+        self::assertFalse($this->context->has('requirement'));
         $this->context->setRequirement('.+');
-        $this->assertEquals('.+', $this->context->getRequirement());
-        $this->assertEquals('.+', $this->context->get('requirement'));
+        self::assertEquals('.+', $this->context->getRequirement());
+        self::assertEquals('.+', $this->context->get('requirement'));
         $this->context->removeRequirement();
-        $this->assertFalse($this->context->has('requirement'));
+        self::assertFalse($this->context->has('requirement'));
     }
 
     public function testArrayAllowed()
     {
-        $this->assertFalse($this->context->has('arrayAllowed'));
+        self::assertFalse($this->context->has('arrayAllowed'));
         $this->context->setArrayAllowed(true);
-        $this->assertTrue($this->context->isArrayAllowed());
-        $this->assertTrue($this->context->get('arrayAllowed'));
+        self::assertTrue($this->context->isArrayAllowed());
+        self::assertTrue($this->context->get('arrayAllowed'));
     }
 
     public function testRangeAllowed()
     {
-        $this->assertFalse($this->context->has('rangeAllowed'));
+        self::assertFalse($this->context->has('rangeAllowed'));
         $this->context->setRangeAllowed(true);
-        $this->assertTrue($this->context->isRangeAllowed());
-        $this->assertTrue($this->context->get('rangeAllowed'));
+        self::assertTrue($this->context->isRangeAllowed());
+        self::assertTrue($this->context->get('rangeAllowed'));
     }
 }

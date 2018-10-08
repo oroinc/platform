@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\MaxRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
+class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MaxRelatedEntitiesConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -17,12 +17,12 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(MaxRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(MaxRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testGetMaxRelatedEntities()
     {
-        $this->assertEquals(
+        self::assertEquals(
             123,
             $this->extra->getMaxRelatedEntities()
         );
@@ -32,7 +32,7 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
-        $this->assertEquals(
+        self::assertEquals(
             123,
             $context->getMaxRelatedEntities()
         );
@@ -40,12 +40,12 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isPropagable());
+        self::assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(
+        self::assertEquals(
             'max_related_entities:123',
             $this->extra->getCacheKeyPart()
         );

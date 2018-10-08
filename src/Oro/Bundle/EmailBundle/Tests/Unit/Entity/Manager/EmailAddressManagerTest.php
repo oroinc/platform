@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
 
-class EmailAddressManagerTest extends \PHPUnit_Framework_TestCase
+class EmailAddressManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testNewEmailAddress()
     {

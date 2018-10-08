@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ReportBundle\Entity\Report;
 
-class ReportTest extends \PHPUnit_Framework_TestCase
+class ReportTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getSetDataProvider

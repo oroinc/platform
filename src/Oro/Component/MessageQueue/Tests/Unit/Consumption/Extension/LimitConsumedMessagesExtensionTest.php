@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class LimitConsumedMessagesExtensionTest extends \PHPUnit_Framework_TestCase
+class LimitConsumedMessagesExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {

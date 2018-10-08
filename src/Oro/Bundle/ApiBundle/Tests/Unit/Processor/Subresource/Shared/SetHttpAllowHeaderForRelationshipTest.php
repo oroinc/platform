@@ -12,16 +12,16 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 
 class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ResourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|SubresourcesProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
     private $subresourcesProvider;
 
     /** @var SetHttpAllowHeaderForRelationship */
     private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -116,7 +116,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessToOneAssociationWhenAtLeastOneAllowedHttpMethodExists()
@@ -139,7 +139,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessToManyAssociationWhenAtLeastOneAllowedHttpMethodExists()
@@ -158,7 +158,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessToOneAssociationWhenNoAllowedHttpMethods()
@@ -226,7 +226,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET, PATCH', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET, PATCH', $this->context->getResponseHeaders()->get('Allow'));
     }
 
     public function testProcessWhenActionDisabledForParticularAssociation()
@@ -254,6 +254,6 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
+        self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 }

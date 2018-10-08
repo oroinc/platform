@@ -10,7 +10,7 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\UserEmailChangeListener;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class UserEmailChangeListenerTest extends \PHPUnit_Framework_TestCase
+class UserEmailChangeListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserEmailChangeListener */
     protected $listener;
@@ -31,7 +31,7 @@ class UserEmailChangeListenerTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setImapConfiguration($userEmailOrigin);
 
-        /** @var PreUpdateEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
+        /** @var PreUpdateEventArgs|\PHPUnit\Framework\MockObject\MockObject $args */
         $args = $this->createMock(PreUpdateEventArgs::class);
         $args->expects($this->once())
             ->method('hasChangedField')
@@ -54,7 +54,7 @@ class UserEmailChangeListenerTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setImapConfiguration($userEmailOrigin);
 
-        /** @var PreUpdateEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
+        /** @var PreUpdateEventArgs|\PHPUnit\Framework\MockObject\MockObject $args */
         $args = $this->createMock(PreUpdateEventArgs::class);
         $args->expects($this->once())
             ->method('hasChangedField')
@@ -68,7 +68,7 @@ class UserEmailChangeListenerTest extends \PHPUnit_Framework_TestCase
             ->method('computeChangeSet')
             ->with($classMetadata, $userEmailOrigin);
 
-        /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $entityManager */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getClassMetadata')

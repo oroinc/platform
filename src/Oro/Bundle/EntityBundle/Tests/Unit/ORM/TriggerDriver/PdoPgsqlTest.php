@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql;
 
-class PdoPgsqlTest extends \PHPUnit_Framework_TestCase
+class PdoPgsqlTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 
@@ -26,7 +26,7 @@ class PdoPgsqlTest extends \PHPUnit_Framework_TestCase
     private $testEntityClass = 'testEntity';
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connection;
 

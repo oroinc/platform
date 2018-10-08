@@ -8,7 +8,7 @@ Feature: Create report
   Scenario: Success create with filter "is empty" and boolean filter "Yes"
     Given I login as administrator
     And I go to Reports & Segments/ Manage Custom Reports
-    And I press "Create Report"
+    And I click "Create Report"
     And I fill "Report Form" with:
       | Name        | Contacts Report |
       | Entity      | Contact Email   |

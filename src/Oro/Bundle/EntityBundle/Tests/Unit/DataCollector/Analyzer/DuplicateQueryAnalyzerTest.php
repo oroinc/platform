@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DataCollector\Analyzer;
 
 use Oro\Bundle\EntityBundle\DataCollector\Analyzer\DuplicateQueryAnalyzer;
 
-class DuplicateQueryAnalyzerTest extends \PHPUnit_Framework_TestCase
+class DuplicateQueryAnalyzerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DuplicateQueryAnalyzer

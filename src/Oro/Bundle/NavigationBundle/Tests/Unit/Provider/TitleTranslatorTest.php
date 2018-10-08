@@ -4,12 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 
-class TitleTranslatorTest extends \PHPUnit_Framework_TestCase
+class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
     /** @var TitleTranslator */

@@ -2,31 +2,31 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Processor\Update\SaveEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SaveEntityTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var SaveEntity */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new SaveEntity($this->doctrineHelper);
     }
 
     public function testProcessWhenNoEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($this->context);
@@ -34,7 +34,7 @@ class SaveEntityTest extends FormProcessorTestCase
 
     public function testProcessForNotSupportedEntity()
     {
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->context->setResult([]);
@@ -45,9 +45,9 @@ class SaveEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn(null);
 
         $this->context->setResult($entity);
@@ -58,16 +58,14 @@ class SaveEntityTest extends FormProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
-            ->with($this->identicalTo($entity), false)
+            ->with(self::identicalTo($entity), false)
             ->willReturn($em);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush')
             ->with(null);
 

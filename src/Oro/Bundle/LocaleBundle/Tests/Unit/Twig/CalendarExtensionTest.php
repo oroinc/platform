@@ -7,17 +7,17 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\CalendarExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class CalendarExtensionTest extends \PHPUnit_Framework_TestCase
+class CalendarExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var CalendarExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $calendar;
 
     protected function setUp()

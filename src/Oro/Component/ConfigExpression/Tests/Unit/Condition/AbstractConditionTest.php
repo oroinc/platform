@@ -5,9 +5,9 @@ namespace Oro\Component\ConfigExpression\Tests\Unit\Condition;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\ConfigExpression\Condition;
 
-class AbstractConditionTest extends \PHPUnit_Framework_TestCase
+class AbstractConditionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Condition\AbstractCondition|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Condition\AbstractCondition|\PHPUnit\Framework\MockObject\MockObject */
     protected $condition;
 
     protected function setUp()

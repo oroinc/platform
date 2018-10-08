@@ -6,12 +6,12 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
 use Symfony\Component\Form\FormView;
 
-class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateTranslationTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailTemplateTranslationType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp()

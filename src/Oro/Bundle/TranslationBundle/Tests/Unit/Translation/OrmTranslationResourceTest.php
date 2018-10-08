@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
 
-class OrmTranslationResourceTest extends \PHPUnit_Framework_TestCase
+class OrmTranslationResourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var OrmTranslationResource */
     protected $trResource;
@@ -12,7 +12,7 @@ class OrmTranslationResourceTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $locale;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metaCache;
 
     protected function setUp()

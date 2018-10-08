@@ -5,10 +5,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Layout\DataProvider\SystemConfigProvider;
 
-class SystemConfigProviderTest extends \PHPUnit_Framework_TestCase
+class SystemConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configManager;
 

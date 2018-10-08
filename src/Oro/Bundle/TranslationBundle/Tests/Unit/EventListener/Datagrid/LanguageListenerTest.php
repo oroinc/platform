@@ -15,15 +15,15 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener;
 use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 
-class LanguageListenerTest extends \PHPUnit_Framework_TestCase
+class LanguageListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LanguageHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $languageHelper;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
-    /** @var TranslationKeyRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationKeyRepository;
 
     /** @var LanguageListener */

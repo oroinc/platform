@@ -15,17 +15,17 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 class RestrictionsExtensionTest extends FormIntegrationTestCase
 {
     /**
-     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $workflowManager;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var RestrictionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $restrictionsManager;
 
@@ -55,7 +55,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     }
 
     /**
-     * @dataProvider testBuildFormDataProvider
+     * @dataProvider buildFormDataProvider
      *
      * @param array $options
      * @param array $fields
@@ -109,7 +109,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function testBuildFormDataProvider()
+    public function buildFormDataProvider()
     {
         return [
             'enabled extension'          => [

@@ -3,60 +3,68 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
+use Oro\Bundle\LocaleBundle\Provider\PreferredLanguageProviderInterface;
+use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
+class SendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailProcessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityNameResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $renderer;
 
     /**
-     * @var ObjectManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $objectManager;
 
     /**
-     * @var EmailTemplateRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $objectRepository;
 
     /**
-     * @var EmailTemplateInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailTemplateInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $emailTemplate;
 
     /**
-     * @var ValidatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $validator;
 
@@ -66,9 +74,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $logger;
+
+    /**
+     * @var PreferredLanguageProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $languageProvider;
 
     protected function setUp()
     {
@@ -101,7 +114,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->willReturn($this->objectRepository);
 
-        $this->emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
+        $this->emailTemplate = $this->createMock(EmailTemplate::class);
+        $this->languageProvider = $this->createMock(PreferredLanguageProviderInterface::class);
 
         $this->action = new SendEmailTemplate(
             $this->contextAccessor,
@@ -113,6 +127,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             $this->validator
         );
         $this->action->setLogger($this->logger);
+        $this->action->setPreferredLanguageProvider($this->languageProvider);
 
         $this->action->setDispatcher($this->dispatcher);
     }
@@ -149,10 +164,10 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ],
-            'no to' => [
+            'no to or recipients' => [
                 'options' => ['from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass()],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'To parameter is required'
+                'exceptionMessage' => 'Need to specify "to" or "recipients" parameters'
             ],
             'no to email' => [
                 'options' => [
@@ -161,6 +176,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                 ],
                 'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
+            ],
+            'recipients in not an array' => [
+                'options' => [
+                    'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
+                    'recipients' => 'some@recipient.com'
+                ],
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                'exceptionMessage' => 'Recipients parameter must be an array',
             ],
             'no to email in one of addresses' => [
                 'options' => [
@@ -194,6 +217,10 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected, 'options', $this->action);
     }
 
+    /**
+     * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function optionsDataProvider()
     {
         return [
@@ -208,7 +235,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'from' => 'test@test.com',
                     'to' => ['test@test.com'],
                     'template' => 'test',
-                    'entity' => new \stdClass()
+                    'entity' => new \stdClass(),
+                    'recipients' => [],
                 ]
             ],
             'simple with name' => [
@@ -222,7 +250,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'from' => 'Test <test@test.com>',
                     'to' => ['Test <test@test.com>'],
                     'template' => 'test',
-                    'entity' => new \stdClass()
+                    'entity' => new \stdClass(),
+                    'recipients' => [],
                 ]
             ],
             'extended' => [
@@ -250,7 +279,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                     'template' => 'test',
-                    'entity' => new \stdClass()
+                    'entity' => new \stdClass(),
+                    'recipients' => [],
                 ]
             ],
             'multiple to' => [
@@ -284,9 +314,26 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                         'Test <test@test.com>'
                     ],
                     'template' => 'test',
-                    'entity' => new \stdClass()
+                    'entity' => new \stdClass(),
+                    'recipients' => [],
                 ]
-            ]
+            ],
+            'with recipients' => [
+                [
+                    'from' => 'test@test.com',
+                    'to' => 'test2@test.com',
+                    'recipients' => [new EmailHolderStub()],
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                ],
+                [
+                    'from' => 'test@test.com',
+                    'to' => ['test2@test.com'],
+                    'recipients' => [new EmailHolderStub()],
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                ],
+            ],
         ];
     }
 
@@ -297,6 +344,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteWithoutTemplateEntity()
     {
+        $language = 'de';
         $options = [
             'from' => 'test@test.com',
             'to' => 'test@test.com',
@@ -305,6 +353,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             'body' => 'body',
             'entity' => new \stdClass(),
         ];
+        $this->expectsEntityClass($options['entity']);
         $context = [];
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
@@ -319,9 +368,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->languageProvider->expects($this->once())
+            ->method('getPreferredLanguage')
+            ->with($options['to'])
+            ->willReturn($language);
         $this->objectRepository->expects($this->once())
-            ->method('findByName')
-            ->with($options['template'])
+            ->method('findOneLocalized')
+            ->with(new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $language)
             ->willReturn(null);
 
         $this->emailTemplate->expects($this->never())
@@ -357,6 +410,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             'body' => 'body',
             'entity' => new \stdClass(),
         ];
+        $this->expectsEntityClass($options['entity']);
         $context = [];
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
@@ -392,33 +446,20 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->willReturn($violationList);
 
         $this->objectRepository->expects($this->never())
-            ->method('findByName')
-            ->with($options['template'])
-            ->willReturn($this->emailTemplate);
+            ->method('findOneLocalized');
 
         $this->emailTemplate->expects($this->never())
-            ->method('getType')
-            ->willReturn('txt');
+            ->method('getType');
         $this->renderer->expects($this->never())
-            ->method('compileMessage')
-            ->willReturn([$options['subject'], $options['body']]);
+            ->method('compileMessage');
 
-        $emailEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailProcessor->expects($this->never())
-            ->method('process');
-        if (array_key_exists('attribute', $options)) {
-            $this->contextAccessor->expects($this->once())
-                ->method('setValue')
-                ->with($context, $options['attribute'], $emailEntity);
-        }
         $this->action->initialize($options);
         $this->action->execute($context);
     }
 
     public function testExecuteWithProcessException()
     {
+        $language = 'de';
         $options = [
             'from' => 'test@test.com',
             'to' => 'test@test.com',
@@ -427,6 +468,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             'body' => 'body',
             'entity' => new \stdClass(),
         ];
+        $this->expectsEntityClass($options['entity']);
         $context = [];
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
@@ -441,9 +483,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->languageProvider->expects($this->once())
+            ->method('getPreferredLanguage')
+            ->with($options['to'])
+            ->willReturn($language);
         $this->objectRepository->expects($this->once())
-            ->method('findByName')
-            ->with($options['template'])
+            ->method('findOneLocalized')
+            ->with(new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $language)
             ->willReturn($this->emailTemplate);
 
         $this->emailTemplate->expects($this->once())
@@ -470,10 +516,17 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider executeOptionsDataProvider
      * @param array $options
+     * @param string|EmailHolderInterface $expectedForPreferredLanguage
      * @param array $expected
+     * @param string $language
      */
-    public function testExecute($options, $expected)
-    {
+    public function testExecute(
+        array $options,
+        $expectedForPreferredLanguage,
+        array $expected,
+        string $language
+    ) {
+        $this->expectsEntityClass($options['entity']);
         $context = [];
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
@@ -488,9 +541,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->languageProvider->expects($this->once())
+            ->method('getPreferredLanguage')
+            ->with($expectedForPreferredLanguage)
+            ->willReturn($language);
         $this->objectRepository->expects($this->once())
-            ->method('findByName')
-            ->with($options['template'])
+            ->method('findOneLocalized')
+            ->with(new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $language)
             ->willReturn($this->emailTemplate);
 
         $this->emailTemplate->expects($this->once())
@@ -546,6 +603,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $nameMock->expects($this->any())
             ->method('getFirstName')
             ->will($this->returnValue('NAME'));
+        $recipient = new EmailHolderStub('recipient@test.com');
 
         return [
             'simple' => [
@@ -555,12 +613,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
+                'test@test.com',
                 [
                     'from' => 'test@test.com',
                     'to' => ['test@test.com'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
-                ]
+                ],
+                'de',
             ],
             'simple with name' => [
                 [
@@ -569,12 +629,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
+                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
-                ]
+                ],
+                'de',
             ],
             'extended' => [
                 [
@@ -589,12 +651,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
+                '"Test" <test@test.com>',
                 [
                     'from' => '"Test" <test@test.com>',
                     'to' => ['"Test" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
-                ]
+                ],
+                'de',
             ],
             'extended with name formatting' => [
                 [
@@ -609,43 +673,176 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
+                '"_Formatted" <test@test.com>',
                 [
                     'from' => '"_Formatted" <test@test.com>',
                     'to' => ['"_Formatted" <test@test.com>'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
-                ]
+                ],
+                'de',
             ],
-            'multiple to' => [
+            'with recipients' => [
                 [
-                    'from' => [
-                        'name' => 'Test',
-                        'email' => 'test@test.com'
-                    ],
-                    'to' => [
-                        [
-                            'name' => 'Test',
-                            'email' => 'test@test.com'
-                        ],
-                        'test@test.com',
-                        '"Test" <test@test.com>',
-                        ' '
-                    ],
+                    'from' => 'test@test.com',
+                    'recipients' => [$recipient],
                     'template' => 'test',
                     'entity' => new \stdClass(),
-                    'attribute' => 'attr'
                 ],
+                $recipient,
                 [
-                    'from' => '"Test" <test@test.com>',
-                    'to' => [
-                        '"Test" <test@test.com>',
-                        'test@test.com',
-                        '"Test" <test@test.com>'
-                    ],
+                    'from' => 'test@test.com',
+                    'to' => ['recipient@test.com'],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
-                ]
+                ],
+                'de'
+            ],
+        ];
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testExecuteWithMultipleRecipients(): void
+    {
+        $toEmail1 = 'to1@test.com';
+        $toEmail2 = 'to2@test.com';
+        $recipientEmail1 = 'recipient1@test.com';
+        $recipient1 = new EmailHolderStub($recipientEmail1);
+        $recipientEmail2 = 'recipient2@test.com';
+        $recipient2 = new EmailHolderStub($recipientEmail2);
+        $enLanguage = 'en';
+        $deLanguage = 'de';
+        $frLanguage = 'fr';
+        $enTemplate = new EmailTemplate('', '', 'txt');
+        $deTemplate = new EmailTemplate('', '', 'txt');
+        $frTemplate = new EmailTemplate('', '', 'txt');
+        $options = [
+            'from' => 'from@test.com',
+            'to' => [
+                $toEmail1,
+                $toEmail2,
+                ' '
+            ],
+            'template' => 'test',
+            'entity' => new \stdClass(),
+            'attribute' => 'attr',
+            'recipients' => [
+                $recipient1,
+                $recipient2,
             ]
         ];
+        $this->expectsEntityClass($options['entity']);
+        $this->contextAccessor->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnArgument(1));
+
+        $this->languageProvider->expects($this->exactly(4))
+            ->method('getPreferredLanguage')
+            ->withConsecutive(
+                [$toEmail1],
+                [$toEmail2],
+                [$recipient1],
+                [$recipient2]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $deLanguage,
+                $enLanguage,
+                $deLanguage,
+                $frLanguage
+            );
+        $this->objectRepository->expects($this->exactly(3))
+            ->method('findOneLocalized')
+            ->withConsecutive(
+                [new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $enLanguage],
+                [new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $deLanguage],
+                [new EmailTemplateCriteria($options['template'], get_class($options['entity'])), $frLanguage]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $enTemplate,
+                $deTemplate,
+                $frTemplate
+            );
+
+        $messages = [
+            'en' => ['subject_en', 'body_en'],
+            'de' => ['subject_de', 'body_de'],
+            'fr' => ['subject_fr', 'body_fr'],
+        ];
+        $this->renderer->expects($this->exactly(3))
+            ->method('compileMessage')
+            ->withConsecutive(
+                [$enTemplate, ['entity' => $options['entity']]],
+                [$deTemplate, ['entity' => $options['entity']]],
+                [$frTemplate, ['entity' => $options['entity']]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $messages['en'],
+                $messages['de'],
+                $messages['fr']
+            );
+
+        $email = new EmailEntity();
+        $this->emailProcessor->expects($this->at(1))
+            ->method('process')
+            ->willReturnCallback(
+                function (Email $model) use ($messages, $toEmail2, $email) {
+                    $this->assertEquals($messages['en'][0], $model->getSubject());
+                    $this->assertEquals($messages['en'][1], $model->getBody());
+                    $this->assertEquals([$toEmail2], $model->getTo());
+                    $this->assertEquals('txt', $model->getType());
+                    $emailUser = new EmailUser();
+                    $emailUser->setEmail($email);
+
+                    return $emailUser;
+                }
+            );
+        $this->emailProcessor->expects($this->at(3))
+            ->method('process')
+            ->willReturnCallback(
+                function (Email $model) use ($messages, $toEmail1, $recipientEmail1) {
+                    $this->assertEquals($messages['de'][0], $model->getSubject());
+                    $this->assertEquals($messages['de'][1], $model->getBody());
+                    $this->assertEquals([$toEmail1, $recipientEmail1], $model->getTo());
+                    $this->assertEquals('txt', $model->getType());
+
+                    return new EmailUser();
+                }
+            );
+        $this->emailProcessor->expects($this->at(5))
+            ->method('process')
+            ->willReturnCallback(
+                function (Email $model) use ($messages, $recipientEmail2) {
+                    $this->assertEquals($messages['fr'][0], $model->getSubject());
+                    $this->assertEquals($messages['fr'][1], $model->getBody());
+                    $this->assertEquals([$recipientEmail2], $model->getTo());
+                    $this->assertEquals('txt', $model->getType());
+
+                    return new EmailUser();
+                }
+            );
+
+        $context = [];
+        $this->contextAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($context, $options['attribute'], $email);
+        $this->action->initialize($options);
+        $this->action->execute($context);
+    }
+
+    /**
+     * @param mixed $entity
+     */
+    private function expectsEntityClass($entity): void
+    {
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $this->objectManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(get_class($entity))
+            ->willReturn($classMetadata);
+        $classMetadata->expects($this->any())
+            ->method('getName')
+            ->willReturn(get_class($entity));
     }
 }

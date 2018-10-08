@@ -13,7 +13,7 @@ use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
+class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testSubscribedEvents()
     {
@@ -254,7 +254,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
      * @param object[]   $added
      * @param object[]   $removed
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Form\Test\FormInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\Form\Test\FormInterface
      */
     protected function getPostSubmitForm(
         $parent,

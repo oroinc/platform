@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 
-class TopicMetaRegistryTest extends \PHPUnit_Framework_TestCase
+class TopicMetaRegistryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithTopics()
     {

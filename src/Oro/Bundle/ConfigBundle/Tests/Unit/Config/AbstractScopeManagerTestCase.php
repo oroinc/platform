@@ -14,20 +14,20 @@ use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var AbstractScopeManager */
     protected $manager;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var ConfigRepository|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repo;
 
-    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
 
     /** @var CacheProvider */
@@ -40,7 +40,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit_Framework_TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->em->expects($this->any())->method('getRepository')->with(Config::class)->willReturn($this->repo);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $doctrine */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())->method('getManagerForClass')->with(Config::class)->willReturn($this->em);
 

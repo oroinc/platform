@@ -253,12 +253,29 @@ class ImportExportContext extends OroFeatureContext implements
      *
      * @param string    $entity
      * @param TableNode $expectedEntities
-     * @param string    $processorName
      */
-    public function exportedFileContainsAtLeastFollowingColumns(
+    public function exportedFileContainsAtLeastFollowingColumns($entity, TableNode $expectedEntities)
+    {
+        $this->exportedFileWithProcessorContainsAtLeastFollowingColumns($entity, $expectedEntities, null);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * This method makes non-strict comparison of data from the downloaded file.
+     *
+     * Checks whether the listed columns (in any order) and corresponding data is present.
+     *
+     * @Given /^Exported file for "(?P<entity>([\w\s]+))" with processor "(?P<processorName>([\w\s\.]+))" contains at least the following columns:$/
+     *
+     * @param string      $entity
+     * @param TableNode   $expectedEntities
+     * @param string|null $processorName
+     */
+    //@codingStandardsIgnoreEnd
+    public function exportedFileWithProcessorContainsAtLeastFollowingColumns(
         $entity,
         TableNode $expectedEntities,
-        $processorName = null
+        $processorName
     ) {
         $filePath = $this->performExport($entity, $processorName);
 
@@ -432,14 +449,31 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * Example: When I validate file
+     *
+     * @When /^(?:|I )validate file$/
+     */
+    public function iValidateFile()
+    {
+        $importSubmitButton = $this->openImportModalAndReturnValidateButton();
+        $this->createElement('ActiveImportFileField')->attachFile($this->importFile);
+
+        $importSubmitButton->press();
+        $this->waitForAjax();
+
+        $flashMessage = 'Validation started successfully. You will receive an email notification upon completion.';
+        $this->oroMainContext->iShouldSeeFlashMessage($flashMessage);
+    }
+
+    /**
      * @When /^I import exported file$/
      */
     public function iImportExportedFile()
     {
-        // todo: CRM-7599 Replace sleep to appropriate logic
+        // BAP-17638: Replace sleep to appropriate logic
         sleep(2);
 
-        // @todo replace with fetching file path from email: CRM-7599
+        // BAP-17638: Replace sleep to appropriate logic
         // temporary solution: find the most recent file created in import_export dir
         $fileManager = $this->getContainer()->get('oro_importexport.file.file_manager');
         $files = $fileManager->getFilesByPeriod();
@@ -510,6 +544,23 @@ class ImportExportContext extends OroFeatureContext implements
         }
 
         return $importSubmitButton;
+    }
+
+    /**
+     * @return OroElement
+     */
+    protected function openImportModalAndReturnValidateButton()
+    {
+        $validateFileButton = $this->createElement('Validate File Button');
+
+        if (false === $validateFileButton->isIsset()) {
+            $mainImportButton = $this->createElement('MainImportFileButton');
+            self::assertNotNull($mainImportButton, 'Main import button was not found');
+            $mainImportButton->click();
+            $this->waitForAjax();
+        }
+
+        return $validateFileButton;
     }
 
     /**

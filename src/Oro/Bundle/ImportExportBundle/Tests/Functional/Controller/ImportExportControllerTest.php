@@ -192,7 +192,7 @@ class ImportExportControllerTest extends WebTestCase
         try {
             $tmpDirName = $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
             $fileDir = __DIR__ . '/Import/fixtures';
-            $fileName = 'testLineEndings.csv';
+            $fileName = 'oro_testLineEndings.csv';
             $file = $fileDir . DIRECTORY_SEPARATOR . $fileName;
             $finder = new Finder();
             $finder
@@ -213,7 +213,7 @@ class ImportExportControllerTest extends WebTestCase
 
             $csvFile = new UploadedFile(
                 $file,
-                'testLineEndings.csv',
+                'oro_testLineEndings.csv',
                 'text/csv'
             );
             $this->assertEquals(

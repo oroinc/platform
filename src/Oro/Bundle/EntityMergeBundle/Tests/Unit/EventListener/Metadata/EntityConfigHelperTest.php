@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 
-class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
+class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EntityConfigHelper
@@ -12,12 +12,12 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     protected $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $extendConfigProvider;
 

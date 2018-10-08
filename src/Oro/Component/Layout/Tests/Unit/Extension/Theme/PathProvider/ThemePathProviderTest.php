@@ -8,9 +8,9 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider;
 use Oro\Component\Layout\LayoutContext;
 
-class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
+class ThemePathProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ThemeManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $themeManager;
 
     /** @var ThemePathProvider */
@@ -160,7 +160,7 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
      * @param null|string  $parent
      * @param PageTemplate $pageTemplate
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
     {

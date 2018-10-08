@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -16,12 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class SetHttpAllowHeader implements ProcessorInterface
 {
-    const RESPONSE_HEADER_NAME = 'Allow';
-
-    const METHOD_GET    = 'GET';
-    const METHOD_POST   = 'POST';
-    const METHOD_PATCH  = 'PATCH';
-    const METHOD_DELETE = 'DELETE';
+    public const RESPONSE_HEADER_NAME = 'Allow';
 
     /** @var ResourcesProvider */
     private $resourcesProvider;
@@ -41,11 +37,7 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (Response::HTTP_METHOD_NOT_ALLOWED !== $context->getResponseStatusCode()) {
-            return;
-        }
-        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
-            // the header is already added to the response
+        if (!$this->isApplicable($context)) {
             return;
         }
 
@@ -61,6 +53,21 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     }
 
     /**
+     * @param Context $context
+     *
+     * @return bool
+     */
+    protected function isApplicable(Context $context): bool
+    {
+        return
+            !$context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)
+            && (
+                Response::HTTP_METHOD_NOT_ALLOWED === $context->getResponseStatusCode()
+                || (ApiActions::OPTIONS === $context->getAction() && $context->isSuccessResponse())
+            );
+    }
+
+    /**
      * @return array [action => HTTP method, ...]
      */
     abstract protected function getHttpMethodToActionsMap();
@@ -71,10 +78,11 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
     protected function getHttpMethodToActionsMapForResourceWithoutIdentifier()
     {
         return [
-            self::METHOD_GET    => ApiActions::GET,
-            self::METHOD_PATCH  => ApiActions::UPDATE,
-            self::METHOD_POST   => ApiActions::CREATE,
-            self::METHOD_DELETE => ApiActions::DELETE
+            Request::METHOD_OPTIONS => ApiActions::OPTIONS,
+            Request::METHOD_GET     => ApiActions::GET,
+            Request::METHOD_PATCH   => ApiActions::UPDATE,
+            Request::METHOD_POST    => ApiActions::CREATE,
+            Request::METHOD_DELETE  => ApiActions::DELETE
         ];
     }
 
@@ -112,13 +120,16 @@ abstract class SetHttpAllowHeader implements ProcessorInterface
      */
     private function getAllowedHttpMethods(array $httpMethodToActionsMap, array $excludeActions)
     {
-        $allowedActions = array_diff(array_values($httpMethodToActionsMap), $excludeActions);
-        $httpMethodToActionsMap = array_flip($httpMethodToActionsMap);
+        $allowedActions = \array_diff(\array_values($httpMethodToActionsMap), $excludeActions);
+        $httpMethodToActionsMap = \array_flip($httpMethodToActionsMap);
         $allowedMethods = [];
         foreach ($allowedActions as $action) {
             $allowedMethods[] = $httpMethodToActionsMap[$action];
         }
+        if (count($allowedMethods) === 1 && Request::METHOD_OPTIONS === $allowedMethods[0]) {
+            $allowedMethods = [];
+        }
 
-        return implode(', ', $allowedMethods);
+        return \implode(', ', $allowedMethods);
     }
 }

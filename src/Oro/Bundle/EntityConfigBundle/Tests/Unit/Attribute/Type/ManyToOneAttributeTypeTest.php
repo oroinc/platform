@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType;
 
 class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $doctrineHelper;
 
     protected function setUp()

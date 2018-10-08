@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
-class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;

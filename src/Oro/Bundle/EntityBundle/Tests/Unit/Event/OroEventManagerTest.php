@@ -5,10 +5,10 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Event;
 use Oro\Bundle\EntityBundle\Event\OroEventManager;
 use Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener;
 
-class OroEventManagerTest extends \PHPUnit_Framework_TestCase
+class OroEventManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $container;
 

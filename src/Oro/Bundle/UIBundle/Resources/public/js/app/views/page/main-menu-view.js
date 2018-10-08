@@ -19,8 +19,6 @@ define([
 
         timeout: 100,
 
-        positions: ['align-menu-left', 'align-menu-right', 'align-single-item-left', 'align-single-item-right'],
-
         events: function() {
             var events = {};
             if (this.$el.hasClass('main-menu-top')) {
@@ -59,6 +57,9 @@ define([
             // Local cache of route to menu item
             this.routeMatchedMenuItemsCache = {};
 
+            this.positions = this.getPositions();
+
+            this.initRouteMatches();
             PageMainMenuView.__super__.initialize.call(this, options);
         },
 
@@ -81,12 +82,8 @@ define([
             var data = this.getTemplateData();
             var currentRoute = this.getCurrentRoute(data);
 
-            if (data) {
-                if (!_.isUndefined(data.mainMenu)) {
-                    PageMainMenuView.__super__.render.call(this);
-                    this.initRouteMatches();
-                }
-            } else {
+            if (data && !_.isUndefined(data.mainMenu)) {
+                PageMainMenuView.__super__.render.call(this);
                 this.initRouteMatches();
             }
 
@@ -96,6 +93,17 @@ define([
             this.$el.trigger('mainMenuUpdated');
 
             return this;
+        },
+
+        getPositions: function() {
+            var start = 'align-menu-start';
+            var end = 'align-menu-end';
+            var itemStart = 'align-single-item-start';
+            var itemEnd = 'align-single-item-end';
+
+            return _.isRTL()
+                ? [end, start, itemEnd, itemStart]
+                : [start, end, itemStart, itemEnd];
         },
 
         _onMenuItemClick: function(e) {
@@ -174,7 +182,7 @@ define([
         },
 
         updateDropdownChildAlign: function($node) {
-            var limit = this.calculateRightPosition(this.$el);
+            var limit = this.calculateMenuPosition(this.$el);
             var $innerDropdown = $node.find('.dropdown-menu:first');
             var $innerDropdownChildren = $innerDropdown.children('.dropdown');
             var isDropdownChildrenOutside = false;
@@ -182,7 +190,7 @@ define([
             // Align first level
             if ($node.hasClass('dropdown-level-1')) {
                 $node.addClass(
-                    this.positions[this.calculateRightPosition($innerDropdown) > limit ? 0: 1]
+                    this.positions[this.calculateMenuPosition($innerDropdown) > limit ? 0: 1]
                 );
             }
 
@@ -191,7 +199,7 @@ define([
             }
 
             _.each($innerDropdownChildren, function(element) {
-                if (this.calculateRightPosition($(element).find('.dropdown-menu:first')) > limit) {
+                if (this.calculateMenuPosition($(element).find('.dropdown-menu:first')) > limit) {
                     isDropdownChildrenOutside = true;
                 }
             }, this);
@@ -205,8 +213,10 @@ define([
             }
         },
 
-        calculateRightPosition: function($element) {
-            return Math.ceil($element.offset().left + $element.outerWidth());
+        calculateMenuPosition: function($element) {
+            return _.isRTL()
+                ? Math.ceil($element.offset().left)
+                : Math.ceil($element.offset().left + $element.outerWidth());
         },
 
         updateDropdownChildPosition: function($toggle) {

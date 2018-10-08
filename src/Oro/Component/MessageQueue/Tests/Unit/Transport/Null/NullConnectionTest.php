@@ -6,7 +6,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullConnection;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class NullConnectionTest extends \PHPUnit_Framework_TestCase
+class NullConnectionTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

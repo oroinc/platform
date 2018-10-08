@@ -4,15 +4,15 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActivityBundle\Provider\ActivityActionWidgetProvider;
 
-class ActivityActionWidgetProviderTest extends \PHPUnit_Framework_TestCase
+class ActivityActionWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActivityActionWidgetProvider */
     protected $provider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $activityManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $placeholderProvider;
 
     protected function setUp()

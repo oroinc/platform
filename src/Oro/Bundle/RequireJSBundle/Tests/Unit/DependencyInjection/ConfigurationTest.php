@@ -5,7 +5,7 @@ namespace Oro\Bundle\RequireJSBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\RequireJSBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider dataProviderExceptionConfigTree

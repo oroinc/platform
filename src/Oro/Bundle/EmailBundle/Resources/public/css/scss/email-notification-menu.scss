@@ -37,7 +37,7 @@
         width: $email-recent-emails-popup-width !important;
         padding: 0;
         outline: none;
-        right: -7px;
+        #{$end}: -7px;
 
         .empty {
             padding: 5px 10px;
@@ -47,8 +47,7 @@
     .new-email-notification {
         position: absolute;
         top: 100%;
-        right: 0;
-        margin-top: 6px;
+        right: -18px;
         display: none;
         width: 160px;
         padding: 8px 12px;

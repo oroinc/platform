@@ -14,24 +14,24 @@ use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class PostponedRowsHandlerTest extends \PHPUnit_Framework_TestCase
+class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var PostponedRowsHandler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $handler;
 
-    /** @var MessageProducerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $messageProducer;
 
-    /** @var Job|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Job|\PHPUnit\Framework\MockObject\MockObject */
     private $currentJob;
 
-    /** @var JobRunner|\PHPUnit_Framework_MockObject_MockObject  */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject  */
     private $jobRunner;
 
-    /** @var JobProcessor|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var JobProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $jobProcessor;
 
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     public function setUp()

@@ -17,7 +17,7 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class RenameExtensionTest extends \PHPUnit_Framework_TestCase
+class RenameExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider renameTableProvider

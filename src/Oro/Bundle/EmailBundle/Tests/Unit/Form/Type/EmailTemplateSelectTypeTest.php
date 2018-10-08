@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\FormView;
 
-class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailTemplateSelectType

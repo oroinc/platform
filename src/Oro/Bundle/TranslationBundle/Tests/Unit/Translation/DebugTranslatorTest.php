@@ -12,7 +12,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
+class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
 {
     protected $messages = array(
         'fr' => array(
@@ -149,7 +149,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates a mock of Loader
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getLoader()
     {
@@ -166,7 +166,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $fallbackLocales
-     * @return TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getStrategyProvider(array $fallbackLocales = [])
     {
@@ -194,7 +194,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
      *
      * @param LoaderInterface $loader
      * @param TranslationStrategyProvider $strategyProvider
-     * @return ContainerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getContainer($loader, $strategyProvider)
     {
@@ -240,7 +240,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
 
         $translator->setStrategyProviderLink($strategyProviderLink);
 
-        /** @var TranslationDomainProvider|\PHPUnit_Framework_MockObject_MockObject $translationDomainProvider */
+        /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject $translationDomainProvider */
         $translationDomainProvider = $this->createMock(TranslationDomainProvider::class);
         $translator->setTranslationDomainProvider($translationDomainProvider);
 

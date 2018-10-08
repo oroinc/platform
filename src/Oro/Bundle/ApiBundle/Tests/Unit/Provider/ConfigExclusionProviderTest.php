@@ -3,15 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
-class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigExclusionProvider */
     private $provider;
 
-    public function setUp()
+    protected function setUp()
     {
         $hierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
         $hierarchyProvider->expects(self::any())
@@ -24,21 +25,24 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->provider = new ConfigExclusionProvider(
-            $hierarchyProvider,
-            [
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::any())
+            ->method('getExclusions')
+            ->willReturn([
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field2'],
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field3'],
                 ['entity' => 'Test\Entity\Entity2'],
                 ['entity' => 'Test\Entity\Entity3']
-            ],
-            [
+            ]);
+        $configCache->expects(self::any())
+            ->method('getInclusions')
+            ->willReturn([
                 ['entity' => 'Test\Entity\Entity1', 'field' => 'field1'],
                 ['entity' => 'Test\Entity\BaseEntity1', 'field' => 'field2'],
                 ['entity' => 'Test\Entity\Entity3']
-            ]
-        );
+            ]);
+        $this->provider = new ConfigExclusionProvider($hierarchyProvider, $configCache);
     }
 
     /**

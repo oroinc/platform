@@ -7,15 +7,15 @@ use Oro\Bundle\UIBundle\Provider\LabelProviderInterface;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
+class GroupingChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
     protected $highPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
     protected $lowPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WidgetProviderInterface */
     protected $unsupportedProvider;
 
     protected function setUp()
@@ -186,7 +186,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
     {
         $groupNameProvider = null;
         if ($withGroupNameProvider) {
-            /** @var \PHPUnit_Framework_MockObject_MockObject|LabelProviderInterface $groupNameProvider */
+            /** @var \PHPUnit\Framework\MockObject\MockObject|LabelProviderInterface $groupNameProvider */
             $groupNameProvider = $this->createMock('Oro\Bundle\UIBundle\Provider\LabelProviderInterface');
             $groupNameProvider->expects($this->any())
                 ->method('getLabel')
@@ -200,7 +200,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($setEventDispatcher) {
-            /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface $eventDispatcher */
+            /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface $eventDispatcher */
             $eventDispatcher = $this->createMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
             $eventDispatcher->expects($this->once())
                 ->method('dispatch');

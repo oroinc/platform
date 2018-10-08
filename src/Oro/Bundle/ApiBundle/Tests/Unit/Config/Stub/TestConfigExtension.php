@@ -38,7 +38,7 @@ class TestConfigExtension extends AbstractConfigExtension
             },
             'sorters.field'         => function (NodeBuilder $node) {
                 $node->scalarNode('sorter_field_extra');
-            },
+            }
         ];
     }
 
@@ -89,7 +89,7 @@ class TestConfigExtension extends AbstractConfigExtension
                 }
 
                 return $config;
-            },
+            }
         ];
     }
 

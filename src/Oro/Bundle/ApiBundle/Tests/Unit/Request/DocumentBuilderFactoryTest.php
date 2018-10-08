@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DocumentBuilderFactoryTest extends \PHPUnit_Framework_TestCase
+class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnDocumentBuilderIfItExistsForSpecificRequestType()
+    public function testShouldReturnDocumentBuilderIfItExistsForSpecificRequestType()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -52,7 +52,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType()
+    public function testShouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -76,7 +76,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot find a document builder for the request "another".
      */
-    public function testSouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
+    public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api']

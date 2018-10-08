@@ -5,7 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
+class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PermissionsHandler
@@ -13,7 +13,7 @@ class PermissionsHandlerTest extends \PHPUnit_Framework_TestCase
     protected $handler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $process;
 

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\UserBundle\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\NotificationBundle\Model\EmailNotification;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
+use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Psr\Log\LoggerInterface;
@@ -16,9 +17,6 @@ use Psr\Log\LoggerInterface;
 class ResetPasswordHandler
 {
     const TEMPLATE_NAME = 'force_reset_password';
-
-    /** @var EmailTemplate */
-    protected $template;
 
     /** @var Registry */
     protected $registry;
@@ -37,7 +35,6 @@ class ResetPasswordHandler
     ) {
         $this->mailManager = $mailManager;
         $this->userManager = $userManager;
-        $this->template = null;
         $this->logger = $logger;
         $this->registry = $registry;
     }
@@ -64,7 +61,7 @@ class ResetPasswordHandler
         $this->userManager->updateUser($user);
 
         try {
-            $this->mailManager->process($user, [$this->getNotification($user)], $this->logger);
+            $this->mailManager->processSingle($this->getNotification($user), [], $this->logger);
 
             return true;
         } catch (\Exception $e) {
@@ -79,15 +76,14 @@ class ResetPasswordHandler
 
     /**
      * @param User $user
-     *
-     * @return EmailNotification
+     * @return TemplateEmailNotificationInterface
      */
-    protected function getNotification(User $user)
+    protected function getNotification(User $user): TemplateEmailNotificationInterface
     {
-        if (null === $this->template) {
-            $this->template = $this->registry->getRepository(EmailTemplate::class)->findOneByName(self::TEMPLATE_NAME);
-        }
-
-        return new EmailNotification($this->template, [$user->getEmail()]);
+        return new TemplateEmailNotification(
+            new EmailTemplateCriteria(self::TEMPLATE_NAME, User::class),
+            [$user],
+            $user
+        );
     }
 }

@@ -11,26 +11,26 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SecuredTopicTest extends \PHPUnit_Framework_TestCase
+class SecuredTopicTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ClientManipulatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $clientManipulator;
 
     /** @var SecuredTopic */
     private $securedTopic;
 
-    /** @var ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /** @var Topic|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Topic|\PHPUnit\Framework\MockObject\MockObject */
     private $topic;
 
-    /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     private $parameterBag;
 
-    /** @var WampRequest|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
     private $request;
 
     protected function setUp()

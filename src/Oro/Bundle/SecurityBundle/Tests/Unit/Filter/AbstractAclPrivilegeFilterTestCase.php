@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Filter;
 use Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilterInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 
-abstract class AbstractAclPrivilegeFilterTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractAclPrivilegeFilterTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeConfigurableFilterInterface */
     protected $filter;

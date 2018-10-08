@@ -6,10 +6,10 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
 
-class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
+class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $languageProvider;
 

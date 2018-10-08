@@ -16,7 +16,7 @@ Feature: Form label for extended relation
       | Field name   | event_user   |
       | Storage Type | Table column |
       | Type         | Many to one  |
-    And I press "Continue"
+    And I click "Continue"
     And I fill form with:
       | Label         | Event Assigned User |
       | Target Entity | User                |

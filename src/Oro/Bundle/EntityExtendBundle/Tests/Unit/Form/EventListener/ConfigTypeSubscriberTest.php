@@ -15,14 +15,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_NAME = 'oro_config_type';
     const SCOPE = 'extend';
     const CLASS_NAME = 'stdClass';
 
     /**
-     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManger;
 
@@ -32,22 +32,22 @@ class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
     protected $entityConfigId;
 
     /**
-     * @var FormConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $formConfig;
 
     /**
-     * @var FormInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $form;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 
     /**
-     * @var PropertyConfigContainer|\PHPUnit_Framework_MockObject_MockObject
+     * @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $propertyConfigContainer;
 
@@ -193,12 +193,12 @@ class ConfigTypeSubscriberTest extends \PHPUnit_Framework_TestCase
             'config_id' => $fieldConfigId,
         ]);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('getConfig')->willReturn($formConfig);
         $form->expects($this->atLeastOnce())->method('getName')->willReturn(self::FORM_NAME);
 
-        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManger */
+        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManger */
         $configManger = $this->createMock(ConfigManager::class);
 
         $configProvider = $this->createMock(ConfigProvider::class);

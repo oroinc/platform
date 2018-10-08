@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 
-class ImapConfigTest extends \PHPUnit_Framework_TestCase
+class ImapConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

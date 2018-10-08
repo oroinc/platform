@@ -6,26 +6,33 @@ use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\StartsWithComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class StartsWithComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class StartsWithComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new StartsWithComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $fieldName = 'e.test';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
         $parameterName = 'test_1';
         $value = 'text';
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $fieldName,
+            $field,
+            $expr,
             $parameterName,
             $value
         );
 
         self::assertEquals(
-            new Comparison($fieldName, 'LIKE', ':' . $parameterName),
+            new Comparison($expr, 'LIKE', ':' . $parameterName),
             $result
         );
         self::assertEquals(

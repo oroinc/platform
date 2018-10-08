@@ -7,26 +7,33 @@ use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class InComparisonExpressionTest extends \PHPUnit_Framework_TestCase
+class InComparisonExpressionTest extends \PHPUnit\Framework\TestCase
 {
     public function testWalkComparisonExpression()
     {
         $expression = new InComparisonExpression();
-        $expressionVisitor = new QueryExpressionVisitor();
-        $fieldName = 'e.test';
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->createMock(EntityClassResolver::class)
+        );
+        $field = 'e.test';
+        $expr = 'LOWER(e.test)';
         $parameterName = 'test_1';
         $value = [1, 2, 3];
 
         $result = $expression->walkComparisonExpression(
             $expressionVisitor,
-            $fieldName,
+            $field,
+            $expr,
             $parameterName,
             $value
         );
 
         self::assertEquals(
-            new Func($fieldName . ' IN', [':' . $parameterName]),
+            new Func($expr . ' IN', [':' . $parameterName]),
             $result
         );
         self::assertEquals(

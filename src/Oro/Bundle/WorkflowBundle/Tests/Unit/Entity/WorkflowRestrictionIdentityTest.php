@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class WorkflowRestrictionIdentityTest extends \PHPUnit_Framework_TestCase
+class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WorkflowRestrictionIdentity

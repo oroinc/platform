@@ -18,15 +18,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class CopyTaggingTest extends \PHPUnit_Framework_TestCase
+class CopyTaggingTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TagManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var TagManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tagManager;
 
     /**
-     * @var TaggableHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $taggableHelper;
 
@@ -78,7 +78,8 @@ class CopyTaggingTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $inputData, $exception, $exceptionMessage)
     {
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->action->initialize($inputData);
     }
@@ -155,8 +156,10 @@ class CopyTaggingTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethodExceptionSource()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(
+            \LogicException::class
+        );
+        $this->expectExceptionMessage(
             'Object in path "source" in "copy_tagging" action should be taggable.'
         );
 
@@ -181,8 +184,10 @@ class CopyTaggingTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteMethodExceptionDestination()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(
+            \LogicException::class
+        );
+        $this->expectExceptionMessage(
             'Object in path "destination" in "copy_tagging" action should be taggable.'
         );
 

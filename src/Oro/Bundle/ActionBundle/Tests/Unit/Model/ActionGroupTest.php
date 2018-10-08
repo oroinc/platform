@@ -14,12 +14,12 @@ use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
-class ActionGroupTest extends \PHPUnit_Framework_TestCase
+class ActionGroupTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
     protected $actionFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
     protected $conditionFactory;
 
     /** @var ActionGroup */
@@ -36,7 +36,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroup\ParametersResolver $parametersResolver */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroup\ParametersResolver $parametersResolver */
         $parametersResolver = $this->getMockBuilder(
             'Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver'
         )->disableOriginalConstructor()->getMock();
@@ -205,13 +205,13 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
      * @param ActionData $data
-     * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createActionGroup(\PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects, ActionData $data)
+    protected function createActionGroup(\PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects, ActionData $data)
     {
-        /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
         $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
         $action->expects($expects)->method('execute')->with($data);
 
@@ -219,17 +219,17 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects
      * @param ActionData $data
      * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createCondition(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        \PHPUnit\Framework\MockObject\Matcher\InvokedCount $expects,
         ActionData $data,
         $returnValue
     ) {
-        /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
+        /* @var $condition ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject */
         $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();

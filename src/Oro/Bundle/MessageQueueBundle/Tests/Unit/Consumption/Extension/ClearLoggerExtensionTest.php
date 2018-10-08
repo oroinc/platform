@@ -11,9 +11,9 @@ use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
-class ClearLoggerExtensionTest extends \PHPUnit_Framework_TestCase
+class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Container */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
     private $container;
 
     /** @var ClearLoggerExtension */

@@ -10,12 +10,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-class LoginListenerTest extends \PHPUnit_Framework_TestCase
+class LoginListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoginListener */
     private $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $syncCredentialsManager;
 
     protected function setUp()

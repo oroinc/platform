@@ -8,11 +8,11 @@ use {{ use }};
 {% endfor %}
 
 {% endfor %}
-class {{ className }} extends \PHPUnit_Framework_TestCase
+class {{ className }} extends \PHPUnit\Framework\TestCase
 {
 {% for dependencyData in dependenciesData %}
     /**
-     * @var {{ dependencyData.class }}|\PHPUnit_Framework_MockObject_MockObject
+     * @var {{ dependencyData.class }}|\PHPUnit\Framework\MockObject\MockObject
      */
     protected ${{ dependencyData.variable }};
 
@@ -43,7 +43,7 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
     public function {{ methodData.testName }}()
     {
 {% for argument in methodData.arguments %}
-{% if argument.class %}        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit_Framework_MockObject_MockObject{% endif %} ${{ argument.name }} **/
+{% if argument.class %}        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit\Framework\MockObject\MockObject{% endif %} ${{ argument.name }} **/
 {% endif %}
 {% if argument.has_constructor is defined %}
 {% set fullClassName = phpVersion > 5.4 ? argument.class~'::class' : "'"~argument.fullClass~"'" %}

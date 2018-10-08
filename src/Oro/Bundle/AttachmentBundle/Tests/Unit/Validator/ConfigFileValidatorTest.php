@@ -9,18 +9,18 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
+class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigFileValidator */
     protected $configValidator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $validator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $attachmentConfigProvider;
 
     public function setUp()

@@ -9,9 +9,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 class SetPrimaryEntityTest extends FormProcessorTestCase
 {
     /** @var SetPrimaryEntity */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

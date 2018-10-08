@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\IncludeFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 
-class FilterCollectionTest extends \PHPUnit_Framework_TestCase
+class FilterCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  FilterCollection */
     private $filterCollection;

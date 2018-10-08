@@ -4,13 +4,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildForm;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
 class BuildFormTest extends FormProcessorTestCase
 {
     /** @var BuildForm */
-    protected $processor;
+    private $processor;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->processor = new BuildForm();
@@ -18,31 +20,31 @@ class BuildFormTest extends FormProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
-        $this->assertSame($form, $this->context->getForm());
+        self::assertSame($form, $this->context->getForm());
     }
 
     public function testProcessWhenFormBuilderDoesNotExists()
     {
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasForm());
+        self::assertFalse($this->context->hasForm());
     }
 
     public function testProcess()
     {
-        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('getForm')
             ->willReturn($form);
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
-        $this->assertSame($form, $this->context->getForm());
-        $this->assertFalse($this->context->hasFormBuilder());
+        self::assertSame($form, $this->context->getForm());
+        self::assertFalse($this->context->hasFormBuilder());
     }
 }

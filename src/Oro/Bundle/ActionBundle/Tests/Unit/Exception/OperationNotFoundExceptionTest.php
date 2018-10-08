@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 
-class OperationNotFoundExceptionTest extends \PHPUnit_Framework_TestCase
+class OperationNotFoundExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

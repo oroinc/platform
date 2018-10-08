@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 
-class ActivityEventTest extends \PHPUnit_Framework_TestCase
+class ActivityEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
 use Oro\Bundle\SecurityBundle\Form\Type\ObjectLabelType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class AclPrivilegeIdentityTypeTest extends \PHPUnit_Framework_TestCase
+class AclPrivilegeIdentityTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AclPrivilegeIdentityType */
     protected $formType;

@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FlashMessageTest extends \PHPUnit_Framework_TestCase
+class FlashMessageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContextAccessor
@@ -22,17 +22,17 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|HtmlTagHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagHelper
      */
     protected $htmlTagHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     protected $requestStack;
 

@@ -7,17 +7,17 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
+class DateTimeOrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /** @var DateTimeOrganizationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp()

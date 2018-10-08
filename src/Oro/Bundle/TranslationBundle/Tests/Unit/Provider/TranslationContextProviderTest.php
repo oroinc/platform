@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface;
 use Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider;
 
-class TranslationContextProviderTest extends \PHPUnit_Framework_TestCase
+class TranslationContextProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationContextProvider */
     protected $provider;

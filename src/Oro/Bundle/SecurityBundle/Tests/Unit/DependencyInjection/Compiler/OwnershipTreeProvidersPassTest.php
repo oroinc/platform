@@ -6,10 +6,10 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvider
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class OwnershipTreeProvidersPassTest extends \PHPUnit_Framework_TestCase
+class OwnershipTreeProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
      */
     protected $containerBuilder;
 

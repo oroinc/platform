@@ -16,13 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DocumentBuilderFactory */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentBuilderFactory */
     private $documentBuilderFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ErrorCompleterRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterRegistry */
     private $errorCompleterRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $logger;
 
     /** @var BuildSingleItemResultDocument */

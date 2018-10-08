@@ -85,7 +85,8 @@ services:
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
             - "@oro_entity_extend.datagrid.extension.fields_helper"
-            - "@oro_featuretoggle.checker.feature_checker"
+            - "@oro_entity.doctrine_helper"
+            - "@oro_datagrid.provider.selected_fields"
         tags:
             - { name: oro_datagrid.extension }
 
@@ -193,6 +194,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.change_type_extend_entity_field_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\ChangeTypeExtendEntityFieldValidator
+        arguments:
+            - "@oro_entity_extend.extend.field_name_validation_helper"
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.change_type_extend_entity_field }
+
     oro_entity_extend.validator.unique_extend_entity_method_name_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
         arguments:
@@ -258,8 +266,9 @@ services:
     oro_entity_extend.extend.field_name_validation_helper:
         class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper
         arguments:
-            - "@oro_entity_config.provider.extend"
-            - "@event_dispatcher"
+            - '@oro_entity_config.provider.extend'
+            - '@event_dispatcher'
+            - '@oro_importexport.strategy.new_entities_helper'
 
     oro_entity_extend.migration.cleanup_marketing_entity_config.post_up.listener:
         class: '%oro_entity_extend.migration.cleanup_marketing.post_up.listener.class%'
@@ -628,3 +637,10 @@ services:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postUpdate }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', event: postRemove }
+
+    oro_entity_extend.validator.field_name_length:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLengthValidator
+        arguments:
+            - '@oro_entity_extend.db_id_name_generator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.field_name_length }

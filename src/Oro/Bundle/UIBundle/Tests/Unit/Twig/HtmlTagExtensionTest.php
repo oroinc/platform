@@ -6,11 +6,11 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
+class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
     /* @var HtmlTagExtension */

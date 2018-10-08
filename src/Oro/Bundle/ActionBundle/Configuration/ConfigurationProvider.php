@@ -10,6 +10,9 @@ use Oro\Component\Config\Merger\ConfigurationMerger;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Provides an entry point for configuration of operations.
+ */
 class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {
     const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
@@ -70,7 +73,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      */
     public function warmUpCache()
     {
-        $this->clearCache();
         $this->cache->save($this->rootNode, $this->resolveConfiguration());
     }
 
@@ -79,7 +81,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      */
     public function warmUpResourceCache(ContainerBuilder $containerBuilder)
     {
-        $this->clearCache();
         $this->cache->save($this->rootNode, $this->resolveConfiguration(null, $containerBuilder));
     }
 
@@ -99,13 +100,12 @@ class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCac
      */
     public function getConfiguration($ignoreCache = false, Collection $errors = null)
     {
-        if (!$ignoreCache && $this->cache->contains($this->rootNode)) {
-            $configuration = $this->cache->fetch($this->rootNode);
-        } else {
+        if ($ignoreCache) {
             $configuration = $this->resolveConfiguration($errors);
-
-            if (!$ignoreCache) {
-                $this->clearCache();
+        } else {
+            $configuration = $this->cache->fetch($this->rootNode);
+            if (false === $configuration) {
+                $configuration = $this->resolveConfiguration($errors);
                 $this->cache->save($this->rootNode, $configuration);
             }
         }

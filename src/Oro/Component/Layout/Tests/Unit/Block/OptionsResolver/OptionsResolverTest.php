@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit\Block\OptionResolver;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
-class OptionsResolverTest extends \PHPUnit_Framework_TestCase
+class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OptionsResolver

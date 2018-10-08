@@ -39,7 +39,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
 
-        /** @var OwnerTreeProvider|\PHPUnit_Framework_MockObject_MockObject $treeProvider */
+        /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject $treeProvider */
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();

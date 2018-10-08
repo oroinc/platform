@@ -1,0 +1,5 @@
+data:
+    type: addresstypes
+    id: shipping
+    attributes:
+        label: Shipping

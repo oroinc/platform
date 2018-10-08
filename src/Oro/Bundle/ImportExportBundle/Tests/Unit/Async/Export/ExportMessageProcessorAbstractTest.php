@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
-class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
+class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 {
     public function testMustImplementMessageProcessorAndTopicSubscriberInterfaces()
     {
@@ -160,7 +160,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -168,7 +168,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
      */
     private function createJobStorageMock()
     {
@@ -176,7 +176,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -184,7 +184,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {

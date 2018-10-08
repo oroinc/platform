@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory;
@@ -14,10 +15,10 @@ use Oro\Component\EntitySerializer\QueryResolver;
 
 class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryResolver */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryResolver */
     private $queryResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|QueryModifierRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierRegistry */
     private $queryModifier;
 
     /** @var AclProtectedQueryFactory */
@@ -41,7 +42,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
     public function testGetQuery()
     {
         $requestType = new RequestType(['rest']);
-        $qb = $this->getQueryBuilderMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $query = new Query($this->em);
 
         $config = new EntityConfig();
@@ -68,7 +69,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 
     public function testGetQueryWhenRequestTypeIsNotSet()
     {
-        $qb = $this->getQueryBuilderMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $query = new Query($this->em);
 
         $config = new EntityConfig();
@@ -94,7 +95,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
     public function testGetQueryWhenAclForRootEntityShouldBeSkipped()
     {
         $requestType = new RequestType(['rest']);
-        $qb = $this->getQueryBuilderMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $query = new Query($this->em);
 
         $config = new EntityConfig();

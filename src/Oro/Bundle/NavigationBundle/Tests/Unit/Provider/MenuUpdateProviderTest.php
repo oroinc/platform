@@ -9,20 +9,20 @@ use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 
-class MenuUpdateProviderTest extends \PHPUnit_Framework_TestCase
+class MenuUpdateProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ScopeManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $scopeManager;
 
     /**
-     * @var MenuUpdateManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var MenuUpdateManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $menuUpdateManager;
 
     /**
-     * @var ItemInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ItemInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $menuItem;
 

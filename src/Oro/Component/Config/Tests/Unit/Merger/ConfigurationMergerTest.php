@@ -4,7 +4,7 @@ namespace Oro\Component\Config\Tests\Unit\Merger;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
 
-class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
+class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
 {
     const BUNDLE1 = 'Oro\Bundle\TestBundle1\TestBundle1';
     const BUNDLE2 = 'Oro\Bundle\TestBundle1\TestBundle2';

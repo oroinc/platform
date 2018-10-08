@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\Extension\Configuration;
 
-class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
+class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AbstractExtension */
     protected $extension;

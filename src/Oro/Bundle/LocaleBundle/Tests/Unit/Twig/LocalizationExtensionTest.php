@@ -8,20 +8,20 @@ use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Twig\LocalizationExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class LocalizationExtensionTest extends \PHPUnit_Framework_TestCase
+class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
     /**  @var LocalizationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageCodeFormatter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageCodeFormatter */
     protected $languageCodeFormatter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormattingCodeFormatter */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormattingCodeFormatter */
     protected $formattingCodeFormatter;
 
-    /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $localizationHelper;
 
     /**

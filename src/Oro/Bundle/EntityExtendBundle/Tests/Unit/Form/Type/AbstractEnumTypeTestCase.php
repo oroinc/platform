@@ -15,10 +15,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $doctrine;
 
     protected function setUp()
@@ -352,7 +352,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigProviderMock()
     {
@@ -362,8 +362,8 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $form
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEventMock2($form)
     {
@@ -380,9 +380,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
     /**
      * @param mixed                                         $entity
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $form
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFormEventMock($entity = null, $form = null)
     {
@@ -409,13 +409,13 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $parentForm
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $parentForm
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function expectFormWillReturnParentForm(
-        \PHPUnit_Framework_MockObject_MockObject $form,
-        \PHPUnit_Framework_MockObject_MockObject $parentForm = null
+        \PHPUnit\Framework\MockObject\MockObject $form,
+        \PHPUnit\Framework\MockObject\MockObject $parentForm = null
     ) {
         if (!$parentForm) {
             $parentForm = $this->createMock('Symfony\Component\Form\Test\FormInterface');
@@ -429,10 +429,10 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
      * @param mixed $data
      */
-    protected function expectFormWillReturnData(\PHPUnit_Framework_MockObject_MockObject $form, $data)
+    protected function expectFormWillReturnData(\PHPUnit\Framework\MockObject\MockObject $form, $data)
     {
         $form->expects($this->once())
             ->method('getData')
@@ -440,13 +440,13 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $form
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $formConfig
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit\Framework\MockObject\MockObject $form
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $formConfig
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function expectFormWillReturnFormConfig(
-        \PHPUnit_Framework_MockObject_MockObject $form,
-        \PHPUnit_Framework_MockObject_MockObject $formConfig = null
+        \PHPUnit\Framework\MockObject\MockObject $form,
+        \PHPUnit\Framework\MockObject\MockObject $formConfig = null
     ) {
         if (!$formConfig) {
             $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
@@ -460,11 +460,11 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $formConfig
+     * @param \PHPUnit\Framework\MockObject\MockObject $formConfig
      * @param array $optionsValueMap
      */
     protected function expectFormConfigWillReturnOptions(
-        \PHPUnit_Framework_MockObject_MockObject $formConfig,
+        \PHPUnit\Framework\MockObject\MockObject $formConfig,
         array $optionsValueMap
     ) {
         $formConfig->expects($this->atLeastOnce())

@@ -5,7 +5,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 
-class WidgetSortByConverterTest extends \PHPUnit_Framework_TestCase
+class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetSortByConverter */
     protected $widgetSortByConverter;

@@ -237,6 +237,17 @@ define(function(require) {
                     modules[helpers.customType(type)] = module;
                 }
             });
+
+            // preload all action confirmation modules
+            _.each(this.data.data, function(model) {
+                _.each(model.action_configuration, function(config) {
+                    var module = config.confirmation && config.confirmation.component;
+                    if (module) {
+                        // the key does not matter, the module just added to list to have it preloaded
+                        modules[module] = module;
+                    }
+                });
+            });
         },
 
         /**
@@ -251,7 +262,7 @@ define(function(require) {
             var collection = gridContentManager.get(collectionName);
 
             var Grid = modules.GridView || GridView;
-            PageableCollection = modules.PageableCollection || PageableCollection;
+            var Collection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
             if (this.data && this.data.data) {
@@ -265,7 +276,7 @@ define(function(require) {
 
             if (!collection) {
                 // otherwise, create collection from metadata
-                collection = new PageableCollection(collectionModels, collectionOptions);
+                collection = new Collection(collectionModels, collectionOptions);
             }
 
             // create grid

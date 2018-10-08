@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
 
-class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
+class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var KeyObjectCollection */
-    protected $collection;
+    private $collection;
 
     protected function setUp()
     {
@@ -84,7 +84,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [''],
-            [' '],
+            [' ']
         ];
     }
 
@@ -101,7 +101,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
         return [
             ['test'],
             [123],
-            [1.23],
+            [1.23]
         ];
     }
 
@@ -187,7 +187,7 @@ class KeyObjectCollectionTest extends \PHPUnit_Framework_TestCase
         self::assertSame([$key1 => $object1, $key2 => $object2], $this->collection->getAll());
     }
 
-    public function testShouldBeIteratable()
+    public function testShouldBeIterable()
     {
         $object = new \stdClass();
         $key = 'key';

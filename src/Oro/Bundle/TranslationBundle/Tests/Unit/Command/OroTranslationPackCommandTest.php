@@ -7,7 +7,7 @@ use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\TestKernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
+class OroTranslationPackCommandTest extends \PHPUnit\Framework\TestCase
 {
     public function testConfigure()
     {
@@ -215,7 +215,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $methods
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|OroTranslationPackCommand
+     * @return \PHPUnit\Framework\MockObject\MockObject|OroTranslationPackCommand
      */
     protected function getCommandMock($methods = array('asText'))
     {
@@ -228,7 +228,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $class
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getNewMock($class)
     {

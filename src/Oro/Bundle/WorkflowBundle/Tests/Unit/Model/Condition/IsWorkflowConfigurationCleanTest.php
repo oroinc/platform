@@ -9,9 +9,9 @@ use Oro\Bundle\WorkflowBundle\Model\Condition\IsWorkflowConfigurationClean;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class IsWorkflowConfigurationCleanTest extends \PHPUnit_Framework_TestCase
+class IsWorkflowConfigurationCleanTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $checker;
 
     /** @var IsWorkflowConfigurationClean */

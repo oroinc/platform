@@ -5,7 +5,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\ChartBundle\Form\EventListener\ChartTypeEventListener;
 use Symfony\Component\Form\FormEvents;
 
-class ChartTypeEventListenerTest extends \PHPUnit_Framework_TestCase
+class ChartTypeEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ChartTypeEventListener

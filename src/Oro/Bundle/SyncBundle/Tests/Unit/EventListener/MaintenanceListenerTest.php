@@ -7,20 +7,20 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\SyncBundle\EventListener\MaintenanceListener;
 
-class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
+class MaintenanceListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $websocketClient;
 
     /**
-     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connectionChecker;
 
     /**
-     * @var TokenAccessorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tokenAccessor;
 

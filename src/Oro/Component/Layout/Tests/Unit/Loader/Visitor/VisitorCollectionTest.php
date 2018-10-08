@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
-class VisitorCollectionTest extends \PHPUnit_Framework_TestCase
+class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldValidateConstructParameters()
     {

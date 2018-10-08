@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 
-class OrganizationSwitchAfterTest extends \PHPUnit_Framework_TestCase
+class OrganizationSwitchAfterTest extends \PHPUnit\Framework\TestCase
 {
     public function testEventInterface()
     {

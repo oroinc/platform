@@ -6,17 +6,17 @@ use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
 use Symfony\Component\Validator\Constraints\Valid;
 
-class EmailSettingsTypeTest extends \PHPUnit_Framework_TestCase
+class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailSettingsType
      */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $userConfigManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $subscriber;
 
     /**

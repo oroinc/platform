@@ -4,7 +4,7 @@ namespace Oro\Bundle\ChartBundle\Tests\Unit\Model\Data;
 
 use Oro\Bundle\ChartBundle\Model\Data\MappedData;
 
-class MappedDataTest extends \PHPUnit_Framework_TestCase
+class MappedDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException

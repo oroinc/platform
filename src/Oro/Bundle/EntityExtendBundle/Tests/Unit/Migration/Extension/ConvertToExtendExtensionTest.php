@@ -13,9 +13,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ConvertToExtendExtensionTest extends \PHPUnit_Framework_TestCase
+class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityMetadataHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityMetadataHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityMetadataHelper;
 
     /** @var ExtendOptionsManager */
@@ -24,13 +24,13 @@ class ConvertToExtendExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendOptionsParser */
     protected $extendOptionsParser;
 
-    /** @var ConfigModelManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configModelManager;
 
-    /** @var QueryBag|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $queries;
 
-    /** @var  Schema|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  Schema|\PHPUnit\Framework\MockObject\MockObject */
     protected $schema;
 
     protected function setUp()

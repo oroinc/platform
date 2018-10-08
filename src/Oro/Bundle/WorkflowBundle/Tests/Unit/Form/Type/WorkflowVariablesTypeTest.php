@@ -23,7 +23,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
     use EntityTrait;
 
-    /** @var VariableGuesser|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
     protected $variableGuesser;
 
     /** @var WorkflowVariablesType */
@@ -37,7 +37,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
 
-        /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $managerRegistry */
+        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
 
@@ -84,7 +84,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->method('addModelTransformer')
             ->with($this->isInstanceOf(WorkflowVariableDataTransformer::class));
 
-        /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
+        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('create')
@@ -300,7 +300,7 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             );
         }
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->any())->method('getVariables')->willReturn($variableCollection);
 

@@ -1,28 +1,27 @@
 /* @theme: blank; */
 
 .line-clamp {
-    overflow: hidden;
+    overflow: $line-clamp-overflow;
 
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    display: $line-clamp-display;
+    -webkit-line-clamp: $line-clamp-line-clamp;
+    -webkit-box-orient: $line-clamp-box-orient;
 
     &-polyfill {
-        position: relative;
+        position: $line-clamp-polyfill-position;
 
-        display: inline-block;
+        display: $line-clamp-polyfill-display;
 
-        overflow: hidden;
+        overflow: $line-clamp-polyfill-overflow;
 
-        &::after {
-            bottom: 0;
-            right: 0;
+        &:after {
+            top: $line-clamp-polyfill-after-top;
+            right: $line-clamp-polyfill-after-right;
 
-            width: 50%;
-            height: ceil($base-font-size * $base-line-height);
+            width: $line-clamp-polyfill-after-width;
+            height: $line-clamp-polyfill-after-height;
 
-            background: linear-gradient(to right, rgba(get-color('additional', 'ultra'), 0),
-                                                  rgba(get-color('additional', 'ultra'), 1) 50%);
+            background: $line-clamp-polyfill-after-background;
 
             @include after();
         }

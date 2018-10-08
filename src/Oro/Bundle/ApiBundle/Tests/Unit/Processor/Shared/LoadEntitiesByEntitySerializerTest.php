@@ -8,22 +8,21 @@ use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use Oro\Component\EntitySerializer\EntitySerializer;
 
 class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $serializer;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
+    private $serializer;
 
     /** @var LoadEntitiesByEntitySerializer */
-    protected $processor;
+    private $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->serializer = $this->getMockBuilder('Oro\Component\EntitySerializer\EntitySerializer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->serializer = $this->createMock(EntitySerializer::class);
 
         $this->processor = new LoadEntitiesByEntitySerializer($this->serializer);
     }
@@ -35,26 +34,26 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         $this->context->setResult($resultEntity);
         $this->processor->process($this->context);
 
-        $this->assertSame($resultEntity, $this->context->getResult());
+        self::assertSame($resultEntity, $this->context->getResult());
     }
 
     public function testProcessWithUnsupportedQuery()
     {
-        $this->assertFalse($this->context->hasResult());
+        self::assertFalse($this->context->hasResult());
 
         $this->context->setQuery(new \stdClass());
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasResult());
+        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcessWithoutConfig()
     {
-        $entityClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group';
+        $entityClass = Group::class;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn(new Config());
 
@@ -62,12 +61,12 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->hasResult());
+        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcess()
     {
-        $entityClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group';
+        $entityClass = Group::class;
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
@@ -76,11 +75,11 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         $entityDefinitionConfig = new EntityDefinitionConfig();
         $config = new Config();
         $config->setDefinition($entityDefinitionConfig);
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->willReturn($config);
 
-        $this->serializer->expects($this->once())
+        $this->serializer->expects(self::once())
             ->method('serialize')
             ->with(
                 self::identicalTo($query),
@@ -98,7 +97,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         $result = $this->context->getResult();
-        $this->assertEquals($data, $result);
-        $this->assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals($data, $result);
+        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
     }
 }

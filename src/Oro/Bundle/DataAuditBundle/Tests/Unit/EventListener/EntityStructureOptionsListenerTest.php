@@ -9,9 +9,9 @@ use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 
-class EntityStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AuditConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AuditConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $auditConfigProvider;
 
     /** @var EntityStructureOptionsListener */
@@ -61,7 +61,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
             ->with(\stdClass::class, 'test_field')
             ->willReturn($isFieldAuditable);
 
-        /** @var EntityStructureOptionsEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var EntityStructureOptionsEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(EntityStructureOptionsEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -130,7 +130,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
             ->with('class', 'field')
             ->willReturn(true);
 
-        /** @var EntityStructureOptionsEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        /** @var EntityStructureOptionsEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(EntityStructureOptionsEvent::class);
         $event->expects($this->once())
             ->method('getData')

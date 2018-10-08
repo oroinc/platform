@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
+class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
@@ -92,13 +92,13 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessageSent('test topic', 'test message');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains('Failed asserting that the message', $exception->getMessage());
             self::assertContains('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -117,13 +117,13 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessageSent('test topic');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains('Failed asserting that the message', $exception->getMessage());
             self::assertContains('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -148,13 +148,13 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessagesSent($topic, [$message1, 'another message']);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains('Failed asserting that the message', $exception->getMessage());
             self::assertContains('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -170,7 +170,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessagesSent($topic, [$message2]);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -182,7 +182,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -216,7 +216,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessagesCount($topic, 1);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
@@ -228,7 +228,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -261,7 +261,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertCountMessages($topic, 1);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
@@ -273,7 +273,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -305,7 +305,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertMessagesEmpty($topic);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -317,7 +317,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -335,7 +335,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertEmptyMessages($topic);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
@@ -347,7 +347,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
             );
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
@@ -361,12 +361,12 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $exception = false;
         try {
             self::assertAllMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
             self::assertContains('Failed asserting that exactly all messages were sent', $exception->getMessage());
         }
         if (!$exception) {
-            self::fail('\PHPUnit_Framework_ExpectationFailedException expected');
+            self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 

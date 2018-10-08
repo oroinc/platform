@@ -112,11 +112,18 @@ define([
                         return model.get('name') === columnName;
                     });
                     if (columnModel) {
+                        attributes.id = columnModel.get('name');
                         return self.columnRenderer.getRawAttributes(self.renderItem(columnModel).$el, attributes);
                     }
                     return '';
                 }
             }));
+
+            _.each(this.getItemViews(), function(view) {
+                view.setElement(this.$('#' + view.column.get('name')));
+                view.$el.attr('id', null);
+            }, this);
+
             return this;
         }
     });

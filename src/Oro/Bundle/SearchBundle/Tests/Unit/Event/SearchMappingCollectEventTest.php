@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
-class SearchMappingCollectEventTest extends \PHPUnit_Framework_TestCase
+class SearchMappingCollectEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

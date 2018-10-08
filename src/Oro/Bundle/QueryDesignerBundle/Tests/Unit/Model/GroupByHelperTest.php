@@ -4,7 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Model;
 
 use Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper;
 
-class GroupByHelperTest extends \PHPUnit_Framework_TestCase
+class GroupByHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider groupByDataProvider

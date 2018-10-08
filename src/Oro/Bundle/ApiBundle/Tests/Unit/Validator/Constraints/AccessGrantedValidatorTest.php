@@ -9,8 +9,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AccessGrantedValidatorTest extends AbstractConstraintValidatorTest
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $authorizationChecker;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
     protected function setUp()
     {

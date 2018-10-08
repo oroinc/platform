@@ -12,20 +12,20 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RouteCollection;
 
-abstract class AbstractLoaderTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|KernelInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|KernelInterface
      */
     protected $kernel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|RouteOptionsResolverInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|RouteOptionsResolverInterface
      */
     protected $routeOptionsResolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
      */
     protected $eventDispatcher;
 

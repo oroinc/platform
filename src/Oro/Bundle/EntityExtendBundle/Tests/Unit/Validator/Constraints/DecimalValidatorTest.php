@@ -6,10 +6,10 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\DecimalValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
+class DecimalValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface
      */
     protected $context;
 

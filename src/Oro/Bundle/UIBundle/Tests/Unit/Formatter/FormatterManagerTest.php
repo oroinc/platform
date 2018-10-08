@@ -7,7 +7,7 @@ use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestDefaultFormatter;
 use Oro\Bundle\UIBundle\Tests\Unit\Fixture\Formatter\TestFormatter;
 
-class FormatterManagerTest extends \PHPUnit_Framework_TestCase
+class FormatterManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormatterManager */
     protected $manager;

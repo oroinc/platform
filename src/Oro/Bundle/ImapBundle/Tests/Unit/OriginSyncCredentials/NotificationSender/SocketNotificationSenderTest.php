@@ -8,18 +8,18 @@ use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class SocketNotificationSenderTest extends \PHPUnit_Framework_TestCase
+class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SocketNotificationSender */
     private $sender;
 
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $websocketClient;
 
     /**
-     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connectionChecker;
 

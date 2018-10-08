@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class SegmentTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var SegmentType
@@ -100,7 +100,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'column_column_field_choice_options' => [
-                        'exclude_fields' => ['relation_type'],
+                        'exclude_fields' => ['relationType'],
                     ],
                     'column_column_choice_type'   => HiddenType::class,
                     'filter_column_choice_type'   => EntityFieldSelectType::class,

@@ -10,7 +10,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessageProducer;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
-class NullDriverTest extends \PHPUnit_Framework_TestCase
+class NullDriverTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
@@ -110,7 +110,7 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|NullSession
      */
     private function createSessionMock()
     {
@@ -118,7 +118,7 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NullSession
+     * @return \PHPUnit\Framework\MockObject\MockObject|NullSession
      */
     private function createSessionStub($message = null, $messageProducer = null)
     {
@@ -145,7 +145,7 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|NullMessageProducer
+     * @return \PHPUnit\Framework\MockObject\MockObject|NullMessageProducer
      */
     private function createMessageProducer()
     {

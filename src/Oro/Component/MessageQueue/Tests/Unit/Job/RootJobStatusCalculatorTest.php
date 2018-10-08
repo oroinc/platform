@@ -12,9 +12,9 @@ use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RootJobStatusCalculatorTest extends \PHPUnit_Framework_TestCase
+class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|JobStorage */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
     private $jobStorage;
 
     /** @var RootJobStatusCalculator */

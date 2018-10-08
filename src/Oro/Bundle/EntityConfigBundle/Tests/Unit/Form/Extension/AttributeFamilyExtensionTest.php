@@ -20,7 +20,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
     const DATA_CLASS = TestActivityTarget::class;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $attributeConfigProvider;
 
@@ -169,7 +169,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
         $formConfig->expects($this->once())
             ->method('getOptions')
             ->willReturn(['data_class' => self::DATA_CLASS]);
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->getMockBuilder(FormInterface::class)
             ->getMock();
         $form->expects($this->once())

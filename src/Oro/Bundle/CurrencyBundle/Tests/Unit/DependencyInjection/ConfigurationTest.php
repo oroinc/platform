@@ -4,7 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test Configuration

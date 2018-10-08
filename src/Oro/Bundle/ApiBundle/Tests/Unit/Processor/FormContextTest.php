@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-class FormContextTest extends \PHPUnit_Framework_TestCase
+class FormContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormContext */
     private $context;

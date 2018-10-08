@@ -5,7 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
-class SegmentSnapshotTest extends \PHPUnit_Framework_TestCase
+class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SegmentSnapshot */
     protected $entity;

@@ -7,17 +7,17 @@ use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 use Symfony\Component\HttpFoundation\Request;
 
-class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
+class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
     const VERSION = '1.0';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $parser;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $helper;
 
@@ -45,13 +45,9 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
 
         $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()
-            ->setMethods(array('save', 'contains', 'fetch'))
+            ->setMethods(array('save', 'fetch'))
             ->getMockForAbstractClass();
 
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with($routeName)
-            ->will($this->returnValue(true));
         $cache->expects($this->once())
             ->method('fetch')
             ->with($routeName)
@@ -69,17 +65,15 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
     }
 
-    public function testGetHelpLinkWithoutRoute()
+    public function testGetHelpLinkWithoutRouteAndWithoutCache()
     {
         $expectedLink = 'http://example.com/';
 
         $cache = $this->getMockBuilder(CacheProvider::class)
             ->disableOriginalConstructor()
-            ->setMethods(['save', 'contains', 'fetch'])
+            ->setMethods(['save', 'fetch'])
             ->getMockForAbstractClass();
 
-        $cache->expects($this->never())
-            ->method('contains');
         $cache->expects($this->never())
             ->method('fetch');
         $cache->expects($this->never())
@@ -92,7 +86,30 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
     }
-    
+
+    public function testGetHelpLinkWithoutRouteAndWithCache()
+    {
+        $expectedLink = 'http://example.com/';
+
+        $cache = $this->getMockBuilder(CacheProvider::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['save', 'fetch'])
+            ->getMockForAbstractClass();
+
+        $cache->expects($this->never())
+            ->method('fetch');
+        $cache->expects($this->never())
+            ->method('save');
+
+        $this->provider->setCache($cache);
+        $this->provider->setConfiguration([
+            'defaults' => [
+                'link' => 'http://example.com/',
+            ]
+        ]);
+        $this->assertEquals($expectedLink, $this->provider->getHelpLinkUrl());
+    }
+
     /**
      * @dataProvider configurationDataProvider
      * @param array $configuration
@@ -139,9 +156,13 @@ class HelpLinkProviderTest extends \PHPUnit_Framework_TestCase
         if ($hasCache) {
             $cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
                 ->disableOriginalConstructor()
-                ->setMethods(array('save'))
+                ->setMethods(array('save', 'fetch'))
                 ->getMockForAbstractClass();
 
+            $cache->expects($this->once())
+                ->method('fetch')
+                ->with($requestAttributes['_route'])
+                ->will($this->returnValue(false));
             $cache->expects($this->once())
                 ->method('save')
                 ->with($requestAttributes['_route'], $expectedLink);

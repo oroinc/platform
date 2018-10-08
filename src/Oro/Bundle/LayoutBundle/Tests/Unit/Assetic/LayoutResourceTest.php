@@ -10,7 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class LayoutResourceTest extends \PHPUnit_Framework_TestCase
+class LayoutResourceTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutResource */
     protected $layoutResource;

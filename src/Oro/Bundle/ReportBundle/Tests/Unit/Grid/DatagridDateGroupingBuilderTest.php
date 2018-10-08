@@ -15,10 +15,10 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @SuppressWarnings("PMD.ExcessiveMethodLength")
  */
-class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
+class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var |\PHPUnit\Framework\MockObject\MockObject
      */
     protected $calendarDateEntity = CalendarDate::class;
 
@@ -28,12 +28,12 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
     protected $datagridDateGroupingBuilder;
 
     /**
-     * @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $config
+     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config
      */
     protected $config;
 
     /**
-     * @var JoinIdentifierHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var JoinIdentifierHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $joinIdHelper;
 

@@ -12,7 +12,7 @@ use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
-class OAuthProviderTest extends \PHPUnit_Framework_TestCase
+class OAuthProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OAuthProvider
@@ -20,17 +20,17 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
     private $oauthProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|OAuthAwareUserProviderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|OAuthAwareUserProviderInterface
      */
     private $userProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ResourceOwnerMap
+     * @var \PHPUnit\Framework\MockObject\MockObject|ResourceOwnerMap
      */
     private $resourceOwnerMap;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|UserCheckerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|UserCheckerInterface
      */
     private $userChecker;
 

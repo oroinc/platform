@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
 
-class ActivityConditionOptionsLoadEventTest extends \PHPUnit_Framework_TestCase
+class ActivityConditionOptionsLoadEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

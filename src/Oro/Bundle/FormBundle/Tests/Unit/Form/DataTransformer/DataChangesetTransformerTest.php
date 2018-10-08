@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Form\DataTransformer\DataChangesetTransformer;
 
-class DataChangesetTransformerTest extends \PHPUnit_Framework_TestCase
+class DataChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DataChangesetTransformer

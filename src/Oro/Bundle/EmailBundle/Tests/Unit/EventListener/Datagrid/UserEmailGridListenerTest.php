@@ -10,18 +10,18 @@ use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-class UserEmailGridListenerTest extends \PHPUnit_Framework_TestCase
+class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserEmailGridListener */
     protected $listener;
 
-    /** @var EmailQueryFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EmailQueryFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $queryFactory;
 
-    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     protected $featureChecker;
 
-    /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagrid;
 
     public function setUp()

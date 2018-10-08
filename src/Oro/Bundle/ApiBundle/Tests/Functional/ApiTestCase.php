@@ -13,7 +13,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
@@ -69,13 +68,13 @@ abstract class ApiTestCase extends WebTestCase
 
         /**
          * Clear the security token and stop sending messages during handling of "kernel.terminate" event.
-         * This is needed to prevent unexpected exceptions in case if
-         * some database related exception occurrs during handling of API request
+         * This is needed to prevent unexpected exceptions
+         * if some database related exception occurs during handling of API request
          * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
          * As functional tests work inside a database transaction, any query to the database
          * after such exception can raise "current transaction is aborted,
          * commands ignored until end of transaction block" SQL exception
-         * in case if PostgreSQL is used in the tests.
+         * if PostgreSQL is used in the tests.
          */
         if (!$this->isKernelTerminateHandlerDisabled) {
             $container = $client->getKernel()->getContainer();
@@ -279,13 +278,13 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * Replaces all values in the given expected response content
-     * with correxponding value from the actual response content
+     * with corresponding value from the actual response content
      * when the key of an element is equal to the given key
      * and the value of this element is equal to the given placeholder.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response        The response object
-     * @param string       $key             The key for with a value shoul be updated
+     * @param string       $key             The key for with a value should be updated
      * @param string       $placeholder     The marker value
      *
      * @return array
@@ -357,8 +356,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -388,8 +387,8 @@ abstract class ApiTestCase extends WebTestCase
     ) {
         try {
             static::assertResponseStatusCodeEquals($response, $statusCode);
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            $e = new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -424,20 +423,67 @@ abstract class ApiTestCase extends WebTestCase
                     if (!empty($message)) {
                         $failureMessage = $message . "\n" . $failureMessage;
                     }
-                    throw new \PHPUnit_Framework_ExpectationFailedException($failureMessage);
+                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
                 }
             } else {
-                \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+                \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
-                $e = new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
                 );
             }
             throw $e;
         }
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     * @param mixed    $expectedValue
+     */
+    public static function assertResponseHeader(Response $response, string $headerName, string $expectedValue)
+    {
+        self::assertEquals(
+            $expectedValue,
+            $response->headers->get($headerName),
+            sprintf('"%s" response header', $headerName)
+        );
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     */
+    public static function assertResponseHeaderNotExists(Response $response, string $headerName)
+    {
+        self::assertFalse(
+            $response->headers->has($headerName),
+            sprintf('"%s" header should not exist in the response', $headerName)
+        );
+    }
+
+    /**
+     * Asserts "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    public static function assertAllowResponseHeader(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ) {
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
     }
 
     /**
@@ -454,7 +500,7 @@ abstract class ApiTestCase extends WebTestCase
         string $message = ''
     ) {
         self::assertResponseStatusCodeEquals($response, Response::HTTP_METHOD_NOT_ALLOWED, $message);
-        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
+        self::assertAllowResponseHeader($response, $expectedAllowedMethods, $message);
     }
 
     /**
@@ -498,13 +544,13 @@ abstract class ApiTestCase extends WebTestCase
             /**
              * Suppress database related exceptions during the clearing of the entity manager,
              * if it was requested for safe handling of "kernel.terminate" event.
-             * This is needed to prevent unexpected exceptions in case if
-             * some database related exception occurrs during handling of API request
+             * This is needed to prevent unexpected exceptions
+             * if some database related exception occurs during handling of API request
              * (e.g. Doctrine\DBAL\Exception\UniqueConstraintViolationException).
              * As functional tests work inside a database transaction, any query to the database
              * after such exception can raise "current transaction is aborted,
              * commands ignored until end of transaction block" SQL exception
-             * in case if PostgreSQL is used in the tests.
+             * if PostgreSQL is used in the tests.
              */
             if ($this->isKernelTerminateHandlerDisabled) {
                 throw $e;

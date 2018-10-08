@@ -7,9 +7,9 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
-class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
+class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasResolverRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolverRegistry */
     private $entityAliasResolverRegistry;
 
     /** @var NormalizeEntityClass */
@@ -60,7 +60,7 @@ class NormalizeEntityClassTest extends \PHPUnit_Framework_TestCase
             ->willReturnMap(
                 [
                     ['alias1', 'Test\Class1'],
-                    ['alias2', 'Test\Class2'],
+                    ['alias2', 'Test\Class2']
                 ]
             );
 

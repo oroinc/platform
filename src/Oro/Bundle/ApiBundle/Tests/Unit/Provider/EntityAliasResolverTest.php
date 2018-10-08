@@ -5,23 +5,23 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
-use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Psr\Log\LoggerInterface;
 
-class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
+class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityAliasLoader */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
     private $loader;
 
-    /** @var EntityOverrideProvider */
+    /** @var MutableEntityOverrideProvider */
     private $entityOverrideProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Cache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
     private $cache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
     private $logger;
 
     /** @var EntityAliasResolver */
@@ -30,7 +30,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
-        $this->entityOverrideProvider = new EntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
+        $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
         $this->cache = $this->createMock(Cache::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 

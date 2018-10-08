@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 
-class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
+class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyIterator()
     {

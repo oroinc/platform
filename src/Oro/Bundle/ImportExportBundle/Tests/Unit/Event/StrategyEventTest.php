@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Event;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
-class StrategyEventTest extends \PHPUnit_Framework_TestCase
+class StrategyEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var StrategyInterface;

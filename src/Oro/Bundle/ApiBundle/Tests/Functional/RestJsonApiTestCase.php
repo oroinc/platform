@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+    protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
      * {@inheritdoc}
@@ -36,16 +36,9 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * Sends REST API request.
-     *
-     * @param string $method
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $server
-     *
-     * @return Response
+     * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         if (!empty($parameters['filter'])) {
             foreach ($parameters['filter'] as $key => $filter) {
@@ -76,8 +69,10 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
-        if (!isset($server['HTTP_X-WSSE'])) {
+        if (!array_key_exists('HTTP_X-WSSE', $server)) {
             $server = array_replace($server, $this->getWsseAuthHeader());
+        } elseif (!$server['HTTP_X-WSSE']) {
+            unset($server['HTTP_X-WSSE']);
         }
 
         $this->client->request(
@@ -85,7 +80,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $uri,
             $parameters,
             [],
-            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE])
+            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]),
+            $content
         );
 
         // make sure that REST API call does not start the session
@@ -732,8 +728,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $content[JsonApiDoc::ERRORS],
                 'Unexpected number of validation errors'
             );
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new \PHPUnit_Framework_ExpectationFailedException(
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),

@@ -8,7 +8,7 @@ use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
 use Symfony\Component\Routing\Route;
 
-class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
+class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
     const MENU_NAME = 'test_menu';
 
@@ -18,12 +18,12 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|BreadcrumbManager
+     * @var \PHPUnit\Framework\MockObject\MockObject|BreadcrumbManager
      */
     protected $managerMock;
 
     /**
-     * @var \Knp\Menu\FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Knp\Menu\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $factory;
 
@@ -40,7 +40,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|BreadcrumbManagerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|BreadcrumbManagerInterface
      */
     protected function getManagerMock()
     {

@@ -11,9 +11,9 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
-class FormExtensionTest extends \PHPUnit_Framework_TestCase
+class FormExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
     protected function setUp()
@@ -36,7 +36,7 @@ class FormExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $extendedType
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|FormTypeExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|FormTypeExtensionInterface
      */
     private function getFormTypeExtension($extendedType)
     {

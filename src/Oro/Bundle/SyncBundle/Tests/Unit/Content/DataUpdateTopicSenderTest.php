@@ -9,24 +9,24 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class DataUpdateTopicSenderTest extends \PHPUnit_Framework_TestCase
+class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_USERNAME = 'usernameTeST';
     private const TEST_TAG1 = 'TestTag1';
     private const TEST_TAG2 = 'TestTag2';
 
     /**
-     * @var WebsocketClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $websocketClient;
 
     /**
-     * @var ConnectionChecker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connectionChecker;
 
     /**
-     * @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $tokenStorage;
 

@@ -7,7 +7,7 @@ define(function(require) {
     var module = require('module');
     var mediator = require('oroui/js/mediator');
     var sync = require('orosync/js/sync');
-    var channel = module.config().clankEvent;
+    var channel = module.config().wsChannel;
     var countCache = require('oroemail/js/util/unread-email-count-cache');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');

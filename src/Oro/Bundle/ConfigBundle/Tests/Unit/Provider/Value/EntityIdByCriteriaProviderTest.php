@@ -7,10 +7,10 @@ use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Provider\Value\Entity\EntityIdByCriteriaProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class EntityIdByCriteriaProviderTest extends \PHPUnit_Framework_TestCase
+class EntityIdByCriteriaProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doctrineHelper;
 

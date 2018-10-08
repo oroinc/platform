@@ -7,18 +7,14 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
- * Class DatagridSourceSegmentProxy
- *
- * @package Oro\Bundle\SegmentBundle\Model
- *
- *  This class is used by SegmentDatagridConfigurationBuilder to prevent converting definition for filters.
- *  It replaces all existing filters by "segment" filter, all segment restrictions will be applied there.
- *  It's only used when need to build segment's datagrid representation
+ * This class is used by SegmentDatagridConfigurationBuilder to prevent converting definition for filters.
+ * It replaces all existing filters by "segment" filter, all segment restrictions will be applied there.
+ * It's only used when need to build segment's datagrid representation
  */
 class DatagridSourceSegmentProxy extends AbstractSegmentProxy
 {
-    /** @var \Doctrine\ORM\EntityManager */
-    protected $em;
+    /** @var EntityManager */
+    private $em;
 
     /**
      * {@inheritdoc}
@@ -34,6 +30,10 @@ class DatagridSourceSegmentProxy extends AbstractSegmentProxy
      */
     public function getDefinition()
     {
+        if (null === $this->segment->getId()) {
+            return $this->segment->getDefinition();
+        }
+
         if (null === $this->preparedDefinition) {
             $definition = $this->segment->getDefinition();
 
@@ -54,11 +54,10 @@ class DatagridSourceSegmentProxy extends AbstractSegmentProxy
                     'filters' => [
                         [
                             'columnName' => $identifier,
-                            'criterion'  =>
-                                [
-                                    'filter' => 'segment',
-                                    'data'   => ['value' => $this->segment->getId()]
-                                ],
+                            'criterion'  => [
+                                'filter' => 'segment',
+                                'data'   => ['value' => $this->segment->getId()]
+                            ]
                         ]
                     ]
                 ]

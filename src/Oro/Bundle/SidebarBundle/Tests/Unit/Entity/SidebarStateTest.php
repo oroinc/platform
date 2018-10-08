@@ -5,7 +5,7 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class SidebarStateTest extends \PHPUnit_Framework_TestCase
+class SidebarStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider

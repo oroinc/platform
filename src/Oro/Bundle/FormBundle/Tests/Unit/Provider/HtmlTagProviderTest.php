@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
-class HtmlTagProviderTest extends \PHPUnit_Framework_TestCase
+class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var HtmlTagProvider

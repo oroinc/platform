@@ -8,15 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
+class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AuthorizationCheckerInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OwnershipQueryHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipQueryHelper */
     protected $ownershipQueryHelper;
 
     /** @var FieldAclExtension */

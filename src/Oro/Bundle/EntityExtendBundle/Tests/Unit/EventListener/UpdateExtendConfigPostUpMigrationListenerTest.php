@@ -7,7 +7,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
-class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
+class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnPostUp()
     {

@@ -4,10 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 
-class FiltersConfigExtraTest extends \PHPUnit_Framework_TestCase
+class FiltersConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FiltersConfigExtra */
-    protected $extra;
+    private $extra;
 
     protected function setUp()
     {
@@ -16,21 +16,21 @@ class FiltersConfigExtraTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(FiltersConfigExtra::NAME, $this->extra->getName());
+        self::assertEquals(FiltersConfigExtra::NAME, $this->extra->getName());
     }
 
     public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isPropagable());
+        self::assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
     {
-        $this->assertEquals(FiltersConfigExtra::NAME, $this->extra->getCacheKeyPart());
+        self::assertEquals(FiltersConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }
 
     public function testConfigType()
     {
-        $this->assertEquals('filters', $this->extra->getConfigType());
+        self::assertEquals('filters', $this->extra->getConfigType());
     }
 }

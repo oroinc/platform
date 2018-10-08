@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 
-class UnidirectionalFieldHelperTest extends \PHPUnit_Framework_TestCase
+class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isFieldUnidirectionalDataProvider

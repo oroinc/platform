@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
-class EmailAttachmentContentTest extends \PHPUnit_Framework_TestCase
+class EmailAttachmentContentTest extends \PHPUnit\Framework\TestCase
 {
     public function testIdGetter()
     {

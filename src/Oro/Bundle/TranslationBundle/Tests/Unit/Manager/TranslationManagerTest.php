@@ -10,35 +10,40 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TranslationManagerTest extends \PHPUnit_Framework_TestCase
+class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Registry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
     protected $registry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationDomainProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationDomainProvider */
     protected $domainProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DynamicTranslationMetadataCache */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager */
     protected $objectManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationKeyRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationKeyRepository */
     protected $translationKeyRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslationRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationRepository */
     protected $translationRepository;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|LanguageRepository */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
     protected $languageRepository;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    protected $eventDispatcher;
 
     protected function setUp()
     {
@@ -81,6 +86,8 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
+
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     protected function tearDown()
@@ -254,6 +261,9 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidateCache($with)
     {
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(InvalidateTranslationCacheEvent::NAME, new InvalidateTranslationCacheEvent($with));
         $this->dbTranslationMetadataCache->expects($this->once())->method('updateTimestamp')->with($with);
         $manager = $this->getTranslationManager();
         $manager->invalidateCache($with);
@@ -289,7 +299,14 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTranslationManager()
     {
-        return new TranslationManager($this->registry, $this->domainProvider, $this->dbTranslationMetadataCache);
+        $translationManager = new TranslationManager(
+            $this->registry,
+            $this->domainProvider,
+            $this->dbTranslationMetadataCache,
+            $this->eventDispatcher
+        );
+
+        return $translationManager;
     }
 
     /**

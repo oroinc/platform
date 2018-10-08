@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 
-class ModeExtensionTest extends \PHPUnit_Framework_TestCase
+class ModeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ModeExtension

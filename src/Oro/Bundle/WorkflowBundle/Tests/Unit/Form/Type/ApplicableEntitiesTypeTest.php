@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ApplicableEntitiesTypeTest extends \PHPUnit_Framework_TestCase
+class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConnector;
 
     /** @var ApplicableEntitiesType */

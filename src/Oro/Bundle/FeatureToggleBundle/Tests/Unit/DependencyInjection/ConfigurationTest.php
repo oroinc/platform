@@ -5,7 +5,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test Configuration

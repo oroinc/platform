@@ -4,7 +4,7 @@ namespace Oro\Bundle\CacheBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 
-class OroDataCacheManagerTest extends \PHPUnit_Framework_TestCase
+class OroDataCacheManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSync()
     {

@@ -10,17 +10,17 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_TestCase
+class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
     const ENTITY_CLASS_NAME = 'entity_class';
 
-    /** @var AbstractDynamicFieldsExtension|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AbstractDynamicFieldsExtension|\PHPUnit\Framework\MockObject\MockObject */
     private $baseExtension;
 
-    /** @var AttributeConfigHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AttributeConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigHelper;
 
     /** @var DynamicFieldsExtensionAttributeDecorator */

@@ -15,28 +15,30 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
+class DateFilterSubsriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
-    /** @var DateFilterModifier|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
     protected $modifier;
+
+    private const TIMEZONE = 'Europe/Moscow';
 
     protected function setUp()
     {
-        /** @var LocaleSettings|\PHPUnit_Framework_MockObject_MockObject $localeSettings */
+        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(['getTimezone'])
             ->getMock();
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('Europe/Moscow'));
+            ->will($this->returnValue(self::TIMEZONE));
 
-        /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject $translatorMock */
+        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translatorMock */
         $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        /** @var DateModifierProvider|\PHPUnit_Framework_MockObject_MockObject $providerMock */
+        /** @var DateModifierProvider|\PHPUnit\Framework\MockObject\MockObject $providerMock */
         $providerMock = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
 
         $this->modifier   = new DateFilterModifier(
@@ -87,7 +89,7 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
      */
     public function dataProvider()
     {
-        $weekDateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $weekDateTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $weekDateTime->modify('this week');
         // Needed because Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult changes first day of week
         $weekNumber = $weekDateTime->format('W');
@@ -104,19 +106,18 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            // TODO: Should be fixed in BAP-13057
-//            'should process weeks'                                                => [
-//                [
-//                    'part'  => DateModifierInterface::PART_WEEK,
-//                    'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
-//                ],
-//                [
-//                    'part'  => DateModifierInterface::PART_WEEK,
-//                    'value' => ['start' => 3, 'end' => $weekNumber]
-//                ],
-//                ['start' => 'start subform', 'end' => 'end subform'],
-//                ['start' => null, 'end' => null]
-//            ],
+            'should process weeks'                                                => [
+                [
+                    'part'  => DateModifierInterface::PART_WEEK,
+                    'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
+                ],
+                [
+                    'part'  => DateModifierInterface::PART_WEEK,
+                    'value' => ['start' => 3, 'end' => $weekNumber]
+                ],
+                ['start' => 'start subform', 'end' => 'end subform'],
+                ['start' => null, 'end' => null]
+            ],
             'should process months'                                               => [
                 [
                     'part'  => DateModifierInterface::PART_MONTH,
@@ -173,7 +174,7 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
                     'type'  => AbstractDateFilterType::TYPE_BETWEEN,
                     'value' => [
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}',
-                        'end' => date('Y') . '-01-01 23:59'
+                        'end' => date('Y') . '-01-02 00:00'
                     ]
                 ]
             ],
@@ -187,7 +188,7 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
                     'part'  => DateModifierInterface::PART_VALUE,
                     'type'  => AbstractDateFilterType::TYPE_NOT_BETWEEN,
                     'value' => [
-                        'end' => date('Y') . '-01-01 23:59',
+                        'end' => date('Y') . '-01-02 00:00',
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}'
                     ]
                 ]

@@ -5,7 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 
-class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
+class ResultStatisticsProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ResultStatisticsProvider
@@ -13,22 +13,22 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
     protected $target;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $indexer;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $search;
 
@@ -138,7 +138,7 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $config
      * @param string $class
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getSearchResultEntity(array $config, $class)
     {
@@ -158,7 +158,7 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $label
      * @param string $icon
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getConfigEntity($label, $icon)
     {

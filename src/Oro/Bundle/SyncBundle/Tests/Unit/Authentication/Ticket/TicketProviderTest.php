@@ -6,12 +6,12 @@ use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDige
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProvider;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class TicketProviderTest extends \PHPUnit_Framework_TestCase
+class TicketProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const TICKET_DIGEST = 'sampleDigest';
 
     /**
-     * @var TicketDigestGeneratorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ticketDigestGenerator;
 

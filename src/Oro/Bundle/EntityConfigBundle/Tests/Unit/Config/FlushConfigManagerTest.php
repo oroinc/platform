@@ -13,32 +13,32 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 
-class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
+class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY_CLASS = 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity';
 
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $testConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $modelManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $auditManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configCache;
 
     protected function setUp()
@@ -139,7 +139,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->setFlushExpectations($em, [$model]);
 
-        $this->eventDispatcher->expects($this->at(2))
+        $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
                 Events::PRE_FLUSH,
@@ -174,7 +174,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $em
+     * @param \PHPUnit\Framework\MockObject\MockObject $em
      * @param ConfigModel[]                            $models
      */
     protected function setFlushExpectations($em, $models)

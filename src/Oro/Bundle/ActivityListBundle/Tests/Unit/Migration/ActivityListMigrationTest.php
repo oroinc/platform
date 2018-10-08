@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Migration;
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class ActivityListMigrationTest extends \PHPUnit_Framework_TestCase
+class ActivityListMigrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testUp()
     {

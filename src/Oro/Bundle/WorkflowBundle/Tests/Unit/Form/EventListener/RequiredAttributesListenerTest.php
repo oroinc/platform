@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Symfony\Component\Form\FormEvents;
 
-class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
+class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RequiredAttributesListener

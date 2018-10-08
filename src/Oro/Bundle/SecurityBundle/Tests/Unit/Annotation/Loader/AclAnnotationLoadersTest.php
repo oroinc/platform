@@ -9,7 +9,7 @@ use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Annotation\Fixtures\TestBundle;
 use Oro\Component\Config\CumulativeResourceManager;
 
-class AclAnnotationLoadersTest extends \PHPUnit_Framework_TestCase
+class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
 {
     protected function setUp()
     {

@@ -3,7 +3,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 
-class ConfigVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigVirtualFieldProvider */
     private $configVirtualFieldProvider;

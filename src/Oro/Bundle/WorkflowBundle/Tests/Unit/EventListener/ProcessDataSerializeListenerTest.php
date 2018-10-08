@@ -13,12 +13,12 @@ use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\TestUtils\Mocks\ServiceLink;
 
-class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
+class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_CLASS = 'Test\Class';
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $serializer;
 

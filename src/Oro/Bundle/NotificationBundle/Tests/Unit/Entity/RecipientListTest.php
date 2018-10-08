@@ -6,7 +6,7 @@ use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class RecipientListTest extends \PHPUnit_Framework_TestCase
+class RecipientListTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RecipientList
@@ -126,7 +126,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidData()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface $context */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface $context */
         $context = $this->createMock(ExecutionContextInterface::class);
 
         $context->expects($this->once())
@@ -151,7 +151,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $group = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
         $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContextInterface $context */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface $context */
         $context = $this->createMock(ExecutionContextInterface::class);
 
         $context->expects($this->never())

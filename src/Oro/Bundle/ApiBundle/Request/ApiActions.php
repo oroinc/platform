@@ -7,6 +7,7 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 final class ApiActions
 {
+    const OPTIONS             = 'options';
     const GET                 = 'get';
     const GET_LIST            = 'get_list';
     const UPDATE              = 'update';

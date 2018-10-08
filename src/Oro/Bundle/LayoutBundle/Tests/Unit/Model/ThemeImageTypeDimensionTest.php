@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Model;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
-class ThemeImageTypeDimensionTest extends \PHPUnit_Framework_TestCase
+class ThemeImageTypeDimensionTest extends \PHPUnit\Framework\TestCase
 {
     const NAME = 'dim';
     const WIDTH = 100;

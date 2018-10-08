@@ -6,12 +6,12 @@ use Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ButtonWidgetActionTest extends \PHPUnit_Framework_TestCase
+class ButtonWidgetActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ButtonWidgetAction */
     protected $action;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     protected $translator;
 
     protected function setUp()

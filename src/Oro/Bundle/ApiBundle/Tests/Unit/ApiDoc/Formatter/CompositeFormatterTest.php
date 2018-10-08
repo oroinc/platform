@@ -7,16 +7,16 @@ use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter\CompositeFormatter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 
-class CompositeFormatterTest extends \PHPUnit_Framework_TestCase
+class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|RestDocViewDetector */
-    protected $docViewDetector;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
+    private $docViewDetector;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FormatterInterface */
-    protected $formatter;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormatterInterface */
+    private $formatter;
 
     /** @var CompositeFormatter */
-    protected $compositeFormatter;
+    private $compositeFormatter;
 
     protected function setUp()
     {

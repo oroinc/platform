@@ -5,27 +5,22 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
 /**
- * Populates ApiDoc annotation based on the confoguration of Data API resource.
+ * Populates ApiDoc annotation based on the configuration of Data API resource.
  */
 class RestDocHandler implements HandlerInterface
 {
-    private const ID_PLACEHOLDER   = '{id}';
-    private const INPUT_DIRECTION  = 'input';
-    private const OUTPUT_DIRECTION = 'output';
+    private const ID_PLACEHOLDER = '{id}';
 
     private const SUCCESS_STATUS_CODES_WITH_CONTENT = [
         Response::HTTP_OK,
@@ -39,8 +34,8 @@ class RestDocHandler implements HandlerInterface
     /** @var RestDocViewDetector */
     private $docViewDetector;
 
-    /** @var ActionProcessorBagInterface */
-    private $processorBag;
+    /** @var RestDocContextProvider */
+    private $contextProvider;
 
     /** @var ValueNormalizer */
     private $valueNormalizer;
@@ -51,28 +46,34 @@ class RestDocHandler implements HandlerInterface
     /** @var RestDocFiltersHandler */
     private $filtersHandler;
 
+    /** @var RestDocStatusCodesHandler */
+    private $statusCodesHandler;
+
     /**
-     * @param string                      $routeGroup
-     * @param RestDocViewDetector         $docViewDetector
-     * @param ActionProcessorBagInterface $processorBag
-     * @param ValueNormalizer             $valueNormalizer
-     * @param RestDocIdentifierHandler    $identifierHandler
-     * @param RestDocFiltersHandler       $filtersHandler
+     * @param string                    $routeGroup
+     * @param RestDocViewDetector       $docViewDetector
+     * @param RestDocContextProvider    $contextProvider
+     * @param ValueNormalizer           $valueNormalizer
+     * @param RestDocIdentifierHandler  $identifierHandler
+     * @param RestDocFiltersHandler     $filtersHandler
+     * @param RestDocStatusCodesHandler $statusCodesHandler
      */
     public function __construct(
         string $routeGroup,
         RestDocViewDetector $docViewDetector,
-        ActionProcessorBagInterface $processorBag,
+        RestDocContextProvider $contextProvider,
         ValueNormalizer $valueNormalizer,
         RestDocIdentifierHandler $identifierHandler,
-        RestDocFiltersHandler $filtersHandler
+        RestDocFiltersHandler $filtersHandler,
+        RestDocStatusCodesHandler $statusCodesHandler
     ) {
         $this->routeGroup = $routeGroup;
         $this->docViewDetector = $docViewDetector;
-        $this->processorBag = $processorBag;
+        $this->contextProvider = $contextProvider;
         $this->valueNormalizer = $valueNormalizer;
         $this->identifierHandler = $identifierHandler;
         $this->filtersHandler = $filtersHandler;
+        $this->statusCodesHandler = $statusCodesHandler;
     }
 
     /**
@@ -97,40 +98,24 @@ class RestDocHandler implements HandlerInterface
         $annotation->setSection($entityType);
         $entityClass = $this->getEntityClass($entityType);
         $associationName = $route->getDefault(RestRouteOptionsResolver::ASSOCIATION_ATTRIBUTE);
-        $context = $this->getContext($action, $entityClass, $associationName);
+        $context = $this->contextProvider->getContext($action, $entityClass, $associationName, $route);
 
         $config = $context->getConfig();
-        if (null === $config) {
-            return;
-        }
+        if (null !== $config) {
+            $this->setDescription($annotation, $config);
+            $this->setDocumentation($annotation, $config);
+            $this->setStatusCodes($annotation, $config);
 
-        $this->setDescription($annotation, $config);
-        $this->setDocumentation($annotation, $config);
-        $this->setStatusCodes($annotation, $config);
-
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
-            return;
-        }
-
-        if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-            $entityConfig = $config;
-            $entityMetadata = $metadata;
-            if ($associationName) {
-                $entityConfig = $context->getParentConfig();
-                $entityMetadata = $context->getParentMetadata();
+            $metadata = $context->getMetadata();
+            if (null !== $metadata) {
+                if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                    $this->handleIdentifier($annotation, $route, $context, $config, $metadata, $associationName);
+                }
+                $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
+                $this->setInputMetadata($annotation, $action, $config, $metadata);
+                $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
             }
-            $this->identifierHandler->handle(
-                $annotation,
-                $route,
-                $entityMetadata,
-                $entityConfig->getIdentifierDescription()
-            );
         }
-
-        $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-        $this->setInputMetadata($annotation, $action, $config, $metadata);
-        $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
     }
 
     /**
@@ -161,81 +146,35 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param string      $action
-     * @param string      $entityClass
-     * @param string|null $associationName
-     *
-     * @return Context|SubresourceContext
+     * @param ApiDoc                 $annotation
+     * @param Route                  $route
+     * @param Context                $context
+     * @param EntityDefinitionConfig $config
+     * @param EntityMetadata         $metadata
+     * @param string|null            $associationName
      */
-    private function getContext($action, $entityClass, $associationName = null)
-    {
-        $processor = $this->processorBag->getProcessor($action);
-        /** @var Context $context */
-        $context = $processor->createContext();
-        $context->addConfigExtra(new DescriptionsConfigExtra());
-        $context->getRequestType()->set($this->docViewDetector->getRequestType());
-        $context->setVersion($this->docViewDetector->getVersion());
-        $context->setLastGroup('initialize');
-        if ($associationName) {
-            /** @var SubresourceContext $context */
-            $context->setParentClassName($entityClass);
-            $context->setAssociationName($associationName);
-            $parentConfigExtras = $context->getParentConfigExtras();
-            $parentConfigExtras[] = new DescriptionsConfigExtra();
-            $context->setParentConfigExtras($parentConfigExtras);
-        } else {
-            $context->setClassName($entityClass);
+    private function handleIdentifier(
+        ApiDoc $annotation,
+        Route $route,
+        Context $context,
+        EntityDefinitionConfig $config,
+        EntityMetadata $metadata,
+        ?string $associationName
+    ) {
+        $entityConfig = $config;
+        $entityMetadata = $metadata;
+        if ($associationName && $context instanceof SubresourceContext) {
+            $entityConfig = $context->getParentConfig();
+            $entityMetadata = $context->getParentMetadata();
         }
-
-        $processor->process($context);
-
-        return $context;
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function getConfig(Context $context): EntityDefinitionConfig
-    {
-        $config = $context->getConfig();
-        if (null === $config) {
-            $message = \sprintf(
-                'The configuration for "%s" cannot be loaded. Action: %s',
-                $context->getClassName(),
-                $context->getAction()
+        if (null !== $entityConfig && null !== $entityMetadata) {
+            $this->identifierHandler->handle(
+                $annotation,
+                $route,
+                $entityMetadata,
+                $entityConfig->getIdentifierDescription()
             );
-            if ($context instanceof SubresourceContext) {
-                $message .= \sprintf(' Association: %s.', $context->getAssociationName());
-            }
-            throw new \LogicException($message);
         }
-
-        return $config;
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return EntityMetadata
-     */
-    private function getMetadata(Context $context): EntityMetadata
-    {
-        $metadata = $context->getMetadata();
-        if (null === $metadata) {
-            $message = \sprintf(
-                'The metadata for "%s" cannot be loaded. Action: %s',
-                $context->getClassName(),
-                $context->getAction()
-            );
-            if ($context instanceof SubresourceContext) {
-                $message .= \sprintf(' Association: %s.', $context->getAssociationName());
-            }
-            throw new \LogicException($message);
-        }
-
-        return $metadata;
     }
 
     /**
@@ -275,10 +214,9 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata
     ) {
         if ($this->isActionWithInput($action)) {
-            $this->setDirectionValue(
+            ApiDocAnnotationUtil::setInput(
                 $annotation,
-                self::INPUT_DIRECTION,
-                $this->getDirectionValue($action, self::INPUT_DIRECTION, $config, $metadata)
+                $this->getDirectionValue($action, 'input', $config, $metadata)
             );
         }
     }
@@ -299,22 +237,25 @@ class RestDocHandler implements HandlerInterface
         EntityMetadata $metadata,
         $associationName = null
     ) {
-        if ($this->isActionWithOutput($annotation)) {
+        if ($this->isActionWithOutput($action, $annotation)) {
             if ($metadata->hasIdentifierFields()) {
                 // check if output format should be taken from another action type. In this case
                 // entity metadata and config will be taken for the action, those format should be used
                 $substituteAction = $this->getOutputAction($action);
                 if ($action !== $substituteAction) {
-                    $substituteContext = $this->getContext($substituteAction, $entityClass, $associationName);
-                    $config = $this->getConfig($substituteContext);
-                    $metadata = $this->getMetadata($substituteContext);
+                    $substituteContext = $this->contextProvider->getContext(
+                        $substituteAction,
+                        $entityClass,
+                        $associationName
+                    );
+                    $config = $this->contextProvider->getConfig($substituteContext);
+                    $metadata = $this->contextProvider->getMetadata($substituteContext);
                 }
             }
 
-            $this->setDirectionValue(
+            ApiDocAnnotationUtil::setOutput(
                 $annotation,
-                self::OUTPUT_DIRECTION,
-                $this->getDirectionValue($action, self::OUTPUT_DIRECTION, $config, $metadata)
+                $this->getDirectionValue($action, 'output', $config, $metadata)
             );
         }
     }
@@ -344,34 +285,6 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * @param ApiDoc $annotation
-     * @param string $direction
-     * @param array  $value
-     */
-    private function setDirectionValue(ApiDoc $annotation, $direction, array $value)
-    {
-        // unfortunately there is no other way to update "input" and "output" parameters
-        // except to use the reflection
-        $outputProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), $direction);
-        $outputProperty->setAccessible(true);
-        $outputProperty->setValue($annotation, $value);
-    }
-
-    /**
-     * @param ApiDoc $annotation
-     * @return array [status code => description, ...]
-     */
-    private function getStatusCodes(ApiDoc $annotation)
-    {
-        // unfortunately there is no other way to get "statusCodes" property
-        // except to use the reflection
-        $statusCodesProperty = ReflectionUtil::getProperty(new \ReflectionClass($annotation), 'statusCodes');
-        $statusCodesProperty->setAccessible(true);
-
-        return $statusCodesProperty->getValue($annotation);
-    }
-
-    /**
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
@@ -379,18 +292,12 @@ class RestDocHandler implements HandlerInterface
     {
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
-            $codes = $statusCodes->getCodes();
-            \ksort($codes);
-            foreach ($codes as $statusCode => $code) {
-                if (!$code->isExcluded()) {
-                    $annotation->addStatusCode($statusCode, $code->getDescription());
-                }
-            }
+            $this->statusCodesHandler->handle($annotation, $statusCodes);
         }
     }
 
     /**
-     * Returns true in case if the given action receives resource data.
+     * Returns true if the given action receives resource data.
      *
      * @param string $action
      *
@@ -415,21 +322,24 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
-     * Returns true in case if the given ApiDoc annotation has at least one sucsess status code
+     * Returns true if the given ApiDoc annotation has at least one success status code
      * indicates that the resource data should be returned in the response.
      *
+     * @param string $action
      * @param ApiDoc $annotation
      *
      * @return bool
      */
-    private function isActionWithOutput(ApiDoc $annotation)
+    private function isActionWithOutput($action, ApiDoc $annotation)
     {
         $result = false;
-        $statusCodes = $this->getStatusCodes($annotation);
-        foreach ($statusCodes as $statusCode => $description) {
-            if (\in_array($statusCode, self::SUCCESS_STATUS_CODES_WITH_CONTENT, true)) {
-                $result = true;
-                break;
+        if (ApiActions::OPTIONS !== $action) {
+            $statusCodes = ApiDocAnnotationUtil::getStatusCodes($annotation);
+            foreach ($statusCodes as $statusCode => $description) {
+                if (\in_array($statusCode, self::SUCCESS_STATUS_CODES_WITH_CONTENT, true)) {
+                    $result = true;
+                    break;
+                }
             }
         }
 

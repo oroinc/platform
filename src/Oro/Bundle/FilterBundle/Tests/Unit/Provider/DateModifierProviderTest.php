@@ -4,7 +4,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
-class DateModifierProviderTest extends \PHPUnit_Framework_TestCase
+class DateModifierProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateModifierProvider */
     protected $dateModifierProvider;

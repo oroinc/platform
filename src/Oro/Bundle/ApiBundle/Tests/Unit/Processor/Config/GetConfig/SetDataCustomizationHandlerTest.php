@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CustomizeLoadedDataProcessor */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CustomizeLoadedDataProcessor */
     private $customizationProcessor;
 
     /** @var SetDataCustomizationHandler */
@@ -295,6 +295,79 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         foreach ([$rootAssert, $field2Assert, $field22Assert] as $assert) {
             $assert();
         }
+    }
+
+    public function testProcessForEntityWithAssociationAsField()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => null,
+                'field2' => [
+                    'exclusion_policy' => 'all',
+                    'data_type'        => 'object',
+                    'target_class'     => 'Test\Field2Target',
+                    'fields'           => [
+                        'field21' => null,
+                        'field22' => [
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\Field22Target',
+                            'fields'           => [
+                                'field221' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertInstanceOf(
+            EntityHandler::class,
+            $configObject->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field1')
+                ->getTargetEntity()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field21')
+                ->getTargetEntity()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getPostSerializeHandler()
+        );
+        self::assertNull(
+            $configObject
+                ->getField('field2')
+                ->getTargetEntity()
+                ->getField('field22')
+                ->getTargetEntity()
+                ->getField('field221')
+                ->getTargetEntity()
+        );
+
+        $rootAssert = $this->getRootHandlerAssertion($configObject);
+        $rootAssert();
     }
 
     /**

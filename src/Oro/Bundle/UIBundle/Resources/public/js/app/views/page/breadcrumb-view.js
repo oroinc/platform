@@ -4,9 +4,9 @@ define([
 ], function(_, PageRegionView) {
     'use strict';
 
-    var BreadcrumbView;
+    var PageBreadcrumbView;
 
-    BreadcrumbView = PageRegionView.extend({
+    PageBreadcrumbView = PageRegionView.extend({
         listen: {
             'mainMenuUpdated mediator': 'onMenuUpdate'
         },
@@ -30,8 +30,8 @@ define([
         /**
          * @inheritDoc
          */
-        constructor: function BreadcrumbView() {
-            BreadcrumbView.__super__.constructor.apply(this, arguments);
+        constructor: function PageBreadcrumbView() {
+            PageBreadcrumbView.__super__.constructor.apply(this, arguments);
         },
 
         /**
@@ -64,5 +64,5 @@ define([
         }
     });
 
-    return BreadcrumbView;
+    return PageBreadcrumbView;
 });

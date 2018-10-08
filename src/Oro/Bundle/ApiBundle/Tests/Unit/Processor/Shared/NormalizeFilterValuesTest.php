@@ -20,10 +20,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ValueNormalizer */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
     private $valueNormalizer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityIdTransformerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
     /** @var NormalizeFilterValues */

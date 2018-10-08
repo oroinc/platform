@@ -12,6 +12,7 @@
         &__central-panel {
             > .container {
                 width: auto;
+                display: flex;
             }
         }
     }
@@ -44,21 +45,6 @@
           background: #dbdbdb;
           border-color: #dbdbdb;
           color: #68686a;
-        }
-    }
-
-    .btn-large {
-        height: 40px;
-        line-height: 38px;
-        border-radius: 20px;
-
-        &.btn-success {
-            font-size: 15px;
-        }
-
-        [class^="fa-"],
-        [class*=" fa-"] {
-            font-size: 14px;
         }
     }
 

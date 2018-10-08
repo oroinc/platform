@@ -8,7 +8,7 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class RepositoryTypeTest extends \PHPUnit_Framework_TestCase
+class RepositoryTypeTest extends \PHPUnit\Framework\TestCase
 {
     use ReflectionHelperTrait;
     use MockHelperTrait;

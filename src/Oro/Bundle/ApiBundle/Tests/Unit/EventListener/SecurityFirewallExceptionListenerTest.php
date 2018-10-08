@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
+class SecurityFirewallExceptionListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const SESSION_NAME = 'TEST_SESSION_ID';
 
@@ -73,7 +73,7 @@ class SecurityFirewallExceptionListenerTest extends \PHPUnit_Framework_TestCase
         return [
             [new AccessDeniedException()],
             [new \LogicException('random', 0, new AccessDeniedException('embed', new AuthenticationException()))],
-            [new AccessDeniedException('random', new \LogicException())],
+            [new AccessDeniedException('random', new \LogicException())]
         ];
     }
 

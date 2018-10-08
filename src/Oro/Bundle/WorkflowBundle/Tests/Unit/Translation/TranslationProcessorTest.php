@@ -9,12 +9,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
-class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
+class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationProcessor */
     private $processor;
 
-    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
     protected function setUp()

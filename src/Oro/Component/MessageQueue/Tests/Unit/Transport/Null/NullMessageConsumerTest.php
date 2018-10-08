@@ -7,7 +7,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Null\NullQueue;
 use Oro\Component\Testing\ClassExtensionTrait;
 
-class NullMessageConsumerTest extends \PHPUnit_Framework_TestCase
+class NullMessageConsumerTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 

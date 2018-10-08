@@ -10,7 +10,7 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryValueBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 
-class SearchQueryBuilderTest extends \PHPUnit_Framework_TestCase
+class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider simpleProvider

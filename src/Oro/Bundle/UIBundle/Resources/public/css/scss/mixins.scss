@@ -1,4 +1,5 @@
 /* @theme: admin.oro; */
+@import "mixins/direction";
 
 $enable-safe-area: true;
 
@@ -299,11 +300,18 @@ $enable-safe-area: true;
 // List of icons https://github.com/FortAwesome/Font-Awesome/blob/v4.7.0/scss/_variables.scss
 // @param $icon (Font Awesome icon)
 // @param $state {CSS pseudo-element}
-@mixin fa-icon($icon: null, $state: before) {
+// Use:  @include fa-icon($view-product-gallery-icon, before, true) {
+//  extra rules
+// }
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
             font-family: 'FontAwesome', $baseFontFamily;
+
+            @if ($extra-rules) {
+                @content;
+            }
         }
     }
 }

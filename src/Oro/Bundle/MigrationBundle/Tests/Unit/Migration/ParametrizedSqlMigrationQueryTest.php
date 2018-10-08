@@ -6,9 +6,9 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 
-class ParametrizedSqlMigrationQueryTest extends \PHPUnit_Framework_TestCase
+class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
     protected function setUp()

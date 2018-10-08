@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
-class ImapEmailTest extends \PHPUnit_Framework_TestCase
+class ImapEmailTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetId()
     {

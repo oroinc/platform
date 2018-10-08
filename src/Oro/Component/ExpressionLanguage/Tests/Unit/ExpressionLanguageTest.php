@@ -8,7 +8,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\ExpressionLanguage\Tests\Fixtures\TestProvider;
 
-class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
+class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ExpressionLanguage

@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerWithoutGroupsFactory;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 
-class ProcessorApplicableCheckerWithoutGroupsFactoryTest extends \PHPUnit_Framework_TestCase
+class ProcessorApplicableCheckerWithoutGroupsFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateApplicableChecker()
     {

@@ -9,7 +9,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class ChangeRoleSubscriberTest extends \PHPUnit_Framework_TestCase
+class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ChangeRoleSubscriber
@@ -42,7 +42,7 @@ class ChangeRoleSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('removeRole')
             ->with($role);
 
-        /** @var Form|\PHPUnit_Framework_MockObject_MockObject $form */
+        /** @var Form|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->getMockBuilder(Form::class)
             ->disableOriginalConstructor()
             ->getMock();

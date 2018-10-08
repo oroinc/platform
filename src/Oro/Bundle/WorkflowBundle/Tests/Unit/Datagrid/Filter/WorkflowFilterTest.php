@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
+class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
 
     /** @var WorkflowFilter */

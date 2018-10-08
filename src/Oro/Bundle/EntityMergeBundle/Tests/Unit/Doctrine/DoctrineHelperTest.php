@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
+class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DoctrineHelper $target
@@ -13,37 +13,37 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     private $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
      */
     private $entityManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
      */
     private $metadataFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
      */
     private $metadata;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $queryBuilder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $query;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $expression;
 

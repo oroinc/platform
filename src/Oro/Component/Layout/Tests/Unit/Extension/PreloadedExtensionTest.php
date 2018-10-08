@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Extension;
 
 use Oro\Component\Layout\Extension\PreloadedExtension;
 
-class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
+class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testTypes()
     {

@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Entity\FieldsChanges;
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 
-class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
+class FieldsChangesManagerTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = '\stdClass';
 
@@ -16,17 +16,17 @@ class FieldsChangesManagerTest extends \PHPUnit_Framework_TestCase
     protected $manager;
 
     /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $repo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 

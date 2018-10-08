@@ -10,7 +10,7 @@ use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsIn
 use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
 use Psr\Log\LoggerInterface;
 
-class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit_Framework_TestCase
+class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MultiAttemptsClientDecoratorListener
@@ -18,7 +18,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit_Framework_TestCa
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
      */
     protected $logger;
 

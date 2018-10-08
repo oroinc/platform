@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 
-class FormActionTest extends \PHPUnit_Framework_TestCase
+class FormActionTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateEmpty()
     {

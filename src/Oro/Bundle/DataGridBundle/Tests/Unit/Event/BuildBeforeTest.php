@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
-class BuildBeforeTest extends \PHPUnit_Framework_TestCase
+class BuildBeforeTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_STRING = 'testString';
 

@@ -42,11 +42,6 @@ parameters:
     oro_navigation.menu_update.scope_type:                     menu_default_visibility
 
 services:
-    oro_menu.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_menu' ] ]
-
     oro_menu_acl_extension:
         class: '%oro_menu.factory.acl_extension.class%'
         arguments:
@@ -244,6 +239,8 @@ services:
             - [ setHistoryItemEntityFQCN, [ '%oro_navigation.entity.navigation_history_item.class%' ]]
             - [ setUserEntityFQCN, [ '%oro_user.entity.class%' ]]
             - [ setNavigationHistoryItemType, ['history']]
+            - [ addExcludedRoute, ['oro_default']]
+            - [ addExcludedRoute, ['nelmio_api_doc_index']]
 
     oro_navigation.event.master_request_route_listener:
         class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener

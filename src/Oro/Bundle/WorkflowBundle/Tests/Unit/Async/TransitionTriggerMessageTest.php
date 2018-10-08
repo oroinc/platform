@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class TransitionTriggerMessageTest extends \PHPUnit_Framework_TestCase
+class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
     use EntityTestCaseTrait;
@@ -104,7 +104,7 @@ class TransitionTriggerMessageTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $id
-     * @return \PHPUnit_Framework_MockObject_MockObject|BaseTransitionTrigger
+     * @return \PHPUnit\Framework\MockObject\MockObject|BaseTransitionTrigger
      */
     protected function getEventTriggerMock($id)
     {

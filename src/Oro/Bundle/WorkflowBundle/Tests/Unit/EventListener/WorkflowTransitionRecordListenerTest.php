@@ -13,15 +13,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var LifecycleEventArgs|\PHPUnit\Framework\MockObject\MockObject */
     private $args;
 
-    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
     /** @var WorkflowTransitionRecordListener */
@@ -75,7 +75,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->any())->method('getEntity')->willReturn($entity);
 
-        /** @var WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject $transitionRecord */
+        /** @var WorkflowTransitionRecord|\PHPUnit\Framework\MockObject\MockObject $transitionRecord */
         $transitionRecord = $this->createMock(WorkflowTransitionRecord::class);
         $transitionRecord->expects($this->any())->method('getWorkflowItem')->willReturn($workflowItem);
 

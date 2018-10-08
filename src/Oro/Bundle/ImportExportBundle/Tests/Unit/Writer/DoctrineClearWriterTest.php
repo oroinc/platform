@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter;
 
-class DoctrineClearWriterTest extends \PHPUnit_Framework_TestCase
+class DoctrineClearWriterTest extends \PHPUnit\Framework\TestCase
 {
     public function testWrite()
     {
@@ -13,7 +13,7 @@ class DoctrineClearWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $registry */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $registry */
         $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->once())
             ->method('getManager')

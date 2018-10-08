@@ -7,7 +7,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class TranslationTest extends \PHPUnit_Framework_TestCase
+class TranslationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 

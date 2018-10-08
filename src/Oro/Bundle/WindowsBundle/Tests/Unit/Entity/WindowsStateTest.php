@@ -4,7 +4,7 @@ namespace Oro\Bundle\WindowsBundle\Tests\Entity;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
-class WindowsStateTest extends \PHPUnit_Framework_TestCase
+class WindowsStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var WindowsState

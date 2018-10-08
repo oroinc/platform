@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListener;
 
-class SendWorkflowStepChangesToAuditListenerTest extends \PHPUnit_Framework_TestCase
+class SendWorkflowStepChangesToAuditListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AdditionalEntityChangesToAuditStorage

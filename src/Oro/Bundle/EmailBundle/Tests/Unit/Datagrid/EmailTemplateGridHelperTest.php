@@ -4,12 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper;
 
-class EmailTemplateGridHelperTest extends \PHPUnit_Framework_TestCase
+class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var EmailTemplateGridHelper */

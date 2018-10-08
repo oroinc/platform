@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
 
-class UrlProviderTest extends \PHPUnit_Framework_TestCase
+class UrlProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UrlProvider
@@ -12,12 +12,12 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
     protected $urlProvider;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 

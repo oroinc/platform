@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class EnumFilterTest extends OrmTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
     /** @var EnumFilter */
@@ -22,7 +22,7 @@ class EnumFilterTest extends OrmTestCase
     {
         $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
-        /** @var DictionaryApiEntityManager|\PHPUnit_Framework_MockObject_MockObject $dictionaryApiEntityManager */
+        /** @var DictionaryApiEntityManager|\PHPUnit\Framework\MockObject\MockObject $dictionaryApiEntityManager */
         $dictionaryApiEntityManager =
             $this->getMockBuilder('Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager')
                 ->disableOriginalConstructor()

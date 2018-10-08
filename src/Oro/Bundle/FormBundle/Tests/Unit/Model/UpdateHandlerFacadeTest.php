@@ -15,24 +15,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class UpdateHandlerFacadeTest extends \PHPUnit_Framework_TestCase
+class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
-    /** @var Session|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
-    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var UpdateFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var UpdateFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $updateFactory;
 
-    /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
     /** @var object */
@@ -240,7 +240,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return UpdateInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return UpdateInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function defaultUpdateBuilding()
     {

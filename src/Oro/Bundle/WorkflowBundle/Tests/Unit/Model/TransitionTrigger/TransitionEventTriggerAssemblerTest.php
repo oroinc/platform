@@ -8,10 +8,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionEventTriggerAssembler;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\Verifier\TransitionEventTriggerVerifierInterface;
 
-class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
+class TransitionEventTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TransitionEventTriggerVerifierInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TransitionEventTriggerVerifierInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $verifier;
 

@@ -8,10 +8,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ResourceDocParserRegistryTest extends \PHPUnit_Framework_TestCase
+class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
 
     protected function setUp()
     {
@@ -32,7 +32,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnResourceDocParserIfItExistsForSpecificRequestType()
+    public function testShouldReturnResourceDocParserIfItExistsForSpecificRequestType()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -52,7 +52,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType()
+    public function testShouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -76,7 +76,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \LogicException
      * @expectedExceptionMessage Cannot find a resource documentation parser for the request "another".
      */
-    public function testSouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
+    public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api']

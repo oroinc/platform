@@ -10,11 +10,11 @@ use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompi
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
-class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
+class OroWorkflowBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->setMethods(['addCompilerPass'])

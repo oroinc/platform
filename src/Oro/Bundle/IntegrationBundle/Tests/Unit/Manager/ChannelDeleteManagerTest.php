@@ -7,7 +7,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationDeleteProvider;
 
-class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
+class ChannelDeleteManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DeleteManager
@@ -20,17 +20,17 @@ class ChannelDeleteManagerTest extends \PHPUnit_Framework_TestCase
     protected $testIntegration;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     * @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
      */
     protected $entityMetadata;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $connection;
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrderItem;
 
-class BaseOrderItemTest extends \PHPUnit_Framework_TestCase
+class BaseOrderItemTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_STRING    = 'testString';
     const TEST_ID        = 123;

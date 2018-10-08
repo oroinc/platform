@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionValidateListener;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
 
-class WorkflowDefinitionValidateListenerTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WorkflowAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     protected $workflowAssembler;
 
     /** @var WorkflowDefinitionValidateListener */
@@ -45,7 +45,7 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return WorkflowChangesEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @return WorkflowChangesEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent()
     {

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DocumentationProviderCompilerPassTest extends \PHPUnit_Framework_TestCase
+class DocumentationProviderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DocumentationProviderCompilerPass */
     private $compiler;

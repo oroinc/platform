@@ -12,15 +12,15 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
-class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
+class WorkflowTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /** @var TranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
-    /** @var TranslationManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
     /** @var WorkflowTranslationHelper */

@@ -6,14 +6,14 @@ use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\LazyOroEntityManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class RegistryTest extends \PHPUnit_Framework_TestCase
+class RegistryTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_NAMESPACE_ALIAS    = 'Test';
     const TEST_NAMESPACE          = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures';
     const TEST_ENTITY_CLASS       = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity';
     const TEST_ENTITY_PROXY_CLASS = 'Doctrine\ORM\Proxy\Proxy';
 
-    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var Registry */
@@ -166,7 +166,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     protected function getManagerMock()
     {

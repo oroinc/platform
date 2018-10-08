@@ -7,7 +7,8 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Removes indexes from `oro_message_queue` table
+ * Removes indexes from `oro_message_queue` table,
+ * Updates json field database type to native JSON
  */
 class MessageQueueBundle implements Migration
 {
@@ -21,5 +22,6 @@ class MessageQueueBundle implements Migration
         $table->dropIndex('IDX_CC483C037FFD7F63');
         $table->dropIndex('IDX_CC483C0362A6DC27');
         $table->dropIndex('IDX_CC483C031A065DF8');
+        $queries->addPostQuery(new UpdateJsonArrayQuery());
     }
 }

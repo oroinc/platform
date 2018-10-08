@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter;
 use Symfony\Component\HttpFoundation\Request;
 
-class RoutePatternVoterTest extends \PHPUnit_Framework_TestCase
+class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
 {
     public function testMatchingWithoutRequest()
     {

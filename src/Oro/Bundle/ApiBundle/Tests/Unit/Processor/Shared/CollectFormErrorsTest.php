@@ -25,10 +25,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -437,7 +434,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWithCustomErrorOccured()
+    public function testProcessWithCustomErrorOccurred()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(

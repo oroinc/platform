@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * The context for the "customize_form_data" action.
+ * The execution context for processors for "customize_form_data" action.
  */
 class CustomizeFormDataContext extends CustomizeDataContext
 {

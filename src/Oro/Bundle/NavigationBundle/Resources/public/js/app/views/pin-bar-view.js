@@ -1,10 +1,9 @@
-define([
-    'underscore',
-    'oroui/js/app/views/base/collection-view'
-], function(_, BaseCollectionView) {
+define(function(require) {
     'use strict';
 
     var BarCollectionView;
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var _ = require('underscore');
 
     BarCollectionView = BaseCollectionView.extend({
         animationDuration: 0,
@@ -37,7 +36,9 @@ define([
             if (!itemView) {
                 return false;
             }
-            return this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
+            return _.isRTL()
+                ? this.el.offsetLeft <= itemView.el.offsetLeft
+                : this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
         }
     });
 

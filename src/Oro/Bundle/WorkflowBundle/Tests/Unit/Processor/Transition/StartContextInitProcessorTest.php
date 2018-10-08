@@ -6,9 +6,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\StartContextInitProcessor;
 use Symfony\Component\HttpFoundation\Request;
 
-class StartContextInitProcessorTest extends \PHPUnit_Framework_TestCase
+class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
     protected $request;
 
     /** @var StartContextInitProcessor */

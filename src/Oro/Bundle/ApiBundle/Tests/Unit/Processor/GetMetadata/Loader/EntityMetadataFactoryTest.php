@@ -13,17 +13,15 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 
 class EntityMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataFactory;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactory */
+    private $metadataFactory;
 
     /** @var EntityMetadataFactory */
-    protected $entityMetadataFactory;
+    private $entityMetadataFactory;
 
     protected function setUp()
     {
-        $this->metadataFactory = $this->getMockBuilder(MetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataFactory = $this->createMock(MetadataFactory::class);
 
         $this->entityMetadataFactory = new EntityMetadataFactory(
             new MetadataHelper(),

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Cache;
 use Oro\Bundle\ActionBundle\Cache\CacheWarmer;
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
-class CacheWarmerTest extends \PHPUnit_Framework_TestCase
+class CacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CacheWarmer */
     protected $warmer;
@@ -34,7 +34,7 @@ class CacheWarmerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigurationProviderInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigurationProviderInterface
      */
     protected function getProviderMock()
     {

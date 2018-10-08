@@ -5,7 +5,7 @@ namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
 
-class ThemeTest extends \PHPUnit_Framework_TestCase
+class ThemeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Theme

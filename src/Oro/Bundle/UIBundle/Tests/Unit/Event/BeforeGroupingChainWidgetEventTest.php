@@ -4,7 +4,7 @@ namespace Oro\Bundle\UI\Tests\Unit\Event;
 
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
-class BeforeGroupingChainWidgetEventTest extends \PHPUnit_Framework_TestCase
+class BeforeGroupingChainWidgetEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testEvent()
     {

@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
-class AcceptorTest extends \PHPUnit_Framework_TestCase
+class AcceptorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
     protected $config;

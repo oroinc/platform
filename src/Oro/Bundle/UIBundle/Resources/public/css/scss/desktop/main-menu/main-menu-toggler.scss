@@ -3,30 +3,23 @@
 .main-menu-toggler {
     position: absolute;
     bottom: 0;
-    right: 0;
+    #{$end}: 0;
 
     width: 48px;
-
     padding-top: 14px;
     padding-bottom: 14px;
 
-    font-size: 16px;
-    line-height: 1;
-
     background-color: transparent;
-    border: 0;
-    color: $menu-toggler-color;
 
-    cursor: pointer;
-
-    &__icon {
-        transition: $menu-animation;
-    }
+    @extend %main-menu-trigger;
+    @include fa-icon($menu-icon-toggler, before, true) {
+        display: inline-block;
+        transform: rotate($menu-icon-toggler-transform);
+    };
 
     &:hover,
     &:focus {
         background-color: $menu-dropdown-background-color-active;
-        color: $menu-item-first-level-text-color-active;
     }
 }
 
@@ -34,8 +27,8 @@
     .main-menu-toggler {
         width: 100%;
 
-        &__icon {
-            transform: rotate(180deg);
+        &:before {
+            transform: rotate($menu-icon-toggler-transform-active);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Component\PropertyAccess\Tests\Unit;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
-abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCase
+abstract class PropertyAccessorArrayAccessTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PropertyAccessor

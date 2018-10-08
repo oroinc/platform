@@ -31,16 +31,16 @@ class OrmTotalsExtensionTest extends OrmTestCase
      */
     protected $config;
 
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var NumberFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $numberFormatter;
 
-    /** @var DateTimeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var DateTimeFormatter|\PHPUnit\Framework\MockObject\MockObject */
     protected $dateTimeFormatter;
 
-    /** @var AclHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $aclHelper;
 
     protected function setUp()
@@ -223,11 +223,11 @@ class OrmTotalsExtensionTest extends OrmTestCase
 
     /**
      * @param DatagridConfiguration $config
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function assertQueryBuilderCalled(DatagridConfiguration $config)
     {
-        /** @var AbstractQuery|\PHPUnit_Framework_MockObject_MockObject $query */
+        /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject $query */
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
             ->setMethods(['setFirstResult', 'setMaxResults', 'getScalarResult'])
@@ -242,7 +242,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
             ->method('getScalarResult')
             ->willReturnOnConsecutiveCalls([], [], [['id' => 10, 'wonCount' => 55]]);
 
-        /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
+        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->any())
             ->method('getQuery')
@@ -282,7 +282,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
             ->method('apply')
             ->willReturnArgument(0);
 
-        /** @var OrmDatasource|\PHPUnit_Framework_MockObject_MockObject $datasource */
+        /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject $datasource */
         $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects($this->any())
             ->method('getQueryBuilder')

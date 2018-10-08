@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 
-class AttributeRenderRegistryTest extends \PHPUnit_Framework_TestCase
+class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttributeRenderRegistry */
     protected $attributeRenderRegistry;

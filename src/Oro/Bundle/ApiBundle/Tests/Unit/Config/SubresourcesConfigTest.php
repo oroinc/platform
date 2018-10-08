@@ -5,34 +5,34 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 
-class SubresourcesConfigTest extends \PHPUnit_Framework_TestCase
+class SubresourcesConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()
     {
         $config = new SubresourcesConfig();
-        $this->assertTrue($config->isEmpty());
+        self::assertTrue($config->isEmpty());
     }
 
     public function testGetAddRemove()
     {
         $subresourceConfig = new SubresourceConfig();
         $config = new SubresourcesConfig();
-        $this->assertEmpty($config->getSubresources());
+        self::assertEmpty($config->getSubresources());
 
         $config->addSubresource('sub-resource1', $subresourceConfig);
-        $this->assertNotEmpty($config->getSubresources());
-        $this->assertCount(1, $config->getSubresources());
+        self::assertNotEmpty($config->getSubresources());
+        self::assertCount(1, $config->getSubresources());
 
-        $this->assertSame($subresourceConfig, $config->getSubresource('sub-resource1'));
-        $this->assertNull($config->getSubresource('sub-resource2'));
+        self::assertSame($subresourceConfig, $config->getSubresource('sub-resource1'));
+        self::assertNull($config->getSubresource('sub-resource2'));
 
         $config->addSubresource('sub-resource2');
-        $this->assertEquals(new SubresourceConfig(), $config->getSubresource('sub-resource2'));
-        $this->assertCount(2, $config->getSubresources());
+        self::assertEquals(new SubresourceConfig(), $config->getSubresource('sub-resource2'));
+        self::assertCount(2, $config->getSubresources());
 
         $config->removeSubresource('sub-resource1');
         $config->removeSubresource('sub-resource2');
-        $this->assertTrue($config->isEmpty());
+        self::assertTrue($config->isEmpty());
     }
 
     public function testToArrayAndClone()
@@ -45,7 +45,7 @@ class SubresourcesConfigTest extends \PHPUnit_Framework_TestCase
         $config->addSubresource('sub-resource1', $subresourceConfig);
         $config->addSubresource('sub-resource2', $subresourceConfig);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'sub-resource1' => [
                     'target_class' => 'Test\Class',
@@ -68,8 +68,8 @@ class SubresourcesConfigTest extends \PHPUnit_Framework_TestCase
         );
 
         $cloneConfig = clone $config;
-        $this->assertEquals($config, $cloneConfig);
-        $this->assertNotSame(
+        self::assertEquals($config, $cloneConfig);
+        self::assertNotSame(
             $config->getSubresource('sub-resource1'),
             $cloneConfig->getSubresource('sub-resource1')
         );

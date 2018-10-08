@@ -15,7 +15,7 @@ use Symfony\Component\Intl\Intl;
  */
 class OroLanguageUpdateCommandTest extends WebTestCase
 {
-    /** @var  ExternalTranslationsProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  ExternalTranslationsProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $externalTranslationsProvider;
 
     protected function setUp()

@@ -9,15 +9,15 @@ use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
-class AclListenerTest extends \PHPUnit_Framework_TestCase
+class AclListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigMetadataDumperInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigMetadataDumperInterface */
     private $dumper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AclAnnotationProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AclAnnotationProvider */
     private $aclAnnotationProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionMetadataProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionMetadataProvider */
     private $actionMetadataProvider;
 
     /** @var AclListener */
@@ -43,7 +43,7 @@ class AclListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $isMasterRequest
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|GetResponseEvent
+     * @return \PHPUnit\Framework\MockObject\MockObject|GetResponseEvent
      */
     private function getEvent($isMasterRequest = true)
     {

@@ -4,7 +4,7 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\PhpIniUtil;
 
-class PhpIniUtilTest extends \PHPUnit_Framework_TestCase
+class PhpIniUtilTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider parseBytesProvider

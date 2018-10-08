@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActions;
 
-class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
+class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResourceDocProvider */
     private $resourceDocProvider;
@@ -30,6 +30,7 @@ class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['unknown', 'Test', null],
+            [ApiActions::OPTIONS, 'Test', 'Get options'],
             [ApiActions::GET, 'Test', 'Get Test'],
             [ApiActions::GET_LIST, 'Test', 'Get Test'],
             [ApiActions::UPDATE, 'Test', 'Update Test'],
@@ -54,6 +55,7 @@ class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['unknown', 'Test', null],
+            [ApiActions::OPTIONS, 'Test', 'Get communication options for a resource'],
             [ApiActions::GET, 'Test', 'Get an entity'],
             [ApiActions::GET_LIST, 'Test', 'Get a list of entities'],
             [ApiActions::UPDATE, 'Test', 'Update an entity'],
@@ -78,6 +80,8 @@ class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['unknown', 'Test', false, null],
+            [ApiActions::OPTIONS, 'test', false, 'Get options'],
+            [ApiActions::OPTIONS, 'test', true, 'Get options'],
             [ApiActions::GET_SUBRESOURCE, 'test', false, 'Get test'],
             [ApiActions::GET_SUBRESOURCE, 'test', true, 'Get test'],
             [ApiActions::UPDATE_SUBRESOURCE, 'test', false, 'Update test'],
@@ -112,6 +116,8 @@ class ResourceDocProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['unknown', 'Test', false, null],
+            [ApiActions::OPTIONS, 'test', false, 'Get communication options for a resource'],
+            [ApiActions::OPTIONS, 'test', true, 'Get communication options for a resource'],
             [ApiActions::GET_SUBRESOURCE, 'test', false, 'Get a related entity'],
             [ApiActions::GET_SUBRESOURCE, 'test', true, 'Get a list of related entities'],
             [ApiActions::UPDATE_SUBRESOURCE, 'test', false, 'Update the specified related entity'],

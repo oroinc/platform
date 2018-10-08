@@ -6,7 +6,7 @@ use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class NavigationItemTest extends \PHPUnit_Framework_TestCase
+class NavigationItemTest extends \PHPUnit\Framework\TestCase
 {
     public function testNavigationItemEntity()
     {

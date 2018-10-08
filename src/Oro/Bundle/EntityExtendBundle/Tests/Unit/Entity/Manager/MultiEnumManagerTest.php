@@ -10,17 +10,17 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
+class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 {
     const ENUM_VALUE_CLASS = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue';
 
     /** @var MultiEnumManager */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     protected function setUp()
@@ -287,7 +287,7 @@ class MultiEnumManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getOnFlushEventArgsMock()
     {

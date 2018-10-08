@@ -13,7 +13,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 class ReportChartTypeTest extends FormIntegrationTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $configProvider;
 

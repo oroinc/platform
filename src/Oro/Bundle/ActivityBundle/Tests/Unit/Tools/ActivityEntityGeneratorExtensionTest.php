@@ -11,9 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
+class ActivityEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $groupingConfigProvider;
 
     /** @var ActivityEntityGeneratorExtension */

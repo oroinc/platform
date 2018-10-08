@@ -9,15 +9,15 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension;
 
-class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
+class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $relationBuilder;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $ownershipMetadataProvider;
 
     /** @var OwnershipEntityConfigDumperExtension */

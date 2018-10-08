@@ -7,7 +7,11 @@ use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group regression
+ */
 class FormValidationTest extends RestJsonApiTestCase
 {
     /**
@@ -29,11 +33,16 @@ class FormValidationTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertApiResponseStatusCodeEquals($response, [400, 403], $entityType, 'post');
+        self::assertApiResponseStatusCodeEquals(
+            $response,
+            [Response::HTTP_BAD_REQUEST, Response::HTTP_FORBIDDEN],
+            $entityType,
+            'post'
+        );
 
         // Make sure that an entity can be created without setting Owner or Organization
         // Owner and or Organization will be set from context for configurable entities
-        if ($response->getStatusCode() === 400) {
+        if ($response->getStatusCode() === Response::HTTP_BAD_REQUEST) {
             $content = self::jsonToArray($response->getContent());
             if (isset($content['errors'])) {
                 /** @var OwnershipMetadataProviderInterface $ownershipMetadataProvider */

@@ -11,15 +11,15 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
+class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CustomizeLoadedDataContext */
     private $context;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var BuildCustomTypes */
@@ -58,6 +58,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionConfig();
         $config->addField('field1')->setDataType('integer');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -74,7 +75,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'field1' => 'val1',
             'field2' => null,
-            'field3' => 'val3',
+            'field3' => 'val3'
         ];
         $config = new EntityDefinitionConfig();
         $config->addField('field1')->setExcluded();
@@ -90,6 +91,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $excludedTargetField->setExcluded();
         $nestedObjectFieldTargetConfig->addField('targetField4')->setPropertyPath('field4');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -113,7 +115,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'renamedField1' => 'val1',
             'renamedField2' => null,
-            'renamedField3' => 'val3',
+            'renamedField3' => 'val3'
         ];
         $config = new EntityDefinitionConfig();
         $field1 = $config->addField('renamedField1');
@@ -135,6 +137,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $excludedTargetField->setExcluded();
         $nestedObjectFieldTargetConfig->addField('targetField4')->setPropertyPath('field4');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -165,6 +168,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
         $nestedObjectFieldTargetConfig->addField('targetField1')->setPropertyPath('field1.field11');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult([]);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -174,7 +178,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'targetEntityClass' => 'Test\TargetEntity',
-            'targetEntityId'    => 123,
+            'targetEntityId'    => 123
         ];
         $config = new EntityDefinitionConfig();
         $config->addField('targetEntityClass')->setExcluded();
@@ -187,6 +191,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $classNameField->setMetaProperty(true);
         $nestedAssociationFieldTargetConfig->addField('id')->setPropertyPath('targetEntityId');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -207,7 +212,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'renamedTargetEntityClass' => 'Test\TargetEntity',
-            'renamedTargetEntityId'    => 123,
+            'renamedTargetEntityId'    => 123
         ];
         $config = new EntityDefinitionConfig();
         $targetEntityClassField = $config->addField('renamedTargetEntityClass');
@@ -224,6 +229,7 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $classNameField->setMetaProperty(true);
         $nestedAssociationFieldTargetConfig->addField('id')->setPropertyPath('targetEntityId');
 
+        $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
@@ -251,6 +257,45 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $association = $config->addField('association');
         $association->setDataType('association:manyToOne:kind');
         $association->setExcluded();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($entityClass)
+            ->willReturn($entityClass);
+        $this->associationManager->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with($entityClass, null, 'manyToOne', 'kind')
+            ->willReturn(
+                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
+            );
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'association1' => null,
+                'association2' => ['id' => 2],
+                'association'  => [
+                    '__class__' => 'Test\Target2',
+                    'id'        => 2
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForExtendedAssociation()
+    {
+        $entityClass = 'Test\Class';
+        $data = [
+            'association1' => null,
+            'association2' => ['id' => 2]
+        ];
+        $config = new EntityDefinitionConfig();
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')

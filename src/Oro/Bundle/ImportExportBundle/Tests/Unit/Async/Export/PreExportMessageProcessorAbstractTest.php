@@ -2,6 +2,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -16,8 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
+class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 {
+    private const USER_ID = 54;
+
     public function testMustImplementMessageProcessorAndTopicSubscriberInterfaces()
     {
         $processor = $this->createMock(PreExportMessageProcessorAbstract::class);
@@ -401,19 +404,24 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $user = $this->createUserStub();
         $user
             ->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::USER_ID)
+        ;
+        $user
+            ->expects($this->once())
             ->method('getEmail')
         ;
 
         $token = $this->createTokenMock();
         $token
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getUser')
             ->willReturn($user)
         ;
 
         $tokenStorage = $this->createTokenStorageMock();
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
@@ -422,6 +430,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $dependentJobContext
             ->expects($this->once())
             ->method('addDependentJob')
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
+            )
         ;
 
         $dependentJob = $this->createDependentJobMock();
@@ -520,19 +534,25 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $user = $this->createUserStub();
         $user
             ->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::USER_ID)
+        ;
+
+        $user
+            ->expects($this->once())
             ->method('getEmail')
         ;
 
         $token = $this->createTokenMock();
         $token
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getUser')
             ->willReturn($user)
         ;
 
         $tokenStorage = $this->createTokenStorageMock();
         $tokenStorage
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getToken')
             ->willReturn($token)
         ;
@@ -541,6 +561,12 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
         $dependentJobContext
             ->expects($this->once())
             ->method('addDependentJob')
+            ->with(
+                Topics::POST_EXPORT,
+                $this->callback(function ($message) {
+                    return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
+                })
+            )
         ;
 
         $dependentJob = $this->createDependentJobMock();
@@ -604,7 +630,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
     private function createSessionMock()
     {
@@ -612,7 +638,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
      */
     private function createJobRunnerMock()
     {
@@ -620,7 +646,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
     private function createMessageProducerMock()
     {
@@ -628,7 +654,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
      */
     private function createTokenStorageMock()
     {
@@ -636,7 +662,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobService
      */
     private function createDependentJobMock()
     {
@@ -644,7 +670,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
+     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
@@ -652,7 +678,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
      */
     private function createLoggerMock()
     {
@@ -660,7 +686,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
      */
     private function createTokenMock()
     {
@@ -668,7 +694,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
      */
     private function createUserMock()
     {
@@ -676,7 +702,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
      */
     private function createUserStub()
     {

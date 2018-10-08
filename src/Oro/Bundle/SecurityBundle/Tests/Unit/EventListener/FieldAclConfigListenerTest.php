@@ -8,15 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\SecurityBundle\EventListener\FieldAclConfigListener;
 
-class FieldAclConfigListenerTest extends \PHPUnit_Framework_TestCase
+class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FieldAclConfigListener */
     protected $listener;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $metadataProvider;
 
 

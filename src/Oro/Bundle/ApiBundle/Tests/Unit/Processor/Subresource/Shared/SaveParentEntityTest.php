@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
     /** @var SaveParentEntity */

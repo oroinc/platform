@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
 
-class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
+class UserMultiSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var UserMultiSelectType
@@ -12,7 +12,7 @@ class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
     protected $type;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 

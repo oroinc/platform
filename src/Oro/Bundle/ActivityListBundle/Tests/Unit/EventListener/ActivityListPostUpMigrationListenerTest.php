@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
-class ActivityListPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
+class ActivityListPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnPostUp()
     {

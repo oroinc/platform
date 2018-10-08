@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-class RestrictHelperTest extends \PHPUnit_Framework_TestCase
+class RestrictHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RestrictHelper */
     protected $helper;
@@ -28,7 +28,7 @@ class RestrictHelperTest extends \PHPUnit_Framework_TestCase
         /** @var Operation[] $operations */
         $operations = [];
         foreach ($operationsValues as $operationName => $buttonOptions) {
-            /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+            /** @var \PHPUnit\Framework\MockObject\MockObject|Operation $operation */
             $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
                 ->disableOriginalConstructor()
                 ->getMock();

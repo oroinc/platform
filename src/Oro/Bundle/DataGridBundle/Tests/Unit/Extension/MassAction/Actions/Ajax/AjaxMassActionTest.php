@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction;
 
-class AjaxMassActionTest extends \PHPUnit_Framework_TestCase
+class AjaxMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var AjaxMassAction

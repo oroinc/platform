@@ -5,13 +5,13 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 
-class RemindersPersistentCollectionTest extends \PHPUnit_Framework_TestCase
+class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'Foo\\Entity';
     const IDENTIFIER = 101;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $repository;
 

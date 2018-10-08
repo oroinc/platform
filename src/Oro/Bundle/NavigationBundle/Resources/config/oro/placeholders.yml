@@ -1,11 +1,5 @@
 placeholders:
     placeholders:
-        scripts_before:
-            items:
-                dot_menu_js:
-                    order: 100
-                pinbar_js:
-                    order: 200
         scripts_after:
             items:
                 navigationItem:
@@ -40,10 +34,6 @@ placeholders:
                     order: 100
 
     items:
-        dot_menu_js:
-            template: OroNavigationBundle:Js:dot.menu.js.twig
-        pinbar_js:
-            template: OroNavigationBundle:Js:pinbar.js.twig
         routing_requirejs_config:
             template: OroNavigationBundle:Js:requirejs.config.js.twig
         shortcuts:

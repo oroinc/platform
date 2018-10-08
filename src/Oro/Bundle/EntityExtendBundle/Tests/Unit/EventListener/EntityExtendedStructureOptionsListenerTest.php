@@ -11,13 +11,13 @@ use Oro\Bundle\EntityExtendBundle\EventListener\EntityExtendedStructureOptionsLi
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class EntityExtendedStructureOptionsListenerTest extends \PHPUnit_Framework_TestCase
+class EntityExtendedStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     const CURRENT_RELATION_TYPE = 'CurrentType';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var EntityExtendedStructureOptionsListener */

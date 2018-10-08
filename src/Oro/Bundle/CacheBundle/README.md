@@ -13,12 +13,14 @@ OroCacheBundle introduces the configuration of the application data cache storag
 
 ## Abstract cache services
 
-There are two abstract services you can use as a parent for your cache services:
+There are three abstract services you can use as a parent for your cache services:
 
  - `oro.file_cache.abstract` - this cache should be used for caching data private for each node in a web farm
  - `oro.cache.abstract` - this cache should be used for caching data that need to be shared between nodes in a web farm
+ - `oro.cache.abstract.without_memory_cache` - the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service
 
 The following example shows how this services can be used:
+
 ``` yaml
 services:
     acme.test.cache:
@@ -28,7 +30,8 @@ services:
             - [ setNamespace, [ 'acme_test' ] ]
 ```
 
-Also each of these abstract services can be re-declared in the application configuration file, for example:
+Also `oro.file_cache.abstract` and `oro.cache.abstract` services can be re-declared in the application configuration file, for example:
+
 ``` yaml
 services:
     oro.cache.abstract:
@@ -36,6 +39,8 @@ services:
         class:                Oro\Bundle\CacheBundle\Provider\PhpFileCache
         arguments:            [%kernel.cache_dir%/oro_data]
 ```
+
+The `oro.cache.abstract.without_memory_cache` service is always declared automatically based on `oro.cache.abstract` service.
 
 Read more about the [caching policy and default implementation](Resources/doc/caching_policy.md).
 

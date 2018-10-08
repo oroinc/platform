@@ -7,11 +7,11 @@ use Oro\Bundle\FormBundle\OroFormBundle;
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroFormBundleTest extends \PHPUnit_Framework_TestCase
+class OroFormBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuild()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
+        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $containerBuilder */
         $containerBuilder = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->setMethods(['addCompilerPass'])

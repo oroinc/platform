@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
-class DocumentBuilderTestCase extends \PHPUnit_Framework_TestCase
+class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param string   $class

@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
 
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints;
 
-class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
+class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $constraintsProvider;
 
@@ -21,9 +22,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->constraintsProvider = $this->getMockBuilder(
-            'Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider'
-        )->disableOriginalConstructor()->getMock();
+        $this->constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
         $this->extension = new JsValidationExtension($this->constraintsProvider);
     }
 

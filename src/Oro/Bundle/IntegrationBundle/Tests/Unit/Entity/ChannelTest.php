@@ -7,7 +7,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Component\Config\Common\ConfigObject;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ChannelTest extends \PHPUnit_Framework_TestCase
+class ChannelTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_STRING  = 'testString';
     const TEST_BOOLEAN = true;

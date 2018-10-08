@@ -19,10 +19,10 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find entity id resolvers
         $resolvers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOLVER_TAG);
         foreach ($taggedServices as $id => $attributes) {
+            $container->getDefinition($id)->setPublic(true);
             foreach ($attributes as $tagAttributes) {
                 $entityId = DependencyInjectionUtil::getRequiredAttribute(
                     $tagAttributes,
@@ -38,7 +38,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
                 );
                 $resolvers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getAttribute($tagAttributes, 'requestType', null),
+                    DependencyInjectionUtil::getRequestType($tagAttributes),
                     $entityId,
                     $entityClass
                 ];
@@ -60,7 +60,6 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
         }
         $resolvers = $restructured;
 
-        // register
         $container->getDefinition(self::RESOLVER_REGISTRY_SERVICE_ID)
             ->replaceArgument(0, $resolvers);
     }

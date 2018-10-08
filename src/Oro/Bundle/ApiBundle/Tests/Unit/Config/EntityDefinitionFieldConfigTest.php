@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class EntityDefinitionFieldConfigTest extends \PHPUnit_Framework_TestCase
+class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testCustomAttribute()
     {

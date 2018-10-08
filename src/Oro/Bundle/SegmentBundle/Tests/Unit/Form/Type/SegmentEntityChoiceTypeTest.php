@@ -5,12 +5,12 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 
-class SegmentEntityChoiceTypeTest extends \PHPUnit_Framework_TestCase
+class SegmentEntityChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SegmentEntityChoiceType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityProviderMock;
 
     protected function setUp()

@@ -26,32 +26,32 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     private $type;
 
     /**
-     * @var SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchRegistry;
 
     /**
-     * @var SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $searchHandler;
 
     /**
-     * @var ConverterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConverterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $converter;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityManager;
 
     /**
-     * @var EntityToIdTransformer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityToIdTransformer;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configProvider;
 
@@ -371,7 +371,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
      * @param string $property
      * @param mixed  $value
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function createMockEntity($property, $value)
     {
@@ -383,7 +383,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockEntityManager()
     {
@@ -398,7 +398,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @return SearchRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchRegistry()
     {
@@ -413,7 +413,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getConfigProvider()
     {
@@ -435,7 +435,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return ConverterInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConverterInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockConverter()
     {
@@ -447,7 +447,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockFormType()
     {
@@ -455,7 +455,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return SearchHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockSearchHandler()
     {
@@ -467,7 +467,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return EntityToIdTransformer|\PHPUnit_Framework_MockObject_MockObject
+     * @return EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getMockEntityToIdTransformer()
     {

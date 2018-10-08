@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $choicesProvider;
 
     /** @var WorkflowDefinitionType */
@@ -114,7 +114,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit_Framework_MockObject_MockObject|OptionsResolver */
+        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
         $resolver->expects($this->once())->method('setDefaults')->with(['data_class' => WorkflowDefinition::class]);
 
@@ -131,10 +131,10 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider $configProvider */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $configProvider */
         $configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Translator $translator */
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
         $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
 
         $choiceType = $this->getMockBuilder(OroChoiceType::class)

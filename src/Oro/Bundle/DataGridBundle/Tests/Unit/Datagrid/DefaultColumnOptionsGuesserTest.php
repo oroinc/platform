@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 
-class DefaultColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
+class DefaultColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultColumnOptionsGuesser */
     protected $guesser;

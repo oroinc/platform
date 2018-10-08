@@ -41,7 +41,7 @@ class TicketControllerTest extends WebTestCase
 
     /**
      * @param array $response
-     * @return ConnectionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function prepareConnection(array $response): ConnectionInterface
     {

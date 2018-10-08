@@ -109,8 +109,6 @@ Oro\Bundle\CalendarBundle\Entity\Calendar                calendar               
 Oro\Bundle\CalendarBundle\Entity\CalendarEvent           calendarevent          calendarevents
 ```
 
-Alternatively, you may use `GET /api/rest/{version}/entities/aliases.{_format}` API to get the list of all available aliases.
-
 **Suggestions for aliases naming**
 
 To solve the conflict situations when the auto-generated entity alias is already in use. Or when there might be another, more general, entity introduced later, for which your generated alias will suit better, we advise to follow naming rules described below:

@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\LocaleBundle\Form\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
+class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testFormTypeWithoutCache()
     {
@@ -42,10 +42,6 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
 
         $cache = $this->createMock('Doctrine\Common\Cache\Cache');
         $cache->expects($this->once())
-            ->method('contains')
-            ->with('timezones')
-            ->will($this->returnValue(true));
-        $cache->expects($this->once())
             ->method('fetch')
             ->with('timezones')
             ->will($this->returnValue($timezones));
@@ -69,7 +65,7 @@ class TimezoneTypeTest extends \PHPUnit_Framework_TestCase
     {
         $cache = $this->createMock('Doctrine\Common\Cache\Cache');
         $cache->expects($this->once())
-            ->method('contains')
+            ->method('fetch')
             ->with('timezones')
             ->will($this->returnValue(false));
         $cache->expects($this->once())

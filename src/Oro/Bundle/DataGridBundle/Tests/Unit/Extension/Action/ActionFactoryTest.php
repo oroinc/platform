@@ -7,9 +7,9 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ActionFactoryTest extends \PHPUnit_Framework_TestCase
+class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $container;
 
     /** @var ActionFactory */

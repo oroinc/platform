@@ -7,6 +7,7 @@ oro_behat_extension:
         mapping:
           Username: '_username'
           Password: '_password'
+          Remember me on this computer: '_remember_me'
 
     User Form:
       selector: 'form[name="oro_user_user_form"]'
@@ -60,10 +61,17 @@ oro_behat_extension:
     Edit Button:
       selector: 'a[title="Edit profile"]'
 
+    Username or Email:
+      selector: '.oro-forgot-password input[name="username"]'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
       route: 'oro_user_security_login'
+
+    User Forgot Password:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserForgotPassword
+      route: 'oro_user_reset_request'
 
     User Profile View:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
@@ -103,12 +111,13 @@ oro_behat_extension:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\FixturesContext
         - OroUserBundle::FeatureContext
-        - OroDataGridBundle::GridContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
         - OroSecurityBundle::PermissionContext
+        - OroLocaleBundle::LocalizationContext
         - OroActivityListBundle::ActivityContext
         - OroDataGridBundle::GridContext
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

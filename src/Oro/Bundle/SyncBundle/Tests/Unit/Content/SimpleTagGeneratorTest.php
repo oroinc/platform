@@ -4,7 +4,7 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 
-class SimpleTagGeneratorTest extends \PHPUnit_Framework_TestCase
+class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  SimpleTagGenerator */
     protected $generator;

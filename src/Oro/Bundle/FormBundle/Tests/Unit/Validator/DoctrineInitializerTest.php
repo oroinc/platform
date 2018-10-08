@@ -7,9 +7,9 @@ use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 
-class DoctrineInitializerTest extends \PHPUnit_Framework_TestCase
+class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $innerInitializer;
 
     /** @var DoctrineInitializer */

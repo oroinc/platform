@@ -7,7 +7,7 @@ use Oro\Component\ExpressionLanguage\Node as CustomNode;
 use Oro\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\Node;
 
-class ParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError

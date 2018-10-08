@@ -7,7 +7,7 @@ define(function(require) {
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
     var module = require('module');
-    var channel = module.config().clankEvent;
+    var channel = module.config().wsChannel;
     var instance;
 
     UnreadEmailsStateHolder = function() {

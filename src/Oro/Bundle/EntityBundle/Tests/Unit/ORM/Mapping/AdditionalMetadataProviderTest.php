@@ -7,12 +7,12 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 
-class AdditionalMetadataProviderTest extends \PHPUnit_Framework_TestCase
+class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AdditionalMetadataProvider */
     protected $additionalMetadataProvider;
 
-    /** @var ClassMetadataFactory|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadataFactory;
 
     public function setUp()

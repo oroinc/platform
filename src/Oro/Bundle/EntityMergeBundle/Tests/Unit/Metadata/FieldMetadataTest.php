@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
-class FieldMetadataTest extends \PHPUnit_Framework_TestCase
+class FieldMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
@@ -15,12 +15,12 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
     protected $options;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $doctrineMetadata;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     protected $entityMetadata;
 
