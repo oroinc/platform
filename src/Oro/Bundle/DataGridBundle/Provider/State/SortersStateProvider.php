@@ -70,6 +70,11 @@ class SortersStateProvider extends AbstractStateProvider
         // Fetch state from datagrid parameters.
         $state = $this->getFromParameters($datagridParameters);
 
+        // Fallback to default sorters.
+        if (!$state) {
+            $state = $this->getDefaultSorters($datagridConfiguration);
+        }
+
         return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
     }
 
