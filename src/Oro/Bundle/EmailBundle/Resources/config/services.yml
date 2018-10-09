@@ -241,6 +241,8 @@ services:
             - '@oro_email.email.address.manager'
             - '@oro_email.email.address.helper'
             - '@doctrine'
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_email.email.model.builder:
         class: %oro_email.email.model.builder.class%
