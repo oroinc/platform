@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-$checkbox-line-height: inherit !default;
+$checkbox-line-height: 1em !default;
 $checkbox-display: inline-block !default;
 $checkbox-vertical-align: -3px !default;
 $checkbox-position: relative !default;
@@ -10,7 +10,7 @@ $checkbox-controls-offset-top: 12px !default;
 
 $checkbox-sibling-outer-offset-start: 5px !default;
 
-$checkbox-icon-display: block !default;
+$checkbox-icon-display: inline-block !default;
 $checkbox-icon-height: 16px !default;
 $checkbox-icon-width: 16px !default;
 $checkbox-icon-border: 2px solid $primary-750 !default;
