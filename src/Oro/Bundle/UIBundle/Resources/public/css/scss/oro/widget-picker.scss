@@ -2,16 +2,8 @@
 
 .widget-picker {
     &__modal {
-        width: $widget-picker-width;
-
-        .modal-body {
-            padding: 48px;
-        }
-
-        .modal-footer {
-            a.ok {
-                display: none;
-            }
+        .modal-dialog {
+            max-width: $widget-picker-max-width;
         }
     }
 
@@ -110,6 +102,7 @@
         margin: 0;
 
         color: $widget-picker-description-cell-color;
+        display: none;
     }
 
     &__toggler-column {
@@ -131,14 +124,18 @@
     }
 
     &__description-toggler {
-        @include fa-icon($widget-picker-description-collapse-icon, before, true) {
-            font-size: $base-font-size;
-        };
+        .fa-icon {
+            @include fa-icon($widget-picker-description-collapse-icon, before, true) {
+                font-size: $base-font-size;
+            }
+        }
 
         &.collapsed {
-            @include fa-icon($widget-picker-description-expand-icon, before, true) {
-                font-size: $base-font-size;
-            };
+            .fa-icon {
+                @include fa-icon($widget-picker-description-expand-icon, before, true) {
+                    font-size: $base-font-size;
+                }
+            }
         }
     }
 

@@ -61,7 +61,7 @@ footer {
 }
 
 #wrapper {
-    border-radius: $baseBorderRadius;
+    border-radius: $border-radius;
     border: 1px solid $general-border-color;
     margin: 0 0 $margin-bottom-box;
 }
@@ -160,18 +160,8 @@ footer {
     line-height: 1.2em;
 }
 
-[class^="fa-"],
-[class*=" fa-"] {
-    margin: 0 3px;
-}
-
 .fa-google {
     margin: 0 5px;
-}
-
-.icons-holder [class^="fa-"],
-.icons-holder [class*=" fa-"] {
-    margin: 0 -3px;
 }
 
 .icons-small button.btn {
@@ -212,67 +202,6 @@ footer {
 
 .list-group > .list-group-item:first-child {
     border: 0;
-}
-
-.badge-enabled,
-.badge-tentatively,
-.badge-disabled {
-    padding: 3px 10px 3px 5px;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.badge-enabled {
-    background-color: #dff2d4;
-    color: #4c7940;
-}
-
-.badge-tentatively {
-    background-color: #faf2cc;
-    color: #a7a50a;
-}
-
-.badge-disabled {
-    color: #aaa;
-    background-color: #f2f2f2;
-}
-
-.status-disabled,
-.status-unknown {
-    color: #aaa;
-}
-
-.status-enabled {
-    color: #2f8206;
-}
-
-.status-tentatively {
-    color: #a7a50a;
-}
-
-.status-disabled,
-.status-tentatively,
-.status-enabled,
-.status-unknown {
-    margin-left: 5px;
-    text-shadow: none;
-    padding: 3px 10px 3px 5px;
-
-    [class^="fa-"]:before {
-        font-size: 12px;
-    }
-}
-
-.status-enabled [class^="fa-"]:before {
-    color: #4a9938;
-}
-
-.status-disabled [class^="fa-"]:before {
-    color: #e37878;
-}
-
-.status-unknown [class^="fa-"]:before {
-    color: #aaa;
 }
 
 .holder-height {
@@ -463,7 +392,7 @@ footer {
         display: inline-block;
         float: none !important;
         font-size: $base-font-size--xl;
-        line-height: $base-line-height;
+        line-height: $line-height-base;
         font-weight: normal;
     }
 
@@ -493,8 +422,10 @@ footer {
     }
 
     ul.inline {
-        margin-bottom: 0;
+        margin: 0;
+        padding: 0;
         color: #777;
+        list-style: none;
 
         li {
             padding: 0 10px;
@@ -502,6 +433,7 @@ footer {
             border-left: 1px solid #e6e6e6;
             font-size: 11px;
             line-height: 14px;
+            display: inline-block;
 
             &:first-child {
                 padding: 0 10px 0 0;
@@ -620,6 +552,8 @@ label.required em,
 .form-horizontal label.required em {
     color: $danger-dark;
     font-size: 21px;
+    font-style: normal;
+    margin-left: 3px;
     line-height: 1px;
 }
 
@@ -744,8 +678,12 @@ textarea {
     top: 0;
 }
 
-.row-fluid.row-fluid-divider {
-    background: url(../../img/vertical-separator.png) repeat-y 50% 0;
+.row-fluid {
+    @include clearfix();
+
+    &.row-fluid-divider {
+        background: url(../../img/vertical-separator.png) repeat-y 50% 0;
+    }
 }
 
 /* fix incorrect aligment of fluid divider line in Firefox */
@@ -757,9 +695,9 @@ textarea {
 
 h5.user-fieldset {
     font-weight: bold;
-    font-size: 15px;
-    line-height: 15px;
-    margin: 0 10px 20px 0;
+    font-size: 20px;
+    line-height: 20px;
+    margin: 20px 10px 16px 0;
 }
 
 .page-size .dropdown-menu {
@@ -877,10 +815,9 @@ label.radio.error {
     }
 
     .removeRow {
-        text-indent: -999;
         font-size: 0;
         line-height: 0;
-        margin: 0 0 0 5px;
+        margin: 0;
 
         &:after {
             display: inline-block;
@@ -911,6 +848,25 @@ label.radio.error {
 
     .row-oro.oro-multiselect-holder {
         margin: 0 0 5px;
+    }
+
+    .enum-value-collection & {
+        .row-oro {
+            &.oro-multiselect-holder {
+                margin: 0 0 10px;
+            }
+        }
+
+        .float-holder {
+            .collection-element-primary {
+                margin-top: 0;
+                display: flex;
+            }
+
+            input:not([type="checkbox"]):not([type="radio"]) {
+                margin-top: 0;
+            }
+        }
     }
 }
 
@@ -988,17 +944,17 @@ pre.email-body {
 iframe.email-body {
     width: 100%;
     min-height: 5em;
-    font-family: $monoFontFamily;
-    color: $grayDark;
-    padding: ($base-line-height - 1) / 2;
-    margin: 0 0 $base-line-height / 2;
+    font-family: $font-family-monospace;
+    color: color('gray-dark');
+    padding: ($line-height-base - 1) / 2;
+    margin: 0 0 $line-height-base / 2;
     display: block;
     font-size: $base-font-size - 1; // 14px to 13px
-    line-height: $base-line-height;
+    line-height: $line-height-base;
     background-color: #f5f5f5;
     border: 1px solid #ccc; // fallback for IE7-8
     border: 1px solid rgba(0, 0, 0, .15);
-    border-radius: $baseBorderRadius;
+    border-radius: $border-radius;
 }
 
 .security-row {
@@ -1258,22 +1214,6 @@ label .popover-body {
         line-height: 15px;
         text-align: center;
         padding: 0 4px;
-    }
-}
-
-.pinned-dropdown {
-    > .btn-group > .btn {
-        [class^="fa-"],
-        [class*=" fa-"] {
-            margin-left: 0;
-        }
-    }
-
-    .dropdown-menu > li > a {
-        [class^="fa-"],
-        [class*=" fa-"] {
-            margin: 0;
-        }
     }
 }
 

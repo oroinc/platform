@@ -111,10 +111,10 @@
     {% if isDesktopVersion() %}
     {% set togglerId = 'dropdown-'|uniqid %}
     <a href="#" role="button" id="{{ togglerId }}" data-toggle="dropdown"
-       class="dropdown-toggle email-notification-icon"
+       class="dropdown-toggle dropdown-toggle--no-caret email-notification-icon"
        title="{{ 'oro.email.menu.user_emails'|trans }}"
        aria-label="{{ 'oro.email.menu.user_emails'|trans }}" aria-haspopup="true" aria-expanded="false"></a>
-    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" aria-labelledby="{{ togglerId }}" tabindex="0"></div>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="{{ togglerId }}" tabindex="0"></div>
     <div class="new-email-notification" {{ UI.renderPageComponentAttributes({
         module: 'oroemail/js/app/components/new-email-message-component'
     }) }}> {{ 'oro.email.notification.new_email'|trans }}</div>

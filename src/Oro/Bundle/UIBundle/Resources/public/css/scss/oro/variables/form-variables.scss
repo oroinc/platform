@@ -9,11 +9,12 @@ $input-border-color: $primary-750 !default;
 $input-background-color: $primary-inverse !default;
 $input-inner-offset: 4px 6px !default;
 $input-box-shadow: none !default;
-$input-font-family: $base-font-family !default;
+$input-font-family: $font-family-sans-serif !default;
 $input-color: $primary-200 !default;
 $input-outer-offset-bottom: 10px !default;
 $input-control-group-outer-offset-bottom: 0 !default;
 $input-box-sizing: border-box !default;
+$input-outline: none !default;
 
 $input-focus-box-shadow: none !default;
 $input-focus-border-color: $secondary !default;

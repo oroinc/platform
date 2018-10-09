@@ -19,8 +19,8 @@
             vertical-align: middle;
         }
 
-        button {
-            padding: 0 4px;
+        [class^="fa-"] {
+            font-size: $zoomable-area-zoom-controls-icon-font-size;
         }
     }
 }

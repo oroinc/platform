@@ -17,7 +17,7 @@
             <div class="default-actions-container">
                 <% if (showConfig) { %>
                 <% var dashboardActionId = _.uniqueId('dashboard-action-') %>
-                <div class="dropdown action-wrapper">
+                <div class="dropdown dropdown--with-arrow action-wrapper">
                     <button id="<%- dashboardActionId %>"
                             class="btn btn-icon btn-light"
                             data-toggle="dropdown"
@@ -25,18 +25,19 @@
                             aria-haspopup="true"
                             aria-expanded="false"
                             data-placement="bottom-end"
+                            data-modifiers="<%- JSON.stringify({offset: {offset: '0,-10', order: 700}}) %>"
                     >
                         <span class="fa-ellipsis-h" aria-hidden="true"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="<%- dashboardActionId %>">
+                    <ul class="dropdown-menu dropdown--with-arrow" aria-labelledby="<%- dashboardActionId %>">
                         <li>
-                            <a class="configure-action" href="#" role="button"
+                            <a class="configure-action dropdown-item" href="#" role="button"
                                title="<%- _.__('oro.dashboard.widget.configure') %>">
                                 <span class="fa-cog hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.configure') %>
                             </a>
                         </li>
                         <li>
-                            <a class="remove-action" href="#" role="button"
+                            <a class="remove-action dropdown-item" href="#" role="button"
                                title="<%- _.__('oro.dashboard.widget.remove') %>">
                                 <span class="fa-trash-o hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.remove') %>
                             </a>

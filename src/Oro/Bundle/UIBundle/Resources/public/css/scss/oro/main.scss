@@ -15,14 +15,11 @@
 @import "dropdown/dropdown-mask";
 @import "zoomable-area";
 @import "select2";
-@import "button";
 @import "datepicker";
 @import "simplecolorpicker";
-@import "dropdown/dropdown";
 @import "dialog";
-@import "modal";
 
-@import "breadcrumb";
+@import "page-toolbar";
 @import "app-header";
 
 @import "form/form-description";
@@ -34,6 +31,7 @@
 @import "flash-messages";
 @import "alert";
 @import "inline-actions";
+@import "modal";
 @import "dropdown/dropdown-menu-collection";
 @import "error-page";
 @import "nav";
@@ -54,7 +52,6 @@
 @import "scrollspy";
 
 @import "tooltip";
-@import "popover";
 @import "widget-picker";
 
 @import "tables";

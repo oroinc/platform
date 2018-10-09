@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+@import "components/bootstrap/scss/reboot";
+
+// Bad practices, should be removed in future
+ul,
+ol {
+    padding: 0;
+}

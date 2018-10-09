@@ -42,11 +42,11 @@ oro_behat_extension:
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\EntityStatus
 
     Breadcrumb Container:
-      selector: 'div.navigation'
-      class: Oro\Bundle\UIBundle\Tests\Behat\Element\BreadcrumbContainerElement
+      selector: 'ul.breadcrumb'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
-    Breadcrumb:
-      selector: 'a'
+    Page Title:
+      selector: '.page-title'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Edit Button:

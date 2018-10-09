@@ -3,8 +3,9 @@
 .with-floating-header {
     .grid-header-cell__link,
     .grid-header-cell__label-container {
-        width: 100%;
         display: flex;
+        align-items: center;
+        width: 100%;
     }
     .grid-header-cell__label {
         text-overflow: ellipsis;
@@ -19,7 +20,7 @@
     }
 
     .dropdown-menu {
-        z-index: $oro-zindex-dropdown - 12;
+        z-index: $zindex-dropdown - 112;
     }
 
     .grid-header:first-child {

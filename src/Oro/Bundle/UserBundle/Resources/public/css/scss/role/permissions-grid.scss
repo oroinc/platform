@@ -90,7 +90,7 @@
     @include clearfix();
 
     &__item {
-        width: 200px;
+        width: 160px;
         margin-#{$end}: 15px;
 
         .dropdown-toggle {
@@ -101,9 +101,16 @@
             &.active {
                 @include fa-icon($role-capability-icon-action, after, true) {
                     position: absolute;
+                    top: 2px;
                     #{$end}: 4px;
 
+                    // Reset Bootstrap styles
+                    width: auto;
+                    height: auto;
+                    border: 0;
+
                     font-size: $role-capability-icon-size;
+                    line-height: 1;
 
                     color: $role-capability-icon-action-color;
                 }

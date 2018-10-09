@@ -102,6 +102,11 @@
         }
     }
 
+    .select2-container {
+        border-color: $inline-editor-select2-border-color;
+        box-shadow: $inline-editor-select2-box-shadow;
+    }
+
     &.select-editor {
         min-width: $inline-editor-select-editor-width;
     }
@@ -144,6 +149,29 @@
 }
 
 .inline-editor__select2-drop {
+    box-shadow: $inline-editor-select2-drop-box-shadow;
+
+    &:before {
+        position: absolute;
+        bottom: 100%;
+        #{$end}: 0;
+        #{$start}: 0;
+
+        height: $inline-editor-select2-drop-placeholder-height;
+        background-color: $inline-editor-select2-drop-placeholder-color;
+
+        content: '';
+    }
+
+    &.select2-drop-above {
+        box-shadow: $inline-editor-select2-drop-above-box-shadow;
+
+        &:before {
+            top: 100%;
+            bottom: auto;
+        }
+    }
+
     .select2-input {
         margin: 0;
         height: $inline-editor-select2-drop-height;

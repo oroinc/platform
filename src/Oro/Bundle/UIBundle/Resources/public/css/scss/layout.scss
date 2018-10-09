@@ -115,9 +115,6 @@
 }
 
 .container-fluid > .responsive-section {
-    margin: 0 -#{$horizontal-padding};
-    padding-right: $horizontal-padding;
-
     .responsive-cell {
         padding-left: $horizontal-padding;
     }

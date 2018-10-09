@@ -86,7 +86,7 @@
     }
 
     .title-box {
-        color: #565656;
+        color: $primary-200;
         margin: 0 0 27px;
         text-align: left;
 
@@ -111,8 +111,8 @@
         }
 
         .title {
-            font: bold 18px/1 $base-font-family;
-            color: #565656;
+            font: bold 18px/1 $font-family-sans-serif;
+            color: $primary-200;
             margin: 0;
         }
     }
@@ -123,7 +123,8 @@
 
     .input-prepend {
         width: 100%;
-        display: block;
+        display: flex;
+        align-items: center;
     }
 
     .oro-hint {
@@ -133,10 +134,8 @@
     .add-on {
         background: none;
         width: 93px;
-        height: 32px;
-        font: 14px/32px $base-font-family;
         text-align: right;
-        color: #565656;
+        color: $primary-200;
         padding: 0 25px 0 0;
         border: none;
     }

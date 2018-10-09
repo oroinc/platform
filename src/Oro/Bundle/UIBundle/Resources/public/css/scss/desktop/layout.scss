@@ -11,6 +11,15 @@
     overflow-x: auto;
 }
 
+.responsive-section {
+    .responsive-cell {
+        &:nth-last-child(1),
+        &:nth-last-child(2) {
+            margin-bottom: 0;
+        }
+    }
+}
+
 .responsive-block {
     min-width: 340px;
     padding-right: 5px;

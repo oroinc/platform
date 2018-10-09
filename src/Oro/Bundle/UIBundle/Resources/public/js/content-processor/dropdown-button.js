@@ -114,8 +114,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 }, this.options.moreButtonAttrs))
                 .addClass('btn dropdown-toggle dropdown-toggle-split')
                 .addClass(this.options.decoreClass || '')
-                .append(this.options.moreLabel)
-                .append('<span class="caret"></span>');
+                .append(this.options.moreLabel);
 
             return $button;
         },

@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
 .workflow-definition-buttons {
+    @include clearfix();
+
     margin-top: -13px;
     margin-bottom: 8px;
 
@@ -541,4 +543,12 @@ table.grid {
     max-width: 294px;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.transition-attributes-form-container {
+    @include clearfix();
+
+    .select2-container {
+        max-width: 100%;
+    }
 }

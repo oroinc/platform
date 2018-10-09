@@ -192,7 +192,7 @@
     .sidebar.minimized &.poppedup &__popup_wrapper {
         position: fixed;
         margin-top: -41px;
-        z-index: $zindexDropdown - 80;
+        z-index: $zindex-dropdown - 80;
         width: 0;
         height: 0;
         overflow: visible;
@@ -265,6 +265,10 @@
         border: 0;
         padding: 0;
         line-height: 1.11em;
+
+        &:focus {
+            outline: none;
+        }
     }
 
     &__icon {
@@ -365,6 +369,7 @@
     background-color: inherit;
     position: relative;
     font-size: 16px;
+    line-height: 14px;
     vertical-align: text-top;
 
     &.highlight,

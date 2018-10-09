@@ -2,45 +2,49 @@
 
 .content-with-sidebar {
     &--sidebar {
-        position: relative;
-        border: 1px solid $sidebarBorderColor;
-        width: $sidebarWidth;
-        background: #fff;
-        flex-shrink: 0;
+        display: $content-sidebar-sidebar-display;
+        flex-direction: $content-sidebar-sidebar-flex-direction;
+        background: $content-sidebar-sidebar-background;
+        border-radius: $content-sidebar-sidebar-border-radius;
+
+        position: $content-sidebar-sidebar-position;
+        flex-shrink: $content-sidebar-sidebar-flex-shrink;
+        width: $content-sidebar-sidebar-width;
+
 
         &:not(.ui-resizable-resizing) {
-            transition: width .3s;
+            transition: $content-sidebar-sidebar-not-ui-resizable-resizing-transition;
         }
 
         &.content-sidebar-minimized {
-            padding-left: 0;
-            width: $sidebarMinimizedWidth;
+            padding-left: $content-sidebar-minimized-offset-inner-left;
+            width: $content-sidebar-minimized-width;
         }
 
         .resizable-area {
-            position: absolute;
-            top: 0;
-            right: 0;
+            position: $content-sidebar-resizable-area-position;
+            top: $content-sidebar-resizable-area-top;
+            right: $content-sidebar-resizable-area-right;
 
-            width: 10px;
-            height: 100%;
+            width: $content-sidebar-resizable-area-width;
+            height: $content-sidebar-resizable-area-height;
 
-            border-right: 3px solid $sidebaResizableAreaColor;
+            border-right: $content-sidebar-resizable-area-border-right;
 
-            touch-action: none;
+            touch-action: $content-sidebar-resizable-area-touch-action;
 
-            cursor: ew-resize;
+            cursor: $content-sidebar-resizable-area-cursor;
 
-            opacity: 0;
+            opacity: $content-sidebar-resizable-area-opacity;
 
-            transition: opacity 150ms linear;
+            transition: $content-sidebar-resizable-area-transition;
 
-            visibility: hidden;
+            visibility: $content-sidebar-resizable-area-visibility;
         }
 
         &:hover {
             .resizable-area {
-                opacity: 1;
+                opacity: $content-sidebar-hover-resizable-area-opacity;
             }
         }
 
@@ -49,6 +53,22 @@
                 visibility: visible;
             }
         }
+
+        .sidebar-items {
+            padding: $content-sidebar-items-offset-inner;
+        }
+
+        .jstree-wrapper .jstree {
+            margin: $content-sidebar-jstree-offset;
+        }
+
+        .default-price-list-choice {
+            margin-bottom: 16px;
+        }
+    }
+
+    &--header-content {
+        white-space: nowrap;
     }
 
     &--sidebar-content,
@@ -59,31 +79,30 @@
     }
 
     &--header {
-        border-bottom: 1px solid $sidebarBorderColor;
-        height: $sidebarHeaderHeight;
-        padding: 5px $sidebarHorizontalPadding 4px;
-        margin-bottom: $sidebarHorizontalPadding;
+        display: $content-sidebar-display;
+        justify-content: $content-sidebar-justify-content;
+        align-items: $content-sidebar-align-items;
+        height: $content-sidebar-height;
+        padding: $content-sidebar-offset-inner;
 
         .content-sidebar-minimized & {
-            padding: 5px 8px 4px;
+            padding: $content-sidebar-minimized-offset-inner;
         }
     }
 
     &--controls {
-        float: right;
-        text-align: right;
+        float: $content-sidebar-controls-float;
     }
 
     &--control {
-        height: 20px;
-        width: 20px;
-        display: inline-block;
-        cursor: pointer;
+        display: $content-sidebar-control-display;
+        cursor: $content-sidebar-control-cursor;
 
         i {
-            font-size: 8px;
-            padding: 6px 0 0 0;
-            display: block;
+            display: $content-sidebar-control-i-display;
+            padding: $content-sidebar-control-i-padding;
+            color: $content-sidebar-control-i-color;
+            font-size: $content-sidebar-control-i-font-size;
         }
     }
 
@@ -104,64 +123,26 @@
     }
 
     &--container {
-        display: flex;
+        display: $content-sidebar-container-display;
+        margin-left: $content-sidebar-container-offset-left;
     }
 
     &--content {
-        width: calc(100% - #{$sidebarWidth});
-        flex: 1 1 auto;
+        width: calc(100% - #{$content-sidebar-width});
+        flex: $content-sidebar-container-flex;
 
         @media only screen and (max-width: 992px) {
-            width: calc(100% - #{$sidebarMinimizedWidth});
+            width: calc(100% - #{$content-sidebar-minimized-width});
         }
 
         &.content-sidebar-minimized {
-            width: calc(100% - #{$sidebarMinimizedWidth});
-        }
-
-        .placeholder {
-            background-color: #f1f1f1;
-
-            .content {
-                padding: $content-padding $content-padding 0;
-            }
+            width: calc(100% - #{$content-sidebar-minimized-width});
         }
 
         .responsive-section {
-            margin: 0 -#{$content-padding};
-            padding-right: $content-padding;
-
             .form-horizontal {
-                padding: $content-padding 0;
+                padding: $content-sidebar-form-horizontal-offset-inner;
             }
-        }
-    }
-
-    &--sidebar {
-        .sidebar-items {
-            padding: 0 $sidebarHorizontalPadding;
-        }
-    }
-}
-
-.mobile-version .content-with-sidebar {
-    &--container {
-        margin-top: -10px;
-
-        @include safe-area-offset(padding, 0);
-
-        .scrollspy.container-fluid {
-            margin-top: 0;
-        }
-    }
-
-    &--sidebar {
-        max-width: $sidebarWidth;
-        min-height: $sidebarMinHeight;
-        overflow: visible;
-
-        &.content-sidebar-maximized {
-            width: 100%;
         }
     }
 }

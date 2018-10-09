@@ -18,12 +18,14 @@ $dialog-buttonpane-flex-shrink: 0 !default;
 $dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
 $dialog-buttonpane-action-wrapper-offset-left: 8px !default;
 
-$dialog-titlebar-inner-offset: side-values(16px 45px 14px 15px) !default;
+$dialog-titlebar-inner-offset: side-values(10px 18px 10px 18px) !default;
 $dialog-titlebar-width: 100% !default;
 $dialog-titlebar-cursor: move !default;
 $dialog-titlebar-start: 1px !default;
 $dialog-titlebar-top: 1px !default;
 $dialog-titlebar-flex-shrink: 0 !default;
+$dialog-titlebar-falign-items: center !default;
+$dialog-titlebar-display: flex !default;
 
 $dialog-titlebar-min-cursor: auto !default;
 
@@ -42,7 +44,7 @@ $dialog-titlebar-min-button-outer-offset: 8px !default;
 $dialog-minimized-outer-offset: 0 4px !default;
 $dialog-minimized-box-shadow: none !default;
 
-$dialog-minimized-titlebar-inner-offset: side-values(3px 80px 3px 12px) !default;
+$dialog-minimized-titlebar-inner-offset: side-values(3px 11px 3px 12px) !default;
 $dialog-minimized-titlebar-outer-bottom-offset: -2px !default;
 
 $dialog-title-font-weight: bold !default;
@@ -65,7 +67,7 @@ $dialog-titlebar-buttonpane-end: 16px !default;
 $dialog-titlebar-buttonpane-end-ios11: if-ltr(calc(constant(safe-area-inset-right) + 16px), calc(constant(safe-area-inset-left) + 16px)) !default;
 $dialog-titlebar-buttonpane-end-ios11-2: if-ltr(calc(env(safe-area-inset-right) + 16px), calc(env(safe-area-inset-left) + 16px)) !default;
 
-$dialog-content-inner-offset: 40px 48px !default;
+$dialog-content-inner-offset: 28px !default;
 $dialog-content-outer-offset: 0 auto !default;
 $dialog-content-position: relative !default;
 $dialog-content-min-width: 250px !default;
@@ -107,7 +109,7 @@ $dialog-resizable-se-presudo-transform: rotate(-45deg) !default;
 $dialog-resizable-se-presudo-db-top: 10px !default;
 
 $dialog-widget-actions-outer-offset: 0 !default;
-$dialog-widget-actions-inner-offset: 10px !default;
+$dialog-widget-actions-inner-offset: 14px 24px !default;
 $dialog-widget-actions-border: none !default;
 
 $dialog-bottom-action-overflow: hidden !default;
@@ -123,3 +125,4 @@ $dialog-buttons-inner-cursor: pointer !default;
 $dialog-buttons-inner-border: 0 !default;
 
 $ui-widget-overlay-z-index: 150 !default;
+$ui-widget-overlay-background-color: rgba(255, 255, 255, .5) !default;

@@ -1,0 +1,8 @@
+/* @theme: admin.oro; */
+
+@import "components/bootstrap/scss/breadcrumb";
+
+.breadcrumb {
+    font-size: $breadcrumb-font-size;
+    color: $breadcrumb-color;
+}

@@ -11,8 +11,7 @@
 
     .jstree {
         &-node {
-            position: static;
-            margin-left: 20px;
+            margin-left: 24px;
         }
 
         &-anchor {
@@ -22,16 +21,16 @@
         &-actions {
             &__menu {
                 &--inline {
-                    float: left;
-                    font-size: 11px;
-                    line-height: 11px;
+                    display: flex;
+                    font-size: 14px;
+                    line-height: 14px;
                 }
             }
         }
 
         &-icon:empty {
             width: 20px;
-            margin-right: 1px;
+            margin-right: 4px;
         }
 
         &-ocl {
@@ -48,7 +47,7 @@
         [class*=" fa-"] {
             display: inline-block;
             text-align: left;
-            margin: 0 -2px 0 2px;
+            margin: 0 4px 0 0;
         }
     }
 }

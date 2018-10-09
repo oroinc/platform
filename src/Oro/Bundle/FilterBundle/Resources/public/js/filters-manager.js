@@ -679,10 +679,7 @@ define(function(require) {
          * @protected
          */
         _setButtonDesign: function($button) {
-            $button.find('span:first').replaceWith(
-                '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
-                '<span class="caret"></span></a>'
-            );
+            $button.addClass('dropdown-toggle');
         },
 
         /**

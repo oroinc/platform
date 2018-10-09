@@ -3,48 +3,42 @@
 .fallback-container {
     width: $fallback-width;
 
-    .content-with-sidebar--container & {
-        td {
-            width: $fallback-content-sidebar-width;
-        }
-    }
-
     .mce-tinymce {
         width: $fallback-mce-tinymce-width !important;
     }
 
-    .mce-container {
-        & ~ .fallback-status {
-            left: $fallback-mce-container-status-left;
-        }
+    .fallback-status {
+        line-height: $fallback-item-use-fallback-status-line-height;
+        height: $fallback-item-use-fallback-status-height;
     }
 
-    .fallback-item {
-        table {
-            width: $fallback-item-table-width;
-        }
-    }
+    div {
+        &.input-widget-select {
+            width: $fallback-container-select-mobile-width !important;
 
-    td {
-        &.fallback-item-value {
-            width: $fallback-item-value-width;
+            span {
+                min-width: $fallback-container-select-span-mobile-min-width;
+            }
 
-            &--first {
-                input[type="text"] {
-                    width: $fallback-item-value-input-width;
-                }
+            .fallback {
+                max-width: none;
             }
         }
     }
+}
 
-    .fallback-status {
-        padding-right: $fallback-status-inner-offset-right;
-    }
+.fallback-item {
+    max-width: $fallback-item-mobile-max-width;
+}
 
-    td.fallback-item-use-fallback,
-    .fallback-status {
-        width: $fallback-item-use-fallback-status-width;
-        line-height: $fallback-item-use-fallback-status-line-height;
-        height: $fallback-item-use-fallback-status-height;
+.fallback-item-value {
+    width: $fallback-item-value-mobile-width;
+}
+
+.fallback-item-value--first {
+    width: $fallback-item-value-mobile--first-width;
+
+    input[type="text"] {
+        width: $fallback-item-value-mobile--first-input-width;
     }
 }

@@ -241,6 +241,7 @@ define(function(require) {
          * Handles content load event and sets focus on first form input
          */
         onContentUpdated: function() {
+            this._fixScrollableHeight();
             this.focusContent();
         },
 
@@ -417,7 +418,6 @@ define(function(require) {
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
                 this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
-                this._fixScrollableHeight();
             }
         },
 

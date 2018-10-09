@@ -60,10 +60,6 @@
         @include safe-area-offset(padding, 0);
     }
 
-    .oro-subtitle {
-        word-break: break-all;
-    }
-
     .dashboard-widget.editable {
         .sortable {
             cursor: move;
@@ -87,7 +83,6 @@
             display: flex;
 
             .dropdown-menu {
-                margin-top: -3px;
                 min-width: 100px;
             }
         }

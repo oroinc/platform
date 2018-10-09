@@ -131,7 +131,7 @@
         <div class="oro-tabs">
             <div class="oro-tabs__head">
                 <ul class="nav nav-tabs">
-                    <li class="nav-item active"><a href="#transition-form" class="nav-link" data-toggle="tab">{{ 'Info'|trans }}</a></li>
+                    <li class="nav-item"><a href="#transition-form" class="nav-link active" data-toggle="tab">{{ 'Info'|trans }}</a></li>
                     <li class="nav-item"><a href="#transition-attributes" class="nav-link" data-toggle="tab">{{ 'Attributes'|trans }}</a></li>
                 </ul>
             </div>
@@ -300,56 +300,59 @@
         }) %}
         <div class="form-container">
             <div class="oro-tabs">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a href="#step-form" data-toggle="tab">{{ 'Info'|trans }}</a></li>
-                    <% if (transitionsAllowed) { %>
-                    <li><a href="#step-transitions" data-toggle="tab">{{ 'Transitions'|trans }}</a></li>
-                    <% } %>
-                </ul>
-
-                <div class="tab-content">
-                    <div class="tab-pane active" id="step-form">
-                        <div class="tab-data">
-                            <form action="#" class="form-horizontal">
-                                <div class="control-group">
-                                    {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
-                                    <div class="controls">
-                                        <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
-                                        <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
-                                            {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>', true) }}
-                                        <% } %>
+                <div class="oro-tabs__head">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a href="#step-form" class="nav-link active" data-toggle="tab">{{ 'Info'|trans }}</a></li>
+                        <% if (transitionsAllowed) { %>
+                        <li class="nav-item"><a href="#step-transitions" class="nav-link" data-toggle="tab">{{ 'Transitions'|trans }}</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+                <div class="oro-tabs__content">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="step-form">
+                            <div class="tab-data">
+                                <form action="#" class="form-horizontal">
+                                    <div class="control-group">
+                                        {{ _self.render_label("oro.workflow.form.name.label"|trans, true, "oro.workflow.workflowdefinition.step.name.tooltip") }}
+                                        <div class="controls">
+                                            <input type="text" name="label" value="<%- label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                                            <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
+                                                {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>', true) }}
+                                            <% } %>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="control-group">
-                                    {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
-                                    <div class="controls">
-                                        <input type="text" name="order" value="<%- order %>" data-validation="{{ orderConstraints|json_encode }}">
+                                    <div class="control-group">
+                                        {{ _self.render_label("oro.workflow.form.position.label"|trans, false, "oro.workflow.workflowdefinition.step.order.tooltip") }}
+                                        <div class="controls">
+                                            <input type="text" name="order" value="<%- order %>" data-validation="{{ orderConstraints|json_encode }}">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="control-group">
-                                    {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
-                                    <div class="controls">
-                                        <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
+                                    <div class="control-group">
+                                        {{ _self.render_label("oro.workflow.form.final.label"|trans, false, "oro.workflow.workflowdefinition.step.is_final.tooltip") }}
+                                        <div class="controls">
+                                            <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="widget-actions">
-                                    <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
-                                    <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
-                                </div>
-                            </form>
+                                    <div class="widget-actions">
+                                        <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                                        <button type="submit" class="btn btn-success">{{ "Apply"|trans }}</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
 
-                    <% if (transitionsAllowed) { %>
-                    <div class="tab-pane" id="step-transitions">
-                        <div class="tab-data">
-                            <div class="transitions-list-container"></div>
+                        <% if (transitionsAllowed) { %>
+                        <div class="tab-pane" id="step-transitions">
+                            <div class="tab-data">
+                                <div class="transitions-list-container"></div>
+                            </div>
                         </div>
+                        <% } %>
                     </div>
-                    <% } %>
                 </div>
             </div>
         </div>
@@ -436,7 +439,7 @@
                 </div>
 
                 <div class="clearfix">
-                    <div class="pull-right" style="margin-top: -35px;">
+                    <div class="pull-right">
                         <button type="reset" class="btn hide"><i class="fa-undo"></i> {{ 'Reset'|trans }}</button>
                         <button type="submit" class="btn btn-success"><i class="fa-plus"></i> {{ 'Add'|trans }}</button>
                     </div>
@@ -555,13 +558,18 @@
 
     {% set stepsListWidget %}
 
-    <div class="workflow-definition-buttons clearfix">
-        <div class="pull-right">
-            <button type="button" class="btn btn-primary add-transition-btn"><i class="fa-plus"></i> {{ 'Add transition'|trans }}</button>
-            <button type="button" class="btn btn-primary add-step-btn"><i class="fa-plus"></i> {{ 'Add step'|trans }}</button>
-            <button type="button" class="btn btn-primary refresh-btn"><i class="fa-refresh"></i> {{ 'Auto sort'|trans }}</button>
+    <div class="workflow-definition-buttons">
+        <div class="workflow-history-container pull-left"></div>
+        <div class="pull-left">
+            <button type="button" class="btn btn-secondary refresh-btn">
+                <span class="fa-refresh" aria-hidden="true"></span>
+                {{ 'Auto sort'|trans }}
+            </button>
         </div>
-        <div class="pull-right workflow-history-container"></div>
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary add-transition-btn">{{ 'Add transition'|trans }}</button>
+            <button type="button" class="btn btn-primary add-step-btn">{{ 'Add step'|trans }}</button>
+        </div>
     </div>
 
     <div class="workflow-step-editor row-fluid clearfix">

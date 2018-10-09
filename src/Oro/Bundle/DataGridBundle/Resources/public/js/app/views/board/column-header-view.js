@@ -31,7 +31,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.boardCollection = options.boardCollection;
-            this.listenTo(this.boardCollection, 'add remove reset sort', this.markAsEmpty);
+            this.listenTo(this.boardCollection, 'add remove reset sort', this.markIfEmpty);
             ColumnHeaderView.__super__.initialize.call(this, options);
             this.markIfEmpty();
         },

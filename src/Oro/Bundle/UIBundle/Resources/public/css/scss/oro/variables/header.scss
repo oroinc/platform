@@ -1,12 +1,13 @@
 /* @theme: admin.oro; */
 
-$header-dropdown-menu-link-line-height:         1.5 !default;
+$header-dropdown-menu-li-line-height:           $line-height-base !default;
+$header-dropdown-menu-link-line-height:         $line-height-base !default;
 $header-search-dropdown-min-width:              400px !default;
 $header-search-dropdown-menu-background:        $primary-inverse !default;
 $header-search-field-container-margin-end:      8px !default;
 $header-search-suggestion-list-separator-color: $primary-860 !default;
 $header-search-suggestion-list-separator-width: 1px !default;
-$header-search-suggestion-list-shadow:          1px 1px 9px 3px rgba(0, 0, 0, 0.08) !default;
+$header-search-suggestion-list-shadow:          1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
 $header-search-suggestion-item-description-color: $primary-200 !default;
 $header-search-suggestion-item-description-line-height: 1.5 !default;
 $header-search-suggestion-item-entity-color:    $primary-550 !default;

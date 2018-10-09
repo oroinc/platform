@@ -1,13 +1,11 @@
-define([
-    'underscore',
-    'backgrid',
-    '../actions-panel',
-    'oroui/js/app/views/base/view',
-    'tpl!orodatagrid/templates/datagrid/action-header-cell.html'
-], function(_, Backgrid, ActionsPanel, BaseView, template) {
+define(function(require) {
     'use strict';
 
     var ActionHeaderCell;
+    var Backgrid = require('backgrid');
+    var ActionsPanel = require('../actions-panel');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('tpl!orodatagrid/templates/datagrid/action-header-cell.html');
 
     /**
      *
@@ -94,7 +92,7 @@ define([
                 this.$el.append(this.getTemplateFunction()(this.getTemplateData()));
                 panel.setElement(this.$('[data-action-panel]'));
                 panel.render();
-                panel.$el.children().wrap('<li/>');
+                panel.$el.children().addClass('dropdown-item').wrap('<li/>');
             }
             return this;
         },

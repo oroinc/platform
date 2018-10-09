@@ -1,6 +1,6 @@
 /* @theme admin.oro; */
 
-$loading-mask-z-index: $oro-zindex-dropdown + 99 !default;
+$loading-mask-z-index: $zindex-dropdown - 1 !default;
 $loading-mask-background-color: $primary-inverse !default;
 
 $loading-mask-icon-color: $primary-700 !default;

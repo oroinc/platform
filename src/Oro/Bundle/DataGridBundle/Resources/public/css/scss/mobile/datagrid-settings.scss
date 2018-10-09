@@ -8,7 +8,7 @@
     }
 
     label {
-        line-height: $base-line-height;
+        line-height: 1;
     }
 
     .dropdown-menu {
@@ -20,24 +20,6 @@
 
         .close {
             right: 12px;
-        }
-
-        &:before {
-            top: -8px;
-            right: 9px;
-            border-top: 0 none;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 7px solid rgba(0, 0, 0, .2);
-        }
-
-        &:after {
-            top: -6px;
-            right: 10px;
-            border-top: 0 none;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 6px solid #fff;
         }
     }
 
@@ -59,19 +41,6 @@
 
         .table-header-wrapper th:nth-child(2) {
             text-align: center;
-        }
-
-        .datagrid-settings-filter {
-            .datagrid-settings-search {
-                &.empty:after {
-                    top: 10px;
-                    right: 13px;
-                }
-
-                .clear {
-                    top: 9px;
-                }
-            }
         }
 
         td.title-cell {
@@ -105,30 +74,6 @@
 
         td.visibility-cell {
             width: 40px;
-        }
-    }
-}
-
-/* changes position of bubble point of dropdown when it's shown above */
-.dropup,
-.dropup-area {
-    .datagrid-settings .dropdown-menu {
-        top: auto;
-        margin-top: 0;
-        margin-bottom: 40px;
-
-        &:before {
-            top: auto;
-            bottom: -7px;
-            border-bottom: 0 none;
-            border-top: 7px solid rgba(0, 0, 0, .1);
-        }
-
-        &:after {
-            top: auto;
-            bottom: -6px;
-            border-bottom: 0 none;
-            border-top: 6px solid #fff;
         }
     }
 }

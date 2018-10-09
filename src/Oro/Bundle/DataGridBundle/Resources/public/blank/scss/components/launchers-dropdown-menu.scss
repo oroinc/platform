@@ -4,4 +4,8 @@
     min-width: 0 !important; // Override bootstrap styles
     margin: 0 !important;  // Override bootstrap styles
     padding: 0 !important;  // Override bootstrap styles
+
+    &.show {
+        margin: 0 !important; // Override bootstrap styles;
+    }
 }

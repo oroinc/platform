@@ -1,118 +1,18 @@
 /* @theme: admin.oro; */
 
 @import "bowerassets/font-awesome/scss/_variables";
-@import "bootstrap/variables";
 
-@import "colors";
+// Should be refactored when style builder will updated
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
 
 // Oro variables
 $enable-safe-area:                      true;
-$content-padding:                       12px;
-$horizontal-padding:                    $content-padding;
-$vertical-padding:                      $content-padding;
-$top-padding:                           $content-padding;
-$bottom-padding:                        $content-padding;
-$margin-bottom-box:                     $content-padding;
-$general-border-color:                  #ddd;
-$width-page:                            960px;
-$width-body-page:                       980px;
-$width-popup:                           480px;
-$width-close-panel:                     25px;
-$width-left-panel:                      230px;
-$width-left-panel2:                     210;
-$width-input:                           280px;
-$base-btn-border-radius:                16px;
-$icon-sprite-path:                      "../../img/glyphicons-halflings.png";
-$icon-white-sprite-path:                "../../img/glyphicons-halflings-white.png";
-$body-color:                            $primary-200;
-$body-background:                       #3e434a;
-$well-background:                       #f8f8f8;
-$base-gradient-color-start:             #39464f;
-$base-gradient-color-end:               #333e48;
-$base-gradient-color-border:            #1e2833;
-$logo-background-color:                 #2d333b;
-$header-icon-button-text-color:         #2a313a;
-$header-text-color:                     #cad2da;
-$inline-action-color:                   #94b4c9;
-$inline-action-background:              #edf5fb;
-$cell-selected-background:              $inline-action-background;
-$row-selected-background:               $extra-300;
-$row-highlight-background:              darken($row-selected-background, 2%);
-$cell-success-background:               $success-ultra-light;
-$cell-success-color:                    #96b76d;
-$cell-error-background:                 $danger-lighten;
-$cell-loading-background:               $warning-light;
-$side-bar-closed-width:                 33px;
-$side-bar-opened-width:                 200px;
-
-$progress-bar-gradient-start:           #dcdcdc;
-$progress-bar-gradient-end:             #d3d3d3;
-
-$page-border-color:                     #ccc;
-$navigation-background-color:           #f8f8f8;
-$page-sidebar-background-color:         $navigation-background-color;
-
-$base-font-family:                      Helvetica, Arial, sans-serif;
-$base-line-height:                      1.57;
-
-$base-font-size:                        14px;
-$base-font-size--xxl:                   32px;
-$base-font-size--xl:                    24px;
-$base-font-size--l:                     18px;
-$base-font-size--m:                     16px;
-$base-font-size--s:                     12px;
-$base-font-size--xs:                    11px;
-
-$input-border-radius:                   3px;
-$window-border-radius:                  3px;
-
-$base-text-color:                       $primary-200;
-$btn-text-color:                        $primary-400;
-
-$accordion-heading-background-color:    #eaeaea;
-
-$success-background:                    $success-ultra-light;
-$success-border:                        $success-ultra-light;
-$success-text:                          $success-darken;
-$success-close:                         $success-darken;
-
-$error-background:                      $danger-ultra-light;
-$error-border:                          $danger-ultra-light;
-$error-text:                            $danger-ultra-dark;
-$error-close:                           $danger-darken;
-
-$warning-background:                    $warning-light;
-$warning-border:                        $warning-light;
-$warning-text:                          $warning-darken;
-$warning-close:                         $warning-dark;
-
-$info-text:                             $info-ultra-dark;
-$info-background:                       $info-lighten;
-$info-border:                           $info-lighten;
-$info-close:                            $info-dark;
-
-$tag-item-color:                        $secondary;
-$tag-item-background:                   $secondary-300;
-$tag-my-item-background:                $secondary;
-
-$error-message-balloon-background:      #fae1dc;
-
-// Links
-$link-color:                            $secondary;
-$link-color-hover:                      darken($link-color, 10%);
-$menu-item-color:                       $primary-200;
-
-// Screen sizes
-$small-screen:                          1024px;
-$medium-screen:                         1340px;
-$large-screen:                          1920px;
 
 // Screen sizes
 $side-bar-closed-width:                 33px;
 $side-bar-opened-width:                 200px;
-
-// Z-indexs
-$oro-zindex-dropdown:                   900;
 
 $dot-menu-dropdown-min-height:          168px;
 $dot-menu-dropdown-max-height:          330px;

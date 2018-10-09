@@ -16,15 +16,12 @@
             {% block header %}
                 {% block label %}
                     {% if data.label|default('') %}
-                        <label class="jstree-wrapper__label">
-                            <input type="checkbox"
-                                   name="jstree-items"
-                                   data-action-type="checkAll"/>
+                        <span class="jstree-wrapper__label">
                             <span class="jstree-wrapper__text"
                                 data-collapse-trigger>
                                 {{ data.label }}
                             </span>
-                        </label>
+                        </span>
                     {% endif %}
                 {% endblock label %}
                 {% block actions %}

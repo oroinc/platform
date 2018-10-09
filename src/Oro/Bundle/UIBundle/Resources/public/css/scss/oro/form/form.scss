@@ -10,6 +10,7 @@
     color: $input-color;
     margin-bottom: $input-outer-offset-bottom;
     box-sizing: $input-box-sizing;
+    outline: $input-outline;
 
     &:not(textarea) {
         height: $field-size;
@@ -97,12 +98,6 @@
             border-color: $uploader-action-active-border-color;
         }
     }
-}
-
-input,
-textarea,
-.uneditable-input {
-    width: $field-width;
 }
 
 textarea,
@@ -231,8 +226,7 @@ input[type="color"],
         width: $add-on-height;
         line-height: $add-on-line-height;
         padding: $add-on-inner-offset;
-
-
+        display: inline-block;
 
         input[type='checkbox'],
         input[type='radio'] {

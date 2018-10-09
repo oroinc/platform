@@ -41,7 +41,7 @@ define(function(require) {
         },
 
         events: {
-            'click >.close': 'onCloseClick'
+            'click >.btn-close': 'onCloseClick'
         },
 
         constructor: function AbstractConditionContainerView(options) {

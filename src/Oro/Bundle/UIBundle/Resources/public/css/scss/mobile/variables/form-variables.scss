@@ -15,20 +15,16 @@ $selector-span-icon-font-size: $base-font-size--l;
 
 $input-append-add-on-height: 40px;
 $input-append-add-on-width: 40px;
-$input-append-add-on-font-size: $base-font-size--m;
+$input-append-add-on-font-size: $base-font-size;
 
 $controls-fields-row-input-small-width: 140px;
 
 $form-horizontal-max-width: 100%;
 $form-horizontal-control-group-max-width: initial;
 $form-horizontal-control-group-offset: 0 0 7px;
-$form-horizontal-control-label-float: none;
-$form-horizontal-control-label-width: auto;
-$form-horizontal-control-label-inner-offset-left: 0;
-$form-horizontal-control-label-text-align: left;
+$form-horizontal-control-label-width: 85px;
 
-$form-horizontal-controls-offset-left: 0;
-$form-horizontal-controls-label-inner-offset-top: 6px;
+$form-horizontal-controls-offset-left: 95px;
 
 $control-group-checkbox-position: relative;
 $control-group-checkbox-display: inline-block;

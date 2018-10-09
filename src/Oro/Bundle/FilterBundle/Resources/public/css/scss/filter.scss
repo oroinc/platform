@@ -95,6 +95,7 @@
 
                 input[type='text'] {
                     max-width: $choice-filter-input-max-width;
+                    width: $choice-filter-input-width;
                     margin-bottom: $choice-filter-input-offset-bottom;
                 }
 
@@ -301,14 +302,17 @@
         .filter-criteria-selector,
         .dropdown-toggle.btn {
             font-weight: $filter-criteria-selector-font-weight;
-
-            .caret {
-                margin-top: $filter-criteria-selector-caret-offset-top;
-            }
         }
 
-        .select-filter-widget .caret {
-            margin-top: $select-filter-widget-caret-offset-top;
+        .filter-criteria-selector {
+            padding-right: 30px;
+
+            &:after {
+                position: absolute;
+                right: 14px;
+                top: 50%;
+                margin-top: -2px;
+            }
         }
 
         &.open-filter {
@@ -353,10 +357,6 @@
 
         .btn {
             vertical-align: $filter-item-btn-vertical-align;
-
-            .caret {
-                margin-top: $filter-item-btn-caret-offset-top;
-            }
         }
 
         & > .btn {
@@ -517,22 +517,6 @@
         input[type="search"] {
             margin: $select-filter-widget-search-offset;
             width: $select-filter-widget-search-width;
-        }
-
-        span.caret {
-            margin-top: $select-filter-widget-caret-offset-top;
-            margin-right: $select-filter-widget-caret-offset-right;
-        }
-
-        .add-filter-button {
-            span.caret {
-                border-top-color: $select-filter-widget-add-filter-button-caret-border-top-color;
-                margin-top: $select-filter-widget-add-filter-button-caret-offset-top;
-            }
-
-            &:hover {
-                text-decoration: $select-filter-widget-add-filter-button-caret-hover-text-decoration;
-            }
         }
 
         .ui-multiselect-header {

@@ -10,7 +10,7 @@
     @import "board-view/card";
 
     .loader-mask {
-        z-index: $oro-zindex-dropdown - 1; // to show under grid's filter
+        z-index: $zindex-dropdown - 101; // to show under grid's filter
     }
 }
 

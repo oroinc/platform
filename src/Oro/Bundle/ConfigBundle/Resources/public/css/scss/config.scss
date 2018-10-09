@@ -32,6 +32,11 @@
         width: auto;
         margin: 0 15px 0 0;
         float: left;
+
+        input,
+        textarea {
+            min-width: 294px;
+        }
     }
 
     .controls .parent-scope-checkbox {
@@ -55,14 +60,11 @@
 
 .system-configuration-content {
     &-wrapper {
-        background-color: #fff;
+        padding: 0 16px;
         margin-bottom: 15px;
-        border: 1px solid #e5e5e5;
-        border-radius: 4px;
     }
 
     &-inner {
-        border-top: 1px solid #e5e5e5;
         padding: 27px 30px 20px;
         width: 100%;
         overflow-y: auto;
@@ -71,19 +73,18 @@
     &-header {
         display: flex;
         justify-content: space-between;
+        background: $primary-900;
+        border-radius: 4px;
         padding: 8px 12px;
     }
 
     &-title {
-        color: #727272;
-        font-size: 13px;
-        font-family: Helvetica, Arial, sans-serif;
+        font-size: 14px;
         font-weight: bold;
-        padding: 8px 12px;
     }
 
     select {
-        width: 280px;
+        width: 294px;
     }
 }
 
@@ -92,6 +93,7 @@
 
     h1 {
         font-size: 20px;
+        margin-top: 12px;
         line-height: 28px;
         float: left;
     }

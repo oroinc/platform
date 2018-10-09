@@ -1,0 +1,49 @@
+/* @theme: admin.oro; */
+// Base file for import of customized bootstrap settings
+
+// Required
+@import "functions";
+@import "variables";
+@import "mixins";
+
+// Optional
+@import "components/bootstrap/scss/root";
+@import "reboot";
+@import "components/bootstrap/scss/type";
+@import "components/bootstrap/scss/images";
+@import "components/bootstrap/scss/code";
+// @import "components/bootstrap/scss/grid";
+// @import "components/bootstrap/scss/tables";
+@import "components/bootstrap/scss/forms";
+@import "buttons";
+@import "components/bootstrap/scss/transitions";
+@import "dropdown";
+@import "button-group";
+@import "components/bootstrap/scss/input-group";
+@import "components/bootstrap/scss/custom-forms";
+@import "components/bootstrap/scss/nav";
+// @import "components/bootstrap/scss/navbar";
+@import "components/bootstrap/scss/card";
+@import "breadcrumb";
+@import "pagination";
+@import "badge";
+// @import "components/bootstrap/scss/jumbotron";
+@import "components/bootstrap/scss/alert";
+@import "components/bootstrap/scss/progress";
+@import "components/bootstrap/scss/media";
+@import "components/bootstrap/scss/list-group";
+@import "components/bootstrap/scss/close";
+@import "modal";
+@import "components/bootstrap/scss/tooltip";
+@import "popover";
+@import "components/bootstrap/scss/carousel";
+@import "components/bootstrap/scss/utilities";
+@import "components/bootstrap/scss/print";
+
+.hide {
+    @extend .d-none;
+}
+
+.control-group {
+    @include clearfix();
+}

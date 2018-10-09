@@ -12,18 +12,11 @@
         padding: $more-bar-holder-toggle-offset;
         height: $more-bar-holder-height;
 
-        font-size: 0;
-        line-height: 0;
+        font-size: $more-bar-holder-icon-font-size;
+        line-height: 1;
         text-decoration: none;
 
-        @include hide-text();
-
         color: $oro-datagrid-action-cell-color;
-
-        @include fa-icon($more-bar-holder-icon, after, true) {
-            font-size: $more-bar-holder-icon-font-size;
-            line-height: 1;
-        }
 
         // Hide bootstrap arrow
         &:before {
@@ -48,8 +41,14 @@
 
 .launchers-dropdown-menu {
     min-width: $oro-datagrid-action-size;
+    // Override bootstrap margin
     margin: 0;
     padding: $launchers-dropdown-menu-offset;
+
+    &.show {
+        // Override bootstrap margin
+        margin: 0;
+    }
 }
 
 .launchers-list {

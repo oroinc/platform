@@ -71,6 +71,11 @@ define(function(require) {
         template: require('tpl!orodatagrid/templates/datagrid/action-launcher.html'),
 
         /**
+         * @property {Object}
+         */
+        attributes: null,
+
+        /**
          * Defines map of events => handlers
          * @return {Object}
          */
@@ -109,61 +114,23 @@ define(function(require) {
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
-            var opts = options || {};
-
-            if (!opts.action) {
+            if (!options.action) {
                 throw new TypeError('"action" is required');
             }
 
-            if (opts.template) {
-                this.template = opts.template;
+            var truthy = _.pick(options, 'template', 'label', 'title', 'icon', 'link',
+                'launcherMode', 'iconClassName', 'className', 'action', 'attributes');
+
+            _.extend(
+                this,
+                _.pick(options, 'iconHideText', 'runAction', 'onClickReturnValue', 'links'),
+                _.pick(truthy, Boolean)
+            );
+
+            if (!this.launcherMode) {
+                this.launcherMode = this._convertToLauncherMode();
             }
 
-            if (opts.label) {
-                this.label = opts.label;
-            }
-
-            if (opts.title) {
-                this.title = opts.title;
-            }
-
-            if (opts.icon) {
-                this.icon = opts.icon;
-            }
-
-            if (opts.iconHideText !== undefined) {
-                this.iconHideText = opts.iconHideText;
-            }
-
-            if (opts.launcherMode) {
-                this.launcherMode = opts.launcherMode;
-            }
-
-            if (opts.link) {
-                this.link = opts.link;
-            }
-
-            if (opts.iconClassName) {
-                this.iconClassName = opts.iconClassName;
-            }
-
-            if (opts.className) {
-                this.className = opts.className;
-            }
-
-            if (_.has(opts, 'runAction')) {
-                this.runAction = opts.runAction;
-            }
-
-            if (_.has(opts, 'onClickReturnValue')) {
-                this.onClickReturnValue = opts.onClickReturnValue;
-            }
-
-            if (_.has(opts, 'links')) {
-                this.links = options.links;
-            }
-
-            this.action = opts.action;
             ActionLauncher.__super__.initialize.apply(this, arguments);
         },
 
@@ -171,15 +138,11 @@ define(function(require) {
          * @return {String}
          */
         _convertToLauncherMode: function() {
-            var str = '';
-
             if (this.icon) {
-                str = this.iconHideText ? 'icon-only' : 'icon-text';
+                return this.iconHideText ? 'icon-only' : 'icon-text';
             } else {
-                str = 'text-only';
+                return 'text-only';
             }
-
-            return str;
         },
 
         /**
@@ -191,27 +154,28 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
+            delete this.attributes;
+
             ActionLauncher.__super__.dispose.apply(this, arguments);
         },
 
         getTemplateData: function() {
-            var label = this.label || this.action.label;
+            var data = _.pick(this, 'icon', 'title', 'label', 'className', 'iconClassName', 'launcherMode', 'link',
+                'links', 'action', 'attributes', 'enabled', 'tagName');
 
-            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
-            return {
-                label: label,
-                icon: this.icon,
-                title: this.title || label,
-                className: this.className,
-                iconClassName: this.iconClassName,
-                launcherMode: this.launcherMode,
-                link: this.link,
-                links: this.links,
-                action: this.action,
-                attributes: this.attributes,
-                enabled: this.enabled,
-                tagName: this.tagName
-            };
+            if (!data.label) {
+                data.label = this.action.label;
+            }
+
+            if (!data.title) {
+                data.title = data.label;
+            }
+
+            if (!data.launcherMode) {
+                data.launcherMode = this._convertToLauncherMode();
+            }
+
+            return data;
         },
 
         /**

@@ -14,7 +14,7 @@
     }) %}
     {{ form_widget(form) }}
     {% if is_granted('oro_config_system') %}
-        <span class="help-block">
+        <span class="form-text">
             <button class="btn btn-primary check-connection-messages"
                data-role="check-smtp-connection"
                data-page-component-module="{{ 'oroemail/js/app/components/check-smtp-connection-component' }}"
@@ -28,7 +28,7 @@
 {% block _email_configuration_oro_email___attachment_sync_max_size_value_widget %}
     {{ form_widget(form) }}
     {% if is_granted('oro_config_system') %}
-    <span class="help-block">
+    <span class="form-text">
         <a class="btn btn-danger"
            href="{{ path('oro_email_purge_emails_attachments') }}"
            data-page-component-module="{{ 'oroui/js/app/components/hidden-redirect-component' }}"

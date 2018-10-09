@@ -3,18 +3,34 @@
         <%- name %><% if (!_.isNull(attribute)) { %>="<%- attribute %>"<% } %>
     <% });
 } %>
+
+<%
+    actionClassNames = [];
+    actionClassNames.push('action');
+    if (className) {
+        actionClassNames.push(className);
+    }
+    if (launcherMode == 'icon-only') {
+        actionClassNames.push('btn-icon');
+    }
+    if (!enabled) {
+        actionClassNames.push('disabled');
+    }
+    if (launcherMode != '') {
+        actionClassNames.push('mode-' +  launcherMode);
+    }
+    if (links) {
+        actionClassNames.push('dropdown-toggle');
+    }
+%>
+
 <% var togglerId = _.uniqueId('dropdown-') %>
 
 <% if (links) { %><div class="btn-group"><% } %>
 
 <<%- tagName %>
     <% if (tagName == "a") { %> href="<%= link %>"<% } %>
-    class="action
-        <%- className ? className : '' %>
-        <%- launcherMode == 'icon-only' ? 'btn-icon' : '' %>
-        <%- !enabled ? 'disabled' : '' %>
-        <%- launcherMode != '' ? 'mode-' +  launcherMode : '' %>
-        <% if (links) { %> dropdown-toggle<% } %>"
+    class="<%= actionClassNames.join(' ') %>"
     title="<%- title %>"
     <% attributesTemplate(attributes) %>
     <% if (links) { %> data-toggle="dropdown" role="button" id="<%- togglerId %>"
@@ -29,26 +45,26 @@
         <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
         <%- label %>
     <% } %>
-
-    <% if (links) { %><span class="caret" aria-hidden="true"></span><% } %>
-</<%- tagName %>>
+</<%= tagName %>>
 
 <% if (links) { %>
     <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">
     <% _.each(links, function(item, index) { %>
-        <li><a href="<%- link %>" data-index="<%- index %>" title="<%- item.label %>"
+        <li>
+            <a href="<%- link %>" class="dropdown-item" data-index="<%- index %>" title="<%- item.label %>"
             <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%- item.key %>">
-            <% if (launcherMode == 'icon-text') { %>
-                <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
-                <%- item.label %>
-            <% } else if (launcherMode == 'icon-only') { %>
-                <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
-            <% } else if (launcherMode == 'text-only') { %>
-                <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
-                <%- item.label %>
-            <% } %>
-        </a></li>
+                <% if (launcherMode == 'icon-text') { %>
+                    <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+                    <%- item.label %>
+                <% } else if (launcherMode == 'icon-only') { %>
+                    <span class="icon <%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
+                <% } else if (launcherMode == 'text-only') { %>
+                    <% if (iconClassName) { %><span class="icon <%- iconClassName %>" aria-hidden="true"></span><% } %>
+                    <%- item.label %>
+                <% } %>
+            </a>
+        </li>
     <% }) %>
     </ul>
 </div>

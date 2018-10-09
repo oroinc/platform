@@ -4,7 +4,7 @@
     {% set listAttributes = item.childrenAttributes %}
     {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
     {% set listAttributes = listAttributes|merge({
-        'class': oro_menu.add_attribute_values(listAttributes, 'class', ['dropdown-menu', 'dropdown-menu-arrow']|merge([options.class|default('')])),
+        'class': oro_menu.add_attribute_values(listAttributes, 'class', ['dropdown-menu']|merge([options.class|default('')])),
         'role': 'menu'
     }) %}
     {% if options.togglerId is defined %}

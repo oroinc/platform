@@ -15,22 +15,24 @@
             {{ UI.app_logo(organization_name) }}
             {{ _self.organization_name_and_logo(organization_name) }}
             {% set togglerId = 'dropdown-'|uniqid %}
-            <span id="{{ togglerId }}" class="fa-caret-down dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
+            <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                   role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
             <ul class="dropdown-menu dropdown-organization-switcher" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for organization in organizations %}
                     <li>
                         {% if curr_organization and curr_organization.getId() == organization.id %}
-                        <span class="selected" aria-selected="true"><b>{{ organization.name }}</b></span>
+                        <span class="dropdown-item-text selected" aria-selected="true"><b>{{- organization.name|trim -}}</b></span>
                         {% else %}
                         <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}"
-                           class="organization-switcher no-hash">
-                            {{- organization.name -}}
+                           class="dropdown-item organization-switcher no-hash">
+                            {{- organization.name|trim -}}
                         </a>
                         {% endif %}
                     </li>
                     {% if not loop.last %}
-                    <li class="divider" role="separator"><span></span></li>
+                    <li>
+                        <div class="dropdown-divider"></div>
+                    </li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -49,16 +51,15 @@
     {% if organizations|length > 1 %}
         <div class="nav organization-switcher dropdown">
             {% set togglerId = 'dropdown-'|uniqid %}
-            <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle" data-toggle="dropdown"
+            <a id="{{ togglerId }}" href="#" role="button" class="logo dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
                 aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false">
                 <span class="organization-name">{{- organization_name -}}</span>
-                <span class="fa-caret-down btn-organization-switcher" aria-hidden="true"></span>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for organization in organizations %}
                     {% set is_current_organization = curr_organization and curr_organization.getId() == organization.id %}
                     <li {% if is_current_organization %}class="current"{% endif %}>
-                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash"
+                        <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="dropdown-item no-hash"
                            {% if is_current_organization %}aria-selected="true"{% endif %}>
                             {{- organization.name -}}
                         </a>

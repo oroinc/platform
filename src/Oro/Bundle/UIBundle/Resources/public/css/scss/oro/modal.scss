@@ -4,8 +4,6 @@
     outline: 0;
 
     &-header {
-        padding: $modal-header-inner-offset;
-
         border-radius: $modal-border-radius $modal-border-radius 0 0;
         background-color: $primary-300;
         border: $modal-header-border;
@@ -22,11 +20,9 @@
         height: $modal-close-size;
         width: $modal-close-size;
         margin: $modal-close-top-outer-offset;
-        float: #{$end};
 
         font-size: $base-font-size--l;
         text-align: $modal-close-align;
-        line-height: $modal-close-size;
 
         color: $primary-inverse;
 
@@ -59,10 +55,6 @@
 
 // Normal mode
 .oro-modal-normal {
-    width: auto;
-
-    background-color: $primary-inverse;
-
     .modal-header {
         background-color: $primary-300;
         color: $primary-inverse;
@@ -75,8 +67,6 @@
 
 // Danger mode
 .oro-modal-danger {
-    background-color: $danger-lighten;
-
     .modal-header {
         background-color: $danger-darken;
         color: $primary-inverse;
@@ -90,8 +80,6 @@
 
 // Info mode
 .modal-primary {
-    background-color: $info-lighten;
-
     .modal-header {
         background-color: $info-dark;
         color: $primary-inverse;

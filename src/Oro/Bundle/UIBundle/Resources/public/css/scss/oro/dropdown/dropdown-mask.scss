@@ -12,7 +12,7 @@
     height: auto;
     width: auto;
     opacity: 0;
-    z-index: $oro-zindex-dropdown - 1;
+    z-index: $zindex-dropdown - 101;
     background-color: #fff;
 
     // opacity should not be zero for valid scroll work on IOS

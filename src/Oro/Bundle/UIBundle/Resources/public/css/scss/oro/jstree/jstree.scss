@@ -3,17 +3,23 @@
 .jstree-wholerow-ul {
     width: $jstree-wholerow-ul-width;
     margin-bottom: $jstree-wholerow-ul-offset-bottom;
-    padding-left: $jstree-wholerow-ul-inner-offset-left;
 }
 
 .jstree-default {
-    .jstree-open > .jstree-ocl,
-    .jstree-closed > .jstree-ocl,
-    .jstree-leaf > .jstree-ocl,
     .jstree-node {
         position: $jstree-default-node-position;
-
         background: $jstree-default-node-background;
+        margin-left: $jstree-default-node-offset-left;
+    }
+
+    > .jstree-container-ul > .jstree-node {
+        margin-left: $jstree-default-container-node-offset-left;
+    }
+
+    .jstree-open > .jstree-ocl,
+    .jstree-closed > .jstree-ocl,
+    .jstree-leaf > .jstree-ocl {
+        background: $jstree-default-ocl-background;
     }
 
     .jstree-themeicon {
@@ -42,11 +48,8 @@
         width: $jstree-icon-width;
         height: $jstree-icon-height;
 
+        font-size: $jstree-icon-font-size;
         line-height: $jstree-icon-line-height;
-    }
-
-    .jstree-clicked {
-        font-weight: $jstree-clicked-font-weight;
     }
 
     .jstree-wholerow-clicked,
@@ -159,6 +162,7 @@
     &__search-icon {
         display: $jstree-search-component-clear-icon-display;
         position: $jstree-search-component-clear-icon-position;
+        margin-top: $jstree-search-component-clear-offset-top;
         top: $jstree-search-component-clear-icon-top;
         right: $jstree-search-component-clear-icon-right;
         font-size: $jstree-search-component-clear-icon-font-size;

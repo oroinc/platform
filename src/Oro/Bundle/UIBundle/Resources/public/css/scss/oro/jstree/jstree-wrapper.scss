@@ -6,54 +6,33 @@
     min-height: $jstree-wrapper-min-height;
     padding: $jstree-wrapper-inner-offset;
 
-    &-title {
+    &__title {
         display: $jstree-wrapper-title-display;
 
+        align-items: $jstree-wrapper-title-align-items;
         justify-content: $jstree-wrapper-title-justify-content;
-
-        margin-bottom: $jstree-wrapper-title-offset-bottom;
     }
 
-    &-label {
+    &__label {
         display: $jstree-wrapper-label-display;
         margin-top: $jstree-wrapper-label-offset-top;
         margin-bottom: $jstree-wrapper-label-offset-bottom;
-
-        &:before {
-            display: $jstree-wrapper-label-before-display;
-
-            width: $jstree-wrapper-label-before-width;
-            margin-right: $jstree-wrapper-label-before-offset-right;
-
-            font-family: $jstree-wrapper-label-before-font-family;
-            font-size: $jstree-wrapper-label-before-font-size;
-            font-weight: $jstree-wrapper-label-before-font-weight;
-            font-style: $jstree-wrapper-label-before-font-style;
-
-            content: $jstree-wrapper-label-before-content;
-
-            color: $jstree-wrapper-label-before-color;
-        }
-    }
-
-    &.expanded &-label:before {
-        content: $jstree-wrapper-label-expanded-before-content;
     }
 
     &.expanded .jstree-actions {
-        display: $jstree-wrapper-label-expanded-jstree-actions-before-display;
+        display: $jstree-wrapper-label-expanded-jstree-actions-display;
     }
 
-    &-text {
+    &__text {
+        font-size: $jstree-wrapper-text-font-size;
         font-weight: $jstree-wrapper-text-font-weight;
 
         cursor: $jstree-wrapper-text-cursor;
-        text-transform: $jstree-wrapper-text-text-transform;
 
         color: $jstree-wrapper-text-color;
     }
 
-    &-checkbox {
+    &__checkbox {
         display: $jstree-wrapper-checkbox-display;
     }
 

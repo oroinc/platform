@@ -6,23 +6,7 @@
         font-size: $accordion-toggle-font-size;
         font-weight: $accordion-toggle-font-weight;
         margin: $accordion-toggle-offset;
-
-        &:before {
-            content: $accordion-toggle-before-content;
-            font-family: $accordion-toggle-before-font-family;
-            font-size: $accordion-toggle-before-font-size;
-            margin: $accordion-toggle-before-offset;
-            width: $accordion-toggle-before-width;
-            display: $accordion-toggle-before-display;
-        }
-
-        &.collapsed {
-            &:before {
-                content: $accordion-toggle-collapsed-before-content;
-                margin: $accordion-toggle-collapsed-before-offset;
-                padding: $accordion-toggle-collapsed-before-inner-offset;
-            }
-        }
+        display: block;
     }
 
     &-group {

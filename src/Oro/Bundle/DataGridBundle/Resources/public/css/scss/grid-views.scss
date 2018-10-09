@@ -10,13 +10,13 @@
     }
 
     .edited-label {
-        font-size: $base-font-size - 1px;
+        font-size: $font-size-base - 1px;
 
         color: $oro-datagrid-grid-views-color;
     }
 
     .grid-view-btn {
-        font-size: $base-font-size;
+        font-size: $font-size-base;
     }
 
     .actions-group,
@@ -44,10 +44,10 @@
 
     .grid-views-choice {
         display: inline-block;
-        max-height: ($base-font-size * $base-line-height) * 2; // two rows
+        max-height: ($font-size-base * $line-height-base) * 2; // two rows
 
-        font-size: $base-font-size;
-        line-height: $base-line-height;
+        font-size: $font-size-base;
+        line-height: $line-height-base;
 
         overflow: hidden;
 
@@ -68,5 +68,19 @@
 
     .oro-subtitle {
         @include text-line-truncate(600px, true);
+    }
+}
+
+.views-group {
+    &__btn {
+        color: $primary-100;
+        padding: 0;
+    }
+}
+
+.actions-group {
+    &__btn {
+        text-transform: none;
+        padding: 0;
     }
 }

@@ -30,6 +30,10 @@
             }
         }
 
+        &.select2-dropdown-open {
+            border-color: $select2-container-open-border-color;
+        }
+
         &.select2-allowclear {
             .select2-search-choice-close {
                 display: $select2-search-choice-close-allow-display;
@@ -288,6 +292,7 @@
 
         &.select2-drop-above {
             border-radius: $select2-drop-above-border-radius;
+            box-shadow: $select2-drop-above-box-shadow;
         }
     }
 

@@ -22,8 +22,8 @@
         text-align: center;
         line-height: 32px;
         border-radius: 50%;
-        background-color: rgba($menu-background-color, .15);
-        color: $menu-full-screen-button-color;
+        background-color: $menu-close-botton-background-color;
+        color: $menu-close-button-color;
     }
 
     .divider {
@@ -64,6 +64,7 @@
 
         .menu {
             margin: 0;
+            padding: 0;
 
             .title,
             .accordion-toggle {

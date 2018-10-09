@@ -1,9 +1,7 @@
 /* @theme: admin.oro; */
 
 .form-horizontal .control-label {
-    font-size: 13px;
     text-align: left;
-    line-height: 1.2em;
 
     &.header-tooltips {
         display: inline;
@@ -47,14 +45,15 @@
         label.control-label {
             float: left;
             width: 160px;
-            padding-top: 7px;
+            margin-bottom: 0;
+            padding-top: 9px;
             font-weight: normal;
             text-align: right;
         }
 
         .control-label.wrap {
             float: left;
-            padding-top: 7px;
+            padding-top: 6px;
             font-weight: normal;
             line-height: 20px;
             text-align: right;
@@ -113,6 +112,7 @@
 
         &.attribute-row label.control-label {
             cursor: default;
+            color: $primary-550;
         }
     }
 }
@@ -157,9 +157,9 @@ input[type='checkbox'] + label {
     margin: 0 auto 20px;
     max-width: 400px;
     padding: 19px 29px 29px;
-    background: linear-gradient($navbarBackgroundHighlight, $navbarBackground);
-    border: 1px solid $navbarBorder;
-    border-radius: $baseBorderRadius;
+    background: $form-pass-reset-background;
+    border: $form-pass-reset-border;
+    border-radius: $border-radius;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
 }
 

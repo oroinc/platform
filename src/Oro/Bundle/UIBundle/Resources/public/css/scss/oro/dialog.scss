@@ -21,8 +21,15 @@
         top: $dialog-titlebar-top;
         #{$start}: $dialog-titlebar-start;
         flex-shrink: $dialog-titlebar-flex-shrink;
+        align-items: $dialog-titlebar-falign-items;
+        display: $dialog-titlebar-display;
 
         cursor: $dialog-titlebar-cursor;
+
+        &:before,
+        &:after {
+            content: none;
+        }
 
         .ui-dialog-minimize-container & {
             position: $dialog-titlebar-minimize-position;
@@ -43,6 +50,8 @@
         white-space: $dialog-title-white-space;
         overflow: $dialog-title-overflow;
         text-overflow: $dialog-title-text-overflow;
+        flex-grow: 1;
+        flex-shrink: 1;
 
         .lang-en & {
             text-transform: capitalize;
@@ -63,6 +72,10 @@
 
         .ui-resizable-handle {
             cursor: $dialog-resizable-handle-cursor;
+        }
+
+        .widget-content {
+            position: relative;
         }
     }
 
@@ -90,6 +103,8 @@
     }
 
     .widget-actions.form-actions {
+        @include clearfix();
+
         margin: $dialog-widget-actions-outer-offset;
         background: $primary-900;
         padding: $dialog-widget-actions-inner-offset;
@@ -116,6 +131,8 @@
         margin: $dialog-titlebar-buttonpane-outer-offset;
         height: $dialog-titlebar-buttonpane-height;
         min-width: $dialog-titlebar-buttonpane-min-width;
+        flex-shrink: 0;
+        position: static;
 
         [class*='ui-dialog-titlebar-'] {
             margin-#{$end}: 13px;
@@ -136,7 +153,7 @@
                 font-size: $base-font-size--l;
                 font-family: FontAwesome;
                 text-align: center;
-                line-height: 18px;
+                line-height: 1;
 
                 .ui-dialog-minimized & {
                     color: $primary-700;
@@ -273,5 +290,6 @@
 
 .ui-widget-overlay {
     z-index: $ui-widget-overlay-z-index;
+    background-color: $ui-widget-overlay-background-color;
 }
 

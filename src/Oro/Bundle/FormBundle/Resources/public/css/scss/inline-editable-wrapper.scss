@@ -52,6 +52,8 @@
     background-color: transparent;
     color: $inline-actions-btn-color;
 
+    cursor: pointer;
+
     &:hover {
         color: $inline-actions-btn-color-hover;
     }

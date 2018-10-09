@@ -6,11 +6,9 @@ $enable-safe-area: true;
 
 // Helper to clear inner floats
 @mixin clearfix() {
-    &::after {
+    &:after {
         content: '';
-
         display: block;
-
         clear: both;
     }
 }
@@ -318,7 +316,7 @@ $enable-safe-area: true;
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
-            font-family: 'FontAwesome', $base-font-family;
+            font-family: 'FontAwesome', $font-family-sans-serif;
 
             @if ($extra-rules) {
                 @content;

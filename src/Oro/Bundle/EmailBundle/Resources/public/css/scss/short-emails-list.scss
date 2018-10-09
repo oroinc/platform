@@ -1,7 +1,13 @@
 /* @theme: admin.oro; */
 
 .short-emails-list {
-    .header {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         padding: 2px 17px;
 
         > a {
@@ -32,9 +38,11 @@
         margin: 0;
 
         li {
+            display: flex;
+            flex-direction: column;
+            position: relative;
             border-top: 1px solid $primary-830;
             padding: 11px 17px;
-            position: relative;
 
             .mail-icon {
                 @include fa-icon($email-inactive-mail-icon);
@@ -42,6 +50,7 @@
                 color: $primary-400;
                 font-size: 16px;
                 font-style: normal;
+                line-height: 1;
                 cursor: pointer;
                 position: absolute;
                 #{$end}: 14px;
@@ -64,6 +73,7 @@
             .title,
             .empty-subject {
                 color: $email-default-text-color;
+                width: 100%;
                 line-height: 20px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -79,6 +89,8 @@
 
             .footer {
                 font-size: 12px;
+                margin-top: 8px;
+                line-height: 1;
 
                 a {
                     padding: 0;
@@ -139,6 +151,7 @@
     .mark-visible-as-read,
     .forward-action-wrapper {
         float: #{$end};
+        text-transform: none;
     }
 }
 

@@ -210,11 +210,11 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >
+        <span class="{{ parameters.iCss }}" >
             {% if not parameters.noIconText|default(false)%}
-                {{ parameters.label }}
+                <span class="sr-only">{{ parameters.label }}</span>
             {% endif %}
-        </i>
+        </span>
         {% endset %}
     {% else %}
     {% endif %}
@@ -271,7 +271,6 @@
                 <span class="{{ parameters.iCss }}" aria-hidden="true"></span>
             {% endif %}
             {{ parameters.label }}
-            <span class="caret" aria-hidden="true"></span>
         </a>
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}" role="menu" aria-labelledby="{{ togglerId }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}

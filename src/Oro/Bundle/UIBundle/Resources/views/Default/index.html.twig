@@ -129,21 +129,24 @@
                                 </div>
                             {% endblock messages %}
                         </div>
-                        <div class="breadcrumb-pin">
+                        <div class="page-toolbar">
                             {% placeholder breadcrumb_pin_before %}
                             <div id="breadcrumb"
+                                class="page-toolbar_breadcrumb" 
                                  {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/breadcrumb-view'}) }}>
                                 {% block breadcrumb %}
                                     {% placeholder breadcrumb %}
                                 {% endblock breadcrumb %}
                             </div>
-                            {% block pin_button %}
-                                {% placeholder pin_button %}
-                            {% endblock pin_button %}
-                            <div id="before-content-addition" data-layout="separate"
+                            <div id="before-content-addition" class="page-toolbar_before-content-addition" data-layout="separate"
                                  {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/before-content-addition-view'}) }}>
                                 {% block before_content_addition %}{% endblock before_content_addition %}
                             </div>
+                            {% block pin_button %}
+                                <div class="page-toolbar_bookmark-buttons">
+                                    {% placeholder pin_button %}
+                                </div>
+                            {% endblock pin_button %}
                             {% placeholder breadcrumb_pin_after %}
                         </div>
                         {% endblock before_content %}

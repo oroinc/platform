@@ -321,9 +321,8 @@
             padding-right: 16px;
 
             &:hover,
-            &.open {
-                padding-left: 11px;
-                padding-right: 8px;
+            &.show {
+                padding-right: 11px;
             }
         }
     }

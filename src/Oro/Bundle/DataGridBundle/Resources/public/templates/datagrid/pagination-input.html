@@ -12,7 +12,7 @@
         >
     <% } else { %>
         <%
-            var buttonClassNames = _.isDesktop() ? 'btn btn-icon btn-light ' : 'btn btn-icon ';
+            var buttonClassNames = _.isDesktop() ? 'btn btn-icon btn-light pagination-trigger ' : 'btn btn-icon pagination-trigger ';
             buttonClassNames += handle.className ? handle.className : '';
             buttonClassNames += disabled ? ' disabled': '';
         %>

@@ -27,6 +27,7 @@
 
     .caret {
         display: none;
+        height: $oro-datagrid-caret-size * 2;
         margin-#{$start}: $oro-datagrid-caret-size;
 
         border: none;
@@ -37,7 +38,7 @@
     .ascending {
         .caret {
             display: inline-block;
-            margin-top: $oro-datagrid-caret-offset;
+            margin-top: -$oro-datagrid-caret-offset;
 
             border-top: $oro-datagrid-caret-size solid transparent;
             border-bottom: $oro-datagrid-caret-size solid transparent;
@@ -48,7 +49,7 @@
     .descending {
         .caret {
             display: inline-block;
-            margin-top: $oro-datagrid-caret-offset * 2;
+            margin-top: ($oro-datagrid-caret-offset / 2);
 
             border-bottom: $oro-datagrid-caret-size solid transparent;
             border-top: $oro-datagrid-caret-size solid transparent;

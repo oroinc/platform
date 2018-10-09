@@ -210,7 +210,7 @@
             > .dropdown-menu {
                 #{$end}: $desktop-app-header-user-menu-offset;
                 #{$start}: auto;
-                z-index: $zindexDropdown;
+                z-index: $zindex-dropdown;
 
                 &:before {
                     #{$end}: -$desktop-app-header-user-menu-offset;
@@ -231,6 +231,25 @@
         > .dropdown-toggle {
             display: inline-block;
             margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+        }
+
+        .dropdown-menu {
+            .divider {
+                border-bottom: 1px solid $primary-900;
+                margin: 4px 0;
+            }
+
+            li {
+                line-height: 28px;
+
+                &:hover {
+                    background: $primary-900;
+                }
+
+                a {
+                    color: $primary-200;
+                }
+            }
         }
     }
 }

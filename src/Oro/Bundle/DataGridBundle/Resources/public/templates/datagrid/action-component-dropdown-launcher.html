@@ -3,14 +3,28 @@
         <%- name %><% if (!_.isNull(attribute)) { %>="<%- attribute %>"<% } %>
     <% });
 } %>
+
+<%
+    actionClassNames = [];
+    actionClassNames.push('action btn');
+    if (className) {
+        actionClassNames.push(className);
+    }
+    if (launcherMode == 'icon-only') {
+        actionClassNames.push('btn-icon');
+    }
+    if (!enabled) {
+        actionClassNames.push('disabled');
+    }
+    if (launcherMode != '') {
+        actionClassNames.push('mode-' +  launcherMode);
+    }
+    actionClassNames.push('dropdown-toggle dropdown-toggle--no-caret');
+%>
+
 <% var togglerId = _.uniqueId('dropdown-') %>
-<div class="<%- wrapperClassName %> dropdown">
-    <a href="#" class="action btn
-            <%- launcherMode == 'icon-only' ? 'btn-icon' : '' %>
-            <%- className ? className : '' %>
-            <%- !enabled ? 'disabled' : '' %>
-            <%- launcherMode != '' ? 'mode-' +  launcherMode : '' %>
-            dropdown-toggle"
+<div class="<%- wrapperClassName %> dropdown dropdown--with-arrow">
+    <a href="#" class="<%= actionClassNames.join(' ') %>"
        title="<%= title %>"
        role="button" id="<%- togglerId %>" data-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false" aria-label="<%- label %>"

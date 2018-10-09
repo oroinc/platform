@@ -5,7 +5,7 @@
         <ul></ul>
         <div class="pin-bar-empty" ><a href="{{ path('oro_pinbar_help') }}">{{ 'Learn how to use this space'|trans }}</a></div>
     </div>
-    <div class="show-more dropdown"><span role="button" id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
+    <div class="show-more dropdown"><span role="button" id="{{ togglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
                                           aria-haspopup="true" aria-expanded="false" aria-label="{{ 'oro.navigation.pins.more_tabs.label'|trans }}"
         ><span class="fa-ellipsis-v" aria-hidden="true"></span></span><ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}"></ul></div>
     {{ oro_menu_render('pinbar') }}

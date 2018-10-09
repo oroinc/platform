@@ -142,7 +142,7 @@ define(function(require) {
          */
         getTemplateData: function() {
             var data = ModalView.__super__.getTemplateData.apply(this, arguments);
-            var fields = ['allowOk', 'allowCancel', 'allowOk', 'cancelButtonClass', 'closeButtonClass',
+            var fields = ['allowOk', 'allowCancel', 'cancelButtonClass', 'closeButtonClass',
                 'okButtonClass', 'closeText', 'cancelText', 'okText', 'secondaryText', 'title', 'content'];
 
             return _.extend({

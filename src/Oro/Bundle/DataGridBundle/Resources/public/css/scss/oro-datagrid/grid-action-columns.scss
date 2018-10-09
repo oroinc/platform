@@ -30,7 +30,7 @@
     width: $oro-datagrid-action-size;
     padding: $oro-datagrid-action-inner-offset;
 
-    text-align: right;
+    text-align: #{$end};
 
     @extend %header-cell-dropdown;
 

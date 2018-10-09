@@ -1,7 +1,7 @@
 {% if app.user %}
     <li class="dropdown user-menu-dropdown" id="user-menu">
         {% set togglerId = 'dropdown-'|uniqid %}
-        <button id="{{ togglerId }}" class="dropdown-toggle" data-toggle="dropdown"
+        <button id="{{ togglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown"
             aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false">
             {% if isMobileVersion() %}
                 <span class="fa-user-circle" aria-hidden="true"></span>
@@ -10,10 +10,9 @@
                 {% if app.user.avatar %}
                     <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name|escape }}"/>
                 {%  endif %}
-                <span class="fa-caret-down" aria-hidden="true"></span>
             {% endif %}
         </button>
-        {{ oro_menu_render('usermenu', {togglerId: togglerId, class:'dropdown-menu-right dropdown-menu-arrow'}) }}
+        {{ oro_menu_render('usermenu', {togglerId: togglerId, class:'dropdown-menu-right'}) }}
     </li>
 {% else %}
     <li><a href="{{ path('oro_user_security_login') }}">{{ 'Login'|trans }}</a></li>

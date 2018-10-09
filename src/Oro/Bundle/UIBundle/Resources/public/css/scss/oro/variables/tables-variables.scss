@@ -19,9 +19,9 @@ $table-td-nowrap-ellipsis-div-text-overflow: ellipsis !default;
 $table-td-nowrap-ellipsis-div-width: 100% !default;
 
 $table-thead-th-background: $primary-600 !default;
-$table-thead-th-font-size: $base-font-size--s !default;
+$table-thead-th-font-size: $base-font-size--xs !default;
 $table-thead-th-color: $primary-inverse !default;
-$table-thead-th-padding: 5px 10px !default;
+$table-thead-th-padding: 11px 8px !default;
 $table-thead-th-white-space: nowrap !default;
 $table-thead-th-vertical-align: top !default;
 $table-bordered-thead-th-border-color: $primary-600 !default;
@@ -43,14 +43,14 @@ $table-thead-th-ascending-color: $extra-100 !default;
 
 $table-thead-th-ascending-caret-offset-top: 0 !default;
 $table-thead-th-ascending-caret-display: inline-block !default;
-$table-thead-th-ascending-caret-border-top: 4px solid transparent !default;
+$table-thead-th-ascending-caret-border-top: none !default;
 $table-thead-th-ascending-caret-border-bottom: 4px solid !default;
 
 $table-thead-th-descending-color: $extra-100 !default;
 
 $table-thead-th-descending-caret-offset-top: 4px !default;
 $table-thead-th-descending-caret-display: inline-block !default;
-$table-thead-th-descending-caret-border-bottom: 4px solid transparent !default;
+$table-thead-th-descending-caret-border-bottom: none !default;
 $table-thead-th-descending-caret-border-top: 4px solid !default;
 
 $table-tbody-row-click-action-cursor: pointer !default;

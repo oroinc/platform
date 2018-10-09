@@ -15,6 +15,8 @@ define(function(require) {
     var DATA_API_KEY = '.data-api';
     var HIDE_EVENT = 'hide' + EVENT_KEY;
     var TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
+    var ATTACHMENT_CLASSES = 'dropdown-menu--top dropdown-menu--bottom dropdown-menu--left dropdown-menu--right';
+    var DROPDOWN_WITH_ARROW_SELECTOR = '.dropdown--with-arrow';
     var GRID_SCROLLABLE_CONTAINER = '.grid-scrollable-container';
     var DIALOG_SCROLLABLE_CONTAINER = '.ui-dialog-content';
     var SCROLLABLE_CONTAINER = [
@@ -41,6 +43,7 @@ define(function(require) {
         dispose: function() {
             var parent = Dropdown._getParentFromElement(this._element);
             $(parent).off(EVENT_KEY);
+            $(document).off('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
             original.dispose.call(this);
         },
 
@@ -74,6 +77,8 @@ define(function(require) {
         },
 
         _addEventListeners: function() {
+            this._onCustomScroll = this._onCustomScroll.bind(this);
+
             original._addEventListeners.call(this);
 
             var parent = Dropdown._getParentFromElement(this._element);
@@ -86,6 +91,18 @@ define(function(require) {
             }.bind(this));
 
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
+            $(document).on('mCSB.scroll' + EVENT_KEY, this._onCustomScroll);
+        },
+
+        _onCustomScroll: function() {
+            if (this._popper) {
+                // When scrolling leads to hidden dropdown appears again, single call of scroll handler
+                // shows dropdown menu in wrong position. But since single scroll event happens very
+                // rarely in real life the next scroll event sets dropdown menu correctly.
+                // To emulate similar effect for custom scroll just call `scheduleUpdate` twice
+                this._popper.scheduleUpdate();
+                this._popper.scheduleUpdate();
+            }
         },
 
         /**
@@ -156,7 +173,43 @@ define(function(require) {
                 this._popper = null;
             }
 
+            var menu = this._getMenuElement();
+
+            if ($(menu).closest(DROPDOWN_WITH_ARROW_SELECTOR).length) {
+                var arrow = $(menu).children('.arrow')[0];
+
+                if (!arrow) {
+                    arrow = document.createElement(menu.tagName.toLowerCase() === 'ul' ? 'li' : 'span');
+                    arrow.classList.add('arrow');
+                    menu.insertBefore(arrow, menu.firstChild);
+                }
+
+                config.modifiers.arrow = _.extend(config.modifiers.arrow || {}, {
+                    element: arrow
+                });
+
+                _.extend(config, {
+                    onCreate: this._handlePopperPlacementChange.bind(this),
+                    onUpdate: this._handlePopperPlacementChange.bind(this)
+                });
+            }
+
+            if (_.result(config.modifiers, 'preventOverflow')) {
+                var boundariesElement = config.modifiers.preventOverflow.boundariesElement;
+
+                if (['scrollParent', 'window', 'viewport'].indexOf(boundariesElement) === -1) {
+                    config.modifiers.preventOverflow.boundariesElement = $(this._element).closest(boundariesElement)[0];
+                }
+            }
+
             return config;
+        },
+
+        _handlePopperPlacementChange: function(data) {
+            var menu = this._getMenuElement();
+            var side = data.placement.split('-')[0];
+
+            $(menu).removeClass(ATTACHMENT_CLASSES).addClass('dropdown-menu--' + side);
         },
 
         /**

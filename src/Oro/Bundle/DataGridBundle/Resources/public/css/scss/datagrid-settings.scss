@@ -20,30 +20,7 @@
         font-weight: normal;
         padding: 20px;
         border-color: #ccc;
-        min-width: 268px;
-
-        &:before,
-        &:after {
-            content: '';
-            display: inline-block;
-            position: absolute;
-        }
-
-        &:before {
-            border-top: 7px solid transparent;
-            border-bottom: 7px solid transparent;
-            border-left: 7px solid rgba(0, 0, 0, .2);
-            top: 6px;
-            right: -7px;
-        }
-
-        &:after {
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            border-left: 6px solid #fff;
-            top: 7px;
-            right: -6px;
-        }
+        min-width: 300px;
 
         .close {
             position: absolute;
@@ -218,7 +195,7 @@
             }
             &.active {
                 pointer-events: none;
-                color: #444;
+                color: $primary;
             }
         }
     }
@@ -238,15 +215,17 @@
             font-size: $base-font-size * 1.15;
             color: lighten($btn-text-color, 15%);
             position: absolute;
-            top: 5px;
-            right: 10px;
+            top: 50%;
+            margin-top: -12px;
+            right: 12px;
             z-index: 0;
         }
 
         > .clear {
             position: absolute;
-            top: 5px;
-            right: 10px;
+            top: 50%;
+            right: 12px;
+            margin-top: -10px;
             z-index: 1;
             font-size: $base-font-size * 1.15;
             font-weight: bold;
@@ -283,7 +262,7 @@
         text-align: center;
         font-size: 14px;
         padding: 20px;
-        background: #f9f9f9;
+        background: $primary-900;
         border-radius: 4px;
         border: 1px solid #ddd;
     }

@@ -170,7 +170,7 @@ class GridRow extends TableRow
      */
     public function findActionLink($action)
     {
-        if ($showMoreLink = $this->find('named', ['link', '...'])) {
+        if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
             $showMoreLink->mouseOver();
             $link = $this->waitFor(5, function () use ($action) {
                 return $this->elementFactory
@@ -201,7 +201,7 @@ class GridRow extends TableRow
      */
     public function getActionLinks()
     {
-        if (null !== ($showMoreLink = $this->find('named', ['link', '...']))) {
+        if (null !== ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle'))) {
             $showMoreLink->mouseOver();
             $links = $this->elementFactory->createElement('GridRowActionMenu')->getElements('GridRowAction');
         } else {

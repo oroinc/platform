@@ -8,7 +8,7 @@ $filter-box-criteria-background-color: $primary-inverse !default;
 $filter-box-criteria-inner-offset: 16px !default;
 $filter-box-criteria-display: block !default;
 $filter-box-criteria-visibility: hidden !default;
-$filter-box-criteria-z-index: $oro-zindex-dropdown !default;
+$filter-box-criteria-z-index: $zindex-dropdown - 100 !default;
 $filter-box-criteria-offset-top: 8px !default;
 $filter-box-criteria-top: auto !default;
 $filter-box-criteria-focus-outline: none !default;
@@ -147,6 +147,7 @@ $choice-filter-value-field-frame-position: relative !default;
 $choice-filter-value-field-frame-vertical-align: top !default;
 $choice-filter-value-field-frame-width: auto !default;
 
+$choice-filter-input-width: 280px !default;
 $choice-filter-input-max-width: 100% !default;
 $choice-filter-input-offset-bottom: 0 !default;
 
@@ -180,13 +181,6 @@ $select-filter-widget-label-state-active-color: #fff !default;
 
 $select-filter-widget-search-offset: 0 !default;
 $select-filter-widget-search-width: 100% !default;
-
-$select-filter-widget-caret-offset-top: 5px !default;
-$select-filter-widget-caret-offset-right: 8px !default;
-
-$select-filter-widget-add-filter-button-caret-border-top-color: $link-color-hover !default;
-$select-filter-widget-add-filter-button-caret-offset-top: 11px !default;
-$select-filter-widget-add-filter-button-caret-hover-text-decoration: none !default;
 
 $select-filter-widget-header-inner-offset: 4px 4px 0 4px !default;
 $select-filter-widget-header-offset: 0 !default;
@@ -224,8 +218,6 @@ $filter-item-btn-text-transform: none !default;
 $filter-item-btn-border: none !default;
 $filter-item-btn-background-color: $primary-900 !default;
 $filter-item-btn-vertical-align: top !default;
-
-$filter-item-btn-caret-offset-top: 10px !default;
 
 $filter-item-fa-close-color: #aaa !default;
 $filter-item-fa-close-font-size: 14px !default;
@@ -290,9 +282,6 @@ $filter-select-oro-line-height: 20px !default;
 $filter-select-oro-width: 120px !default;
 
 $filter-criteria-selector-font-weight: normal !default;
-$filter-criteria-selector-caret-offset-top: 14px !default;
-
-$select-filter-widget-caret-offset-top: 8px !default;
 
 $open-filter-before-content: "" !default;
 $open-filter-before-background: #fff !default;
@@ -311,7 +300,7 @@ $open-filter-after-content: "" !default;
 $open-filter-after-left: 10px !default;
 $open-filter-after-position: absolute !default;
 $open-filter-after-bottom: -11px !default;
-$open-filter-after-z-index: $oro-zindex-dropdown  !default;
+$open-filter-after-z-index: $zindex-dropdown - 100 !default;
 
 $open-filter-filter-criteria-selector-background-color: $additional-extra-light  !default;
 $open-filter-filter-criteria-selector-box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, 0.21)  !default;

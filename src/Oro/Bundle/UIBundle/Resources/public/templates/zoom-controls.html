@@ -1,9 +1,9 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
-<button class="btn btn-default btn-zoom-in" title="<%- _.__('oro.ui.zoom.in') %>"><span class="fa-search-plus" aria-hidden="true"></span></button>
+<button class="btn btn-icon btn-zoom-in" title="<%- _.__('oro.ui.zoom.in') %>"><span class="fa-search-plus" aria-hidden="true"></span></button>
 <div class="btn-group">
     <button id="<%- togglerId %>" data-toggle="dropdown" class="btn dropdown-toggle "
             aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.ui.zoom.steps') %>">
-        <%= Math.round(zoom * 100) %>%<span class="caret" aria-hidden="true"></span>
+        <%= Math.round(zoom * 100) %>%
     </button>
     <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="<%- togglerId %>">
         <li><a href="#" role="button" class="btn-set-zoom" data-size="50">50%</a></li>
@@ -13,6 +13,6 @@
         <li><a href="#" role="button" class="btn-set-zoom" data-size="200">200%</a></li>
     </ul>
 </div>
-<button class="btn btn-default btn-zoom-out" title="<%- _.__('oro.ui.zoom.out') %>"><span class="fa-search-minus" aria-hidden="true"></span></button>
-<button class="btn btn-default btn-auto-zoom" title="<%- _.__('oro.ui.zoom.auto') %>"><span class="fa-expand" aria-hidden="true"></span></button>
+<button class="btn btn-icon btn-zoom-out" title="<%- _.__('oro.ui.zoom.out') %>"><span class="fa-search-minus" aria-hidden="true"></span></button>
+<button class="btn btn-icon btn-auto-zoom" title="<%- _.__('oro.ui.zoom.auto') %>"><span class="fa-expand" aria-hidden="true"></span></button>
 

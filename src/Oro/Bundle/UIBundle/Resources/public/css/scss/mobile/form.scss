@@ -49,23 +49,20 @@
     & > .span6 {
         max-width: $form-horizontal-max-width;
     }
+
     .control-group {
         max-width: $form-horizontal-control-group-max-width;
         margin: $form-horizontal-control-group-offset;
 
-        .control-label {
-            float: $form-horizontal-control-label-float;
+        label.control-label {
             width: $form-horizontal-control-label-width;
-            padding-left: $form-horizontal-control-label-inner-offset-left;
-            text-align: $form-horizontal-control-label-text-align;
         }
+
         .controls {
             margin-left: $form-horizontal-controls-offset-left;
-            .control-label {
-                padding-top: $form-horizontal-controls-label-inner-offset-top;
-            }
         }
     }
+
     .control-group-checkbox {
         position: $control-group-checkbox-position;
         display: $control-group-checkbox-display;
@@ -75,15 +72,18 @@
             width: $control-group-checkbox-label-width;
             margin-right: $control-group-checkbox-label-offset-right;
         }
+
         label.control-label {
             line-height: $control-group-checkbox-label-line-height;
         }
+
         .controls {
             position: $control-group-checkbox-controls-position;
             top: $control-group-checkbox-controls-top;
             right: $control-group-checkbox-controls-right;
         }
     }
+
     .select2-container {
         width: $control-select2-container-width;
         max-width: $control-select2-container-max-width;

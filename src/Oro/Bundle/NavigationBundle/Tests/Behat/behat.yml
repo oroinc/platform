@@ -109,5 +109,6 @@ oro_behat_extension:
         - OroNavigationBundle::PinbarContext
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
+        - OroUIBundle::BreadcrumbContext
       paths:
         - '@OroNavigationBundle/Tests/Behat/Features'

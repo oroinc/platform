@@ -11,7 +11,6 @@
 .breadcrumb-pin,
 .container-fluid.page-title,
 .navbar-extra {
-    background-color: #f1f1f1;
     padding-right: 0;
     padding-left: 0;
 }
@@ -40,31 +39,19 @@
         margin-left: 0;
     }
 
-    .oro-subtitle {
-        text-align: left;
-        white-space: normal;
-        padding-right: 13px;
-    }
-
     .grid-views {
         margin-left: 0;
 
+        .oro-subtitle {
+            display: inline-block;
+        }
+
         .views-group {
-            margin-right: 12px;
             vertical-align: baseline;
 
             & > .dropdown-toggle {
                 height: auto;
                 vertical-align: baseline;
-            }
-
-            .caret,
-            &.open .btn.dropdown-toggle .caret {
-                margin: 0 -13px 0 5px;
-                vertical-align: baseline;
-                display: inline;
-                line-height: initial;
-                font-size: 4px;
             }
         }
 
@@ -76,18 +63,14 @@
         .edited-label,
         .actions-group .dropdown-toggle {
             vertical-align: baseline;
-
-            &:after {
-                content: '';
-                font-size: 20px;
-            }
         }
     }
 }
 
 .page-title {
     h1 {
-        font-size: $base-font-size * 1.75;
+        font-size: $base-font-size--xl;
+        font-weight: bold;
         margin: 0;
         line-height: $base-font-size * 2.5;
         display: block;
@@ -135,31 +118,6 @@
     .dropdown-toggle {
         .caret {
             margin-left: 5px;
-        }
-    }
-
-    .btn {
-        font-size: $base-font-size--l;
-        line-height: $base-font-size--l * 2;
-        height: 34px;
-        padding-left: 10px;
-        padding-right: 10px;
-
-        .caret {
-            border-top-color: #666;
-            margin-top: 16px;
-        }
-
-        [class^="fa-"].hide-text:before {
-            margin: 0 0 0 -9px;
-            line-height: 35px;
-        }
-
-        &:active {
-            [class^="fa-"]:before,
-            .caret {
-                color: #444;
-            }
         }
     }
 

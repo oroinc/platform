@@ -46,6 +46,14 @@
         margin: 0 auto;
     }
 
+    @include if-rtl() {
+        .pagination-trigger {
+            position: relative;
+
+            transform: rotate(180deg);
+        }
+    }
+
     .totals-label {
         padding-left: $oro-datagrid-toolbar-label-offset;
     }
@@ -57,7 +65,7 @@
     .grid-toolbar-mass-actions,
     .sorting {
         &:empty {
-        display: none;
+            display: none;
         }
     }
 }
