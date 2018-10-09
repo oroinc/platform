@@ -51,7 +51,7 @@ define([
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
-            'class': 'list-box map-box'
+            'class': 'map-box'
         },
 
         /**
