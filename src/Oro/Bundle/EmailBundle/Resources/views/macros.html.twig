@@ -483,7 +483,13 @@
     {% set recipientsCc = [] %}
     {% set recipientsBcc = [] %}
     {% for recipient in email.recipients %}
-        {% set recipientName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags ~ " &lt;" ~ oro_get_email_address(recipient.name)|oro_html_strip_tags ~ "&gt;" %}
+        {% set emailAddressName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags %}
+        {% set emailAddress = oro_get_email_address(recipient.name)|oro_html_strip_tags %}
+        {% if emailAddressName == '' and emailAddress == '' %}
+            {% set recipientName = '' %}
+        {% else %}
+            {% set recipientName = emailAddressName ~ " &lt;" ~ emailAddress ~ "&gt;" %}
+        {% endif %}
         {% if recipient.type == 'to' %}
             {% set recipientsTo = recipientsTo|merge([recipientName])%}
         {% elseif recipient.type == 'cc' %}

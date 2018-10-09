@@ -40,7 +40,13 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->builder = new EmailEntityBuilder($this->batch, $addrManager, new EmailAddressHelper(), $this->doctrine);
+        $this->builder = new EmailEntityBuilder(
+            $this->batch,
+            $addrManager,
+            new EmailAddressHelper(),
+            $this->doctrine,
+            $this->logger
+        );
     }
 
     private function initEmailStorage()
@@ -362,7 +368,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
                 'An invalid recipient address has been ignored',
                 ['exception' => $expectedContextMessage]
             );
-        $this->builder->setLogger($this->logger);
 
         $date = new \DateTime('now');
         $this->builder->emailUser(

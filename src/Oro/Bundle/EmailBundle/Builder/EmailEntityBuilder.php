@@ -21,18 +21,15 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * The builder that simplifies creation of the email related entities.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EmailEntityBuilder implements LoggerAwareInterface
+class EmailEntityBuilder
 {
-    use LoggerAwareTrait;
-
     /** @var EmailEntityBatchProcessor */
     private $batch;
 
@@ -56,17 +53,20 @@ class EmailEntityBuilder implements LoggerAwareInterface
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
      * @param ManagerRegistry           $doctrine
+     * @param LoggerInterface           $logger
      */
     public function __construct(
         EmailEntityBatchProcessor $batch,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
-        ManagerRegistry $doctrine
+        ManagerRegistry $doctrine,
+        LoggerInterface $logger
     ) {
         $this->batch = $batch;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
@@ -586,12 +586,10 @@ class EmailEntityBuilder implements LoggerAwareInterface
         try {
             $object->addRecipient($this->recipient($type, $email));
         } catch (EmailAddressParseException $e) {
-            if (null !== $this->logger) {
-                $this->logger->warning(
-                    'An invalid recipient address has been ignored',
-                    ['exception' => $e->getMessage()]
-                );
-            }
+            $this->logger->warning(
+                'An invalid recipient address has been ignored',
+                ['exception' => $e->getMessage()]
+            );
         }
     }
 }
