@@ -139,6 +139,7 @@
     .accordion-toggle.title-level-1 {
         position: relative;
         padding: side-values(14px 22px 14px 24px);
+        margin: 0;
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 

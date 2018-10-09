@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
-$btn-not-btn-icon-fa-offset: 0 6px 0 0 !default;
+$btn-not-btn-icon-fa-offset: side-values(0 6px 0 0) !default;
+$btn-not-btn-icon-end-fa-offset: side-values(0 0 0 6px) !default;
 $btn-dropdown-toggle-padding: 0 12px !default;
 
 $btn-icon-width: 32px !default;

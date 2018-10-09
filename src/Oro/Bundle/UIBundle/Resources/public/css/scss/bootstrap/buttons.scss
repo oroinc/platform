@@ -62,6 +62,10 @@ button {
         margin: $btn-not-btn-icon-fa-offset;
     }
 
+    &.icon-end:not(.btn-icon) [class^="fa-"] {
+        margin: $btn-not-btn-icon-end-fa-offset;
+    }
+
     &.dropdown-toggle {
         padding: $btn-dropdown-toggle-padding;
     }
@@ -95,7 +99,7 @@ fieldset:disabled a.btn {
         text-indent: $btn-icon-fa-text-indent;
         position: $btn-icon-fa-position;
         top: $btn-icon-fa-top;
-        left: $btn-icon-fa-left;
+        #{$start}: $btn-icon-fa-left;
         transform: $btn-icon-fa-transform;
     }
 
@@ -104,14 +108,14 @@ fieldset:disabled a.btn {
 
         [class^="fa-"],
         [class*=" fa-"] {
-            left: $btn-icon-dropdown-toggle-fa-left;
+            #{$start}: $btn-icon-dropdown-toggle-fa-left;
             transform: $btn-icon-dropdown-toggle-fa-transform;
         }
 
         &:after {
             position: $btn-icon-dropdown-toggle-after-position;
             top: $btn-icon-dropdown-toggle-after-top;
-            right: $btn-icon-dropdown-toggle-after-right;
+            #{$end}: $btn-icon-dropdown-toggle-after-right;
             transform: $btn-icon-dropdown-toggle-after-transform;
         }
     }
@@ -182,7 +186,7 @@ fieldset:disabled a.btn {
     &-google {
         @include button-custom-variant($btn-brand-google...);
 
-        padding-left: $btn-brand-google-padding-left;
+        padding-#{$start}: $btn-brand-google-padding-left;
         position: relative;
 
         &:before {
@@ -191,7 +195,7 @@ fieldset:disabled a.btn {
             font-size: $btn-brand-google-before-font-size;
             position: $btn-brand-google-before-position;
             top: $btn-brand-google-before-top;
-            left: $btn-brand-google-before-left;
+            #{$start}: $btn-brand-google-before-left;
             transform: $btn-brand-google-before-transform;
         }
     }

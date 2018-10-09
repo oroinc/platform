@@ -398,7 +398,7 @@
                 </div>
                 <div class="dropdown link-to-record">
                     {% set togglerId = 'dropdown-'|uniqid %}
-                    <a class="no-hash dropdown-toggle" id="{{ togglerId }}" href="#" role="button" data-toggle="dropdown">
+                    <a class="no-hash dropdown-toggle dropdown-toggle--no-caret" id="{{ togglerId }}" href="#" role="button" data-toggle="dropdown">
                         <span class="fa {{ icon }}" aria-hidden="true"></span> {{ oro_format_filename(attachment.fileName, 11, 4, 5) }}
                     </a>
                     <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="{{ togglerId }}">

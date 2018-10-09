@@ -308,19 +308,6 @@
     }
 }
 
-.activity-list-widget {
-    .email-info,
-    .email-load-more {
-        margin: 0 20px 0 0;
-    }
-
-    .accordion-body > .message {
-        .email-content .comment {
-            padding-right: 0;
-        }
-    }
-}
-
 .icon-email-thread {
     background: url(../../img/icon-email-thread.png);
     width: 21px;
@@ -387,11 +374,13 @@ span.icon.grid .fa-paperclip {
     }
 
     .email-sent-date {
-        text-align: right;
-        height: 28px;
-        float: right;
         display: inline-block;
+        float: #{$end};
         padding: 5px 18px;
+
+        text-align: #{$end};
+
+        color: $primary-550;
     }
 
     .comment-count {
@@ -756,9 +745,8 @@ span.icon.grid .fa-paperclip {
 
 .attachment-item {
     display: inline-block;
-    float: left;
     position: relative;
-    margin-right: 8px;
+    margin-right: 16px;
 
     span.filename-label {
         color: #006acc;
@@ -908,7 +896,7 @@ a.attachment .icon .fa-link {
     border-radius: 6px;
     padding: 1px 4px;
     vertical-align: top;
-    font-size: 10;
+    font-size: 10px;
 }
 
 .oro-email-user-emails .email-count {

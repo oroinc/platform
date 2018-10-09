@@ -23,6 +23,14 @@
             }
         }
     }
+
+    &-previous {
+        margin-#{$end}: 4px;
+    }
+
+    &-next {
+        margin-#{$start}: 4px;
+    }
 }
 
 .page-item {

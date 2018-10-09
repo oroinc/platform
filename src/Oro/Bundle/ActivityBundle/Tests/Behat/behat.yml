@@ -2,9 +2,7 @@ oro_behat_extension:
   elements:
     Activity Dropdown Menu:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
-      selector:
-        locator: '//a[@class="dropdown-toggle activity-item"]/../..'
-        type: xpath
+      selector: '.dropdown-toggle.activity-item'
 
     Context Entity Dropdown:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
