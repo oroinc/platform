@@ -5,6 +5,7 @@
     display: $checkbox-display;
     vertical-align: $checkbox-vertical-align;
     position: $checkbox-position;
+    margin: -$checkbox-icon-border-shadow-size;
     overflow: $checkbox-overflow;
 
     &__icon {
@@ -23,6 +24,7 @@
         position: $checkbox-icon-position;
 
         color: $checkbox-icon-color;
+        margin: $checkbox-icon-border-shadow-size;
         vertical-align: -$checkbox-icon-border-shadow-size;
 
         &:before {
