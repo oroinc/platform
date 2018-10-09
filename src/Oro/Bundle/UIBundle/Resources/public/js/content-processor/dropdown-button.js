@@ -112,7 +112,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                     'data-placement': 'bottom-end',
                     'data-inherit-parent-width': 'loosely'
                 }, this.options.moreButtonAttrs))
-                .addClass('btn dropdown-toggle dropdown-toggle-split')
+                .addClass('btn dropdown-toggle')
                 .addClass(this.options.decoreClass || '')
                 .append(this.options.moreLabel);
 

@@ -653,7 +653,10 @@ textarea {
     float: #{$start};
 }
 
-
+.input-append,
+.input-prepend {
+    display: flex;
+}
 
 .oro-action .btn-group {
     margin-#{$end}: 0;
@@ -878,7 +881,7 @@ label.radio.error {
     .removeRow {
         font-size: 0;
         line-height: 0;
-        margin: side-values(0 0 0 5px);
+        margin: 0;
 
         &:after {
             display: inline-block;

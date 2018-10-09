@@ -62,3 +62,13 @@
         line-height: 24px;
     }
 }
+
+.entity-pagination {
+    display: flex;
+    align-items: center;
+
+    &_total {
+        font-size: 12px;
+        margin: 4px 0 0;
+    }
+}

@@ -120,19 +120,4 @@
             margin-left: 5px;
         }
     }
-
-    .btn-group > .dropdown-menu {
-        li a,
-        li button {
-            font-size: $base-font-size--l;
-            line-height: $base-font-size--l * 1.8;
-            padding: 1px 26px 1px 30px;
-            color: #666;
-
-            [class^="fa-"] {
-                margin-left: -25px;
-                margin-right: 5px;
-            }
-        }
-    }
 }

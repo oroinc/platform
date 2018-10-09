@@ -90,9 +90,9 @@
 
                     <div class="pull-right title-buttons-container">
                         {% if allowEdit %}
-                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group pull-left">
-                                <i class="fa-plus"></i>
-                                {{ 'oro.dashboard.add_dashboard_widgets.add_widget'|trans }}
+                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group">
+                                <span class="fa-plus"></span>
+                                {{- 'oro.dashboard.add_dashboard_widgets.add_widget'|trans|trim -}}
                             </a>
                         {% endif %}
 

@@ -2,7 +2,7 @@
 
 {% block form_row %}
     {% spaceless %}
-        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
+        <div class="control-group{% if attr.class is defined %} {{- attr.class -}}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
             {% if hint|default() and hint_position|default() == 'above' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
             {% endif %}

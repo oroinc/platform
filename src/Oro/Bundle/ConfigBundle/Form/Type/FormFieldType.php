@@ -42,7 +42,7 @@ class FormFieldType extends AbstractType
                 $attr['class'] = '';
             }
 
-            $attr['class'] = sprintf('%s, control-group-%s', $attr['class'], $options['target_field_alias']);
+            $attr['class'] = sprintf('%s control-group-%s', $attr['class'], $options['target_field_alias']);
 
             return $attr;
         });
