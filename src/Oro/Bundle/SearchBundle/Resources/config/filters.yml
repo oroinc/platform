@@ -51,3 +51,11 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_search.extension.search_filter.filter, type: entity, datasource: search }
+
+    oro_search.boolean_filter:
+        class: 'Oro\Bundle\SearchBundle\Datagrid\Filter\SearchBooleanFilter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_search.extension.search_filter.filter, type: boolean, datasource: search }
