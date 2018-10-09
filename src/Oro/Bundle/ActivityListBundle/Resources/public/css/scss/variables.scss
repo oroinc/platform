@@ -13,6 +13,7 @@ $activity-no-data-font-size: 13px !default;
 $activity-no-data-font-offset: 4px 0 !default;
 
 $activity-icon-font-size: 16px !default;
+$activity-icon-size: 28px !default;
 
 $activity-heading-min-height: 46px !default;
 $activity-heading-offset: 6px 0!default;
@@ -28,7 +29,7 @@ $activity-accordion-icon-expanded: $fa-var-minus-square-o !default;
 $activity-accordion-icon-collapsed: $fa-var-plus-square-o !default;
 
 $activity-details-width: 240px !default;
-$activity-details-offset: side-values(0 30px 0 22px) !default;
+$activity-details-offset: side-values(0 30px 0 10px) !default;
 
 $activity-info-width: calc(100% - 400px) !default;
 

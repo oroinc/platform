@@ -74,9 +74,10 @@
     }
 
     .icon {
-        width: auto;
+        width: $activity-icon-size;
 
         font-size: $activity-icon-font-size;
+        text-align: center;
 
         color: $activity-icon-color;
     }
@@ -88,6 +89,7 @@
             font-size: $activity-icon-font-size;
         }
     }
+
     .comment-count {
         margin: $activity-count-offset;
 

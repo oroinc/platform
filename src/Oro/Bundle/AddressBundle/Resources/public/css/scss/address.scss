@@ -3,7 +3,7 @@
 .address-book-item {
     &__address {
         margin-bottom: 0;
-        line-height: $address-box-address-line-height;;
+        line-height: $address-box-address-line-height;
     }
 
     &__labels {
@@ -67,8 +67,8 @@
     .map-address-list {
         width: 40%;
         overflow: hidden;
-        margin: 0 $address-box-margin-small/2 0 0;
-        padding: 0 $address-box-margin-small/2 0 0;
+        margin: side-values(0 $address-box-margin-small/2 0 0);
+        padding: side-values(0 $address-box-margin-small/2 0 0);
 
         &:hover {
             overflow-y: auto;
@@ -79,7 +79,7 @@
         .alert,
         .loader-overlay {
             width: auto;
-            margin: 0 $address-box-margin-medium 0 $address-box-margin-small;
+            margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
         }
     }
 
@@ -105,7 +105,7 @@
     }
 
     .map-visual {
-        margin: 0 $address-box-margin-medium 0 $address-box-margin-small;
+        margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
 
         img {
             max-width:none;
