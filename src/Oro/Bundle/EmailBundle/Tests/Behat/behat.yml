@@ -40,10 +40,6 @@ oro_behat_extension:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
 
-    Email Template Grid:
-      selector: 'div[data-page-component-name="email-templates"]'
-      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
-
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
