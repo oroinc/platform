@@ -6,11 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 
+/**
+ * Handles logic for creating and manipulation with embedded forms
+ */
 class EmbeddedFormManager
 {
     /** @var ContainerInterface */
@@ -28,7 +30,7 @@ class EmbeddedFormManager
      */
     public function __construct(ContainerInterface $container, FormFactoryInterface $formFactory)
     {
-        $this->container   = $container;
+        $this->container = $container;
         $this->formFactory = $formFactory;
     }
 
@@ -142,9 +144,12 @@ class EmbeddedFormManager
     }
 
     /**
-     * @param string $type
+     * Gets FormType instance by its name from  Form Registry
+     * if name is passed
+     * @param string|null $type
      *
-     * @return EmbeddedFormInterface|AbstractType
+     * @return EmbeddedFormInterface|AbstractType|null
+     *
      */
     public function getTypeInstance($type)
     {
@@ -156,6 +161,7 @@ class EmbeddedFormManager
             $typeInstance = new $type();
             return $typeInstance;
         }
+
         return $typeInstance;
     }
 }

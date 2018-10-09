@@ -48,7 +48,13 @@ services:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         arguments:
           - '@knp_gaufrette.filesystem_map'
+        calls:
+          - [setProtocolValidator, ['@oro_attachment.protocol_validator']]
         lazy: true
+
+    oro_attachment.protocol_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
+        public: false
 
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
@@ -152,6 +158,7 @@ services:
             - [setAttachmentManager, ['@oro_attachment.manager']]
             - [setFileManager, ['@oro_attachment.file_manager']]
             - [setValidator, ['@oro_attachment.validator.file_config_validator']]
+            - [setLogger, ['@logger']]
         tags:
             - { name: oro_importexport.normalizer}
 
