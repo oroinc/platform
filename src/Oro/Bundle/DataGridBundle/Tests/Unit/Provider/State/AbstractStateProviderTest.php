@@ -54,10 +54,12 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
     protected function mockCurrentGridViewId($viewId): void
     {
         $this->datagridParameters
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('get')
-            ->with(ParameterBag::ADDITIONAL_PARAMETERS)
-            ->willReturn([GridViewsExtension::VIEWS_PARAM_KEY => $viewId]);
+            ->willReturnMap([
+                [GridViewsExtension::GRID_VIEW_ROOT_PARAM, [], []],
+                [ParameterBag::ADDITIONAL_PARAMETERS, [], [GridViewsExtension::VIEWS_PARAM_KEY => $viewId]],
+            ]);
     }
 
     /**
@@ -100,5 +102,18 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
         $this->gridViewManager
             ->expects(self::never())
             ->method('getDefaultView');
+    }
+
+    protected function assertGridViewsDisabled(): void
+    {
+        $this->datagridParameters
+            ->expects(self::once())
+            ->method('get')
+            ->with(GridViewsExtension::GRID_VIEW_ROOT_PARAM, [])
+            ->willReturn([GridViewsExtension::DISABLED_PARAM => 1]);
+
+        $this->datagridConfiguration
+            ->expects(self::never())
+            ->method('getName');
     }
 }

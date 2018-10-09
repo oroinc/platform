@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Bundle\ApiBundle\Model\Error;
+
 /**
  * A helper class that can be used to execute processors from a specified group.
  */
@@ -19,6 +21,8 @@ class StepExecutor
     }
 
     /**
+     * Creates the execution context.
+     *
      * @return ByStepNormalizeResultContext
      */
     public function createContext(): ByStepNormalizeResultContext
@@ -27,12 +31,19 @@ class StepExecutor
     }
 
     /**
-     * @param string                       $stepName
-     * @param ByStepNormalizeResultContext $context
-     * @param bool                         $resetErrors
+     * Executes the given step.
+     *
+     * @param string                       $stepName    The step name to be executed
+     * @param ByStepNormalizeResultContext $context     The execution context
+     * @param bool                         $resetErrors Whether existing in the context errors
+     *                                                  should be removed before the execution of the step
+     *                                                  and then added to the context together with new errors, if any
      */
-    public function executeStep(string $stepName, ByStepNormalizeResultContext $context, $resetErrors = true): void
-    {
+    public function executeStep(
+        string $stepName,
+        ByStepNormalizeResultContext $context,
+        bool $resetErrors = true
+    ): void {
         $context->setFirstGroup($stepName);
         $context->setLastGroup($stepName);
 
@@ -58,7 +69,7 @@ class StepExecutor
 
     /**
      * @param ByStepNormalizeResultContext $context
-     * @param array                        $errors
+     * @param Error[]                      $errors
      */
     private function saveErrors(ByStepNormalizeResultContext $context, array $errors): void
     {

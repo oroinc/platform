@@ -51,11 +51,15 @@ services:
 
     oro_datagrid.extension.orm_sorter:
         class: '%oro_datagrid.extension.orm_sorter.class%'
+        arguments:
+            - '@oro_datagrid.provider.state.sorters'
         tags:
             - { name: oro_datagrid.extension }
 
     oro_datagrid.extension.array_sorter:
         class: Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension
+        arguments:
+            - '@oro_datagrid.provider.state.sorters'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -148,10 +152,7 @@ services:
     oro_datagrid.extension.columns:
         class: '%oro_datagrid.extension.columns.class%'
         arguments:
-            - '@doctrine'
-            - '@oro_security.token_accessor'
-            - '@oro_security.acl_helper'
-            - '@oro_datagrid.columns.helper'
+            - '@oro_datagrid.provider.state.columns'
         tags:
             - { name: oro_datagrid.extension }
 
