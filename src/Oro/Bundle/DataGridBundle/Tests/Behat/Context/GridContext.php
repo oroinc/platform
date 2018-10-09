@@ -377,6 +377,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )check records in grid:$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)" grid:$/
+     *
+     * @param TableNode $table
+     * @param string $gridName
+     */
+    public function iCheckRecordsInGrid(TableNode $table, ?string $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!count($grid->getRows())) {
+            self::fail('Grid has no records to check');
+        }
+        foreach ($table->getRows() as $row) {
+            $first = reset($row);
+            $grid->checkRecord($first);
+        }
+    }
+
+    /**
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)" grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)"$/
