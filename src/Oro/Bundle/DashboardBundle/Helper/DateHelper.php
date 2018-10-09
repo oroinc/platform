@@ -10,6 +10,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
+ * Provides a set of reusable utility methods for dashboard widgets
+ * to simplify a work with time periods by which the widget's data is filtered.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DateHelper
@@ -367,31 +369,9 @@ class DateHelper
         $start->setTime(0, 0, 0);
 
         $end = $this->getCurrentDateTime();
-        $end->setTime(23, 59, 59);
+        $end->setTime(0, 0, 0)->modify('1 day');
 
         $start = $start->sub(new \DateInterval($interval));
-
-        return [$start, $end];
-    }
-
-    /**
-     * Gets previous date interval
-     *
-     * @param \DateTime $from
-     * @param \DateTime $to
-     *
-     * @return array
-     */
-    public function getPreviousDateTimeInterval(\DateTime $from, \DateTime $to)
-    {
-        $interval = $from->diff($to);
-        $start    = clone $from;
-        $start    = $start->sub($interval);
-        $start    = $start->sub(new \DateInterval('PT1S'));
-
-        $end = clone $to;
-        $end = $end->sub($interval);
-        $end = $end->sub(new \DateInterval('PT1S'));
 
         return [$start, $end];
     }

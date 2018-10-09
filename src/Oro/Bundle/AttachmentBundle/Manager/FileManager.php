@@ -5,21 +5,32 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 use Gaufrette\Adapter\MetadataSupporter;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
+use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * This manager can be used to simplify retrieving and storing attachments.
+ */
 class FileManager extends GaufretteFileManager
 {
+    /** @var ProtocolValidatorInterface */
+    private $protocolValidator;
+
     /**
-     * @param FilesystemMap $filesystemMap
-     * @deprecated since 2.1. Use "oro_gaufrette.file_manager" as the parent service for your service
+     * @param FilesystemMap              $filesystemMap
+     * @param ProtocolValidatorInterface $protocolValidator
      */
-    public function __construct(FilesystemMap $filesystemMap)
+    public function __construct(FilesystemMap $filesystemMap, ProtocolValidatorInterface $protocolValidator)
     {
         parent::__construct('attachments');
         $this->setFilesystemMap($filesystemMap);
+        $this->protocolValidator = $protocolValidator;
     }
 
     /**
@@ -40,33 +51,41 @@ class FileManager extends GaufretteFileManager
     }
 
     /**
-     * Copies a file to temporary directory and return File entity contains a reference to this file
+     * Copies a file to a temporary directory and returns File entity contains a reference to this file.
      *
      * @param string $path The local path or remote URL of a file
      *
-     * @return File|null
+     * @return File
+     *
+     * @throws FileNotFoundException         When the given file doesn't exist
+     * @throws ProtocolNotSupportedException When the given file path is not supported
+     * @throws IOException                   When the given file cannot be copied to a temporary folder
      */
     public function createFileEntity($path)
     {
-        try {
-            $fileName = pathinfo($path, PATHINFO_BASENAME);
-            $parametersPosition = strpos($fileName, '?');
-            if ($parametersPosition) {
-                $fileName = substr($fileName, 0, $parametersPosition);
-            }
-
-            $tmpFile = $this->getTemporaryFileName($fileName);
-            $filesystem = new SymfonyFileSystem();
-            $filesystem->copy($path, $tmpFile, true);
-
-            $entity = new File();
-            $entity->setFile(new ComponentFile($tmpFile));
-            $entity->setOriginalFilename($fileName);
-
-            return $entity;
-        } catch (\Exception $e) {
-            return null;
+        $path = \trim($path);
+        $protocolDelimiter = strpos($path, '://');
+        if (false !== $protocolDelimiter
+            && !$this->protocolValidator->isSupportedProtocol(strtolower(substr($path, 0, $protocolDelimiter)))
+        ) {
+            throw new ProtocolNotSupportedException($path);
         }
+
+        $fileName = pathinfo($path, PATHINFO_BASENAME);
+        $parametersPosition = strpos($fileName, '?');
+        if ($parametersPosition) {
+            $fileName = substr($fileName, 0, $parametersPosition);
+        }
+
+        $tmpFile = $this->getTemporaryFileName($fileName);
+        $filesystem = new SymfonyFileSystem();
+        $filesystem->copy($path, $tmpFile, true);
+
+        $entity = new File();
+        $entity->setFile(new ComponentFile($tmpFile));
+        $entity->setOriginalFilename($fileName);
+
+        return $entity;
     }
 
     /**

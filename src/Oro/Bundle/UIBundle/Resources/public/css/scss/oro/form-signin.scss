@@ -48,21 +48,6 @@
         }
     }
 
-    .btn-large {
-        height: 40px;
-        line-height: 38px;
-        border-radius: 20px;
-
-        &.btn-success {
-            font-size: 15px;
-        }
-
-        [class^="fa-"],
-        [class*=" fa-"] {
-            font-size: 14px;
-        }
-    }
-
     .btn-primary {
         color: #fff;
 

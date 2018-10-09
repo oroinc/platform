@@ -17,10 +17,34 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 interface DatagridStateProviderInterface
 {
     /**
+     * Returns state based on parameters, grid view and configuration.
+     *
      * @param DatagridConfiguration $datagridConfiguration
      * @param ParameterBag $datagridParameters
      *
      * @return array State of datagrid component, e.g. columns` state, sorters state
      */
     public function getState(DatagridConfiguration $datagridConfiguration, ParameterBag $datagridParameters);
+
+    /**
+     * Returns state based on parameters and configuration.
+     *
+     * @param DatagridConfiguration $datagridConfiguration
+     * @param ParameterBag $datagridParameters
+     *
+     * @return array State of datagrid component, e.g. columns` state, sorters state
+     */
+    public function getStateFromParameters(
+        DatagridConfiguration $datagridConfiguration,
+        ParameterBag $datagridParameters
+    );
+
+    /**
+     * Returns default state based on configuration only.
+     *
+     * @param DatagridConfiguration $datagridConfiguration
+     *
+     * @return array State of datagrid component, e.g. columns` state, sorters state
+     */
+    public function getDefaultState(DatagridConfiguration $datagridConfiguration);
 }

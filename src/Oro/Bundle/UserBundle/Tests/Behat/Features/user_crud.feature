@@ -43,7 +43,6 @@ Feature: User CRUD
       | First Name        | Johnny                |
       | Last Name         | Mnemonic              |
       | Primary Email     | edited@test.com       |
-      | Enabled           | Enabled        |
 
   Scenario: Delete user
     Given I should see johnny in grid
