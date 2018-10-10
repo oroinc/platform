@@ -24,13 +24,14 @@
             width: $oro-tabs-head-width;
             flex-shrink: $oro-tabs-head-flex-shrink;
             flex-grow: $oro-tabs-head-flex-grow;
-            margin-right: $oro-tabs-head-outer-offset-right;
+            margin-#{$end}: $oro-tabs-head-outer-offset-right;
             position: $oro-tabs-head-position;
         }
 
         > .oro-tabs__content {
             flex-grow: $oro-tabs-content-flex-grow;
-            border-left: $oro-tabs-content-border-left;
+            border-#{$start}: $oro-tabs-content-border-left;
+            padding-#{$start}: $horizontal-padding;
         }
     }
 }
