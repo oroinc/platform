@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 $widget-picker-max-width:                       738px !default;
-$widget-picker-search-width:                    178px !default;
+$widget-picker-search-width:                    208px !default;
 $widget-picker-icon-size:                       32px !default;
 $widget-picker-icon-bg-color:                   $primary-750 !default;
 
@@ -10,6 +10,9 @@ $widget-picker-item-separator-color:            $primary-860 !default;
 $widget-picker-description-collapse-icon:       $fa-var-minus-square-o !default;
 $widget-picker-description-expand-icon:         $fa-var-plus-square-o !default;
 $widget-picker-description-cell-color:          $primary-550 !default;
+
+$widget-picker-loading-size:                    16px !default;
+$widget-picker-loading-border-size:             $widget-picker-loading-size/4 !default;
 
 $widget-picker-new-badge-color:                 $danger-dark !default;
 $widget-picker-added-badge-color:               $success !default;

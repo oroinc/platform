@@ -58,13 +58,20 @@
         margin-#{$end}: $app-header-logo-wrapper-margin-end;
     }
 
+    .organization-logo-wrapper {
+        white-space: nowrap;
+        max-width: 50%;
+    }
+
     .logo {
         color: $app-header-logo-text-color;
         font-weight: bold;
         font-size: $app-header-logo-font-size;
         line-height: inherit;
+        text-overflow: ellipsis;
         margin: 0;
         display: inline-block;
+        overflow: hidden;
 
         a {
             color: inherit;

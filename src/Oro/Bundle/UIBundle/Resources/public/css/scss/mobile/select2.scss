@@ -66,10 +66,11 @@
 
         .select2-search-choice {
             font-size: $base-font-size--m;
-            padding: 6px 40px 6px 8px;
+            padding: 6px 32px 6px 8px;
             height: 32px;
             background: $additional-extra-light;
             margin: 4px;
+            white-space: nowrap;
             line-height: 20px;
             max-width: 100%;
 

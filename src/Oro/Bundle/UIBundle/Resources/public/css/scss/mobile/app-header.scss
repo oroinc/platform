@@ -120,15 +120,13 @@
             float: #{$start};
             line-height: $app-header-height;
             height: $app-header-height;
+            max-width: $app-header-max-width;
             white-space: nowrap;
-            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
             .organization-name {
                 color: inherit;
-                max-width: 100%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
             }
         }
 

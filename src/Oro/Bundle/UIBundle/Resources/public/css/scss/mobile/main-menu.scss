@@ -40,7 +40,6 @@
         margin-#{$start}: constant(safe-area-inset-left);
         /* iOS 11.2+ */
         margin-#{$start}: env(safe-area-inset-left);
-        padding-top: 8px;
         width: $main-menu-mobile-width;
         background-color: $menu-background-color;
         box-shadow: $menu-mobile-box-shadow;
