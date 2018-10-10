@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 @import "mixins/direction";
 @import "mixins/loading";
+@import "mixins/no-data";
 
 $enable-safe-area: true;
 
@@ -228,12 +229,14 @@ $enable-safe-area: true;
 // Use like native padding
 // Ex. @include safe-area-offset(padding, 10px 15px);
 // Ex. @include safe-area-offset(margin, 10px 15px 20px);
-@mixin safe-area-offset($property, $values) {
+@mixin safe-area-offset($property, $values, $default: true) {
     @if ($property != null and $values != null and length($values) <= 4) {
         $safe-area-offset-left: 0;
         $safe-area-offset-right: 0;
 
-        #{$property}: #{$values};
+        @if ($default) {
+            #{$property}: #{$values};
+        }
 
         @if ($enable-safe-area) {
             @if (length($values) == 1) {

@@ -195,13 +195,7 @@
     }
 
     .no-data {
-        padding: $activity-no-data-font-offset;
-
-        font-size: $activity-no-data-font-size;
-
-        color: $activity-icon-color;
-
-        text-align: center;
+        @include no-data;
     }
 
     .responsive-block {

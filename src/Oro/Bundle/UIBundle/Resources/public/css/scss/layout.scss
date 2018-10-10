@@ -126,6 +126,12 @@
         margin-top: 7px;
         padding-#{$end}: 0;
     }
+
+    .responsive-cell {
+        .no-data {
+            @include no-data;
+        }
+    }
 }
 
 body.backdrop:before {
