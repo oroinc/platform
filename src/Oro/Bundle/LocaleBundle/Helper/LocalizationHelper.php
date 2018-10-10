@@ -10,6 +10,9 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 
+/**
+ * Handles logic to work with localization
+ */
 class LocalizationHelper
 {
     use FallbackTrait;

@@ -337,6 +337,16 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 
+    oro_entity.entity_name_provider.dictionary:
+        class: Oro\Bundle\EntityBundle\Provider\DictionaryEntityNameProvider
+        public: false
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
+            - '@property_accessor'
+        tags:
+            - { name: oro_entity.name_provider, priority: -85 }
+
     oro_entity.entity_name_provider.fallback:
         class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
         public: false

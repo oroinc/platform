@@ -685,6 +685,8 @@ services:
             - '@doctrine'
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email_grid_mailbox_name_helper'
+        calls:
+            - [setEmailAddressManager, ['@oro_email.email.address.manager']]
 
     oro_email.email_grid_mailbox_name_helper:
         class: Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper
@@ -997,6 +999,12 @@ services:
             - '@doctrine.orm.entity_manager'
         calls:
             - [setLogger, ['@logger']]
+
+    oro_email.internal_email.flag_manager_loader:
+        public: false
+        class: Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader
+        tags:
+            - { name: oro_email.email_flag_manager_loader }
 
     oro_email.manager.notification:
         class: %oro_email.manager.notification.class%

@@ -19,6 +19,17 @@ define(function(require) {
 
         formState: null,
 
+        /** @property */
+        hiddenElement: null,
+
+        /** @property */
+        useHiddenElement: false,
+
+        /** @property */
+        events: {
+            'content:initialized': 'contentInitialized'
+        },
+
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
@@ -34,10 +45,19 @@ define(function(require) {
             this._hideLoading();
             this.disposePageComponents();
 
-            this.$el
-                .trigger('content:remove')
-                .html($(content).children())
-                .trigger('content:changed');
+            if (this.useHiddenElement) {
+                // Create a hidden element in which initialization will be performed
+                this.hiddenElement = this.$el.clone(true).hide();
+                this.hiddenElement.insertAfter(this.$el);
+                this.hiddenElement.trigger('content:remove')
+                    .html($(content).children())
+                    .trigger('content:changed');
+            } else {
+                this.$el
+                    .trigger('content:remove')
+                    .html($(content).children())
+                    .trigger('content:changed');
+            }
         },
 
         beforeContentLoading: function() {
@@ -51,7 +71,7 @@ define(function(require) {
         afterContentLoading: function() {
             this._restoreFormState();
             // Initialize tooltips and other elements
-            mediator.execute('layout:init', this.$el);
+            mediator.execute('layout:init', this.useHiddenElement ? this.hiddenElement : this.$el);
         },
 
         contentLoadingFail: function() {
@@ -122,6 +142,17 @@ define(function(require) {
 
         _getInputs: function() {
             return this.$el.find('input, textarea, select').filter('[name!=""]');
+        },
+
+        contentInitialized: function() {
+            if (this.useHiddenElement) {
+                // Replace a target element with an initialized hidden element
+                this.$el.html(this.hiddenElement.html());
+                // Remove a hidden element
+                this.hiddenElement.remove();
+                this.hiddenElement = null;
+                this.useHiddenElement = false;
+            }
         }
     });
 

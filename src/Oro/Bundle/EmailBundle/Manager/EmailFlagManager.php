@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
@@ -99,12 +100,15 @@ class EmailFlagManager implements LoggerAwareInterface
      *
      * @param EmailUser $emailUser - EmailUser
      *
-     * @return EmailFlagManagerInterface
+     * @return EmailFlagManagerInterface|null
      */
     protected function selectEmailFlagManager(EmailUser $emailUser)
     {
         $folder = $emailUser->getFolders()->first();
-        $origin = $emailUser->getOrigin();
+        if (!$folder instanceof EmailFolder) {
+            return null;
+        }
+        $origin = $folder->getOrigin();
         if (!$origin || !$origin->isActive()) {
             return null;
         }
