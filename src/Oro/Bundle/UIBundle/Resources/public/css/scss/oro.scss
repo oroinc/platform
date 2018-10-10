@@ -1121,12 +1121,10 @@ label .popover-body {
 
 .list-widget .widget-actions-section {
     a.btn {
-        line-height: 1em;
         height: auto;
         border: 0;
-        background: 0;
         box-shadow: none;
-        padding: side-values(0 0 0 10px);
+        padding: side-values(0 2px 0 8px);
 
         [class^="fa-"] {
             &:before {
@@ -1158,6 +1156,24 @@ label .popover-body {
             }
         }
     }
+
+    .action-wrapper {
+        &:not(:first-of-type) .btn {
+            margin-#{$start}: 4px;
+        }
+
+        .btn-mini {
+            margin-#{$start}: 0;
+            border-radius: 0;
+            font-weight: normal;
+            font-size: $btn-font-size;
+            padding: 0 7px;
+        }
+    }
+
+    .action-wrapper + .action-wrapper .btn-mini {
+        border-left: 1px solid $primary-750;
+    }
 }
 
 .list-box {
@@ -1175,6 +1191,45 @@ label .popover-body {
             float: #{$end};
             margin-#{$end}: -4px;
             z-index: 99;
+
+            .btn {
+                line-height: 1em;
+                height: auto;
+                border: 0;
+                background: none;
+                box-shadow: none;
+                padding: 0;
+
+                [class^="fa-"] {
+                    &:before {
+                        opacity: .6;
+                        font-size: 15px;
+                    }
+
+                    &:hover {
+                        &:before {
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+
+            .btn.disabled,
+            .btn[disabled] {
+                cursor: not-allowed;
+
+                [class^="fa-"] {
+                    &:before {
+                        opacity: .3;
+                    }
+
+                    &:hover {
+                        &:before {
+                            opacity: .3;
+                        }
+                    }
+                }
+            }
         }
     }
 }
