@@ -233,7 +233,7 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
         $process = sprintf(
             'PGPASSWORD="%s" psql -h %s --port=%s -U %s -t -c "'.
             'SELECT pg_terminate_backend(pid) FROM pg_stat_activity '.
-            'WHERE datname in (\'%s\', \'%s\') AND pid <> pg_backend_pid()"',
+            'WHERE datname in (\'%s\', \'%s\') AND pid <> pg_backend_pid()" postgres',
             $this->dbPass,
             $this->dbHost,
             $this->dbPort,
