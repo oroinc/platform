@@ -47,7 +47,6 @@ define(function(require) {
         render: function() {
             this.appendClearDefault();
             this.updateClearDefault();
-            this.initSortable();
             // Delays sortable initialization which prevents spinner loading a lot of time in case if have hundreds of options
             _.delay(this.initSortable.bind(this), this.sortableInitDelay);
             this.reindexValues();
