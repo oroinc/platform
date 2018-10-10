@@ -270,9 +270,13 @@ footer {
     position: relative;
 
     .top-action-box {
-        padding: 3px 12px;
+        padding: 0 12px;
         background-color: $primary-inverse;
         float: #{$end};
+        > * {
+            margin-top: 3px;
+            margin-bottom: 3px;
+        }
     }
 }
 

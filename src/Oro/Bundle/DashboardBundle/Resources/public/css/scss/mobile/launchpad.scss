@@ -1,5 +1,25 @@
 /* @theme: admin.oro; */
 
+@media only screen and (max-width: $medium-devices-media-breakpoint) {
+  .launchpad-container {
+
+    .launchpad-first-column,
+    .launchpad-second-column {
+      width: auto;
+      float: none;
+    }
+
+    .launchpad-widget-content {
+      float: none;
+      clear: none;
+      width: auto;
+      max-width: $quick-launchpad-item-width;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
 @media only screen and (max-width: $small-devices-media-breakpoint) {
   .quick-launchpad-toolbar {
     padding: 0 16px;
@@ -51,6 +71,23 @@
       border: 0 none;
 
       display: inline-block;
+    }
+  }
+
+  .launchpad-container {
+
+    .launchpad-first-column,
+    .launchpad-second-column {
+      width: auto;
+      float: none;
+    }
+
+    .launchpad-widget-content {
+      float: none;
+      clear: none;
+      width: auto;
+      max-width: none;
+      margin: $quick-launchpad-item-margin;
     }
   }
 }
