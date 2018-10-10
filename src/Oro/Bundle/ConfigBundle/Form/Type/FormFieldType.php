@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for global fields of system configuration.
+ */
 class FormFieldType extends AbstractType
 {
     /**
