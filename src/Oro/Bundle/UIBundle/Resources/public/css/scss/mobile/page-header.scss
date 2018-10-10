@@ -8,9 +8,7 @@
     float: left;
 }
 
-.breadcrumb-pin,
-.container-fluid.page-title,
-.navbar-extra {
+.breadcrumb-pin {
     padding-right: 0;
     padding-left: 0;
 }
@@ -18,7 +16,9 @@
 .container-fluid.page-title {
     margin-bottom: 10px;
 
-    @include safe-area-offset(padding, 0);
+    @include safe-area-offset(padding, $content-padding);
+
+    padding: 0 $content-padding;
 }
 
 .navbar-extra {

@@ -4,7 +4,7 @@ $scrollspy-position: relative !default;
 $scrollspy-overflow: auto !default;
 
 $scrollspy-nav-background: $primary-900 !default;
-$scrollspy-nav-offset: 0 $content-padding !default;
+$scrollspy-nav-offset: null !default;
 $scrollspy-nav-border-radius: 16px !default;
 
 $scrollspy-nav-target-height: 20px !default;

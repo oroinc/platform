@@ -33,17 +33,8 @@
     margin-#{$end}: $content-padding;
 }
 
-.container-fluid {
-    padding-#{$end}: $content-padding;
-    padding-#{$start}: $content-padding;
-
-    & > .responsive-section {
-        margin: 0 -#{$content-padding};
-        padding-#{$end}: $content-padding;
-    }
-}
-
-.page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
+.scrollspy.container-fluid,
+.page-title + [data-bound-component*="datagrid"],
 .page-title + .product-container {
     margin-top: -10px;
 
@@ -56,14 +47,15 @@
     }
 }
 
-.page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"],
-.page-title + .product-container,
-.page-title + .layout-content {
-    @include safe-area-offset(padding, 0);
+.page-title + [data-bound-component*="datagrid"] {
+    @include safe-area-property-left(padding-left, $content-padding, false);
+    @include safe-area-property-right(padding-right, $content-padding, false);
 }
 
 .layout-content .responsive-section {
-    padding: 0;
+    &:only-child {
+        padding: 0;
+    }
 
     .form-horizontal {
         padding: $content-padding 0;
@@ -124,20 +116,11 @@
     border-radius: 3px;
 
     .title {
-        padding: side-values($content-padding $content-padding $content-padding 0);
+        padding-bottom: $content-padding;
     }
 
     .calendar-container {
         padding: 0;
-    }
-}
-
-.dashboard-container {
-    .responsive-cell {
-        .box-type1 {
-            margin-#{$end}: 10px;
-            margin-#{$start}: 10px;
-        }
     }
 }
 
@@ -149,8 +132,8 @@
             margin-bottom: 0;
 
             .container-fluid {
-                padding-#{$start}: 10px;
-                padding-#{$end}: 10px;
+                padding-#{$start}: $content-padding;
+                padding-#{$end}: $content-padding;
             }
         }
     }
@@ -169,6 +152,44 @@
             padding-#{$end}: 0;
         }
     }
+}
+
+.layout-content {
+    > .scrollable-container {
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
+    }
+
+    // Update offset on pages with sidebar
+    > .sidebar-container .category-data {
+        padding-#{$start}: $content-padding;
+    }
+
+    //  Update offset on view pages
+    .layout-content .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+//  Update offset on create / update pages
+form > .layout-content {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+
+    .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
 }
 
 .oro-page {

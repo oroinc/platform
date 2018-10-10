@@ -22,10 +22,20 @@
 
 .responsive-block {
     min-width: 340px;
-    padding-right: 5px;
+
+    &:first-child {
+        padding-#{$end}: $content-padding-medium / 2;
+    }
+
+    &:last-child {
+        padding-#{$start}: $content-padding-medium / 2;
+    }
+    &:only-child {
+        padding: 0;
+    }
 
     &.border-right {
-        border-right: 2px solid #f4f4f4;
+        border-#{$end}: 2px solid $primary-860;
     }
 }
 
@@ -57,6 +67,45 @@
     }
 }
 
+
+.layout-content {
+    > .scrollable-container {
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+
+    // Update offset on pages with sidebar
+    > .sidebar-container .category-data {
+        padding-#{$start}: $content-padding;
+    }
+
+    //  Update offset on view pages
+    .layout-content .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+//  Update offset on create / update pages
+form > .layout-content {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+
+    .scrollspy-main-container > .scrollable-container {
+        margin-#{$start}: -$content-padding;
+        margin-#{$end}: -$content-padding;
+        padding-#{$start}: $content-padding;
+        padding-#{$end}: $content-padding;
+    }
+}
+
+.page-title + [data-bound-component*="datagrid"] {
+    padding-#{$start}: $content-padding;
+    padding-#{$end}: $content-padding;
+}
+
 .oro-page {
     &.collapsible-sidebar {
         .oro-page-sidebar {
@@ -67,9 +116,4 @@
             }
         }
     }
-}
-
-.container-fluid {
-    padding-right: $content-padding;
-    padding-left: $content-padding;
 }

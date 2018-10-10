@@ -5,7 +5,7 @@
 }
 
 .filter-box {
-    padding: 8px 20px 0 12px;
+    padding: $filter-box-offset;
 
     .filter-criteria {
         position: $filter-box-criteria-position;

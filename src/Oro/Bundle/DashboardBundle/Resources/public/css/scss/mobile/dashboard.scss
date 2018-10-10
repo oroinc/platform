@@ -4,11 +4,13 @@
     min-height: 100%;
 
     .responsive-section {
-        padding: 0;
-
         .responsive-cell > div {
             padding: 0;
         }
+    }
+
+    .scrollable-container {
+        padding-top: $dashboard-wrapper-mobile-offset;
     }
 
     .dashboard-widget {

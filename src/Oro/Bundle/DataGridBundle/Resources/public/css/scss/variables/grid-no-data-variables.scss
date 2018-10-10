@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-$grid-no-data-offset: 50px !default;
+$grid-no-data-offset: $content-padding 0 !default;
 
 $grid-no-data-icon: $fa-var-search !default;
 $grid-no-data-icon-offset: 6px !default;

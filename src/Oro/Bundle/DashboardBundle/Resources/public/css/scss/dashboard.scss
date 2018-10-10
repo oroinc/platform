@@ -39,25 +39,37 @@
     background-color: $dashboard-wrapper-bg;
 
     .page-title {
+        background-color: $dashboard-container-title-background-color;
         border-bottom: $dashboard-container-border;
     }
 
+    .responsive-section:not(.responsive-small) {
+        .dashboard-column {
+            &:first-child {
+                padding-#{$end}: $content-padding-medium / 2;
+            }
+
+            &:last-child {
+                padding-#{$start}: $content-padding-medium / 2;
+            }
+        }
+    }
+
     .responsive-section {
-        padding-top: 13px;
-        padding-#{$start}: 13px;
+        padding-top: $content-padding;
 
         background: $dashboard-wrapper-bg;
 
         .responsive-cell > div {
-            padding-#{$end}: 13px;
-            padding-bottom: 13px;
+            padding-bottom: $content-padding-medium;
         }
     }
 
     .scrollable-container {
         background: $dashboard-wrapper-bg;
 
-        @include safe-area-offset(padding, 0);
+        @include safe-area-property-left(padding-left, $content-padding, false);
+        @include safe-area-property-right(padding-right, $content-padding, false);
     }
 
     .dashboard-widget.editable {
@@ -140,7 +152,7 @@
         }
 
         .widget-title {
-            padding: 11px 0 3px;
+            padding: 6px 0 0;
 
             color: $dashboard-widget-title-color;
             font-size: 18px;

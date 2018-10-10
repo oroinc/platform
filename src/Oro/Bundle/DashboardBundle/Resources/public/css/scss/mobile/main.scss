@@ -4,6 +4,7 @@
 
 .mobile-version {
     @import "oroui/css/scss/mobile/variables";
+    @import "variables";
     @import "./big-numbers";
     @import "./dashboard";
     @import "./launchpad";

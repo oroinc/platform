@@ -103,5 +103,5 @@ $jstree-search-component-search-icon-display: block !default;
 $jstree-search-component-search-icon-pointer-events: none !default;
 
 $tree-empty-content-sidebar-text-align: center !default;
-$tree-empty-content-sidebar-inner-offset: 15px !default;
-$tree-empty-content-sidebar-background: #f1f1f1 !default;
+$tree-empty-content-sidebar-inner-offset: $content-padding-medium !default;
+$tree-empty-content-sidebar-background: $primary-860 !default;

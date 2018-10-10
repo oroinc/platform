@@ -20,7 +20,7 @@
 
             & > .content {
                 margin-left: 335px;
-                padding: 15px 15px 0;
+                padding: $content-padding-medium $content-padding-medium 0;
                 box-sizing: border-box;
             }
         }
@@ -28,10 +28,12 @@
 }
 
 .system-configuration-container {
+    padding: 0 $content-padding;
+
     .controls.control-subgroup {
         width: auto;
-        margin: 0 15px 0 0;
-        float: left;
+        margin: side-values( 0 $content-padding-medium 0 0);
+        float: #{$start};
 
         input,
         textarea {
@@ -60,12 +62,12 @@
 
 .system-configuration-content {
     &-wrapper {
-        padding: 0 16px;
+        padding-#{$start}: $content-padding-medium;
         margin-bottom: 15px;
     }
 
     &-inner {
-        padding: 27px 30px 20px;
+        padding: $content-padding $content-padding $content-padding-medium;
         width: 100%;
         overflow-y: auto;
     }
@@ -90,6 +92,8 @@
 
 .scrollable-container .container-fluid.configuration-header {
     background-color: #fff;
+
+    @include clearfix();
 
     h1 {
         font-size: 20px;

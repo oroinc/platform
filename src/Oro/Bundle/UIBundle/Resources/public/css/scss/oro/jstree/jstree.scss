@@ -184,7 +184,8 @@
 .content-with-sidebar--content {
     .tree-empty-content {
         text-align: $tree-empty-content-sidebar-text-align;
-        padding: $tree-empty-content-sidebar-inner-offset;
+        padding-top: $tree-empty-content-sidebar-inner-offset;
+        padding-bottom: $tree-empty-content-sidebar-inner-offset;
         background: $tree-empty-content-sidebar-background;
     }
 }

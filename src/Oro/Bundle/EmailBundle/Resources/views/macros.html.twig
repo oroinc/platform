@@ -573,7 +573,7 @@
     Render title and buttons for Mailbox configuration
 #}
 {% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid configuration-header clearfix">
+    <div class="container-fluid page-title configuration-header">
         {% if pageTitle is iterable %}
             <div class="customer-info customer-simple pull-left">
                 {% for title in pageTitle%}

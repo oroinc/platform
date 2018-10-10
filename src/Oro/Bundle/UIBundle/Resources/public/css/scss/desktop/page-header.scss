@@ -1,25 +1,26 @@
 /* @theme: admin.oro; */
 
 .container-fluid.page-title {
-    padding-right: 0;
+    padding-#{$end}: 0;
+    padding-#{$start}: $content-padding;
 
     .navbar-extra > .row {
         > .pull-right {
             max-width: calc(100% - 180px);
 
             > .title-buttons-container {
-                text-align: right;
+                text-align: #{$end};
 
                 > .pull-left,
                 > .btn-group {
-                    text-align: left;
+                    text-align: #{$start};
                     display: inline-block;
                     margin-bottom: 4px;
                     vertical-align: top;
                 }
 
                 > .pinned-dropdown > .btn-group {
-                    text-align: left;
+                    text-align: #{$start};
                 }
             }
 
@@ -34,7 +35,7 @@
     }
 
     .page-title-center.under-left-block {
-        clear: left;
+        clear: #{$start};
         position: relative;
         top: 8px;
     }
@@ -45,7 +46,7 @@
 
             > .pull-left-extra {
                 width: 100%;
-                margin-left: 0;
+                margin-#{$start}: 0;
             }
 
             > .pull-right {
@@ -70,7 +71,7 @@
         margin: 0 0 3px;
 
         &.user-name {
-            margin-right: 5px;
+            margin-#{$end}: 5px;
         }
     }
 

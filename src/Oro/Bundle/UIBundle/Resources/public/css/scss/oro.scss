@@ -43,23 +43,6 @@ footer {
     padding: 0 $horizontal-padding;
 }
 
-.layout-content {
-    margin: 0 !important;
-
-    .navbar-inner {
-        z-index: 1;
-        min-height: 0;
-
-        .divider-vertical {
-            border: none;
-        }
-
-        .nav {
-            margin-#{$end}: 0;
-        }
-    }
-}
-
 #wrapper {
     border-radius: $border-radius;
     border: 1px solid $general-border-color;
@@ -965,7 +948,7 @@ label.radio.error {
     background-color: $primary-inverse;
 
     .title {
-        margin-bottom: 10px;
+        padding-bottom: $content-padding / 2;
 
         font-size: 20px;
         font-weight: bold;

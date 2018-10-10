@@ -124,7 +124,7 @@
 
     &--container {
         display: $content-sidebar-container-display;
-        margin-left: $content-sidebar-container-offset-left;
+        margin-#{$start}: $content-sidebar-container-offset-left;
     }
 
     &--content {
