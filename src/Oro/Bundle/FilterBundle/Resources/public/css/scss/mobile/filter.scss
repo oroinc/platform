@@ -169,7 +169,6 @@
                     bottom: 0;
                     left: 0;
                     right: 0;
-
                 }
 
                 input[type='text'] {
@@ -178,6 +177,16 @@
 
                 .filter-separator {
                     margin: 0 6px;
+                }
+            }
+
+            &.dictionary-filter {
+                .btn-group.btn-block {
+                    float: none;
+                }
+
+                .select2-container {
+                    margin-left: 0;
                 }
             }
         }
