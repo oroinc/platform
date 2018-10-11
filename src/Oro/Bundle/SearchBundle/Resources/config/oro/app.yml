@@ -21,6 +21,10 @@ doctrine:
                 metadata_cache_driver:
                     type: service
                     id:   oro_search.cache.doctrine_metadata
+                query_cache_driver:
+                    type: service
+                    id:   oro_search.cache.doctrine_query
+
 fos_rest:
     exception:
         messages:

@@ -246,7 +246,7 @@ class AstVisitor extends Visitor
      */
     public function walkExists(Exists $existsExpr): ConditionalPrimary
     {
-        $exist = new ExistsExpression($this->dispatch($existsExpr->getExpression()));
+        $exist = new ExistsExpression($existsExpr->getExpression()->visit($this));
         $exist->not = $existsExpr->isNot();
 
         $primaryConditional = new ConditionalPrimary();
@@ -260,24 +260,13 @@ class AstVisitor extends Visitor
      */
     public function walkNullComparison(NullComparison $comparison): ConditionalPrimary
     {
-        $expression = new NullComparisonExpression($this->dispatch($comparison->getExpression()));
+        $expression = new NullComparisonExpression($comparison->getExpression()->visit($this));
         $expression->not = $comparison->isNot();
 
         $primaryConditional = new ConditionalPrimary();
         $primaryConditional->simpleConditionalExpression = $expression;
 
         return $primaryConditional;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dispatch(ExpressionInterface $expr)
-    {
-        $result = parent::dispatch($expr);
-        $this->alias = null;
-
-        return $result;
     }
 
     /**

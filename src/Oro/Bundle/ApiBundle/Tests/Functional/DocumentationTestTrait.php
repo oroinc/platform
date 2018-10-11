@@ -302,4 +302,45 @@ trait DocumentationTestTrait
 
         return $result;
     }
+
+    /**
+     * @param string $entityType
+     */
+    private function checkOptionsDocumentationForEntity($entityType)
+    {
+        $docs = $this->getEntityDocsForAction($entityType, ApiActions::OPTIONS);
+        $data = $this->getSimpleFormatter()->format($docs);
+        foreach ($data as $resource => $resourceData) {
+            $resourceData = reset($resourceData);
+            $this->checkOptionsDocumentationForResource($resource, $resourceData);
+        }
+    }
+
+    /**
+     * @param string $resource
+     * @param string $resourceData
+     */
+    private function checkOptionsDocumentationForResource($resource, array $resourceData)
+    {
+        self::assertArrayContains(
+            [
+                'description'   => 'Get options',
+                'documentation' => 'Get communication options for a resource'
+            ],
+            $resourceData,
+            $resource
+        );
+        self::assertTrue(
+            empty($resourceData['parameters']),
+            sprintf('The "parameters" section for %s should be empty', $resource)
+        );
+        self::assertTrue(
+            empty($resourceData['filters']),
+            sprintf('The "filters" section for %s should be empty', $resource)
+        );
+        self::assertTrue(
+            empty($resourceData['response']),
+            sprintf('The "response" section for %s should be empty', $resource)
+        );
+    }
 }

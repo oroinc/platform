@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\SendImportErrorNotificationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -23,7 +24,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
         $chunkHttpImportMessageProcessor = new SendImportErrorNotificationMessageProcessor(
             $this->createMessageProducerInterfaceMock(),
             $this->createLoggerInterfaceMock(),
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettingsMock(),
             $this->createDoctrineMock()
         );
 
@@ -52,7 +53,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
         $processor = new SendImportErrorNotificationMessageProcessor(
             $this->createMessageProducerInterfaceMock(),
             $logger,
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettingsMock(),
             $this->createDoctrineMock()
         );
 
@@ -93,7 +94,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
         $processor = new SendImportErrorNotificationMessageProcessor(
             $this->createMessageProducerInterfaceMock(),
             $logger,
-            $this->createConfigManagerMock(),
+            $this->createNotificationSettingsMock(),
             $doctrine
         );
 
@@ -141,18 +142,13 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
             ->method('getRepository')
             ->with(User::class)
             ->will($this->returnValue($userRepo));
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_email')
-            ->willReturn('test@mail.com');
-        $configManager
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_name')
-            ->willReturn('John');
 
+        $sender = From::emailAddress('test@mail.com', 'John');
+        $notificationSettings = $this->createNotificationSettingsMock();
+        $notificationSettings
+            ->expects($this->once())
+            ->method('getSender')
+            ->willReturn(From::emailAddress('test@mail.com', 'John'));
 
         $producer = $this->createMessageProducerInterfaceMock();
         $producer
@@ -161,8 +157,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
             ->with(
                 NotificationTopics::SEND_NOTIFICATION_EMAIL,
                 [
-                    'fromEmail' => 'test@mail.com',
-                    'fromName' => 'John',
+                    'sender' => $sender->toArray(),
                     'toEmail' => $user->getEmail(),
                     'subject' => 'Cannot Import file import.csv',
                     'body' => 'error import',
@@ -172,7 +167,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
         $processor = new SendImportErrorNotificationMessageProcessor(
             $producer,
             $logger,
-            $configManager,
+            $notificationSettings,
             $doctrine
         );
         $message = $this->createMessageMock();
@@ -202,18 +197,12 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
             ->expects($this->any())
             ->method('critical');
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->at(0))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_email')
-            ->willReturn('test@mail.com');
-        $configManager
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('oro_notification.email_notification_sender_name')
-            ->willReturn('John');
-
+        $sender = From::emailAddress('test@mail.com', 'John');
+        $notificationSettings = $this->createNotificationSettingsMock();
+        $notificationSettings
+            ->expects($this->once())
+            ->method('getSender')
+            ->willReturn(From::emailAddress('test@mail.com', 'John'));
 
         $producer = $this->createMessageProducerInterfaceMock();
         $producer
@@ -222,8 +211,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
             ->with(
                 NotificationTopics::SEND_NOTIFICATION_EMAIL,
                 [
-                    'fromEmail' => 'test@mail.com',
-                    'fromName' => 'John',
+                    'sender' => $sender->toArray(),
                     'toEmail' => 'test@mail.com',
                     'subject' => 'Cannot Import file import.csv',
                     'body' => 'error import',
@@ -233,7 +221,7 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
         $processor = new SendImportErrorNotificationMessageProcessor(
             $producer,
             $logger,
-            $configManager,
+            $notificationSettings,
             $this->createDoctrineMock()
         );
         $message = $this->createMessageMock();
@@ -266,11 +254,11 @@ class SendImportErrorNotificationMessageProcessorTest extends \PHPUnit\Framework
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
+     * @return \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
      */
-    private function createConfigManagerMock()
+    private function createNotificationSettingsMock()
     {
-        return $this->createMock(ConfigManager::class);
+        return $this->createMock(NotificationSettings::class);
     }
 
     /**

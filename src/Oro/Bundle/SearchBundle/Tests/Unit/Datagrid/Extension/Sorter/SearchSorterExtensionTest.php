@@ -3,260 +3,25 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Sorter\AbstractSorterExtensionTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Sorter\SearchSorterExtension;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
-class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
+class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 {
     /**
      * @var SearchSorterExtension
      */
-    protected $sorter;
+    protected $extension;
 
     public function setUp()
     {
-        $this->sorter = new SearchSorterExtension();
-    }
+        parent::setUp();
 
-    /**
-     * @param array $input
-     * @param array $expected
-     *
-     * @dataProvider setParametersDataProvider
-     */
-    public function testSetParameters(array $input, array $expected)
-    {
-        $this->sorter->setParameters(new ParameterBag($input));
-        $this->assertEquals($expected, $this->sorter->getParameters()->all());
-    }
-
-    /**
-     * @return array
-     */
-    public function setParametersDataProvider()
-    {
-        return [
-            'empty'    => [
-                'input'    => [],
-                'expected' => [],
-            ],
-            'regular'  => [
-                'input'    => [
-                    SearchSorterExtension::SORTERS_ROOT_PARAM => [
-                        'firstName' => SearchSorterExtension::DIRECTION_ASC,
-                        'lastName'  => SearchSorterExtension::DIRECTION_DESC,
-                    ]
-                ],
-                'expected' => [
-                    SearchSorterExtension::SORTERS_ROOT_PARAM => [
-                        'firstName' => SearchSorterExtension::DIRECTION_ASC,
-                        'lastName'  => SearchSorterExtension::DIRECTION_DESC,
-                    ]
-                ]
-            ],
-            'minified' => [
-                'input'    => [
-                    ParameterBag::MINIFIED_PARAMETERS => [
-                        SearchSorterExtension::MINIFIED_SORTERS_PARAM => [
-                            'firstName' => '-1',
-                            'lastName'  => '1',
-                        ]
-                    ]
-                ],
-                'expected' => [
-                    ParameterBag::MINIFIED_PARAMETERS         => [
-                        SearchSorterExtension::MINIFIED_SORTERS_PARAM => [
-                            'firstName' => '-1',
-                            'lastName'  => '1',
-                        ]
-                    ],
-                    SearchSorterExtension::SORTERS_ROOT_PARAM => [
-                        'firstName' => SearchSorterExtension::DIRECTION_ASC,
-                        'lastName'  => SearchSorterExtension::DIRECTION_DESC,
-                    ]
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * @param array $sorters
-     * @param array $columns
-     * @param array $expectedData
-     *
-     * @dataProvider visitMetadataDataProvider
-     */
-    public function testVisitMetadata(array $sorters, array $columns, array $expectedData)
-    {
-        $config = DatagridConfiguration::create([Configuration::SORTERS_KEY => $sorters]);
-
-        $data = MetadataObject::create([Configuration::COLUMNS_KEY => $columns]);
-        $this->sorter->setParameters(new ParameterBag());
-        $this->sorter->visitMetadata($config, $data);
-        $this->assertEquals($expectedData, $data->toArray());
-    }
-
-    /**
-     * @return array
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function visitMetadataDataProvider()
-    {
-        return [
-            'sortable' => [
-                Configuration::SORTERS_KEY => [
-                    Configuration::COLUMNS_KEY => [
-                        'name' => [],
-                    ],
-                ],
-                Configuration::COLUMNS_KEY => [
-                    ['name' => 'name'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedData'             => [
-                    Configuration::COLUMNS_KEY => [
-                        [
-                            'name'     => 'name',
-                            'sortable' => true,
-                        ],
-                        ['name' => 'createdAt']
-                    ],
-                    'options'                  => [
-                        'multipleSorting' => false,
-                        'toolbarOptions'  => [
-                            'addSorting' => false,
-                            'disableNotSelectedOption' => false
-                        ],
-                    ],
-                    'initialState'             => [Configuration::SORTERS_KEY => []],
-                    'state'                    => [Configuration::SORTERS_KEY => []],
-                ]
-            ],
-            'multiple' => [
-                Configuration::SORTERS_KEY => [
-                    Configuration::COLUMNS_KEY   => [
-                        'name' => [],
-                    ],
-                    Configuration::MULTISORT_KEY => true,
-                ],
-                Configuration::COLUMNS_KEY => [
-                    ['name' => 'name'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedData'             => [
-                    Configuration::COLUMNS_KEY => [
-                        [
-                            'name'     => 'name',
-                            'sortable' => true,
-                        ],
-                        ['name' => 'createdAt']
-                    ],
-                    'options'                  => [
-                        'multipleSorting' => true,
-                        'toolbarOptions'  => [
-                            'addSorting' => false,
-                            'disableNotSelectedOption' => false
-                        ],
-                    ],
-                    'initialState'             => [Configuration::SORTERS_KEY => []],
-                    'state'                    => [Configuration::SORTERS_KEY => []],
-                ]
-            ],
-            'toolbar'  => [
-                Configuration::SORTERS_KEY => [
-                    Configuration::COLUMNS_KEY         => [
-                        'name' => ['type' => 'string'],
-                        'age'  => [],
-                    ],
-                    Configuration::TOOLBAR_SORTING_KEY => true,
-                ],
-                Configuration::COLUMNS_KEY => [
-                    ['name' => 'name'],
-                    ['name' => 'age'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedData'             => [
-                    Configuration::COLUMNS_KEY => [
-                        [
-                            'name'        => 'name',
-                            'sortable'    => true,
-                            'sortingType' => 'string',
-                        ],
-                        [
-                            'name'     => 'age',
-                            'sortable' => true,
-                        ],
-                        ['name' => 'createdAt']
-                    ],
-                    'options'                  => [
-                        'multipleSorting' => false,
-                        'toolbarOptions'  => [
-                            'addSorting' => true,
-                            'disableNotSelectedOption' => false
-                        ],
-                    ],
-                    'initialState'             => [Configuration::SORTERS_KEY => []],
-                    'state'                    => [Configuration::SORTERS_KEY => []],
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider visitMetadataUnknownColumnDataProvider
-     * @param array  $sorters
-     * @param array  $columns
-     * @param string $expectedMessage
-     */
-    public function testVisitMetadataUnknownColumn(array $sorters, array $columns, $expectedMessage)
-    {
-        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\LogicException');
-        $this->expectExceptionMessage($expectedMessage);
-        $config = DatagridConfiguration::create([Configuration::SORTERS_KEY => $sorters]);
-
-        $data = MetadataObject::create([Configuration::COLUMNS_KEY => $columns]);
-        $this->sorter->setParameters(new ParameterBag());
-        $this->sorter->visitMetadata($config, $data);
-    }
-
-    /**
-     * @return array
-     */
-    public function visitMetadataUnknownColumnDataProvider()
-    {
-        return [
-            'unknown column'        => [
-                Configuration::SORTERS_KEY => [
-                    Configuration::COLUMNS_KEY => [
-                        'unknown' => [],
-                        'age'     => [],
-                    ],
-                ],
-                Configuration::COLUMNS_KEY => [
-                    ['name' => 'age'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedMessage'          => 'Could not found column(s) "unknown" for sorting',
-            ],
-            'unknown single column' => [
-                Configuration::SORTERS_KEY => [
-                    Configuration::COLUMNS_KEY => [
-                        'unknown' => [],
-                    ],
-                ],
-                Configuration::COLUMNS_KEY => [
-                    ['name' => 'age'],
-                    ['name' => 'createdAt'],
-                ],
-                'expectedMessage'          => 'Could not found column(s) "unknown" for sorting',
-            ],
-        ];
+        $this->extension = new SearchSorterExtension($this->sortersStateProvider);
     }
 
     /**
@@ -280,24 +45,24 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
-            ->getMock();
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn(['testColumn' => 'ASC']);
 
-        $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockQuery = $this->createMock(SearchQueryInterface::class);
+
+        $mockDatasource = $this->createMock(SearchDatasource::class);
 
         $mockDatasource
             ->expects($this->once())
             ->method('getSearchQuery')
             ->willReturn($mockQuery);
 
-        $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->sorter->setParameters($mockParameterBag);
+        $mockParameterBag = $this->createMock(ParameterBag::class);
+        $this->extension->setParameters($mockParameterBag);
 
-        $this->sorter->visitDatasource($config, $mockDatasource);
+        $this->extension->visitDatasource($config, $mockDatasource);
     }
 
     /**
@@ -334,6 +99,11 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn(['testColumn' => 'ASC']);
+
         $mockDatasource = $this->getMockBuilder(SearchDatasource::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -342,8 +112,8 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sorter->setParameters($mockParameterBag);
-        $this->sorter->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($mockParameterBag);
+        $this->extension->visitDatasource($config, $mockDatasource);
     }
 
     public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled()
@@ -362,6 +132,11 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
+        $this->sortersStateProvider
+            ->expects($this->once())
+            ->method('getStateFromParameters')
+            ->willReturn(['testColumn' => 'ASC']);
+
         $mockQuery = $this->getMockBuilder(SearchQueryInterface::class)
             ->getMock();
 
@@ -377,9 +152,9 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
         $mockParameterBag = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->sorter->setParameters($mockParameterBag);
+        $this->extension->setParameters($mockParameterBag);
 
-        $this->sorter->visitDatasource($config, $mockDatasource);
+        $this->extension->visitDatasource($config, $mockDatasource);
     }
 
     public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
@@ -398,8 +173,8 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
 
         list($mockDatasource, $mockParameterBag) = $this->getDependenciesMocks();
 
-        $this->sorter->setParameters($mockParameterBag);
-        $this->sorter->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($mockParameterBag);
+        $this->extension->visitDatasource($config, $mockDatasource);
     }
 
     public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
@@ -421,32 +196,8 @@ class SearchSorterExtensionTest extends \PHPUnit\Framework\TestCase
 
         list($mockDatasource, $mockParameterBag) = $this->getDependenciesMocks();
 
-        $this->sorter->setParameters($mockParameterBag);
-        $this->sorter->visitDatasource($config, $mockDatasource);
-    }
-
-    public function testVisitDatasourceThrowsExceptionWhenInvalidDefaultSortersApplied()
-    {
-        $config = DatagridConfiguration::create([
-            Configuration::SORTERS_KEY => [
-                Configuration::COLUMNS_KEY         => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => 'string',
-                    ]
-                ],
-                Configuration::DEFAULT_SORTERS_KEY => [
-                    'non-existing' => 'ASC',
-                ],
-            ],
-        ]);
-
-        list($mockDatasource, $mockParameterBag) = $this->getDependenciesMocks();
-
-        $this->sorter->setParameters($mockParameterBag);
-
-        $this->expectException(LogicException::class);
-        $this->sorter->visitDatasource($config, $mockDatasource);
+        $this->extension->setParameters($mockParameterBag);
+        $this->extension->visitDatasource($config, $mockDatasource);
     }
 
     /**

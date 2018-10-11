@@ -59,7 +59,7 @@ Feature: Pin page
   Scenario: Pin filled form
     Given go to Dashboards/Dashboard
     And go to System/User Management/Users
-    And press "Create User"
+    And click "Create User"
     When I fill "User Form" with:
       | Username          | userName       |
       | Enabled           | Enabled        |

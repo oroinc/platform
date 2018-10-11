@@ -391,6 +391,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($configurationValue));
 
         $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
+        $this->assertEquals($expectedValue, $this->localeSettings->getLanguage());
     }
 
     /**
@@ -408,6 +409,19 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
                 'configurationValue' => null,
             ),
         );
+    }
+
+    public function testGetActualLanguage()
+    {
+        $en = 'en';
+        $fr = 'fr';
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->with('oro_locale.language')
+            ->willReturnOnConsecutiveCalls($en, $fr);
+
+        $this->assertEquals($en, $this->localeSettings->getActualLanguage());
+        $this->assertEquals($fr, $this->localeSettings->getActualLanguage());
     }
 
     public function testGetCurrencySymbolByCurrency()

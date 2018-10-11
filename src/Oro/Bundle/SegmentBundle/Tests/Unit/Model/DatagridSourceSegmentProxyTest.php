@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Model;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -20,22 +24,23 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
             $this->expectException($expectedException);
         }
 
-        $segment            = $this->getSegment(false, $definition);
+        $segment = $this->getSegment(false, $definition);
         $expectedDefinition = json_encode($expectedDefinition);
 
-        $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()->getMock();
-        $entityMetadata->expects($this->any())->method('getIdentifier')
-            ->will($this->returnValue([self::TEST_IDENTIFIER_NAME]));
+        $entityMetadata = $this->createMock(ClassMetadata::class);
+        $entityMetadata->expects($this->any())
+            ->method('getIdentifier')
+            ->willReturn([self::TEST_IDENTIFIER_NAME]);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $em->expects($this->any())->method('getClassMetadata')->with(self::TEST_ENTITY)
-            ->will($this->returnValue($entityMetadata));
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(self::TEST_ENTITY)
+            ->willReturn($entityMetadata);
         $proxy = new DatagridSourceSegmentProxy($segment, $em);
 
         $this->assertEquals($expectedDefinition, $proxy->getDefinition());
-        $this->assertSame($proxy->getEntity(), $segment->getEntity());
+        $this->assertEquals($proxy->getEntity(), $segment->getEntity());
     }
 
     /**
@@ -94,8 +99,25 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
             'bad definition given, expected exception'                                    => [
                 null,
                 null,
-                'Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException'
+                InvalidConfigurationException::class
             ]
         ];
+    }
+
+    public function testProxyForNewSegment()
+    {
+        $definition = json_encode($this->getDefaultDefinition());
+        $segment = new Segment();
+        $segment->setEntity(self::TEST_ENTITY);
+        $segment->setDefinition($definition);
+
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->never())
+            ->method('getClassMetadata');
+
+        $proxy = new DatagridSourceSegmentProxy($segment, $em);
+
+        $this->assertEquals($definition, $proxy->getDefinition());
+        $this->assertEquals($proxy->getEntity(), $segment->getEntity());
     }
 }

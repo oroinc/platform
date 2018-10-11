@@ -35,6 +35,9 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridConfigProvider;
 
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $attributeConfigProvider;
+
     /** @var FieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $fieldsHelper;
 
@@ -69,6 +72,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->extendConfigProvider = $this->getConfigProviderMock();
         $this->datagridConfigProvider = $this->getConfigProviderMock();
         $this->viewConfigProvider = $this->getConfigProviderMock();
+        $this->attributeConfigProvider = $this->getConfigProviderMock();
 
         $this->configManager->expects($this->any())
             ->method('getProvider')
@@ -79,6 +83,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                         ['extend', $this->extendConfigProvider],
                         ['datagrid', $this->datagridConfigProvider],
                         ['view', $this->viewConfigProvider],
+                        ['attribute', $this->attributeConfigProvider],
                     ]
                 )
             );

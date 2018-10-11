@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\Query;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -10,13 +9,13 @@ use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * CountryRegions controller
  * @RouteResource("country/regions")
  * @NamePrefix("oro_api_country_")
- * TODO: Discuss ACL impl.
+ * BAP-17635 Discuss ACL impl.
  */
 class CountryRegionsController extends FOSRestController
 {

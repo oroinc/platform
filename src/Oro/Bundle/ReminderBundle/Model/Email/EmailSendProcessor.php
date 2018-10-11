@@ -10,6 +10,9 @@ use Oro\Bundle\ReminderBundle\Event\SendReminderEmailEvent;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Sends reminde notification emails.
+ */
 class EmailSendProcessor implements SendProcessorInterface
 {
     const NAME = 'email';
@@ -25,7 +28,7 @@ class EmailSendProcessor implements SendProcessorInterface
     protected $em;
 
     /**
-     * @var EmailNotification
+     * @var TemplateEmailNotification
      */
     protected $emailNotification;
 
@@ -41,12 +44,12 @@ class EmailSendProcessor implements SendProcessorInterface
 
     /**
      * @param EmailNotificationManager $emailNotificationManager
-     * @param EmailNotification          $emailNotification
-     * @param EventDispatcherInterface   $eventDispatcher
+     * @param TemplateEmailNotification $emailNotification
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
-        EmailNotification $emailNotification,
+        TemplateEmailNotification $emailNotification,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->emailNotificationManager = $emailNotificationManager;
@@ -88,12 +91,8 @@ class EmailSendProcessor implements SendProcessorInterface
         $this->emailNotification->setReminder($reminder);
 
         try {
-            $this->emailNotificationManager
-                ->process(
-                    $this->emailNotification->getEntity(),
-                    [$this->emailNotification],
-                    null
-                );
+            $this->emailNotificationManager->processSingle($this->emailNotification);
+
             $reminder->setState(Reminder::STATE_SENT);
         } catch (\Exception $exception) {
             $reminder->setState(Reminder::STATE_FAIL);

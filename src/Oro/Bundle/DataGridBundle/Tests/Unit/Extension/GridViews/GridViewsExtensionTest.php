@@ -164,7 +164,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->gridViewsExtension->setParameters(new ParameterBag());
         $this->gridViewsExtension->visitMetadata($config, $data);
         $this->assertTrue($data->offsetExists('state'));
-        $this->assertEquals(['filters' => [], 'gridView' => $expectedGridView], $data->offsetGet('state'));
+        $this->assertEquals(['gridView' => $expectedGridView], $data->offsetGet('state'));
     }
 
     /**

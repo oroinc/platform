@@ -4,9 +4,11 @@ namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActions;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
@@ -45,6 +47,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
+    /** @var RestRoutes */
+    private $routes;
+
     /** @var RestActionMapper */
     private $actionMapper;
 
@@ -59,6 +64,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /**
      * @param string               $routeGroup
+     * @param RestRoutes           $routes
      * @param RestActionMapper     $actionMapper
      * @param RestDocViewDetector  $docViewDetector
      * @param ResourcesProvider    $resourcesProvider
@@ -67,6 +73,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function __construct(
         string $routeGroup,
+        RestRoutes $routes,
         RestActionMapper $actionMapper,
         RestDocViewDetector $docViewDetector,
         ResourcesProvider $resourcesProvider,
@@ -74,6 +81,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         ValueNormalizer $valueNormalizer
     ) {
         $this->routeGroup = $routeGroup;
+        $this->routes = $routes;
         $this->actionMapper = $actionMapper;
         $this->docViewDetector = $docViewDetector;
         $this->resourcesProvider = $resourcesProvider;
@@ -121,7 +129,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $this->adjustRoutes($routeName, $route, $routes, $resources, $actions);
             }
         }
-        if ($this->actionMapper->getListRouteName() === $routeName) {
+        if ($this->routes->getListRouteName() === $routeName) {
             $resources = $this->getResourcesWithoutIdentifier();
             if (!empty($resources)) {
                 $actions = $this->actionMapper->getActionsForResourcesWithoutIdentifier();
@@ -207,10 +215,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     {
         $result = null;
         $routeNames = [
-            $this->actionMapper->getItemRouteName(),
-            $this->actionMapper->getListRouteName(),
-            $this->actionMapper->getSubresourceRouteName(),
-            $this->actionMapper->getRelationshipRouteName()
+            $this->routes->getItemRouteName(),
+            $this->routes->getListRouteName(),
+            $this->routes->getSubresourceRouteName(),
+            $this->routes->getRelationshipRouteName()
         ];
         foreach ($routeNames as $routeName) {
             $routePath = \str_replace(
@@ -337,12 +345,14 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         array $actions
     ) {
         $cache = new RouteCollection();
+        $isSubresource = $this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER);
         foreach ($resources as $entityType => $resource) {
             $entityClass = $resource->getEntityClass();
             foreach ($actions as $action) {
-                if ($this->hasAttribute($route, self::ASSOCIATION_PLACEHOLDER)) {
+                if ($isSubresource) {
                     $cache = $this->addSubresources(
                         $action,
+                        $actions,
                         $entityType,
                         $entityClass,
                         $routeName,
@@ -350,7 +360,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                         $routes,
                         $cache
                     );
-                } elseif (!\in_array($action, $resource->getExcludedActions(), true)) {
+                } elseif (!$this->isExcludedAction($action, $actions, $resource->getExcludedActions())) {
                     $cache = $this->addResource(
                         $action,
                         $entityType,
@@ -366,6 +376,40 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         if ($cache->count()) {
             $routes->insertCollection($cache, $routeName, true);
         }
+    }
+
+    /**
+     * @param string   $action
+     * @param string[] $otherActions
+     * @param string[] $excludedActions
+     *
+     * @return bool
+     */
+    private function isExcludedAction($action, $otherActions, $excludedActions)
+    {
+        if (ApiActions::OPTIONS === $action) {
+            return !$this->hasOtherActions($action, $otherActions, $excludedActions);
+        }
+
+        return \in_array($action, $excludedActions, true);
+    }
+
+    /**
+     * @param string   $action
+     * @param string[] $otherActions
+     * @param string[] $excludedActions
+     *
+     * @return bool
+     */
+    private function hasOtherActions($action, $otherActions, $excludedActions)
+    {
+        foreach ($otherActions as $otherAction) {
+            if ($otherAction !== $action && !\in_array($otherAction, $excludedActions, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -438,6 +482,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
     /**
      * @param string                  $action
+     * @param string[]                $otherActions
      * @param string                  $entityType
      * @param string                  $entityClass
      * @param string                  $routeName
@@ -449,6 +494,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     private function addSubresources(
         $action,
+        $otherActions,
         $entityType,
         $entityClass,
         $routeName,
@@ -463,7 +509,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 
         $entityRoutePath = \str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath());
         foreach ($subresources as $associationName => $subresource) {
-            if (\in_array($action, $subresource->getExcludedActions(), true)) {
+            if ($this->isExcludedAction($action, $otherActions, $subresource->getExcludedActions())) {
                 continue;
             }
 

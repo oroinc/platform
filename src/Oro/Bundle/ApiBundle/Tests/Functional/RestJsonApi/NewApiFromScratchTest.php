@@ -38,11 +38,11 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [])
+    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
         $server['HTTP_X-Test-Request-Type'] = 'test_new';
 
-        return parent::request($method, $uri, $parameters, $server);
+        return parent::request($method, $uri, $parameters, $server, $content);
     }
 
     public function testCustomEntitiesShouldBeRegisteredByDefault()

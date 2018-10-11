@@ -6,6 +6,9 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 
+/**
+ * The event trigger cache.
+ */
 class EventTriggerCache
 {
     const DATA = 'data';
@@ -102,7 +105,7 @@ class EventTriggerCache
      */
     protected function isBuilt()
     {
-        return $this->provider->contains(self::BUILT) && $this->provider->fetch(self::BUILT);
+        return true === $this->provider->fetch(self::BUILT);
     }
 
     /**

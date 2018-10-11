@@ -9,6 +9,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
+/**
+ * This Processor provide functionality to updates database and all related caches
+ * according to changes of extended entities
+ */
 class EntityProcessor
 {
     /** @var MaintenanceMode */
@@ -51,11 +55,9 @@ class EntityProcessor
      *                                after database schema is changed
      * @param bool $updateRouting     Whether routes should be updated after database schema is changed
      *
-     * @param bool $attributesOnly Run command for update schema for fields which are attributes
-     *
      * @return bool
      */
-    public function updateDatabase($warmUpConfigCache = false, $updateRouting = false, $attributesOnly = false)
+    public function updateDatabase($warmUpConfigCache = false, $updateRouting = false)
     {
         set_time_limit(0);
 
@@ -66,7 +68,7 @@ class EntityProcessor
         }
 
         $this->maintenance->activate();
-        $commands = $this->getCommandsToExecute($warmUpConfigCache, $updateRouting, $attributesOnly);
+        $commands = $this->getCommandsToExecute($warmUpConfigCache, $updateRouting);
         $result = $this->executeCommands($commands);
         if ($result) {
             try {
@@ -90,21 +92,15 @@ class EntityProcessor
     /**
      * @param bool $warmUpConfigCache
      * @param bool $updateRouting
-     * @param bool $attributesOnly
      * @return array
      */
-    private function getCommandsToExecute($warmUpConfigCache = false, $updateRouting = false, $attributesOnly = false)
+    private function getCommandsToExecute($warmUpConfigCache = false, $updateRouting = false)
     {
         $commands = [
             'oro:entity-extend:update-config' => ['--update-custom' => true],
             'oro:entity-extend:cache:warmup' => [],
             'oro:entity-extend:update-schema' => []
         ];
-
-        if ($attributesOnly) {
-            $commands['oro:entity-extend:update-config']['--attributes-only'] = true;
-            $commands['oro:entity-extend:update-schema']['--attributes-only'] = true;
-        }
 
         if ($warmUpConfigCache) {
             $commands = array_merge(

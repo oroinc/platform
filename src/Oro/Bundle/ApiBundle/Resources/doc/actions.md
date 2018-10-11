@@ -16,6 +16,7 @@
    - [**update_relationship** Action](#update_relationship-action)
    - [**add_relationship** Action](#add_relationship-action)
    - [**delete_relationship** Action](#delete_relationship-action)
+   - [**options** Action](#options-action)
  - Auxiliary actions
    - [**customize_loaded_data** Action](#customize_loaded_data-action)
    - [**customize_form_data** Action](#customize_form_data-action)
@@ -59,6 +60,7 @@ The following table shows all actions provided out of the box:
 | [update_relationship](#update_relationship-action) | Updates "to-one" relationship and completely replaces all members of "to-many" relationship. |
 | [add_relationship](#add_relationship-action) | Adds one or several entities to a relationship. This action is applicable only for "to-many" relationships. |
 | [delete_relationship](#delete_relationship-action) | Deletes one or several entities from a relationship. This action is applicable only for "to-many" relationships. |
+| [options](#options-action) | Returns the communication options for a resource. |
 | [customize_loaded_data](#customize_loaded_data-action) | Modifies the data loaded by [get](#get-action), [get_list](#get_list-action), and [get_subresource](#get_subresource-action) actions. |
 | [customize_form_data](#customize_form_data-action) | Modifies the submitted data for [create](#create-action) and [update](#update-action) actions. |
 | [get_config](#get_config-action) | Returns an entity configuration. |
@@ -93,7 +95,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility of Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | To add a new processor to this group, include it to the **security_check** group of actions that execute this action. For example, compare with the **security_check** group of the [create](#create-action) or [update](#update-action) actions. |
@@ -130,7 +132,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -167,7 +169,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -209,7 +211,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -246,7 +248,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the created entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
@@ -284,7 +286,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | When you add a new processor to the **security_check** group of the [get](#get-action) action, add it to this group as well. This is necessary because the **VIEW** permission is checked here: the updated entity should be returned in response, and the **security_check** group of the [get](#get-action) action is disabled by the **oro_api.update.load_normalized_entity** processor. |
@@ -322,7 +324,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -364,7 +366,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -418,7 +420,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for to use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -472,7 +474,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -521,7 +523,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -558,7 +560,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -595,7 +597,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing the input data for to use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -632,7 +634,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
-| initialize | The context initialization. | Also the processors from this group are executed during the generation of the data API documentation. |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
 | resource_check | Checking whether the requested resource type is accessible via API. | |
 | normalize_input | Preparing input data for use by processors from the next groups. | |
 | security_check | Checking whether access to the requested resource type is granted. | |
@@ -648,6 +650,30 @@ The following diagram shows the main data flow for this action:
 ![Data flow diagram](./actions/delete_relationship.png "The data flow diagram")
 
 For examples of usage, see the `handleDeleteRelationship` method of [RequestActionHandler](../../Request/RequestActionHandler.php).
+
+## options Action
+
+This action is intended to retrieve the communication options for a resource. For more details, see the [OPTIONS](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2) section of the HTTP specification.
+
+This action is also intended [CORS preflight requests](https://www.w3.org/TR/cors/#resource-preflight-requests) for REST API. For more details, see the [CORS Configuration](./cors.md) section.
+
+The HTTP method for REST API: `OPTIONS`.
+
+The context class: [OptionsContext](../../Processor/Options/OptionsContext.php).
+
+The main processor class: [OptionsProcessor](../../Processor/OptionsProcessor.php).
+
+Existing worker processors: [processors.options.yml](../../Resources/config/processors.options.yml), [processors.shared.yml](../../Resources/config/processors.shared.yml). Run `php bin/console oro:api:debug options` to list the processors.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility of Processors | Description |
+| --- | --- | --- |
+| initialize | The context initialization. | Also, the processors from this group are executed during the generation of the API documentation. |
+| resource_check | Checking whether the requested resource type is accessible via API and validating the request parameters. | |
+| normalize_result | Building the action result. | The processors from this group are executed even if an exception has been thrown by a processor of one of the previous groups. For implementation details, see [NormalizeResultActionProcessor](../../Processor/NormalizeResultActionProcessor.php). |
+
+For examples of usage, see `handleOptionsItem`, `handleOptionsList`, `handleOptionsSubresource` and `handleOptionsRelationship` methods of [RequestActionHandler](../../Request/RequestActionHandler.php).
 
 ## customize_loaded_data Action
 
@@ -847,6 +873,8 @@ General methods:
 - **getFilters()** - Retrieves a [list of filters](../../Filter/FilterCollection.php) to set additional restrictions to a query used to retrieve the entity data.
 - **getFilterValues()** - Retrieves a collection of the [FilterValue](../../Filter/FilterValue.php) objects that contains all incoming filters.
 - **setFilterValues(accessor)** - Sets an [object](../../Filter/FilterValueAccessorInterface.php) to use for accessing the incoming filters.
+- **isCorsRequest()** - Indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
+- **setCorsRequest($cors)** - Sets a flag indicates whether the current request is [CORS](https://www.w3.org/TR/cors/) request.
 - **hasQuery()** - Checks whether a query used to get the result data exists.
 - **getQuery()** - Retrieves a query used to get result data.
 - **setQuery(query)** - Sets a query used to get result data.

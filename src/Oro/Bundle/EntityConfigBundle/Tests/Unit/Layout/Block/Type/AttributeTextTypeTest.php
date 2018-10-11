@@ -13,7 +13,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AttributeTextTypeTest extends BlockTypeTestCase
 {
-    /** @var AttributeConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
+    /** @var AttributeConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject $attributeManager */
     private $attributeConfigurationProvider;
 
     /**

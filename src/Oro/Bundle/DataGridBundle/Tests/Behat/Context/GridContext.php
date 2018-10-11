@@ -377,6 +377,26 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )check records in grid:$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)":$/
+     * @When /^(?:|I )check records in "(?P<gridName>[\w\s]+)" grid:$/
+     *
+     * @param TableNode $table
+     * @param string $gridName
+     */
+    public function iCheckRecordsInGrid(TableNode $table, ?string $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        if (!count($grid->getRows())) {
+            self::fail('Grid has no records to check');
+        }
+        foreach ($table->getRows() as $row) {
+            $first = reset($row);
+            $grid->checkRecord($first);
+        }
+    }
+
+    /**
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)" grid$/
      * @Then /^(?:|I )uncheck (?P<content>\S+) record in "(?P<gridName>[\w\s]+)"$/
@@ -741,7 +761,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^I should see that "(?P<content>([\w\s]+))" is in (?P<rowNum>([\d]+)) row$/
+     * @Then /^I should see that "(?P<content>([^"]+))" is in (?P<rowNum>([\d]+)) row$/
      */
     public function assertRowContentInTable($content, $rowNum)
     {
@@ -802,6 +822,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)"$/
      * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>[\w\s\,\.\_\%]+)" in "(?P<filterGridName>[\w\s]+)" grid$/
      *
@@ -975,8 +996,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:]+)" filter$/
-     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)]+)" filter$/
+     * @When /^(?:|I )reset "(?P<filterName>[\w\s\:\(\)]+)" filter on grid "(?P<filterGridName>[\w\s]+)"$/
      *
      * @param string $filterName
      * @param string $filterGridName
@@ -1053,8 +1074,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Asserts that no record with provided content in grid
      * Example: And there is no "Glorious workflow" in grid
      *
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in grid$/
-     * @Then /^there is no "(?P<record>[\w\s\%]+)" in "(?P<gridName>[\w\s]+)"/
+     * @Then /^there is no "(?P<record>(?:[^"]|\\")*)" in grid$/
+     * @Then /^there is no "(?P<record>(?:[^"]|\\")*)" in "(?P<gridName>[\w\s]+)"/
      * @param string $record
      */
     public function thereIsNoInGrid($record, $gridName = null)

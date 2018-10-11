@@ -5,12 +5,12 @@ Feature: Workflow variables
   Scenario: Set up workflow variable configuration
     Given I login as administrator
     When go to System/ Localization/ Translations
-    And press "Update Cache"
+    And click "Update Cache"
     Then I should see "Translation Cache has been updated" flash message
 
     When I go to System/ User Management/ Users
     And I click "View" on row "User1 First Name User1 Last Name" in grid
-    And I press "first transition"
+    And I click "first transition"
     Then I should see "UiDialog" with elements:
       | Content | start message -  - end message |
     And click "Cancel"
@@ -44,7 +44,7 @@ Feature: Workflow variables
   Scenario: Check that value of entity variable correct displayed
     When I go to System/ User Management/ Users
     And I click "View" on row "User1 First Name User1 Last Name" in grid
-    And I press "first transition"
+    And I click "first transition"
     Then I should see "UiDialog" with elements:
       | Content | start message - User2 First Name User2 Last Name - end message |
     And click "Cancel"

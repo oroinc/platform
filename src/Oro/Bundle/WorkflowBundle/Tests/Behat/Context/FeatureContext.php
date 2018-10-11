@@ -111,4 +111,24 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
             }
         }
     }
+
+    /**
+     * @Given /^complete workflow fixture loading$/
+     */
+    public function completeWorkflowFixtureLoading()
+    {
+        $container = $this->getContainer();
+
+        $cache = $container->get('oro_workflow.cache.entity_aware');
+        $cache->invalidateActiveRelated();
+
+        $provider = $container->get('oro_translation.provider.translation_domain');
+        $provider->clearCache();
+
+        $translator = $container->get('translator.default');
+        $translator->rebuildCache();
+
+        $dumper = $container->get('oro_translation.js_dumper');
+        $dumper->dumpTranslations();
+    }
 }

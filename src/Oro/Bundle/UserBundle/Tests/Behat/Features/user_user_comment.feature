@@ -21,11 +21,11 @@ Feature: User user comment
   Scenario: Add comment
     Given I go to System/User Management/Users
     And click view Charlie in grid
-    And press "Add Comment"
+    And click "Add Comment"
     When I fill "Comment Form" with:
       | Message    | Amazing cat |
       | Attachment | cat0.jpg    |
-    And press "Add"
+    And click "Add"
     Then I should see "Amazing cat"
     When I click on "cat0.jpg" attachment thumbnail
     Then I should see large image

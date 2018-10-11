@@ -33,7 +33,7 @@
                 <td nowrap="true" class="fallback-item-use-fallback">
                     {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
                 </td>
-                <td class="fallback-item-fallback">
+                <td class="fallback-item-fallback {% if form.vars.exclude_parent_localization %}hide{% endif %}">
                     {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
                 </td>
             {% endif %}
