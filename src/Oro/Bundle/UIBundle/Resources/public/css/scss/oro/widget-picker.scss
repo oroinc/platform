@@ -79,7 +79,7 @@
 
             .widget-picker__actions-column {
                 &:after {
-                    @include loader($widget-picker-loading-size);
+                    @include loader($widget-picker-loading-size, $widget-picker-loading-border-size);
 
                     content: '';
                     margin: 0 auto;
