@@ -209,4 +209,24 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(2, $integerFields->count());
         $this->assertEquals(5, $integerFields->get(3)->getValue());
     }
+
+    public function testSetWeight()
+    {
+        $this->assertAttributeEquals(1, 'weight', $this->item);
+
+        $weight = 4.2;
+        $this->item->setWeight($weight);
+
+        $this->assertAttributeEquals($weight, 'weight', $this->item);
+    }
+
+    public function testGetWeight()
+    {
+        $this->assertEquals(1, $this->item->getWeight());
+
+        $weight = 4.2;
+        $this->item->setWeight($weight);
+
+        $this->assertEquals($weight, $this->item->getWeight());
+    }
 }

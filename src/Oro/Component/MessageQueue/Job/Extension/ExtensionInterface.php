@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Component\MessageQueue\Job;
+namespace Oro\Component\MessageQueue\Job\Extension;
+
+use Oro\Component\MessageQueue\Job\Job;
 
 /**
  * An interface for classes that can do some additional work before and after job processing.
@@ -51,4 +53,18 @@ interface ExtensionInterface
      * @param mixed $jobResult
      */
     public function onPostRunDelayed(Job $job, $jobResult);
+
+    /**
+     * Executed if root job was interrupted.
+     *
+     * @param Job $job
+     */
+    public function onCancel(Job $job);
+
+    /**
+     * Executed if job was crashed during callback processing.
+     *
+     * @param Job $job
+     */
+    public function onError(Job $job);
 }

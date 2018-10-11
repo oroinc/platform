@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Security;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Component\MessageQueue\Job\AbstractExtension;
+use Oro\Component\MessageQueue\Job\Extension\AbstractExtension;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
