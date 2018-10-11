@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var routing = require('routing');
-    var __ = require('orotranslation/js/translator');
 
     return {
         create: function(templateId, relatedEntityId) {
