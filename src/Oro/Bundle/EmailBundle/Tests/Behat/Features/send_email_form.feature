@@ -49,3 +49,16 @@ Feature: Send email form
     Then I should see following grid:
       | CONTACT       | SUBJECT                                  |
       | Charlie Sheen | Test Template Subject Test Template Body |
+
+  Scenario: Check if email template can be used
+    Given I click My Emails in user menu
+    And I follow "Compose"
+    When fill "Email Form" with:
+      | Body           | This is test mail with template error |
+      | To             | Charlie Sheen                         |
+      | Subject        | Behat test                            |
+    And I select "export_result" from "Apply template"
+    And I click "Yes, Proceed"
+    Then I should see "This email template can't be used"
+    And click "Send"
+    And I should see "The email was sent" flash message

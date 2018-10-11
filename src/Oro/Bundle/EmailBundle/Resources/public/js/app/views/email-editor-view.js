@@ -122,9 +122,21 @@ define(function(require) {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
                     .always(_.bind(mediator.execute, mediator, 'hideLoading'))
+                    .fail(_.bind(this.showTemplateErrorMessage, this))
                     .done(_.bind(this.fillForm, this));
             }, this));
             confirm.open();
+        },
+
+        showTemplateErrorMessage: function() {
+            var container = this.$('[name$="[template]"]').parent();
+
+            mediator.execute(
+                'showMessage',
+                'error',
+                __('oro.email.emailtemplate.load_failed'),
+                {container: container}
+            );
         },
 
         fillForm: function(emailData) {
