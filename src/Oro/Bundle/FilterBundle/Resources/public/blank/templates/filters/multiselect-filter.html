@@ -20,7 +20,7 @@
                         selected="selected"
                     <% } %>
                 >
-                    <%- option.label %>
+                    <%- option.label %> <% if (option.count !== undefined) { %>(<%- option.count %>)<% } %>
                 </option>
             <% }); %>
         </select>

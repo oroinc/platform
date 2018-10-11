@@ -7,6 +7,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class BooleanAttributeType implements AttributeTypeInterface
 {
+    public const TRUE_VALUE = 1;
+    public const FALSE_VALUE = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +31,7 @@ class BooleanAttributeType implements AttributeTypeInterface
      */
     public function isFilterable(FieldConfigModel $attribute = null)
     {
-        return false;
+        return true;
     }
 
     /**
@@ -52,7 +55,7 @@ class BooleanAttributeType implements AttributeTypeInterface
      */
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        throw new \RuntimeException('Not supported');
+        return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }
 
     /**
@@ -60,6 +63,6 @@ class BooleanAttributeType implements AttributeTypeInterface
      */
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
-        return $originalValue ? 1 : 0;
+        return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }
 }

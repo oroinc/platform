@@ -77,4 +77,32 @@ class ChainExtension implements ExtensionInterface
             $extension->onPostRunDelayed($job, $jobResult);
         }
     }
+
+    /**
+     * Executed if root job was interrupted.
+     *
+     * @param Job $job
+     */
+    public function onCancel(Job $job)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension instanceof AbstractExtension) {
+                $extension->onCancel($job);
+            }
+        }
+    }
+
+    /**
+     * Executed if job was crashed during callback processing.
+     *
+     * @param Job $job
+     */
+    public function onError(Job $job)
+    {
+        foreach ($this->extensions as $extension) {
+            if ($extension instanceof AbstractExtension) {
+                $extension->onError($job);
+            }
+        }
+    }
 }
