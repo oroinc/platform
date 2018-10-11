@@ -1,5 +1,4 @@
 request:
-    supported_engines: [orm]
     search: "+- item1 &^& item2"
     offset: ~
     max_results: ~
