@@ -2,7 +2,6 @@
 
 namespace Oro\Component\MessageQueue\Job\Extension;
 
-use Oro\Component\MessageQueue\Job\AbstractExtension;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 
@@ -50,6 +49,14 @@ class JobExtension extends AbstractExtension
      * {@inheritdoc}
      */
     public function onPostRunDelayed(Job $job, $jobResult)
+    {
+        $this->consumerState->setJob();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onCancel(Job $job)
     {
         $this->consumerState->setJob();
     }
