@@ -6,10 +6,10 @@ use Gaufrette\Adapter\MetadataSupporter;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
+use Oro\Bundle\AttachmentBundle\Manager\File\TemporaryFile;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFileSystem;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -89,7 +89,7 @@ class FileManager extends GaufretteFileManager
         $filesystem->copy($path, $tmpFile, true);
 
         $entity = new File();
-        $entity->setFile(new ComponentFile($tmpFile));
+        $entity->setFile(new TemporaryFile($tmpFile));
         $entity->setOriginalFilename($fileName);
 
         return $entity;
