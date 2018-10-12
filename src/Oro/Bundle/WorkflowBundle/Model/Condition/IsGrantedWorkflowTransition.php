@@ -3,7 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
@@ -167,7 +169,10 @@ class IsGrantedWorkflowTransition extends AbstractCondition implements ContextAc
             $workflow = $this->workflowManager->getWorkflow($context);
             $transition = $workflow->getTransitionManager()->getTransition($this->transitionName);
             if ($transition && $transition->isStart()) {
-                $entity = 'workflow:' . $context->getWorkflowName();
+                $entity = ObjectIdentityHelper::encodeIdentityString(
+                    WorkflowAclExtension::NAME,
+                    $context->getWorkflowName()
+                );
             }
         }
         return new DomainObjectWrapper(

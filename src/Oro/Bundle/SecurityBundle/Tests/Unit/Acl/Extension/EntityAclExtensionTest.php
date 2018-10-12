@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
@@ -1136,35 +1135,31 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
      * @param string $type
      * @param string $class
      * @param bool $isEntity
-     * @param bool $isProtectedEntity
-     * @param string $entityGroup
-     * @param string $group
      * @param bool $expected
      */
-    public function testSupports($id, $type, $class, $isEntity, $isProtectedEntity, $entityGroup, $group, $expected)
+    public function testSupports($id, $type, $class, $isEntity, $isProtectedEntity, $expected)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver $entityClassResolverMock */
-        $entityClassResolverMock = $this->createMock(EntityClassResolver::class);
+        $entityClassResolverMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
         $entityClassResolverMock->expects($isEntity ? $this->once() : $this->never())
             ->method('getEntityClass')
             ->with($class)
             ->willReturn($class);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
-        $entityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
-        $metadata = $this->createMock(EntitySecurityMetadata::class);
-        $metadata->expects($this->exactly((int)!empty($entityGroup)))
-            ->method('getGroup')
-            ->willReturn($group);
-        $entityMetadataProvider->expects($this->exactly((int)!empty($entityGroup)))
-            ->method('getMetadata')
-            ->willReturn($metadata);
+        $entityMetadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $entityMetadataProvider->expects($this->once())
             ->method('isProtectedEntity')
             ->with($class)
             ->willReturn($isProtectedEntity);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FieldAclExtension $fieldAclExtension */
-        $fieldAclExtension = $this->createMock(FieldAclExtension::class);
+        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($this->doctrineHelper),
@@ -1187,64 +1182,44 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function supportsDataProvider()
     {
         return [
-            'not protected entity' => [
+            [
                 'id' => 'action',
                 'type' => '\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => false,
                 'isProtectedEntity' => false,
-                'entityGroup' => '',
-                'group' => null,
                 'expected' => false
             ],
-            'supported entity' => [
+            [
                 'id' => 'entity',
                 'type' => '\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
                 'isProtectedEntity' => true,
-                'entityGroup' => '',
-                'group' => null,
                 'expected' => true
             ],
-            'supported entity with empty group' => [
+            [
                 'id' => 'entity',
                 'type' => '@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
                 'isProtectedEntity' => true,
-                'entityGroup' => '',
-                'group' => null,
                 'expected' => true
             ],
-            'supported entity with unsupported group' => [
+            [
                 'id' => 'entity',
                 'type' => 'group@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
                 'isProtectedEntity' => true,
-                'entityGroup' => 'group',
-                'group' => null,
-                'expected' => false
-            ],
-            'supported entity with supported group' => [
-                'id' => 'entity',
-                'type' => 'group@\stdClass',
-                'class' => '\stdClass',
-                'isEntity' => true,
-                'isProtectedEntity' => true,
-                'entityGroup' => 'group',
-                'group' => 'group',
                 'expected' => true
             ],
-            'supported not protected entity' => [
+            [
                 'id' => 'entity',
                 'type' => '@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
                 'isProtectedEntity' => false,
-                'entityGroup' => '',
-                'group' => null,
                 'expected' => false
             ],
         ];

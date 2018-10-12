@@ -355,6 +355,8 @@ services:
             - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
             - '@event_dispatcher'
+        calls:
+            - ['setAclGroupProvider', ['@oro_security.acl.group_provider.chain']]
 
     oro_security.entity_security_metadata_provider.cache:
         public: false
