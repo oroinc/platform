@@ -8,11 +8,15 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * ACL metadata provider for entities.
+ */
 class EntitySecurityMetadataProvider
 {
     const ACL_SECURITY_TYPE = 'ACL';
@@ -49,6 +53,9 @@ class EntitySecurityMetadataProvider
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var AclGroupProviderInterface */
+    private $aclGroupProvider;
+
     /**
      * @param ConfigProvider      $securityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
@@ -77,6 +84,14 @@ class EntitySecurityMetadataProvider
     }
 
     /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
+    }
+
+    /**
      * Checks whether an entity is protected using the given security type.
      *
      * @param string $className    The entity class name
@@ -88,7 +103,19 @@ class EntitySecurityMetadataProvider
     {
         $this->ensureMetadataLoaded($securityType);
 
-        return isset($this->localCache[$securityType][$className]);
+        if (isset($this->localCache[$securityType][$className])) {
+            // For entities under protection check that current group is configured for entity
+            $group = $this->aclGroupProvider->getGroup();
+            if ($group) {
+                $metadata = $this->getMetadata($className, $securityType);
+
+                return $metadata->getGroup() === $group;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
