@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Component\MessageQueue\Job;
+namespace Oro\Component\MessageQueue\Job\Extension;
+
+use Oro\Component\MessageQueue\Job\Job;
 
 /**
  * Abstract MQ job extension
@@ -46,6 +48,20 @@ abstract class AbstractExtension implements ExtensionInterface
      * {@inheritdoc}
      */
     public function onPostRunDelayed(Job $job, $jobResult)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onCancel(Job $job)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function onError(Job $job)
     {
     }
 }

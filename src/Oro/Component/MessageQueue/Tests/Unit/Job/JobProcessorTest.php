@@ -2,14 +2,10 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Component\MessageQueue\Job\Topics;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 
 /**
@@ -21,31 +17,17 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
     private $jobStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProducer */
-    private $messageProducer;
-
     /** @var JobProcessor */
     private $jobProcessor;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->jobStorage = $this->createMock(JobStorage::class);
-        $this->messageProducer = $this->createMock(MessageProducer::class);
 
-        $this->jobProcessor = new JobProcessor($this->jobStorage, $this->messageProducer);
-    }
-
-    /**
-     * @param array $message
-     */
-    private function assertCalculateRootJobStatusMessageSent(array $message)
-    {
-        $this->messageProducer->expects(self::once())
-            ->method('send')
-            ->with(
-                Topics::CALCULATE_ROOT_JOB_STATUS,
-                new Message($message, MessagePriority::HIGH)
-            );
+        $this->jobProcessor = new JobProcessor($this->jobStorage);
     }
 
     public function testCreateRootJobShouldThrowIfOwnerIdIsEmpty()
@@ -261,8 +243,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $result = $this->jobProcessor->findOrCreateChildJob('job-name', $job);
 
         self::assertSame($job, $result);
@@ -319,6 +299,8 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $jobStatus
      * @dataProvider getStatusThatCanRun
+     *
+     * @param string $jobStatus
      */
     public function testStartJobShouldUpdateJobWithRunningStatusAndStartAtTime($jobStatus)
     {
@@ -334,8 +316,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345]);
 
         $this->jobProcessor->startChildJob($job);
 
@@ -389,8 +369,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $this->jobProcessor->successChildJob($job);
 
         self::assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
@@ -442,8 +420,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
 
         $this->jobProcessor->failChildJob($job);
 
@@ -499,8 +475,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345, 'calculateProgress' => true]);
-
         $this->jobProcessor->cancelChildJob($job);
 
         self::assertEquals(Job::STATUS_CANCELLED, $job->getStatus());
@@ -543,8 +517,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('findJobById')
             ->with(1234)
             ->willReturn($childJob);
-
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 1234, 'calculateProgress' => true]);
 
         $this->jobProcessor->interruptRootJob($rootJob, true);
 
@@ -648,8 +620,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(12345)
             ->willReturn($job);
 
-        $this->assertCalculateRootJobStatusMessageSent(['jobId' => 12345]);
-
         $this->jobProcessor->failAndRedeliveryChildJob($job);
 
         self::assertEquals(Job::STATUS_FAILED_REDELIVERED, $job->getStatus());
@@ -666,9 +636,6 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('findJobById')
             ->with(12345)
             ->willReturn($job);
-
-        $this->messageProducer->expects(self::never())
-            ->method('send');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
