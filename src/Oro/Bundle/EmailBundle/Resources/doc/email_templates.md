@@ -78,7 +78,7 @@ After these steps, the Twig function "order_line_items" became available for usa
 
 Please note, that in Emails Templates could be iterated only data sets that contained in plain PHP arrays, not objects or collections. Thereby the custom twig function has to return an array if you need to iterate through this dataset in your Email Templates.
 
-Extend available data in email templates
+Basic email template structure
 ----------------------------------------
 
 The most important point when creating a template is its structure.
