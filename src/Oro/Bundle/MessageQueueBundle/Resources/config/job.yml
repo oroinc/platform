@@ -117,3 +117,11 @@ services:
             - '@oro_message_queue.job.storage'
         tags:
             - { name: oro_message_queue.job.extension }
+
+    oro_message_queue.job.root_job_status_extension:
+        class: 'Oro\Component\MessageQueue\Job\Extension\RootJobStatusExtension'
+        public: false
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: oro_message_queue.job.extension }
