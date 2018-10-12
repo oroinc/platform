@@ -123,7 +123,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider getTestToRecipientDataProvider
      */
-    public function testToRecipient($recipient, $expectedName, $expectedEmail)
+    public function testToRecipient(string $recipient, string $expectedName, string $expectedEmail)
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects(self::once())
@@ -159,10 +159,10 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
                 'expectedName' => '"Test" <test@example.com>',
                 'expectedEmail' => 'test@example.com'
             ],
-            'undisclosed recipients' => [
-                'recipient' => '<undisclosed-recipients:;>',
-                'expectedName' => '<undisclosed-recipients:;>',
-                'expectedEmail' => '<undisclosed-recipients:;>'
+            'email adress' => [
+                'recipient' => 'test@example.com',
+                'expectedName' => 'test@example.com',
+                'expectedEmail' => 'test@example.com'
             ]
         ];
     }
@@ -340,11 +340,6 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
                 'expectedExceptionMessage' => ''
             ],
             [
-                'email' => '<undisclosed-recipients:;>',
-                'expectedException' => null,
-                'expectedExceptionMessage' => ''
-            ],
-            [
                 'email' => '',
                 'expectedException' => EmailAddressParseException::class,
                 'expectedExceptionMessage' => 'Not valid email address'
@@ -358,7 +353,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider getTestValidateRecipientEmailAddressDataProvider
      */
-    public function testValidateRecipientEmailAddress($email, $expectedContextMessage)
+    public function testValidateRecipientEmailAddress(string $email, string $expectedContextMessage)
     {
         $this->mockMetadata();
 
