@@ -225,10 +225,7 @@ class EmailEntityBuilder implements LoggerAwareInterface
     private function validateEmailAddress($email)
     {
         $atPos = strrpos($email, '@');
-        $groupAddressesAtPos = strrpos($email, 'undisclosed-recipients');
-        if ($atPos === false
-            && $groupAddressesAtPos === false
-        ) {
+        if ($atPos === false) {
             throw new EmailAddressParseException(sprintf('Not valid email address: %s', $email));
         }
 
@@ -587,6 +584,10 @@ class EmailEntityBuilder implements LoggerAwareInterface
         try {
             $object->addRecipient($this->recipient($type, $email));
         } catch (EmailAddressParseException $e) {
+            /**
+             * An invalid email address should be ignored as well as mailing groups,
+             * such as "<undisclosed-recipients:;>" or "<nobody:;>"
+             */
             if (null !== $this->logger) {
                 $this->logger->warning(
                     'An invalid recipient address has been ignored',
