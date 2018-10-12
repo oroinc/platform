@@ -114,6 +114,7 @@ class SegmentManagerTest extends WebTestCase
     {
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
+        $dynamicSegment->setRecordsLimit(10);
         $this->assertCount(50, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
     }
 
