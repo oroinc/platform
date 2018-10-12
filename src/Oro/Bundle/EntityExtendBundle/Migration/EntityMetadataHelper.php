@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * Provides a way to get metadata information from the Doctrine by entity class or table name.
+ */
 class EntityMetadataHelper
 {
     /**
@@ -29,27 +32,6 @@ class EntityMetadataHelper
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
-    }
-
-    /**
-     * @deprecated Use getEntityClassesByTableNames instead
-     *
-     * Gets an entity full class name by entity table name
-     *
-     * @param string $tableName
-     * @return string|null
-     */
-    public function getEntityClassByTableName($tableName)
-    {
-        $classes = $this->getEntityClassesByTableName($tableName);
-        if (count($classes) > 1) {
-            throw new \RuntimeException(sprintf(
-                'Table "%s" has more than 1 class. Use "getEntityClassesByTableNames" method instead.',
-                $tableName
-            ));
-        }
-
-        return reset($classes) ?: null;
     }
 
     /**
