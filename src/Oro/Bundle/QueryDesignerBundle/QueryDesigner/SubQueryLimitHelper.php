@@ -22,9 +22,6 @@ class SubQueryLimitHelper
      */
     public function setLimit(QueryBuilder $queryBuilder, $limit, $fieldName)
     {
-        // TODO: Fix BAP-17718
-        return $queryBuilder;
-
         $uniqueIdentifier = QueryBuilderUtil::generateParameterName(SqlWalker::WALKER_HOOK_LIMIT_KEY);
 
         $walkerHook = "'$uniqueIdentifier' = '$uniqueIdentifier'";

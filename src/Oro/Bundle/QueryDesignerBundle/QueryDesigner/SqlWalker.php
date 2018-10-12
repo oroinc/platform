@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\SqlWalker as GrandparentSqlWalker;
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
 use Oro\Component\DoctrineUtils\ORM\HookUnionTrait;
 
 /**
@@ -35,5 +36,17 @@ class SqlWalker extends TranslationWalker
         }
 
         return $this->hookUnion($sql);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExecutor($AST)
+    {
+        if (!$AST instanceof SelectStatement) {
+            return parent::getExecutor($AST);
+        }
+
+        return GrandparentSqlWalker::getExecutor($AST);
     }
 }
