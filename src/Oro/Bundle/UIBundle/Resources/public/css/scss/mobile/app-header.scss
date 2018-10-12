@@ -120,13 +120,13 @@
             float: #{$start};
             line-height: $app-header-height;
             height: $app-header-height;
-            max-width: $app-header-max-width;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
 
             .organization-name {
                 color: inherit;
+                display: inline-block;
+                vertical-align: middle;
+                @include text-line-truncate($app-header-max-width, true);
             }
         }
 

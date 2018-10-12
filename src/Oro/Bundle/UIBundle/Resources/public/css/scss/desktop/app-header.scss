@@ -47,6 +47,11 @@
         }
     }
 
+    .organization-logo-wrapper {
+        flex-shrink: 1;
+        overflow: hidden;
+    }
+
     .app-logo {
         width: $app-header-app-logo-width;
         margin-#{$end}: $app-header-app-logo-margin-end;
@@ -56,11 +61,9 @@
         display: flex;
         margin-#{$start}: 0;
         margin-#{$end}: $app-header-logo-wrapper-margin-end;
-    }
-
-    .organization-logo-wrapper {
-        white-space: nowrap;
-        max-width: 50%;
+        flex-wrap: nowrap;
+        position: static;   //  necessary for showing menu outside of overflow hidden block
+        height: 100%;
     }
 
     .logo {
@@ -68,7 +71,6 @@
         font-weight: bold;
         font-size: $app-header-logo-font-size;
         line-height: inherit;
-        text-overflow: ellipsis;
         margin: 0;
         display: inline-block;
         overflow: hidden;
@@ -76,6 +78,8 @@
         a {
             color: inherit;
             text-transform: uppercase;
+            display: inline-block;
+            @include text-line-truncate($app-header-max-width, true);
 
             [class^="fa-"] {
                 font-size: $app-header-logo-link-font-size;
