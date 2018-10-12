@@ -48,4 +48,22 @@ abstract class AbstractExtension implements ExtensionInterface
     public function onPostRunDelayed(Job $job, $jobResult)
     {
     }
+
+    /**
+     * Executed if root job was interrupted.
+     *
+     * @param Job $job
+     */
+    public function onCancel(Job $job)
+    {
+    }
+
+    /**
+     * Executed if job was crashed during callback processing.
+     *
+     * @param Job $job
+     */
+    public function onError(Job $job)
+    {
+    }
 }

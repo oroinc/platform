@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper;
+use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 
 class DatagridParametersHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -110,6 +111,79 @@ class DatagridParametersHelperTest extends \PHPUnit_Framework_TestCase
                 'parameterName' => 'sampleParameterName',
                 'expectedParameterValue' => 'sampleParameterValue',
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider filterParametersDataProvider
+     *
+     * @param string $filterName
+     * @param array $originalParameters
+     * @param array $expectedParameters
+     */
+    public function testResetFilter(string $filterName, array $originalParameters, array $expectedParameters): void
+    {
+        $parameters = new ParameterBag($originalParameters);
+        $this->datagridParametersHelper->resetFilter($parameters, $filterName);
+
+        self::assertEquals(new ParameterBag($expectedParameters), $parameters);
+    }
+
+    /**
+     * @return array
+     */
+    public function filterParametersDataProvider(): array
+    {
+        return [
+            'check that filter value is removed from root param' => [
+                'filterName' => 'some_filter',
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => []
+                ]
+            ],
+            'check that filter value is removed from minified param' => [
+                'filterName' => 'some_filter',
+                'originalParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => []
+                    ]
+                ]
+            ],
+            'check that parameters are not changed if no such filter' => [
+                'filterName' => 'some_other_filter',
+                'originalParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ],
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ],
+                'expectedParameters' => [
+                    AbstractFilterExtension::FILTER_ROOT_PARAM => [
+                        'some_filter' => ['some' => 'data']
+                    ],
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        AbstractFilterExtension::MINIFIED_FILTER_PARAM => [
+                            'some_filter' => ['some' => 'data']
+                        ]
+                    ]
+                ]
+            ]
         ];
     }
 }

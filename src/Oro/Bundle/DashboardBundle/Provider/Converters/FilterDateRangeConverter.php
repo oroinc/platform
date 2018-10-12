@@ -11,6 +11,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
+/**
+ * Converts a date range configuration of a dashboard widget
+ * to a representation that can be used to filter data and vise versa.
+ */
 class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {
     const MIN_DATE = '1900-01-01';
@@ -24,7 +28,10 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var DateHelper */
+    /**
+     * @var DateHelper
+     * @deprecated will be removed in 3.0
+     */
     protected $dateHelper;
 
     /** @var array */
@@ -109,6 +116,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             }
             if ($end) {
                 $end->setTime(23, 59, 59);
+                $end->setTime(0, 0, 0)->modify('1 day');
             }
             if ($start) {
                 $start->setTime(0, 0, 0);
@@ -128,7 +136,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             $prevEnd = clone $end;
             $prevEnd->sub($diff);
             $prevStart->setTime(0, 0, 0);
-            $prevEnd->setTime(23, 59, 59);
+            $prevEnd->setTime(0, 0, 0)->modify('1 day');
 
             $dateData['prev_start'] = $prevStart;
             $dateData['prev_end']   = $prevEnd;
@@ -244,7 +252,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $end->modify($modify);
             }
             $start->setTime(0, 0, 0);
-            $end->setTime(23, 59, 59);
+            $end->setTime(0, 0, 0)->modify('1 day');
             if ($cretePreviousPeriod) {
                 $prevStart  = clone $start;
                 $prevModify = static::$valueTypesStartVarsMap[$value['type']]['modify_previous_start'];
@@ -256,7 +264,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                     $prevEnd->modify($modify);
                 }
                 $prevStart->setTime(0, 0, 0);
-                $prevEnd->setTime(23, 59, 59);
+                $prevEnd->setTime(0, 0, 0)->modify('1 day');
             }
         }
         if ($value['type'] === AbstractDateFilterType::TYPE_ALL_TIME) {
