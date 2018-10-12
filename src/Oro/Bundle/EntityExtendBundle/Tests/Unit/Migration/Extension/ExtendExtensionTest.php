@@ -44,17 +44,6 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
                 ->getMock();
 
         $this->entityMetadataHelper->expects($this->any())
-            ->method('getEntityClassByTableName')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
-                        ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
-                        ['oro_enum_test_enum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum'],
-                    ]
-                )
-            );
-        $this->entityMetadataHelper->expects($this->any())
             ->method('getEntityClassesByTableName')
             ->will(
                 $this->returnValueMap(
