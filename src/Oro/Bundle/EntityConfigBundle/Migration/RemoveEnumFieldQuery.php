@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
-class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
+abstract class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
 {
     /** @var string  */
     protected $entityClass = '';
@@ -97,8 +97,9 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     protected function updateEntityData(LoggerInterface $logger, $enumClass, $data)
     {
         $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $relationType = $this->getRelationType();
 
-        $extendKey = sprintf('manyToOne|%s|%s|%s', $this->entityClass, $enumClass, $this->enumField);
+        $extendKey = sprintf($relationType . '|%s|%s|%s', $this->entityClass, $enumClass, $this->enumField);
         if (isset($data['extend']['relation'][$extendKey])) {
             unset($data['extend']['relation'][$extendKey]);
         }
@@ -135,4 +136,10 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     {
         return 'Remove outdated '. $this->enumField .' enum field data';
     }
+
+    /**
+     * Returns the type of the relation, for example manyToMany, or manyToOne
+     * @return string
+     */
+    abstract public function getRelationType();
 }
