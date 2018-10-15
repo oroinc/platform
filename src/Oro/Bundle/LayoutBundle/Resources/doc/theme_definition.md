@@ -36,7 +36,7 @@ label:  ~ # this is a "hidden" theme
 groups: [ main ]
 
 # src/Acme/Bundle/DemoBundle/Resources/views/layouts/oro/theme.yml
-# Default layout theme for the OroPlatform
+# Default layout theme for OroPlatform
 label:  Oro Theme
 icon:   bundles/oroui/themes/oro/images/favicon.ico
 parent: base

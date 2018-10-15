@@ -130,7 +130,7 @@ performance of each request, because all of these services need to be fetched fr
 To solve this issue the Symfony provides an ability to mark the listeners as lazily loaded. For details see
 [Lazy loading for Event Listeners](https://symfony.com/doc/current/doctrine/event_listeners_subscribers.html#lazy-loading-for-event-listeners).
 But it is easy to forget about this, especially in a big project with a lot of listeners. This is the reason why in
-the OroPlatform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
+OroPlatform all the listeners are marked as lazily loaded. But if needed, you can remove the lazy loading
 for your listeners by adding `lazy: false` to `doctrine.event_listener` or `doctrine.orm.entity_listener` tags. E.g.:
 
 ```yaml
