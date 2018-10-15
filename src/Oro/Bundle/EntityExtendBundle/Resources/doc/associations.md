@@ -68,7 +68,7 @@ Pros and cons of both approaches:
 
     Pros:
 
-     - Associations provide a common and well tested approach in the Oro Platform to add relations between entities when types of target entities are unknown in design stage or when you need unified access to relations to different entities.
+     - Associations provide a common and well tested approach in the OroPlatform to add relations between entities when types of target entities are unknown in design stage or when you need unified access to relations to different entities.
      - It is easy to add other types of owners from any external bundle or even by an administrator using the entity management UI.
 
     Cons:
@@ -346,7 +346,7 @@ class NoteExtension implements ExtendExtensionAwareInterface
 Configure many-to-many associations
 -----------------------------------
 
-In this section we will use the [Oro ActivityBundle](../../../ActivityBundle/README.md) and the Oro [Email](../../../EmailBundle/Entity/Email.php) entity, which is one of activity entities provided by the Oro Platform, as an example of configuration of a many-to-many association. An activity association has two important features:
+In this section we will use the [Oro ActivityBundle](../../../ActivityBundle/README.md) and the Oro [Email](../../../EmailBundle/Entity/Email.php) entity, which is one of activity entities provided by the OroPlatform, as an example of configuration of a many-to-many association. An activity association has two important features:
 
  - the owning side of this association can be any entity marked as an activity (it means that an entity is included in *activity* group).
  - it is "named" association. It means that the association name is included in names of Doctrine relations as well as in names of generated helper methods.

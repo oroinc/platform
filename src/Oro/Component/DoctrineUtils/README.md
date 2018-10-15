@@ -4,7 +4,7 @@
 
 ## QueryHintResolver class
 
-The [QueryHintResolver](./ORM/QueryHintResolver.php) can be used to make [Doctrine query hints](https://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html#query-hints) more flexible. An example you can find in ORO Platform.
+The [QueryHintResolver](./ORM/QueryHintResolver.php) can be used to make [Doctrine query hints](https://doctrine-orm.readthedocs.org/en/latest/reference/dql-doctrine-query-language.html#query-hints) more flexible. An example you can find in OroPlatform.
 
 Here are desctiption of the class methods:
 
