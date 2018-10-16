@@ -34,15 +34,20 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
         $attribute = 'grouping_used';
         $style = 'decimal';
         $locale = 'fr_CA';
+        $attributes = ['decimal_digits' => 4];
         $expectedResult = 1;
 
         $this->formatter->expects($this->once())->method('getAttribute')
-            ->with($attribute, $style, $locale)
+            ->with($attribute, $style, $locale, $attributes)
             ->will($this->returnValue($expectedResult));
 
         $this->assertEquals(
             $expectedResult,
-            self::callTwigFunction($this->extension, 'oro_locale_number_attribute', [$attribute, $style, $locale])
+            self::callTwigFunction(
+                $this->extension,
+                'oro_locale_number_attribute',
+                [$attribute, $style, $locale, $attributes]
+            )
         );
     }
 
